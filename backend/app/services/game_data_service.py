@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 from pydantic import BaseModel, ValidationError
 
@@ -20,7 +20,7 @@ T = TypeVar("T", bound=BaseModel)
 class GameDataValidationError(Exception):
     """JSON 數據驗證錯誤."""
 
-    def __init__(self, file_path: str, errors: list[dict]) -> None:
+    def __init__(self, file_path: str, errors: list[dict[str, Any]]) -> None:
         self.file_path = file_path
         self.errors = errors
         super().__init__(f"Validation failed for {file_path}: {errors}")
@@ -57,7 +57,8 @@ class GameDataService:
             raise FileNotFoundError(f"Data file not found: {file_path}")
 
         with file_path.open("r", encoding="utf-8") as f:
-            return json.load(f)
+            data: dict[str, Any] = json.load(f)
+            return data
 
     def _validate_and_load(self, filename: str, schema_class: type[T]) -> T:
         """載入並驗證 JSON 數據.
@@ -79,12 +80,12 @@ class GameDataService:
         except ValidationError as e:
             raise GameDataValidationError(
                 file_path=str(self.data_dir / filename),
-                errors=e.errors(),
+                errors=cast(list[dict[str, Any]], e.errors()),
             ) from e
 
     def validate_json_file(
-        self, filename: str, schema_class: type[T]
-    ) -> tuple[bool, list[dict]]:
+        self, filename: str, schema_class: type[BaseModel]
+    ) -> tuple[bool, list[dict[str, Any]]]:
         """驗證 JSON 檔案是否符合 Schema.
 
         Args:
@@ -101,15 +102,15 @@ class GameDataService:
         except FileNotFoundError as e:
             return False, [{"type": "file_not_found", "msg": str(e)}]
         except ValidationError as e:
-            return False, e.errors()
+            return False, cast(list[dict[str, Any]], e.errors())
 
-    def validate_all(self) -> dict[str, tuple[bool, list[dict]]]:
+    def validate_all(self) -> dict[str, tuple[bool, list[dict[str, Any]]]]:
         """驗證所有數據檔案.
 
         Returns:
             {filename: (is_valid, errors)} 字典
         """
-        validations = {
+        validations: dict[str, type[BaseModel]] = {
             "buildings.json": BuildingData,
             "troops.json": TroopData,
             "resources.json": ResourceFieldData,
@@ -117,7 +118,7 @@ class GameDataService:
             "artefacts.json": ArtefactData,
         }
 
-        results = {}
+        results: dict[str, tuple[bool, list[dict[str, Any]]]] = {}
         for filename, schema_class in validations.items():
             results[filename] = self.validate_json_file(filename, schema_class)
 
