@@ -1,0 +1,41 @@
+project:
+  name: travian-tools
+  type: web-app
+tech_stack:
+  backend:
+    language: python
+    framework: fastapi
+    orm: sqlalchemy
+    architecture: clean
+  frontend:
+    language: typescript
+    framework: react
+    ui_framework:
+      default: shadcn
+    styling: css-modules
+    package_manager: pnpm
+  database:
+    type: mysql
+    version: '16'
+  infrastructure:
+    cloud: gcp
+    ci_cd: null
+    iac: null
+team:
+  test_coverage: 80
+  e2e_required: true
+  e2e_framework: playwright
+  git_workflow: github-flow
+  commit_convention: conventional
+  review_required: true
+  review_agents:
+    - security
+    - test
+    - quality
+    - pm
+design:
+  enabled: true
+paths:
+  prd: docs/PRD.md
+  tickets: docs/TICKETS.md
+  designs: docs/designs/

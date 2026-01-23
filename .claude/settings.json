@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Edit",
+      "Write",
+      "Read"
+    ],
+    "ask": [
+      "Bash(sudo *)",
+      "Bash(*DROP DATABASE*)",
+      "Bash(*DROP TABLE*)",
+      "Bash(*TRUNCATE TABLE*)",
+      "Bash(*DELETE FROM users*)",
+      "Bash(*DELETE FROM organizations*)",
+      "Bash(*DELETE FROM sessions*)",
+      "Bash(*git push --force*)",
+      "Bash(*git push -f*)"
+    ],
+    "deny": [
+      "Bash(sudo rm -rf /)",
+      "Bash(sudo rm -rf ~*)"
+    ]
+  },
+  "enabledPlugins": {
+    "ralph-loop@claude-plugins-official": true
+  }
+}
