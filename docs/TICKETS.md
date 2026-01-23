@@ -30,13 +30,13 @@
 | Phase | 名稱 | 狀態 | 完成 |
 | ----- | ---- | ---- | ---- |
 | Phase 0 | 專案準備 | ✅ 完成 | 3/3 |
-| Phase 1 | 核心數據 + 基礎計算器 | 🔵 進行中 | 4/12 |
+| Phase 1 | 核心數據 + 基礎計算器 | 🔵 進行中 | 5/12 |
 | Phase 2 | 數據抓取 + 用戶系統 | ⚪ 未開始 | 0/8 |
 | Phase 3 | AI 策略引擎 | ⚪ 未開始 | 0/6 |
 | Phase 4 | 半自動執行 | ⚪ 未開始 | 0/5 |
 | Phase 5 | 進階功能 | ⚪ 未開始 | 0/6 |
 
-**總計**: 7/40 Tickets 完成
+**總計**: 8/40 Tickets 完成
 
 ---
 
@@ -284,27 +284,42 @@
 
 ---
 
-### TICKET-105: 兵種數據查詢 API
+### TICKET-105: 兵種數據查詢 API ✅
 
 **類型**: Backend
+
+**狀態**: ✅ 完成
 
 **描述**: 實作兵種數據查詢 REST API
 
 **驗收條件**:
 
-- [ ] `GET /api/v1/troops` - 取得所有兵種列表
-- [ ] `GET /api/v1/troops/{tribe}` - 取得特定種族兵種
-- [ ] `GET /api/v1/troops/{tribe}/{troop_id}` - 取得單一兵種資料
-- [ ] `GET /api/v1/troops/compare` - 兵種比較功能
-- [ ] 支援性價比計算欄位
-- [ ] 回應時間 < 200ms
-- [ ] 單元測試覆蓋率 > 80%
+- [x] `GET /api/v1/troops` - 取得所有兵種列表
+- [x] `GET /api/v1/troops/{tribe}` - 取得特定種族兵種
+- [x] `GET /api/v1/troops/{tribe}/{troop_id}` - 取得單一兵種資料
+- [x] `GET /api/v1/troops/compare` - 兵種比較功能
+- [x] 支援性價比計算欄位
+- [x] 回應時間 < 200ms
+- [x] 單元測試覆蓋率 > 80%
 
 **相關 PRD**: F1.2 兵種數據查詢
 
 **技術規格參考**: PROJECT-REQUIREMENTS.md 11.4 節（API 端點設計）
 
 **依賴**: TICKET-102
+
+**完成日期**: 2026-01-23
+
+**實作摘要**:
+
+- 實作 4 個 API 端點：兵種列表、種族兵種、兵種詳情、兵種比較
+- 支援依種族/類型篩選（tribe, category query parameters）
+- 支援中英文名稱搜尋（search query parameter）
+- 兵種比較功能（2-10 個兵種比較，含最佳攻擊/防禦/速度/效率摘要）
+- 性價比計算欄位：attack_per_crop, defense_per_crop, attack_per_cost
+- 回應時間 < 200ms（測試驗證通過）
+- 18 個單元測試，覆蓋率 98%
+- 檔案位置：`backend/app/api/v1/endpoints/troops.py`
 
 ---
 
