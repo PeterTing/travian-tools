@@ -1,0 +1,111 @@
+{
+  "artefacts": {
+    "trainer_small": {
+      "artefact_id": "trainer_small",
+      "name_zh": "訓練師的小神器",
+      "name_en": "Small Trainer Artifact",
+      "artefact_type": "small",
+      "effect_range": "village",
+      "effects": [
+        {
+          "effect_type": "training_speed",
+          "effect_description_zh": "訓練速度提升",
+          "effect_description_en": "Training speed boost",
+          "effect_value": -25,
+          "effect_unit": "percent"
+        }
+      ],
+      "spawn_day": 100,
+      "spawn_location": "各區域 Natar 村莊",
+      "description_zh": "小型訓練師神器，減少該村莊訓練時間 25%",
+      "description_en": "Small trainer artifact, reduces training time by 25% in this village"
+    },
+    "trainer_large": {
+      "artefact_id": "trainer_large",
+      "name_zh": "訓練師的大神器",
+      "name_en": "Large Trainer Artifact",
+      "artefact_type": "large",
+      "effect_range": "account",
+      "effects": [
+        {
+          "effect_type": "training_speed",
+          "effect_description_zh": "訓練速度提升",
+          "effect_description_en": "Training speed boost",
+          "effect_value": -25,
+          "effect_unit": "percent"
+        }
+      ],
+      "spawn_day": 100,
+      "spawn_location": "灰色區域 Natar 村莊",
+      "description_zh": "大型訓練師神器，減少帳號所有村莊訓練時間 25%",
+      "description_en": "Large trainer artifact, reduces training time by 25% for all villages"
+    },
+    "trainer_unique": {
+      "artefact_id": "trainer_unique",
+      "name_zh": "訓練師的獨特神器",
+      "name_en": "Unique Trainer Artifact",
+      "artefact_type": "unique",
+      "effect_range": "account",
+      "effects": [
+        {
+          "effect_type": "training_speed",
+          "effect_description_zh": "訓練速度提升",
+          "effect_description_en": "Training speed boost",
+          "effect_value": -50,
+          "effect_unit": "percent"
+        }
+      ],
+      "spawn_day": 100,
+      "spawn_location": "世界中心 (0|0) 附近",
+      "description_zh": "獨特訓練師神器，減少帳號所有村莊訓練時間 50%",
+      "description_en": "Unique trainer artifact, reduces training time by 50% for all villages"
+    },
+    "architect_small": {
+      "artefact_id": "architect_small",
+      "name_zh": "建築師的小神器",
+      "name_en": "Small Architect Artifact",
+      "artefact_type": "small",
+      "effect_range": "village",
+      "effects": [
+        {
+          "effect_type": "build_speed",
+          "effect_description_zh": "建造速度提升",
+          "effect_description_en": "Construction speed boost",
+          "effect_value": -25,
+          "effect_unit": "percent"
+        }
+      ],
+      "spawn_day": 100,
+      "spawn_location": "各區域 Natar 村莊",
+      "description_zh": "小型建築師神器，減少該村莊建造時間 25%",
+      "description_en": "Small architect artifact, reduces build time by 25% in this village"
+    },
+    "fool_unique": {
+      "artefact_id": "fool_unique",
+      "name_zh": "愚者的獨特神器",
+      "name_en": "Unique Fool Artifact",
+      "artefact_type": "unique",
+      "effect_range": "account",
+      "effects": [
+        {
+          "effect_type": "great_warehouse",
+          "effect_description_zh": "大倉庫可建造",
+          "effect_description_en": "Great Warehouse can be built",
+          "effect_value": 1,
+          "effect_unit": "multiplier"
+        },
+        {
+          "effect_type": "great_granary",
+          "effect_description_zh": "大糧倉可建造",
+          "effect_description_en": "Great Granary can be built",
+          "effect_value": 1,
+          "effect_unit": "multiplier"
+        }
+      ],
+      "spawn_day": 100,
+      "spawn_location": "世界中心 (0|0) 附近",
+      "description_zh": "愚者獨特神器，允許建造大倉庫和大糧倉",
+      "description_en": "Unique fool artifact, allows building Great Warehouse and Granary"
+    }
+  }
+}

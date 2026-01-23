@@ -29,14 +29,14 @@
 
 | Phase | 名稱 | 狀態 | 完成 |
 | ----- | ---- | ---- | ---- |
-| Phase 0 | 專案準備 | 🔵 進行中 | 2/3 |
+| Phase 0 | 專案準備 | ✅ 完成 | 3/3 |
 | Phase 1 | 核心數據 + 基礎計算器 | ⚪ 未開始 | 0/12 |
 | Phase 2 | 數據抓取 + 用戶系統 | ⚪ 未開始 | 0/8 |
 | Phase 3 | AI 策略引擎 | ⚪ 未開始 | 0/6 |
 | Phase 4 | 半自動執行 | ⚪ 未開始 | 0/5 |
 | Phase 5 | 進階功能 | ⚪ 未開始 | 0/6 |
 
-**總計**: 2/40 Tickets 完成
+**總計**: 3/40 Tickets 完成
 
 ---
 
@@ -108,24 +108,36 @@
 
 ---
 
-### TICKET-003: 靜態數據 JSON Schema 設計
+### TICKET-003: 靜態數據 JSON Schema 設計 ✅
 
 **類型**: Backend
+
+**狀態**: ✅ 完成
 
 **描述**: 設計遊戲靜態數據的 JSON Schema 結構
 
 **驗收條件**:
 
-- [ ] 設計建築數據 Schema (buildings.json)
-- [ ] 設計兵種數據 Schema (troops.json)
-- [ ] 設計資源田數據 Schema (resources.json)
-- [ ] 設計綠洲數據 Schema (oases.json)
-- [ ] 設計神器數據 Schema (artefacts.json)
-- [ ] 建立 JSON Schema 驗證工具
+- [x] 設計建築數據 Schema (buildings.json)
+- [x] 設計兵種數據 Schema (troops.json)
+- [x] 設計資源田數據 Schema (resources.json)
+- [x] 設計綠洲數據 Schema (oases.json)
+- [x] 設計神器數據 Schema (artefacts.json)
+- [x] 建立 JSON Schema 驗證工具
 
 **相關 PRD**: F1. 遊戲數據庫系統
 
 **技術規格參考**: PROJECT-REQUIREMENTS.md 第二章（核心數據結構）
+
+**完成日期**: 2026-01-23
+
+**實作摘要**:
+
+- Pydantic Schemas: Building, Troop, ResourceField, Oasis, Artefact
+- 驗證工具: GameDataService (惰性載入、驗證、重載)
+- 範例數據: buildings.json, troops.json, resources.json, oases.json, artefacts.json
+- 單元測試: 31 tests, 88% coverage
+- 檔案位置: `backend/app/domain/schemas/game_data/`
 
 ---
 
@@ -1045,3 +1057,4 @@
 | ---- | ---- | -------- |
 | 1.0 | 2026-01-22 | 初版建立，從 PRD 拆分 40 個 Tickets |
 | 1.1 | 2026-01-23 | TICKET-002 完成 - 資料庫 Schema 設計 |
+| 1.2 | 2026-01-23 | TICKET-003 完成 - 靜態數據 JSON Schema 設計，Phase 0 完成 |

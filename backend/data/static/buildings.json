@@ -1,0 +1,127 @@
+{
+  "buildings": {
+    "barracks": {
+      "building_id": "barracks",
+      "name_zh": "兵營",
+      "name_en": "Barracks",
+      "category": "military",
+      "max_level": 20,
+      "description_zh": "訓練步兵的建築",
+      "description_en": "Building for training infantry",
+      "prerequisites": [
+        {"building_id": "main_building", "level": 3},
+        {"building_id": "rally_point", "level": 1}
+      ],
+      "levels": [
+        {
+          "level": 1,
+          "cost_wood": 210,
+          "cost_clay": 140,
+          "cost_iron": 260,
+          "cost_crop": 120,
+          "build_time_base": 1020,
+          "population": 4,
+          "culture_points": 1,
+          "effect_value": 0.95,
+          "effect_description": "訓練時間 -5%"
+        },
+        {
+          "level": 2,
+          "cost_wood": 270,
+          "cost_clay": 180,
+          "cost_iron": 335,
+          "cost_crop": 155,
+          "build_time_base": 1360,
+          "population": 2,
+          "culture_points": 1,
+          "effect_value": 0.90,
+          "effect_description": "訓練時間 -10%"
+        },
+        {
+          "level": 3,
+          "cost_wood": 345,
+          "cost_clay": 230,
+          "cost_iron": 425,
+          "cost_crop": 195,
+          "build_time_base": 1760,
+          "population": 2,
+          "culture_points": 2,
+          "effect_value": 0.85,
+          "effect_description": "訓練時間 -15%"
+        }
+      ]
+    },
+    "main_building": {
+      "building_id": "main_building",
+      "name_zh": "本部",
+      "name_en": "Main Building",
+      "category": "infrastructure",
+      "max_level": 20,
+      "description_zh": "村莊的行政中心，可加快建造速度",
+      "description_en": "Administrative center that speeds up construction",
+      "prerequisites": [],
+      "levels": [
+        {
+          "level": 1,
+          "cost_wood": 70,
+          "cost_clay": 40,
+          "cost_iron": 60,
+          "cost_crop": 20,
+          "build_time_base": 1020,
+          "population": 2,
+          "culture_points": 2,
+          "effect_value": 1.0,
+          "effect_description": "建造時間基準"
+        },
+        {
+          "level": 2,
+          "cost_wood": 90,
+          "cost_clay": 50,
+          "cost_iron": 75,
+          "cost_crop": 25,
+          "build_time_base": 1360,
+          "population": 1,
+          "culture_points": 2,
+          "effect_value": 0.96,
+          "effect_description": "建造時間 -4%"
+        },
+        {
+          "level": 3,
+          "cost_wood": 115,
+          "cost_clay": 65,
+          "cost_iron": 100,
+          "cost_crop": 35,
+          "build_time_base": 1760,
+          "population": 1,
+          "culture_points": 2,
+          "effect_value": 0.92,
+          "effect_description": "建造時間 -8%"
+        }
+      ]
+    },
+    "rally_point": {
+      "building_id": "rally_point",
+      "name_zh": "集結點",
+      "name_en": "Rally Point",
+      "category": "military",
+      "max_level": 20,
+      "description_zh": "軍隊集結地點",
+      "description_en": "Where troops gather",
+      "prerequisites": [],
+      "levels": [
+        {
+          "level": 1,
+          "cost_wood": 110,
+          "cost_clay": 160,
+          "cost_iron": 90,
+          "cost_crop": 70,
+          "build_time_base": 1020,
+          "population": 1,
+          "culture_points": 1,
+          "effect_value": null,
+          "effect_description": null
+        }
+      ]
+    }
+  }
+}

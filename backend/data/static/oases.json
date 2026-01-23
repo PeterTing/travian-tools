@@ -1,0 +1,112 @@
+{
+  "oases": {
+    "wood_25": {
+      "oasis_id": "wood_25",
+      "oasis_type": "single",
+      "bonuses": [
+        {"resource_type": "wood", "bonus_percentage": 25}
+      ],
+      "beast_spawns": [
+        {"beast_id": "wolf", "min_count": 3, "max_count": 8}
+      ],
+      "description_zh": "木材綠洲 25%",
+      "description_en": "Wood oasis 25%"
+    },
+    "wood_50": {
+      "oasis_id": "wood_50",
+      "oasis_type": "single",
+      "bonuses": [
+        {"resource_type": "wood", "bonus_percentage": 50}
+      ],
+      "beast_spawns": [
+        {"beast_id": "wolf", "min_count": 5, "max_count": 15},
+        {"beast_id": "bear", "min_count": 2, "max_count": 5}
+      ],
+      "description_zh": "木材綠洲 50%",
+      "description_en": "Wood oasis 50%"
+    },
+    "crop_25": {
+      "oasis_id": "crop_25",
+      "oasis_type": "single",
+      "bonuses": [
+        {"resource_type": "crop", "bonus_percentage": 25}
+      ],
+      "beast_spawns": [
+        {"beast_id": "rat", "min_count": 5, "max_count": 10}
+      ],
+      "description_zh": "糧食綠洲 25%",
+      "description_en": "Crop oasis 25%"
+    },
+    "wood_clay_25": {
+      "oasis_id": "wood_clay_25",
+      "oasis_type": "double",
+      "bonuses": [
+        {"resource_type": "wood", "bonus_percentage": 25},
+        {"resource_type": "clay", "bonus_percentage": 25}
+      ],
+      "beast_spawns": [
+        {"beast_id": "wolf", "min_count": 3, "max_count": 8},
+        {"beast_id": "snake", "min_count": 2, "max_count": 6}
+      ],
+      "description_zh": "木材/磚塊雙綠洲",
+      "description_en": "Wood/Clay double oasis"
+    }
+  },
+  "beasts": {
+    "rat": {
+      "beast_id": "rat",
+      "name_zh": "老鼠",
+      "name_en": "Rat",
+      "attack": 10,
+      "defense_infantry": 25,
+      "defense_cavalry": 20,
+      "resource_drop_min": 2,
+      "resource_drop_max": 4,
+      "hero_experience": 1
+    },
+    "spider": {
+      "beast_id": "spider",
+      "name_zh": "蜘蛛",
+      "name_en": "Spider",
+      "attack": 20,
+      "defense_infantry": 35,
+      "defense_cavalry": 40,
+      "resource_drop_min": 2,
+      "resource_drop_max": 4,
+      "hero_experience": 2
+    },
+    "snake": {
+      "beast_id": "snake",
+      "name_zh": "蛇",
+      "name_en": "Snake",
+      "attack": 60,
+      "defense_infantry": 40,
+      "defense_cavalry": 60,
+      "resource_drop_min": 3,
+      "resource_drop_max": 5,
+      "hero_experience": 3
+    },
+    "wolf": {
+      "beast_id": "wolf",
+      "name_zh": "狼",
+      "name_en": "Wolf",
+      "attack": 100,
+      "defense_infantry": 80,
+      "defense_cavalry": 70,
+      "resource_drop_min": 5,
+      "resource_drop_max": 10,
+      "hero_experience": 5
+    },
+    "bear": {
+      "beast_id": "bear",
+      "name_zh": "熊",
+      "name_en": "Bear",
+      "attack": 250,
+      "defense_infantry": 120,
+      "defense_cavalry": 150,
+      "resource_drop_min": 8,
+      "resource_drop_max": 15,
+      "hero_experience": 10
+    }
+  }
+}

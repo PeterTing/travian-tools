@@ -1,0 +1,161 @@
+{
+  "resource_fields": {
+    "wood": {
+      "resource_type": "wood",
+      "name_zh": "伐木場",
+      "name_en": "Woodcutter",
+      "max_level": 10,
+      "max_level_capital": 20,
+      "levels": [
+        {
+          "level": 0,
+          "production_per_hour": 2,
+          "cost_wood": 0,
+          "cost_clay": 0,
+          "cost_iron": 0,
+          "cost_crop": 0,
+          "build_time_base": 0,
+          "population": 0,
+          "culture_points": 0
+        },
+        {
+          "level": 1,
+          "production_per_hour": 5,
+          "cost_wood": 40,
+          "cost_clay": 100,
+          "cost_iron": 50,
+          "cost_crop": 60,
+          "build_time_base": 260,
+          "population": 2,
+          "culture_points": 1
+        },
+        {
+          "level": 2,
+          "production_per_hour": 9,
+          "cost_wood": 65,
+          "cost_clay": 165,
+          "cost_iron": 85,
+          "cost_crop": 100,
+          "build_time_base": 620,
+          "population": 1,
+          "culture_points": 1
+        },
+        {
+          "level": 3,
+          "production_per_hour": 15,
+          "cost_wood": 110,
+          "cost_clay": 280,
+          "cost_iron": 140,
+          "cost_crop": 165,
+          "build_time_base": 1190,
+          "population": 1,
+          "culture_points": 2
+        }
+      ]
+    },
+    "clay": {
+      "resource_type": "clay",
+      "name_zh": "黏土坑",
+      "name_en": "Clay Pit",
+      "max_level": 10,
+      "max_level_capital": 20,
+      "levels": [
+        {
+          "level": 0,
+          "production_per_hour": 2,
+          "cost_wood": 0,
+          "cost_clay": 0,
+          "cost_iron": 0,
+          "cost_crop": 0,
+          "build_time_base": 0,
+          "population": 0,
+          "culture_points": 0
+        },
+        {
+          "level": 1,
+          "production_per_hour": 5,
+          "cost_wood": 80,
+          "cost_clay": 40,
+          "cost_iron": 80,
+          "cost_crop": 50,
+          "build_time_base": 220,
+          "population": 2,
+          "culture_points": 1
+        },
+        {
+          "level": 2,
+          "production_per_hour": 9,
+          "cost_wood": 135,
+          "cost_clay": 65,
+          "cost_iron": 135,
+          "cost_crop": 85,
+          "build_time_base": 550,
+          "population": 1,
+          "culture_points": 1
+        }
+      ]
+    },
+    "iron": {
+      "resource_type": "iron",
+      "name_zh": "鐵礦場",
+      "name_en": "Iron Mine",
+      "max_level": 10,
+      "max_level_capital": 20,
+      "levels": [
+        {
+          "level": 0,
+          "production_per_hour": 2,
+          "cost_wood": 0,
+          "cost_clay": 0,
+          "cost_iron": 0,
+          "cost_crop": 0,
+          "build_time_base": 0,
+          "population": 0,
+          "culture_points": 0
+        },
+        {
+          "level": 1,
+          "production_per_hour": 5,
+          "cost_wood": 100,
+          "cost_clay": 80,
+          "cost_iron": 30,
+          "cost_crop": 60,
+          "build_time_base": 450,
+          "population": 2,
+          "culture_points": 1
+        }
+      ]
+    },
+    "crop": {
+      "resource_type": "crop",
+      "name_zh": "農田",
+      "name_en": "Cropland",
+      "max_level": 10,
+      "max_level_capital": 20,
+      "levels": [
+        {
+          "level": 0,
+          "production_per_hour": 2,
+          "cost_wood": 0,
+          "cost_clay": 0,
+          "cost_iron": 0,
+          "cost_crop": 0,
+          "build_time_base": 0,
+          "population": 0,
+          "culture_points": 0
+        },
+        {
+          "level": 1,
+          "production_per_hour": 5,
+          "cost_wood": 70,
+          "cost_clay": 90,
+          "cost_iron": 70,
+          "cost_crop": 20,
+          "build_time_base": 150,
+          "population": 0,
+          "culture_points": 1
+        }
+      ]
+    }
+  }
+}
