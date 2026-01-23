@@ -24,8 +24,15 @@ class Settings(BaseSettings):
     # 資料庫設定 - 必須從環境變數設定，無預設值
     DATABASE_URL: str
 
-    # CORS 設定 - 生產環境應明確設定
-    CORS_ORIGINS: list[str] = []
+    # CORS 設定 - 生產環境應明確設定 (以逗號分隔的字串)
+    CORS_ORIGINS: str = ""
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        """取得 CORS origins 列表."""
+        if not self.CORS_ORIGINS:
+            return []
+        return [i.strip() for i in self.CORS_ORIGINS.split(",") if i.strip()]
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
@@ -34,16 +41,6 @@ class Settings(BaseSettings):
         if not v or v == "":
             raise ValueError("DATABASE_URL must be set via environment variable")
         return v
-
-    @field_validator("CORS_ORIGINS", mode="before")
-    @classmethod
-    def assemble_cors_origins(cls, v: str | list[str]) -> list[str]:
-        """解析 CORS origins."""
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",") if i.strip()]
-        elif isinstance(v, list):
-            return v
-        raise ValueError(v)
 
 
 @lru_cache

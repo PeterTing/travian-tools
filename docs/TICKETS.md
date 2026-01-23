@@ -29,14 +29,14 @@
 
 | Phase | 名稱 | 狀態 | 完成 |
 | ----- | ---- | ---- | ---- |
-| Phase 0 | 專案準備 | 🔵 進行中 | 1/3 |
+| Phase 0 | 專案準備 | 🔵 進行中 | 2/3 |
 | Phase 1 | 核心數據 + 基礎計算器 | ⚪ 未開始 | 0/12 |
 | Phase 2 | 數據抓取 + 用戶系統 | ⚪ 未開始 | 0/8 |
 | Phase 3 | AI 策略引擎 | ⚪ 未開始 | 0/6 |
 | Phase 4 | 半自動執行 | ⚪ 未開始 | 0/5 |
 | Phase 5 | 進階功能 | ⚪ 未開始 | 0/6 |
 
-**總計**: 1/40 Tickets 完成
+**總計**: 2/40 Tickets 完成
 
 ---
 
@@ -73,26 +73,38 @@
 
 ---
 
-### TICKET-002: 資料庫 Schema 設計
+### TICKET-002: 資料庫 Schema 設計 ✅
 
 **類型**: Backend
+
+**狀態**: ✅ 完成
 
 **描述**: 設計並實作 MySQL 資料庫 Schema
 
 **驗收條件**:
 
-- [ ] 設計用戶資料表 (users)
-- [ ] 設計遊戲帳號資料表 (game_accounts)
-- [ ] 設計村莊資料表 (villages)
-- [ ] 設計建築實例資料表 (building_instances)
-- [ ] 設計部隊實例資料表 (troop_instances)
-- [ ] 設計戰鬥報告資料表 (battle_reports)
-- [ ] 建立 SQLAlchemy ORM Models
-- [ ] 建立資料庫遷移腳本
+- [x] 設計用戶資料表 (users)
+- [x] 設計遊戲帳號資料表 (game_accounts)
+- [x] 設計村莊資料表 (villages)
+- [x] 設計建築實例資料表 (building_instances)
+- [x] 設計部隊實例資料表 (troop_instances)
+- [x] 設計戰鬥報告資料表 (battle_reports)
+- [x] 建立 SQLAlchemy ORM Models
+- [x] 建立資料庫遷移腳本
 
 **相關 PRD**: 4.1 技術棧
 
 **技術規格參考**: PROJECT-REQUIREMENTS.md 11.3 節（資料庫設計）
+
+**完成日期**: 2026-01-23
+
+**實作摘要**:
+
+- ORM Models: User, GameAccount, Village, BuildingInstance, TroopInstance, BattleReport
+- Enums: TribeType (7 種族), VillageRole, VillageType, TroopLocation, ReportType, BattleResult
+- Alembic migration: 001_create_initial_tables.py
+- 單元測試: 19 tests, 82% coverage
+- 檔案位置: `backend/app/infrastructure/database/models/`
 
 ---
 
@@ -1032,3 +1044,4 @@
 | 版本 | 日期 | 變更內容 |
 | ---- | ---- | -------- |
 | 1.0 | 2026-01-22 | 初版建立，從 PRD 拆分 40 個 Tickets |
+| 1.1 | 2026-01-23 | TICKET-002 完成 - 資料庫 Schema 設計 |

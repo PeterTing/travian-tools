@@ -8,6 +8,16 @@ from alembic import context
 from app.core.config import settings
 from app.infrastructure.database.base import Base
 
+# Import all models for autogenerate support
+from app.infrastructure.database.models import (  # noqa: F401
+    BattleReport,
+    BuildingInstance,
+    GameAccount,
+    TroopInstance,
+    User,
+    Village,
+)
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
