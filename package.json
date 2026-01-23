@@ -1,0 +1,41 @@
+{
+  "name": "travian-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Travian: Legends 助手系統",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build": "pnpm -r build",
+    "build:frontend": "pnpm --filter frontend build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "clean": "pnpm -r clean",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "travian",
+    "game-tools",
+    "calculator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  },
+  "lint-staged": {
+    "frontend/src/**/*.{ts,tsx}": [
+      "pnpm --filter frontend exec eslint --fix --max-warnings 0"
+    ],
+    "backend/**/*.py": [
+      "python3 -m ruff check --fix",
+      "python3 -m ruff format"
+    ]
+  }
+}

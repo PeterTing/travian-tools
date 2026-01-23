@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.venv/
+venv/
+ENV/
+env/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml
+
+# IDE
+.idea/
+.vscode/
+
+# Environment
+.env
+
+# MyPy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Temporary
+tmp/
+*.tmp

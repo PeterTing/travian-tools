@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: travian-tools-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-travian_tools}
+      MYSQL_USER: ${MYSQL_USER:-travian}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - travian-network
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: travian-tools-backend
+    restart: always
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DEBUG=false
+      - CORS_ORIGINS=${CORS_ORIGINS}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - travian-network
+
+  # React Frontend (Production with Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: travian-tools-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - travian-network
+
+volumes:
+  mysql_data:
+
+networks:
+  travian-network:
+    driver: bridge

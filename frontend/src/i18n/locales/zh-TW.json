@@ -1,0 +1,26 @@
+{
+  "common": {
+    "comingSoon": "即將推出",
+    "backToHome": "返回首頁"
+  },
+  "home": {
+    "title": "Travian Tools",
+    "subtitle": "Travian: Legends 遊戲助手系統",
+    "troopCalculator": {
+      "title": "兵種計算器",
+      "description": "計算各部落兵種的訓練時間、資源消耗和攻防數值"
+    },
+    "resourcePlanner": {
+      "title": "資源規劃",
+      "description": "規劃村莊資源生產和建築升級順序"
+    },
+    "battleSimulator": {
+      "title": "戰鬥模擬",
+      "description": "模擬攻擊和防守的戰鬥結果"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "message": "找不到您要尋找的頁面"
+  }
+}

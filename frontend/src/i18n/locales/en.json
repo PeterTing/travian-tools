@@ -1,0 +1,26 @@
+{
+  "common": {
+    "comingSoon": "Coming Soon",
+    "backToHome": "Back to Home"
+  },
+  "home": {
+    "title": "Travian Tools",
+    "subtitle": "Travian: Legends Game Assistant System",
+    "troopCalculator": {
+      "title": "Troop Calculator",
+      "description": "Calculate training time, resource costs and combat values for each tribe's troops"
+    },
+    "resourcePlanner": {
+      "title": "Resource Planner",
+      "description": "Plan village resource production and building upgrade order"
+    },
+    "battleSimulator": {
+      "title": "Battle Simulator",
+      "description": "Simulate attack and defense battle results"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "message": "The page you are looking for could not be found"
+  }
+}
