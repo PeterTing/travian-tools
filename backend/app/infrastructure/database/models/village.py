@@ -13,6 +13,7 @@ from app.infrastructure.database.base import Base
 if TYPE_CHECKING:
     from app.infrastructure.database.models.building_instance import BuildingInstance
     from app.infrastructure.database.models.game_account import GameAccount
+    from app.infrastructure.database.models.sync_log import SyncLog
     from app.infrastructure.database.models.troop_instance import TroopInstance
 
 
@@ -91,6 +92,11 @@ class Village(Base):
     )
     troop_instances: Mapped[list["TroopInstance"]] = relationship(
         "TroopInstance",
+        back_populates="village",
+        cascade="all, delete-orphan",
+    )
+    sync_logs: Mapped[list["SyncLog"]] = relationship(
+        "SyncLog",
         back_populates="village",
         cascade="all, delete-orphan",
     )

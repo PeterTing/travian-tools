@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     map_sql,
     resources,
     sync,
+    sync_logs,
     tribes,
     troops,
     villages,
@@ -27,3 +28,4 @@ router.include_router(buildings.router, prefix="/buildings", tags=["buildings"])
 router.include_router(troops.router, prefix="/troops", tags=["troops"])
 router.include_router(resources.router, prefix="/resources", tags=["resources"])
 router.include_router(map_sql.router)
+router.include_router(sync_logs.router)

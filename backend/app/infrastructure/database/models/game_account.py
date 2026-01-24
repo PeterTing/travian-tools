@@ -12,6 +12,7 @@ from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
     from app.infrastructure.database.models.battle_report import BattleReport
+    from app.infrastructure.database.models.sync_log import SyncLog
     from app.infrastructure.database.models.user import User
     from app.infrastructure.database.models.village import Village
 
@@ -77,6 +78,11 @@ class GameAccount(Base):
     battle_reports: Mapped[list["BattleReport"]] = relationship(
         "BattleReport",
         back_populates="game_account",
+        cascade="all, delete-orphan",
+    )
+    sync_logs: Mapped[list["SyncLog"]] = relationship(
+        "SyncLog",
+        back_populates="account",
         cascade="all, delete-orphan",
     )
 
