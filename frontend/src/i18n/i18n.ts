@@ -27,6 +27,10 @@ i18n
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
     },
+    saveMissing: true,
+    missingKeyHandler: (_lngs, _ns, key) => {
+      console.warn(`🌐 Missing i18n key: "${key}"`)
+    },
   })
 
 export default i18n

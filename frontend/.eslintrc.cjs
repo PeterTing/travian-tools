@@ -23,8 +23,18 @@ module.exports = {
           include: ['label', 'placeholder', 'alt', 'title', 'aria-label'],
         },
         words: {
-          exclude: ['Travian'],
+          exclude: [
+            'Travian',
+            // Common formatting characters and symbols
+            'x', 'X', 'vs', '+', '-', '/', '%', ':', '|',
+            // Level indicators
+            'Lv', 'Lv\\.\\d+',
+            // Number formats
+            '\\d+x', '\\d+h', '\\d+m', '\\d+s',
+          ],
         },
+        // Ignore template literal expressions
+        ignoreCallee: ['t', 'i18n.t'],
       },
     ],
   },

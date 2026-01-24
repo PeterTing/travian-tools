@@ -25,6 +25,7 @@ const renderApp = () => {
 describe('App', () => {
   it('renders the home page', () => {
     renderApp()
-    expect(screen.getByText(/Travian Tools/i)).toBeInTheDocument()
+    // 使用 getAllByText 因為有多個 "Travian Tools" 元素（nav 和 h1）
+    expect(screen.getAllByText(/Travian Tools/i).length).toBeGreaterThan(0)
   })
 })

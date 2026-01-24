@@ -37,7 +37,8 @@ class BuildingLevel(BaseModel):
     cost_crop: int = Field(..., ge=0, description="糧食成本")
     build_time_base: int = Field(..., ge=0, description="基礎建造時間（秒，本部 Lv1）")
     population: int = Field(..., ge=0, description="人口增加")
-    culture_points: int = Field(..., ge=0, description="文化點")
+    culture_points: int = Field(..., ge=0, description="文化點（升級時獲得）")
+    cp_per_day: int = Field(0, ge=0, description="每日文化點產出")
     effect_value: float | None = Field(None, description="效果數值")
     effect_description: str | None = Field(None, description="效果描述")
 
