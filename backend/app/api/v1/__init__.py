@@ -7,6 +7,7 @@ from app.api.v1.endpoints import (
     buildings,
     calculator,
     game_accounts,
+    map_sql,
     resources,
     sync,
     tribes,
@@ -25,3 +26,4 @@ router.include_router(calculator.router, prefix="/calculator", tags=["calculator
 router.include_router(buildings.router, prefix="/buildings", tags=["buildings"])
 router.include_router(troops.router, prefix="/troops", tags=["troops"])
 router.include_router(resources.router, prefix="/resources", tags=["resources"])
+router.include_router(map_sql.router)
