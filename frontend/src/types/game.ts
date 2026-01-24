@@ -375,3 +375,75 @@ export interface GameAccountListResponse {
   accounts: GameAccount[]
   total: number
 }
+
+// ============ 村莊類型 ============
+
+export type VillageRole = 'capital' | 'hammer' | 'anvil' | 'resource' | 'mixed' | 'ww'
+export type VillageType = '4-4-4-6' | '3-4-5-6' | '15c' | '9c' | '7c' | '6c'
+
+export interface BuildingInstance {
+  instance_id: string
+  village_id: string
+  building_id: string
+  position: number | null
+  current_level: number
+  is_upgrading: boolean
+  upgrade_finish_time: string | null
+  created_at: string
+}
+
+export interface TroopInstance {
+  instance_id: string
+  village_id: string
+  troop_id: string
+  count: number
+  location: string
+  is_training: boolean
+  training_finish_time: string | null
+  created_at: string
+}
+
+export interface Village {
+  village_id: string
+  account_id: string
+  name: string | null
+  coordinate_x: number | null
+  coordinate_y: number | null
+  population: number
+  village_type: VillageType | null
+  is_capital: boolean
+  role: VillageRole | null
+  last_updated: string | null
+  created_at: string
+}
+
+export interface VillageDetail extends Village {
+  buildings: BuildingInstance[]
+  troops: TroopInstance[]
+}
+
+export interface VillageListResponse {
+  villages: Village[]
+  total: number
+}
+
+export interface VillageCreate {
+  account_id: string
+  name?: string
+  coordinate_x?: number
+  coordinate_y?: number
+  population?: number
+  village_type?: VillageType
+  is_capital?: boolean
+  role?: VillageRole
+}
+
+export interface VillageUpdate {
+  name?: string
+  coordinate_x?: number
+  coordinate_y?: number
+  population?: number
+  village_type?: VillageType
+  is_capital?: boolean
+  role?: VillageRole
+}

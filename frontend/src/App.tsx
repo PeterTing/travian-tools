@@ -17,6 +17,9 @@ import BattleSimulatorPage from '@/pages/calculator/BattleSimulatorPage'
 import CropBalancePage from '@/pages/calculator/CropBalancePage'
 // Game accounts page
 import { GameAccountsPage } from '@/pages/game-accounts'
+// Village pages
+import VillagesPage from '@/pages/villages/VillagesPage'
+import VillageDetailPage from '@/pages/villages/VillageDetailPage'
 import { Button } from '@/components/ui/button'
 
 function Navigation() {
@@ -98,6 +101,11 @@ function Navigation() {
                     {t('gameAccounts.title')}
                   </Button>
                 </Link>
+                <Link to="/villages">
+                  <Button variant="ghost" size="sm">
+                    {t('villages.title')}
+                  </Button>
+                </Link>
                 <span className="text-sm text-muted-foreground">
                   {user?.username}
                 </span>
@@ -144,6 +152,9 @@ function AppContent() {
         <Route path="/calculator/crop" element={<CropBalancePage />} />
         {/* Game accounts route */}
         <Route path="/game-accounts" element={<GameAccountsPage />} />
+        {/* Village routes */}
+        <Route path="/villages" element={<VillagesPage />} />
+        <Route path="/villages/:villageId" element={<VillageDetailPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>
