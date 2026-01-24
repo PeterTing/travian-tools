@@ -38,6 +38,16 @@
   "home": {
     "title": "Travian Tools",
     "subtitle": "Travian: Legends Game Assistant System",
+    "viewNow": "View Now",
+    "features": {
+      "buildings": "View upgrade costs, build times, and effects for all buildings",
+      "troops": "View attack/defense values, training costs, and efficiency for all troops",
+      "resources": "View production and ROI analysis for resource field levels",
+      "buildingCalc": "Calculate resources, time, and culture points for upgrades",
+      "roiCalc": "Calculate return on investment for resource field upgrades",
+      "battleSim": "Simulate battle results and estimate casualties",
+      "cropBalance": "Calculate village crop production and consumption balance"
+    },
     "troopCalculator": {
       "title": "Troop Calculator",
       "description": "Calculate training time, resource costs and combat values for each tribe's troops"
@@ -242,6 +252,40 @@
     "clay": "Clay Pit",
     "iron": "Iron Mine",
     "crop": "Cropland"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "loginDescription": "Sign in to your account to access more features",
+    "registerDescription": "Create a new account to get started",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Enter your password again",
+    "loginButton": "Sign In",
+    "registerButton": "Sign Up",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "registerLink": "Sign up now",
+    "loginLink": "Sign in now",
+    "loginError": "Login failed, please check your email and password",
+    "registerError": "Registration failed, please try again later",
+    "passwordRequirements": "Password must be at least 8 characters with uppercase, lowercase, and numbers",
+    "validation": {
+      "usernameLength": "Username must be 3-50 characters",
+      "usernameFormat": "Username can only contain letters, numbers, underscores, and hyphens",
+      "emailFormat": "Please enter a valid email",
+      "passwordLength": "Password must be at least 8 characters",
+      "passwordUppercase": "Password must contain at least one uppercase letter",
+      "passwordLowercase": "Password must contain at least one lowercase letter",
+      "passwordNumber": "Password must contain at least one number",
+      "passwordMismatch": "Passwords do not match"
+    }
   },
   "categories": {
     "infrastructure": "Infrastructure",

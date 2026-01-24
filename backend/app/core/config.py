@@ -27,6 +27,12 @@ class Settings(BaseSettings):
     # CORS 設定 - 生產環境應明確設定 (以逗號分隔的字串)
     CORS_ORIGINS: str = ""
 
+    # JWT 認證設定
+    JWT_SECRET_KEY: str = "your-secret-key-change-in-production"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
     @property
     def cors_origins_list(self) -> list[str]:
         """取得 CORS origins 列表."""

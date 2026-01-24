@@ -1,3 +1,32 @@
+// ============ 認證類型 ============
+
+export interface UserRegisterRequest {
+  username: string
+  email: string
+  password: string
+}
+
+export interface UserLoginRequest {
+  email: string
+  password: string
+}
+
+export interface TokenResponse {
+  access_token: string
+  refresh_token: string
+  token_type: string
+}
+
+export interface UserResponse {
+  user_id: string
+  username: string
+  email: string
+}
+
+export interface MessageResponse {
+  message: string
+}
+
 // ============ 建築類型 ============
 
 export type BuildingCategory =
