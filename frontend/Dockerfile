@@ -1,5 +1,5 @@
 # Frontend Dockerfile
-FROM node:20-alpine as builder
+FROM node:20-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -7,26 +7,30 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
-# Copy package files
-COPY package.json pnpm-lock.yaml* ./
+# Copy workspace config and lockfile from root
+COPY pnpm-workspace.yaml pnpm-lock.yaml ./
+
+# Copy frontend package.json
+COPY frontend/package.json ./frontend/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --filter travian-tools-frontend
 
-# Copy source code
-COPY . .
+# Copy frontend source code
+COPY frontend/ ./frontend/
 
 # Build the application
+WORKDIR /app/frontend
 RUN pnpm build
 
 # Production stage
 FROM nginx:alpine
 
 # Copy built files
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/frontend/dist /usr/share/nginx/html
 
 # Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port
 EXPOSE 80
