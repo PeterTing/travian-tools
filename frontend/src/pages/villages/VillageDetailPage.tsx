@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -31,6 +31,19 @@ export default function VillageDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const loadVillage = useCallback(async (id: string) => {
+    try {
+      setLoading(true)
+      setError(null)
+      const data = await villageApi.getById(id)
+      setVillage(data)
+    } catch {
+      setError(t('villages.loadError'))
+    } finally {
+      setLoading(false)
+    }
+  }, [t])
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/auth/login')
@@ -39,20 +52,7 @@ export default function VillageDetailPage() {
     if (villageId) {
       loadVillage(villageId)
     }
-  }, [isAuthenticated, navigate, villageId])
-
-  const loadVillage = async (id: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const data = await villageApi.getById(id)
-      setVillage(data)
-    } catch (err) {
-      setError(t('villages.loadError'))
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [isAuthenticated, navigate, villageId, loadVillage])
 
   const getRoleBadgeColor = (role: string | null) => {
     switch (role) {
