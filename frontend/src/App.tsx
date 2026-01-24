@@ -15,6 +15,8 @@ import BuildingCalculatorPage from '@/pages/calculator/BuildingCalculatorPage'
 import RoiCalculatorPage from '@/pages/calculator/RoiCalculatorPage'
 import BattleSimulatorPage from '@/pages/calculator/BattleSimulatorPage'
 import CropBalancePage from '@/pages/calculator/CropBalancePage'
+// Game accounts page
+import { GameAccountsPage } from '@/pages/game-accounts'
 import { Button } from '@/components/ui/button'
 
 function Navigation() {
@@ -91,6 +93,11 @@ function Navigation() {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
+                <Link to="/game-accounts">
+                  <Button variant="ghost" size="sm">
+                    {t('gameAccounts.title')}
+                  </Button>
+                </Link>
                 <span className="text-sm text-muted-foreground">
                   {user?.username}
                 </span>
@@ -135,6 +142,8 @@ function AppContent() {
         <Route path="/calculator/roi" element={<RoiCalculatorPage />} />
         <Route path="/calculator/battle" element={<BattleSimulatorPage />} />
         <Route path="/calculator/crop" element={<CropBalancePage />} />
+        {/* Game accounts route */}
+        <Route path="/game-accounts" element={<GameAccountsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>

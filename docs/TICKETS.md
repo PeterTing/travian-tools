@@ -31,12 +31,12 @@
 | ----- | ---- | ---- | ---- |
 | Phase 0 | 專案準備 | ✅ 完成 | 3/3 |
 | Phase 1 | 核心數據 + 基礎計算器 | ✅ 完成 | 12/12 |
-| Phase 2 | 數據抓取 + 用戶系統 | ⚪ 未開始 | 0/8 |
+| Phase 2 | 數據抓取 + 用戶系統 | 🔄 進行中 | 1/8 |
 | Phase 3 | AI 策略引擎 | ⚪ 未開始 | 0/6 |
 | Phase 4 | 半自動執行 | ⚪ 未開始 | 0/5 |
 | Phase 5 | 進階功能 | ⚪ 未開始 | 0/6 |
 
-**總計**: 15/40 Tickets 完成
+**總計**: 16/40 Tickets 完成
 
 ---
 
@@ -581,9 +581,11 @@
 
 ## Phase 2: 數據抓取 + 用戶系統
 
-### TICKET-201: 用戶註冊/登入系統
+### TICKET-201: 用戶註冊/登入系統 ✅
 
 **類型**: Full-Stack
+
+**狀態**: ✅ 完成
 
 **設計稿**:
 
@@ -594,17 +596,30 @@
 
 **驗收條件**:
 
-- [ ] `POST /api/v1/auth/register` 註冊端點
-- [ ] `POST /api/v1/auth/login` 登入端點
-- [ ] JWT Token 認證機制
-- [ ] 密碼加密儲存 (bcrypt)
-- [ ] 註冊/登入前端頁面
-- [ ] 表單驗證
-- [ ] 單元測試覆蓋率 > 80%
+- [x] `POST /api/v1/auth/register` 註冊端點
+- [x] `POST /api/v1/auth/login` 登入端點
+- [x] JWT Token 認證機制
+- [x] 密碼加密儲存 (bcrypt)
+- [x] 註冊/登入前端頁面
+- [x] 表單驗證
+- [x] 單元測試覆蓋率 > 80%
 
 **相關 PRD**: F4. 數據抓取系統
 
 **技術規格參考**: PROJECT-REQUIREMENTS.md 11.3 節（資料庫設計 - users 表）
+
+**完成日期**: 2026-01-24
+
+**實作摘要**:
+
+- 後端 Auth API: register, login, refresh, me, logout 五個端點
+- JWT Token 認證: pyjwt + bcrypt 密碼雜湊
+- 前端頁面: LoginPage, RegisterPage（含表單驗證）
+- AuthContext: React Context 管理認證狀態
+- Axios Interceptor: 自動 Token 刷新
+- 依賴注入: CurrentUser, OptionalUser 類型別名
+- Docker: 自動執行 alembic migration
+- 單元測試: 178 tests, 92% coverage
 
 ---
 
@@ -1210,3 +1225,4 @@
 | 1.6 | 2026-01-23 | TICKET-104 完成 - 建築數據查詢 API（4 個端點，15 個測試，97% 覆蓋率） |
 | 1.7 | 2026-01-23 | TICKET-105 完成 - 兵種數據查詢 API |
 | 1.8 | 2026-01-23 | TICKET-106~112 完成 - Phase 1 全部完成（資源田 API、計算器 API、前端頁面） |
+| 1.9 | 2026-01-24 | TICKET-201 完成 - 用戶註冊/登入系統（JWT 認證、bcrypt 密碼、前端頁面） |

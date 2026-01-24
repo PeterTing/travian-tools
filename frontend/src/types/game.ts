@@ -332,3 +332,46 @@ export interface CropBalanceResponse {
   warning_message: string | null
   suggestions: string[]
 }
+
+// ============ 遊戲帳號類型 ============
+
+export interface GameAccountCreate {
+  server_url: string
+  server_name?: string
+  server_speed?: number
+  tribe?: TroopTribe
+  player_name?: string
+  alliance_name?: string
+  account_age_days?: number
+}
+
+export interface GameAccountUpdate {
+  server_url?: string
+  server_name?: string
+  server_speed?: number
+  tribe?: TroopTribe
+  player_name?: string
+  alliance_name?: string
+  account_age_days?: number
+  is_active?: boolean
+}
+
+export interface GameAccount {
+  account_id: string
+  user_id: string
+  server_url: string
+  server_name: string | null
+  server_speed: number
+  tribe: TroopTribe | null
+  player_name: string | null
+  alliance_name: string | null
+  account_age_days: number
+  is_active: boolean
+  last_updated: string | null
+  created_at: string
+}
+
+export interface GameAccountListResponse {
+  accounts: GameAccount[]
+  total: number
+}
