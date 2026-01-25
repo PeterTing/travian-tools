@@ -23,18 +23,6 @@
     "dot": ".",
     "cropUnitFormat": "{{num}}-crop troops"
   },
-  "nav": {
-    "title": "Travian Tools",
-    "database": "Database",
-    "calculator": "Calculator",
-    "buildings": "Buildings",
-    "troops": "Troops",
-    "resources": "Resources",
-    "buildingCalc": "Building Calculator",
-    "roiCalc": "ROI Calculator",
-    "battleSim": "Battle Simulator",
-    "cropBalance": "Crop Balance"
-  },
   "home": {
     "title": "Travian Tools",
     "subtitle": "Travian: Legends Game Assistant System",
@@ -428,6 +416,75 @@
     "statusInProgress": "In Progress",
     "statusPending": "Pending",
     "extensionHint": "Use browser extension or Map.sql upload to sync data"
+  },
+  "nav": {
+    "title": "Travian Tools",
+    "database": "Database",
+    "calculator": "Calculator",
+    "buildings": "Buildings",
+    "troops": "Troops",
+    "resources": "Resources",
+    "buildingCalc": "Building Calculator",
+    "roiCalc": "ROI Calculator",
+    "battleSim": "Battle Simulator",
+    "cropBalance": "Crop Balance",
+    "strategy": "Strategy",
+    "aiAdvisor": "AI Advisor",
+    "healthCheck": "Health Check"
+  },
+  "strategy": {
+    "selectAccount": "Select Game Account",
+    "aiAdvisor": "AI Strategy Advisor",
+    "aiAdvisorDesc": "Get personalized strategy advice powered by AI",
+    "askPlaceholder": "What would you like to ask?",
+    "send": "Send",
+    "exampleQuestions": "Example Questions",
+    "phaseInfo": "Current Phase",
+    "day": "Day",
+    "villages": "Villages",
+    "population": "Population",
+    "phase": "Phase",
+    "immediateActions": "Immediate Actions",
+    "shortTermPlan": "Short-term Plan",
+    "riskWarnings": "Risk Warnings",
+    "newConversation": "New Conversation",
+    "loadError": "Failed to load data",
+    "adviceError": "Failed to get advice",
+    "noAccountsTitle": "No Game Accounts",
+    "noAccountsDesc": "Please add a game account first",
+    "goToAccounts": "Go to Game Accounts",
+    "examples": {
+      "whatToBuild": "What should I build next?",
+      "troopStrategy": "What troops should I train?",
+      "expandVillage": "When should I expand?",
+      "defenseStrategy": "How should I defend?"
+    }
+  },
+  "health": {
+    "title": "Account Health Check",
+    "description": "Comprehensive analysis of your game account status",
+    "overallScore": "Overall Score",
+    "checkItems": "Check Items",
+    "priorityActions": "Priority Actions",
+    "runCheck": "Run Health Check",
+    "lastChecked": "Last Checked",
+    "status": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "warning": "Warning",
+      "critical": "Critical"
+    },
+    "checks": {
+      "cropBalance": "Crop Balance",
+      "culturePoints": "Culture Points",
+      "villageConfig": "Village Configuration",
+      "troopTraining": "Troop Training",
+      "resourceUtil": "Resource Utilization"
+    },
+    "suggestions": "Suggestions",
+    "noSuggestions": "No suggestions at this time",
+    "loadError": "Failed to load data",
+    "checkError": "Health check failed"
   },
   "mapSql": {
     "title": "Map.sql Analyzer",

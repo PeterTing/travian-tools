@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # Claude API 設定
+    ANTHROPIC_API_KEY: str = ""
+    CLAUDE_MODEL: str = "claude-sonnet-4-20250514"
+    CLAUDE_MAX_TOKENS: int = 4096
+    CLAUDE_TEMPERATURE: float = 0.7
+
     @property
     def cors_origins_list(self) -> list[str]:
         """取得 CORS origins 列表."""

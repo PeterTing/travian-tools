@@ -33,7 +33,10 @@
     "buildingCalc": "建築升級計算",
     "roiCalc": "ROI 計算器",
     "battleSim": "戰鬥模擬器",
-    "cropBalance": "糧食平衡"
+    "cropBalance": "糧食平衡",
+    "strategy": "策略",
+    "aiAdvisor": "AI 顧問",
+    "healthCheck": "健康檢查"
   },
   "home": {
     "title": "Travian Tools",
@@ -613,5 +616,44 @@
     "searchResultsCount": "找到 {{count}} 筆結果",
     "clearSearch": "清除搜尋",
     "showingFirst100": "僅顯示前 100 筆結果"
+  },
+  "strategy": {
+    "selectAccount": "選擇遊戲帳號",
+    "selectAccountPlaceholder": "請選擇帳號...",
+    "phaseInfo": "遊戲階段資訊",
+    "currentPhase": "當前階段",
+    "serverDay": "伺服器天數",
+    "progress": "進度狀態",
+    "villages": "村莊數",
+    "population": "總人口",
+    "recommendations": "策略建議",
+    "ahead": "領先",
+    "normal": "正常",
+    "behind": "落後",
+    "aiAdvisor": "AI 策略顧問",
+    "newConversation": "新對話",
+    "welcomeTitle": "歡迎使用 AI 策略顧問",
+    "welcomeHint": "輸入您的問題，AI 會根據您的遊戲狀態提供策略建議",
+    "exampleQuestions": "範例問題：",
+    "example1": "我現在應該優先做什麼？",
+    "example2": "如何加快開村速度？",
+    "example3": "我的部隊配置合理嗎？",
+    "inputPlaceholder": "輸入您的問題...",
+    "send": "發送",
+    "thinking": "思考中..."
+  },
+  "health": {
+    "title": "帳號健康檢查",
+    "overallScore": "綜合評分",
+    "good": "良好",
+    "warning": "警告",
+    "critical": "危急",
+    "checking": "檢查中...",
+    "priorityActions": "優先改進建議",
+    "detailedChecks": "詳細檢查項目",
+    "suggestions": "建議",
+    "askAI": "諮詢 AI 顧問",
+    "recheck": "重新檢查",
+    "noAccountSelected": "請選擇遊戲帳號以執行健康檢查"
   }
 }

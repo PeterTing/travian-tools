@@ -1,0 +1,584 @@
+"""策略建議服務."""
+
+from sqlalchemy.orm import Session, joinedload
+
+from app.domain.schemas.strategy import (
+    GamePhase,
+    HealthCheckItem,
+    HealthCheckResponse,
+    PhaseDetectionResponse,
+    PhaseStandard,
+    ProgressStatus,
+)
+from app.infrastructure.database.models.game_account import GameAccount
+from app.infrastructure.database.models.village import Village
+from app.services.game_data_service import get_game_data_service
+
+# ============ 階段標準定義 ============
+
+PHASE_STANDARDS: dict[GamePhase, dict] = {
+    GamePhase.BEGINNER_PROTECTION: {
+        "day_range": (1, 3),
+        "name_zh": "新手保護期",
+        "description": "無法被攻擊的保護期，專注於完成新手任務和基礎建設",
+        "standard": PhaseStandard(
+            min_villages=1,
+            target_villages=1,
+            min_population=50,
+            target_population=100,
+            key_objectives=[
+                "完成所有新手任務",
+                "升級資源田至 Lv2-3",
+                "建造基礎建築（倉庫、糧倉、本部）",
+                "訓練少量兵力開始農場",
+            ],
+        ),
+    },
+    GamePhase.EARLY_DEVELOPMENT: {
+        "day_range": (1, 7),
+        "name_zh": "早期發展期",
+        "description": "快速發展資源產出，為開設第二村做準備",
+        "standard": PhaseStandard(
+            min_villages=1,
+            target_villages=2,
+            min_population=100,
+            target_population=300,
+            key_objectives=[
+                "資源田升級至 Lv5-6",
+                "累積文化點達到開村門檻",
+                "建立穩定的農場收入",
+                "完成第二村定居",
+            ],
+        ),
+    },
+    GamePhase.MID_EXPANSION: {
+        "day_range": (8, 30),
+        "name_zh": "中期擴張期",
+        "description": "多村發展、確立角色定位（進攻/防守/經濟）",
+        "standard": PhaseStandard(
+            min_villages=2,
+            target_villages=6,
+            min_population=500,
+            target_population=2000,
+            key_objectives=[
+                "持續開村，目標 6 村以上",
+                "確定村莊角色分工",
+                "開始建立部隊基礎",
+                "加入聯盟，建立外交關係",
+            ],
+        ),
+    },
+    GamePhase.LATE_MID: {
+        "day_range": (31, 100),
+        "name_zh": "中後期",
+        "description": "軍事競爭期，聯盟協作變得重要",
+        "standard": PhaseStandard(
+            min_villages=6,
+            target_villages=15,
+            min_population=3000,
+            target_population=10000,
+            key_objectives=[
+                "持續擴張村莊數量",
+                "建立主力部隊（Hammer 或 Anvil）",
+                "參與聯盟作戰",
+                "準備神器爭奪",
+            ],
+        ),
+    },
+    GamePhase.ARTEFACT: {
+        "day_range": (100, 150),
+        "name_zh": "神器期",
+        "description": "神器發布後的競爭期",
+        "standard": PhaseStandard(
+            min_villages=15,
+            target_villages=25,
+            min_population=15000,
+            target_population=50000,
+            key_objectives=[
+                "爭奪或防守神器",
+                "最大化部隊訓練",
+                "聯盟協調作戰",
+                "為 WW 期做準備",
+            ],
+        ),
+    },
+    GamePhase.ENDGAME: {
+        "day_range": (150, 999),
+        "name_zh": "終局/WW 期",
+        "description": "世界奇蹟建造期，全聯盟協作",
+        "standard": PhaseStandard(
+            min_villages=20,
+            target_villages=40,
+            min_population=50000,
+            target_population=150000,
+            key_objectives=[
+                "支援 WW 建造",
+                "防守 WW 村",
+                "摧毀敵方 WW",
+                "維持資源供給線",
+            ],
+        ),
+    },
+}
+
+
+class StrategyService:
+    """策略建議服務類."""
+
+    def __init__(self, db: Session) -> None:
+        """初始化服務."""
+        self.db = db
+        self.game_data = get_game_data_service()
+
+    def _verify_account_ownership(
+        self, account_id: str, user_id: str
+    ) -> GameAccount | None:
+        """驗證帳號所有權並返回帳號."""
+        account = (
+            self.db.query(GameAccount)
+            .options(
+                joinedload(GameAccount.villages).joinedload(Village.building_instances)
+            )
+            .options(
+                joinedload(GameAccount.villages).joinedload(Village.troop_instances)
+            )
+            .filter(
+                GameAccount.account_id == account_id,
+                GameAccount.user_id == user_id,
+            )
+            .first()
+        )
+        return account
+
+    def _determine_phase(self, day: int) -> GamePhase:
+        """根據天數判斷遊戲階段."""
+        if day <= 3:
+            return GamePhase.BEGINNER_PROTECTION
+        elif day <= 7:
+            return GamePhase.EARLY_DEVELOPMENT
+        elif day <= 30:
+            return GamePhase.MID_EXPANSION
+        elif day <= 100:
+            return GamePhase.LATE_MID
+        elif day <= 150:
+            return GamePhase.ARTEFACT
+        else:
+            return GamePhase.ENDGAME
+
+    def _evaluate_progress(
+        self, phase: GamePhase, village_count: int, total_population: int
+    ) -> tuple[ProgressStatus, str]:
+        """評估玩家進度."""
+        standard = PHASE_STANDARDS[phase]["standard"]
+
+        # 計算村莊和人口的進度百分比
+        village_progress = (
+            village_count / standard.target_villages
+            if standard.target_villages > 0
+            else 1.0
+        )
+        population_progress = (
+            total_population / standard.target_population
+            if standard.target_population > 0
+            else 1.0
+        )
+
+        # 綜合評估
+        avg_progress = (village_progress + population_progress) / 2
+
+        if avg_progress >= 1.0:
+            return ProgressStatus.AHEAD, "發展進度領先，可以考慮更積極的策略"
+        elif avg_progress >= 0.6:
+            return ProgressStatus.NORMAL, "發展進度正常，保持當前節奏"
+        else:
+            if village_count < standard.min_villages:
+                return (
+                    ProgressStatus.BEHIND,
+                    f"村莊數量不足（目前 {village_count}，建議至少 {standard.min_villages}）",
+                )
+            elif total_population < standard.min_population:
+                return (
+                    ProgressStatus.BEHIND,
+                    f"人口偏低（目前 {total_population}，建議至少 {standard.min_population}）",
+                )
+            else:
+                return ProgressStatus.BEHIND, "整體發展落後，建議加快資源建設和村莊擴張"
+
+    def _generate_recommendations(
+        self,
+        phase: GamePhase,
+        progress_status: ProgressStatus,
+        village_count: int,
+        total_population: int,
+    ) -> list[str]:
+        """生成策略建議."""
+        recommendations = []
+        standard = PHASE_STANDARDS[phase]["standard"]
+
+        # 基礎建議 - 來自階段目標
+        recommendations.extend(standard.key_objectives[:2])
+
+        # 根據進度狀態添加建議
+        if progress_status == ProgressStatus.BEHIND:
+            if village_count < standard.min_villages:
+                recommendations.append("優先累積文化點開設新村莊")
+            if total_population < standard.min_population:
+                recommendations.append("加快資源田和建築升級以提升人口")
+            recommendations.append("考慮減少軍事支出，專注經濟發展")
+        elif progress_status == ProgressStatus.AHEAD:
+            recommendations.append("可以考慮更積極的軍事策略")
+            recommendations.append("幫助聯盟成員發展")
+
+        return recommendations[:5]  # 最多返回 5 條建議
+
+    def detect_phase(
+        self, account_id: str, user_id: str
+    ) -> PhaseDetectionResponse | None:
+        """檢測遊戲階段."""
+        account = self._verify_account_ownership(account_id, user_id)
+        if not account:
+            return None
+
+        # 計算基本數據
+        day = account.account_age_days or 1
+        villages = account.villages or []
+        village_count = len(villages)
+        total_population = sum(v.population or 0 for v in villages)
+
+        # 判斷階段
+        phase = self._determine_phase(day)
+        phase_info = PHASE_STANDARDS[phase]
+
+        # 評估進度
+        progress_status, progress_description = self._evaluate_progress(
+            phase, village_count, total_population
+        )
+
+        # 生成建議
+        recommendations = self._generate_recommendations(
+            phase, progress_status, village_count, total_population
+        )
+
+        return PhaseDetectionResponse(
+            phase=phase,
+            phase_name_zh=phase_info["name_zh"],
+            phase_description=phase_info["description"],
+            day=day,
+            village_count=village_count,
+            total_population=total_population,
+            progress_status=progress_status,
+            progress_description=progress_description,
+            standard=phase_info["standard"],
+            recommendations=recommendations,
+        )
+
+    def health_check(self, account_id: str, user_id: str) -> HealthCheckResponse | None:
+        """帳號健康檢查."""
+        account = self._verify_account_ownership(account_id, user_id)
+        if not account:
+            return None
+
+        checks: list[HealthCheckItem] = []
+        total_score = 0
+
+        # 1. 糧食平衡檢查
+        crop_check = self._check_crop_balance(account)
+        checks.append(crop_check)
+        total_score += crop_check.score
+
+        # 2. 文化點產出檢查
+        cp_check = self._check_culture_points(account)
+        checks.append(cp_check)
+        total_score += cp_check.score
+
+        # 3. 村莊配置檢查
+        village_check = self._check_village_configuration(account)
+        checks.append(village_check)
+        total_score += village_check.score
+
+        # 4. 部隊訓練檢查
+        troop_check = self._check_troop_training(account)
+        checks.append(troop_check)
+        total_score += troop_check.score
+
+        # 5. 資源利用率檢查
+        resource_check = self._check_resource_utilization(account)
+        checks.append(resource_check)
+        total_score += resource_check.score
+
+        # 計算總體評分
+        overall_score = total_score // len(checks) if checks else 0
+
+        # 判斷總體狀態
+        if overall_score >= 80:
+            overall_status = "healthy"
+        elif overall_score >= 60:
+            overall_status = "warning"
+        else:
+            overall_status = "critical"
+
+        # 生成優先改進建議
+        priority_actions = self._generate_priority_actions(checks)
+
+        return HealthCheckResponse(
+            overall_score=overall_score,
+            overall_status=overall_status,
+            checks=checks,
+            priority_actions=priority_actions,
+        )
+
+    def _check_crop_balance(self, account: GameAccount) -> HealthCheckItem:
+        """檢查糧食平衡."""
+        villages = account.villages or []
+        if not villages:
+            return HealthCheckItem(
+                name="糧食平衡",
+                status="warning",
+                score=50,
+                message="無村莊數據，無法評估糧食狀況",
+                suggestions=["請同步村莊數據"],
+            )
+
+        # 計算總人口（簡化計算，實際應該考慮部隊糧耗）
+        total_population = sum(v.population or 0 for v in villages)
+
+        # 根據人口判斷糧食壓力（這是簡化邏輯）
+        # 實際應該根據同步的資源產量數據
+        if total_population < 500:
+            return HealthCheckItem(
+                name="糧食平衡",
+                status="good",
+                score=90,
+                message=f"人口 {total_population}，糧食壓力較小",
+                suggestions=[],
+            )
+        elif total_population < 2000:
+            return HealthCheckItem(
+                name="糧食平衡",
+                status="good",
+                score=80,
+                message=f"人口 {total_population}，糧食平衡正常",
+                suggestions=["注意持續升級農田"],
+            )
+        else:
+            return HealthCheckItem(
+                name="糧食平衡",
+                status="warning",
+                score=60,
+                message=f"人口 {total_population}，需注意糧食供給",
+                suggestions=["優先升級農田", "考慮佔領糧食綠洲"],
+            )
+
+    def _check_culture_points(self, account: GameAccount) -> HealthCheckItem:
+        """檢查文化點產出."""
+        villages = account.villages or []
+        village_count = len(villages)
+        day = account.account_age_days or 1
+
+        # 根據天數和村莊數評估（簡化邏輯）
+        expected_villages = max(1, day // 5)  # 大約每 5 天一村
+
+        if village_count >= expected_villages:
+            return HealthCheckItem(
+                name="文化點產出",
+                status="good",
+                score=85,
+                message=f"村莊數 {village_count}，文化點產出正常",
+                suggestions=[],
+            )
+        elif village_count >= expected_villages * 0.7:
+            return HealthCheckItem(
+                name="文化點產出",
+                status="warning",
+                score=65,
+                message=f"村莊數 {village_count}，文化點產出略低",
+                suggestions=["升級市政廳加速文化點", "考慮舉辦慶典"],
+            )
+        else:
+            return HealthCheckItem(
+                name="文化點產出",
+                status="critical",
+                score=40,
+                message=f"村莊數 {village_count}，發展速度落後",
+                suggestions=["優先建造/升級市政廳", "儘快舉辦慶典", "加快資源田發展"],
+            )
+
+    def _check_village_configuration(self, account: GameAccount) -> HealthCheckItem:
+        """檢查村莊配置."""
+        villages = account.villages or []
+        village_count = len(villages)
+
+        if village_count == 0:
+            return HealthCheckItem(
+                name="村莊配置",
+                status="warning",
+                score=50,
+                message="無村莊數據",
+                suggestions=["請同步村莊數據"],
+            )
+
+        # 檢查是否有首都
+        has_capital = any(v.is_capital for v in villages)
+
+        # 檢查村莊角色分配
+        roles = [v.role for v in villages if v.role]
+        has_role_diversity = len(set(roles)) > 1 if roles else False
+
+        score = 70
+        suggestions = []
+
+        if not has_capital:
+            score -= 10
+            suggestions.append("設定首都村莊")
+
+        if village_count >= 3 and not has_role_diversity:
+            score -= 10
+            suggestions.append("為村莊分配不同角色（進攻/防守/資源）")
+
+        if score >= 80:
+            status = "good"
+            message = "村莊配置合理"
+        elif score >= 60:
+            status = "warning"
+            message = "村莊配置有改進空間"
+        else:
+            status = "critical"
+            message = "村莊配置需要優化"
+
+        return HealthCheckItem(
+            name="村莊配置",
+            status=status,
+            score=score,
+            message=message,
+            suggestions=suggestions,
+        )
+
+    def _check_troop_training(self, account: GameAccount) -> HealthCheckItem:
+        """檢查部隊訓練進度."""
+        villages = account.villages or []
+
+        total_troops = 0
+        for village in villages:
+            for troop in village.troop_instances or []:
+                total_troops += troop.count or 0
+
+        day = account.account_age_days or 1
+
+        # 根據天數評估部隊數量（簡化邏輯）
+        if day < 7:
+            expected_troops = 50
+        elif day < 30:
+            expected_troops = 500
+        elif day < 100:
+            expected_troops = 5000
+        else:
+            expected_troops = 20000
+
+        ratio = total_troops / expected_troops if expected_troops > 0 else 0
+
+        if ratio >= 0.8:
+            return HealthCheckItem(
+                name="部隊訓練",
+                status="good",
+                score=85,
+                message=f"部隊數量 {total_troops}，訓練進度良好",
+                suggestions=[],
+            )
+        elif ratio >= 0.5:
+            return HealthCheckItem(
+                name="部隊訓練",
+                status="warning",
+                score=60,
+                message=f"部隊數量 {total_troops}，訓練進度略慢",
+                suggestions=["持續訓練部隊", "升級兵營/馬廄提高訓練速度"],
+            )
+        else:
+            return HealthCheckItem(
+                name="部隊訓練",
+                status="critical",
+                score=40,
+                message=f"部隊數量 {total_troops}，部隊嚴重不足",
+                suggestions=[
+                    "優先建造/升級訓練建築",
+                    "開始持續訓練部隊",
+                    "考慮調整資源分配",
+                ],
+            )
+
+    def _check_resource_utilization(self, account: GameAccount) -> HealthCheckItem:
+        """檢查資源利用率."""
+        villages = account.villages or []
+
+        # 計算平均資源田等級（需要建築數據）
+        total_resource_fields = 0
+        total_level = 0
+
+        for village in villages:
+            for building in village.building_instances or []:
+                if building.building_id in [
+                    "woodcutter",
+                    "clay_pit",
+                    "iron_mine",
+                    "cropland",
+                ]:
+                    total_resource_fields += 1
+                    total_level += building.current_level or 0
+
+        if total_resource_fields == 0:
+            return HealthCheckItem(
+                name="資源利用率",
+                status="warning",
+                score=50,
+                message="無資源田數據",
+                suggestions=["請同步村莊建築數據"],
+            )
+
+        avg_level = total_level / total_resource_fields
+
+        if avg_level >= 8:
+            return HealthCheckItem(
+                name="資源利用率",
+                status="good",
+                score=85,
+                message=f"資源田平均等級 {avg_level:.1f}，資源產出良好",
+                suggestions=[],
+            )
+        elif avg_level >= 5:
+            return HealthCheckItem(
+                name="資源利用率",
+                status="warning",
+                score=65,
+                message=f"資源田平均等級 {avg_level:.1f}，有提升空間",
+                suggestions=["持續升級資源田", "優先升級 ROI 最高的資源田"],
+            )
+        else:
+            return HealthCheckItem(
+                name="資源利用率",
+                status="critical",
+                score=40,
+                message=f"資源田平均等級 {avg_level:.1f}，資源產出不足",
+                suggestions=["優先升級資源田至 Lv5+", "參考 ROI 計算器優化升級順序"],
+            )
+
+    def _generate_priority_actions(self, checks: list[HealthCheckItem]) -> list[str]:
+        """生成優先改進建議."""
+        priority_actions = []
+
+        # 按分數排序，優先處理分數最低的
+        sorted_checks = sorted(checks, key=lambda x: x.score)
+
+        for check in sorted_checks:
+            if check.status in ["critical", "warning"] and check.suggestions:
+                priority_actions.extend(check.suggestions[:2])
+
+        # 去重並限制數量
+        seen = set()
+        unique_actions = []
+        for action in priority_actions:
+            if action not in seen:
+                seen.add(action)
+                unique_actions.append(action)
+                if len(unique_actions) >= 5:
+                    break
+
+        return unique_actions

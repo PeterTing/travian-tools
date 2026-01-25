@@ -23,6 +23,8 @@ import VillagesPage from '@/pages/villages/VillagesPage'
 import VillageDetailPage from '@/pages/villages/VillageDetailPage'
 // Map pages
 import MapSqlPage from '@/pages/map/MapSqlPage'
+// Strategy pages
+import { AIAdvisorPage, HealthCheckPage } from '@/pages/strategy'
 import { Button } from '@/components/ui/button'
 
 function Navigation() {
@@ -114,6 +116,25 @@ function Navigation() {
                     {t('mapSql.title')}
                   </Button>
                 </Link>
+                <div className="relative group">
+                  <Button variant="ghost" size="sm">
+                    {t('nav.strategy')}
+                  </Button>
+                  <div className="absolute top-full right-0 hidden group-hover:block bg-background border rounded shadow-lg py-2 min-w-[140px] z-50">
+                    <Link
+                      to="/strategy/advisor"
+                      className="block px-4 py-2 hover:bg-muted"
+                    >
+                      {t('nav.aiAdvisor')}
+                    </Link>
+                    <Link
+                      to="/strategy/health-check"
+                      className="block px-4 py-2 hover:bg-muted"
+                    >
+                      {t('nav.healthCheck')}
+                    </Link>
+                  </div>
+                </div>
                 <span className="text-sm text-muted-foreground">
                   {user?.username}
                 </span>
@@ -163,6 +184,9 @@ function AppContent() {
         <Route path="/villages" element={<RequireAuth><VillagesPage /></RequireAuth>} />
         <Route path="/villages/:villageId" element={<RequireAuth><VillageDetailPage /></RequireAuth>} />
         <Route path="/map-sql" element={<RequireAuth><MapSqlPage /></RequireAuth>} />
+        {/* Strategy routes */}
+        <Route path="/strategy/advisor" element={<RequireAuth><AIAdvisorPage /></RequireAuth>} />
+        <Route path="/strategy/health-check" element={<RequireAuth><HealthCheckPage /></RequireAuth>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>
