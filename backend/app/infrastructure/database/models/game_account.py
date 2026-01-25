@@ -51,7 +51,7 @@ class GameAccount(Base):
     server_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     server_speed: Mapped[int] = mapped_column(Integer, default=1)
     tribe: Mapped[TribeType | None] = mapped_column(
-        Enum(TribeType),
+        Enum(TribeType, values_callable=lambda x: [e.value for e in x]),
         nullable=True,
     )
     player_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
