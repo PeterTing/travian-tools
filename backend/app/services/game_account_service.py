@@ -15,6 +15,7 @@ class GameAccountService:
 
     def create_account(self, user_id: str, data: GameAccountCreate) -> GameAccount:
         """建立遊戲帳號."""
+        # Pydantic 已經驗證並轉換 tribe 為 TribeType Enum
         account = GameAccount(
             user_id=user_id,
             server_url=data.server_url,

@@ -62,6 +62,44 @@ class TestGameAccountServiceCreate:
         assert result.server_speed == 1
         assert result.tribe is None
 
+    def test_create_account_with_string_tribe(
+        self,
+        service: GameAccountService,
+        mock_db: MagicMock,
+    ) -> None:
+        """測試使用字串 tribe 建立帳號（模擬 API 傳入）."""
+        data = GameAccountCreate(
+            server_url="https://ts1.travian.com",
+            server_name="Speed 3x",
+            server_speed=3,
+            tribe="gauls",  # 小寫字串，模擬前端傳入
+            player_name="TestPlayer",
+        )
+        user_id = "user-123"
+
+        result = service.create_account(user_id, data)
+
+        mock_db.add.assert_called_once()
+        mock_db.commit.assert_called_once()
+        assert isinstance(result, GameAccount)
+        assert result.tribe == TribeType.GAULS
+
+    def test_create_account_with_enum_tribe(
+        self,
+        service: GameAccountService,
+        mock_db: MagicMock,
+    ) -> None:
+        """測試使用 Enum 物件 tribe 建立帳號."""
+        data = GameAccountCreate(
+            server_url="https://ts1.travian.com",
+            tribe=TribeType.ROMANS,  # Enum 物件
+        )
+        user_id = "user-123"
+
+        result = service.create_account(user_id, data)
+
+        assert result.tribe == TribeType.ROMANS
+
 
 class TestGameAccountServiceGet:
     """取得遊戲帳號測試."""
@@ -198,6 +236,26 @@ class TestGameAccountServiceUpdate:
         assert result is not None
         assert result.server_speed == 3
         assert result.player_name == "OldName"  # 未被更新
+
+    def test_update_account_with_string_tribe(
+        self,
+        service: GameAccountService,
+        mock_db: MagicMock,
+    ) -> None:
+        """測試使用字串 tribe 更新帳號."""
+        mock_account = GameAccount(
+            account_id="acc-123",
+            user_id="user-123",
+            server_url="https://ts1.travian.com",
+            tribe=TribeType.ROMANS,
+        )
+        mock_db.query.return_value.filter.return_value.first.return_value = mock_account
+
+        data = GameAccountUpdate(tribe="teutons")  # 小寫字串
+        result = service.update_account("acc-123", "user-123", data)
+
+        assert result is not None
+        assert result.tribe == TribeType.TEUTONS
 
 
 class TestGameAccountServiceDelete:
