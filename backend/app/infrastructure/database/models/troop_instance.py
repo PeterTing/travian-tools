@@ -47,10 +47,10 @@ class TroopInstance(Base):
         comment="部隊類型 ID（對應 troops.json）",
     )
     count: Mapped[int] = mapped_column(Integer, default=0)
-    location: Mapped[TroopLocation] = mapped_column(
+    location: Mapped[str] = mapped_column(
         String(20),
-        default=TroopLocation.HOME,
-        comment="部隊位置狀態",
+        default="home",
+        comment="部隊位置狀態: home/training/away",
     )
     is_training: Mapped[bool] = mapped_column(Boolean, default=False)
     training_finish_time: Mapped[datetime | None] = mapped_column(

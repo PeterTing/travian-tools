@@ -57,6 +57,11 @@ class Village(Base):
         ForeignKey("game_accounts.account_id", ondelete="CASCADE"),
         nullable=False,
     )
+    travian_village_id: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+        index=True,
+    )
     name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     coordinate_x: Mapped[int | None] = mapped_column(Integer, nullable=True)
     coordinate_y: Mapped[int | None] = mapped_column(Integer, nullable=True)

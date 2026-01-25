@@ -8,6 +8,8 @@ from app.core.dependencies import CurrentUser, DBSession
 from app.domain.schemas.sync import (
     FullSync,
     FullSyncResponse,
+    ReportsSync,
+    ReportsSyncResponse,
     SyncResponse,
     TroopSync,
     VillageCenterSync,
@@ -141,4 +143,37 @@ def sync_full(
         villages_synced=villages,
         buildings_synced=buildings,
         troops_synced=troops,
+    )
+
+
+@router.post(
+    "/reports",
+    response_model=ReportsSyncResponse,
+    summary="同步報告",
+    description="同步戰鬥報告數據",
+)
+def sync_reports(
+    data: ReportsSync,
+    db: DBSession,
+    current_user: CurrentUser,
+) -> ReportsSyncResponse:
+    """同步報告數據."""
+    service = SyncService(db)
+    success, message, count, new_count, updated_count = service.sync_reports(
+        current_user.user_id, data
+    )
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=message,
+        )
+
+    return ReportsSyncResponse(
+        success=success,
+        message=message,
+        synced_at=datetime.now(),
+        count=count,
+        new_count=new_count,
+        updated_count=updated_count,
     )

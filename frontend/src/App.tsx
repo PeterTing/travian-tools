@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+import { RequireAuth } from '@/components/auth'
 import HomePage from '@/pages/HomePage'
 import NotFoundPage from '@/pages/NotFoundPage'
 // Auth pages
@@ -20,6 +21,8 @@ import { GameAccountsPage } from '@/pages/game-accounts'
 // Village pages
 import VillagesPage from '@/pages/villages/VillagesPage'
 import VillageDetailPage from '@/pages/villages/VillageDetailPage'
+// Map pages
+import MapSqlPage from '@/pages/map/MapSqlPage'
 import { Button } from '@/components/ui/button'
 
 function Navigation() {
@@ -106,6 +109,11 @@ function Navigation() {
                     {t('villages.title')}
                   </Button>
                 </Link>
+                <Link to="/map-sql">
+                  <Button variant="ghost" size="sm">
+                    {t('mapSql.title')}
+                  </Button>
+                </Link>
                 <span className="text-sm text-muted-foreground">
                   {user?.username}
                 </span>
@@ -150,11 +158,11 @@ function AppContent() {
         <Route path="/calculator/roi" element={<RoiCalculatorPage />} />
         <Route path="/calculator/battle" element={<BattleSimulatorPage />} />
         <Route path="/calculator/crop" element={<CropBalancePage />} />
-        {/* Game accounts route */}
-        <Route path="/game-accounts" element={<GameAccountsPage />} />
-        {/* Village routes */}
-        <Route path="/villages" element={<VillagesPage />} />
-        <Route path="/villages/:villageId" element={<VillageDetailPage />} />
+        {/* Protected routes - 需要登入 */}
+        <Route path="/game-accounts" element={<RequireAuth><GameAccountsPage /></RequireAuth>} />
+        <Route path="/villages" element={<RequireAuth><VillagesPage /></RequireAuth>} />
+        <Route path="/villages/:villageId" element={<RequireAuth><VillageDetailPage /></RequireAuth>} />
+        <Route path="/map-sql" element={<RequireAuth><MapSqlPage /></RequireAuth>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>

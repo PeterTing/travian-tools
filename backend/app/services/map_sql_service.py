@@ -1,19 +1,74 @@
 """Map.sql 解析服務."""
 
+import gzip
 import re
+from io import BytesIO
+
+import httpx
+from sqlalchemy.orm import Session
 
 from app.domain.schemas.map_sql import (
     MapAlliance,
     MapParseResponse,
     MapPlayer,
+    MapSaveResponse,
     MapVillage,
+)
+from app.infrastructure.database.models.game_account import GameAccount
+from app.infrastructure.database.models.map_data import (
+    MapAllianceData,
+    MapPlayerData,
+    MapSnapshot,
+    MapVillageData,
 )
 
 
 class MapSqlService:
     """Map.sql 解析服務類."""
 
-    # Map.sql 格式：x, y, field_type, village_id, village_name, player_id, player_name, alliance_id, alliance_name, population, is_capital
+    def __init__(self, db: Session | None = None) -> None:
+        """初始化服務."""
+        self.db = db
+
+    @staticmethod
+    def download_map_sql(server_url: str) -> str:
+        """從伺服器下載 map.sql 檔案.
+
+        Args:
+            server_url: Travian 伺服器網址，如 https://ts1.travian.com
+
+        Returns:
+            map.sql 檔案內容
+
+        Raises:
+            httpx.HTTPError: 下載失敗
+        """
+        # 移除結尾斜線
+        server_url = server_url.rstrip("/")
+
+        # 先嘗試下載壓縮版
+        gz_url = f"{server_url}/map.sql.gz"
+        sql_url = f"{server_url}/map.sql"
+
+        with httpx.Client(timeout=60.0, follow_redirects=True) as client:
+            # 嘗試下載 gzip 壓縮版
+            try:
+                response = client.get(gz_url)
+                if response.status_code == 200:
+                    # 解壓縮
+                    with gzip.GzipFile(fileobj=BytesIO(response.content)) as f:
+                        return f.read().decode("utf-8")
+            except Exception:
+                pass
+
+            # 嘗試下載非壓縮版
+            response = client.get(sql_url)
+            response.raise_for_status()
+            return response.text
+
+    # Map.sql 格式有兩種：
+    # 1. CSV 格式：x, y, field_type, village_id, village_name, player_id, player_name, alliance_id, alliance_name, population, is_capital
+    # 2. SQL INSERT 格式：INSERT INTO `x_world` VALUES (x,y,field_type,village_id,'village_name',player_id,'player_name',alliance_id,'alliance_name',population,is_capital);
     MAP_LINE_PATTERN = re.compile(
         r"(-?\d+)[,\t]+"  # x
         r"(-?\d+)[,\t]+"  # y
@@ -26,6 +81,20 @@ class MapSqlService:
         r"([^,\t]*)[,\t]+"  # alliance_name
         r"(\d+)[,\t]*"  # population
         r"(\d*)"  # is_capital (optional)
+    )
+
+    # SQL INSERT 格式的正則表達式
+    # INSERT INTO `x_world` VALUES (id,x,y,field_type,village_id,'village_name',player_id,'player_name',alliance_id,'alliance_name',population,is_capital,...);
+    # 實際格式: (22209,-47,145,1,23880,'Rome',2638,'CrazyTurtle',45,'TNC',310,NULL,FALSE,FALSE,NULL,NULL)
+    # 欄位順序: id, x, y, field_type, village_id, village_name, player_id, player_name, alliance_id, alliance_name, population, is_capital
+    SQL_INSERT_PATTERN = re.compile(
+        r"\((\d+),(-?\d+),(-?\d+),(\d+),"  # id, x, y, field_type
+        r"(\d+),'([^']*)',"  # village_id, village_name
+        r"(\d+),'([^']*)',"  # player_id, player_name
+        r"(\d+),'([^']*)',"  # alliance_id, alliance_name
+        r"(\d+),"  # population
+        r"(NULL|\d+)",  # is_capital (NULL or number)
+        re.IGNORECASE,
     )
 
     def parse_sql(self, sql_content: str) -> MapParseResponse:
@@ -75,7 +144,33 @@ class MapSqlService:
 
     def _parse_line(self, line: str) -> MapVillage | None:
         """解析單行數據."""
-        # 嘗試使用正則表達式
+        # 先嘗試 SQL INSERT 格式
+        # 欄位順序: id, x, y, field_type, village_id, village_name, player_id, player_name, alliance_id, alliance_name, population, is_capital
+        # groups[0]=id, groups[1]=x, groups[2]=y, groups[3]=field_type, groups[4]=village_id, groups[5]=village_name
+        # groups[6]=player_id, groups[7]=player_name, groups[8]=alliance_id, groups[9]=alliance_name
+        # groups[10]=population, groups[11]=is_capital
+        match = self.SQL_INSERT_PATTERN.search(line)
+        if match:
+            groups = match.groups()
+            return MapVillage(
+                x=int(groups[1]),  # x 是第二欄
+                y=int(groups[2]),  # y 是第三欄
+                field_type=int(groups[3]),
+                village_id=int(groups[4]) if groups[4] else None,
+                village_name=groups[5] if groups[5] else None,
+                player_id=int(groups[6]) if groups[6] else None,
+                player_name=groups[7] if groups[7] else None,
+                alliance_id=int(groups[8])
+                if groups[8] and int(groups[8]) > 0
+                else None,
+                alliance_name=groups[9] if groups[9] else None,
+                population=int(groups[10]) if groups[10] else 0,
+                is_capital=groups[11] == "1"
+                if groups[11] and groups[11] != "NULL"
+                else False,
+            )
+
+        # 嘗試 CSV 格式正則表達式
         match = self.MAP_LINE_PATTERN.match(line)
         if match:
             groups = match.groups()
@@ -197,3 +292,161 @@ class MapSqlService:
             for v in parse_result.villages
             if abs(v.x - center_x) <= radius and abs(v.y - center_y) <= radius
         ]
+
+    def save_to_database(
+        self,
+        user_id: str,
+        account_id: str,
+        sql_content: str,
+    ) -> MapSaveResponse:
+        """解析並儲存 map.sql 到資料庫."""
+        if not self.db:
+            return MapSaveResponse(
+                success=False,
+                message="資料庫連線未初始化",
+                villages_saved=0,
+                players_found=0,
+                alliances_found=0,
+            )
+
+        # 驗證帳號所有權
+        account = (
+            self.db.query(GameAccount)
+            .filter(
+                GameAccount.account_id == account_id,
+                GameAccount.user_id == user_id,
+            )
+            .first()
+        )
+        if not account:
+            return MapSaveResponse(
+                success=False,
+                message="無權存取此遊戲帳號",
+                villages_saved=0,
+                players_found=0,
+                alliances_found=0,
+            )
+
+        # 解析 SQL 內容
+        parse_result = self.parse_sql(sql_content)
+
+        if parse_result.total_villages == 0:
+            return MapSaveResponse(
+                success=False,
+                message="未能解析任何村莊數據，請確認 map.sql 格式正確",
+                villages_saved=0,
+                players_found=0,
+                alliances_found=0,
+            )
+
+        # 建立快照
+        snapshot = MapSnapshot(
+            account_id=account_id,
+            server_url=account.server_url,
+            total_villages=parse_result.total_villages,
+            total_players=parse_result.total_players,
+            total_alliances=parse_result.total_alliances,
+        )
+        self.db.add(snapshot)
+        self.db.flush()
+
+        # 批量儲存村莊
+        villages_saved = 0
+        for village in parse_result.villages:
+            if village.village_id:
+                village_data = MapVillageData(
+                    snapshot_id=snapshot.snapshot_id,
+                    travian_village_id=village.village_id,
+                    village_name=village.village_name,
+                    x=village.x,
+                    y=village.y,
+                    field_type=village.field_type,
+                    travian_player_id=village.player_id,
+                    player_name=village.player_name,
+                    travian_alliance_id=village.alliance_id,
+                    alliance_name=village.alliance_name,
+                    population=village.population,
+                    is_capital=village.is_capital,
+                )
+                self.db.add(village_data)
+                villages_saved += 1
+
+        # 儲存玩家數據
+        for player in parse_result.players:
+            player_data = MapPlayerData(
+                snapshot_id=snapshot.snapshot_id,
+                travian_player_id=player.player_id,
+                player_name=player.player_name,
+                travian_alliance_id=player.alliance_id,
+                alliance_name=player.alliance_name,
+                village_count=player.village_count,
+                total_population=player.total_population,
+            )
+            self.db.add(player_data)
+
+        # 儲存聯盟數據
+        for alliance in parse_result.alliances:
+            alliance_data = MapAllianceData(
+                snapshot_id=snapshot.snapshot_id,
+                travian_alliance_id=alliance.alliance_id,
+                alliance_name=alliance.alliance_name,
+                member_count=alliance.member_count,
+                total_population=alliance.total_population,
+            )
+            self.db.add(alliance_data)
+
+        self.db.commit()
+
+        return MapSaveResponse(
+            success=True,
+            message=f"成功儲存 {villages_saved} 個村莊, {parse_result.total_players} 個玩家, {parse_result.total_alliances} 個聯盟",
+            villages_saved=villages_saved,
+            players_found=parse_result.total_players,
+            alliances_found=parse_result.total_alliances,
+        )
+
+    def get_snapshots(self, account_id: str) -> list[MapSnapshot]:
+        """取得帳號的所有快照."""
+        if not self.db:
+            return []
+        return (
+            self.db.query(MapSnapshot)
+            .filter(MapSnapshot.account_id == account_id)
+            .order_by(MapSnapshot.created_at.desc())
+            .all()
+        )
+
+    def get_snapshot_villages(
+        self,
+        snapshot_id: str,
+        player_name: str | None = None,
+        alliance_name: str | None = None,
+        center_x: int | None = None,
+        center_y: int | None = None,
+        radius: int | None = None,
+    ) -> list[MapVillageData]:
+        """取得快照中的村莊."""
+        if not self.db:
+            return []
+
+        query = self.db.query(MapVillageData).filter(
+            MapVillageData.snapshot_id == snapshot_id
+        )
+
+        if player_name:
+            query = query.filter(MapVillageData.player_name.ilike(f"%{player_name}%"))
+
+        if alliance_name:
+            query = query.filter(
+                MapVillageData.alliance_name.ilike(f"%{alliance_name}%")
+            )
+
+        if center_x is not None and center_y is not None and radius is not None:
+            query = query.filter(
+                MapVillageData.x >= center_x - radius,
+                MapVillageData.x <= center_x + radius,
+                MapVillageData.y >= center_y - radius,
+                MapVillageData.y <= center_y + radius,
+            )
+
+        return query.all()

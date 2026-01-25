@@ -19,9 +19,14 @@ class ReportType(str, Enum):
     """戰鬥報告類型."""
 
     ATTACK = "attack"
+    ATTACK_INCOMING = "attack_incoming"
     DEFENSE = "defense"
     SCOUT = "scout"
+    SPY = "spy"
+    TRADE = "trade"
     REINFORCEMENT = "reinforcement"
+    ADVENTURE = "adventure"
+    UNKNOWN = "unknown"
 
 
 class BattleResult(str, Enum):
@@ -50,14 +55,29 @@ class BattleReport(Base):
         ForeignKey("game_accounts.account_id", ondelete="CASCADE"),
         nullable=False,
     )
+    travian_report_id: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+        unique=True,
+        comment="Travian 遊戲內的報告 ID",
+    )
     report_type: Mapped[ReportType] = mapped_column(
         String(20),
         nullable=False,
         comment="報告類型",
     )
-    battle_time: Mapped[datetime] = mapped_column(
+    title: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+        comment="報告標題",
+    )
+    is_read: Mapped[bool] = mapped_column(
+        default=False,
+        comment="是否已讀",
+    )
+    battle_time: Mapped[datetime | None] = mapped_column(
         DateTime,
-        nullable=False,
+        nullable=True,
         comment="戰鬥發生時間",
     )
     attacker_troops: Mapped[dict[str, Any] | None] = mapped_column(

@@ -6,8 +6,9 @@ from pydantic import BaseModel, Field
 class MapVillage(BaseModel):
     """地圖村莊數據."""
 
-    x: int = Field(..., ge=-400, le=400, description="X 座標")
-    y: int = Field(..., ge=-400, le=400, description="Y 座標")
+    # 座標範圍根據伺服器大小不同，不設限制
+    x: int = Field(..., description="X 座標")
+    y: int = Field(..., description="Y 座標")
     field_type: int = Field(0, description="地形類型")
     village_id: int | None = Field(None, description="村莊 ID")
     village_name: str | None = Field(None, description="村莊名稱")
@@ -56,6 +57,18 @@ class MapParseResponse(BaseModel):
     total_villages: int
     total_players: int
     total_alliances: int
+
+
+class MapDownloadRequest(BaseModel):
+    """Map.sql 下載請求."""
+
+    server_url: str = Field(..., description="伺服器網址，如 https://ts1.travian.com")
+
+
+class MapDownloadAndSaveRequest(BaseModel):
+    """Map.sql 下載並儲存請求."""
+
+    account_id: str = Field(..., description="遊戲帳號 ID")
 
 
 class MapSaveRequest(BaseModel):

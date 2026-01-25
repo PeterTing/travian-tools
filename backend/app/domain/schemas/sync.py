@@ -28,17 +28,17 @@ class ProductionData(BaseModel):
 class ResourceFieldData(BaseModel):
     """資源田數據."""
 
-    position: int = Field(..., ge=1, le=18)
+    position: int = Field(..., ge=1, le=99)  # 放寬驗證
     resource_type: str = Field(..., description="資源類型: wood/clay/iron/crop")
-    level: int = Field(0, ge=0, le=20)
+    level: int = Field(0, ge=0, le=30)  # 放寬等級上限
 
 
 class BuildingData(BaseModel):
     """建築數據."""
 
-    position: int = Field(..., ge=19, le=40)
+    position: int = Field(..., ge=1, le=99)  # 放寬驗證以支援不同版本
     building_id: str = Field(..., description="建築 ID")
-    level: int = Field(0, ge=0, le=20)
+    level: int = Field(0, ge=0, le=30)  # 放寬等級上限
     is_upgrading: bool = False
     upgrade_finish_time: datetime | None = None
 
@@ -48,6 +48,7 @@ class TroopData(BaseModel):
 
     troop_id: str = Field(..., description="部隊 ID")
     count: int = Field(0, ge=0)
+    location: str = Field("home", description="部隊位置: home/training/away")
     is_training: bool = False
     training_finish_time: datetime | None = None
 
@@ -77,9 +78,12 @@ class VillageOverviewSync(BaseModel):
     village_name: str | None = None
     coordinate_x: int | None = Field(None, ge=-400, le=400)
     coordinate_y: int | None = Field(None, ge=-400, le=400)
+    population: int = Field(0, ge=0)
+    is_capital: bool = False
     resources: ResourceData
     production: ProductionData
     resource_fields: list[ResourceFieldData] = []
+    troops: list[TroopData] = []
 
 
 class VillageCenterSync(BaseModel):
@@ -87,7 +91,13 @@ class VillageCenterSync(BaseModel):
 
     account_id: str
     village_id: str | None = None
+    village_name: str | None = None
+    coordinate_x: int | None = Field(None, ge=-400, le=400)
+    coordinate_y: int | None = Field(None, ge=-400, le=400)
+    population: int = Field(0, ge=0)
+    is_capital: bool = False
     buildings: list[BuildingData] = []
+    troops: list[TroopData] = []
 
 
 class TroopSync(BaseModel):
@@ -123,3 +133,36 @@ class FullSyncResponse(BaseModel):
     villages_synced: int
     buildings_synced: int
     troops_synced: int
+
+
+class ReportData(BaseModel):
+    """報告數據."""
+
+    report_id: str = Field(..., description="Travian 報告 ID")
+    report_type: str = Field("unknown", description="報告類型")
+    title: str | None = None
+    timestamp: str | None = None
+    is_read: bool = False
+    url: str | None = None
+    # 詳細報告資料
+    attacker: dict | None = None
+    defender: dict | None = None
+    resources_stolen: dict | None = None
+
+
+class ReportsSync(BaseModel):
+    """報告同步請求."""
+
+    account_id: str
+    reports: list[ReportData] = []
+
+
+class ReportsSyncResponse(BaseModel):
+    """報告同步回應."""
+
+    success: bool
+    message: str
+    synced_at: datetime
+    count: int = 0
+    new_count: int = 0
+    updated_count: int = 0

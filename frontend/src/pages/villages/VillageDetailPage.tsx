@@ -17,19 +17,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useAuth } from '@/contexts/AuthContext'
+import { Badge } from '@/components/ui/badge'
 import { villageApi } from '@/services/villageApi'
+import { syncApi, type SyncLog, type SyncStats } from '@/services/syncApi'
 import type { VillageDetail } from '@/types/game'
 
 export default function VillageDetailPage() {
   const { t } = useTranslation()
-  const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const { villageId } = useParams<{ villageId: string }>()
 
   const [village, setVillage] = useState<VillageDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lastSync, setLastSync] = useState<SyncLog | null>(null)
+  const [syncStats, setSyncStats] = useState<SyncStats | null>(null)
+  const [syncLoading, setSyncLoading] = useState(false)
 
   const loadVillage = useCallback(async (id: string) => {
     try {
@@ -37,6 +40,18 @@ export default function VillageDetailPage() {
       setError(null)
       const data = await villageApi.getById(id)
       setVillage(data)
+
+      // 載入同步狀態
+      try {
+        const [lastSyncData, statsData] = await Promise.all([
+          syncApi.getLastSync({ village_id: id }),
+          syncApi.getStats(data.account_id),
+        ])
+        setLastSync(lastSyncData)
+        setSyncStats(statsData)
+      } catch {
+        // 同步狀態載入失敗不影響主要功能
+      }
     } catch {
       setError(t('villages.loadError'))
     } finally {
@@ -44,15 +59,39 @@ export default function VillageDetailPage() {
     }
   }, [t])
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth/login')
-      return
+  const handleRefreshSync = async () => {
+    if (!villageId) return
+    setSyncLoading(true)
+    try {
+      const [lastSyncData, statsData] = await Promise.all([
+        syncApi.getLastSync({ village_id: villageId }),
+        village ? syncApi.getStats(village.account_id) : Promise.resolve(null),
+      ])
+      setLastSync(lastSyncData)
+      if (statsData) setSyncStats(statsData)
+    } finally {
+      setSyncLoading(false)
     }
+  }
+
+  const getSyncStatusBadge = (status: string) => {
+    switch (status) {
+      case 'success':
+        return <Badge variant="default" className="bg-green-100 text-green-800">{t('sync.statusSuccess')}</Badge>
+      case 'failed':
+        return <Badge variant="destructive">{t('sync.statusFailed')}</Badge>
+      case 'in_progress':
+        return <Badge variant="secondary">{t('sync.statusInProgress')}</Badge>
+      default:
+        return <Badge variant="outline">{t('sync.statusPending')}</Badge>
+    }
+  }
+
+  useEffect(() => {
     if (villageId) {
       loadVillage(villageId)
     }
-  }, [isAuthenticated, navigate, villageId, loadVillage])
+  }, [villageId, loadVillage])
 
   const getRoleBadgeColor = (role: string | null) => {
     switch (role) {
@@ -111,6 +150,65 @@ export default function VillageDetailPage() {
           {t('villages.backToList')}
         </Button>
       </div>
+
+      {/* 同步狀態 */}
+      <Card className="mb-6">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-lg">{t('sync.title')}</CardTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefreshSync}
+            disabled={syncLoading}
+          >
+            {syncLoading ? t('common.loading') : t('sync.refresh')}
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-4">
+            <div className="text-center p-3 bg-muted rounded-lg">
+              <p className="text-xl font-bold">{syncStats?.total_syncs ?? 0}</p>
+              <p className="text-xs text-muted-foreground">{t('sync.totalSyncs')}</p>
+            </div>
+            <div className="text-center p-3 bg-muted rounded-lg">
+              <p className="text-xl font-bold text-green-600">{syncStats?.successful_syncs ?? 0}</p>
+              <p className="text-xs text-muted-foreground">{t('sync.successfulSyncs')}</p>
+            </div>
+            <div className="text-center p-3 bg-muted rounded-lg">
+              <p className="text-xl font-bold text-red-600">{syncStats?.failed_syncs ?? 0}</p>
+              <p className="text-xs text-muted-foreground">{t('sync.failedSyncs')}</p>
+            </div>
+            <div className="text-center p-3 bg-muted rounded-lg">
+              <p className="text-xl font-bold">{syncStats?.items_synced_today ?? 0}</p>
+              <p className="text-xs text-muted-foreground">{t('sync.itemsToday')}</p>
+            </div>
+          </div>
+          {lastSync && (
+            <div className="mt-4 p-3 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">{t('sync.lastSync')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(lastSync.started_at).toLocaleString()}
+                  </p>
+                </div>
+                {getSyncStatusBadge(lastSync.status)}
+              </div>
+              {lastSync.message && (
+                <p className="text-xs text-muted-foreground mt-2">{lastSync.message}</p>
+              )}
+              {lastSync.error_details && (
+                <p className="text-xs text-destructive mt-2">{lastSync.error_details}</p>
+              )}
+            </div>
+          )}
+          {!lastSync && (
+            <p className="mt-4 text-sm text-muted-foreground text-center">
+              {t('sync.noSyncYet')}
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* 基本資訊 */}
@@ -209,7 +307,7 @@ export default function VillageDetailPage() {
                   .map((building) => (
                     <TableRow key={building.instance_id}>
                       <TableCell>{building.position ?? '-'}</TableCell>
-                      <TableCell>{building.building_id}</TableCell>
+                      <TableCell>{t(`buildingNames.${building.building_id}`, { defaultValue: building.building_id })}</TableCell>
                       <TableCell>{building.current_level}</TableCell>
                       <TableCell>
                         {building.is_upgrading ? (
@@ -250,7 +348,7 @@ export default function VillageDetailPage() {
               <TableBody>
                 {village.troops.map((troop) => (
                   <TableRow key={troop.instance_id}>
-                    <TableCell>{troop.troop_id}</TableCell>
+                    <TableCell>{t(`troopNames.${troop.troop_id}`, { defaultValue: troop.troop_id })}</TableCell>
                     <TableCell>{troop.count}</TableCell>
                     <TableCell>{troop.location}</TableCell>
                     <TableCell>

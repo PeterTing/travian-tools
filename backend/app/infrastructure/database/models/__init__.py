@@ -7,6 +7,12 @@ from app.infrastructure.database.models.battle_report import (
 )
 from app.infrastructure.database.models.building_instance import BuildingInstance
 from app.infrastructure.database.models.game_account import GameAccount, TribeType
+from app.infrastructure.database.models.map_data import (
+    MapAllianceData,
+    MapPlayerData,
+    MapSnapshot,
+    MapVillageData,
+)
 from app.infrastructure.database.models.sync_log import SyncLog, SyncStatus, SyncType
 from app.infrastructure.database.models.troop_instance import (
     TroopInstance,
@@ -24,6 +30,10 @@ __all__ = [
     "TroopInstance",
     "BattleReport",
     "SyncLog",
+    "MapSnapshot",
+    "MapVillageData",
+    "MapPlayerData",
+    "MapAllianceData",
     # Enums
     "TribeType",
     "VillageRole",

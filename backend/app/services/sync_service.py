@@ -5,12 +5,14 @@ from sqlalchemy.orm import Session
 from app.domain.schemas.sync import (
     BuildingData,
     FullSync,
+    ReportsSync,
     ResourceFieldData,
     TroopData,
     TroopSync,
     VillageCenterSync,
     VillageOverviewSync,
 )
+from app.infrastructure.database.models.battle_report import BattleReport, ReportType
 from app.infrastructure.database.models.building_instance import BuildingInstance
 from app.infrastructure.database.models.game_account import GameAccount
 from app.infrastructure.database.models.sync_log import SyncStatus, SyncType
@@ -42,19 +44,32 @@ class SyncService:
     def _find_or_create_village(
         self,
         account_id: str,
-        village_id: str | None,
+        travian_village_id: str | None,
         name: str | None,
         x: int | None,
         y: int | None,
     ) -> Village:
-        """查找或建立村莊."""
+        """查找或建立村莊.
+
+        優先順序：
+        1. 透過 travian_village_id 查找（Travian 的 data-did）
+        2. 透過座標查找
+        3. 建立新村莊
+        """
         village = None
 
-        if village_id:
+        # 1. 透過 Travian 村莊 ID 查找
+        if travian_village_id:
             village = (
-                self.db.query(Village).filter(Village.village_id == village_id).first()
+                self.db.query(Village)
+                .filter(
+                    Village.account_id == account_id,
+                    Village.travian_village_id == travian_village_id,
+                )
+                .first()
             )
 
+        # 2. 透過座標查找
         if not village and x is not None and y is not None:
             village = (
                 self.db.query(Village)
@@ -66,15 +81,26 @@ class SyncService:
                 .first()
             )
 
+        # 3. 建立新村莊
         if not village:
             village = Village(
                 account_id=account_id,
+                travian_village_id=travian_village_id,
                 name=name,
                 coordinate_x=x,
                 coordinate_y=y,
             )
             self.db.add(village)
             self.db.flush()
+        else:
+            # 更新現有村莊的 travian_village_id（如果之前沒有）
+            if travian_village_id and not village.travian_village_id:
+                village.travian_village_id = travian_village_id
+            # 更新座標（如果之前沒有）
+            if x is not None and village.coordinate_x is None:
+                village.coordinate_x = x
+            if y is not None and village.coordinate_y is None:
+                village.coordinate_y = y
 
         return village
 
@@ -157,6 +183,7 @@ class SyncService:
 
             if existing:
                 existing.count = troop.count
+                existing.location = troop.location
                 existing.is_training = troop.is_training
                 existing.training_finish_time = troop.training_finish_time
             else:
@@ -164,6 +191,7 @@ class SyncService:
                     village_id=village.village_id,
                     troop_id=troop.troop_id,
                     count=troop.count,
+                    location=troop.location,
                     is_training=troop.is_training,
                     training_finish_time=troop.training_finish_time,
                 )
@@ -202,7 +230,19 @@ class SyncService:
             if data.village_name:
                 village.name = data.village_name
 
+            # 更新人口
+            if data.population > 0:
+                village.population = data.population
+
+            # 更新首都狀態
+            if data.is_capital:
+                village.is_capital = True
+
             items_synced = self._sync_resource_fields(village, data.resource_fields)
+
+            # 同步部隊
+            if data.troops:
+                items_synced += self._sync_troops(village, data.troops)
 
             self.log_service.complete_log(
                 log,
@@ -225,7 +265,7 @@ class SyncService:
             user_id=user_id,
             sync_type=SyncType.VILLAGE_CENTER,
             account_id=data.account_id,
-            village_id=data.village_id,
+            # 注意：不傳入 village_id，因為 data.village_id 是 Travian 的 ID，不是我們的 UUID
         )
 
         try:
@@ -239,13 +279,29 @@ class SyncService:
             village = self._find_or_create_village(
                 data.account_id,
                 data.village_id,
-                None,
-                None,
-                None,
+                data.village_name,
+                data.coordinate_x,
+                data.coordinate_y,
             )
             log.village_id = village.village_id
 
+            # 更新村莊名稱（如果有提供）
+            if data.village_name:
+                village.name = data.village_name
+
+            # 更新人口
+            if data.population > 0:
+                village.population = data.population
+
+            # 更新首都狀態
+            if data.is_capital:
+                village.is_capital = True
+
             items_synced = self._sync_buildings(village, data.buildings)
+
+            # 同步部隊
+            if data.troops:
+                items_synced += self._sync_troops(village, data.troops)
 
             self.log_service.complete_log(
                 log,
@@ -370,6 +426,95 @@ class SyncService:
                 villages_synced,
                 buildings_synced,
                 troops_synced,
+            )
+        except Exception as e:
+            self.log_service.complete_log(log, SyncStatus.FAILED, error_details=str(e))
+            self.db.commit()
+            raise
+
+    def _map_report_type(self, report_type_str: str) -> ReportType:
+        """將字串報告類型映射到 ReportType enum."""
+        mapping = {
+            "attack": ReportType.ATTACK,
+            "attack_incoming": ReportType.ATTACK_INCOMING,
+            "defense": ReportType.DEFENSE,
+            "scout": ReportType.SCOUT,
+            "spy": ReportType.SPY,
+            "trade": ReportType.TRADE,
+            "reinforcement": ReportType.REINFORCEMENT,
+            "adventure": ReportType.ADVENTURE,
+        }
+        return mapping.get(report_type_str.lower(), ReportType.UNKNOWN)
+
+    def sync_reports(
+        self, user_id: str, data: ReportsSync
+    ) -> tuple[bool, str, int, int, int]:
+        """同步報告數據."""
+        log = self.log_service.create_log(
+            user_id=user_id,
+            sync_type=SyncType.FULL,  # 使用 FULL 作為報告同步類型
+            account_id=data.account_id,
+        )
+
+        try:
+            if not self._verify_account_ownership(data.account_id, user_id):
+                self.log_service.complete_log(
+                    log, SyncStatus.FAILED, message="無權存取此遊戲帳號"
+                )
+                self.db.commit()
+                return False, "無權存取此遊戲帳號", 0, 0, 0
+
+            new_count = 0
+            updated_count = 0
+
+            for report_data in data.reports:
+                # 先用 travian_report_id 查找是否已存在
+                existing = (
+                    self.db.query(BattleReport)
+                    .filter(
+                        BattleReport.account_id == data.account_id,
+                        BattleReport.travian_report_id == report_data.report_id,
+                    )
+                    .first()
+                )
+
+                if existing:
+                    # 更新現有報告
+                    existing.title = report_data.title
+                    existing.is_read = report_data.is_read
+                    existing.report_type = self._map_report_type(
+                        report_data.report_type
+                    )
+                    if report_data.resources_stolen:
+                        existing.resources_stolen = report_data.resources_stolen
+                    updated_count += 1
+                else:
+                    # 建立新報告
+                    report = BattleReport(
+                        account_id=data.account_id,
+                        travian_report_id=report_data.report_id,
+                        report_type=self._map_report_type(report_data.report_type),
+                        title=report_data.title,
+                        is_read=report_data.is_read,
+                        resources_stolen=report_data.resources_stolen,
+                    )
+                    self.db.add(report)
+                    new_count += 1
+
+            total_count = new_count + updated_count
+            self.log_service.complete_log(
+                log,
+                SyncStatus.SUCCESS,
+                items_synced=total_count,
+                message=f"報告同步成功: {new_count} 新增, {updated_count} 更新",
+            )
+            self.db.commit()
+            return (
+                True,
+                f"報告同步成功: {new_count} 新增, {updated_count} 更新",
+                total_count,
+                new_count,
+                updated_count,
             )
         except Exception as e:
             self.log_service.complete_log(log, SyncStatus.FAILED, error_details=str(e))

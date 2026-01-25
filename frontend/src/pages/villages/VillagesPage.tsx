@@ -26,7 +26,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { useAuth } from '@/contexts/AuthContext'
 import { gameAccountApi } from '@/services/gameAccountApi'
 import { villageApi } from '@/services/villageApi'
 import type { GameAccount, Village } from '@/types/game'
@@ -34,7 +33,6 @@ import VillageForm from './VillageForm'
 
 export default function VillagesPage() {
   const { t } = useTranslation()
-  const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
   const [accounts, setAccounts] = useState<GameAccount[]>([])
@@ -46,12 +44,8 @@ export default function VillagesPage() {
   const [deleteVillageId, setDeleteVillageId] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth/login')
-      return
-    }
     loadAccounts()
-  }, [isAuthenticated, navigate])
+  }, [])
 
   useEffect(() => {
     if (selectedAccountId) {

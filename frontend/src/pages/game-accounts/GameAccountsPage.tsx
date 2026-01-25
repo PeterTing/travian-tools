@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -19,15 +18,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { useAuth } from '@/contexts/AuthContext'
 import { gameAccountApi } from '@/services/gameAccountApi'
 import type { GameAccount } from '@/types/game'
 import GameAccountForm from './GameAccountForm'
 
 export default function GameAccountsPage() {
   const { t } = useTranslation()
-  const { isAuthenticated } = useAuth()
-  const navigate = useNavigate()
 
   const [accounts, setAccounts] = useState<GameAccount[]>([])
   const [loading, setLoading] = useState(true)
@@ -36,12 +32,8 @@ export default function GameAccountsPage() {
   const [deleteAccountId, setDeleteAccountId] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth/login')
-      return
-    }
     loadAccounts()
-  }, [isAuthenticated, navigate])
+  }, [])
 
   const loadAccounts = async () => {
     try {

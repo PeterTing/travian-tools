@@ -728,7 +728,7 @@
 
 ### TICKET-205: 村莊數據抓取實作 ✅
 
-**類型**: Backend
+**類型**: Backend + Browser Extension
 
 **狀態**: ✅ 完成
 
@@ -749,13 +749,15 @@
 
 **依賴**: TICKET-204
 
-**完成日期**: 2026-01-24
+**完成日期**: 2026-01-25
 
 **實作摘要**:
 
-- 後端 API: `POST /api/v1/sync/villages` 同步端點
+- 後端 API: `POST /api/v1/sync/village-overview`, `POST /api/v1/sync/village-center` 同步端點
 - SyncService: 村莊、建築、部隊同步邏輯
-- Pydantic Schemas: SyncVillageRequest, SyncBuildingData, SyncTroopData
+- Pydantic Schemas: VillageOverviewSync, VillageCenterSync, TroopSync
+- 瀏覽器擴展: Chrome/Firefox 兼容，支援 dorf1.php 和 dorf2.php 頁面抓取
+- 檔案位置: `browser-extension/` 目錄
 - 錯誤處理: 驗證失敗、資料庫錯誤
 - 單元測試: 7 tests
 
@@ -763,7 +765,7 @@
 
 ### TICKET-206: Map.sql 解析器 ✅
 
-**類型**: Backend
+**類型**: Full-Stack
 
 **狀態**: ✅ 完成
 
@@ -782,14 +784,17 @@
 
 **技術規格參考**: PROJECT-REQUIREMENTS.md 5.2 節（Map.sql 解析）
 
-**完成日期**: 2026-01-24
+**完成日期**: 2026-01-25
 
 **實作摘要**:
 
-- 後端 API: `POST /api/v1/map-sql/parse` 解析端點
-- MapSqlService: 正則解析 SQL INSERT 語句
-- Pydantic Schemas: MapSqlData, MapVillage, MapPlayer, MapAlliance
+- 後端 API: `POST /api/v1/map-sql/parse` 解析端點, `POST /api/v1/map-sql/save` 儲存端點
+- MapSqlService: 正則解析 CSV 格式，支援儲存到資料庫
+- Pydantic Schemas: MapParseResponse, MapSaveResponse, MapVillage, MapPlayer, MapAlliance
+- 資料庫模型: MapSnapshot, MapVillageData, MapPlayerData, MapAllianceData
+- 前端頁面: MapSqlPage（上傳、解析、儲存、搜尋功能）
 - 支援統計資訊：村莊數、玩家數、聯盟數
+- 支援座標範圍、玩家名稱、聯盟名稱搜尋
 - 單元測試: 29 tests（13 API + 16 service）
 
 ---
@@ -816,14 +821,18 @@
 
 **依賴**: TICKET-205, TICKET-206
 
-**完成日期**: 2026-01-24
+**完成日期**: 2026-01-25
 
 **實作摘要**:
 
 - SyncLog Model: 同步日誌資料表
 - SyncLogService: 建立、完成、查詢同步記錄
+- SchedulerService: APScheduler 排程服務（單例模式）
 - 後端 API: `GET /api/v1/sync-logs` 同步日誌端點
+- 後端 API: `GET /api/v1/scheduler/jobs` 排程任務列表
+- 後端 API: `POST /api/v1/scheduler/sync-reminder` 新增同步提醒
 - 支援 should_sync() 檢查、同步間隔控制
+- 支援自動清理舊同步日誌（30 天）
 - 單元測試: 13 tests
 
 ---
@@ -854,14 +863,16 @@
 
 **依賴**: TICKET-203
 
-**完成日期**: 2026-01-24
+**完成日期**: 2026-01-25
 
 **實作摘要**:
 
 - VillagesPage: 村莊列表，依帳號篩選
-- VillageDetailPage: 村莊詳情、建築表格、部隊表格
+- VillageDetailPage: 村莊詳情、建築表格、部隊表格、同步狀態卡片
 - VillageForm: 新增/編輯村莊表單
-- UI 元件: Table, Select（Radix UI）
+- syncApi: 同步日誌和統計 API 服務
+- UI 元件: Table, Select, Badge（Radix UI）
+- 同步狀態顯示: 總同步次數、成功/失敗數、今日同步項目、最後同步時間
 - i18n: 中英文翻譯
 - 響應式設計: 桌面/平板/手機
 
@@ -1308,4 +1319,5 @@
 | 1.7 | 2026-01-23 | TICKET-105 完成 - 兵種數據查詢 API |
 | 1.8 | 2026-01-23 | TICKET-106~112 完成 - Phase 1 全部完成（資源田 API、計算器 API、前端頁面） |
 | 1.9 | 2026-01-24 | TICKET-201 完成 - 用戶註冊/登入系統（JWT 認證、bcrypt 密碼、前端頁面） |
-| 2.0 | 2026-01-24 | Phase 2 全部完成 - TICKET-202~208（遊戲帳號管理、村莊 CRUD、Browser MCP 研究、數據抓取、Map.sql 解析、同步機制、村莊前端頁面） |
+| 2.0 | 2026-01-24 | Phase 2 部分完成 - TICKET-202~204（遊戲帳號管理、村莊 CRUD、Browser MCP 研究） |
+| 2.1 | 2026-01-25 | Phase 2 全部完成 - TICKET-205~208 補齊實作（瀏覽器擴展、Map.sql 完整功能、APScheduler 排程、村莊同步狀態顯示） |
