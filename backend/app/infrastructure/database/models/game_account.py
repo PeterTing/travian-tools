@@ -29,6 +29,15 @@ class TribeType(str, enum.Enum):
     SPARTANS = "spartans"
 
 
+class PlayerRole(str, enum.Enum):
+    """玩家角色定位枚舉."""
+
+    ATTACKER = "attacker"  # 進攻手：重視攻擊部隊、錘子村
+    DEFENDER = "defender"  # 防守手：重視防禦部隊、鐵砧村
+    FARMER = "farmer"  # 經濟發展：重視資源產量、村莊數
+    HYBRID = "hybrid"  # 混合型：平衡發展
+
+
 class GameAccount(Base):
     """遊戲帳號資料表.
 
@@ -57,6 +66,11 @@ class GameAccount(Base):
     player_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     alliance_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     account_age_days: Mapped[int] = mapped_column(Integer, default=0)
+    player_role: Mapped[PlayerRole | None] = mapped_column(
+        Enum(PlayerRole, values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+        default=None,
+    )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_updated: Mapped[datetime | None] = mapped_column(
         DateTime,

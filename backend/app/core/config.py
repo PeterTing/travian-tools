@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     CLAUDE_MODEL: str = "claude-sonnet-4-20250514"
     CLAUDE_MAX_TOKENS: int = 4096
     CLAUDE_TEMPERATURE: float = 0.7
+    ANTHROPIC_BASE_URL: str = ""  # 可選：自訂 API base URL (例如 proxy)
 
     @property
     def cors_origins_list(self) -> list[str]:

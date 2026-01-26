@@ -216,7 +216,7 @@ class TestStrategyServiceEvaluateProgress:
             total_population=100,  # 最低 500
         )
         assert status == ProgressStatus.BEHIND
-        assert "村莊" in desc or "人口" in desc
+        assert "落後" in desc or "村莊" in desc or "人口" in desc
 
     def test_evaluate_progress_behind_population(self):
         """測試落後進度評估 - 人口不足."""

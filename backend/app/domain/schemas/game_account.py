@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.infrastructure.database.models.game_account import TribeType
+from app.infrastructure.database.models.game_account import PlayerRole, TribeType
 
 
 class GameAccountBase(BaseModel):
@@ -17,6 +17,10 @@ class GameAccountBase(BaseModel):
     player_name: str | None = Field(None, max_length=50, description="遊戲內玩家名稱")
     alliance_name: str | None = Field(None, max_length=50, description="聯盟名稱")
     account_age_days: int = Field(0, ge=0, description="帳號天數")
+    player_role: PlayerRole | None = Field(
+        None,
+        description="玩家角色定位: attacker(進攻手), defender(防守手), farmer(經濟發展), hybrid(混合型)",
+    )
 
     @field_validator("server_url")
     @classmethod
@@ -44,6 +48,7 @@ class GameAccountUpdate(BaseModel):
     player_name: str | None = Field(None, max_length=50)
     alliance_name: str | None = Field(None, max_length=50)
     account_age_days: int | None = Field(None, ge=0)
+    player_role: PlayerRole | None = None
     is_active: bool | None = None
 
     @field_validator("server_url")
@@ -63,6 +68,7 @@ class GameAccountResponse(GameAccountBase):
 
     account_id: str
     user_id: str
+    player_role: PlayerRole | None
     is_active: bool
     last_updated: datetime | None
     created_at: datetime

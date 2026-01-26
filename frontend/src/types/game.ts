@@ -335,6 +335,8 @@ export interface CropBalanceResponse {
 
 // ============ 遊戲帳號類型 ============
 
+export type PlayerRole = 'attacker' | 'defender' | 'farmer' | 'hybrid'
+
 export interface GameAccountCreate {
   server_url: string
   server_name?: string
@@ -343,6 +345,7 @@ export interface GameAccountCreate {
   player_name?: string
   alliance_name?: string
   account_age_days?: number
+  player_role?: PlayerRole
 }
 
 export interface GameAccountUpdate {
@@ -354,6 +357,7 @@ export interface GameAccountUpdate {
   alliance_name?: string
   account_age_days?: number
   is_active?: boolean
+  player_role?: PlayerRole
 }
 
 export interface GameAccount {
@@ -366,6 +370,7 @@ export interface GameAccount {
   player_name: string | null
   alliance_name: string | null
   account_age_days: number
+  player_role: PlayerRole | null
   is_active: boolean
   last_updated: string | null
   created_at: string

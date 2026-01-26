@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,7 +15,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { gameAccountApi } from '@/services/gameAccountApi'
-import type { GameAccount } from '@/types/game'
+import type { GameAccount, PlayerRole } from '@/types/game'
 import {
   getAdvice,
   detectPhase,
@@ -35,7 +36,16 @@ export default function AIAdvisorPage() {
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isUpdatingRole, setIsUpdatingRole] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // 角色選項
+  const roleOptions: { value: PlayerRole; label: string; description: string }[] = [
+    { value: 'attacker', label: t('strategy.role.attacker'), description: t('strategy.role.attackerDesc') },
+    { value: 'defender', label: t('strategy.role.defender'), description: t('strategy.role.defenderDesc') },
+    { value: 'farmer', label: t('strategy.role.farmer'), description: t('strategy.role.farmerDesc') },
+    { value: 'hybrid', label: t('strategy.role.hybrid'), description: t('strategy.role.hybridDesc') },
+  ]
 
   // 載入帳號列表
   useEffect(() => {
@@ -121,6 +131,28 @@ export default function AIAdvisorPage() {
     setError(null)
   }
 
+  const handleRoleChange = async (role: PlayerRole) => {
+    if (!selectedAccountId) return
+
+    setIsUpdatingRole(true)
+    try {
+      const updatedAccount = await gameAccountApi.update(selectedAccountId, { player_role: role })
+      // 更新本地帳號列表
+      setAccounts((prev) =>
+        prev.map((acc) =>
+          acc.account_id === selectedAccountId ? { ...acc, player_role: updatedAccount.player_role } : acc
+        )
+      )
+      // 重新載入階段資訊
+      const data = await detectPhase(selectedAccountId)
+      setPhaseInfo(data)
+    } catch (err) {
+      console.error('更新角色失敗:', err)
+    } finally {
+      setIsUpdatingRole(false)
+    }
+  }
+
   const getProgressBadgeVariant = (status: string) => {
     switch (status) {
       case 'ahead':
@@ -172,6 +204,38 @@ export default function AIAdvisorPage() {
               </Select>
             </CardContent>
           </Card>
+
+          {/* 玩家角色設定 */}
+          {selectedAccountId && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">{t('strategy.playerRole')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Select
+                  value={accounts.find((a) => a.account_id === selectedAccountId)?.player_role || ''}
+                  onValueChange={(value) => handleRoleChange(value as PlayerRole)}
+                  disabled={isUpdatingRole}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('strategy.selectRolePlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roleOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex flex-col">
+                          <span>{option.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {t('strategy.roleHint')}
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* 階段資訊 */}
           {phaseInfo && (
@@ -282,7 +346,13 @@ export default function AIAdvisorPage() {
                             : 'bg-muted'
                         }`}
                       >
-                        <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+                        {msg.role === 'assistant' ? (
+                          <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                          </div>
+                        ) : (
+                          <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+                        )}
                       </div>
                     </div>
                   ))

@@ -10,9 +10,46 @@ from app.domain.schemas.strategy import (
     PhaseStandard,
     ProgressStatus,
 )
-from app.infrastructure.database.models.game_account import GameAccount
+from app.infrastructure.database.models.game_account import GameAccount, PlayerRole
 from app.infrastructure.database.models.village import Village
 from app.services.game_data_service import get_game_data_service
+
+# ============ 根據玩家角色的評估調整係數 ============
+
+ROLE_ADJUSTMENTS = {
+    # 進攻手：部隊更重要，村莊/人口要求稍低
+    PlayerRole.ATTACKER: {
+        "village_weight": 0.8,
+        "population_weight": 0.7,
+        "troop_weight": 1.5,
+        "focus": "部隊訓練和攻擊能力",
+        "key_metrics": ["部隊攻擊力", "錘子村發展", "資源掠奪效率"],
+    },
+    # 防守手：防禦部隊重要，村莊數適中
+    PlayerRole.DEFENDER: {
+        "village_weight": 0.9,
+        "population_weight": 0.8,
+        "troop_weight": 1.3,
+        "focus": "防禦部隊和城牆",
+        "key_metrics": ["防禦部隊數量", "城牆等級", "增援速度"],
+    },
+    # 經濟發展：村莊和人口最重要
+    PlayerRole.FARMER: {
+        "village_weight": 1.3,
+        "population_weight": 1.2,
+        "troop_weight": 0.6,
+        "focus": "資源產出和村莊擴張",
+        "key_metrics": ["資源產量", "村莊數量", "文化點產出"],
+    },
+    # 混合型：平衡發展
+    PlayerRole.HYBRID: {
+        "village_weight": 1.0,
+        "population_weight": 1.0,
+        "troop_weight": 1.0,
+        "focus": "平衡發展",
+        "key_metrics": ["整體發展", "靈活應變能力"],
+    },
+}
 
 # ============ 階段標準定義 ============
 
@@ -166,43 +203,94 @@ class StrategyService:
             return GamePhase.ENDGAME
 
     def _evaluate_progress(
-        self, phase: GamePhase, village_count: int, total_population: int
+        self,
+        phase: GamePhase,
+        village_count: int,
+        total_population: int,
+        player_role: PlayerRole | None = None,
+        total_troops: int = 0,
     ) -> tuple[ProgressStatus, str]:
-        """評估玩家進度."""
+        """評估玩家進度（根據角色調整標準）."""
         standard = PHASE_STANDARDS[phase]["standard"]
+
+        # 取得角色調整係數
+        role = player_role or PlayerRole.HYBRID
+        adjustments = ROLE_ADJUSTMENTS.get(role, ROLE_ADJUSTMENTS[PlayerRole.HYBRID])
+
+        # 根據角色調整目標
+        adjusted_village_target = (
+            standard.target_villages * adjustments["village_weight"]
+        )
+        adjusted_population_target = (
+            standard.target_population * adjustments["population_weight"]
+        )
 
         # 計算村莊和人口的進度百分比
         village_progress = (
-            village_count / standard.target_villages
-            if standard.target_villages > 0
+            village_count / adjusted_village_target
+            if adjusted_village_target > 0
             else 1.0
         )
         population_progress = (
-            total_population / standard.target_population
-            if standard.target_population > 0
+            total_population / adjusted_population_target
+            if adjusted_population_target > 0
             else 1.0
         )
 
-        # 綜合評估
-        avg_progress = (village_progress + population_progress) / 2
+        # 綜合評估（根據角色加權）
+        if role == PlayerRole.ATTACKER:
+            # 進攻手：減少村莊/人口的重要性
+            avg_progress = village_progress * 0.3 + population_progress * 0.3 + 0.4
+            # 如果有部隊數據，應該納入考量
+        elif role == PlayerRole.DEFENDER:
+            avg_progress = village_progress * 0.4 + population_progress * 0.4 + 0.2
+        elif role == PlayerRole.FARMER:
+            # 經濟型：村莊和人口是主要指標
+            avg_progress = village_progress * 0.5 + population_progress * 0.5
+        else:
+            avg_progress = (village_progress + population_progress) / 2
+
+        # 生成描述
+        role_focus = adjustments["focus"]
 
         if avg_progress >= 1.0:
-            return ProgressStatus.AHEAD, "發展進度領先，可以考慮更積極的策略"
+            return (
+                ProgressStatus.AHEAD,
+                f"發展進度領先（{role_focus}為重點），可考慮更積極的策略",
+            )
         elif avg_progress >= 0.6:
-            return ProgressStatus.NORMAL, "發展進度正常，保持當前節奏"
+            return (
+                ProgressStatus.NORMAL,
+                f"發展進度正常（{role_focus}為重點），保持當前節奏",
+            )
         else:
-            if village_count < standard.min_villages:
+            # 根據角色給出不同的落後建議
+            if role == PlayerRole.ATTACKER:
                 return (
                     ProgressStatus.BEHIND,
-                    f"村莊數量不足（目前 {village_count}，建議至少 {standard.min_villages}）",
+                    "作為進攻手，應優先發展部隊訓練和攻擊能力",
                 )
-            elif total_population < standard.min_population:
+            elif role == PlayerRole.DEFENDER:
                 return (
                     ProgressStatus.BEHIND,
-                    f"人口偏低（目前 {total_population}，建議至少 {standard.min_population}）",
+                    "作為防守手，應優先發展防禦部隊和城牆",
                 )
+            elif role == PlayerRole.FARMER:
+                if village_count < standard.min_villages:
+                    return (
+                        ProgressStatus.BEHIND,
+                        f"村莊數量不足（目前 {village_count}，建議至少 {int(standard.min_villages * 1.2)}）",
+                    )
+                else:
+                    return (
+                        ProgressStatus.BEHIND,
+                        f"人口偏低（目前 {total_population}），需加快資源建設",
+                    )
             else:
-                return ProgressStatus.BEHIND, "整體發展落後，建議加快資源建設和村莊擴張"
+                return (
+                    ProgressStatus.BEHIND,
+                    "整體發展落後，建議根據角色定位調整策略",
+                )
 
     def _generate_recommendations(
         self,
@@ -210,24 +298,50 @@ class StrategyService:
         progress_status: ProgressStatus,
         village_count: int,
         total_population: int,
+        player_role: PlayerRole | None = None,
     ) -> list[str]:
-        """生成策略建議."""
+        """生成策略建議（根據玩家角色調整）."""
         recommendations = []
         standard = PHASE_STANDARDS[phase]["standard"]
+        role = player_role or PlayerRole.HYBRID
 
-        # 基礎建議 - 來自階段目標
-        recommendations.extend(standard.key_objectives[:2])
-
-        # 根據進度狀態添加建議
-        if progress_status == ProgressStatus.BEHIND:
-            if village_count < standard.min_villages:
+        # 根據角色生成不同的建議
+        if role == PlayerRole.ATTACKER:
+            recommendations.append("持續訓練攻擊部隊，建立錘子村")
+            recommendations.append("尋找掠奪目標，保持資源收入")
+            if progress_status == ProgressStatus.BEHIND:
+                recommendations.append("優先升級兵營/馬廄，加快部隊訓練")
+            elif progress_status == ProgressStatus.AHEAD:
+                recommendations.append("考慮發起進攻行動")
+        elif role == PlayerRole.DEFENDER:
+            recommendations.append("持續訓練防禦部隊，強化鐵砧村")
+            recommendations.append("升級城牆，提升防禦加成")
+            if progress_status == ProgressStatus.BEHIND:
+                recommendations.append("優先訓練長矛兵/方陣兵等防禦單位")
+            elif progress_status == ProgressStatus.AHEAD:
+                recommendations.append("協助聯盟成員防禦")
+        elif role == PlayerRole.FARMER:
+            recommendations.append("持續開村，擴大經濟版圖")
+            recommendations.append("升級資源田，最大化資源產出")
+            if progress_status == ProgressStatus.BEHIND:
                 recommendations.append("優先累積文化點開設新村莊")
-            if total_population < standard.min_population:
-                recommendations.append("加快資源田和建築升級以提升人口")
-            recommendations.append("考慮減少軍事支出，專注經濟發展")
-        elif progress_status == ProgressStatus.AHEAD:
-            recommendations.append("可以考慮更積極的軍事策略")
-            recommendations.append("幫助聯盟成員發展")
+                recommendations.append("加快資源田升級")
+            elif progress_status == ProgressStatus.AHEAD:
+                recommendations.append("考慮建立資源供給線支援盟友")
+        else:
+            # 混合型：使用原本的邏輯
+            recommendations.extend(standard.key_objectives[:2])
+            if progress_status == ProgressStatus.BEHIND:
+                if village_count < standard.min_villages:
+                    recommendations.append("優先累積文化點開設新村莊")
+                if total_population < standard.min_population:
+                    recommendations.append("加快資源田和建築升級以提升人口")
+            elif progress_status == ProgressStatus.AHEAD:
+                recommendations.append("可以考慮更積極的軍事策略")
+
+        # 添加通用建議
+        if not player_role:
+            recommendations.append("建議設定玩家角色以獲得更精準的建議")
 
         return recommendations[:5]  # 最多返回 5 條建議
 
@@ -245,18 +359,32 @@ class StrategyService:
         village_count = len(villages)
         total_population = sum(v.population or 0 for v in villages)
 
+        # 計算部隊數量
+        total_troops = 0
+        for village in villages:
+            for troop in village.troop_instances or []:
+                total_troops += troop.count or 0
+
         # 判斷階段
         phase = self._determine_phase(day)
         phase_info = PHASE_STANDARDS[phase]
 
-        # 評估進度
+        # 評估進度（根據玩家角色調整）
         progress_status, progress_description = self._evaluate_progress(
-            phase, village_count, total_population
+            phase,
+            village_count,
+            total_population,
+            player_role=account.player_role,
+            total_troops=total_troops,
         )
 
-        # 生成建議
+        # 生成建議（根據玩家角色調整）
         recommendations = self._generate_recommendations(
-            phase, progress_status, village_count, total_population
+            phase,
+            progress_status,
+            village_count,
+            total_population,
+            player_role=account.player_role,
         )
 
         return PhaseDetectionResponse(
