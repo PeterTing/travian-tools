@@ -67,12 +67,12 @@ class Village(Base):
     coordinate_y: Mapped[int | None] = mapped_column(Integer, nullable=True)
     population: Mapped[int] = mapped_column(Integer, default=0)
     village_type: Mapped[VillageType | None] = mapped_column(
-        Enum(VillageType),
+        Enum(VillageType, values_callable=lambda x: [e.value for e in x]),
         nullable=True,
     )
     is_capital: Mapped[bool] = mapped_column(Boolean, default=False)
     role: Mapped[VillageRole | None] = mapped_column(
-        Enum(VillageRole),
+        Enum(VillageRole, values_callable=lambda x: [e.value for e in x]),
         nullable=True,
     )
     last_updated: Mapped[datetime | None] = mapped_column(

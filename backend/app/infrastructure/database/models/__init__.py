@@ -6,6 +6,11 @@ from app.infrastructure.database.models.battle_report import (
     ReportType,
 )
 from app.infrastructure.database.models.building_instance import BuildingInstance
+from app.infrastructure.database.models.conversation import (
+    Conversation,
+    ConversationMessage,
+    MessageRole,
+)
 from app.infrastructure.database.models.game_account import GameAccount, TribeType
 from app.infrastructure.database.models.map_data import (
     MapAllianceData,
@@ -34,6 +39,8 @@ __all__ = [
     "MapVillageData",
     "MapPlayerData",
     "MapAllianceData",
+    "Conversation",
+    "ConversationMessage",
     # Enums
     "TribeType",
     "VillageRole",
@@ -43,4 +50,5 @@ __all__ = [
     "BattleResult",
     "SyncType",
     "SyncStatus",
+    "MessageRole",
 ]

@@ -354,7 +354,7 @@ class StrategyService:
             return None
 
         # 計算基本數據
-        day = account.account_age_days or 1
+        day = account.current_server_day
         villages = account.villages or []
         village_count = len(villages)
         total_population = sum(v.population or 0 for v in villages)
@@ -501,7 +501,7 @@ class StrategyService:
         """檢查文化點產出."""
         villages = account.villages or []
         village_count = len(villages)
-        day = account.account_age_days or 1
+        day = account.current_server_day
 
         # 根據天數和村莊數評估（簡化邏輯）
         expected_villages = max(1, day // 5)  # 大約每 5 天一村
@@ -590,7 +590,7 @@ class StrategyService:
             for troop in village.troop_instances or []:
                 total_troops += troop.count or 0
 
-        day = account.account_age_days or 1
+        day = account.current_server_day
 
         # 根據天數評估部隊數量（簡化邏輯）
         if day < 7:

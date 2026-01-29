@@ -1,6 +1,6 @@
 """遊戲帳號 Schema."""
 
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -16,7 +16,9 @@ class GameAccountBase(BaseModel):
     tribe: TribeType | None = Field(None, description="種族")
     player_name: str | None = Field(None, max_length=50, description="遊戲內玩家名稱")
     alliance_name: str | None = Field(None, max_length=50, description="聯盟名稱")
-    account_age_days: int = Field(0, ge=0, description="帳號天數")
+    server_start_date: date | None = Field(
+        None, description="伺服器/帳號開始日期，用於計算遊戲天數"
+    )
     player_role: PlayerRole | None = Field(
         None,
         description="玩家角色定位: attacker(進攻手), defender(防守手), farmer(經濟發展), hybrid(混合型)",
@@ -47,7 +49,7 @@ class GameAccountUpdate(BaseModel):
     tribe: TribeType | None = None
     player_name: str | None = Field(None, max_length=50)
     alliance_name: str | None = Field(None, max_length=50)
-    account_age_days: int | None = Field(None, ge=0)
+    server_start_date: date | None = None
     player_role: PlayerRole | None = None
     is_active: bool | None = None
 
@@ -72,6 +74,7 @@ class GameAccountResponse(GameAccountBase):
     is_active: bool
     last_updated: datetime | None
     created_at: datetime
+    current_server_day: int = Field(1, description="當前伺服器天數（自動計算）")
 
     model_config = {"from_attributes": True}
 

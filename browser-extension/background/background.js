@@ -136,6 +136,8 @@ async function syncVillageOverview(accountId, data) {
       coordinate_y: data.coordinate_y,
       population: data.population || 0,
       is_capital: data.is_capital || false,
+      village_type: data.village_type || null,
+      capital_village_id: data.capital_village_id || null,
       resources: data.resources,
       production: data.production,
       resource_fields: data.resource_fields || [],
@@ -158,6 +160,7 @@ async function syncVillageCenter(accountId, villageId, data) {
       coordinate_y: data.coordinate_y,
       population: data.population || 0,
       is_capital: data.is_capital || false,
+      capital_village_id: data.capital_village_id || null,
       buildings: data.buildings || [],
       troops: data.troops || [],
     }),
@@ -173,6 +176,19 @@ async function syncReports(accountId, reports) {
     body: JSON.stringify({
       account_id: accountId,
       reports: reports,
+    }),
+  });
+}
+
+/**
+ * 同步軍隊統計數據
+ */
+async function syncTroopStatistics(accountId, villagesTroops) {
+  return apiRequest('/sync/troop-statistics', {
+    method: 'POST',
+    body: JSON.stringify({
+      account_id: accountId,
+      villages_troops: villagesTroops,
     }),
   });
 }
@@ -406,6 +422,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             request.reports
           );
           return { success: true, data: reportsResult };
+
+        case 'sync_troop_statistics':
+          const troopStatsResult = await syncTroopStatistics(
+            request.accountId,
+            request.villagesTroops
+          );
+          return { success: true, data: troopStatsResult };
 
         // 自動同步相關
         case 'get_auto_sync_status':

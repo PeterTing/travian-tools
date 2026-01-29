@@ -11,6 +11,8 @@ from app.domain.schemas.sync import (
     ReportsSync,
     ReportsSyncResponse,
     SyncResponse,
+    TroopStatisticsSync,
+    TroopStatisticsSyncResponse,
     TroopSync,
     VillageCenterSync,
     VillageOverviewSync,
@@ -176,4 +178,36 @@ def sync_reports(
         count=count,
         new_count=new_count,
         updated_count=updated_count,
+    )
+
+
+@router.post(
+    "/troop-statistics",
+    response_model=TroopStatisticsSyncResponse,
+    summary="同步軍隊統計",
+    description="從軍隊統計頁面批量同步所有村莊的軍隊數據",
+)
+def sync_troop_statistics(
+    data: TroopStatisticsSync,
+    db: DBSession,
+    current_user: CurrentUser,
+) -> TroopStatisticsSyncResponse:
+    """同步軍隊統計數據."""
+    service = SyncService(db)
+    success, message, villages_synced, troops_synced = service.sync_troop_statistics(
+        current_user.user_id, data
+    )
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=message,
+        )
+
+    return TroopStatisticsSyncResponse(
+        success=success,
+        message=message,
+        synced_at=datetime.now(),
+        villages_synced=villages_synced,
+        troops_synced=troops_synced,
     )

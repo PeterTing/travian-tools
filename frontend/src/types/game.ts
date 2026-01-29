@@ -344,7 +344,7 @@ export interface GameAccountCreate {
   tribe?: TroopTribe
   player_name?: string
   alliance_name?: string
-  account_age_days?: number
+  server_start_date?: string
   player_role?: PlayerRole
 }
 
@@ -355,7 +355,7 @@ export interface GameAccountUpdate {
   tribe?: TroopTribe
   player_name?: string
   alliance_name?: string
-  account_age_days?: number
+  server_start_date?: string
   is_active?: boolean
   player_role?: PlayerRole
 }
@@ -369,7 +369,8 @@ export interface GameAccount {
   tribe: TroopTribe | null
   player_name: string | null
   alliance_name: string | null
-  account_age_days: number
+  server_start_date: string | null
+  current_server_day: number
   player_role: PlayerRole | null
   is_active: boolean
   last_updated: string | null

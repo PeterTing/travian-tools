@@ -111,23 +111,27 @@ async function detectPage() {
       rally_point: '集結點',
       hero: '英雄',
       reports: '報告列表',
+      troop_statistics: '軍隊統計',
       map: '地圖',
       unknown: '未知頁面',
     };
 
     pageTypeEl.textContent = pageTypeNames[currentPageType] || currentPageType;
 
-    // 村莊頁面或報告頁面都能同步
+    // 村莊頁面、報告頁面、軍隊統計頁面都能同步
     const canSync =
       accountSelect.value &&
       (currentPageType === 'village_overview' ||
        currentPageType === 'village_center' ||
-       currentPageType === 'reports');
+       currentPageType === 'reports' ||
+       currentPageType === 'troop_statistics');
     syncBtn.disabled = !canSync;
 
     // 更新按鈕文字
     if (currentPageType === 'reports') {
       syncBtn.textContent = '同步報告';
+    } else if (currentPageType === 'troop_statistics') {
+      syncBtn.textContent = '同步軍隊統計';
     } else {
       syncBtn.textContent = '同步當前頁面';
     }
@@ -178,12 +182,20 @@ async function syncData() {
         accountId: accountSelect.value,
         reports: currentPageData.reports || [],
       });
+    } else if (currentPageType === 'troop_statistics') {
+      syncResult = await sendMessage('sync_troop_statistics', {
+        accountId: accountSelect.value,
+        villagesTroops: currentPageData.villages_troops || [],
+      });
     }
 
     if (syncResult?.success) {
-      const successMsg = currentPageType === 'reports'
-        ? `同步成功！共 ${syncResult.data?.count || 0} 筆報告`
-        : '同步成功！';
+      let successMsg = '同步成功！';
+      if (currentPageType === 'reports') {
+        successMsg = `同步成功！共 ${syncResult.data?.count || 0} 筆報告`;
+      } else if (currentPageType === 'troop_statistics') {
+        successMsg = `同步成功！${syncResult.data?.villages_synced || 0} 個村莊，${syncResult.data?.troops_synced || 0} 筆部隊`;
+      }
       syncResultEl.textContent = successMsg;
       syncResultEl.className = 'sync-result success';
     } else {
@@ -200,7 +212,13 @@ async function syncData() {
     }
   } finally {
     syncBtn.disabled = false;
-    syncBtn.textContent = currentPageType === 'reports' ? '同步報告' : '同步當前頁面';
+    if (currentPageType === 'reports') {
+      syncBtn.textContent = '同步報告';
+    } else if (currentPageType === 'troop_statistics') {
+      syncBtn.textContent = '同步軍隊統計';
+    } else {
+      syncBtn.textContent = '同步當前頁面';
+    }
   }
 }
 

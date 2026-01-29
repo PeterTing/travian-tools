@@ -324,16 +324,16 @@ export default function VillageDetailPage() {
         </CardContent>
       </Card>
 
-      {/* 部隊列表 */}
+      {/* 村莊內部隊 */}
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>{t('villages.troops')}</CardTitle>
-          <CardDescription>{t('villages.troopsDescription')}</CardDescription>
+          <CardTitle>{t('villages.troopsInVillage')}</CardTitle>
+          <CardDescription>{t('villages.troopsInVillageDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
-          {village.troops.length === 0 ? (
+          {village.troops.filter(t => t.location === 'home').length === 0 ? (
             <p className="text-muted-foreground text-center py-8">
-              {t('villages.noTroops')}
+              {t('villages.noTroopsInVillage')}
             </p>
           ) : (
             <Table>
@@ -341,25 +341,67 @@ export default function VillageDetailPage() {
                 <TableRow>
                   <TableHead>{t('villages.troopId')}</TableHead>
                   <TableHead>{t('villages.count')}</TableHead>
-                  <TableHead>{t('villages.location')}</TableHead>
                   <TableHead>{t('villages.status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {village.troops.map((troop) => (
-                  <TableRow key={troop.instance_id}>
-                    <TableCell>{t(`troopNames.${troop.troop_id}`, { defaultValue: troop.troop_id })}</TableCell>
-                    <TableCell>{troop.count}</TableCell>
-                    <TableCell>{troop.location}</TableCell>
-                    <TableCell>
-                      {troop.is_training ? (
-                        <span className="text-orange-600">{t('villages.training')}</span>
-                      ) : (
-                        <span className="text-green-600">{t('villages.ready')}</span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {village.troops
+                  .filter(troop => troop.location === 'home')
+                  .map((troop) => (
+                    <TableRow key={troop.instance_id}>
+                      <TableCell>{t(`troopNames.${troop.troop_id}`, { defaultValue: troop.troop_id })}</TableCell>
+                      <TableCell>{troop.count}</TableCell>
+                      <TableCell>
+                        {troop.is_training ? (
+                          <span className="text-orange-600">{t('villages.training')}</span>
+                        ) : (
+                          <span className="text-green-600">{t('villages.ready')}</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* 全部部隊（含外派） */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>{t('villages.totalTroopsTitle')}</CardTitle>
+          <CardDescription>{t('villages.totalTroopsDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {village.troops.filter(t => t.location === 'total').length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              {t('villages.noTotalTroops')}
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('villages.troopId')}</TableHead>
+                  <TableHead>{t('villages.count')}</TableHead>
+                  <TableHead>{t('villages.status')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {village.troops
+                  .filter(troop => troop.location === 'total')
+                  .map((troop) => (
+                    <TableRow key={troop.instance_id}>
+                      <TableCell>{t(`troopNames.${troop.troop_id}`, { defaultValue: troop.troop_id })}</TableCell>
+                      <TableCell>{troop.count}</TableCell>
+                      <TableCell>
+                        {troop.is_training ? (
+                          <span className="text-orange-600">{t('villages.training')}</span>
+                        ) : (
+                          <span className="text-green-600">{t('villages.ready')}</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           )}

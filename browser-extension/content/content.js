@@ -145,6 +145,62 @@ function parseResourceFields() {
 }
 
 /**
+ * 根據資源田配置計算村莊類型
+ * 村莊類型判斷：
+ * - 15c: 1木+1泥+1鐵+15糧 (total 18 fields)
+ * - 9c: 3木+3泥+3鐵+9糧 (total 18 fields)
+ * - 7c: 4木+4泥+3鐵+7糧 (total 18 fields)
+ * - 6c: 4木+4泥+4鐵+6糧 (total 18 fields) - 即 4-4-4-6
+ * - 5c: 3木+4泥+5鐵+6糧 (total 18 fields) - 即 3-4-5-6
+ * - 4-4-4-6: 標準平衡型
+ * - 3-4-5-6: 標準混合型
+ */
+function calculateVillageType(resourceFields) {
+  if (!resourceFields || resourceFields.length === 0) {
+    return null;
+  }
+
+  // 統計各類型資源田數量
+  const counts = {
+    wood: 0,
+    clay: 0,
+    iron: 0,
+    crop: 0,
+  };
+
+  for (const field of resourceFields) {
+    if (field.resource_type && counts.hasOwnProperty(field.resource_type)) {
+      counts[field.resource_type]++;
+    }
+  }
+
+  log('Resource field counts:', counts);
+
+  const cropCount = counts.crop;
+
+  // 根據農田數量判斷類型
+  if (cropCount === 15) {
+    return '15c';
+  } else if (cropCount === 9) {
+    return '9c';
+  } else if (cropCount === 7) {
+    return '7c';
+  } else if (cropCount === 6) {
+    // 判斷是 4-4-4-6 還是 3-4-5-6
+    if (counts.wood === 4 && counts.clay === 4 && counts.iron === 4) {
+      return '4-4-4-6';
+    } else if (counts.wood === 3 && counts.clay === 4 && counts.iron === 5) {
+      return '3-4-5-6';
+    } else {
+      return '6c';
+    }
+  } else {
+    // 其他不常見配置，返回通用格式
+    return `${counts.wood}-${counts.clay}-${counts.iron}-${cropCount}`;
+  }
+}
+
+/**
  * 解析建築 (dorf2.php)
  * Travian Legends 使用 data-gid 屬性或 gid{N} class 來標識建築類型
  */
@@ -307,6 +363,7 @@ function getCoordinates() {
  */
 function getAllVillages() {
   const villages = [];
+  const capitalId = findCapitalVillageId();
 
   try {
     const villageEntries = document.querySelectorAll('.villageList .listEntry.village');
@@ -317,6 +374,22 @@ function getAllVillages() {
       const xEl = entry.querySelector('.coordinateX');
       const yEl = entry.querySelector('.coordinateY');
 
+      // 檢查是否為首都
+      let isCapital = did === capitalId;
+      if (!isCapital) {
+        // 額外檢查各種首都標記
+        const capitalSelectors = ['.capital', '.capitalIcon', '.isCapital', '.mainVillage', '[class*="capital"]'];
+        for (const sel of capitalSelectors) {
+          if (entry.querySelector(sel)) {
+            isCapital = true;
+            break;
+          }
+        }
+        if (entry.classList.contains('capital') || entry.classList.contains('mainVillage')) {
+          isCapital = true;
+        }
+      }
+
       if (did && nameEl) {
         villages.push({
           village_id: did,
@@ -324,6 +397,7 @@ function getAllVillages() {
           coordinate_x: parseCoordinateText(xEl?.textContent),
           coordinate_y: parseCoordinateText(yEl?.textContent),
           is_active: entry.classList.contains('active'),
+          is_capital: isCapital,
         });
       }
     });
@@ -348,6 +422,8 @@ function getPageType() {
   if (url.includes('reports.php')) return 'reports';
   if (url.includes('berichte.php')) return 'reports'; // 德文版
   if (url.includes('map.php')) return 'map';
+  // 軍隊統計頁面
+  if (url.includes('village/statistics/troops') || url.includes('statistiken.php')) return 'troop_statistics';
   return 'unknown';
 }
 
@@ -636,17 +712,42 @@ function isCapitalVillage() {
         return true;
       }
 
-      // 檢查首都圖示
-      const capitalIcon = activeVillage.querySelector('.capital, .capitalIcon, [class*="capital"], .isCapital');
-      if (capitalIcon) {
-        log('Found capital icon');
-        return true;
+      // 檢查首都圖示 - 擴展更多選擇器
+      const capitalSelectors = [
+        '.capital',
+        '.capitalIcon',
+        '.isCapital',
+        '.mainVillage',
+        '.main',
+        '[class*="capital"]',
+        '[class*="Capital"]',
+        'i.capital',
+        'span.capital',
+        '.villageType.capital',
+      ];
+
+      for (const selector of capitalSelectors) {
+        const capitalIcon = activeVillage.querySelector(selector);
+        if (capitalIcon) {
+          log('Found capital icon with selector:', selector);
+          return true;
+        }
       }
 
       // 檢查特殊標記或屬性
       if (activeVillage.getAttribute('data-capital') === 'true') {
         return true;
       }
+
+      // 方法 1b: 檢查 HTML 中是否有 "首都" 或 "capital" 文字
+      const html = activeVillage.innerHTML.toLowerCase();
+      if (html.includes('capital') || html.includes('hauptdorf') || html.includes('首都')) {
+        log('Found capital text in village entry');
+        return true;
+      }
+
+      // 除錯：輸出 active village 的 HTML
+      log('Active village HTML for capital detection:', activeVillage.outerHTML.substring(0, 500));
     }
 
     // 方法 2: 從頁面內容判斷（如果在村莊詳情頁）
@@ -654,6 +755,8 @@ function isCapitalVillage() {
       '.capitalIndicator',
       '#villageInfo .capital',
       '[class*="mainVillage"]',
+      '.villageType.capital',
+      '#sidebarBoxVillagelist .capital',
     ];
 
     for (const selector of capitalIndicators) {
@@ -662,10 +765,106 @@ function isCapitalVillage() {
         return true;
       }
     }
+
+    // 方法 3: 檢查是否有皇宮（building_gid=26）或行宮（building_gid=25）升到 20 級
+    // 首都特徵：皇宮 (Palace) 只能建在首都
+    const palaceSlot = document.querySelector('[data-gid="26"], .gid26');
+    if (palaceSlot) {
+      log('Found palace - this is the capital');
+      return true;
+    }
   } catch (e) {
     log('Error checking capital:', e);
   }
   return false;
+}
+
+/**
+ * 取得所有村莊並標記哪個是首都
+ * Travian 的村莊列表沒有首都標記，需要透過其他方式判斷：
+ * 1. 檢查當前村莊是否有皇宮 (gid=26)
+ * 2. 從 localStorage 讀取之前儲存的首都 ID
+ * 3. 如果都找不到，返回 null（不假設）
+ */
+function findCapitalVillageId() {
+  try {
+    const villageEntries = document.querySelectorAll('.villageList .listEntry.village');
+
+    // 方法 1: 檢查村莊列表是否有首都標記（通常沒有，但還是檢查一下）
+    for (const entry of villageEntries) {
+      const did = entry.getAttribute('data-did');
+
+      const capitalSelectors = [
+        '.capital',
+        '.capitalIcon',
+        '.isCapital',
+        '.mainVillage',
+        '[class*="capital"]',
+      ];
+
+      for (const selector of capitalSelectors) {
+        if (entry.querySelector(selector)) {
+          log('Found capital village ID:', did);
+          saveCapitalVillageId(did);
+          return did;
+        }
+      }
+
+      if (entry.classList.contains('capital') || entry.classList.contains('mainVillage')) {
+        log('Found capital village ID from class:', did);
+        saveCapitalVillageId(did);
+        return did;
+      }
+    }
+
+    // 方法 2: 從 localStorage 讀取之前儲存的首都 ID
+    const savedCapitalId = localStorage.getItem('travian_tools_capital_id');
+    if (savedCapitalId) {
+      log('Found capital from localStorage:', savedCapitalId);
+      return savedCapitalId;
+    }
+
+    // 方法 3: 如果當前在 dorf2 頁面且有皇宮，標記當前村莊為首都
+    // 這個會在 detectAndSaveCapital() 中處理
+
+    log('No capital found - user needs to visit their capital village once to detect it');
+    return null;
+  } catch (e) {
+    log('Error finding capital village:', e);
+  }
+  return null;
+}
+
+/**
+ * 儲存首都村莊 ID 到 localStorage
+ */
+function saveCapitalVillageId(villageId) {
+  if (villageId) {
+    localStorage.setItem('travian_tools_capital_id', villageId);
+    log('Saved capital village ID to localStorage:', villageId);
+  }
+}
+
+/**
+ * 檢測當前村莊是否為首都（透過檢查皇宮）
+ * 應在 dorf2.php 頁面呼叫
+ */
+function detectAndSaveCapital() {
+  try {
+    // 皇宮的 gid 是 26
+    const palaceSlot = document.querySelector('[data-gid="26"], .gid26, .building.g26');
+    if (palaceSlot) {
+      const currentVillageId = getCurrentVillageId();
+      if (currentVillageId) {
+        log('Detected palace in current village - this is the capital:', currentVillageId);
+        saveCapitalVillageId(currentVillageId);
+        return currentVillageId;
+      }
+    }
+  } catch (e) {
+    log('Error detecting capital:', e);
+  }
+  return null;
 }
 
 /**
@@ -793,8 +992,13 @@ function parseTroops() {
 function extractTroopId(element) {
   if (!element) return null;
 
-  // 從 class 提取 (u1, u2, unit1, unit2, etc.)
   const className = element.className || '';
+  const src = element.src || element.getAttribute('src') || '';
+
+  // 除錯輸出
+  log('DEBUG extractTroopId: class=', className, 'src=', src);
+
+  // 從 class 提取 (u1, u2, unit1, unit2, etc.)
   let match = className.match(/\bu(\d+)\b/);
   if (match) return `troop_${match[1]}`;
 
@@ -802,7 +1006,6 @@ function extractTroopId(element) {
   if (match) return `troop_${match[1]}`;
 
   // 從 src 提取 (unit/u1.gif, etc.)
-  const src = element.src || element.getAttribute('src') || '';
   match = src.match(/u(\d+)/);
   if (match) return `troop_${match[1]}`;
 
@@ -871,29 +1074,156 @@ function addTroop(map, troopId, count, location, isTraining) {
 }
 
 /**
+ * 解析軍隊統計頁面 (village/statistics/troops)
+ * 這個頁面顯示所有村莊的軍隊數量
+ */
+function parseTroopStatistics() {
+  const villagesTroops = [];
+
+  try {
+    // 除錯：列出頁面上所有 table
+    const allTables = document.querySelectorAll('table');
+    log('DEBUG: All tables on page:', allTables.length);
+    allTables.forEach((t, i) => {
+      log(`  Table ${i}: id="${t.id}", class="${t.className}"`);
+    });
+
+    // 找到所有軍隊表格（每個種族一個表格）
+    const tables = document.querySelectorAll('table#troops, table.troops');
+
+    log('Found troop statistics tables:', tables.length);
+
+    for (const table of tables) {
+      // 取得表頭的兵種 ID
+      const headerRow = table.querySelector('thead tr');
+      if (!headerRow) continue;
+
+      const unitCells = headerRow.querySelectorAll('th.unit');
+      const unitIds = [];
+
+      for (const cell of unitCells) {
+        const img = cell.querySelector('img.unit');
+        if (img) {
+          // 從 class 提取兵種 ID (u21, u22, uhero 等)
+          const match = img.className.match(/\bu(\d+|hero)\b/);
+          if (match) {
+            unitIds.push(match[1] === 'hero' ? 'hero' : match[1]);
+          }
+        }
+      }
+
+      log('Unit IDs from header:', unitIds);
+
+      // 解析每個村莊行
+      const rows = table.querySelectorAll('tbody tr');
+
+      for (const row of rows) {
+        // 跳過空行和總和行
+        if (row.querySelector('td.empty') || row.classList.contains('sum')) continue;
+
+        const villageCell = row.querySelector('td.villageName a');
+        if (!villageCell) {
+          log('DEBUG: No villageCell found in row, trying alternative selectors');
+          // 嘗試其他選擇器
+          const altCell = row.querySelector('td a, a[href*="newdid"], a[href*="did"]');
+          if (altCell) {
+            log('DEBUG: Found alternative cell:', altCell.outerHTML.substring(0, 200));
+          }
+          continue;
+        }
+
+        // 從 href 取得村莊 ID (newdid=XXXXX 或 did=XXXXX)
+        const href = villageCell.getAttribute('href') || '';
+        log('DEBUG: Village href:', href);
+        let villageId = null;
+        let didMatch = href.match(/newdid=(\d+)/);
+        if (didMatch) {
+          villageId = didMatch[1];
+        } else {
+          // 嘗試其他格式
+          didMatch = href.match(/did=(\d+)/) || href.match(/village\/(\d+)/);
+          if (didMatch) {
+            villageId = didMatch[1];
+          }
+        }
+        const villageName = villageCell.textContent.trim();
+        log('DEBUG: Parsed village:', villageName, 'ID:', villageId);
+
+        if (!villageId) continue;
+
+        // 取得各兵種數量
+        const troops = [];
+        const cells = row.querySelectorAll('td:not(.villageName)');
+
+        cells.forEach((cell, index) => {
+          if (index < unitIds.length) {
+            const count = parseInt(cell.textContent.trim().replace(/\D/g, ''), 10) || 0;
+            if (count > 0) {
+              troops.push({
+                troop_id: `troop_${unitIds[index]}`,
+                count: count,
+                location: 'home',
+                is_training: false,
+              });
+            }
+          }
+        });
+
+        if (troops.length > 0) {
+          villagesTroops.push({
+            village_id: villageId,
+            village_name: villageName,
+            troops: troops,
+          });
+        }
+      }
+    }
+
+    log('Parsed troop statistics:', villagesTroops);
+  } catch (e) {
+    log('Error parsing troop statistics:', e);
+  }
+
+  return villagesTroops;
+}
+
+/**
  * 收集當前頁面數據
  */
 function collectPageData() {
   const pageType = getPageType();
   const coordinates = getCoordinates();
+  const currentVillageId = getCurrentVillageId();
+
+  // 在 dorf2 頁面嘗試偵測首都（透過皇宮）
+  if (pageType === 'village_center') {
+    detectAndSaveCapital();
+  }
+
+  const capitalVillageId = findCapitalVillageId();
 
   const data = {
     page_type: pageType,
     timestamp: new Date().toISOString(),
-    village_id: getCurrentVillageId(),
+    village_id: currentVillageId,
     village_name: getVillageName(),
     coordinates: coordinates,
     coordinate_x: coordinates?.x,
     coordinate_y: coordinates?.y,
     population: getPopulation(),
-    is_capital: isCapitalVillage(),
+    is_capital: currentVillageId === capitalVillageId || isCapitalVillage(),
+    capital_village_id: capitalVillageId, // 明確標記哪個村莊是首都
     resources: parseResources(),
     production: parseProduction(),
     troops: parseTroops(),
   };
 
   if (pageType === 'village_overview') {
-    data.resource_fields = parseResourceFields();
+    const resourceFields = parseResourceFields();
+    data.resource_fields = resourceFields;
+    // 計算村莊類型
+    data.village_type = calculateVillageType(resourceFields);
+    log('Calculated village type:', data.village_type);
   } else if (pageType === 'village_center') {
     data.buildings = parseBuildings();
   } else if (pageType === 'reports') {
@@ -904,6 +1234,10 @@ function collectPageData() {
     } else {
       data.reports = parseReportsList();
     }
+  } else if (pageType === 'troop_statistics') {
+    // 軍隊統計頁面 - 包含所有村莊的軍隊數據
+    data.villages_troops = parseTroopStatistics();
+    log('Collected troop statistics for', data.villages_troops.length, 'villages');
   }
 
   return data;

@@ -17,7 +17,8 @@ if TYPE_CHECKING:
 class TroopLocation(str, Enum):
     """部隊位置狀態."""
 
-    HOME = "home"
+    HOME = "home"  # 在村莊內
+    TOTAL = "total"  # 總兵力（從軍隊統計頁面）
     MOVING = "moving"
     STATIONED = "stationed"
     ATTACKING = "attacking"

@@ -2,10 +2,10 @@
 
 import enum
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, func
+from sqlalchemy import Boolean, Date, DateTime, Enum, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base
@@ -65,7 +65,11 @@ class GameAccount(Base):
     )
     player_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     alliance_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    account_age_days: Mapped[int] = mapped_column(Integer, default=0)
+    server_start_date: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
+        comment="伺服器/帳號開始日期，用於計算遊戲天數",
+    )
     player_role: Mapped[PlayerRole | None] = mapped_column(
         Enum(PlayerRole, values_callable=lambda x: [e.value for e in x]),
         nullable=True,
@@ -99,6 +103,20 @@ class GameAccount(Base):
         back_populates="account",
         cascade="all, delete-orphan",
     )
+
+    @property
+    def current_server_day(self) -> int:
+        """計算當前伺服器天數.
+
+        從 server_start_date 開始計算到今天的天數。
+        如果沒有設定 server_start_date，返回 1。
+        """
+        if not self.server_start_date:
+            return 1
+        today = date.today()
+        delta = today - self.server_start_date
+        # 遊戲天數從 Day 1 開始，所以 +1
+        return max(1, delta.days + 1)
 
     def __repr__(self) -> str:
         return f"<GameAccount(account_id={self.account_id}, player_name={self.player_name})>"

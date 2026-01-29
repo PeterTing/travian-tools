@@ -45,7 +45,7 @@ export default function GameAccountForm({
     tribe: account?.tribe || '',
     player_name: account?.player_name || '',
     alliance_name: account?.alliance_name || '',
-    account_age_days: account?.account_age_days || 0,
+    server_start_date: account?.server_start_date || '',
     is_active: account?.is_active ?? true,
   })
   const [loading, setLoading] = useState(false)
@@ -80,7 +80,7 @@ export default function GameAccountForm({
           tribe: formData.tribe as TroopTribe || undefined,
           player_name: formData.player_name || undefined,
           alliance_name: formData.alliance_name || undefined,
-          account_age_days: formData.account_age_days,
+          server_start_date: formData.server_start_date || undefined,
           is_active: formData.is_active,
         }
         await gameAccountApi.update(account.account_id, updateData)
@@ -92,7 +92,7 @@ export default function GameAccountForm({
           tribe: formData.tribe as TroopTribe || undefined,
           player_name: formData.player_name || undefined,
           alliance_name: formData.alliance_name || undefined,
-          account_age_days: formData.account_age_days,
+          server_start_date: formData.server_start_date || undefined,
         }
         await gameAccountApi.create(createData)
       }
@@ -212,16 +212,18 @@ export default function GameAccountForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="account_age_days">{t('gameAccounts.accountAgeDays')}</Label>
+            <Label htmlFor="server_start_date">{t('gameAccounts.serverStartDate')}</Label>
             <Input
-              id="account_age_days"
-              type="number"
-              min={0}
-              value={formData.account_age_days}
+              id="server_start_date"
+              type="date"
+              value={formData.server_start_date}
               onChange={(e) =>
-                setFormData({ ...formData, account_age_days: parseInt(e.target.value) || 0 })
+                setFormData({ ...formData, server_start_date: e.target.value })
               }
             />
+            <p className="text-xs text-muted-foreground">
+              {t('gameAccounts.serverStartDateHint')}
+            </p>
           </div>
 
           {isEditing && (

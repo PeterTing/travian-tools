@@ -48,7 +48,9 @@ class TroopData(BaseModel):
 
     troop_id: str = Field(..., description="部隊 ID")
     count: int = Field(0, ge=0)
-    location: str = Field("home", description="部隊位置: home/training/away")
+    location: str = Field(
+        "home", description="部隊位置: home(在村莊內)/total(總兵力)/training/away"
+    )
     is_training: bool = False
     training_finish_time: datetime | None = None
 
@@ -80,6 +82,12 @@ class VillageOverviewSync(BaseModel):
     coordinate_y: int | None = Field(None, ge=-400, le=400)
     population: int = Field(0, ge=0)
     is_capital: bool = False
+    village_type: str | None = Field(
+        None, description="村莊類型: 15c, 9c, 7c, 6c, 4-4-4-6, 3-4-5-6"
+    )
+    capital_village_id: str | None = Field(
+        None, description="首都村莊的 Travian ID (data-did)"
+    )
     resources: ResourceData
     production: ProductionData
     resource_fields: list[ResourceFieldData] = []
@@ -96,6 +104,9 @@ class VillageCenterSync(BaseModel):
     coordinate_y: int | None = Field(None, ge=-400, le=400)
     population: int = Field(0, ge=0)
     is_capital: bool = False
+    capital_village_id: str | None = Field(
+        None, description="首都村莊的 Travian ID (data-did)"
+    )
     buildings: list[BuildingData] = []
     troops: list[TroopData] = []
 
@@ -155,6 +166,31 @@ class ReportsSync(BaseModel):
 
     account_id: str
     reports: list[ReportData] = []
+
+
+class VillageTroopsData(BaseModel):
+    """單一村莊的軍隊數據."""
+
+    village_id: str = Field(..., description="Travian 村莊 ID (data-did)")
+    village_name: str | None = None
+    troops: list[TroopData] = []
+
+
+class TroopStatisticsSync(BaseModel):
+    """軍隊統計同步請求（批量同步所有村莊的軍隊）."""
+
+    account_id: str
+    villages_troops: list[VillageTroopsData] = []
+
+
+class TroopStatisticsSyncResponse(BaseModel):
+    """軍隊統計同步回應."""
+
+    success: bool
+    message: str
+    synced_at: datetime
+    villages_synced: int = 0
+    troops_synced: int = 0
 
 
 class ReportsSyncResponse(BaseModel):

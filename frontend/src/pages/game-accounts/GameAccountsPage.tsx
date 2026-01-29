@@ -156,8 +156,8 @@ export default function GameAccountsPage() {
                     <span>{account.server_speed}x</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('gameAccounts.accountAgeDays')}:</span>
-                    <span>{account.account_age_days}</span>
+                    <span className="text-muted-foreground">{t('gameAccounts.serverDay')}:</span>
+                    <span>Day {account.current_server_day}</span>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-4">

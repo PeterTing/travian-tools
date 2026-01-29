@@ -24,7 +24,7 @@ class GameAccountService:
             tribe=data.tribe,
             player_name=data.player_name,
             alliance_name=data.alliance_name,
-            account_age_days=data.account_age_days,
+            server_start_date=data.server_start_date,
         )
         self.db.add(account)
         self.db.commit()

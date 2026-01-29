@@ -6,6 +6,7 @@ from app.api.v1.endpoints import (
     auth,
     buildings,
     calculator,
+    conversations,
     game_accounts,
     map_sql,
     resources,
@@ -33,3 +34,4 @@ router.include_router(map_sql.router)
 router.include_router(sync_logs.router)
 router.include_router(scheduler.router)
 router.include_router(strategy.router)
+router.include_router(conversations.router)
