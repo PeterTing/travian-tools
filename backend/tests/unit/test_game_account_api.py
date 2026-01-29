@@ -1,6 +1,6 @@
 """遊戲帳號 API 單元測試."""
 
-from datetime import datetime
+from datetime import date, datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -25,7 +25,7 @@ def create_mock_account(
     tribe: TribeType | None = None,
     player_name: str | None = None,
     alliance_name: str | None = None,
-    account_age_days: int = 0,
+    server_start_date: date | None = None,
     is_active: bool = True,
 ) -> GameAccount:
     """建立模擬帳號."""
@@ -38,7 +38,7 @@ def create_mock_account(
         tribe=tribe,
         player_name=player_name,
         alliance_name=alliance_name,
-        account_age_days=account_age_days,
+        server_start_date=server_start_date,
         is_active=is_active,
     )
     account.created_at = datetime.now()

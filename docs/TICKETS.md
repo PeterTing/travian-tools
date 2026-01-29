@@ -1394,3 +1394,4 @@
 | 2.0 | 2026-01-24 | Phase 2 部分完成 - TICKET-202~204（遊戲帳號管理、村莊 CRUD、Browser MCP 研究） |
 | 2.1 | 2026-01-25 | Phase 2 全部完成 - TICKET-205~208 補齊實作（瀏覽器擴展、Map.sql 完整功能、APScheduler 排程、村莊同步狀態顯示） |
 | 2.2 | 2026-01-26 | Phase 3 全部完成 - TICKET-301~306（AI 策略引擎：遊戲階段判斷、Claude API 整合、AI 諮詢 API、健康檢查、前端頁面） |
+| 2.3 | 2026-01-29 | Bug fix - AI Tool Use: get_building_info 輸出新增 effect_description 欄位，修正英雄宅綠洲佔領等級查詢問題 |

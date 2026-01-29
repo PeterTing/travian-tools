@@ -8,6 +8,7 @@ from app.domain.schemas.sync import (
     ReportsSync,
     ResourceFieldData,
     TroopData,
+    TroopStatisticsSync,
     TroopSync,
     VillageCenterSync,
     VillageOverviewSync,
@@ -17,7 +18,7 @@ from app.infrastructure.database.models.building_instance import BuildingInstanc
 from app.infrastructure.database.models.game_account import GameAccount
 from app.infrastructure.database.models.sync_log import SyncStatus, SyncType
 from app.infrastructure.database.models.troop_instance import TroopInstance
-from app.infrastructure.database.models.village import Village
+from app.infrastructure.database.models.village import Village, VillageType
 from app.services.sync_log_service import SyncLogService
 
 
@@ -40,6 +41,21 @@ class SyncService:
             .first()
         )
         return account is not None
+
+    def _parse_village_type(self, type_str: str | None) -> VillageType | None:
+        """將村莊類型字串轉換為 VillageType enum."""
+        if not type_str:
+            return None
+
+        mapping = {
+            "15c": VillageType.TYPE_15C,
+            "9c": VillageType.TYPE_9C,
+            "7c": VillageType.TYPE_7C,
+            "6c": VillageType.TYPE_6C,
+            "4-4-4-6": VillageType.TYPE_4446,
+            "3-4-5-6": VillageType.TYPE_3456,
+        }
+        return mapping.get(type_str.lower())
 
     def _find_or_create_village(
         self,
@@ -168,34 +184,34 @@ class SyncService:
 
         return count
 
-    def _sync_troops(self, village: Village, troops: list[TroopData]) -> int:
-        """同步部隊."""
+    def _sync_troops(
+        self, village: Village, troops: list[TroopData], location: str = "home"
+    ) -> int:
+        """同步部隊.
+
+        Args:
+            village: 村莊
+            troops: 部隊資料
+            location: 部隊位置類型 ('home' 在村莊內, 'total' 總兵力)
+        """
+        # 先清除該村莊該 location 的所有舊部隊資料
+        self.db.query(TroopInstance).filter(
+            TroopInstance.village_id == village.village_id,
+            TroopInstance.location == location,
+        ).delete()
+
+        # 新增新的部隊資料
         count = 0
         for troop in troops:
-            existing = (
-                self.db.query(TroopInstance)
-                .filter(
-                    TroopInstance.village_id == village.village_id,
-                    TroopInstance.troop_id == troop.troop_id,
-                )
-                .first()
+            instance = TroopInstance(
+                village_id=village.village_id,
+                troop_id=troop.troop_id,
+                count=troop.count,
+                location=location,
+                is_training=troop.is_training,
+                training_finish_time=troop.training_finish_time,
             )
-
-            if existing:
-                existing.count = troop.count
-                existing.location = troop.location
-                existing.is_training = troop.is_training
-                existing.training_finish_time = troop.training_finish_time
-            else:
-                instance = TroopInstance(
-                    village_id=village.village_id,
-                    troop_id=troop.troop_id,
-                    count=troop.count,
-                    location=troop.location,
-                    is_training=troop.is_training,
-                    training_finish_time=troop.training_finish_time,
-                )
-                self.db.add(instance)
+            self.db.add(instance)
             count += 1
 
         return count
@@ -234,8 +250,14 @@ class SyncService:
             if data.population > 0:
                 village.population = data.population
 
-            # 更新首都狀態
-            if data.is_capital:
+            # 更新村莊類型
+            if data.village_type:
+                village.village_type = self._parse_village_type(data.village_type)
+
+            # 更新首都狀態 - 優先使用 capital_village_id 比對
+            if data.capital_village_id and data.village_id == data.capital_village_id:
+                village.is_capital = True
+            elif data.is_capital:
                 village.is_capital = True
 
             items_synced = self._sync_resource_fields(village, data.resource_fields)
@@ -293,8 +315,10 @@ class SyncService:
             if data.population > 0:
                 village.population = data.population
 
-            # 更新首都狀態
-            if data.is_capital:
+            # 更新首都狀態 - 優先使用 capital_village_id 比對
+            if data.capital_village_id and data.village_id == data.capital_village_id:
+                village.is_capital = True
+            elif data.is_capital:
                 village.is_capital = True
 
             items_synced = self._sync_buildings(village, data.buildings)
@@ -515,6 +539,80 @@ class SyncService:
                 total_count,
                 new_count,
                 updated_count,
+            )
+        except Exception as e:
+            self.log_service.complete_log(log, SyncStatus.FAILED, error_details=str(e))
+            self.db.commit()
+            raise
+
+    def sync_troop_statistics(
+        self, user_id: str, data: TroopStatisticsSync
+    ) -> tuple[bool, str, int, int]:
+        """同步軍隊統計數據（批量同步所有村莊的總兵力）.
+
+        使用 location='total' 來儲存總兵力資料，
+        與村莊頁面的 location='home'（在村莊內的兵力）分開。
+        """
+        log = self.log_service.create_log(
+            user_id=user_id,
+            sync_type=SyncType.TROOPS,
+            account_id=data.account_id,
+        )
+
+        try:
+            if not self._verify_account_ownership(data.account_id, user_id):
+                self.log_service.complete_log(
+                    log, SyncStatus.FAILED, message="無權存取此遊戲帳號"
+                )
+                self.db.commit()
+                return False, "無權存取此遊戲帳號", 0, 0
+
+            villages_synced = 0
+            troops_synced = 0
+
+            for village_troops in data.villages_troops:
+                # 使用 travian_village_id 查找村莊
+                village = self._find_or_create_village(
+                    data.account_id,
+                    village_troops.village_id,
+                    village_troops.village_name,
+                    None,  # x
+                    None,  # y
+                )
+
+                # 只清除該村莊 location='total' 的軍隊數據
+                # 不影響 location='home' 的資料
+                self.db.query(TroopInstance).filter(
+                    TroopInstance.village_id == village.village_id,
+                    TroopInstance.location == "total",
+                ).delete()
+
+                # 新增軍隊數據（使用 location='total'）
+                for troop in village_troops.troops:
+                    instance = TroopInstance(
+                        village_id=village.village_id,
+                        troop_id=troop.troop_id,
+                        count=troop.count,
+                        location="total",  # 軍隊統計頁面 = 總兵力
+                        is_training=False,
+                    )
+                    self.db.add(instance)
+                    troops_synced += 1
+
+                villages_synced += 1
+
+            self.log_service.complete_log(
+                log,
+                SyncStatus.SUCCESS,
+                items_synced=troops_synced,
+                message=f"軍隊統計同步成功: {villages_synced} 村莊, {troops_synced} 軍隊",
+            )
+            self.db.commit()
+            return (
+                True,
+                f"軍隊統計同步成功: {villages_synced} 村莊, {troops_synced} 軍隊",
+                villages_synced,
+                troops_synced,
             )
         except Exception as e:
             self.log_service.complete_log(log, SyncStatus.FAILED, error_details=str(e))

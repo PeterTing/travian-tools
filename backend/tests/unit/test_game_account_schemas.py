@@ -1,5 +1,7 @@
 """遊戲帳號 Schema 單元測試."""
 
+from datetime import date, timedelta
+
 import pytest
 from pydantic import ValidationError
 
@@ -22,7 +24,7 @@ class TestGameAccountCreate:
             tribe=TribeType.ROMANS,
             player_name="TestPlayer",
             alliance_name="TestAlliance",
-            account_age_days=10,
+            server_start_date=date.today() - timedelta(days=10),
         )
         assert data.server_url == "https://ts1.travian.com"
         assert data.server_speed == 3
@@ -72,13 +74,21 @@ class TestGameAccountCreate:
         with pytest.raises(ValidationError):
             GameAccountCreate(server_url="https://ts1.travian.com", server_speed=11)
 
-    def test_negative_account_age(self) -> None:
-        """測試負數帳號天數."""
-        with pytest.raises(ValidationError):
-            GameAccountCreate(
-                server_url="https://ts1.travian.com",
-                account_age_days=-1,
-            )
+    def test_server_start_date_valid(self) -> None:
+        """測試有效的伺服器開始日期."""
+        # 可以是過去的日期
+        data = GameAccountCreate(
+            server_url="https://ts1.travian.com",
+            server_start_date=date.today() - timedelta(days=10),
+        )
+        assert data.server_start_date == date.today() - timedelta(days=10)
+
+        # 也可以是今天
+        data = GameAccountCreate(
+            server_url="https://ts1.travian.com",
+            server_start_date=date.today(),
+        )
+        assert data.server_start_date == date.today()
 
 
 class TestGameAccountUpdate:
@@ -100,7 +110,7 @@ class TestGameAccountUpdate:
             tribe=TribeType.GAULS,
             player_name="NewPlayer",
             alliance_name="NewAlliance",
-            account_age_days=20,
+            server_start_date=date.today() - timedelta(days=20),
             is_active=False,
         )
         assert data.server_url == "https://ts2.travian.com"

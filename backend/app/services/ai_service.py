@@ -1,4 +1,4 @@
-"""AI 策略諮詢服務（Claude API 整合 + RAG 知識庫）."""
+"""AI 策略諮詢服務（Claude API 整合 + RAG 知識庫 + Tool Use）."""
 
 import logging
 import uuid
@@ -6,7 +6,13 @@ from datetime import UTC, datetime
 from typing import Any, cast
 
 from anthropic import Anthropic, APIError, AuthenticationError, RateLimitError
-from anthropic.types import MessageParam, TextBlock
+from anthropic.types import (
+    MessageParam,
+    TextBlock,
+    ToolParam,
+    ToolResultBlockParam,
+    ToolUseBlock,
+)
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.config import settings
@@ -21,9 +27,140 @@ from app.knowledge_base.rag_service import (
     format_knowledge_for_prompt,
     retrieve_knowledge,
 )
+from app.services.game_data_service import get_game_data_service
 from app.services.strategy_service import PHASE_STANDARDS, StrategyService
 
 logger = logging.getLogger(__name__)
+
+
+# ============ Tool Definitions for Claude Tool Use ============
+
+GAME_DATA_TOOLS: list[ToolParam] = [
+    {
+        "name": "get_building_info",
+        "description": "查詢 Travian 建築的詳細資料，包括各等級的建造成本（木材、磚塊、鐵礦、糧食）、建造時間、人口消耗、文化點等。使用此工具來提供準確的建築數據。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "building_id": {
+                    "type": "string",
+                    "description": "建築 ID，例如：main_building（主建築）、barracks（兵營）、stable（馬廄）、heros_mansion（英雄館）、academy（研究院）、warehouse（倉庫）、granary（糧倉）、marketplace（市場）、residence（行宮）、palace（皇宮）、town_hall（城鎮廳）、smithy（鐵匠鋪）、rally_point（集合點）、wall（城牆）",
+                },
+            },
+            "required": ["building_id"],
+        },
+    },
+    {
+        "name": "get_building_level_cost",
+        "description": "查詢建築特定等級的詳細建造成本，包括各資源需求、建造時間、人口消耗等。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "building_id": {
+                    "type": "string",
+                    "description": "建築 ID",
+                },
+                "level": {
+                    "type": "integer",
+                    "description": "要查詢的等級（1-20）",
+                },
+            },
+            "required": ["building_id", "level"],
+        },
+    },
+    {
+        "name": "calculate_upgrade_cost",
+        "description": "計算建築從某等級升到目標等級的總成本，包括所有中間等級的累計資源需求。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "building_id": {
+                    "type": "string",
+                    "description": "建築 ID",
+                },
+                "from_level": {
+                    "type": "integer",
+                    "description": "起始等級（0 表示尚未建造）",
+                },
+                "to_level": {
+                    "type": "integer",
+                    "description": "目標等級",
+                },
+            },
+            "required": ["building_id", "from_level", "to_level"],
+        },
+    },
+    {
+        "name": "list_buildings",
+        "description": "列出所有可用的建築，可依類別篩選。類別包括：infrastructure（基礎設施）、military（軍事）、resource（資源）、defense（防禦）、special（特殊）。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "description": "建築類別篩選",
+                    "enum": [
+                        "infrastructure",
+                        "military",
+                        "resource",
+                        "defense",
+                        "special",
+                    ],
+                },
+            },
+        },
+    },
+    {
+        "name": "get_troop_info",
+        "description": "查詢 Travian 兵種的詳細資料，包括攻防數值、訓練成本、速度、載重量等。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "troop_id": {
+                    "type": "string",
+                    "description": "兵種 ID，例如：legionnaire（軍團兵）、praetorian（禁衛兵）、imperian（帝國兵）、phalanx（方陣兵）、swordsman（劍士）、clubswinger（棍棒兵）、spearman（矛兵）等",
+                },
+            },
+            "required": ["troop_id"],
+        },
+    },
+    {
+        "name": "list_troops",
+        "description": "列出所有可用的兵種，可依種族篩選。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "tribe": {
+                    "type": "string",
+                    "description": "種族篩選",
+                    "enum": [
+                        "romans",
+                        "gauls",
+                        "teutons",
+                        "huns",
+                        "egyptians",
+                        "spartans",
+                    ],
+                },
+            },
+        },
+    },
+    {
+        "name": "get_resource_field_info",
+        "description": "查詢資源田（伐木場、採土場、鐵礦場、農田）的各等級產量和建造成本。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "resource_type": {
+                    "type": "string",
+                    "description": "資源類型",
+                    "enum": ["wood", "clay", "iron", "crop"],
+                },
+            },
+            "required": ["resource_type"],
+        },
+    },
+]
 
 
 # ============ System Prompt Template ============
@@ -108,7 +245,8 @@ class AIService:
         villages = account.villages or []
         village_count = len(villages)
         total_population = sum(v.population or 0 for v in villages)
-        day = account.account_age_days or 1
+        # 使用自動計算的伺服器天數
+        day = account.current_server_day
 
         # 判斷階段
         phase = self.strategy_service._determine_phase(day)
@@ -123,24 +261,60 @@ class AIService:
             progress_status.value, progress_status.value
         )
 
-        # 計算部隊數量
+        # 計算部隊數量（優先使用 total，否則用 home）
         total_troops = 0
         for village in villages:
             for troop in village.troop_instances or []:
-                total_troops += troop.count or 0
+                # 優先計算 total（總兵力），避免重複計算
+                if troop.location == "total":
+                    total_troops += troop.count or 0
+
+        # 如果沒有 total 資料，fallback 到 home
+        if total_troops == 0:
+            for village in villages:
+                for troop in village.troop_instances or []:
+                    if troop.location == "home":
+                        total_troops += troop.count or 0
 
         # 建構村莊摘要
         village_summaries = []
         for v in villages[:5]:  # 最多顯示 5 個村莊
             buildings_count = len(v.building_instances or [])
-            troops_in_village = sum(t.count or 0 for t in (v.troop_instances or []))
+            # 優先顯示總兵力，否則顯示在村莊內的兵力
+            troops_total = sum(
+                t.count or 0 for t in (v.troop_instances or []) if t.location == "total"
+            )
+            troops_home = sum(
+                t.count or 0 for t in (v.troop_instances or []) if t.location == "home"
+            )
+            # 村莊類型標記
+            type_label = ""
+            if v.village_type:
+                type_label = f" [{v.village_type.value}]"
+            elif v.is_capital:
+                type_label = " [首都]"
+            # 村莊角色
+            role_label = f" ({v.role.value})" if v.role else ""
+            # 部隊顯示：如果有總兵力就顯示總兵力，否則顯示在村莊內
+            if troops_total > 0:
+                troops_label = f"總兵力 {troops_total}"
+            elif troops_home > 0:
+                troops_label = f"在村莊 {troops_home}"
+            else:
+                troops_label = "部隊 0"
             village_summaries.append(
-                f"  - {v.name or '未命名'}: 人口 {v.population or 0}, "
-                f"建築 {buildings_count} 個, 部隊 {troops_in_village}"
+                f"  - {v.name or '未命名'}{type_label}{role_label}: "
+                f"人口 {v.population or 0}, 建築 {buildings_count} 個, {troops_label}"
             )
 
         # 階段標準
         standard = phase_info["standard"]
+
+        # 統計村莊類型
+        village_types = [v.village_type.value for v in villages if v.village_type]
+        has_15c = any(
+            v.village_type and v.village_type.value == "15c" for v in villages
+        )
 
         # 給 RAG 用的玩家資訊
         player_info = {
@@ -150,6 +324,8 @@ class AIService:
             "progress_status": progress_status.value,
             "village_count": village_count,
             "total_population": total_population,
+            "village_types": village_types,
+            "has_15c": has_15c,
         }
 
         context = f"""
@@ -169,11 +345,235 @@ class AIService:
 """
         return context, player_info
 
+    def _execute_tool(self, tool_name: str, tool_input: dict[str, Any]) -> str:
+        """執行工具並返回結果.
+
+        Args:
+            tool_name: 工具名稱
+            tool_input: 工具輸入參數
+
+        Returns:
+            工具執行結果的字串
+        """
+        try:
+            game_data = get_game_data_service()
+
+            if tool_name == "get_building_info":
+                building_id = tool_input.get("building_id", "")
+                building = game_data.buildings.get_building(building_id)
+                if not building:
+                    return f"找不到建築 '{building_id}'。請使用 list_buildings 工具查看可用的建築 ID。"
+
+                # 建構詳細資訊
+                result = f"## {building.name_zh} ({building.name_en})\n\n"
+                result += f"- **類別**: {building.category.value}\n"
+                result += f"- **最高等級**: {building.max_level}\n"
+                if building.description_zh:
+                    result += f"- **說明**: {building.description_zh}\n"
+
+                if building.prerequisites:
+                    result += "\n**前置需求**:\n"
+                    for prereq in building.prerequisites:
+                        result += f"- {prereq.building_id} 等級 {prereq.level}\n"
+
+                result += "\n### 各等級成本與效果\n\n"
+                result += "| 等級 | 木材 | 磚塊 | 鐵礦 | 糧食 | 總計 | 建造時間(秒) | 人口 | 文化點 | 效果 |\n"
+                result += "|------|------|------|------|------|------|--------------|------|--------|------|\n"
+
+                for level in building.levels:
+                    total = (
+                        level.cost_wood
+                        + level.cost_clay
+                        + level.cost_iron
+                        + level.cost_crop
+                    )
+                    effect = level.effect_description or "-"
+                    result += f"| {level.level} | {level.cost_wood:,} | {level.cost_clay:,} | {level.cost_iron:,} | {level.cost_crop:,} | {total:,} | {level.build_time_base:,} | {level.population} | {level.culture_points} | {effect} |\n"
+
+                return result
+
+            elif tool_name == "get_building_level_cost":
+                building_id = tool_input.get("building_id", "")
+                level = tool_input.get("level", 1)
+
+                building = game_data.buildings.get_building(building_id)
+                if not building:
+                    return f"找不到建築 '{building_id}'"
+
+                level_data = building.get_level(level)
+                if not level_data:
+                    return f"建築 '{building_id}' 沒有等級 {level} 的資料"
+
+                total = (
+                    level_data.cost_wood
+                    + level_data.cost_clay
+                    + level_data.cost_iron
+                    + level_data.cost_crop
+                )
+                result = f"## {building.name_zh} 等級 {level} 建造成本\n\n"
+                result += f"- **木材**: {level_data.cost_wood:,}\n"
+                result += f"- **磚塊**: {level_data.cost_clay:,}\n"
+                result += f"- **鐵礦**: {level_data.cost_iron:,}\n"
+                result += f"- **糧食**: {level_data.cost_crop:,}\n"
+                result += f"- **總計**: {total:,}\n"
+                result += f"- **建造時間**: {level_data.build_time_base:,} 秒\n"
+                result += f"- **人口消耗**: {level_data.population}\n"
+                result += f"- **文化點**: {level_data.culture_points}\n"
+                if level_data.effect_description:
+                    result += f"- **效果**: {level_data.effect_description}\n"
+
+                return result
+
+            elif tool_name == "calculate_upgrade_cost":
+                building_id = tool_input.get("building_id", "")
+                from_level = tool_input.get("from_level", 0)
+                to_level = tool_input.get("to_level", 1)
+
+                building = game_data.buildings.get_building(building_id)
+                if not building:
+                    return f"找不到建築 '{building_id}'"
+
+                if from_level >= to_level:
+                    return "起始等級必須小於目標等級"
+
+                cost = building.get_upgrade_cost(from_level, to_level)
+                if not cost:
+                    return f"無法計算從等級 {from_level} 到等級 {to_level} 的成本"
+
+                total = cost["wood"] + cost["clay"] + cost["iron"] + cost["crop"]
+                result = f"## {building.name_zh} 升級成本計算\n\n"
+                result += f"**從等級 {from_level} 升到等級 {to_level}**\n\n"
+                result += f"- **木材**: {cost['wood']:,}\n"
+                result += f"- **磚塊**: {cost['clay']:,}\n"
+                result += f"- **鐵礦**: {cost['iron']:,}\n"
+                result += f"- **糧食**: {cost['crop']:,}\n"
+                result += f"- **總計**: {total:,}\n"
+
+                return result
+
+            elif tool_name == "list_buildings":
+                category = tool_input.get("category")
+
+                if category:
+                    from app.domain.schemas.game_data import BuildingCategory
+
+                    try:
+                        cat_enum = BuildingCategory(category)
+                        buildings = game_data.buildings.get_buildings_by_category(
+                            cat_enum
+                        )
+                    except ValueError:
+                        return f"無效的類別: {category}"
+                else:
+                    buildings = list(game_data.buildings.buildings.values())
+
+                result = "## 建築列表\n\n"
+                if category:
+                    result += f"**類別**: {category}\n\n"
+                result += f"共 {len(buildings)} 個建築\n\n"
+                result += "| ID | 中文名稱 | 英文名稱 | 類別 | 最高等級 |\n"
+                result += "|----|----------|----------|------|----------|\n"
+
+                for b in buildings:
+                    result += f"| {b.building_id} | {b.name_zh} | {b.name_en} | {b.category.value} | {b.max_level} |\n"
+
+                return result
+
+            elif tool_name == "get_troop_info":
+                troop_id = tool_input.get("troop_id", "")
+                troop = game_data.troops.get_troop(troop_id)
+                if not troop:
+                    return f"找不到兵種 '{troop_id}'。請使用 list_troops 工具查看可用的兵種 ID。"
+
+                result = f"## {troop.name_zh} ({troop.name_en})\n\n"
+                result += f"- **種族**: {troop.tribe.value}\n"
+                result += f"- **類型**: {troop.category.value}\n\n"
+                result += "### 基礎數值\n"
+                result += f"- **攻擊力**: {troop.attack}\n"
+                result += f"- **步兵防禦**: {troop.defense_infantry}\n"
+                result += f"- **騎兵防禦**: {troop.defense_cavalry}\n"
+                result += f"- **速度**: {troop.speed} 格/小時\n"
+                result += f"- **載重**: {troop.carry_capacity}\n"
+                result += f"- **糧食消耗**: {troop.crop_consumption}\n\n"
+                result += "### 訓練成本\n"
+                result += f"- **木材**: {troop.cost_wood}\n"
+                result += f"- **磚塊**: {troop.cost_clay}\n"
+                result += f"- **鐵礦**: {troop.cost_iron}\n"
+                result += f"- **糧食**: {troop.cost_crop}\n"
+                result += f"- **訓練時間**: {troop.training_time_base} 秒\n"
+
+                return result
+
+            elif tool_name == "list_troops":
+                tribe = tool_input.get("tribe")
+
+                if tribe:
+                    from app.domain.schemas.game_data import TroopTribe
+
+                    try:
+                        tribe_enum = TroopTribe(tribe)
+                        troops = game_data.troops.get_troops_by_tribe(tribe_enum)
+                    except ValueError:
+                        return f"無效的種族: {tribe}"
+                else:
+                    troops = list(game_data.troops.troops.values())
+
+                result = "## 兵種列表\n\n"
+                if tribe:
+                    result += f"**種族**: {tribe}\n\n"
+                result += f"共 {len(troops)} 個兵種\n\n"
+                result += (
+                    "| ID | 中文名稱 | 種族 | 攻擊 | 步防 | 騎防 | 速度 | 糧耗 |\n"
+                )
+                result += (
+                    "|----|----------|------|------|------|------|------|------|\n"
+                )
+
+                for t in troops:
+                    result += f"| {t.troop_id} | {t.name_zh} | {t.tribe.value} | {t.attack} | {t.defense_infantry} | {t.defense_cavalry} | {t.speed} | {t.crop_consumption} |\n"
+
+                return result
+
+            elif tool_name == "get_resource_field_info":
+                resource_type = tool_input.get("resource_type", "")
+                resource = game_data.resources.get_resource_field(resource_type)
+                if not resource:
+                    return f"找不到資源類型 '{resource_type}'"
+
+                type_names = {
+                    "wood": "伐木場",
+                    "clay": "採土場",
+                    "iron": "鐵礦場",
+                    "crop": "農田",
+                }
+                result = (
+                    f"## {type_names.get(resource_type, resource_type)} 資源田資料\n\n"
+                )
+                result += "### 各等級產量與成本\n\n"
+                result += (
+                    "| 等級 | 產量/小時 | 木材 | 磚塊 | 鐵礦 | 糧食 | 建造時間(秒) |\n"
+                )
+                result += (
+                    "|------|-----------|------|------|------|------|---------------|\n"
+                )
+
+                for res_level in resource.levels:
+                    result += f"| {res_level.level} | {res_level.production_per_hour} | {res_level.cost_wood:,} | {res_level.cost_clay:,} | {res_level.cost_iron:,} | {res_level.cost_crop:,} | {res_level.build_time_base:,} |\n"
+
+                return result
+
+            else:
+                return f"未知的工具: {tool_name}"
+
+        except Exception as e:
+            logger.error(f"執行工具 {tool_name} 時發生錯誤: {e}")
+            return f"執行工具時發生錯誤: {str(e)}"
+
     def _create_fallback_response(
         self, account: GameAccount, question: str, error_msg: str
     ) -> dict[str, Any]:
         """建立 fallback 回應（當 API 不可用時）."""
-        day = account.account_age_days or 1
+        day = account.current_server_day or 1
         phase = self.strategy_service._determine_phase(day)
         phase_info = PHASE_STANDARDS[phase]
 
@@ -296,24 +696,108 @@ class AIService:
             # 加入用戶新問題
             messages.append({"role": "user", "content": question})
 
-            # 呼叫 Claude API（帶入 RAG 知識）
-            response = self.client.messages.create(
-                model=settings.CLAUDE_MODEL,
-                max_tokens=settings.CLAUDE_MAX_TOKENS,
-                system=SYSTEM_PROMPT.format(
-                    player_context=player_context,
-                    knowledge_context=knowledge_context,
-                ),
-                messages=messages,
+            # 建構 system prompt（帶入 RAG 知識和工具使用說明）
+            system_prompt = SYSTEM_PROMPT.format(
+                player_context=player_context,
+                knowledge_context=knowledge_context,
             )
+            system_prompt += """
 
-            # 取得回應文字
-            first_block = response.content[0]
-            response_text = (
-                first_block.text if isinstance(first_block, TextBlock) else ""
-            )
+## 遊戲數據查詢工具（必須使用）
 
-            # 更新對話歷史
+⚠️ **極度重要 - 強制規則**：
+當回答涉及以下內容時，你**必須**先使用工具查詢數據庫，**絕對禁止**憑記憶或估算回答：
+- 建築成本（木材、磚塊、鐵礦、糧食）
+- 建築建造時間
+- 兵種數據（攻防、成本、速度）
+- 資源田產量
+- 任何需要具體數字的問題
+
+可用工具：
+- `get_building_info`: 查詢建築完整資料（所有等級）
+- `get_building_level_cost`: 查詢特定等級的建造成本
+- `calculate_upgrade_cost`: 計算從等級 A 升到等級 B 的總成本
+- `list_buildings`: 列出所有建築 ID
+- `get_troop_info`: 查詢兵種資料
+- `list_troops`: 列出所有兵種
+- `get_resource_field_info`: 查詢資源田各等級資料
+
+**違反此規則會導致數據錯誤，損害玩家利益。**
+如果你不確定建築 ID，請先使用 `list_buildings` 查詢。"""
+
+            # Tool Use 迴圈：最多執行 5 次工具呼叫
+            max_tool_iterations = 5
+            response_text = ""
+
+            for iteration in range(max_tool_iterations):
+                # 呼叫 Claude API（帶入工具定義）
+                response = self.client.messages.create(
+                    model=settings.CLAUDE_MODEL,
+                    max_tokens=settings.CLAUDE_MAX_TOKENS,
+                    system=system_prompt,
+                    messages=messages,
+                    tools=GAME_DATA_TOOLS,
+                )
+
+                logger.info(
+                    f"Tool Use 迴圈第 {iteration + 1} 次，stop_reason: {response.stop_reason}"
+                )
+
+                # 檢查是否有 tool_use
+                tool_use_blocks = [
+                    block
+                    for block in response.content
+                    if isinstance(block, ToolUseBlock)
+                ]
+
+                if not tool_use_blocks:
+                    # 沒有工具呼叫，提取最終回應文字
+                    for block in response.content:
+                        if isinstance(block, TextBlock):
+                            response_text = block.text
+                            break
+                    break
+
+                # 處理工具呼叫
+                # 先將 assistant 的回應加入 messages
+                assistant_content: list[Any] = []
+                for block in response.content:
+                    if isinstance(block, TextBlock):
+                        assistant_content.append({"type": "text", "text": block.text})
+                    elif isinstance(block, ToolUseBlock):
+                        assistant_content.append(
+                            {
+                                "type": "tool_use",
+                                "id": block.id,
+                                "name": block.name,
+                                "input": block.input,
+                            }
+                        )
+
+                messages.append({"role": "assistant", "content": assistant_content})
+
+                # 執行工具並收集結果
+                tool_results: list[ToolResultBlockParam] = []
+                for tool_block in tool_use_blocks:
+                    logger.info(
+                        f"執行工具: {tool_block.name}, 輸入: {tool_block.input}"
+                    )
+                    result = self._execute_tool(
+                        tool_block.name,
+                        cast(dict[str, Any], tool_block.input),
+                    )
+                    tool_results.append(
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_block.id,
+                            "content": result,
+                        }
+                    )
+
+                # 將工具結果加入 messages
+                messages.append({"role": "user", "content": tool_results})
+
+            # 更新對話歷史（只保存最終的對話，不保存中間的工具呼叫）
             AIService._conversations[conversation_id].append(
                 {"role": "user", "content": question}
             )
@@ -327,7 +811,7 @@ class AIService:
 
             # 如果沒有解析到階段分析，補充
             if not parsed["phase_analysis"]:
-                day = account.account_age_days or 1
+                day = account.current_server_day or 1
                 phase = self.strategy_service._determine_phase(day)
                 phase_info = PHASE_STANDARDS[phase]
                 parsed["phase_analysis"] = (
