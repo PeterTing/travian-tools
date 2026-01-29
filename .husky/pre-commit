@@ -1,6 +1,6 @@
 # Frontend checks
 pnpm lint-staged
-cd frontend && pnpm exec tsc --noEmit && pnpm test
+cd frontend && pnpm lint && pnpm exec tsc --noEmit && pnpm test
 cd ..
 
 # Backend checks
