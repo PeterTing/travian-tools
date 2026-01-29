@@ -68,7 +68,7 @@ export default function AIAdvisorPage() {
       try {
         const data = await gameAccountApi.getAll()
         setAccounts(data.accounts || [])
-        if (!selectedAccountId && data.accounts?.length > 0) {
+        if (!initialAccountId && data.accounts?.length > 0) {
           setSelectedAccountId(data.accounts[0].account_id)
         }
       } catch (err) {
@@ -76,7 +76,7 @@ export default function AIAdvisorPage() {
       }
     }
     loadAccounts()
-  }, [])
+  }, [initialAccountId])
 
   // 當選擇帳號時載入階段資訊和對話列表
   useEffect(() => {
