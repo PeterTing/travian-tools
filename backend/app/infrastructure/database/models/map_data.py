@@ -52,6 +52,21 @@ class MapSnapshot(Base):
         back_populates="snapshot",
         cascade="all, delete-orphan",
     )
+    conquests: Mapped[list["MapConquest"]] = relationship(
+        "MapConquest",
+        back_populates="snapshot",
+        cascade="all, delete-orphan",
+    )
+    name_changes: Mapped[list["MapNameChange"]] = relationship(
+        "MapNameChange",
+        back_populates="snapshot",
+        cascade="all, delete-orphan",
+    )
+    server_stats: Mapped[list["MapServerStats"]] = relationship(
+        "MapServerStats",
+        back_populates="snapshot",
+        cascade="all, delete-orphan",
+    )
 
 
 class MapVillageData(Base):
@@ -177,7 +192,9 @@ class MapConquest(Base):
     new_alliance_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # Relationships
-    snapshot: Mapped["MapSnapshot"] = relationship("MapSnapshot")
+    snapshot: Mapped["MapSnapshot"] = relationship(
+        "MapSnapshot", back_populates="conquests"
+    )
 
     __table_args__ = (Index("ix_map_conquests_snapshot_id", "detected_at_snapshot_id"),)
 
@@ -211,7 +228,9 @@ class MapNameChange(Base):
     game_day: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # Relationships
-    snapshot: Mapped["MapSnapshot"] = relationship("MapSnapshot")
+    snapshot: Mapped["MapSnapshot"] = relationship(
+        "MapSnapshot", back_populates="name_changes"
+    )
 
     __table_args__ = (
         Index("ix_map_name_changes_snapshot_id", "detected_at_snapshot_id"),
@@ -253,6 +272,8 @@ class MapServerStats(Base):
     conquests_today: Mapped[int] = mapped_column(Integer, default=0)
 
     # Relationships
-    snapshot: Mapped["MapSnapshot"] = relationship("MapSnapshot")
+    snapshot: Mapped["MapSnapshot"] = relationship(
+        "MapSnapshot", back_populates="server_stats"
+    )
 
     __table_args__ = (Index("ix_map_server_stats_snapshot_id", "snapshot_id"),)
