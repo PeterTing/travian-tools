@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, func
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base
@@ -140,3 +140,119 @@ class MapAllianceData(Base):
     __table_args__ = (
         Index("ix_map_alliances_snapshot_id", "snapshot_id", "travian_alliance_id"),
     )
+
+
+class MapConquest(Base):
+    """村莊佔領記錄.
+
+    追蹤快照間偵測到的村莊所有權變更。
+    """
+
+    __tablename__ = "map_conquests"
+
+    conquest_id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    server_url: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    detected_at_snapshot_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("map_snapshots.snapshot_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    detected_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=func.now(),
+    )
+    village_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    village_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    village_x: Mapped[int] = mapped_column(Integer, nullable=False)
+    village_y: Mapped[int] = mapped_column(Integer, nullable=False)
+    old_player_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    old_player_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    old_alliance_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    new_player_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    new_player_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    new_alliance_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    # Relationships
+    snapshot: Mapped["MapSnapshot"] = relationship("MapSnapshot")
+
+    __table_args__ = (Index("ix_map_conquests_snapshot_id", "detected_at_snapshot_id"),)
+
+
+class MapNameChange(Base):
+    """玩家改名記錄.
+
+    追蹤快照間偵測到的玩家名稱變更。
+    """
+
+    __tablename__ = "map_name_changes"
+
+    change_id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    server_url: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    detected_at_snapshot_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("map_snapshots.snapshot_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    detected_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=func.now(),
+    )
+    player_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    old_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    new_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    game_day: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    # Relationships
+    snapshot: Mapped["MapSnapshot"] = relationship("MapSnapshot")
+
+    __table_args__ = (
+        Index("ix_map_name_changes_snapshot_id", "detected_at_snapshot_id"),
+    )
+
+
+class MapServerStats(Base):
+    """伺服器統計快照.
+
+    每日伺服器層級的統計數據。
+    """
+
+    __tablename__ = "map_server_stats"
+
+    stats_id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    snapshot_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("map_snapshots.snapshot_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    server_url: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=func.now(),
+    )
+    total_players: Mapped[int] = mapped_column(Integer, default=0)
+    active_players: Mapped[int] = mapped_column(Integer, default=0)
+    total_villages: Mapped[int] = mapped_column(Integer, default=0)
+    total_alliances: Mapped[int] = mapped_column(Integer, default=0)
+    total_population: Mapped[int] = mapped_column(BigInteger, default=0)
+    new_players: Mapped[int] = mapped_column(Integer, default=0)
+    deleted_players: Mapped[int] = mapped_column(Integer, default=0)
+    villages_settled: Mapped[int] = mapped_column(Integer, default=0)
+    villages_destroyed: Mapped[int] = mapped_column(Integer, default=0)
+    conquests_today: Mapped[int] = mapped_column(Integer, default=0)
+
+    # Relationships
+    snapshot: Mapped["MapSnapshot"] = relationship("MapSnapshot")
+
+    __table_args__ = (Index("ix_map_server_stats_snapshot_id", "snapshot_id"),)
