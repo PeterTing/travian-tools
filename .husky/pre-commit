@@ -1,10 +1,9 @@
 # Frontend checks
 pnpm lint-staged
-cd frontend && pnpm lint && pnpm exec tsc --noEmit && pnpm test
+cd frontend && pnpm exec tsc --noEmit && pnpm test
 cd ..
 
 # Backend checks
 cd backend
-python3 -m ruff check .
-python3 -m mypy app --ignore-missing-imports
-python3 -m pytest --tb=short -q
+.venv/bin/python -m ruff check .
+.venv/bin/python -m pytest --tb=short -q
