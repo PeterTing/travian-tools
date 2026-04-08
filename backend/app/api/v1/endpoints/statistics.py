@@ -180,8 +180,8 @@ async def search_inactive_villages(
 
 @router.post("/snapshot/trigger")
 async def trigger_snapshot(
+    current_user: CurrentUser,
     server_url: str = Query(..., description="伺服器 URL"),
-    current_user: CurrentUser = None,
     db: Session = Depends(get_db),
 ) -> dict:
     """手動觸發快照下載.
