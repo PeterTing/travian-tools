@@ -21,8 +21,19 @@ import { GameAccountsPage } from '@/pages/game-accounts'
 // Village pages
 import VillagesPage from '@/pages/villages/VillagesPage'
 import VillageDetailPage from '@/pages/villages/VillageDetailPage'
+// Dashboard page
+import DashboardPage from '@/pages/DashboardPage'
 // Map pages
 import MapSqlPage from '@/pages/map/MapSqlPage'
+// Statistics pages
+import {
+  ServerOverviewPage,
+  PlayerRankingPage,
+  AllianceRankingPage,
+  ConquestActivityPage,
+  NameChangesPage,
+  InactiveSearchPage,
+} from '@/pages/statistics'
 // Strategy pages
 import { AIAdvisorPage, HealthCheckPage } from '@/pages/strategy'
 import { Button } from '@/components/ui/button'
@@ -96,11 +107,59 @@ function Navigation() {
                   </Link>
                 </div>
               </div>
+              <div className="relative group">
+                <span className="cursor-pointer hover:text-primary">
+                  統計
+                </span>
+                <div className="absolute top-full left-0 hidden group-hover:block bg-background border rounded shadow-lg py-2 min-w-[140px] z-50">
+                  <Link
+                    to="/statistics/overview"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    伺服器總覽
+                  </Link>
+                  <Link
+                    to="/statistics/players"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    玩家排名
+                  </Link>
+                  <Link
+                    to="/statistics/alliances"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    聯盟排名
+                  </Link>
+                  <Link
+                    to="/statistics/conquests"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    征服記錄
+                  </Link>
+                  <Link
+                    to="/statistics/name-changes"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    改名記錄
+                  </Link>
+                  <Link
+                    to="/statistics/search/inactives"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    不活躍搜尋
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
+                <Link to="/dashboard">
+                  <Button variant="ghost" size="sm">
+                    儀表板
+                  </Button>
+                </Link>
                 <Link to="/game-accounts">
                   <Button variant="ghost" size="sm">
                     {t('gameAccounts.title')}
@@ -179,7 +238,15 @@ function AppContent() {
         <Route path="/calculator/roi" element={<RoiCalculatorPage />} />
         <Route path="/calculator/battle" element={<BattleSimulatorPage />} />
         <Route path="/calculator/crop" element={<CropBalancePage />} />
+        {/* Statistics routes - 公開 */}
+        <Route path="/statistics/overview" element={<ServerOverviewPage />} />
+        <Route path="/statistics/players" element={<PlayerRankingPage />} />
+        <Route path="/statistics/alliances" element={<AllianceRankingPage />} />
+        <Route path="/statistics/conquests" element={<ConquestActivityPage />} />
+        <Route path="/statistics/name-changes" element={<NameChangesPage />} />
+        <Route path="/statistics/search/inactives" element={<InactiveSearchPage />} />
         {/* Protected routes - 需要登入 */}
+        <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
         <Route path="/game-accounts" element={<RequireAuth><GameAccountsPage /></RequireAuth>} />
         <Route path="/villages" element={<RequireAuth><VillagesPage /></RequireAuth>} />
         <Route path="/villages/:villageId" element={<RequireAuth><VillageDetailPage /></RequireAuth>} />
