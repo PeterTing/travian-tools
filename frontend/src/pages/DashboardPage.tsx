@@ -6,7 +6,8 @@
  */
 
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { AlertTriangle, Building2, RefreshCw, Sword, Wheat, Loader2, Clock, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AlertTriangle, Building2, RefreshCw, Sword, Wheat, Loader2, Clock, CheckCircle2, UserPlus } from 'lucide-react';
 import { useDynamicResources, formatElapsedTime } from '@/hooks/useDynamicResources';
 
 import { Button } from '@/components/ui/button';
@@ -45,6 +46,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [noAccount, setNoAccount] = useState(false);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [nextSync, setNextSync] = useState<string | null>(null);
 
@@ -107,8 +109,11 @@ export default function DashboardPage() {
           error_message: null,
         });
       }
-    } catch (err) {
-      if (!isInitialCheck) {
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number } };
+      if (axiosErr?.response?.status === 404) {
+        setNoAccount(true);
+      } else if (!isInitialCheck) {
         setError(err instanceof Error ? err.message : '啟動同步失敗');
       }
       setIsSyncing(false);
@@ -119,6 +124,7 @@ export default function DashboardPage() {
   const loadCachedData = useCallback(async (autoSync = true) => {
     setLoading(true);
     setError(null);
+    setNoAccount(false);
     try {
       const response = await getCachedData(serverUrl);
       setVillages(response.villages);
@@ -129,10 +135,15 @@ export default function DashboardPage() {
       if (response.villages.length > 0 && !selectedVillageId) {
         setSelectedVillageId(response.villages[0].village_id);
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      // 檢查是否為「找不到遊戲帳號」(404)
+      const axiosErr = err as { response?: { status?: number } };
+      if (axiosErr?.response?.status === 404) {
+        setNoAccount(true);
+        return;
+      }
       // 如果沒有快取資料，自動啟動同步
       if (autoSync) {
-        console.log('沒有快取資料，啟動同步...');
         startSync();
       } else {
         setError(err instanceof Error ? err.message : '載入資料失敗');
@@ -263,8 +274,28 @@ export default function DashboardPage() {
         </Card>
       )}
 
+      {/* 未建立遊戲帳號提示 */}
+      {noAccount && (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <UserPlus className="h-12 w-12 text-muted-foreground mb-4" />
+            <h2 className="text-xl font-semibold mb-2">尚未建立遊戲帳號</h2>
+            <p className="text-muted-foreground mb-6 text-center max-w-md">
+              要使用儀表板，請先建立一個遊戲帳號並設定你的 Travian 伺服器網址。
+              建立帳號後即可同步村莊資料。
+            </p>
+            <Link to="/game-accounts">
+              <Button>
+                <UserPlus className="mr-2 h-4 w-4" />
+                前往建立遊戲帳號
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
       {/* 錯誤提示 */}
-      {error && (
+      {error && !noAccount && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>錯誤</AlertTitle>
@@ -573,8 +604,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* 沒有資料且不在同步中 */}
-      {villages.length === 0 && !isSyncing && !loading && (
+      {/* 沒有資料且不在同步中（有帳號但還沒同步過） */}
+      {villages.length === 0 && !isSyncing && !loading && !noAccount && (
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">尚無村莊資料</p>
           <Button onClick={() => startSync()}>
