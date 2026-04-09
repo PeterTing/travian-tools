@@ -5,6 +5,7 @@ import logging
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    advanced_calculator,
     auth,
     automation,
     buildings,
@@ -49,6 +50,11 @@ router.include_router(reminders.router)
 router.include_router(transport.router)
 router.include_router(automation.router)
 router.include_router(statistics.router)
+router.include_router(
+    advanced_calculator.router,
+    prefix="/advanced-calculator",
+    tags=["advanced-calculator"],
+)
 
 # Scraper router requires nodriver (Chrome automation) which is not available in Docker
 # Only load it when nodriver is installed (local development)
