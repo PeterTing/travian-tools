@@ -110,11 +110,14 @@ export default function DashboardPage() {
         });
       }
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { status?: number } };
+      const axiosErr = err as { response?: { status?: number; data?: { detail?: string } } };
       if (axiosErr?.response?.status === 404) {
         setNoAccount(true);
+      } else if (axiosErr?.response?.status === 503) {
+        setError('同步服務尚未啟動。請確認 Redis 和 ARQ Worker 正在運行。');
       } else if (!isInitialCheck) {
-        setError(err instanceof Error ? err.message : '啟動同步失敗');
+        const detail = axiosErr?.response?.data?.detail;
+        setError(detail || (err instanceof Error ? err.message : '啟動同步失敗'));
       }
       setIsSyncing(false);
     }
