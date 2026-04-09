@@ -16,6 +16,14 @@ import BuildingCalculatorPage from '@/pages/calculator/BuildingCalculatorPage'
 import RoiCalculatorPage from '@/pages/calculator/RoiCalculatorPage'
 import BattleSimulatorPage from '@/pages/calculator/BattleSimulatorPage'
 import CropBalancePage from '@/pages/calculator/CropBalancePage'
+// Advanced calculator pages
+import PathCalculatorPage from '@/pages/calculator/PathCalculatorPage'
+import InterceptionCalculatorPage from '@/pages/calculator/InterceptionCalculatorPage'
+import CulturePointsCalculatorPage from '@/pages/calculator/CulturePointsCalculatorPage'
+import TechnologyCalculatorPage from '@/pages/calculator/TechnologyCalculatorPage'
+import NpcCalculatorPage from '@/pages/calculator/NpcCalculatorPage'
+import SaveTroopsCalculatorPage from '@/pages/calculator/SaveTroopsCalculatorPage'
+import PathSpeedTsCalculatorPage from '@/pages/calculator/PathSpeedTsCalculatorPage'
 // Game accounts page
 import { GameAccountsPage } from '@/pages/game-accounts'
 // Village pages
@@ -104,6 +112,49 @@ function Navigation() {
                     className="block px-4 py-2 hover:bg-muted"
                   >
                     {t('nav.cropBalance')}
+                  </Link>
+                  <hr className="my-1 border-muted" />
+                  <Link
+                    to="/calculator/path"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    路徑計算器
+                  </Link>
+                  <Link
+                    to="/calculator/interception"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    攔截計算器
+                  </Link>
+                  <Link
+                    to="/calculator/culture-points"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    文化點計算器
+                  </Link>
+                  <Link
+                    to="/calculator/technology"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    科技計算器
+                  </Link>
+                  <Link
+                    to="/calculator/npc"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    NPC 計算器
+                  </Link>
+                  <Link
+                    to="/calculator/save-troops"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    避兵計算器
+                  </Link>
+                  <Link
+                    to="/calculator/path-speed-ts"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    TS 反推計算器
                   </Link>
                 </div>
               </div>
@@ -238,6 +289,14 @@ function AppContent() {
         <Route path="/calculator/roi" element={<RoiCalculatorPage />} />
         <Route path="/calculator/battle" element={<BattleSimulatorPage />} />
         <Route path="/calculator/crop" element={<CropBalancePage />} />
+        {/* Advanced calculator routes */}
+        <Route path="/calculator/path" element={<PathCalculatorPage />} />
+        <Route path="/calculator/interception" element={<InterceptionCalculatorPage />} />
+        <Route path="/calculator/culture-points" element={<CulturePointsCalculatorPage />} />
+        <Route path="/calculator/technology" element={<TechnologyCalculatorPage />} />
+        <Route path="/calculator/npc" element={<NpcCalculatorPage />} />
+        <Route path="/calculator/save-troops" element={<SaveTroopsCalculatorPage />} />
+        <Route path="/calculator/path-speed-ts" element={<PathSpeedTsCalculatorPage />} />
         {/* Statistics routes - 公開 */}
         <Route path="/statistics/overview" element={<ServerOverviewPage />} />
         <Route path="/statistics/players" element={<PlayerRankingPage />} />
