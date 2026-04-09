@@ -29,8 +29,7 @@ import { GameAccountsPage } from '@/pages/game-accounts'
 // Village pages
 import VillagesPage from '@/pages/villages/VillagesPage'
 import VillageDetailPage from '@/pages/villages/VillageDetailPage'
-// Dashboard page
-import DashboardPage from '@/pages/DashboardPage'
+// DashboardPage removed — village management is now unified in VillagesPage
 // Map pages
 import MapSqlPage from '@/pages/map/MapSqlPage'
 // Statistics pages
@@ -206,11 +205,6 @@ function Navigation() {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
-                <Link to="/dashboard">
-                  <Button variant="ghost" size="sm">
-                    儀表板
-                  </Button>
-                </Link>
                 <Link to="/game-accounts">
                   <Button variant="ghost" size="sm">
                     {t('gameAccounts.title')}
@@ -305,7 +299,6 @@ function AppContent() {
         <Route path="/statistics/name-changes" element={<NameChangesPage />} />
         <Route path="/statistics/search/inactives" element={<InactiveSearchPage />} />
         {/* Protected routes - 需要登入 */}
-        <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
         <Route path="/game-accounts" element={<RequireAuth><GameAccountsPage /></RequireAuth>} />
         <Route path="/villages" element={<RequireAuth><VillagesPage /></RequireAuth>} />
         <Route path="/villages/:villageId" element={<RequireAuth><VillageDetailPage /></RequireAuth>} />
