@@ -49,7 +49,11 @@ class VillageStatsSyncService:
         try:
             await scraper._start_browser()
 
-            # Fetch 4 pages
+            # Ensure login first: navigate to main page to trigger login
+            logger.info("[STATS_SYNC] Ensuring login...")
+            await scraper._navigate(f"{server_url}/dorf1.php")
+
+            # Fetch 4 pages (now guaranteed to be logged in)
             html_pages: dict[str, str] = {}
             for name, path in self.STATS_PAGES:
                 url = f"{server_url}{path}"
