@@ -80,6 +80,36 @@ class VillageStatsSyncService:
                 overview, resources, culture_points, troops, coordinates
             )
 
+            # Fetch per-village production/capacity from dorf1
+            from app.services.travian_parser import TravianParser
+            for village_data in merged:
+                vid = village_data.get("travian_village_id")
+                if not vid:
+                    continue
+                try:
+                    dorf1_url = f"{server_url}/dorf1.php?newdid={vid}"
+                    logger.info("[STATS_SYNC] Fetching dorf1 for village %s", vid)
+                    html = await scraper._navigate_fast(dorf1_url, wait_for_element="#l1")
+                    parsed = TravianParser.parse_resources(html)
+                    if parsed:
+                        village_data["wood_production"] = parsed.wood_production
+                        village_data["clay_production"] = parsed.clay_production
+                        village_data["iron_production"] = parsed.iron_production
+                        village_data["crop_production"] = parsed.crop_production
+                        village_data["warehouse_capacity"] = parsed.warehouse_capacity or 800
+                        village_data["granary_capacity"] = parsed.granary_capacity or 800
+                        # Update current resources from dorf1 (more recent)
+                        if parsed.wood:
+                            village_data["wood"] = parsed.wood
+                        if parsed.clay:
+                            village_data["clay"] = parsed.clay
+                        if parsed.iron:
+                            village_data["iron"] = parsed.iron
+                        if parsed.crop:
+                            village_data["crop"] = parsed.crop
+                except Exception as e:
+                    logger.warning("[STATS_SYNC] Failed to fetch dorf1 for village %s: %s", vid, e)
+
             # Save to database
             now = datetime.now(UTC)
             saved_count = 0
@@ -142,6 +172,27 @@ class VillageStatsSyncService:
         village.crop = data.get("crop", 0)
         village.has_incoming_attack = data.get("has_attack", False)
         village.attack_count = 1 if data.get("has_attack", False) else 0
+        village.cp_per_day = data.get("cp_per_day", 0)
+        village.merchants_used = data.get("merchants_used", 0)
+        village.merchants_total = data.get("merchants_total", 0)
+        village.total_troops = data.get("total_troops", 0)
+
+        # Production rates (from dorf1)
+        if data.get("wood_production"):
+            village.wood_production = data["wood_production"]
+        if data.get("clay_production"):
+            village.clay_production = data["clay_production"]
+        if data.get("iron_production"):
+            village.iron_production = data["iron_production"]
+        if data.get("crop_production"):
+            village.crop_production = data["crop_production"]
+
+        # Warehouse/granary capacity (from dorf1)
+        if data.get("warehouse_capacity") and data["warehouse_capacity"] != 800:
+            village.warehouse_capacity = data["warehouse_capacity"]
+        if data.get("granary_capacity") and data["granary_capacity"] != 800:
+            village.granary_capacity = data["granary_capacity"]
+
         village.last_updated = now
 
         # Coordinates from sidebar
