@@ -270,55 +270,61 @@ class StatisticsPageParser:
     def parse_troops(html: str) -> list[dict]:
         """Parse /village/statistics/troops.
 
+        The troops page has MULTIPLE tables — one per tribe (race).
+        Each table has its own header with tribe-specific troop icons.
+
         Returns list of dicts with:
             name, troops (dict of troop_name -> count), total_troops
         """
         soup = BeautifulSoup(html, "html.parser")
-        table = soup.find("table")
-        if not table:
+        tables = soup.find_all("table")
+        if not tables:
             return []
 
-        # Extract troop names from header row th > img[alt]
-        header_row = table.find("tr")
-        if not header_row:
-            return []
+        # Collect results across all tables, merging by village name
+        village_troops: dict[str, dict[str, int]] = {}
 
-        troop_names: list[str] = []
-        ths = header_row.find_all("th")
-        for th in ths[1:]:  # skip first th (village name column)
-            img = th.find("img")
-            if img and img.get("alt"):
-                troop_names.append(img["alt"])
+        for table in tables:
+            header_row = table.find("tr")
+            if not header_row:
+                continue
+
+            # Extract troop names from header
+            troop_names: list[str] = []
+            for cell in header_row.find_all(["th", "td"])[1:]:
+                img = cell.find("img")
+                if img and img.get("alt"):
+                    troop_names.append(img["alt"])
+
+            if not troop_names:
+                continue
+
+            for row in table.find_all("tr")[1:]:
+                row_classes = row.get("class", [])
+                if "sum" in row_classes or "small" in row_classes:
+                    continue
+
+                cells = row.find_all("td")
+                if len(cells) < 2:
+                    continue
+
+                name = cells[0].get_text(strip=True)
+                if not name:
+                    continue
+
+                if name not in village_troops:
+                    village_troops[name] = {}
+
+                for j, troop_name in enumerate(troop_names):
+                    if j + 1 < len(cells):
+                        count = StatisticsPageParser._clean_number(
+                            cells[j + 1].get_text()
+                        )
+                        village_troops[name][troop_name] = count
 
         results: list[dict] = []
-        rows = table.find_all("tr")
-
-        for row in rows[1:]:  # skip header
-            row_classes = row.get("class", [])
-            if "sum" in row_classes:
-                continue
-
-            cells = row.find_all("td")
-
-            # Skip empty rows
-            if len(cells) == 1:
-                continue
-            if len(cells) < 2:
-                continue
-
-            vil_td = cells[0]
-            name = vil_td.get_text(strip=True)
-            if not name:
-                continue
-
-            troops: dict[str, int] = {}
-            total = 0
-            for j, troop_name in enumerate(troop_names):
-                if j + 1 < len(cells):
-                    count = StatisticsPageParser._clean_number(cells[j + 1].get_text())
-                    troops[troop_name] = count
-                    total += count
-
+        for name, troops in village_troops.items():
+            total = sum(troops.values())
             results.append(
                 {
                     "name": name,
