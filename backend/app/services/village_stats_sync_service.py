@@ -61,6 +61,12 @@ class VillageStatsSyncService:
                 await scraper._navigate(url)
                 html_pages[name] = await scraper._page.content()
 
+            # Parse coordinates from sidebar (present on any page)
+            coordinates = StatisticsPageParser.parse_sidebar_coordinates(
+                html_pages["overview"]
+            )
+            logger.info("[STATS_SYNC] Parsed %d village coordinates from sidebar", len(coordinates))
+
             # Parse all pages
             overview = StatisticsPageParser.parse_overview(html_pages["overview"])
             resources = StatisticsPageParser.parse_resources(html_pages["resources"])
@@ -69,9 +75,9 @@ class VillageStatsSyncService:
             )
             troops = StatisticsPageParser.parse_troops(html_pages["troops"])
 
-            # Merge data
+            # Merge data (including coordinates)
             merged = StatisticsPageParser.merge_all(
-                overview, resources, culture_points, troops
+                overview, resources, culture_points, troops, coordinates
             )
 
             # Save to database
@@ -128,17 +134,21 @@ class VillageStatsSyncService:
             )
             self.db.add(village)
 
-        # Update fields from statistics data
+        # Update all fields from statistics data
         village.name = data.get("name", village.name)
         village.wood = data.get("wood", 0)
         village.clay = data.get("clay", 0)
         village.iron = data.get("iron", 0)
         village.crop = data.get("crop", 0)
         village.has_incoming_attack = data.get("has_attack", False)
+        village.attack_count = 1 if data.get("has_attack", False) else 0
         village.last_updated = now
 
-        # cp_per_day is not on the Village model yet; skip for now.
-        # population is available on the model but not returned by the parser.
+        # Coordinates from sidebar
+        if data.get("coordinate_x") is not None:
+            village.coordinate_x = data["coordinate_x"]
+        if data.get("coordinate_y") is not None:
+            village.coordinate_y = data["coordinate_y"]
 
         self.db.flush()
         return village

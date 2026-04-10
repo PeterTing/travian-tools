@@ -68,9 +68,22 @@ class StatisticsPageParser:
             vid_match = re.search(r"newdid=(\d+)", href)
             travian_village_id = int(vid_match.group(1)) if vid_match else 0
 
-            # Attack: check if there's any img inside td.att
+            # Attack detection from td.att:
+            # img.att1 = incoming enemy attack (被攻擊)
+            # img.att2 = own troops attacking (自己出征)
+            # img.def1 = arriving reinforcements (援軍到達)
+            # img.def2 = own reinforcements out (援軍外出)
+            # Only att1 means the village is being attacked
             att_td = row.find("td", class_="att")
-            has_attack = att_td is not None and att_td.find("img") is not None
+            has_attack = False
+            has_outgoing_attack = False
+            if att_td:
+                for img in att_td.find_all("img"):
+                    img_classes = img.get("class", [])
+                    if "att1" in img_classes:
+                        has_attack = True
+                    if "att2" in img_classes:
+                        has_outgoing_attack = True
 
             # Building: check if there's a link (active building) in td.bui
             bui_td = row.find("td", class_="bui")
@@ -89,6 +102,7 @@ class StatisticsPageParser:
                     "travian_village_id": travian_village_id,
                     "name": name,
                     "has_attack": has_attack,
+                    "has_outgoing_attack": has_outgoing_attack,
                     "is_building": is_building,
                     "merchants_used": merchants_used,
                     "merchants_total": merchants_total,
@@ -96,6 +110,41 @@ class StatisticsPageParser:
             )
 
         return results
+
+    @staticmethod
+    def parse_sidebar_coordinates(html: str) -> dict[int, tuple[int, int]]:
+        """Parse village coordinates from the sidebar village list.
+
+        The sidebar is present on every Travian page and contains
+        .listEntry.village elements with data-did and coordinate text.
+
+        Returns dict mapping travian_village_id -> (x, y).
+        """
+        soup = BeautifulSoup(html, "html.parser")
+        coords: dict[int, tuple[int, int]] = {}
+
+        for entry in soup.select(".listEntry.village"):
+            did = entry.get("data-did", "")
+            if not did:
+                continue
+            # Clean text and extract coordinates like (-47|144)
+            text = entry.get_text()
+            clean = (
+                text.replace("\u202d", "")
+                .replace("\u202c", "")
+                .replace("\u202a", "")
+                .replace("\u202b", "")
+                .replace("\u2212", "-")
+                .replace("−", "-")
+            )
+            coord_match = re.search(r"\(\s*(-?\d+)\s*\|\s*(-?\d+)\s*\)", clean)
+            if coord_match:
+                coords[int(did)] = (
+                    int(coord_match.group(1)),
+                    int(coord_match.group(2)),
+                )
+
+        return coords
 
     @staticmethod
     def parse_resources(html: str) -> list[dict]:
@@ -286,6 +335,7 @@ class StatisticsPageParser:
         resources: list[dict],
         culture_points: list[dict],
         troops: list[dict],
+        coordinates: dict[int, tuple[int, int]] | None = None,
     ) -> list[dict]:
         """Merge data from all 4 pages by village name.
 
@@ -330,6 +380,13 @@ class StatisticsPageParser:
             trp = troops_by_name.get(name, {})
             record["troops"] = trp.get("troops", {})
             record["total_troops"] = trp.get("total_troops", 0)
+
+            # Merge coordinates from sidebar
+            if coordinates:
+                vid = record.get("travian_village_id", 0)
+                if vid in coordinates:
+                    record["coordinate_x"] = coordinates[vid][0]
+                    record["coordinate_y"] = coordinates[vid][1]
 
             merged.append(record)
 

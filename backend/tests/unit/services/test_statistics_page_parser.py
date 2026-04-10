@@ -84,17 +84,17 @@ class TestParseOverview:
         assert v["name"] == "Hello Moto"
         assert v["travian_village_id"] == 25012
 
-    def test_has_attack_detected(self):
-        """Hello Moto, Hello Moto 2, and D1 have attacks."""
-        names_with_attack = {v["name"] for v in self.result if v["has_attack"]}
-        assert "Hello Moto" in names_with_attack
-        assert "Hello Moto 2" in names_with_attack
-        assert "D1" in names_with_attack
+    def test_no_incoming_attack(self):
+        """Hello Moto has att2 (outgoing) + def1 (reinforcements), NOT incoming (att1)."""
+        hm = next(v for v in self.result if v["name"] == "Hello Moto")
+        assert hm["has_attack"] is False
+        assert hm["has_outgoing_attack"] is True
 
-    def test_no_attack_detected(self):
-        """D2 should not have attacks."""
+    def test_no_attack_on_d2(self):
+        """D2 has no attack indicators."""
         d2 = next(v for v in self.result if v["name"] == "D2")
         assert d2["has_attack"] is False
+        assert d2["has_outgoing_attack"] is False
 
     def test_is_building(self):
         """炮2, 資源5, 資源6 are building."""
