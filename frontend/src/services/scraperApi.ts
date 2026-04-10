@@ -170,6 +170,10 @@ export interface CachedVillage {
   };
   warehouse_capacity: number;
   granary_capacity: number;
+  cp_per_day: number;
+  merchants_used: number;
+  merchants_total: number;
+  total_troops: number;
   last_updated: string | null;
   completion_events: CompletionEvent[];
 }

@@ -205,21 +205,20 @@ export default function VillagesPage() {
   const attackedVillages = villages.filter((v) => v.has_incoming_attack)
   const attackedCount = attackedVillages.length
 
-  // Compute total troops per village from cached data (sum based on available info)
-  const getTotalTroopCount = (_village: CachedVillage): string => {
-    // CachedVillage doesn't have troop data in the overview, show '-'
-    // The troop count would come from a detail view
-    return '-'
+  const getTotalTroopCount = (village: CachedVillage): string => {
+    const count = village.total_troops
+    return count ? count.toLocaleString() : '0'
   }
 
-  // Compute culture points per day — not available in cached data
-  const getCulturePointsPerDay = (_village: CachedVillage): string => {
-    return '-'
+  const getCulturePointsPerDay = (village: CachedVillage): string => {
+    const cp = village.cp_per_day
+    return cp ? cp.toLocaleString() : '0'
   }
 
-  // Format merchant info — not available in cached data
-  const getMerchantInfo = (_village: CachedVillage): string => {
-    return '-'
+  const getMerchantInfo = (village: CachedVillage): string => {
+    const used = village.merchants_used ?? 0
+    const total = village.merchants_total ?? 0
+    return `${used}/${total}`
   }
 
   return (
