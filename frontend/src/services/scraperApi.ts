@@ -5,7 +5,7 @@
  * 使用 nodriver (Chrome automation) 在 Docker 容器內執行
  */
 
-import { api } from './api';
+import api from './api';
 
 // ============ 類型定義 ============
 

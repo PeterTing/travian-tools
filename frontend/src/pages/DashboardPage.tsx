@@ -390,7 +390,7 @@ export default function DashboardPage() {
 
                 <Tabs
                   defaultValue="resources"
-                  onValueChange={(value) => {
+                  onValueChange={(value: string) => {
                     // 切換到部隊 tab 時自動載入
                     if (value === 'troops' && selectedVillage.travian_village_id && !selectedVillageDetail && !detailLoading) {
                       loadVillageDetail(selectedVillage.travian_village_id);
