@@ -108,3 +108,4 @@ dmypy.json
 # Coverage
 coverage/
 .nyc_output/
+.gstack/
