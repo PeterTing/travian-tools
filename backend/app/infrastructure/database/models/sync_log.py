@@ -1,7 +1,7 @@
 """同步日誌模型."""
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from app.infrastructure.database.models.village import Village
 
 
-class SyncType(str, Enum):
+class SyncType(StrEnum):
     """同步類型."""
 
     VILLAGE_OVERVIEW = "village_overview"
@@ -26,7 +26,7 @@ class SyncType(str, Enum):
     MAP_SQL = "map_sql"
 
 
-class SyncStatus(str, Enum):
+class SyncStatus(StrEnum):
     """同步狀態."""
 
     SUCCESS = "success"

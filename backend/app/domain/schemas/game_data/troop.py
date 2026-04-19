@@ -1,11 +1,11 @@
 """Troop data schema for troops.json validation."""
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field, computed_field
 
 
-class TroopTribe(str, Enum):
+class TroopTribe(StrEnum):
     """種族列表."""
 
     ROMANS = "romans"
@@ -17,7 +17,7 @@ class TroopTribe(str, Enum):
     SPARTANS = "spartans"
 
 
-class TroopCategory(str, Enum):
+class TroopCategory(StrEnum):
     """兵種類型."""
 
     INFANTRY = "infantry"  # 步兵
@@ -28,7 +28,7 @@ class TroopCategory(str, Enum):
     SETTLER = "settler"  # 移民
 
 
-class TrainingBuilding(str, Enum):
+class TrainingBuilding(StrEnum):
     """訓練建築."""
 
     BARRACKS = "barracks"  # 兵營

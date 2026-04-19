@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from app.infrastructure.database.models.village import Village
 
 
-class TroopLocation(str, Enum):
+class TroopLocation(StrEnum):
     """部隊位置狀態."""
 
     HOME = "home"  # 在村莊內

@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import DateTime, ForeignKey, String, func
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from app.infrastructure.database.models.game_account import GameAccount
 
 
-class ReportType(str, Enum):
+class ReportType(StrEnum):
     """戰鬥報告類型."""
 
     ATTACK = "attack"
@@ -29,7 +29,7 @@ class ReportType(str, Enum):
     UNKNOWN = "unknown"
 
 
-class BattleResult(str, Enum):
+class BattleResult(StrEnum):
     """戰鬥結果."""
 
     ATTACKER_WIN = "attacker_win"

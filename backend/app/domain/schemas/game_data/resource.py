@@ -1,11 +1,11 @@
 """Resource field data schema for resources.json validation."""
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field, computed_field
 
 
-class ResourceType(str, Enum):
+class ResourceType(StrEnum):
     """資源類型."""
 
     WOOD = "wood"  # 木材

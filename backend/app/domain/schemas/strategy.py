@@ -1,11 +1,11 @@
 """策略建議相關 Schema."""
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class GamePhase(str, Enum):
+class GamePhase(StrEnum):
     """遊戲階段枚舉."""
 
     BEGINNER_PROTECTION = "beginner_protection"  # 新手保護期 (Day 1-3)
@@ -16,7 +16,7 @@ class GamePhase(str, Enum):
     ENDGAME = "endgame"  # 終局/WW 期 (Day 150+)
 
 
-class ProgressStatus(str, Enum):
+class ProgressStatus(StrEnum):
     """玩家進度狀態枚舉."""
 
     AHEAD = "ahead"  # 領先

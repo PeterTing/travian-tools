@@ -1,11 +1,11 @@
 """Building data schema for buildings.json validation."""
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class BuildingCategory(str, Enum):
+class BuildingCategory(StrEnum):
     """建築類別."""
 
     RESOURCE = "resource"  # 資源類

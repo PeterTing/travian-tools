@@ -9,6 +9,10 @@ mysql-connector-python>=8.3.0
 python-dotenv>=1.0.0
 httpx>=0.26.0
 
+# HTML parsing (statistics_page_parser, village_scraper_service)
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
 # Authentication
 pyjwt>=2.8.0
 bcrypt>=4.0.0

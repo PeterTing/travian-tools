@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from app.infrastructure.database.models.village import Village
 
 
-class TribeType(str, enum.Enum):
+class TribeType(enum.StrEnum):
     """種族類型枚舉."""
 
     ROMANS = "romans"
@@ -29,7 +29,7 @@ class TribeType(str, enum.Enum):
     SPARTANS = "spartans"
 
 
-class PlayerRole(str, enum.Enum):
+class PlayerRole(enum.StrEnum):
     """玩家角色定位枚舉."""
 
     ATTACKER = "attacker"  # 進攻手：重視攻擊部隊、錘子村

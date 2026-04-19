@@ -1,11 +1,11 @@
 """Oasis and beast data schema for oases.json validation."""
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class OasisType(str, Enum):
+class OasisType(StrEnum):
     """綠洲類型."""
 
     SINGLE = "single"  # 單資源

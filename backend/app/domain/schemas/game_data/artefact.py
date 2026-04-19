@@ -1,11 +1,11 @@
 """Artefact data schema for artefacts.json validation."""
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class ArtefactType(str, Enum):
+class ArtefactType(StrEnum):
     """神器類型."""
 
     SMALL = "small"  # 小型
@@ -13,7 +13,7 @@ class ArtefactType(str, Enum):
     UNIQUE = "unique"  # 獨特
 
 
-class ArtefactRange(str, Enum):
+class ArtefactRange(StrEnum):
     """神器效果範圍."""
 
     VILLAGE = "village"  # 村莊

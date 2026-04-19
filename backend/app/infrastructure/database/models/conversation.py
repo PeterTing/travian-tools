@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, func
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from app.infrastructure.database.models.user import User
 
 
-class MessageRole(str, Enum):
+class MessageRole(StrEnum):
     """訊息角色."""
 
     USER = "user"
