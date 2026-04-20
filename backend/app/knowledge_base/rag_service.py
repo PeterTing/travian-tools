@@ -1,5 +1,6 @@
 """RAG (Retrieval-Augmented Generation) 知識檢索服務."""
 
+from pathlib import Path
 from typing import Any
 
 from app.knowledge_base.buildings import (
@@ -14,6 +15,24 @@ from app.knowledge_base.strategies import (
     MID_GAME_STRATEGIES,
 )
 from app.knowledge_base.tribes import TRIBES_DATA
+
+# Path to docs/knowledge/ markdown topic files (Phase 1 additions)
+# Points at the worktree-local docs/knowledge directory. When running from a
+# different CWD, override via BROWSE_KB_DIR env var (unset by default).
+_KNOWLEDGE_DIR = Path(__file__).resolve().parents[3] / "docs" / "knowledge"
+
+# Topic key (matches TOPIC_KEYWORDS below) → filename in docs/knowledge/
+# Each markdown file cites its Travian Support source at the top.
+_MARKDOWN_TOPICS: dict[str, str] = {
+    "siege": "siege-and-catapult.md",
+    "loyalty": "loyalty-and-conquest.md",
+    "wall_durability": "wall-durability.md",
+    "hero_system": "hero-system.md",
+    "artifacts_md": "artifacts.md",
+    "town_hall": "town-hall-celebrations.md",
+    "tournament_square": "tournament-square-speed.md",
+    "npc_village": "npc-village-template.md",
+}
 
 
 class TravianKnowledgeBase:
@@ -175,6 +194,95 @@ class TravianKnowledgeBase:
             "coordination",
             "team",
         ],
+        # Phase 1 additions — each key maps to a docs/knowledge/*.md file
+        "siege": [
+            "催化彈",
+            "投石車",
+            "投石",
+            "攻城武器",
+            "破城槌",
+            "ram",
+            "catapult",
+            "cat",
+            "siege",
+            "殺村",
+            "摧毀",
+            "拆除",
+            "demolish",
+            "destruction",
+        ],
+        "loyalty": [
+            "忠誠度",
+            "忠誠",
+            "征服",
+            "酋長",
+            "貴族",
+            "拓荒者",
+            "chief",
+            "senator",
+            "chieftain",
+            "loyalty",
+            "conquer",
+            "tablet of law",
+        ],
+        "wall_durability": [
+            "城牆",
+            "耐久",
+            "durability",
+            "wall",
+            "palisade",
+            "earth wall",
+            "city wall",
+        ],
+        "hero_system": [
+            "英雄",
+            "冒險",
+            "物品",
+            "屬性",
+            "auction",
+            "auction house",
+            "revival",
+            "馬",
+            "mount",
+            "boots",
+        ],
+        "artifacts_md": [
+            "神器",
+            "artifact",
+            "artefact",
+            "architect",
+            "boots of mercury",
+            "stonemason",
+            "world wonder plan",
+        ],
+        "town_hall": [
+            "城鎮廳",
+            "town hall",
+            "慶典",
+            "celebration",
+            "大慶典",
+            "great celebration",
+            "brewery",
+            "文化點生產",
+            "cp production",
+        ],
+        "tournament_square": [
+            "競技場",
+            "tournament square",
+            "ts level",
+            "長程速度",
+            "long-range",
+            "30 格",
+            "30 field",
+        ],
+        "npc_village": [
+            "npc 村",
+            "npc village",
+            "倉儲村",
+            "轉換村",
+            "supply hub",
+            "storage village",
+        ],
     }
 
     def __init__(self) -> None:
@@ -187,6 +295,26 @@ class TravianKnowledgeBase:
         self.defense_strategies: dict[str, Any] = DEFENSE_STRATEGIES
         self.hero_guide: dict[str, Any] = HERO_GUIDE
         self.culture_guide: dict[str, Any] = CULTURE_POINTS_GUIDE
+
+        # Phase 1 additions — load markdown topic files from docs/knowledge/
+        # Each file is self-contained with Travian Support citations at top.
+        self.markdown_topics: dict[str, str] = self._load_markdown_topics()
+
+    def _load_markdown_topics(self) -> dict[str, str]:
+        """Load Phase 1 markdown knowledge files into memory.
+
+        Returns a dict mapping topic key (matches TOPIC_KEYWORDS) to file
+        content. Failures are silent (file may be missing in some deploys);
+        `_retrieve_from_markdown` returns empty list when file not loaded.
+        """
+        loaded: dict[str, str] = {}
+        for topic_key, filename in _MARKDOWN_TOPICS.items():
+            try:
+                path = _KNOWLEDGE_DIR / filename
+                loaded[topic_key] = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                continue
+        return loaded
 
     def _detect_topics(self, query: str) -> list[str]:
         """檢測查詢相關的主題."""
@@ -293,6 +421,11 @@ class TravianKnowledgeBase:
 
         if "world_wonder" in topics or "alliance" in topics:
             results.extend(self._retrieve_endgame_info())
+
+        # Phase 1 markdown-based topics
+        for md_topic in _MARKDOWN_TOPICS:
+            if md_topic in topics:
+                results.extend(self._retrieve_from_markdown(md_topic))
 
         # 如果沒有檢測到特定主題，根據玩家階段提供通用建議
         if not topics and player_context:
@@ -618,6 +751,38 @@ class TravianKnowledgeBase:
         )
 
         return results
+
+    def _retrieve_from_markdown(self, topic_key: str) -> list[dict]:
+        """從 Phase 1 markdown knowledge 檔案檢索.
+
+        每個 markdown 檔案的 heading 引用 Travian Support 官方文章；
+        內容會截斷到 4000 字以免超出 prompt 預算。
+        """
+        content = self.markdown_topics.get(topic_key)
+        if not content:
+            return []
+
+        # Extract first-level heading for title
+        lines = content.splitlines()
+        title = topic_key.replace("_", " ").title()
+        for line in lines[:5]:
+            if line.startswith("# "):
+                title = line[2:].strip()
+                break
+
+        # Truncate to keep prompt budget manageable
+        truncated = content[:4000]
+        if len(content) > 4000:
+            truncated += "\n\n... (詳見 docs/knowledge/ 對應檔案)"
+
+        return [
+            {
+                "title": title,
+                "content": truncated,
+                "relevance": "high",
+                "source_file": f"docs/knowledge/{_MARKDOWN_TOPICS[topic_key]}",
+            }
+        ]
 
     # ========== 格式化方法 ==========
 
