@@ -44,35 +44,13 @@ Travian uses a geometric progression to calculate the cost of a building at a gi
 
 ## Tribes Overview
 
-Seven tribes are supported. Each has unique traits that dictate strategy.
+Each tribe has unique traits that dictate strategy:
 
-1. **Romans**: Expensive but powerful troops. Can build one resource field AND one town building simultaneously. Excellent late-game infantry (Imperian) and cavalry (Equites Imperatoris/Caesaris). Praetorian is the best anti-infantry defender in the game. Tribe-specific: City Wall (GID 31 — highest bonus, low durability), Horse Drinking Trough (GID 41 — cuts cavalry crop consumption).
-2. **Gauls**: Defensive specialists. Trapper (GID 36) captures attackers (10/level, up to 400 at Lv 20). Cranny hides 2× the resources (Gaul bonus). Fastest cavalry in the game (Theutates Thunder). Tribe-specific: Palisade (GID 33 — balanced bonus/durability).
-3. **Teutons**: Aggressive early game. Cheapest and fastest troops to train (Clubswinger). Hero Cranny Dip item reduces enemy Cranny protection by 20% (NOT a passive tribe bonus — specific hero consumable). Tribe-specific: Earth Wall (GID 32 — lowest bonus, highest durability), Brewery (GID 35 — capital only, +1% attack per level).
-4. **Egyptians** (special-server tribe, now on 5-tribe worlds): Economic powerhouse. Double resource output from oases. Tribe-specific: Waterworks (GID 45 — oasis bonus multiplier), Stone Wall (bonus ~Gaul Palisade, higher durability).
-5. **Huns** (special-server tribe): Fast cavalry focus. Multi-village mobility. Tribe-specific: Command Center (alternative to Residence/Palace), Makeshift Wall (worst wall in game).
-6. **Spartans** (special-server tribe, now on 5-tribe worlds): Strong single-unit durability. Asclepeion (hospital equivalent) recovers 60% of wounded (vs Hospital 40%).
-7. **Vikings** (special-server tribe): Strong infantry plus fast boats on harbor/deep-water servers. Wall is low bonus, high durability (similar to Hun in bonus, much better in durability).
-
-> **Server version caveat:** Classic 3-tribe and 5-tribe servers don't expose every tribe. Special scenarios (Reign of Fire, Ancient Powers, Harbor/Deep Water) add or remove tribes. Account type should always be read from sync data, not assumed.
-
-## Game Phases (standardized)
-
-Adopted from the Lumi/Eggstra/Dave community guide. All other docs (PRD, RAG prompts, strategy service) use these ranges.
-
-| Phase | Days | Focus |
-|-------|------|-------|
-| Early game | Day 1 – Day 45 | Settle, establish cap, control quadrant, first raids |
-| Mid game | Day 45 – Day 90 | First ops launch, account matures, pre-artifact setup |
-| Late game | Day 90 onward | Artifacts released, WW prep, large-scale cata operations |
-
-Sub-phases for decision support:
-
-- Protection period: Day 1 – Day 3 (new-player protection, no PVP)
-- Settling phase: Day 1 – Day 14 (aim for second village)
-- Cap development: Day 7 – Day 45 (push cap fields to Lv 17+ before artifacts)
-- Artifact phase: ~Day 90 (varies by server speed) — artifacts spawn
-- Endgame / WW phase: Day 150+ (focus shifts from sim to troops)
+1. **Romans**: Expensive but powerful troops. Can build a resource field AND a town building simultaneously. Excellent late-game.
+2. **Gauls**: Defensive specialists. Trapper building traps attackers. Fast merchants and cavalry (Theutates Thunders are great raiders).
+3. **Teutons**: Aggressive early game. Cheap, fast-to-train Clubswingers. Plunder bonus (Crannies only protect 80% instead of 100%).
+4. **Huns** (Special): Fast cavalry, reliant on multi-village mobility.
+5. **Egyptians** (Special): Economic powerhouse. Double resource output from Oases, incredibly strong defensive troops.
 
 ## Build Queue Rules (Bot Logistics)
 

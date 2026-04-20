@@ -1,166 +1,214 @@
-"""資源運輸模型（對應 Travco Supply/Push 功能）.
-
-VillageTransportConfig：每個村莊的運輸角色與目標設定（單一設定）。
-TransportSchedule：定時或條件觸發的運輸排程。
-TransportLog：每次實際執行的運輸紀錄。
-"""
+"""資源運送相關資料模型."""
 
 from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
 
 from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
+    from app.infrastructure.database.models.game_account import GameAccount
+    from app.infrastructure.database.models.user import User
     from app.infrastructure.database.models.village import Village
 
 
 class VillageTransportRole(StrEnum):
-    """村莊在運輸網路中的角色."""
+    """村莊運送角色."""
 
-    NONE = "none"
-    SENDER = "sender"
-    RECEIVER = "receiver"
-    HUB = "hub"  # NPC / 中繼站
+    SENDER = "sender"  # 運出
+    RECEIVER = "receiver"  # 接收
+    BOTH = "both"  # 雙向
+    DISABLED = "disabled"  # 停用
 
 
 class TransportMode(StrEnum):
-    """運輸觸發模式."""
+    """運送模式."""
 
-    MANUAL = "manual"
-    SCHEDULED = "scheduled"  # 固定排程
-    AUTO_FILL = "auto_fill"  # 倉儲滿觸發
-    ON_DEFENSE_CALL = "on_defense_call"  # 拉防時自動補糧
+    MANY_TO_ONE = "many_to_one"  # 多對一
+    ONE_TO_MANY = "one_to_many"  # 一對多
+    AUTO_BALANCE = "auto_balance"  # 自動平衡
 
 
 class VillageTransportConfig(Base):
-    """村莊運輸設定（一村一筆）."""
+    """村莊運送配置."""
 
     __tablename__ = "village_transport_configs"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    config_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
+    )
+    account_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("game_accounts.account_id", ondelete="CASCADE"),
+        nullable=False,
+    )
     village_id: Mapped[str] = mapped_column(
         String(36),
         ForeignKey("villages.village_id", ondelete="CASCADE"),
-        unique=True,
-        index=True,
+        nullable=False,
     )
 
-    role: Mapped[VillageTransportRole] = mapped_column(
-        SQLEnum(VillageTransportRole, native_enum=False, length=16),
-        default=VillageTransportRole.NONE,
-    )
-    mode: Mapped[TransportMode] = mapped_column(
-        SQLEnum(TransportMode, native_enum=False, length=32),
-        default=TransportMode.MANUAL,
+    # 運送角色
+    transport_role: Mapped[VillageTransportRole] = mapped_column(
+        SQLEnum(VillageTransportRole),
+        nullable=False,
+        default=VillageTransportRole.DISABLED,
     )
 
-    # 不設 FK constraint：避免與 village_id 造成 Village.transport_config
-    # 的 join ambiguity。如 Phase 2 需要 join 直接用 Query 過濾即可。
-    target_village_id: Mapped[str | None] = mapped_column(
-        String(36),
-        nullable=True,
-        index=True,
+    # 滿倉時間設定（小時）
+    max_full_time_hours: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=8, comment="滿倉時間上限（小時）"
     )
-    # e.g. {"wood": 10000, "clay": 5000, "iron": 5000, "crop": 0} reserved (not sent)
-    reserved_resources: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
+    # 保留資源（不運出的最低量）
+    reserve_wood: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    reserve_clay: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    reserve_iron: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    reserve_crop: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    # 優先順序（數字越小越優先）
+    priority: Mapped[int] = mapped_column(Integer, nullable=False, default=100)
+
+    # 是否啟用
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+    # 時間戳
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime, nullable=False, default=datetime.utcnow
     )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    # 關聯
+    user: Mapped["User"] = relationship("User", back_populates="transport_configs")
+    account: Mapped["GameAccount"] = relationship(
+        "GameAccount", back_populates="transport_configs"
+    )
+    village: Mapped["Village"] = relationship(
+        "Village", back_populates="transport_config"
     )
 
-    village: Mapped["Village"] = relationship(
-        "Village",
-        back_populates="transport_config",
-    )
-    schedules: Mapped[list["TransportSchedule"]] = relationship(
-        "TransportSchedule",
-        back_populates="config",
-        cascade="all, delete-orphan",
-    )
-    logs: Mapped[list["TransportLog"]] = relationship(
-        "TransportLog",
-        back_populates="config",
-        cascade="all, delete-orphan",
-    )
+    def __repr__(self) -> str:
+        return f"<VillageTransportConfig {self.village_id} role={self.transport_role}>"
 
 
 class TransportSchedule(Base):
-    """運輸排程."""
+    """運送排程配置."""
 
     __tablename__ = "transport_schedules"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    config_id: Mapped[int] = mapped_column(
-        ForeignKey("village_transport_configs.id", ondelete="CASCADE"),
-        index=True,
+    schedule_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
+    )
+    account_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("game_accounts.account_id", ondelete="CASCADE"),
+        nullable=False,
     )
 
-    cron_expression: Mapped[str] = mapped_column(String(128))
-    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
-    description: Mapped[str | None] = mapped_column(String(255), nullable=True)
-
-    last_run_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
+    # 排程設定
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    interval_minutes: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=30, comment="運送間隔（分鐘）"
     )
-    next_run_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
+    transport_mode: Mapped[TransportMode] = mapped_column(
+        SQLEnum(TransportMode),
+        nullable=False,
+        default=TransportMode.AUTO_BALANCE,
     )
 
+    # 目標村莊（多對一模式使用）
+    target_village_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("villages.village_id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    # 上次執行時間
+    last_executed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    next_execute_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    # 時間戳
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime, nullable=False, default=datetime.utcnow
+    )
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    # 關聯
+    user: Mapped["User"] = relationship("User", back_populates="transport_schedules")
+    account: Mapped["GameAccount"] = relationship(
+        "GameAccount", back_populates="transport_schedules"
+    )
+    target_village: Mapped["Village"] = relationship(
+        "Village", foreign_keys=[target_village_id]
     )
 
-    config: Mapped[VillageTransportConfig] = relationship(
-        "VillageTransportConfig", back_populates="schedules"
-    )
+    def __repr__(self) -> str:
+        return (
+            f"<TransportSchedule {self.account_id} interval={self.interval_minutes}m>"
+        )
 
 
 class TransportLog(Base):
-    """運輸實際執行紀錄."""
+    """運送日誌."""
 
     __tablename__ = "transport_logs"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    config_id: Mapped[int] = mapped_column(
-        ForeignKey("village_transport_configs.id", ondelete="CASCADE"),
-        index=True,
+    log_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
     )
-
-    # 純 ID 欄位，不設 FK（理由同 VillageTransportConfig.target_village_id）
-    from_village_id: Mapped[str | None] = mapped_column(
+    account_id: Mapped[str] = mapped_column(
         String(36),
-        nullable=True,
-        index=True,
+        ForeignKey("game_accounts.account_id", ondelete="CASCADE"),
+        nullable=False,
     )
-    to_village_id: Mapped[str | None] = mapped_column(
+
+    # 來源與目標
+    source_village_id: Mapped[str] = mapped_column(
         String(36),
+        ForeignKey("villages.village_id", ondelete="SET NULL"),
         nullable=True,
-        index=True,
     )
-    resources_sent: Mapped[dict] = mapped_column(JSON, default=dict)
-    merchants_used: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    arrive_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
+    target_village_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("villages.village_id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    # 外部運送用座標
+    target_x: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    target_y: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    # 運送資源量
+    wood: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    clay: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    iron: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    crop: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    # 運送結果
+    success: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # 時間戳
+    executed_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow
     )
 
-    status: Mapped[str] = mapped_column(String(32), default="sent", index=True)
-    error_message: Mapped[str | None] = mapped_column(String(255), nullable=True)
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+    # 關聯
+    user: Mapped["User"] = relationship("User")
+    account: Mapped["GameAccount"] = relationship("GameAccount")
+    source_village: Mapped["Village"] = relationship(
+        "Village", foreign_keys=[source_village_id]
+    )
+    target_village: Mapped["Village"] = relationship(
+        "Village", foreign_keys=[target_village_id]
     )
 
-    config: Mapped[VillageTransportConfig] = relationship(
-        "VillageTransportConfig", back_populates="logs"
-    )
+    def __repr__(self) -> str:
+        total = self.wood + self.clay + self.iron + self.crop
+        return f"<TransportLog {self.source_village_id}->{self.target_village_id} total={total}>"

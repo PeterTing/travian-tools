@@ -1,129 +1,170 @@
-"""半自動執行任務模型（PRD F5.1 操作佇列）.
-
-每筆 ExecutionTask 代表一個待使用者確認並執行的遊戲內動作（升級建築 / 訓練兵
-/ 英雄出冒險 / 執行農場清單等）。ExecutionLog 保存每次嘗試的歷史。
-"""
+"""執行任務模型."""
 
 from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
 
 from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
+    from app.infrastructure.database.models.game_account import GameAccount
+    from app.infrastructure.database.models.user import User
     from app.infrastructure.database.models.village import Village
 
 
 class ExecutionType(StrEnum):
-    """執行任務類型."""
+    """執行類型."""
 
-    BUILDING = "building"
-    TRAINING = "training"
-    ADVENTURE = "adventure"
-    FARM = "farm"
-    TRANSPORT = "transport"
+    BUILD = "build"  # 建造/升級建築
+    TRAIN = "train"  # 訓練部隊
+    ADVENTURE = "adventure"  # 英雄冒險
+    TRANSPORT = "transport"  # 資源運送
+    KEEPALIVE = "keepalive"  # Keep-alive
 
 
 class ExecutionStatus(StrEnum):
-    """執行任務狀態."""
+    """執行狀態."""
 
-    PENDING = "pending"
-    APPROVED = "approved"
-    EXECUTING = "executing"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+    PENDING = "pending"  # 待確認
+    CONFIRMED = "confirmed"  # 已確認，等待執行
+    EXECUTING = "executing"  # 執行中
+    COMPLETED = "completed"  # 已完成
+    FAILED = "failed"  # 失敗
+    CANCELLED = "cancelled"  # 已取消
 
 
 class ExecutionTask(Base):
-    """待執行的遊戲操作任務."""
+    """執行任務模型."""
 
     __tablename__ = "execution_tasks"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-
-    village_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey("villages.village_id", ondelete="CASCADE"),
-        index=True,
+    task_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.user_id"), nullable=False
+    )
+    account_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("game_accounts.account_id"), nullable=False
+    )
+    village_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("villages.village_id"), nullable=True
     )
 
-    task_type: Mapped[ExecutionType] = mapped_column(
-        SQLEnum(ExecutionType, native_enum=False, length=32),
-        index=True,
+    # 任務類型與目標
+    execution_type: Mapped[ExecutionType] = mapped_column(
+        SQLEnum(ExecutionType), nullable=False
     )
+    target_id: Mapped[str] = mapped_column(
+        String(100), nullable=False
+    )  # building_id 或 troop_id
+    target_name: Mapped[str] = mapped_column(
+        String(100), nullable=False
+    )  # 建築/兵種名稱
+    target_level: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
+    )  # 目標等級（建築用）
+    quantity: Mapped[int] = mapped_column(Integer, default=1)  # 數量（訓練用）
+    position: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
+    )  # 建築位置（建築用）
+
+    # 預估成本
+    cost_wood: Mapped[int] = mapped_column(Integer, default=0)
+    cost_clay: Mapped[int] = mapped_column(Integer, default=0)
+    cost_iron: Mapped[int] = mapped_column(Integer, default=0)
+    cost_crop: Mapped[int] = mapped_column(Integer, default=0)
+    estimated_duration: Mapped[int] = mapped_column(Integer, default=0)  # 秒
+
+    # 狀態
     status: Mapped[ExecutionStatus] = mapped_column(
-        SQLEnum(ExecutionStatus, native_enum=False, length=32),
-        default=ExecutionStatus.PENDING,
-        index=True,
+        SQLEnum(ExecutionStatus), default=ExecutionStatus.PENDING
     )
+    priority: Mapped[int] = mapped_column(
+        Integer, default=0
+    )  # 優先順序，數字越大越優先
 
-    # 例如：{"gid": 15, "target_level": 20} or {"troop_id": "praetorian", "count": 50}
-    parameters: Mapped[dict] = mapped_column(JSON, default=dict)
-
-    # 預計執行時間；None 代表「資源到就立刻執行」
-    scheduled_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    executed_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # 執行結果
+    result_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    screenshot_path: Mapped[str | None] = mapped_column(
+        String(500), nullable=True
+    )  # 執行截圖路徑
 
-    priority: Mapped[int] = mapped_column(Integer, default=0, index=True)
-
+    # 時間戳
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime, default=datetime.utcnow, nullable=False
     )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
-    )
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
-    village: Mapped["Village"] = relationship(
-        "Village",
-        back_populates="execution_tasks",
+    # 關聯
+    user: Mapped["User"] = relationship("User", back_populates="execution_tasks")
+    account: Mapped["GameAccount"] = relationship(
+        "GameAccount", back_populates="execution_tasks"
     )
-    logs: Mapped[list["ExecutionLog"]] = relationship(
-        "ExecutionLog",
-        back_populates="task",
-        cascade="all, delete-orphan",
+    village: Mapped["Village | None"] = relationship(
+        "Village", back_populates="execution_tasks"
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<ExecutionTask(id={self.id}, type={self.task_type}, "
-            f"status={self.status})>"
-        )
+        """字串表示."""
+        return f"<ExecutionTask {self.task_id} {self.execution_type.value} {self.status.value}>"
 
 
 class ExecutionLog(Base):
-    """單一執行嘗試的歷史紀錄."""
+    """執行日誌模型 - 記錄每次執行的詳細資訊."""
 
     __tablename__ = "execution_logs"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-
-    task_id: Mapped[int] = mapped_column(
-        ForeignKey("execution_tasks.id", ondelete="CASCADE"),
-        index=True,
+    log_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    task_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("execution_tasks.task_id"), nullable=False
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.user_id"), nullable=False
+    )
+    account_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("game_accounts.account_id"), nullable=False
+    )
+    village_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("villages.village_id"), nullable=True
     )
 
-    event: Mapped[str] = mapped_column(String(64))
-    message: Mapped[str | None] = mapped_column(Text, nullable=True)
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+    # 執行資訊
+    execution_type: Mapped[ExecutionType] = mapped_column(
+        SQLEnum(ExecutionType), nullable=False
     )
+    target_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    target_name: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    task: Mapped[ExecutionTask] = relationship("ExecutionTask", back_populates="logs")
+    # 執行參數（JSON 格式）
+    parameters: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # 結果
+    success: Mapped[bool] = mapped_column(default=False)
+    result_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    screenshot_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
+    # 時間戳
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, nullable=False
+    )
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    duration_ms: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
+    )  # 執行時間（毫秒）
+
+    # 關聯
+    task: Mapped["ExecutionTask"] = relationship("ExecutionTask")
+    user: Mapped["User"] = relationship("User")
+    account: Mapped["GameAccount"] = relationship("GameAccount")
+    village: Mapped["Village | None"] = relationship("Village")
 
     def __repr__(self) -> str:
-        return f"<ExecutionLog(task_id={self.task_id}, event={self.event})>"
+        """字串表示."""
+        return f"<ExecutionLog {self.log_id} {self.execution_type.value} {'OK' if self.success else 'FAIL'}>"

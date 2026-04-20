@@ -1,144 +1,160 @@
-"""提醒與通知模型（PRD F5.4）.
+"""提醒規則模型."""
 
-- ReminderRule：使用者定義的觸發條件
-- Notification：實際產生的通知（推播前/後都存）
-- PushSubscription：瀏覽器 Web Push 訂閱資訊
-"""
-
+import uuid
 from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
 
 from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
+    from app.infrastructure.database.models.game_account import GameAccount
     from app.infrastructure.database.models.user import User
 
 
 class ReminderType(StrEnum):
-    """提醒觸發類型."""
+    """提醒類型."""
 
-    BUILDING_COMPLETE = "building_complete"
-    TRAINING_COMPLETE = "training_complete"
-    RESOURCE_FULL = "resource_full"
-    RESOURCE_LOW = "resource_low"
-    HERO_ADVENTURE = "hero_adventure"
-    HERO_HEALTH_LOW = "hero_health_low"
-    UNDER_ATTACK = "under_attack"
-    SYNC_FAILED = "sync_failed"
+    BUILD_COMPLETE = "build_complete"  # 建造完成
+    TRAIN_COMPLETE = "train_complete"  # 訓練完成
+    RESOURCE_FULL = "resource_full"  # 資源即將滿倉
+    HERO_READY = "hero_ready"  # 英雄可出冒險
+    ATTACK_INCOMING = "attack_incoming"  # 遭受攻擊
+    CUSTOM = "custom"  # 自訂提醒
 
 
 class ReminderRule(Base):
-    """提醒規則."""
+    """提醒規則模型."""
 
     __tablename__ = "reminder_rules"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(
+    rule_id: Mapped[str] = mapped_column(
         String(36),
-        ForeignKey("users.user_id", ondelete="CASCADE"),
-        index=True,
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.user_id"), nullable=False
     )
     account_id: Mapped[str | None] = mapped_column(
-        String(36),
-        ForeignKey("game_accounts.account_id", ondelete="CASCADE"),
-        nullable=True,
-        index=True,
+        String(36), ForeignKey("game_accounts.account_id"), nullable=True
     )
 
+    # 提醒類型
     reminder_type: Mapped[ReminderType] = mapped_column(
-        SQLEnum(ReminderType, native_enum=False, length=32),
-        index=True,
+        SQLEnum(ReminderType), nullable=False
     )
+
+    # 規則設定
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    threshold: Mapped[int | None] = mapped_column(
+        Integer, nullable=True, comment="閾值（如資源滿倉百分比）"
+    )
+    description: Mapped[str | None] = mapped_column(
+        String(200), nullable=True, comment="規則描述"
+    )
 
-    # 條件與門檻（依類型不同，例如 {"threshold_pct": 90} 或 {"village_ids": [1, 2]}）
-    config: Mapped[dict] = mapped_column(JSON, default=dict)
-
+    # 時間戳
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime, default=datetime.utcnow, nullable=False
     )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
+    updated_at: Mapped[datetime | None] = mapped_column(
+        DateTime, nullable=True, onupdate=datetime.utcnow
     )
 
+    # 關聯
     user: Mapped["User"] = relationship("User")
-    notifications: Mapped[list["Notification"]] = relationship(
-        "Notification",
-        back_populates="rule",
-        cascade="all, delete-orphan",
-    )
+    account: Mapped["GameAccount | None"] = relationship("GameAccount")
+
+    def __repr__(self) -> str:
+        """字串表示."""
+        return f"<ReminderRule {self.rule_id} {self.reminder_type.value}>"
 
 
 class Notification(Base):
-    """實際產生的通知."""
+    """通知記錄模型."""
 
     __tablename__ = "notifications"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(
+    notification_id: Mapped[str] = mapped_column(
         String(36),
-        ForeignKey("users.user_id", ondelete="CASCADE"),
-        index=True,
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
     )
-    rule_id: Mapped[int | None] = mapped_column(
-        ForeignKey("reminder_rules.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True,
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.user_id"), nullable=False
     )
-
-    title: Mapped[str] = mapped_column(String(255))
-    body: Mapped[str] = mapped_column(Text)
-    payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-
-    read_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
+    account_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("game_accounts.account_id"), nullable=True
     )
-    delivered_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
+    rule_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("reminder_rules.rule_id"), nullable=True
     )
 
+    # 通知內容
+    title: Mapped[str] = mapped_column(String(100), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    notification_type: Mapped[ReminderType] = mapped_column(
+        SQLEnum(ReminderType), nullable=False
+    )
+
+    # 狀態
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_pushed: Mapped[bool] = mapped_column(
+        Boolean, default=False, comment="是否已推播"
+    )
+
+    # 時間戳
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), index=True
+        DateTime, default=datetime.utcnow, nullable=False
     )
+    read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
+    # 關聯
     user: Mapped["User"] = relationship("User")
-    rule: Mapped[ReminderRule | None] = relationship(
-        "ReminderRule", back_populates="notifications"
-    )
+    account: Mapped["GameAccount | None"] = relationship("GameAccount")
+    rule: Mapped["ReminderRule | None"] = relationship("ReminderRule")
+
+    def __repr__(self) -> str:
+        """字串表示."""
+        return f"<Notification {self.notification_id} {self.notification_type.value}>"
 
 
 class PushSubscription(Base):
-    """Web Push 訂閱（瀏覽器推播）."""
+    """Web Push 訂閱模型."""
 
     __tablename__ = "push_subscriptions"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(
+    subscription_id: Mapped[str] = mapped_column(
         String(36),
-        ForeignKey("users.user_id", ondelete="CASCADE"),
-        index=True,
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.user_id"), nullable=False
     )
 
-    endpoint: Mapped[str] = mapped_column(Text, unique=True)
-    p256dh_key: Mapped[str] = mapped_column(String(255))
-    auth_key: Mapped[str] = mapped_column(String(255))
+    # Web Push 訂閱資訊
+    endpoint: Mapped[str] = mapped_column(Text, nullable=False)
+    p256dh_key: Mapped[str] = mapped_column(String(500), nullable=False)
+    auth_key: Mapped[str] = mapped_column(String(500), nullable=False)
 
-    user_agent: Mapped[str | None] = mapped_column(String(512), nullable=True)
-    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    # 狀態
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # 時間戳
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime, default=datetime.utcnow, nullable=False
     )
-    last_used_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
+    # 關聯
     user: Mapped["User"] = relationship("User")
+
+    def __repr__(self) -> str:
+        """字串表示."""
+        return f"<PushSubscription {self.subscription_id}>"

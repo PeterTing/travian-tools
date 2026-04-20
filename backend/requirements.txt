@@ -22,6 +22,18 @@ email-validator>=2.0.0
 # Scheduler
 apscheduler>=3.10.0
 
+# Task Queue (ARQ)
+arq>=0.26.1
+redis>=5.0.0
+
+# Browser automation
+playwright>=1.40.0
+aiohttp>=3.9.0
+
+# HTML parsing
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
 # AI
 anthropic>=0.40.0
 

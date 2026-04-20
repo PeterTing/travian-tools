@@ -23,6 +23,13 @@ class GameAccountBase(BaseModel):
         None,
         description="玩家角色定位: attacker(進攻手), defender(防守手), farmer(經濟發展), hybrid(混合型)",
     )
+    # Travian 登入憑證（用於自動化）
+    login_email: str | None = Field(
+        None, max_length=100, description="Travian 登入 email"
+    )
+    login_password: str | None = Field(
+        None, max_length=200, description="Travian 登入密碼"
+    )
 
     @field_validator("server_url")
     @classmethod
@@ -52,6 +59,9 @@ class GameAccountUpdate(BaseModel):
     server_start_date: date | None = None
     player_role: PlayerRole | None = None
     is_active: bool | None = None
+    # Travian 登入憑證
+    login_email: str | None = Field(None, max_length=100)
+    login_password: str | None = Field(None, max_length=200)
 
     @field_validator("server_url")
     @classmethod
@@ -65,16 +75,25 @@ class GameAccountUpdate(BaseModel):
         return v
 
 
-class GameAccountResponse(GameAccountBase):
+class GameAccountResponse(BaseModel):
     """遊戲帳號回應."""
 
     account_id: str
     user_id: str
+    server_url: str
+    server_name: str | None
+    server_speed: int
+    tribe: TribeType | None
+    player_name: str | None
+    alliance_name: str | None
+    server_start_date: date | None
     player_role: PlayerRole | None
     is_active: bool
     last_updated: datetime | None
     created_at: datetime
     current_server_day: int = Field(1, description="當前伺服器天數（自動計算）")
+    # 不返回密碼，只返回是否已設定
+    has_login_credentials: bool = Field(False, description="是否已設定登入憑證")
 
     model_config = {"from_attributes": True}
 

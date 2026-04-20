@@ -260,6 +260,20 @@ class SyncService:
             elif data.is_capital:
                 village.is_capital = True
 
+            # 更新資源數據
+            if data.resources:
+                village.wood = data.resources.wood
+                village.clay = data.resources.clay
+                village.iron = data.resources.iron
+                village.crop = data.resources.crop
+
+            # 更新產量數據
+            if data.production:
+                village.wood_production = data.production.wood
+                village.clay_production = data.production.clay
+                village.iron_production = data.production.iron
+                village.crop_production = data.production.crop
+
             items_synced = self._sync_resource_fields(village, data.resource_fields)
 
             # 同步部隊

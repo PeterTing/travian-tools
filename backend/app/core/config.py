@@ -40,6 +40,24 @@ class Settings(BaseSettings):
     CLAUDE_TEMPERATURE: float = 0.7
     ANTHROPIC_BASE_URL: str = ""  # 可選：自訂 API base URL (例如 proxy)
 
+    # Travian 登入憑證（用於自動化抓取）
+    TRAVIAN_LOGIN_EMAIL: str = ""
+    TRAVIAN_LOGIN_PASSWORD: str = ""
+
+    # Redis 設定（用於 ARQ 任務隊列）
+    REDIS_HOST: str = "redis"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+
+    @property
+    def redis_settings(self) -> dict:
+        """取得 Redis 連線設定."""
+        return {
+            "host": self.REDIS_HOST,
+            "port": self.REDIS_PORT,
+            "database": self.REDIS_DB,
+        }
+
     @property
     def cors_origins_list(self) -> list[str]:
         """取得 CORS origins 列表."""

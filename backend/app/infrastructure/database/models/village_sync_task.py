@@ -1,26 +1,17 @@
-"""村莊同步任務模型.
+"""村莊同步任務模型."""
 
-追蹤長時間執行的村莊批次同步任務（由 `village_sync_service.py` 驅動）。
-"""
-
+import enum
 from datetime import datetime
-from enum import StrEnum
-from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy import Enum as SQLEnum
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.infrastructure.database.base import Base
 
-if TYPE_CHECKING:
-    from app.infrastructure.database.models.game_account import GameAccount
 
-
-class SyncTaskStatus(StrEnum):
+class SyncTaskStatus(enum.StrEnum):
     """同步任務狀態."""
 
     PENDING = "pending"
@@ -30,59 +21,54 @@ class SyncTaskStatus(StrEnum):
 
 
 class VillageSyncTask(Base):
-    """村莊同步任務模型."""
+    """村莊同步任務.
+
+    追蹤背景同步任務的執行狀態和進度。
+    """
 
     __tablename__ = "village_sync_tasks"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     task_id: Mapped[str] = mapped_column(
         String(36),
-        unique=True,
-        index=True,
+        primary_key=True,
         default=lambda: str(uuid4()),
     )
-
     account_id: Mapped[str] = mapped_column(
         String(36),
         ForeignKey("game_accounts.account_id", ondelete="CASCADE"),
         index=True,
     )
-    server_url: Mapped[str] = mapped_column(String(255))
+    server_url: Mapped[str] = mapped_column(String(200))
 
     status: Mapped[SyncTaskStatus] = mapped_column(
-        SQLEnum(SyncTaskStatus, native_enum=False, length=32),
+        Enum(SyncTaskStatus, values_callable=lambda x: [e.value for e in x]),
         default=SyncTaskStatus.PENDING,
-        index=True,
     )
 
+    # 進度追蹤
     total_villages: Mapped[int] = mapped_column(Integer, default=0)
     synced_villages: Mapped[int] = mapped_column(Integer, default=0)
-    current_village_name: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    current_village_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
-    started_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    completed_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
+    # 時間戳記
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime,
         server_default=func.now(),
     )
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
-    game_account: Mapped["GameAccount"] = relationship("GameAccount")
+    # 錯誤訊息
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    @hybrid_property
-    def progress_percent(self) -> float:
-        """完成百分比（0-100）."""
-        if not self.total_villages:
-            return 0.0
-        return round(self.synced_villages * 100.0 / self.total_villages, 1)
+    # 關聯
+    account = relationship("GameAccount", back_populates="sync_tasks")
+
+    @property
+    def progress_percent(self) -> int:
+        """計算進度百分比."""
+        if self.total_villages == 0:
+            return 0
+        return int((self.synced_villages / self.total_villages) * 100)
 
     def __repr__(self) -> str:
-        return (
-            f"<VillageSyncTask(task_id={self.task_id}, status={self.status}, "
-            f"progress={self.synced_villages}/{self.total_villages})>"
-        )
+        return f"<VillageSyncTask(task_id={self.task_id}, status={self.status.value})>"

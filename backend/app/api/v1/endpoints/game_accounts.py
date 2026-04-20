@@ -9,9 +9,31 @@ from app.domain.schemas.game_account import (
     GameAccountResponse,
     GameAccountUpdate,
 )
+from app.infrastructure.database.models.game_account import GameAccount
 from app.services.game_account_service import GameAccountService
 
 router = APIRouter(prefix="/game-accounts", tags=["game-accounts"])
+
+
+def _to_response(account: GameAccount) -> GameAccountResponse:
+    """轉換為 Response schema，加入 has_login_credentials."""
+    return GameAccountResponse(
+        account_id=account.account_id,
+        user_id=account.user_id,
+        server_url=account.server_url,
+        server_name=account.server_name,
+        server_speed=account.server_speed,
+        tribe=account.tribe,
+        player_name=account.player_name,
+        alliance_name=account.alliance_name,
+        server_start_date=account.server_start_date,
+        player_role=account.player_role,
+        is_active=account.is_active,
+        last_updated=account.last_updated,
+        created_at=account.created_at,
+        current_server_day=account.current_server_day,
+        has_login_credentials=bool(account.login_email and account.login_password),
+    )
 
 
 @router.post(
@@ -29,7 +51,7 @@ def create_game_account(
     """新增遊戲帳號."""
     service = GameAccountService(db)
     account = service.create_account(current_user.user_id, data)
-    return GameAccountResponse.model_validate(account)
+    return _to_response(account)
 
 
 @router.get(
@@ -47,7 +69,7 @@ def get_game_accounts(
     service = GameAccountService(db)
     accounts = service.get_accounts_by_user(current_user.user_id, include_inactive)
     return GameAccountListResponse(
-        accounts=[GameAccountResponse.model_validate(a) for a in accounts],
+        accounts=[_to_response(a) for a in accounts],
         total=len(accounts),
     )
 
@@ -71,7 +93,7 @@ def get_game_account(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="遊戲帳號不存在",
         )
-    return GameAccountResponse.model_validate(account)
+    return _to_response(account)
 
 
 @router.put(
@@ -94,7 +116,7 @@ def update_game_account(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="遊戲帳號不存在",
         )
-    return GameAccountResponse.model_validate(account)
+    return _to_response(account)
 
 
 @router.delete(

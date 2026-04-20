@@ -11,10 +11,19 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
+    from app.infrastructure.database.models.automation_settings import (
+        AutomationSettings,
+    )
     from app.infrastructure.database.models.battle_report import BattleReport
+    from app.infrastructure.database.models.execution_task import ExecutionTask
+    from app.infrastructure.database.models.resource_transport import (
+        TransportSchedule,
+        VillageTransportConfig,
+    )
     from app.infrastructure.database.models.sync_log import SyncLog
     from app.infrastructure.database.models.user import User
     from app.infrastructure.database.models.village import Village
+    from app.infrastructure.database.models.village_sync_task import VillageSyncTask
 
 
 class TribeType(enum.StrEnum):
@@ -75,6 +84,19 @@ class GameAccount(Base):
         nullable=True,
         default=None,
     )
+
+    # Travian 登入憑證 (用於自動化)
+    login_email: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+        comment="Travian 登入 email",
+    )
+    login_password: Mapped[str | None] = mapped_column(
+        String(200),
+        nullable=True,
+        comment="Travian 登入密碼 (加密存儲)",
+    )
+
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_updated: Mapped[datetime | None] = mapped_column(
         DateTime,
@@ -100,6 +122,32 @@ class GameAccount(Base):
     )
     sync_logs: Mapped[list["SyncLog"]] = relationship(
         "SyncLog",
+        back_populates="account",
+        cascade="all, delete-orphan",
+    )
+    execution_tasks: Mapped[list["ExecutionTask"]] = relationship(
+        "ExecutionTask",
+        back_populates="account",
+        cascade="all, delete-orphan",
+    )
+    transport_configs: Mapped[list["VillageTransportConfig"]] = relationship(
+        "VillageTransportConfig",
+        back_populates="account",
+        cascade="all, delete-orphan",
+    )
+    transport_schedules: Mapped[list["TransportSchedule"]] = relationship(
+        "TransportSchedule",
+        back_populates="account",
+        cascade="all, delete-orphan",
+    )
+    automation_settings: Mapped["AutomationSettings"] = relationship(
+        "AutomationSettings",
+        back_populates="account",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+    sync_tasks: Mapped[list["VillageSyncTask"]] = relationship(
+        "VillageSyncTask",
         back_populates="account",
         cascade="all, delete-orphan",
     )
