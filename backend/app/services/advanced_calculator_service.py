@@ -2,13 +2,19 @@
 
 import json
 import math
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from app.domain.schemas.advanced_calculator import (
+    BuildStep,
+    CropperMatch,
+    CropScouterRequest,
+    CropScouterResponse,
     CulturePointsRequest,
     CulturePointsResponse,
     CulturePointsVillage,
+    FakeTroopsRequest,
+    FakeTroopsResponse,
     InterceptionRequest,
     InterceptionResponse,
     NpcCalculatorRequest,
@@ -23,6 +29,11 @@ from app.domain.schemas.advanced_calculator import (
     TechnologyRequest,
     TechnologyResponse,
     TroopTechRow,
+    TsOptimizerRequest,
+    TsOptimizerResponse,
+    TsOptimizerResult,
+    VillageBuilderRequest,
+    VillageBuilderResponse,
 )
 
 # 文化點需求表（Travian Legends）
@@ -384,6 +395,399 @@ class AdvancedCalculatorService:
         return PathSpeedTsResponse(
             distance=round(distance, 2),
             possible_matches=possible_matches,
+        )
+
+    # ─── Village Builder (Lumi-style build order) ─────────────────
+
+    def calculate_village_builder(
+        self, request: VillageBuilderRequest
+    ) -> VillageBuilderResponse:
+        """Build a Lumi-style recommended construction order.
+
+        Source references:
+        - docs/knowledge/template-definitions.md (slot budgets per template)
+        - Lumi/Eggstra/Dave guide §2.1 (ROI) and §3.1 (village types)
+        - Travian Support Buildings and Resource Fields Statistics article
+          (7000090158) for prerequisites
+
+        Algorithm:
+        1. Phase 1: push all 4 resource fields to Lv 5 (cheap initial ROI)
+        2. Phase 2: Grain Mill unlocked at Cropland Lv 5
+        3. Phase 3: Cropland to Lv 10 (unlocks Bakery)
+        4. Phase 4: Bakery (stacks with Grain Mill for +50% crop)
+        5. Phase 5 (NON-15c only): other field types to Lv 10 → unlock
+           Sawmill / Brickyard / Iron Foundry, each to Lv 5
+        6. Phase 6: push fields to target level (15c only pushes Cropland)
+        """
+        steps: list[BuildStep] = []
+        step_num = 1
+        is_15c = request.cropper_type == "15c"
+
+        # Phase 1: all fields to Lv 5 (baseline ROI efficiency)
+        for field in ("woodcutter", "clay_pit", "iron_mine", "cropland"):
+            steps.append(
+                BuildStep(
+                    step=step_num,
+                    action="upgrade_field",
+                    target=field,
+                    from_level=0,
+                    to_level=5,
+                    reason="Phase 1: all fields to Lv 5 before bonus prereqs",
+                )
+            )
+            step_num += 1
+
+        # Phase 2: Grain Mill (Cropland Lv 5 prereq, always built)
+        steps.append(
+            BuildStep(
+                step=step_num,
+                action="upgrade_bonus_building",
+                target="grain_mill",
+                from_level=0,
+                to_level=5,
+                reason="Unlock +25% crop (stacks with Bakery)",
+            )
+        )
+        step_num += 1
+
+        # Phase 3: Cropland to Lv 10
+        steps.append(
+            BuildStep(
+                step=step_num,
+                action="upgrade_field",
+                target="cropland",
+                from_level=5,
+                to_level=10,
+                reason="Cropland priority — Lv 10 unlocks Bakery",
+            )
+        )
+        step_num += 1
+
+        # Phase 4: Bakery (Cropland Lv 10 + Grain Mill Lv 5 + MB Lv 5 prereq)
+        steps.append(
+            BuildStep(
+                step=step_num,
+                action="upgrade_bonus_building",
+                target="bakery",
+                from_level=0,
+                to_level=5,
+                reason="+25% crop stacks with Grain Mill",
+            )
+        )
+        step_num += 1
+
+        # Phase 5 (non-15c only): Sawmill / Brickyard / Iron Foundry
+        # 15c explicitly skips per Lumi guide ("15-Cropper Special Case")
+        if not is_15c:
+            for field, bonus in (
+                ("woodcutter", "sawmill"),
+                ("clay_pit", "brickyard"),
+                ("iron_mine", "iron_foundry"),
+            ):
+                steps.append(
+                    BuildStep(
+                        step=step_num,
+                        action="upgrade_field",
+                        target=field,
+                        from_level=5,
+                        to_level=10,
+                        reason=f"Lv 10 {field} unlocks {bonus}",
+                    )
+                )
+                step_num += 1
+                steps.append(
+                    BuildStep(
+                        step=step_num,
+                        action="upgrade_bonus_building",
+                        target=bonus,
+                        from_level=0,
+                        to_level=5,
+                        reason=f"+25% {field} production",
+                    )
+                )
+                step_num += 1
+
+        # Phase 6: push fields to target level (15c only pushes cropland)
+        final_lvl = request.target_field_level
+        if final_lvl > 10:
+            for field in ("woodcutter", "clay_pit", "iron_mine", "cropland"):
+                if is_15c and field != "cropland":
+                    continue
+                steps.append(
+                    BuildStep(
+                        step=step_num,
+                        action="upgrade_field",
+                        target=field,
+                        from_level=10,
+                        to_level=final_lvl,
+                        reason=f"Push to Lv {final_lvl}",
+                    )
+                )
+                step_num += 1
+
+        # Rough day estimate: 0.3 days per step + 0.5 days per level above 10
+        total_upgrades_after_10 = sum(
+            (s.to_level - 10)
+            for s in steps
+            if s.action == "upgrade_field"
+            and s.to_level is not None
+            and s.to_level > 10
+        )
+        estimated_days = len(steps) * 0.3 + total_upgrades_after_10 * 0.5
+        if request.gold_plus:
+            estimated_days *= 0.85
+
+        return VillageBuilderResponse(
+            cropper_type=request.cropper_type,
+            tribe_egyptian=request.tribe_egyptian,
+            gold_plus=request.gold_plus,
+            target_field_level=request.target_field_level,
+            total_steps=len(steps),
+            build_sequence=steps,
+            estimated_days=round(estimated_days, 1),
+        )
+
+    # ─── Crop Scouter (反推對手首都類型) ───────────────────────────
+
+    def calculate_crop_scouter(
+        self, request: CropScouterRequest
+    ) -> CropScouterResponse:
+        """Estimate cropper type from scouted production values.
+
+        Heuristic based on community farming practice:
+          - crop / avg(other) ≥ 3.0  → 15c (strong crop dominance)
+          - 2.0 – 3.0                → 9c
+          - 1.5 – 2.0                → 7c
+          - 1.2 – 1.5                → 6c
+          - < 1.2                    → 4-4-4-6 or 3-3-4-7 (non-cropper)
+        """
+        resources = {
+            "wood": request.wood_production,
+            "clay": request.clay_production,
+            "iron": request.iron_production,
+            "crop": request.crop_production,
+        }
+        dominant = max(resources, key=lambda k: resources[k])
+
+        avg_others = (
+            request.wood_production + request.clay_production + request.iron_production
+        ) / 3
+        crop_ratio = request.crop_production / avg_others if avg_others > 0 else 0
+        wood_to_crop = (
+            request.wood_production / request.crop_production
+            if request.crop_production > 0
+            else 0
+        )
+
+        matches: list[CropperMatch] = []
+
+        if crop_ratio >= 3.0:
+            matches.append(
+                CropperMatch(
+                    cropper_type="15c",
+                    likelihood=min(crop_ratio / 4.5, 1.0),
+                    reasoning=(
+                        f"Crop production is {crop_ratio:.1f}× average of other "
+                        "resources — strongly suggests 15-cropper"
+                    ),
+                )
+            )
+            matches.append(
+                CropperMatch(
+                    cropper_type="9c",
+                    likelihood=0.2,
+                    reasoning="Secondary candidate (9c can also show high crop ratio)",
+                )
+            )
+        elif 2.0 <= crop_ratio < 3.0:
+            matches.append(
+                CropperMatch(
+                    cropper_type="9c",
+                    likelihood=0.75,
+                    reasoning=f"Crop:avg ≈ {crop_ratio:.1f}×, typical of 9c",
+                )
+            )
+            matches.append(
+                CropperMatch(
+                    cropper_type="15c",
+                    likelihood=0.15,
+                    reasoning="15c possible but crop production not yet maxed",
+                )
+            )
+        elif 1.5 <= crop_ratio < 2.0:
+            matches.append(
+                CropperMatch(
+                    cropper_type="7c",
+                    likelihood=0.7,
+                    reasoning=f"Crop:avg ≈ {crop_ratio:.1f}×, common for 7c",
+                )
+            )
+        elif 1.2 <= crop_ratio < 1.5:
+            matches.append(
+                CropperMatch(
+                    cropper_type="6c",
+                    likelihood=0.65,
+                    reasoning=f"Crop:avg ≈ {crop_ratio:.1f}×, common for 6c",
+                )
+            )
+        else:
+            matches.append(
+                CropperMatch(
+                    cropper_type="4446",
+                    likelihood=0.6,
+                    reasoning="Balanced resources — non-cropper capital (4-4-4-6)",
+                )
+            )
+            matches.append(
+                CropperMatch(
+                    cropper_type="3347",
+                    likelihood=0.3,
+                    reasoning="Secondary 3-3-4-7 candidate",
+                )
+            )
+
+        return CropScouterResponse(
+            matches=matches,
+            dominant_resource=dominant,
+            wood_to_crop_ratio=round(wood_to_crop, 3),
+        )
+
+    # ─── Attack TS Optimizer (多攻擊者同步到達) ────────────────────
+
+    def calculate_ts_optimizer(
+        self, request: TsOptimizerRequest
+    ) -> TsOptimizerResponse:
+        """Compute send times for multiple attackers to sync arrival.
+
+        Tournament Square formula (docs/knowledge/tournament-square-speed.md):
+          if distance ≤ 30: travel_time = distance / unit_speed
+          else:
+            threshold_time = 30 / unit_speed
+            beyond_time    = (distance - 30) / (unit_speed × (1 + TS × 0.20))
+            travel_time    = threshold_time + beyond_time
+
+        Server speed divides total travel seconds.
+        """
+        try:
+            target_dt = datetime.fromisoformat(request.target_arrival)
+            if target_dt.tzinfo is None:
+                target_dt = target_dt.replace(tzinfo=UTC)
+        except ValueError as exc:
+            raise ValueError(
+                f"Invalid target_arrival: {request.target_arrival}; expected ISO 8601"
+            ) from exc
+
+        # Prepare attacker distances, sort farthest first so that
+        # wave index lines up with send-time ordering
+        prepared = []
+        for atk in request.attackers:
+            dx = atk.x - request.target_x
+            dy = atk.y - request.target_y
+            distance = (dx * dx + dy * dy) ** 0.5
+            prepared.append((distance, atk))
+        prepared.sort(key=lambda p: -p[0])
+
+        results: list[TsOptimizerResult] = []
+        warnings: list[str] = []
+        now = datetime.now(UTC)
+
+        for wave_idx, (distance, atk) in enumerate(prepared):
+            ts_level = atk.ts_level
+            if distance > 30:
+                near_seconds = (30 / atk.unit_speed) * 3600 / request.server_speed
+                effective_speed = atk.unit_speed * (1 + ts_level * 0.20)
+                far_seconds = (
+                    ((distance - 30) / effective_speed) * 3600 / request.server_speed
+                )
+                travel_sec = near_seconds + far_seconds
+            else:
+                travel_sec = (distance / atk.unit_speed) * 3600 / request.server_speed
+
+            send_dt = target_dt - timedelta(
+                seconds=travel_sec + wave_idx * request.wave_spacing_seconds
+            )
+
+            if send_dt <= now:
+                warnings.append(
+                    f"{atk.village_label}: send time already in the past — "
+                    "raise TS level or reduce troops"
+                )
+
+            hours = int(travel_sec // 3600)
+            minutes = int((travel_sec % 3600) // 60)
+            secs = int(travel_sec % 60)
+            travel_fmt = f"{hours}:{minutes:02d}:{secs:02d}"
+
+            results.append(
+                TsOptimizerResult(
+                    village_label=atk.village_label,
+                    recommended_ts_level=ts_level,
+                    send_time=send_dt.isoformat(timespec="seconds"),
+                    travel_time_formatted=travel_fmt,
+                    distance=round(distance, 2),
+                )
+            )
+
+        return TsOptimizerResponse(
+            target_arrival=request.target_arrival,
+            results=results,
+            warnings=warnings,
+        )
+
+    # ─── Fake Troops Calculator (佯攻部隊) ─────────────────────────
+
+    def calculate_fake_troops(self, request: FakeTroopsRequest) -> FakeTroopsResponse:
+        """Compute minimum fake-attack composition that looks credible.
+
+        Community heuristic:
+          - infantry  = 5% of target population × tribe multiplier (min 10)
+          - cavalry   = 1% of target population × tribe multiplier (min 1)
+          - catapults = target_pop / 50  (0 if excluded)
+          - rams      = target_pop / 100 (0 if excluded)
+
+        Tribe multipliers reflect relative unit cost (Teuton cheapest,
+        Spartan priciest). Population cost follows standard Travian
+        crop-consumption: infantry × 1, cavalry × 4, cats × 6, rams × 4.
+        """
+        pop = request.target_population
+        tribe = request.attacker_tribe.lower()
+
+        tribe_multipliers = {
+            "romans": 1.0,
+            "teutons": 0.8,
+            "gauls": 0.9,
+            "huns": 0.95,
+            "egyptians": 0.9,
+            "spartans": 1.05,
+            "vikings": 0.95,
+        }
+        multiplier = tribe_multipliers.get(tribe, 1.0)
+
+        min_infantry = max(10, int(pop * 0.05 * multiplier))
+        min_cavalry = max(1, int(pop * 0.01 * multiplier))
+        min_catapults = int(pop / 50) if request.include_catapults else 0
+        min_rams = int(pop / 100) if request.include_rams else 0
+
+        total_pop_cost = (
+            min_infantry * 1 + min_cavalry * 4 + min_catapults * 6 + min_rams * 4
+        )
+
+        reasoning_parts = [
+            f"Target population {pop} ({tribe}). Fake needs ~5% infantry + ",
+            f"{min_cavalry} cavalry for speed profile.",
+        ]
+        if request.include_catapults:
+            reasoning_parts.append(" Catapults included (real-attack signal).")
+        if request.include_rams:
+            reasoning_parts.append(" Rams included.")
+
+        return FakeTroopsResponse(
+            min_infantry=min_infantry,
+            min_cavalry=min_cavalry,
+            min_catapults=min_catapults,
+            min_rams=min_rams,
+            total_population_cost=total_pop_cost,
+            reasoning="".join(reasoning_parts),
         )
 
 

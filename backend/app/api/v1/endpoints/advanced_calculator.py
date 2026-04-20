@@ -3,8 +3,12 @@
 from fastapi import APIRouter
 
 from app.domain.schemas.advanced_calculator import (
+    CropScouterRequest,
+    CropScouterResponse,
     CulturePointsRequest,
     CulturePointsResponse,
+    FakeTroopsRequest,
+    FakeTroopsResponse,
     InterceptionRequest,
     InterceptionResponse,
     NpcCalculatorRequest,
@@ -17,6 +21,10 @@ from app.domain.schemas.advanced_calculator import (
     SaveTroopsResponse,
     TechnologyRequest,
     TechnologyResponse,
+    TsOptimizerRequest,
+    TsOptimizerResponse,
+    VillageBuilderRequest,
+    VillageBuilderResponse,
 )
 from app.services.advanced_calculator_service import get_advanced_calculator_service
 
@@ -78,3 +86,39 @@ async def calculate_path_speed_ts(
     """TS 反推計算器 — 從已知距離和時間反推速度 + TS 組合."""
     service = get_advanced_calculator_service()
     return service.calculate_path_speed_ts(request)
+
+
+@router.post("/village-builder", response_model=VillageBuilderResponse)
+async def calculate_village_builder(
+    request: VillageBuilderRequest,
+) -> VillageBuilderResponse:
+    """最佳建造順序計算器 — 依 cropper 類型 + 綠洲 + Plus 產出 Lumi 風格建造序列."""
+    service = get_advanced_calculator_service()
+    return service.calculate_village_builder(request)
+
+
+@router.post("/crop-scouter", response_model=CropScouterResponse)
+async def calculate_crop_scouter(
+    request: CropScouterRequest,
+) -> CropScouterResponse:
+    """首都類型反推器 — 從偵查產量推測對手 cropper 類型."""
+    service = get_advanced_calculator_service()
+    return service.calculate_crop_scouter(request)
+
+
+@router.post("/ts-optimizer", response_model=TsOptimizerResponse)
+async def calculate_ts_optimizer(
+    request: TsOptimizerRequest,
+) -> TsOptimizerResponse:
+    """攻擊 TS 優化器 — 多個攻擊者對同一目標同步抵達時間."""
+    service = get_advanced_calculator_service()
+    return service.calculate_ts_optimizer(request)
+
+
+@router.post("/fake-troops", response_model=FakeTroopsResponse)
+async def calculate_fake_troops(
+    request: FakeTroopsRequest,
+) -> FakeTroopsResponse:
+    """佯攻部隊計算器 — 計算看起來像真打的最小兵量."""
+    service = get_advanced_calculator_service()
+    return service.calculate_fake_troops(request)

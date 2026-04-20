@@ -196,3 +196,173 @@ class PathSpeedTsResponse(BaseModel):
 
     distance: float
     possible_matches: list[SpeedTsMatch]
+
+
+# ============ Village Builder (最佳建造順序) ============
+
+
+class OasisConfig(BaseModel):
+    """單一綠洲設定（對應 Hero's Mansion 征服的綠洲）."""
+
+    crop_bonus: int = Field(0, description="綠洲穀物加成 (0, 25, 50)")
+    wood_bonus: int = Field(0, description="綠洲木材加成 (0, 25)")
+    clay_bonus: int = Field(0, description="綠洲磚塊加成 (0, 25)")
+    iron_bonus: int = Field(0, description="綠洲鐵礦加成 (0, 25)")
+
+
+class VillageBuilderRequest(BaseModel):
+    """最佳建造順序計算器請求."""
+
+    cropper_type: str = Field(
+        ...,
+        description="首都類型代碼：'15c', '9c', '7c', '6c', '4446', '3347'",
+    )
+    oases: list[OasisConfig] = Field(
+        default_factory=list,
+        description="1-3 個綠洲設定；空清單代表尚未奪綠洲",
+    )
+    tribe_egyptian: bool = Field(
+        False, description="是否為埃及族（Waterworks 加成啟用）"
+    )
+    gold_plus: bool = Field(False, description="是否有 Plus 帳號 +25% 加成")
+    target_field_level: int = Field(
+        18, ge=10, le=20, description="目標資源田等級 (10, 15, 18, 19)"
+    )
+
+
+class BuildStep(BaseModel):
+    """建造序列中的單一步驟."""
+
+    step: int
+    action: str = Field(
+        ...,
+        description="動作類型：'upgrade_field' | 'upgrade_bonus_building' | 'note'",
+    )
+    target: str = Field(
+        ..., description="目標：'woodcutter', 'bakery', 'warehouse', ..."
+    )
+    from_level: int | None = None
+    to_level: int | None = None
+    reason: str | None = Field(None, description="為什麼這個時間點升這個")
+
+
+class VillageBuilderResponse(BaseModel):
+    """最佳建造順序計算器回應."""
+
+    cropper_type: str
+    tribe_egyptian: bool
+    gold_plus: bool
+    target_field_level: int
+    total_steps: int
+    build_sequence: list[BuildStep]
+    estimated_days: float = Field(..., description="以 x1 速度粗估完成天數")
+
+
+# ============ Crop Scouter (反推對手首都類型) ============
+
+
+class CropScouterRequest(BaseModel):
+    """Crop Scouter 請求 — 偵查結果反推對手首都類型."""
+
+    wood_production: int = Field(..., ge=0, description="木材產量 (per hour)")
+    clay_production: int = Field(..., ge=0, description="磚塊產量")
+    iron_production: int = Field(..., ge=0, description="鐵礦產量")
+    crop_production: int = Field(..., ge=0, description="穀物產量")
+    population: int = Field(..., ge=0, description="人口數")
+    server_speed: int = Field(1, ge=1, le=10, description="伺服器速度倍率")
+
+
+class CropperMatch(BaseModel):
+    """反推的可能首都類型."""
+
+    cropper_type: str
+    likelihood: float = Field(..., ge=0.0, le=1.0)
+    reasoning: str
+
+
+class CropScouterResponse(BaseModel):
+    """Crop Scouter 回應 — 可能性排序的候選首都類型."""
+
+    matches: list[CropperMatch]
+    dominant_resource: str = Field(
+        ..., description="主要產出資源：'wood', 'clay', 'iron', 'crop'"
+    )
+    wood_to_crop_ratio: float
+
+
+# ============ Attack TS Optimizer (攻擊 TS 優化器) ============
+
+
+class AttackerProfile(BaseModel):
+    """單一攻擊村莊的時速/TS 配置."""
+
+    village_label: str = Field(..., description="識別名，例如 'Hammer-1'")
+    x: int = Field(..., ge=-200, le=200)
+    y: int = Field(..., ge=-200, le=200)
+    unit_speed: int = Field(..., gt=0, description="最慢發送部隊速度 (fields/hour)")
+    ts_level: int = Field(0, ge=0, le=20, description="當前 Tournament Square 等級")
+    allow_ts_adjustment: bool = Field(
+        True, description="是否允許發送前微調 TS 等級以命中時間窗"
+    )
+
+
+class TsOptimizerRequest(BaseModel):
+    """攻擊 TS 優化器請求 — 多個攻擊者共同對一目標."""
+
+    target_x: int = Field(..., ge=-200, le=200)
+    target_y: int = Field(..., ge=-200, le=200)
+    target_arrival: str = Field(
+        ...,
+        description="所有波次希望抵達的絕對時間 (ISO 8601)",
+    )
+    attackers: list[AttackerProfile] = Field(
+        ..., min_length=1, description="所有參與攻擊者"
+    )
+    wave_spacing_seconds: float = Field(
+        1.0, ge=0.0, le=10.0, description="波次間距（秒）"
+    )
+    server_speed: int = Field(1, ge=1, le=10)
+
+
+class TsOptimizerResult(BaseModel):
+    """單一攻擊者的最優發送設定."""
+
+    village_label: str
+    recommended_ts_level: int
+    send_time: str  # ISO 8601
+    travel_time_formatted: str
+    distance: float
+
+
+class TsOptimizerResponse(BaseModel):
+    """攻擊 TS 優化器回應."""
+
+    target_arrival: str
+    results: list[TsOptimizerResult]
+    warnings: list[str] = Field(default_factory=list)
+
+
+# ============ Fake Troops Calculator (佯攻部隊計算器) ============
+
+
+class FakeTroopsRequest(BaseModel):
+    """佯攻部隊計算器請求."""
+
+    target_population: int = Field(..., ge=0, description="目標村莊人口")
+    attacker_tribe: str = Field(
+        ...,
+        description="攻擊者種族：'romans','teutons','gauls','huns','egyptians','spartans','vikings'",
+    )
+    include_catapults: bool = Field(True, description="是否包含催化彈（真打標配）")
+    include_rams: bool = Field(True, description="是否包含破城槌")
+
+
+class FakeTroopsResponse(BaseModel):
+    """佯攻部隊計算器回應."""
+
+    min_infantry: int
+    min_cavalry: int
+    min_catapults: int
+    min_rams: int
+    total_population_cost: int
+    reasoning: str
