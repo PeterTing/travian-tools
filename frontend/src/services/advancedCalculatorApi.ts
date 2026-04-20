@@ -130,6 +130,117 @@ export interface PathSpeedTsResponse {
   possible_matches: SpeedTsMatch[]
 }
 
+// ============ Village Builder ============
+
+export interface OasisConfig {
+  crop_bonus: number
+  wood_bonus: number
+  clay_bonus: number
+  iron_bonus: number
+}
+
+export interface VillageBuilderRequest {
+  cropper_type: '15c' | '9c' | '7c' | '6c' | '4446' | '3347'
+  oases: OasisConfig[]
+  tribe_egyptian: boolean
+  gold_plus: boolean
+  target_field_level: number
+}
+
+export interface BuildStep {
+  step: number
+  action: 'upgrade_field' | 'upgrade_bonus_building' | 'note'
+  target: string
+  from_level: number | null
+  to_level: number | null
+  reason: string | null
+}
+
+export interface VillageBuilderResponse {
+  cropper_type: string
+  tribe_egyptian: boolean
+  gold_plus: boolean
+  target_field_level: number
+  total_steps: number
+  build_sequence: BuildStep[]
+  estimated_days: number
+}
+
+// ============ Crop Scouter ============
+
+export interface CropScouterRequest {
+  wood_production: number
+  clay_production: number
+  iron_production: number
+  crop_production: number
+  population: number
+  server_speed?: number
+}
+
+export interface CropperMatch {
+  cropper_type: string
+  likelihood: number
+  reasoning: string
+}
+
+export interface CropScouterResponse {
+  matches: CropperMatch[]
+  dominant_resource: string
+  wood_to_crop_ratio: number
+}
+
+// ============ Attack TS Optimizer ============
+
+export interface AttackerProfile {
+  village_label: string
+  x: number
+  y: number
+  unit_speed: number
+  ts_level: number
+  allow_ts_adjustment: boolean
+}
+
+export interface TsOptimizerRequest {
+  target_x: number
+  target_y: number
+  target_arrival: string // ISO 8601
+  attackers: AttackerProfile[]
+  wave_spacing_seconds?: number
+  server_speed?: number
+}
+
+export interface TsOptimizerResult {
+  village_label: string
+  recommended_ts_level: number
+  send_time: string
+  travel_time_formatted: string
+  distance: number
+}
+
+export interface TsOptimizerResponse {
+  target_arrival: string
+  results: TsOptimizerResult[]
+  warnings: string[]
+}
+
+// ============ Fake Troops Calculator ============
+
+export interface FakeTroopsRequest {
+  target_population: number
+  attacker_tribe: string
+  include_catapults: boolean
+  include_rams: boolean
+}
+
+export interface FakeTroopsResponse {
+  min_infantry: number
+  min_cavalry: number
+  min_catapults: number
+  min_rams: number
+  total_population_cost: number
+  reasoning: string
+}
+
 // ============ API Client ============
 
 export const advancedCalculatorApi = {
@@ -169,6 +280,34 @@ export const advancedCalculatorApi = {
     request: PathSpeedTsRequest
   ): Promise<PathSpeedTsResponse> => {
     const response = await api.post('/advanced-calculator/path-speed-ts', request)
+    return response.data
+  },
+
+  calculateVillageBuilder: async (
+    request: VillageBuilderRequest
+  ): Promise<VillageBuilderResponse> => {
+    const response = await api.post('/advanced-calculator/village-builder', request)
+    return response.data
+  },
+
+  calculateCropScouter: async (
+    request: CropScouterRequest
+  ): Promise<CropScouterResponse> => {
+    const response = await api.post('/advanced-calculator/crop-scouter', request)
+    return response.data
+  },
+
+  calculateTsOptimizer: async (
+    request: TsOptimizerRequest
+  ): Promise<TsOptimizerResponse> => {
+    const response = await api.post('/advanced-calculator/ts-optimizer', request)
+    return response.data
+  },
+
+  calculateFakeTroops: async (
+    request: FakeTroopsRequest
+  ): Promise<FakeTroopsResponse> => {
+    const response = await api.post('/advanced-calculator/fake-troops', request)
     return response.data
   },
 }

@@ -24,6 +24,10 @@ import TechnologyCalculatorPage from '@/pages/calculator/TechnologyCalculatorPag
 import NpcCalculatorPage from '@/pages/calculator/NpcCalculatorPage'
 import SaveTroopsCalculatorPage from '@/pages/calculator/SaveTroopsCalculatorPage'
 import PathSpeedTsCalculatorPage from '@/pages/calculator/PathSpeedTsCalculatorPage'
+// Phase 1 new calculators (2026-04)
+import VillageBuilderPage from '@/pages/calculator/VillageBuilderPage'
+import CropScouterPage from '@/pages/calculator/CropScouterPage'
+import AttackPlannerPage from '@/pages/calculator/AttackPlannerPage'
 // Game accounts page
 import { GameAccountsPage } from '@/pages/game-accounts'
 // Village pages
@@ -154,6 +158,24 @@ function Navigation() {
                     className="block px-4 py-2 hover:bg-muted"
                   >
                     TS 反推計算器
+                  </Link>
+                  <Link
+                    to="/calculator/village-builder"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    最佳建造順序
+                  </Link>
+                  <Link
+                    to="/calculator/crop-scouter"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    首都類型反推
+                  </Link>
+                  <Link
+                    to="/calculator/attack-planner"
+                    className="block px-4 py-2 hover:bg-muted"
+                  >
+                    攻擊規劃器
                   </Link>
                 </div>
               </div>
@@ -291,6 +313,10 @@ function AppContent() {
         <Route path="/calculator/npc" element={<NpcCalculatorPage />} />
         <Route path="/calculator/save-troops" element={<SaveTroopsCalculatorPage />} />
         <Route path="/calculator/path-speed-ts" element={<PathSpeedTsCalculatorPage />} />
+        {/* Phase 1 new calculators */}
+        <Route path="/calculator/village-builder" element={<VillageBuilderPage />} />
+        <Route path="/calculator/crop-scouter" element={<CropScouterPage />} />
+        <Route path="/calculator/attack-planner" element={<AttackPlannerPage />} />
         {/* Statistics routes - 公開 */}
         <Route path="/statistics/overview" element={<ServerOverviewPage />} />
         <Route path="/statistics/players" element={<PlayerRankingPage />} />
