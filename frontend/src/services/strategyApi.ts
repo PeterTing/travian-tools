@@ -38,27 +38,6 @@ export interface HealthCheckResponse {
   priority_actions: string[]
 }
 
-export interface StrategyAdviceResponse {
-  conversation_id: string
-  phase_analysis: string
-  immediate_actions: string[]
-  short_term_plan: string[]
-  risk_warnings: string[]
-  answer: string
-}
-
-export interface ConversationMessage {
-  role: 'user' | 'assistant'
-  content: string
-}
-
-export interface ConversationHistoryResponse {
-  conversation_id: string
-  messages: ConversationMessage[]
-  created_at: string
-  last_updated: string
-}
-
 // ============ API Functions ============
 
 export const detectPhase = async (accountId: string): Promise<PhaseDetectionResponse> => {
@@ -72,27 +51,5 @@ export const healthCheck = async (accountId: string): Promise<HealthCheckRespons
   const response = await api.post<HealthCheckResponse>('/strategy/health-check', {
     account_id: accountId,
   })
-  return response.data
-}
-
-export const getAdvice = async (
-  accountId: string,
-  question: string,
-  conversationId?: string
-): Promise<StrategyAdviceResponse> => {
-  const response = await api.post<StrategyAdviceResponse>('/strategy/advice', {
-    account_id: accountId,
-    question,
-    conversation_id: conversationId,
-  })
-  return response.data
-}
-
-export const getConversationHistory = async (
-  conversationId: string
-): Promise<ConversationHistoryResponse> => {
-  const response = await api.get<ConversationHistoryResponse>(
-    `/strategy/conversation/${conversationId}`
-  )
   return response.data
 }

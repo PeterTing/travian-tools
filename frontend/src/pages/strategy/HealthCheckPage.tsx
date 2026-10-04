@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -243,11 +243,6 @@ export default function HealthCheckPage() {
 
             {/* 操作按鈕 */}
             <div className="flex gap-4 justify-center">
-              <Link to={`/strategy/advisor?accountId=${selectedAccountId}`}>
-                <Button variant="outline">
-                  {t('health.askAI')}
-                </Button>
-              </Link>
               <Button
                 onClick={() => {
                   setHealthData(null)

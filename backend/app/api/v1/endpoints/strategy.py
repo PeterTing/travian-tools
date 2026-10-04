@@ -4,15 +4,11 @@ from fastapi import APIRouter, HTTPException, status
 
 from app.core.dependencies import CurrentUser, DBSession
 from app.domain.schemas.strategy import (
-    ConversationHistoryResponse,
     HealthCheckRequest,
     HealthCheckResponse,
     PhaseDetectionRequest,
     PhaseDetectionResponse,
-    StrategyAdviceRequest,
-    StrategyAdviceResponse,
 )
-from app.services.ai_service import AIService
 from app.services.strategy_service import StrategyService
 
 router = APIRouter(prefix="/strategy", tags=["strategy"])
@@ -85,89 +81,6 @@ async def health_check(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="找不到該遊戲帳號或無權限存取",
-        )
-
-    return result
-
-
-@router.post("/advice", response_model=StrategyAdviceResponse)
-async def get_strategy_advice(
-    request: StrategyAdviceRequest,
-    db: DBSession,
-    current_user: CurrentUser,
-) -> StrategyAdviceResponse:
-    """AI 策略諮詢.
-
-    透過 Claude AI 提供即時策略建議，支援多輪對話。
-
-    輸入：
-    - account_id: 遊戲帳號 ID
-    - question: 玩家的問題（自然語言）
-    - conversation_id: 對話 ID（可選，用於延續對話）
-
-    輸出：
-    - 階段分析
-    - 立即行動建議
-    - 短期計畫
-    - 風險提醒
-    - AI 回答
-
-    Args:
-        request: 策略諮詢請求
-        db: 資料庫 session
-        current_user: 當前登入用戶
-
-    Returns:
-        StrategyAdviceResponse: AI 策略建議
-
-    Raises:
-        HTTPException: 帳號不存在或無權限
-    """
-    service = AIService(db)
-    result = service.get_advice(
-        request.account_id,
-        current_user.user_id,
-        request.question,
-        request.conversation_id,
-    )
-
-    if not result:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="找不到該遊戲帳號或無權限存取",
-        )
-
-    return result
-
-
-@router.get(
-    "/conversation/{conversation_id}", response_model=ConversationHistoryResponse
-)
-async def get_conversation_history(
-    conversation_id: str,
-    db: DBSession,
-    current_user: CurrentUser,
-) -> ConversationHistoryResponse:
-    """取得對話歷史.
-
-    Args:
-        conversation_id: 對話 ID
-        db: 資料庫 session
-        current_user: 當前登入用戶
-
-    Returns:
-        ConversationHistoryResponse: 對話歷史
-
-    Raises:
-        HTTPException: 對話不存在
-    """
-    service = AIService(db)
-    result = service.get_conversation_history(conversation_id)
-
-    if not result:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="找不到該對話",
         )
 
     return result

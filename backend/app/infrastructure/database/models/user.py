@@ -10,15 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
-    from app.infrastructure.database.models.automation_settings import (
-        AutomationSettings,
-    )
-    from app.infrastructure.database.models.execution_task import ExecutionTask
     from app.infrastructure.database.models.game_account import GameAccount
-    from app.infrastructure.database.models.resource_transport import (
-        TransportSchedule,
-        VillageTransportConfig,
-    )
     from app.infrastructure.database.models.sync_log import SyncLog
 
 
@@ -53,26 +45,6 @@ class User(Base):
     )
     sync_logs: Mapped[list["SyncLog"]] = relationship(
         "SyncLog",
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
-    execution_tasks: Mapped[list["ExecutionTask"]] = relationship(
-        "ExecutionTask",
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
-    transport_configs: Mapped[list["VillageTransportConfig"]] = relationship(
-        "VillageTransportConfig",
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
-    transport_schedules: Mapped[list["TransportSchedule"]] = relationship(
-        "TransportSchedule",
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
-    automation_settings: Mapped[list["AutomationSettings"]] = relationship(
-        "AutomationSettings",
         back_populates="user",
         cascade="all, delete-orphan",
     )

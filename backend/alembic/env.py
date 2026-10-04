@@ -4,19 +4,12 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
 
+# Import every model module so Base.metadata is complete for autogenerate /
+# `alembic check` (the package __init__ imports all model classes).
+import app.infrastructure.database.models  # noqa: E402,F401
 from alembic import context
 from app.core.config import settings
 from app.infrastructure.database.base import Base
-
-# Import all models for autogenerate support
-from app.infrastructure.database.models import (  # noqa: F401
-    BattleReport,
-    BuildingInstance,
-    GameAccount,
-    TroopInstance,
-    User,
-    Village,
-)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -35,6 +28,39 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+
+_NOW_DEFAULTS = {"now()", "current_timestamp()", "current_timestamp"}
+
+
+def compare_server_default(
+    context,  # noqa: ANN001
+    inspected_column,  # noqa: ANN001
+    metadata_column,  # noqa: ANN001
+    inspected_default: str | None,
+    metadata_default,  # noqa: ANN001
+    rendered_metadata_default: str | None,
+) -> bool | None:
+    """Treat MariaDB's ``current_timestamp()`` as equal to ``func.now()``.
+
+    Returns False (= no difference) for that pair and None otherwise so Alembic
+    falls back to its default comparison.
+    """
+
+    def norm(value: str | None) -> str | None:
+        return value.strip("'\" ").lower() if value else value
+
+    if norm(inspected_default) in _NOW_DEFAULTS and (
+        norm(rendered_metadata_default) in _NOW_DEFAULTS
+    ):
+        return False
+    return None
+
+
+COMPARE_OPTS = {
+    "compare_type": True,
+    "compare_server_default": compare_server_default,
+}
 
 
 def get_url() -> str:
@@ -58,6 +84,7 @@ def run_migrations_offline() -> None:
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
+        **COMPARE_OPTS,
         dialect_opts={"paramstyle": "named"},
     )
 
@@ -80,7 +107,11 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            **COMPARE_OPTS,
+        )
 
         with context.begin_transaction():
             context.run_migrations()

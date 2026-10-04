@@ -303,3 +303,37 @@ class TestDeleteGameAccount:
         response = client.delete("/game-accounts/acc-999")
 
         assert response.status_code == 404
+
+
+class TestNoStoredCredentials:
+    """Travian 登入憑證不得被接受、儲存或回傳."""
+
+    @patch("app.api.v1.endpoints.game_accounts.GameAccountService")
+    def test_login_fields_in_payload_are_ignored(
+        self,
+        mock_service_class: MagicMock,
+        client: TestClient,
+    ) -> None:
+        mock_service_class.return_value.create_account.return_value = (
+            create_mock_account()
+        )
+        response = client.post(
+            "/game-accounts",
+            json={
+                "server_url": "https://ts1.travian.com",
+                "login_email": "someone@example.com",
+                "login_password": "do-not-store",
+            },
+        )
+        assert response.status_code == 201
+        passed = mock_service_class.return_value.create_account.call_args
+        dumped = repr(passed)
+        assert "do-not-store" not in dumped
+        assert "someone@example.com" not in dumped
+        body = response.text
+        assert "login_password" not in body and "login_email" not in body
+        assert "has_login_credentials" not in body
+
+    def test_model_has_no_credential_columns(self) -> None:
+        cols = set(GameAccount.__table__.columns.keys())
+        assert not {"login_email", "login_password"} & cols

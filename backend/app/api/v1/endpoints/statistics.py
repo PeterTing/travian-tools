@@ -3,7 +3,16 @@
 所有查詢端點為公開（不需認證），手動快照觸發端點需要認證。
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import CurrentUser, get_db
@@ -11,7 +20,8 @@ from app.domain.schemas.statistics import (
     PaginatedResponse,
     ServerOverview,
 )
-from app.services.snapshot_scheduler import SnapshotScheduler
+from app.services.map_sql_fetcher import MapSqlFetchError, decode_map_sql
+from app.services.snapshot_service import SnapshotService
 from app.services.statistics_service import StatisticsService
 
 router = APIRouter(prefix="/statistics", tags=["Statistics"])
@@ -178,27 +188,29 @@ async def search_inactive_villages(
     )
 
 
-@router.post("/snapshot/trigger")
-async def trigger_snapshot(
+@router.post("/snapshot/upload")
+async def upload_snapshot(
     current_user: CurrentUser,
-    server_url: str = Query(..., description="伺服器 URL"),
+    server_url: str = Form(..., description="伺服器 URL（快照歸屬，不會連線）"),
+    file: UploadFile = File(..., description="map.sql 或 map.sql.gz"),
     db: Session = Depends(get_db),
 ) -> dict:
-    """手動觸發快照下載.
+    """手動上傳 map.sql 建立伺服器快照並計算差異.
 
-    需要認證。觸發指定伺服器的 map.sql 下載和處理。
+    需要認證。每日自動抓取由固定排程負責；這裡沒有即時下載。
     """
-    scheduler = SnapshotScheduler(db)
-    result = scheduler.download_snapshot(server_url)
+    try:
+        sql_content = decode_map_sql(await file.read())
+    except MapSqlFetchError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
 
+    result = SnapshotService(db).ingest(server_url.rstrip("/"), sql_content)
     if result is None:
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"無法下載 {server_url} 的快照",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="無法解析 map.sql 或沒有任何村莊資料",
         )
 
-    return {
-        "success": True,
-        "message": "快照下載完成",
-        **result,
-    }
+    return {"success": True, "message": "快照匯入完成", **result}

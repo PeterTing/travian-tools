@@ -105,14 +105,18 @@ export default function ServerOverviewPage() {
     setServerUrl(inputUrl)
   }
 
-  const handleTriggerSnapshot = async () => {
+  // 手動上傳 map.sql 建立快照（伺服器不會即時連線 Travian；每日抓取由固定排程負責）
+  const handleUploadSnapshot = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
     try {
       setSnapshotMessage(null)
-      const result = await statisticsApi.triggerSnapshot(serverUrl)
+      const result = await statisticsApi.uploadSnapshot(serverUrl, file)
       setSnapshotMessage(result.message)
       fetchData()
     } catch {
-      setSnapshotMessage('快照觸發失敗')
+      setSnapshotMessage('快照上傳失敗')
     }
   }
 
@@ -131,8 +135,16 @@ export default function ServerOverviewPage() {
         />
         <Button onClick={handleSearch}>查詢</Button>
         {isAuthenticated && (
-          <Button variant="outline" onClick={handleTriggerSnapshot}>
-            觸發快照
+          <Button variant="outline" asChild>
+            <label className="cursor-pointer">
+              上傳 map.sql 快照
+              <input
+                type="file"
+                accept=".sql,.txt,.gz"
+                className="hidden"
+                onChange={handleUploadSnapshot}
+              />
+            </label>
           </Button>
         )}
       </div>

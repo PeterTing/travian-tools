@@ -16,7 +16,7 @@ router = APIRouter(prefix="/game-accounts", tags=["game-accounts"])
 
 
 def _to_response(account: GameAccount) -> GameAccountResponse:
-    """轉換為 Response schema，加入 has_login_credentials."""
+    """轉換為 Response schema."""
     return GameAccountResponse(
         account_id=account.account_id,
         user_id=account.user_id,
@@ -32,7 +32,6 @@ def _to_response(account: GameAccount) -> GameAccountResponse:
         last_updated=account.last_updated,
         created_at=account.created_at,
         current_server_day=account.current_server_day,
-        has_login_credentials=bool(account.login_email and account.login_password),
     )
 
 

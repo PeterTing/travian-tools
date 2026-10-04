@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import router as api_v1_router
 from app.core.config import settings
-from app.services.scheduler_service import scheduler_service
+from app.services.map_sql_scheduler import map_sql_scheduler
 
 # 配置 logging
 logging.basicConfig(
@@ -17,23 +17,15 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
-# 設定特定模組的 log 級別
-logging.getLogger("app.services.scheduler_service").setLevel(logging.INFO)
-logging.getLogger("app.services.village_sync_service").setLevel(logging.INFO)
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """應用程式生命週期管理."""
-    # 啟動時
-    scheduler_service.start()
-    # 載入待處理的完成事件
-    scheduler_service.load_pending_completion_events()
-    # 恢復所有帳號的週期性同步任務
-    scheduler_service.restore_periodic_sync_jobs()
+    # 啟動時：只有固定排程（每日公開 map.sql 抓取 + log 清理）
+    map_sql_scheduler.start()
     yield
     # 關閉時
-    scheduler_service.shutdown()
+    map_sql_scheduler.shutdown()
 
 
 app = FastAPI(

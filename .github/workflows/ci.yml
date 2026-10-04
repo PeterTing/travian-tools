@@ -47,6 +47,17 @@ jobs:
         run: |
           ruff check .
 
+      - name: Compliance guard (no browser automation / Travian traffic except map.sql)
+        run: |
+          pytest tests/unit/test_compliance.py --no-cov -q
+
+      - name: Migrations build the exact model schema
+        env:
+          DATABASE_URL: mysql+mysqlconnector://root:test_password@localhost:3306/travian_tools_test
+        run: |
+          alembic upgrade head
+          alembic check
+
       - name: Type check with mypy
         run: |
           mypy app --ignore-missing-imports

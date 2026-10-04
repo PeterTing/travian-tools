@@ -161,11 +161,17 @@ export const statisticsApi = {
     return response.data
   },
 
-  async triggerSnapshot(serverUrl: string): Promise<{ success: boolean; message: string }> {
+  async uploadSnapshot(
+    serverUrl: string,
+    file: File,
+  ): Promise<{ success: boolean; message: string }> {
+    const form = new FormData()
+    form.append('server_url', serverUrl)
+    form.append('file', file)
     const response = await api.post<{ success: boolean; message: string }>(
-      '/statistics/snapshot/trigger',
-      null,
-      { params: { server_url: serverUrl } },
+      '/statistics/snapshot/upload',
+      form,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
     )
     return response.data
   },

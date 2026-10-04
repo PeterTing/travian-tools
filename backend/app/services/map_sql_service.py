@@ -1,10 +1,7 @@
 """Map.sql 解析服務."""
 
-import gzip
 import re
-from io import BytesIO
 
-import httpx
 from sqlalchemy.orm import Session
 
 from app.domain.schemas.map_sql import (
@@ -30,42 +27,6 @@ class MapSqlService:
         """初始化服務."""
         self.db = db
 
-    @staticmethod
-    def download_map_sql(server_url: str) -> str:
-        """從伺服器下載 map.sql 檔案.
-
-        Args:
-            server_url: Travian 伺服器網址，如 https://ts1.travian.com
-
-        Returns:
-            map.sql 檔案內容
-
-        Raises:
-            httpx.HTTPError: 下載失敗
-        """
-        # 移除結尾斜線
-        server_url = server_url.rstrip("/")
-
-        # 先嘗試下載壓縮版
-        gz_url = f"{server_url}/map.sql.gz"
-        sql_url = f"{server_url}/map.sql"
-
-        with httpx.Client(timeout=60.0, follow_redirects=True) as client:
-            # 嘗試下載 gzip 壓縮版
-            try:
-                response = client.get(gz_url)
-                if response.status_code == 200:
-                    # 解壓縮
-                    with gzip.GzipFile(fileobj=BytesIO(response.content)) as f:
-                        return f.read().decode("utf-8")
-            except Exception:
-                pass
-
-            # 嘗試下載非壓縮版
-            response = client.get(sql_url)
-            response.raise_for_status()
-            return response.text
-
     # Map.sql 格式有兩種：
     # 1. CSV 格式：x, y, field_type, village_id, village_name, player_id, player_name, alliance_id, alliance_name, population, is_capital
     # 2. SQL INSERT 格式：INSERT INTO `x_world` VALUES (x,y,field_type,village_id,'village_name',player_id,'player_name',alliance_id,'alliance_name',population,is_capital);
@@ -83,19 +44,101 @@ class MapSqlService:
         r"(\d*)"  # is_capital (optional)
     )
 
-    # SQL INSERT 格式的正則表達式
-    # INSERT INTO `x_world` VALUES (id,x,y,field_type,village_id,'village_name',player_id,'player_name',alliance_id,'alliance_name',population,is_capital,...);
-    # 實際格式: (22209,-47,145,1,23880,'Rome',2638,'CrazyTurtle',45,'TNC',310,NULL,FALSE,FALSE,NULL,NULL)
-    # 欄位順序: id, x, y, field_type, village_id, village_name, player_id, player_name, alliance_id, alliance_name, population, is_capital
-    SQL_INSERT_PATTERN = re.compile(
-        r"\((\d+),(-?\d+),(-?\d+),(\d+),"  # id, x, y, field_type
-        r"(\d+),'([^']*)',"  # village_id, village_name
-        r"(\d+),'([^']*)',"  # player_id, player_name
-        r"(\d+),'([^']*)',"  # alliance_id, alliance_name
-        r"(\d+),"  # population
-        r"(NULL|\d+)",  # is_capital (NULL or number)
-        re.IGNORECASE,
-    )
+    # T4.x 官方 map.sql（`INSERT INTO `x_world` VALUES (...);`）欄位順序：
+    #   0 fieldId, 1 x, 2 y, 3 tid(種族), 4 vid, 5 village, 6 uid, 7 player,
+    #   8 aid, 9 alliance, 10 population, 11 region(NULL 或字串),
+    #   12 capital(TRUE/FALSE), 13 city, 14 harbor, 15 victoryPoints
+    # 舊版只有前 11 欄。字串可能含 \' 或 '' 跳脫。
+    _INSERT_PREFIX = re.compile(r"INSERT\s+INTO\s+`?x_world`?\s+VALUES\s*", re.I)
+
+    @staticmethod
+    def _split_sql_tuples(values: str) -> list[list[str | None]]:
+        """把 `(..),(..);` 拆成欄位列表；字串去引號並還原跳脫，NULL 轉 None."""
+        rows: list[list[str | None]] = []
+        i, n = 0, len(values)
+        while i < n:
+            if values[i] != "(":
+                i += 1
+                continue
+            i += 1
+            row: list[str | None] = []
+            while i < n:
+                while i < n and values[i] in " \t":
+                    i += 1
+                if i < n and values[i] == "'":
+                    i += 1
+                    buf: list[str] = []
+                    while i < n:
+                        c = values[i]
+                        if c == "\\" and i + 1 < n:
+                            nxt = values[i + 1]
+                            buf.append(
+                                {"n": "\n", "r": "\r", "t": "\t", "0": "\0"}.get(
+                                    nxt, nxt
+                                )
+                            )
+                            i += 2
+                        elif c == "'" and i + 1 < n and values[i + 1] == "'":
+                            buf.append("'")
+                            i += 2
+                        elif c == "'":
+                            i += 1
+                            break
+                        else:
+                            buf.append(c)
+                            i += 1
+                    row.append("".join(buf))
+                else:
+                    j = i
+                    while j < n and values[j] not in ",)":
+                        j += 1
+                    tok = values[i:j].strip()
+                    row.append(None if tok.upper() == "NULL" else tok)
+                    i = j
+                while i < n and values[i] in " \t":
+                    i += 1
+                if i < n and values[i] == ",":
+                    i += 1
+                    continue
+                if i < n and values[i] == ")":
+                    i += 1
+                    break
+            rows.append(row)
+        return rows
+
+    @staticmethod
+    def _sql_bool(tok: str | None) -> bool:
+        return tok is not None and tok.strip().upper() in ("TRUE", "1")
+
+    @classmethod
+    def _village_from_sql_row(cls, row: list[str | None]) -> MapVillage | None:
+        if len(row) < 11:
+            return None
+        try:
+
+            def _int(v: str | None) -> int | None:
+                return int(v) if v not in (None, "") else None
+
+            tribe = _int(row[3]) or 0
+            aid = _int(row[8])
+            return MapVillage(
+                map_field_id=_int(row[0]),
+                x=int(row[1] or 0),
+                y=int(row[2] or 0),
+                tribe_id=tribe,
+                field_type=tribe,
+                village_id=_int(row[4]),
+                village_name=row[5] or None,
+                player_id=_int(row[6]),
+                player_name=row[7] or None,
+                alliance_id=aid if aid and aid > 0 else None,
+                alliance_name=row[9] or None,
+                population=_int(row[10]) or 0,
+                region=row[11] if len(row) > 11 and row[11] else None,
+                is_capital=cls._sql_bool(row[12]) if len(row) > 12 else False,
+            )
+        except (TypeError, ValueError):
+            return None
 
     def parse_sql(self, sql_content: str) -> MapParseResponse:
         """解析 map.sql 內容."""
@@ -110,11 +153,20 @@ class MapSqlService:
             if not line or line.startswith("#") or line.startswith("--"):
                 continue
 
-            village = self._parse_line(line)
-            if village and village.village_id:
-                villages.append(village)
-                self._update_player(players_map, village)
-                self._update_alliance(alliances_map, village)
+            prefix = self._INSERT_PREFIX.search(line)
+            if prefix:
+                parsed = [
+                    self._village_from_sql_row(row)
+                    for row in self._split_sql_tuples(line[prefix.end() :])
+                ]
+            else:
+                parsed = [self._parse_line(line)]
+
+            for village in parsed:
+                if village and village.village_id:
+                    villages.append(village)
+                    self._update_player(players_map, village)
+                    self._update_alliance(alliances_map, village)
 
         # 計算統計
         for player in players_map.values():
@@ -143,33 +195,8 @@ class MapSqlService:
         )
 
     def _parse_line(self, line: str) -> MapVillage | None:
-        """解析單行數據."""
-        # 先嘗試 SQL INSERT 格式
-        # 欄位順序: id, x, y, field_type, village_id, village_name, player_id, player_name, alliance_id, alliance_name, population, is_capital
-        # groups[0]=id, groups[1]=x, groups[2]=y, groups[3]=field_type, groups[4]=village_id, groups[5]=village_name
-        # groups[6]=player_id, groups[7]=player_name, groups[8]=alliance_id, groups[9]=alliance_name
-        # groups[10]=population, groups[11]=is_capital
-        match = self.SQL_INSERT_PATTERN.search(line)
-        if match:
-            groups = match.groups()
-            return MapVillage(
-                x=int(groups[1]),  # x 是第二欄
-                y=int(groups[2]),  # y 是第三欄
-                field_type=int(groups[3]),
-                village_id=int(groups[4]) if groups[4] else None,
-                village_name=groups[5] if groups[5] else None,
-                player_id=int(groups[6]) if groups[6] else None,
-                player_name=groups[7] if groups[7] else None,
-                alliance_id=int(groups[8])
-                if groups[8] and int(groups[8]) > 0
-                else None,
-                alliance_name=groups[9] if groups[9] else None,
-                population=int(groups[10]) if groups[10] else 0,
-                is_capital=groups[11] == "1"
-                if groups[11] and groups[11] != "NULL"
-                else False,
-            )
-
+        """解析單行 CSV/TSV 數據（SQL INSERT 由 parse_sql 處理）."""
+        # 非 SQL INSERT 行：相容舊的 CSV/TSV 匯出格式（第 3 欄為種族 id）
         # 嘗試 CSV 格式正則表達式
         match = self.MAP_LINE_PATTERN.match(line)
         if match:
