@@ -35,7 +35,7 @@ class PhaseDetectionRequest(BaseModel):
         5,
         ge=1,
         le=30,
-        description="新手保護天數（依世界；x1=5、可延長；S12）",
+        description="新手保護天數（依世界；x1=5、可延長）",  # S12
     )
 
 
@@ -75,7 +75,7 @@ class HealthCheckRequest(BaseModel):
         5,
         ge=1,
         le=30,
-        description="新手保護天數（依世界；x1=5；S12）",
+        description="新手保護天數（依世界；x1=5）",  # S12
     )
 
 

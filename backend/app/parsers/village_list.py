@@ -5,7 +5,20 @@ from __future__ import annotations
 from bs4 import BeautifulSoup
 
 from app.parsers.html_utils import attr, class_list
-from app.parsers.numbers import parse_coordinate_text
+from app.parsers.numbers import clean_number, parse_coordinate_text
+
+
+def parse_page_population(html_or_soup: str | BeautifulSoup) -> int:
+    """頁面側欄／資訊列的「人口：N」（dorf1／dorf2 都有；村莊列表列上常常沒有）。"""
+    soup = (
+        html_or_soup
+        if isinstance(html_or_soup, BeautifulSoup)
+        else BeautifulSoup(html_or_soup or "", "html.parser")
+    )
+    el = soup.select_one("div.population span") or soup.select_one("div.population")
+    if el is None:
+        return 0
+    return clean_number(el.get_text())
 
 
 def parse_village_list(html: str) -> list[dict]:

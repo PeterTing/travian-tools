@@ -2,7 +2,7 @@
 
 | 項目 | 內容 |
 |---|---|
-| 版本 | v2.0.14（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
+| 版本 | v2.0.15（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
 | 更新日期 | 2026-10-05 |
 | 規格來源 | [`PRD.md`](PRD.md) |
 
@@ -70,6 +70,7 @@
 - 進度：已由 [#3](https://github.com/PeterTing/travian-tools/pull/3)／[#4](https://github.com/PeterTing/travian-tools/pull/4) 完成（本票不重做）；P0-03 再把上傳改成送 HTML 給共用解析器
 
 ### P0-05 貼上流程與「解析結果確認」畫面 ✅
+- PR：[#12](https://github.com/PeterTing/travian-tools/pull/12)（已 merge，2026-10-05，merge commit `9c7c8fa5`）
 - 驗收：
   - 照線框稿 v0.6（畫面稿 v0.7）；三種入口共用同一個確認元件
   - 確認畫面「存到／村莊／擷取時間」三列：村莊列在集結點／村莊中心顯示；多村總覽／戰報不顯示；預設首都（或解析對上的村）
@@ -168,6 +169,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-05 | v2.0.15 | P0-05 標為完成（[#12](https://github.com/PeterTing/travian-tools/pull/12)，merge `9c7c8fa5`） |
 | 2026-10-05 | v2.0 | 依 PRD v2 重排 P0 到 P2；v1 封存 |
 | 2026-10-05 | v2.0.1 | 新增 P0-12：Cloud Run 部署時擴充 `host_permissions` 改指向正式網址 |
 | 2026-10-05 | v2.0.2 | P0-04 驗收補上：popup 不放輸入框、沒登入只給「在工具網站登入」、擴充登入憑證有到期時間且登出一起清 |

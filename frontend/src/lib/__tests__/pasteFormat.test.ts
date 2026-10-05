@@ -1,10 +1,12 @@
 
 import { describe, expect, it } from 'vitest'
 import {
+  emptyPasteReasonKey,
   formatCaptureShort,
   formatVillageLabel,
   pageNeedsVillageSelector,
   parseCaptureShort,
+  parseResultIsSaveable,
   pickDefaultVillageId,
 } from '../pasteFormat'
 
@@ -75,5 +77,31 @@ describe('formatVillageLabel', () => {
     expect(
       formatVillageLabel({ name: '主村', coordinate_x: 10, coordinate_y: -3 }),
     ).toBe('主村 (10|−3)')
+  })
+})
+
+
+describe('emptyPasteReasonKey', () => {
+  it('maps page types to i18n keys', () => {
+    expect(emptyPasteReasonKey('rally_point')).toBe('paste.emptyWhyRally')
+    expect(emptyPasteReasonKey('village_center')).toBe('paste.emptyWhyCenter')
+    expect(emptyPasteReasonKey('village_overview')).toBe('paste.emptyWhyOverview')
+    expect(emptyPasteReasonKey('unknown')).toBe('paste.emptyWhyGeneric')
+  })
+})
+
+describe('parseResultIsSaveable', () => {
+  it('rejects garrison-only rally', () => {
+    expect(
+      parseResultIsSaveable('rally_point', {
+        garrison_own: [{ troop_id: 't1', count: 1 }],
+        incoming: [],
+        movements: [{ kind: 'own', role: '自軍' }],
+      }),
+    ).toBe(false)
+  })
+
+  it('rejects empty village_center buildings', () => {
+    expect(parseResultIsSaveable('village_center', { buildings: [] })).toBe(false)
   })
 })

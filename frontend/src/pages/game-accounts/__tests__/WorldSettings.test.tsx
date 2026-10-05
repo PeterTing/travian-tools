@@ -10,7 +10,7 @@ import WorldSettings from '../WorldSettings'
 const ts3 = {
   world_id: 'w-ts3',
   server_url: 'https://ts3.x1.asia.travian.com',
-  utc_offset: null,
+  utc_offset: null as number | null,
   account_count: 2,
 }
 
@@ -41,12 +41,19 @@ describe('WorldSettings (UTC offset on the world)', () => {
     fireEvent.change(select, { target: { value: '60' } })
     fireEvent.click(screen.getByRole('button', { name: '儲存' }))
     await waitFor(() => expect(api.update).toHaveBeenCalledWith('w-ts3', { utc_offset: 60 }))
-    expect(await screen.findByText('已儲存')).toBeInTheDocument()
+    expect(await screen.findByTestId('utc-offset-summary-w-ts3')).toHaveTextContent('伺服器時差 UTC+1')
+    expect(screen.getByTestId('utc-offset-change-w-ts3')).toHaveTextContent('更改')
+  })
 
-    api.update.mockResolvedValueOnce({ ...ts3, utc_offset: null })
-    fireEvent.change(select, { target: { value: '' } })
-    fireEvent.click(screen.getByRole('button', { name: '儲存' }))
-    await waitFor(() => expect(api.update).toHaveBeenLastCalledWith('w-ts3', { utc_offset: null }))
+  it('collapses a set offset to one line and expands on 更改', async () => {
+    api.getAll.mockResolvedValue({ worlds: [{ ...ts3, utc_offset: 60 }], total: 1 })
+    render(<WorldSettings />)
+    const summary = await screen.findByTestId('utc-offset-summary-w-ts3')
+    expect(summary).toHaveTextContent('伺服器時差 UTC+1')
+    expect(screen.queryByLabelText('伺服器時區（UTC 時差）')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByTestId('utc-offset-change-w-ts3'))
+    expect(await screen.findByLabelText('伺服器時區（UTC 時差）')).toBeInTheDocument()
   })
 
   it('lists offsets like UTC+1 and UTC+5:45', async () => {

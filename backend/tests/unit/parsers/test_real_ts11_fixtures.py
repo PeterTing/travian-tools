@@ -37,6 +37,7 @@ def test_dorf1_html_resources_and_fields() -> None:
     assert result.ok is True
     assert result.page_type == "village_overview"
     assert result.data["village_name"] == "HandsomeTing的村莊"
+    assert result.data["population"] == 8
     assert result.data["resources"]["wood"] > 0
     assert len(result.data["resource_fields"]) == 18
     assert result.data["production"]["crop"] == 56
@@ -61,6 +62,7 @@ def test_dorf2_html_buildings() -> None:
     )
     assert result.ok is True
     assert result.page_type == "village_center"
+    assert result.data["population"] == 8
     assert len(result.data["buildings"]) >= 10
 
 

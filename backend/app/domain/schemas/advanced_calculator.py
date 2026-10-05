@@ -135,12 +135,11 @@ class NpcCalculatorRequest(BaseModel):
         ...,
         description="期望資源分配比例，例如 {'wood': 1, 'clay': 1, 'iron': 1, 'crop': 1}",
     )
+    # NPC merchant capacity caps (internal source S38)
     warehouse_capacity: int | None = Field(
-        None, ge=0, description="倉庫容量上限（木/磚/鐵；S38）"
+        None, ge=0, description="倉庫容量上限（木/磚/鐵）"
     )
-    granary_capacity: int | None = Field(
-        None, ge=0, description="穀倉容量上限（穀；S38）"
-    )
+    granary_capacity: int | None = Field(None, ge=0, description="穀倉容量上限（穀）")
 
 
 class NpcCalculatorResponse(BaseModel):

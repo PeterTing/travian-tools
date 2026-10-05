@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { useTranslation } from 'react-i18next'
 import {
+  emptyPasteReasonKey,
   formatCaptureShort,
   formatVillageLabel,
   movementKindLabel,
@@ -69,6 +71,7 @@ export function ParseConfirmPanel({
   askTimeDisplay,
   askUtcOffset,
 }: Props) {
+  const { t } = useTranslation()
   const [helpImprove, setHelpImprove] = useState(false)
   const [timeDisplay, setTimeDisplay] = useState<'server' | 'local'>('server')
   const [utcOffsetDraft, setUtcOffsetDraft] = useState('')
@@ -317,9 +320,10 @@ export function ParseConfirmPanel({
             className="rounded-md border border-amber-300 bg-amber-50 text-amber-950 text-sm px-3 py-2"
             data-testid="parse-empty-state"
           >
-            <b>沒有可存的解析結果</b>
-            <p className="mt-1 text-xs">
-              只認得出頁面類型，或只剩下原文。請回到首頁改貼 HTML（遊戲頁「檢視原始碼」）或用擴充上傳，再試一次。
+            <b>{t('paste.emptyTitle')}</b>
+            <p className="mt-1 text-xs" data-testid="parse-empty-detail">
+              {t('paste.emptyRecognized', { page: pageTypeLabel(state.pageType) })}{' '}
+              {t(emptyPasteReasonKey(state.pageType))} {t('paste.emptyNextStep')}
             </p>
           </div>
         )}
@@ -331,10 +335,10 @@ export function ParseConfirmPanel({
               {state.data.coordinate_x != null && state.data.coordinate_y != null
                 ? ` (${String(state.data.coordinate_x)}|${String(state.data.coordinate_y)})`
                 : ''}
-              {state.data.population ? (
-                <span className="text-muted-foreground font-normal">
+              {Number(state.data.population) > 0 ? (
+                <span className="text-muted-foreground font-normal" data-testid="overview-population">
                   {' '}
-                  · 人口 {String(state.data.population)}
+                  · {t('paste.population', { value: String(state.data.population) })}
                 </span>
               ) : null}
             </div>
@@ -393,13 +397,57 @@ export function ParseConfirmPanel({
               {state.data.coordinate_x != null && state.data.coordinate_y != null
                 ? ` (${String(state.data.coordinate_x)}|${String(state.data.coordinate_y)})`
                 : ''}
+              {state.data.population ? (
+                <span className="text-muted-foreground font-normal">
+                  {' '}
+                  · {t('paste.population', { value: String(state.data.population) })}
+                </span>
+              ) : null}
             </div>
-            <div className="text-xs text-muted-foreground">
-              建築 {Array.isArray(state.data.buildings) ? state.data.buildings.length : 0} 座
-              {Array.isArray(state.data.troops) && state.data.troops.length
-                ? ` · 部隊 ${state.data.troops.length} 種`
-                : ''}
-            </div>
+            {(() => {
+              const all = Array.isArray(state.data.buildings)
+                ? (state.data.buildings as {
+                    building_id?: string
+                    level?: number
+                    position?: number
+                  }[])
+                : []
+              const listed = all.filter(
+                (b) => b.building_id && b.building_id !== 'building_0' && Number(b.level || 0) > 0,
+              )
+              return (
+                <>
+                  <div className="text-xs text-muted-foreground">
+                    {t('paste.buildingsCount', { count: listed.length || all.length })}
+                    {Array.isArray(state.data.troops) && state.data.troops.length
+                      ? ` · 部隊 ${state.data.troops.length} 種`
+                      : ''}
+                  </div>
+                  {listed.length > 0 ? (
+                    <ul
+                      className="text-xs rounded-md border divide-y max-h-56 overflow-auto"
+                      data-testid="building-list"
+                    >
+                      {listed.map((b, i) => (
+                        <li
+                          key={`${b.position ?? i}-${b.building_id}`}
+                          className="px-2 py-1.5 flex justify-between gap-2"
+                        >
+                          <span className="min-w-0 truncate">
+                            {t(`buildingNames.${b.building_id}`, {
+                              defaultValue: b.building_id,
+                            })}
+                          </span>
+                          <span className="font-mono shrink-0 text-muted-foreground">
+                            {t('paste.buildingLevel', { level: Number(b.level || 0) })}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </>
+              )
+            })()}
           </div>
         )}
 
