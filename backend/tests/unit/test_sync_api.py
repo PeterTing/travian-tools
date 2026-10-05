@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.api.v1.endpoints.sync import router
-from app.core.dependencies import get_current_user, get_db
+from app.core.dependencies import get_current_user, get_db, get_upload_user
 from app.infrastructure.database.models.user import User
 
 app = FastAPI()
@@ -36,6 +36,7 @@ def mock_db() -> MagicMock:
 def client(mock_user: User, mock_db: MagicMock) -> TestClient:
     """建立測試客戶端."""
     app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_upload_user] = lambda: mock_user
     app.dependency_overrides[get_db] = lambda: mock_db
     yield TestClient(app)
     app.dependency_overrides.clear()

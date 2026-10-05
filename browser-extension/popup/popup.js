@@ -2,11 +2,17 @@
  * Travian Tools - Popup Script
  *
  * popup 裡沒有任何輸入框。沒登入時只顯示「在工具網站登入」，按下去開新分頁
- * 到工具網站；登入後網站會把有到期時間的憑證交給擴充（見 background）。
+ * 到工具網站；登入後網站會把有到期時間、只能上傳的憑證交給擴充（background）。
+ *
+ * 這裡是擴充唯一會發出請求的地方：使用者按「上傳這一頁」時，把目前分頁讀到
+ * 的資料送到 Travian Tools 的上傳 API。不會自動上傳其他頁面。
  */
 
-import { TOOL_SITE_URL } from '../lib/config.js';
-import { describeExpiry } from '../lib/credential.js';
+import { API_BASE_URL, TOOL_SITE_URL } from '../lib/config.js';
+import { clearCredential, describeExpiry, loadCredential } from '../lib/credential.js';
+import { UPLOAD_ENDPOINTS, UPLOAD_HINTS, uploadState } from '../lib/pages.js';
+
+const storage = chrome.storage.local;
 
 // DOM 元素
 const loginSection = document.getElementById('login-section');
@@ -16,19 +22,21 @@ const logoutBtn = document.getElementById('logout-btn');
 const usernameEl = document.getElementById('username');
 const expiryEl = document.getElementById('expiry');
 const accountSelect = document.getElementById('account-select');
+const pageLineEl = document.getElementById('page-line');
 const pageTypeEl = document.getElementById('page-type');
+const uploadHintEl = document.getElementById('upload-hint');
 const syncBtn = document.getElementById('sync-btn');
 const syncResultEl = document.getElementById('sync-result');
 const errorMessageEl = document.getElementById('error-message');
 
-// 狀態
-let currentAuth = null;
-let currentPageType = null;
-let currentPageData = null;
+// 只在 Travian 遊戲頁面上讀取（使用者點開 popup 時，activeTab 才授權目前分頁）
+const TRAVIAN_PAGE = /^https:\/\/([a-z0-9-]+\.)*travian\.(com|tw|net)\//i;
 
-/**
- * 顯示錯誤訊息
- */
+// 狀態
+let credential = null;
+let currentPageType = null;
+let detecting = true;
+
 function showError(message) {
   errorMessageEl.textContent = message;
   errorMessageEl.classList.remove('hidden');
@@ -36,18 +44,6 @@ function showError(message) {
     errorMessageEl.classList.add('hidden');
   }, 5000);
 }
-
-/**
- * 發送消息到 background script
- */
-async function sendMessage(action, data = {}) {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ action, ...data }, resolve);
-  });
-}
-
-// 只在 Travian 遊戲頁面上讀取（使用者點開 popup 時，activeTab 才授權目前分頁）
-const TRAVIAN_PAGE = /^https:\/\/([a-z0-9-]+\.)*travian\.(com|tw|net)\//i;
 
 function messageTab(tabId, message) {
   return new Promise((resolve) => {
@@ -91,17 +87,89 @@ async function sendToContent(action, data = {}) {
   return messageTab(tab.id, { action, ...data });
 }
 
-/**
- * 更新 UI 狀態
- */
+/** 依頁面類型組出上傳內容 */
+function buildUploadBody(pageType, accountId, data) {
+  switch (pageType) {
+    case 'village_overview':
+      return {
+        account_id: accountId,
+        village_id: data.village_id,
+        village_name: data.village_name,
+        coordinate_x: data.coordinate_x,
+        coordinate_y: data.coordinate_y,
+        population: data.population || 0,
+        is_capital: data.is_capital || false,
+        village_type: data.village_type || null,
+        capital_village_id: data.capital_village_id || null,
+        resources: data.resources,
+        production: data.production,
+        resource_fields: data.resource_fields || [],
+        troops: data.troops || [],
+      };
+    case 'village_center':
+      return {
+        account_id: accountId,
+        village_id: data.village_id,
+        village_name: data.village_name,
+        coordinate_x: data.coordinate_x,
+        coordinate_y: data.coordinate_y,
+        population: data.population || 0,
+        is_capital: data.is_capital || false,
+        capital_village_id: data.capital_village_id || null,
+        buildings: data.buildings || [],
+        troops: data.troops || [],
+      };
+    case 'reports':
+      return { account_id: accountId, reports: data.reports || [] };
+    case 'troop_statistics':
+      return { account_id: accountId, villages_troops: data.villages_troops || [] };
+    default:
+      return null;
+  }
+}
+
+/** 把這一頁送到 Travian Tools 的上傳 API（擴充唯一的請求） */
+async function uploadPage(pageType, body) {
+  const endpoint = UPLOAD_ENDPOINTS[pageType];
+  if (!endpoint || !body) throw new Error('這一頁不能上傳');
+  const current = await loadCredential(storage);
+  if (!current) throw new Error('尚未登入，請在工具網站登入');
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${current.access_token}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (response.status === 401) {
+    // 過期或網站已登出（後端撤銷）：清掉本地憑證
+    await clearCredential(storage);
+    throw new Error('登入已過期，請在工具網站重新登入');
+  }
+  if (!response.ok) {
+    let message = `HTTP ${response.status}`;
+    try {
+      const error = await response.json();
+      message = error.detail || error.message || message;
+    } catch {
+      // 忽略
+    }
+    throw new Error(message);
+  }
+  return response.json();
+}
+
 function updateUI() {
-  if (currentAuth) {
+  if (credential) {
     loginSection.classList.add('hidden');
     mainSection.classList.remove('hidden');
     logoutBtn.classList.remove('hidden');
-    const user = currentAuth.user || {};
+    const user = credential.user || {};
     usernameEl.textContent = user.username || user.email || '已登入';
-    expiryEl.textContent = describeExpiry(currentAuth);
+    expiryEl.textContent = describeExpiry(credential);
   } else {
     loginSection.classList.remove('hidden');
     mainSection.classList.add('hidden');
@@ -109,64 +177,49 @@ function updateUI() {
   }
 }
 
-/**
- * 載入帳號列表
- */
-async function loadAccounts() {
-  const result = await sendMessage('get_accounts');
-  if (result.success && result.data?.accounts) {
-    accountSelect.innerHTML = '<option value="">選擇遊戲帳號</option>';
-    result.data.accounts.forEach((account) => {
-      const option = document.createElement('option');
-      option.value = account.account_id;
-      option.textContent = `${account.player_name || '未命名'} · ${account.server_name || account.server_url}`;
-      accountSelect.appendChild(option);
-    });
-    if (result.data.accounts.length === 1) {
-      accountSelect.value = result.data.accounts[0].account_id;
-    }
+/** 「存到」的選項：網站交憑證時一併帶來的遊戲帳號 */
+function renderAccounts() {
+  const accounts = credential?.accounts || [];
+  accountSelect.replaceChildren();
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = accounts.length ? '選擇遊戲帳號' : '請先在工具網站新增遊戲帳號';
+  accountSelect.appendChild(placeholder);
+  for (const account of accounts) {
+    const option = document.createElement('option');
+    option.value = account.account_id;
+    option.textContent = account.label;
+    accountSelect.appendChild(option);
+  }
+  if (accounts.length === 1) {
+    accountSelect.value = accounts[0].account_id;
   }
 }
 
-/**
- * 檢測當前頁面
- */
+/** 依頁面與帳號狀態更新「目前頁面」、說明文字與按鈕；按鈕不能按時一定有說明 */
+function refreshSyncButton() {
+  const state = uploadState({
+    pageType: currentPageType,
+    detecting,
+    hasAccounts: (credential?.accounts || []).length > 0,
+    accountSelected: Boolean(accountSelect.value),
+  });
+  pageTypeEl.textContent = state.pageName;
+  pageLineEl.classList.toggle('hidden', !state.pageName);
+  uploadHintEl.textContent = state.hint;
+  uploadHintEl.classList.toggle('hidden', !state.hint);
+  syncBtn.disabled = !state.canUpload;
+}
+
 async function detectPage() {
+  detecting = true;
+  refreshSyncButton();
   const result = await sendToContent('get_page_type');
-  if (result.success) {
-    currentPageType = result.page_type;
-
-    const pageTypeNames = {
-      village_overview: '村莊總覽 (dorf1)',
-      village_center: '村莊中心 (dorf2)',
-      rally_point: '集結點',
-      hero: '英雄',
-      reports: '報告列表',
-      troop_statistics: '軍隊統計',
-      map: '地圖',
-      unknown: '未知頁面',
-    };
-
-    pageTypeEl.textContent = pageTypeNames[currentPageType] || currentPageType;
-
-    // 村莊頁面、報告頁面、軍隊統計頁面都能同步
-    const canSync =
-      accountSelect.value &&
-      (currentPageType === 'village_overview' ||
-       currentPageType === 'village_center' ||
-       currentPageType === 'reports' ||
-       currentPageType === 'troop_statistics');
-    syncBtn.disabled = !canSync;
-
-  } else {
-    pageTypeEl.textContent = '不是 Travian 遊戲頁面';
-    syncBtn.disabled = true;
-  }
+  currentPageType = result.success ? result.page_type : null;
+  detecting = false;
+  refreshSyncButton();
 }
 
-/**
- * 同步數據
- */
 async function syncData() {
   if (!accountSelect.value) {
     showError('請先選擇遊戲帳號');
@@ -175,71 +228,37 @@ async function syncData() {
 
   syncBtn.disabled = true;
   syncBtn.textContent = '上傳中…';
+  uploadHintEl.textContent = UPLOAD_HINTS.UPLOADING;
+  uploadHintEl.classList.remove('hidden');
   syncResultEl.textContent = '';
   syncResultEl.className = 'sync-result';
 
   try {
-    // 收集頁面數據
     const collectResult = await sendToContent('collect_data');
     if (!collectResult.success) {
-      throw new Error(collectResult.error || '無法收集頁面數據');
+      throw new Error(collectResult.error || '無法讀取這一頁');
     }
+    const body = buildUploadBody(currentPageType, accountSelect.value, collectResult.data);
+    const result = await uploadPage(currentPageType, body);
 
-    currentPageData = collectResult.data;
-
-    // 根據頁面類型同步
-    let syncResult;
-    if (currentPageType === 'village_overview') {
-      syncResult = await sendMessage('sync_village_overview', {
-        accountId: accountSelect.value,
-        data: currentPageData,
-      });
-    } else if (currentPageType === 'village_center') {
-      syncResult = await sendMessage('sync_village_center', {
-        accountId: accountSelect.value,
-        villageId: currentPageData.village_id,
-        data: currentPageData,
-      });
-    } else if (currentPageType === 'reports') {
-      syncResult = await sendMessage('sync_reports', {
-        accountId: accountSelect.value,
-        reports: currentPageData.reports || [],
-      });
+    let successMsg = '上傳成功！';
+    if (currentPageType === 'reports') {
+      successMsg = `上傳成功！共 ${result?.count || 0} 筆報告`;
     } else if (currentPageType === 'troop_statistics') {
-      syncResult = await sendMessage('sync_troop_statistics', {
-        accountId: accountSelect.value,
-        villagesTroops: currentPageData.villages_troops || [],
-      });
+      successMsg = `上傳成功！${result?.villages_synced || 0} 個村莊，${result?.troops_synced || 0} 筆部隊`;
     }
-
-    if (syncResult?.success) {
-      let successMsg = '上傳成功！';
-      if (currentPageType === 'reports') {
-        successMsg = `上傳成功！共 ${syncResult.data?.count || 0} 筆報告`;
-      } else if (currentPageType === 'troop_statistics') {
-        successMsg = `上傳成功！${syncResult.data?.villages_synced || 0} 個村莊，${syncResult.data?.troops_synced || 0} 筆部隊`;
-      }
-      syncResultEl.textContent = successMsg;
-      syncResultEl.className = 'sync-result success';
-    } else {
-      throw new Error(syncResult?.error || '上傳失敗');
-    }
+    syncResultEl.textContent = successMsg;
+    syncResultEl.className = 'sync-result success';
   } catch (error) {
     syncResultEl.textContent = `錯誤: ${error.message}`;
     syncResultEl.className = 'sync-result error';
-
-    // 如果是認證錯誤，回到登入畫面
-    if (
-      error.message.includes('登入已過期') ||
-      error.message.includes('尚未登入') ||
-      error.message.includes('401')
-    ) {
-      currentAuth = null;
+    if (!(await loadCredential(storage))) {
+      credential = null;
       updateUI();
     }
   } finally {
-    syncBtn.disabled = false;
     syncBtn.textContent = '上傳這一頁';
+    refreshSyncButton();
   }
 }
 
@@ -251,32 +270,22 @@ openSiteBtn.addEventListener('click', () => {
 });
 
 logoutBtn.addEventListener('click', async () => {
-  await sendMessage('logout');
-  currentAuth = null;
+  await clearCredential(storage);
+  credential = null;
   syncResultEl.textContent = '';
   updateUI();
 });
 
-accountSelect.addEventListener('change', () => {
-  detectPage();
-});
-
+accountSelect.addEventListener('change', refreshSyncButton);
 syncBtn.addEventListener('click', syncData);
 
 // 初始化
 (async () => {
-  // 檢查登入狀態
-  const authResult = await sendMessage('get_auth');
-  if (authResult?.success && authResult.data) {
-    currentAuth = authResult.data;
-    updateUI();
-    await loadAccounts();
-  } else {
-    updateUI();
-  }
-
-  // 檢測當前頁面（沒登入就不用讀遊戲頁面）
-  if (currentAuth) {
+  credential = await loadCredential(storage);
+  updateUI();
+  if (credential) {
+    renderAccounts();
+    // 沒登入就不用讀遊戲頁面
     await detectPage();
   }
 })();

@@ -1,6 +1,7 @@
 """認證服務."""
 
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import bcrypt
 import jwt
@@ -10,7 +11,7 @@ from app.core.config import settings
 from app.domain.schemas.auth import TokenResponse, UserResponse
 from app.infrastructure.database.models.user import User
 
-EXTENSION_SCOPE = "extension"
+EXTENSION_SCOPE = "extension_upload"
 
 
 class AuthService:
@@ -35,16 +36,7 @@ class AuthService:
         )
 
     @staticmethod
-    def create_access_token(user_id: str) -> str:
-        """建立存取 Token."""
-        expire = datetime.now(UTC) + timedelta(
-            minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
-        )
-        payload = {
-            "sub": user_id,
-            "exp": expire,
-            "type": "access",
-        }
+    def _encode(payload: dict[str, Any]) -> str:
         return jwt.encode(
             payload,
             settings.JWT_SECRET_KEY,
@@ -52,11 +44,23 @@ class AuthService:
         )
 
     @staticmethod
-    def create_extension_token(user_id: str) -> tuple[str, datetime]:
+    def create_access_token(user_id: str) -> str:
+        """建立存取 Token."""
+        expire = datetime.now(UTC) + timedelta(
+            minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+        )
+        return AuthService._encode({"sub": user_id, "exp": expire, "type": "access"})
+
+    @staticmethod
+    def create_extension_token(
+        user_id: str, extension_token_version: int = 0
+    ) -> tuple[str, datetime]:
         """建立交給瀏覽器擴充的短效 Token.
 
-        仍是 ``type=access``，所以同步 API 可以直接使用；另外帶
-        ``scope=extension``，讓它不能再拿來換發新的擴充 Token。
+        ``scope=extension_upload``：只能用在 popup 會呼叫的上傳 API，
+        其他 API（含換發、刷新、帳號設定）一律 403。帶 ``ver``
+        （使用者的 extension_token_version），網站登出（+1）後立刻失效。
+        網站自己的 access / refresh Token 不受影響。
 
         Returns:
             (token, 到期時間 UTC)
@@ -64,26 +68,30 @@ class AuthService:
         expire = datetime.now(UTC).replace(microsecond=0) + timedelta(
             minutes=settings.JWT_EXTENSION_TOKEN_EXPIRE_MINUTES
         )
-        payload = {
-            "sub": user_id,
-            "exp": expire,
-            "type": "access",
-            "scope": EXTENSION_SCOPE,
-        }
-        token = jwt.encode(
-            payload,
-            settings.JWT_SECRET_KEY,
-            algorithm=settings.JWT_ALGORITHM,
+        token = AuthService._encode(
+            {
+                "sub": user_id,
+                "exp": expire,
+                "type": "access",
+                "scope": EXTENSION_SCOPE,
+                "ver": extension_token_version,
+            }
         )
         return token, expire
 
     @classmethod
-    def is_extension_token(cls, token: str) -> bool:
-        """判斷 Token 是否為擴充專用 Token."""
+    def token_scope(cls, token: str) -> str | None:
+        """回傳 Token 的 scope（一般 Token 為 None）."""
         payload = cls.decode_token(token)
         if not payload:
-            return False
-        return payload.get("scope") == EXTENSION_SCOPE
+            return None
+        scope = payload.get("scope")
+        return scope if isinstance(scope, str) else None
+
+    @classmethod
+    def is_extension_token(cls, token: str) -> bool:
+        """判斷 Token 是否為擴充專用（只能上傳）Token."""
+        return cls.token_scope(token) == EXTENSION_SCOPE
 
     @staticmethod
     def create_refresh_token(user_id: str) -> str:
@@ -91,22 +99,13 @@ class AuthService:
         expire = datetime.now(UTC) + timedelta(
             days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS
         )
-        payload = {
-            "sub": user_id,
-            "exp": expire,
-            "type": "refresh",
-        }
-        return jwt.encode(
-            payload,
-            settings.JWT_SECRET_KEY,
-            algorithm=settings.JWT_ALGORITHM,
-        )
+        return AuthService._encode({"sub": user_id, "exp": expire, "type": "refresh"})
 
     @staticmethod
-    def decode_token(token: str) -> dict[str, str] | None:
+    def decode_token(token: str) -> dict[str, Any] | None:
         """解碼 Token."""
         try:
-            payload: dict[str, str] = jwt.decode(
+            payload: dict[str, Any] = jwt.decode(
                 token,
                 settings.JWT_SECRET_KEY,
                 algorithms=[settings.JWT_ALGORITHM],
@@ -116,6 +115,24 @@ class AuthService:
             return None
         except jwt.InvalidTokenError:
             return None
+
+    @staticmethod
+    def user_extension_token_version(user: User) -> int:
+        """使用者目前的 extension_token_version（尚未有值時視為 0）."""
+        version = getattr(user, "extension_token_version", 0)
+        return version if isinstance(version, int) else 0
+
+    @classmethod
+    def extension_version_matches(cls, payload: dict[str, Any], user: User) -> bool:
+        """擴充 Token 的 ver 是否等於使用者目前的 extension_token_version."""
+        ver = payload.get("ver")
+        return isinstance(ver, int) and ver == cls.user_extension_token_version(user)
+
+    def revoke_extension_tokens(self, user: User) -> int:
+        """撤銷這個使用者先前發出的所有擴充 Token（網站 Token 不受影響）."""
+        user.extension_token_version = self.user_extension_token_version(user) + 1
+        self.db.commit()
+        return user.extension_token_version
 
     def get_user_by_email(self, email: str) -> User | None:
         """根據 email 取得使用者."""
@@ -230,16 +247,32 @@ class AuthService:
             None,
         )
 
-    def get_current_user(self, token: str) -> User | None:
-        """從 Token 取得當前使用者."""
+    def authenticate(self, token: str) -> tuple[User | None, str | None]:
+        """驗證存取 Token，回傳 (使用者, scope)；無效、過期或已撤銷回傳 (None, None).
+
+        只有擴充 Token 會檢查 ver（extension_token_version）；網站 Token 照舊。
+        """
         payload = self.decode_token(token)
-        if not payload:
-            return None
-
-        if payload.get("type") != "access":
-            return None
-
+        if not payload or payload.get("type") != "access":
+            return None, None
         user_id = payload.get("sub")
-        if not user_id:
-            return None
-        return self.get_user_by_id(user_id)
+        if not isinstance(user_id, str) or not user_id:
+            return None, None
+        user = self.get_user_by_id(user_id)
+        if not user:
+            return None, None
+        scope = payload.get("scope")
+        if scope is None:
+            return user, None
+        if not isinstance(scope, str):
+            return None, None
+        if scope == EXTENSION_SCOPE and not self.extension_version_matches(
+            payload, user
+        ):
+            return None, None
+        return user, scope
+
+    def get_current_user(self, token: str) -> User | None:
+        """從 Token 取得當前使用者（不檢查 scope；scope 由 dependencies 把關）."""
+        user, _scope = self.authenticate(token)
+        return user

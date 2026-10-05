@@ -26,12 +26,39 @@ describe('popup.html', () => {
   });
 });
 
+describe('upload hint', () => {
+  const html = read('popup/popup.html');
+  const js = read('popup/popup.js');
+
+  it('sits above the upload button, which starts disabled with a hint', () => {
+    const hint = html.match(/<p id="upload-hint"[^>]*>([^<]*)<\/p>/);
+    assert.ok(hint, 'hint line missing');
+    assert.ok(hint[1].length > 0, 'initial grey button must have a hint');
+    assert.ok(html.indexOf('id="upload-hint"') < html.indexOf('id="sync-btn"'));
+    assert.match(html, /<button id="sync-btn"[^>]*\bdisabled\b/);
+  });
+
+  it('button and hint are driven by uploadState together', () => {
+    assert.match(js, /uploadHintEl\.textContent = state\.hint/);
+    assert.match(js, /syncBtn\.disabled = !state\.canUpload/);
+    // 其他地方只有「上傳中」會把按鈕變灰，而且同時顯示說明
+    const disables = js.match(/syncBtn\.disabled = true/g) ?? [];
+    assert.equal(disables.length, 1);
+    assert.match(js, /syncBtn\.disabled = true;[\s\S]{0,120}UPLOAD_HINTS\.UPLOADING/);
+  });
+});
+
 describe('popup.js', () => {
   const js = read('popup/popup.js');
 
   it('never asks for or sends credentials', () => {
     assert.doesNotMatch(js, /password/i);
-    assert.doesNotMatch(js, /sendMessage\('login'/);
+    assert.doesNotMatch(js, /runtime\.sendMessage\(/);
+  });
+
+  it('has exactly one request: the upload to our API', () => {
+    assert.equal(js.match(/\bfetch\s*\(/g).length, 1);
+    assert.match(js, /fetch\(`\$\{API_BASE_URL\}\$\{endpoint\}`/);
   });
 
   it('opens the tool site (and only the tool site) in a new tab', () => {

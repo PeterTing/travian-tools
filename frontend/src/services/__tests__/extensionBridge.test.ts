@@ -1,12 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const post = vi.fn()
-vi.mock('../api', () => ({ default: { post: (...args: unknown[]) => post(...args) } }))
+const get = vi.fn()
+vi.mock('../api', () => ({
+  default: {
+    post: (...args: unknown[]) => post(...args),
+    get: (...args: unknown[]) => get(...args),
+  },
+}))
 
 import {
   EXTENSION_MESSAGE,
   clearExtensionLogin,
   getExtensionIds,
+  resendAccountsToExtension,
   shareLoginWithExtension,
 } from '../extensionBridge'
 
@@ -31,6 +38,16 @@ describe('extensionBridge', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_EXTENSION_ID', EXT_ID)
     post.mockReset()
+    get.mockReset()
+    get.mockResolvedValue({
+      data: {
+        accounts: [
+          { account_id: 'a1', player_name: 'PeterT', server_name: 'ts3', server_url: 'https://ts3.example' },
+          { account_id: 'a2', player_name: null, server_name: null, server_url: 'https://ts5.example' },
+        ],
+        total: 2,
+      },
+    })
   })
 
   afterEach(() => {
@@ -81,7 +98,27 @@ describe('extensionBridge', () => {
       access_token: 'ext.jwt.token',
       expires_at: '2026-10-05T11:00:00Z',
       user: { username: 'petert', email: 'p@example.com' },
+      accounts: [
+        { account_id: 'a1', label: 'PeterT · ts3' },
+        { account_id: 'a2', label: '未命名 · https://ts5.example' },
+      ],
     })
+  })
+
+  it('still hands over the token when the account list cannot be loaded', async () => {
+    get.mockRejectedValue(new Error('500'))
+    post.mockResolvedValue({
+      data: {
+        access_token: 't.t.t',
+        token_type: 'bearer',
+        expires_at: '2026-10-05T11:00:00Z',
+        expires_in: 60,
+        user: { user_id: 'u1', username: 'petert', email: 'p@example.com' },
+      },
+    })
+    const runtime = installChrome(() => ({ success: true }))
+    expect(await shareLoginWithExtension()).toBe(1)
+    expect(runtime.sendMessage.mock.calls[1][1]).toMatchObject({ accounts: [] })
   })
 
   it('swallows backend errors so site login still works', async () => {
@@ -98,5 +135,29 @@ describe('extensionBridge', () => {
       { type: EXTENSION_MESSAGE.CLEAR },
       expect.any(Function)
     )
+  })
+
+  it('resendAccountsToExtension hands over the fresh account list', async () => {
+    post.mockResolvedValue({
+      data: {
+        access_token: 'ext.jwt.token2',
+        token_type: 'bearer',
+        expires_at: '2026-10-05T12:00:00Z',
+        expires_in: 28800,
+        user: { user_id: 'u1', username: 'petert', email: 'p@example.com' },
+      },
+    })
+    get.mockResolvedValue({
+      data: {
+        accounts: [{ account_id: 'a9', player_name: 'New', server_name: 'ts9', server_url: 'x' }],
+        total: 1,
+      },
+    })
+    const runtime = installChrome(() => ({ success: true }))
+    expect(await resendAccountsToExtension()).toBe(1)
+    expect(runtime.sendMessage.mock.calls[1][1]).toMatchObject({
+      type: EXTENSION_MESSAGE.SET,
+      accounts: [{ account_id: 'a9', label: 'New · ts9' }],
+    })
   })
 })

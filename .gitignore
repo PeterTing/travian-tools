@@ -116,3 +116,7 @@ coverage/
 backups/
 *.dump.sql
 *.dump.sql.gz
+
+# Browser-extension signing key (kept outside the repo)
+*.pem
+*.crx

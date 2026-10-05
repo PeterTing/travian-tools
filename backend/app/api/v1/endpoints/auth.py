@@ -1,12 +1,10 @@
 """認證 API 端點."""
 
 from datetime import UTC, datetime
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi import APIRouter, HTTPException, status
 
-from app.core.dependencies import CurrentUser, DBSession, security
+from app.core.dependencies import CurrentUser, DBSession
 from app.domain.schemas.auth import (
     ExtensionTokenResponse,
     MessageResponse,
@@ -76,7 +74,12 @@ async def login(request: UserLoginRequest, db: DBSession) -> TokenResponse:
     description="使用刷新 Token 取得新的存取 Token",
 )
 async def refresh_token(request: TokenRefreshRequest, db: DBSession) -> TokenResponse:
-    """刷新 Token."""
+    """刷新 Token（擴充上傳 Token 一律 403）."""
+    if AuthService.is_extension_token(request.refresh_token):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="擴充憑證不能刷新，請在工具網站登入",
+        )
     auth_service = AuthService(db)
     token, error = auth_service.refresh_tokens(request.refresh_token)
 
@@ -109,18 +112,14 @@ async def get_me(current_user: CurrentUser) -> UserResponse:
         "擴充專用 Token 不能再拿來換發。"
     ),
 )
-async def create_extension_token(
-    current_user: CurrentUser,
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)],
-) -> ExtensionTokenResponse:
-    """換發擴充登入憑證."""
-    if credentials and AuthService.is_extension_token(credentials.credentials):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="擴充憑證不能再換發新的憑證，請在工具網站登入",
-        )
+async def create_extension_token(current_user: CurrentUser) -> ExtensionTokenResponse:
+    """換發擴充登入憑證.
 
-    token, expires_at = AuthService.create_extension_token(current_user.user_id)
+    CurrentUser 已經擋掉擴充上傳 Token（403），所以擴充不能自己續期。
+    """
+    token, expires_at = AuthService.create_extension_token(
+        current_user.user_id, AuthService.user_extension_token_version(current_user)
+    )
     expires_in = max(0, int((expires_at - datetime.now(UTC)).total_seconds()))
     return ExtensionTokenResponse(
         access_token=token,
@@ -134,12 +133,14 @@ async def create_extension_token(
     "/logout",
     response_model=MessageResponse,
     summary="使用者登出",
-    description="登出當前使用者（前端應清除 Token）",
+    description="登出，並撤銷先前交給擴充的上傳 Token（網站 Token 不受影響）",
 )
-async def logout(current_user: CurrentUser) -> MessageResponse:
+async def logout(current_user: CurrentUser, db: DBSession) -> MessageResponse:
     """使用者登出.
 
-    Note: 由於 JWT 是無狀態的，實際的 Token 失效需要在前端處理。
-    如需要伺服器端失效，可以實作 Token 黑名單機制。
+    extension_token_version +1：先前交給擴充的上傳 Token 立刻失效（401）。
+    網站自己的 access / refresh Token 不受影響（其他裝置不會被登出；
+    「登出所有裝置」不在範圍內），前端照舊自行清除。
     """
+    AuthService(db).revoke_extension_tokens(current_user)
     return MessageResponse(message="登出成功")

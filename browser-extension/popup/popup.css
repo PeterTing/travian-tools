@@ -43,6 +43,16 @@ body {
   margin: 4px 0 10px;
 }
 
+/* 「目前頁面」和下面的說明文字靠近一點 */
+#page-line {
+  margin-bottom: 2px;
+}
+
+/* 可以上傳時（沒有說明文字），按鈕跟上一行之間留一點距離 */
+#upload-hint.hidden + .btn {
+  margin-top: 10px;
+}
+
 .note {
   margin-top: 8px;
 }

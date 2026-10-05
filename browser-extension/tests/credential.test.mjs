@@ -53,7 +53,24 @@ describe('normalizeCredential', () => {
       access_token: TOKEN,
       expires_at: NOW + 8 * HOUR,
       user: { username: 'petert', email: 'p@example.com' },
+      accounts: [],
     });
+  });
+
+  it('keeps sanitized account choices handed over by the site', () => {
+    const cred = normalizeCredential(
+      {
+        access_token: TOKEN,
+        expires_at: NOW + HOUR,
+        accounts: [
+          { account_id: 'a1', label: 'PeterT · ts3', password: 'x' },
+          { label: 'no id' },
+          null,
+        ],
+      },
+      NOW,
+    );
+    assert.deepEqual(cred.accounts, [{ account_id: 'a1', label: 'PeterT · ts3' }]);
   });
 
   it('rejects missing expiry, expired, nearly expired and over-long tokens', () => {
@@ -84,7 +101,7 @@ describe('isExpired', () => {
 
 describe('loadCredential', () => {
   it('returns a valid credential', async () => {
-    const cred = { access_token: TOKEN, expires_at: NOW + HOUR, user: null };
+    const cred = { access_token: TOKEN, expires_at: NOW + HOUR, user: null, accounts: [] };
     const storage = memoryStorage({ [CREDENTIAL_KEY]: cred });
     assert.deepEqual(await loadCredential(storage, NOW), cred);
     assert.deepEqual(storage.data[CREDENTIAL_KEY], cred);

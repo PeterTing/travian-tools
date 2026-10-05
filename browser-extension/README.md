@@ -27,7 +27,7 @@
 
 ## 使用方式
 
-1. 安裝擴展後，到 `chrome://extensions/` 複製擴充 ID，設定到網站的 `VITE_EXTENSION_ID`（`.env`），重開前端
+1. 安裝擴展（載入未封裝項目）。`manifest.json` 有固定的 `key`，擴充 ID 一定是 `nkgbmaokaapljaciiifbhgohlejmdcdn`，也是網站 `VITE_EXTENSION_ID` 的預設值（`.env.example`、`docker-compose.yml`）
 2. 點擊瀏覽器工具列中的 Travian Tools 圖示
 3. 沒登入時 popup 只有一顆「在工具網站登入」，會開新分頁到工具網站；在網站登入後，網站會把有到期時間的登入憑證交給擴充（popup 裡沒有任何輸入框，也不會問遊戲密碼）
 4. 回到遊戲分頁，再點一次圖示，選擇要存到哪個遊戲帳號
@@ -38,7 +38,16 @@
 - 由工具網站在登入時（以及每次打開網站時）呼叫 `POST /api/v1/auth/extension-token` 換發，預設 8 小時到期（後端 `JWT_EXTENSION_TOKEN_EXPIRE_MINUTES`）
 - 只有 `manifest.json` 的 `externally_connectable.matches` 列出的網站能交憑證；background 還會再檢查一次來源（`lib/config.js` 的 `TRUSTED_SITE_ORIGINS`，兩邊要一致）
 - 過期就視為登出，讀取時自動清掉；擴充「登出擴充」與網站登出都會清掉
+- 只能上傳（`scope=extension_upload`）：後端只有 popup 會呼叫的 4 個 `/sync/*` 上傳 API 接受，其他 API 一律 403；「存到」的帳號選項由網站跟憑證一起交過來
+- 伺服器端撤銷：網站登出會把使用者的 `extension_token_version` +1，之前發出的擴充憑證立刻 401（popup 收到 401 會清掉本地憑證）；網站自己在其他裝置的登入不受影響
+- 擴充沒有計時器、輪詢或自行發出的請求，背景程式只回應工具網站傳來的訊息；唯一的請求是 popup 按「上傳這一頁」時送到工具 API
 - 正式網域在 P0-12 部署定案後，加到 `externally_connectable.matches` 與 `TRUSTED_SITE_ORIGINS`
+
+### 擴充 ID 與 key
+
+- 擴充 ID：`nkgbmaokaapljaciiifbhgohlejmdcdn`（由 `manifest.json` 的 `key` 公鑰推導）
+- 對應的私鑰**不在 repo 裡**（只在 Peter 的工作環境），只有要打包 `.crx` 時才需要；開發時「載入未封裝項目」只要公鑰。
+- 換 key 時要同時更新 `.env.example`、`docker-compose.yml`、這份 README（`tests/manifest-key.test.mjs` 會檢查三處一致）
 
 ### 測試
 
