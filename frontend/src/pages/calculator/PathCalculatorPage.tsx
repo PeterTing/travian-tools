@@ -57,7 +57,7 @@ export default function PathCalculatorPage() {
     'w-full min-w-0 max-w-full rounded border border-input bg-background p-2 text-sm'
 
   return (
-    <div className="mx-auto w-full max-w-5xl min-w-0 overflow-x-hidden px-3 py-4 sm:px-4">
+    <div className="mx-auto w-full max-w-5xl min-w-0 overflow-x-clip px-3 py-4 sm:px-4">
       <div className="mb-4 rounded-xl border bg-card p-4">
         <h1 className="mb-2 text-xl font-semibold">{t('pathCalc.title')}</h1>
         <p className="text-sm text-muted-foreground">{t('pathCalc.intro')}</p>
