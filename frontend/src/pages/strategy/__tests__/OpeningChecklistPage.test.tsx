@@ -36,8 +36,10 @@ const openingChecklistApi = vi.hoisted(() => {
       world_id: `world-${accountId}`,
       strategy,
       checked_step_ids: ids,
-      checked_count: ids.length,
-      total_steps: 0,
+      required_checked: ids.length,
+      required_total: 0,
+      optional_checked: 0,
+      optional_total: 0,
     }
   }
   return {
@@ -140,6 +142,31 @@ describe('起手式清單 (P0-10)', () => {
     expect(sectionButton('任務等級 1')).toHaveAttribute('aria-expanded', 'false')
     expect(sectionButton('任務等級 1')).toHaveTextContent('這段都做完了')
     expect(sectionButton('任務等級 2')).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('the optional section has its own count and never moves the main progress', async () => {
+    renderPage()
+    await loaded()
+    const optional = sectionButton('選做：便宜的文明點建築')
+    expect(optional).toHaveTextContent('選做 0 / 2')
+    expect(optional).toHaveTextContent('…還有 2 步')
+    fireEvent.click(optional)
+    fireEvent.click(screen.getByRole('checkbox', { name: '完成：大使館 升到 1' }))
+    await waitFor(() => expect(openingChecklistApi.setStep).toHaveBeenLastCalledWith('acc-ts3', '4p-farm', 'r095', true))
+    expect(sectionButton('選做：便宜的文明點建築')).toHaveTextContent('選做 1 / 2')
+    expect(progressText()).toHaveTextContent('0 / 5 步')
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+  })
+
+  it('all required steps done is 100% even with no optional step done', async () => {
+    db.progress['acc-ts3/4p-farm'] = ['r003', 'r004', 'r010', 'r058', 'r084']
+    renderPage()
+    await waitFor(() => expect(progressText()).toHaveTextContent('5 / 5 步'))
+    const bar = screen.getByRole('progressbar')
+    expect(bar).toHaveAttribute('aria-valuenow', '5')
+    expect(bar).toHaveAttribute('aria-valuemax', '5')
+    expect((bar.firstElementChild as HTMLElement).style.width).toBe('100%')
+    expect(sectionButton('選做：便宜的文明點建築')).toHaveTextContent('選做 0 / 2')
   })
 
   it('checks and unchecks a step, strikes it through, and saves it for this account and strategy', async () => {

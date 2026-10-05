@@ -36,7 +36,12 @@ def test_two_strategies_from_the_english_sheets(data: dict) -> None:
 def test_steps_are_unique_and_complete(data: dict, strategy: str) -> None:
     s = next(x for x in data["strategies"] if x["id"] == strategy)
     ids = [st["id"] for sec in s["sections"] for st in sec["steps"]]
-    assert len(ids) == len(set(ids)) == s["total_steps"]
+    assert len(ids) == len(set(ids)) == s["required_steps"] + s["optional_steps"]
+    # 只有「選做：便宜的文明點建築」是選做，而且在最後一段
+    optional = [sec for sec in s["sections"] if sec["optional"]]
+    assert [sec["id"] for sec in optional] == ["extra-cp"]
+    assert s["sections"][-1]["id"] == "extra-cp"
+    assert s["optional_steps"] == len(optional[0]["steps"]) == 15
     rows = [int(i[1:]) for i in ids]
     assert rows == sorted(rows), "照 Excel 的順序"
     for sec in s["sections"]:

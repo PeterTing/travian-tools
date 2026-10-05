@@ -22,6 +22,7 @@ from app.services.opening_checklist_service import (
     OpeningChecklistService,
     UnknownStepError,
     load_checklist,
+    optional_step_ids,
     step_order,
 )
 
@@ -43,13 +44,17 @@ def _progress(
     account: GameAccount, strategy: OpeningStrategy, checked: list[str]
 ) -> OpeningProgressResponse:
     assert account.world_id is not None  # get_account 已經補上世界
+    optional = optional_step_ids(strategy.value)
     return OpeningProgressResponse(
         account_id=account.account_id,
         world_id=account.world_id,
         strategy=strategy,
         checked_step_ids=checked,
-        checked_count=len(checked),
-        total_steps=len(step_order(strategy.value)),
+        # 主進度只算必做；選做（便宜的文明點建築）另外算
+        required_checked=sum(1 for sid in checked if sid not in optional),
+        required_total=len(step_order(strategy.value)) - len(optional),
+        optional_checked=sum(1 for sid in checked if sid in optional),
+        optional_total=len(optional),
     )
 
 

@@ -40,6 +40,34 @@ export function remainingSteps(section: OpeningSection, checked: ReadonlySet<str
   return section.steps.filter((s) => !checked.has(s.id)).length
 }
 
+export interface ProgressCounts {
+  requiredDone: number
+  requiredTotal: number
+  optionalDone: number
+  optionalTotal: number
+}
+
+/** 主進度只算必做的步驟；選做段落（便宜的文明點建築）另外算 */
+export function progressCounts(
+  sections: OpeningSection[],
+  checked: ReadonlySet<string>
+): ProgressCounts {
+  const counts: ProgressCounts = { requiredDone: 0, requiredTotal: 0, optionalDone: 0, optionalTotal: 0 }
+  for (const section of sections) {
+    for (const step of section.steps) {
+      const done = checked.has(step.id)
+      if (section.optional) {
+        counts.optionalTotal += 1
+        if (done) counts.optionalDone += 1
+      } else {
+        counts.requiredTotal += 1
+        if (done) counts.requiredDone += 1
+      }
+    }
+  }
+  return counts
+}
+
 /** 預設只展開第一個還有沒勾的段落；全部做完就都收起來 */
 export function defaultOpenSection(
   sections: OpeningSection[],

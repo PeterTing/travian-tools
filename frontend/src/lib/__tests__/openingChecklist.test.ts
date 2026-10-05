@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { defaultOpenSection, formatAmount, remainingSteps, resolveStep } from '@/lib/openingChecklist'
+import {
+  defaultOpenSection,
+  formatAmount,
+  progressCounts,
+  remainingSteps,
+  resolveStep,
+} from '@/lib/openingChecklist'
 import { makeOpeningChecklist } from '@/test/openingChecklistFixture'
 
 const sections = () => makeOpeningChecklist().strategies[0].sections
@@ -34,7 +40,23 @@ describe('opening checklist helpers (P0-10)', () => {
   it('opens the first section that still has unfinished steps', () => {
     expect(defaultOpenSection(sections(), new Set())).toBe('tier-1')
     expect(defaultOpenSection(sections(), new Set(['r003', 'r004']))).toBe('tier-2')
-    expect(defaultOpenSection(sections(), new Set(['r003', 'r004', 'r010', 'r058', 'r084']))).toBeNull()
+    // 必做都勾完了，接著是選做段落
+    const required = ['r003', 'r004', 'r010', 'r058', 'r084']
+    expect(defaultOpenSection(sections(), new Set(required))).toBe('extra-cp')
+    expect(defaultOpenSection(sections(), new Set([...required, 'r095', 'r096']))).toBeNull()
+  })
+
+  it('main progress counts required steps only; optional steps are counted separately', () => {
+    expect(progressCounts(sections(), new Set(['r003', 'r095']))).toEqual({
+      requiredDone: 1,
+      requiredTotal: 5,
+      optionalDone: 1,
+      optionalTotal: 2,
+    })
+    // 必做全部勾完＝100%，選做一個都沒勾也一樣
+    const all = progressCounts(sections(), new Set(['r003', 'r004', 'r010', 'r058', 'r084']))
+    expect(all.requiredDone).toBe(all.requiredTotal)
+    expect(all.optionalDone).toBe(0)
   })
 
   it('counts remaining steps per section', () => {

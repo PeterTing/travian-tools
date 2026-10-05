@@ -563,6 +563,7 @@
     "progressLabel": "Opening checklist progress",
     "progressCount": "{{done}} / {{total}} steps · from Peter's Excel",
     "sectionCount": "{{done}} / {{total}}",
+    "optionalCount": "Optional {{done}} / {{total}}",
     "remaining": "…{{count}} more steps",
     "sectionDone": "All done",
     "cost": "Cost {{value}}",

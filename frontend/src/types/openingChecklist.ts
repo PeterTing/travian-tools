@@ -62,6 +62,8 @@ export interface OpeningSection {
   id: string
   title: string
   tier: number | null
+  /** 選做段落（便宜的文明點建築）：不算進主進度，段落自己顯示完成數 */
+  optional: boolean
   intro: OpeningAdvice | null
   steps: OpeningStep[]
 }
@@ -71,7 +73,10 @@ export interface OpeningStrategy {
   name: string
   sheet: string
   parties: number
-  total_steps: number
+  /** 必做步驟數（主進度的分母） */
+  required_steps: number
+  /** 選做步驟數 */
+  optional_steps: number
   sections: OpeningSection[]
 }
 
@@ -119,6 +124,8 @@ export interface OpeningProgress {
   world_id: string
   strategy: OpeningStrategyId
   checked_step_ids: string[]
-  checked_count: number
-  total_steps: number
+  required_checked: number
+  required_total: number
+  optional_checked: number
+  optional_total: number
 }

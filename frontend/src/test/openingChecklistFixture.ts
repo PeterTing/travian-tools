@@ -29,12 +29,14 @@ export function makeOpeningChecklist(): OpeningChecklistData {
         name: '4P 農開',
         sheet: '4P - Farm',
         parties: 4,
-        total_steps: 5,
+        required_steps: 5,
+        optional_steps: 2,
         sections: [
           {
             id: 'tier-1',
             title: '任務等級 1',
             tier: 1,
+            optional: false,
             intro: null,
             steps: [
               step({
@@ -51,6 +53,7 @@ export function makeOpeningChecklist(): OpeningChecklistData {
             id: 'tier-2',
             title: '任務等級 2',
             tier: 2,
+            optional: false,
             intro: null,
             steps: [
               step({ id: 'r010', building: '泥坑', tier: 2 }),
@@ -81,6 +84,17 @@ export function makeOpeningChecklist(): OpeningChecklistData {
               }),
             ],
           },
+          {
+            id: 'extra-cp',
+            title: '選做：便宜的文明點建築',
+            tier: null,
+            optional: true,
+            intro: { zh: '想多拿文明點時，先蓋這些。', en: 'Cheap CP.', source: 'manual' },
+            steps: [
+              step({ id: 'r095', building: '大使館', tier: null, cp: 5, res_per_cp: 118.4 }),
+              step({ id: 'r096', building: '城鎮廳', tier: null, cp: 6, res_per_cp: 1032.5 }),
+            ],
+          },
         ],
       },
       {
@@ -88,12 +102,14 @@ export function makeOpeningChecklist(): OpeningChecklistData {
         name: '3P 兵開',
         sheet: '3P - Sim',
         parties: 3,
-        total_steps: 2,
+        required_steps: 2,
+        optional_steps: 0,
         sections: [
           {
             id: 'tier-1',
             title: '任務等級 1',
             tier: 1,
+            optional: false,
             intro: null,
             steps: [
               step({ id: 'r003', building: '村莊大樓', cost: null }),

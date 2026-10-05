@@ -27,5 +27,7 @@ class OpeningProgressResponse(BaseModel):
     checked_step_ids: list[str] = Field(
         default_factory=list, description="勾掉的步驟（照清單順序）"
     )
-    checked_count: int
-    total_steps: int
+    required_checked: int = Field(..., description="勾掉的必做步驟數（主進度的分子）")
+    required_total: int = Field(..., description="必做步驟數（主進度的分母）")
+    optional_checked: int = Field(..., description="勾掉的選做步驟數")
+    optional_total: int = Field(..., description="選做步驟數（便宜的文明點建築）")

@@ -44,6 +44,20 @@ def step_order(strategy: str) -> tuple[str, ...]:
     raise KeyError(strategy)
 
 
+@cache
+def optional_step_ids(strategy: str) -> frozenset[str]:
+    """選做段落（便宜的文明點建築）的步驟；不算進主進度."""
+    for s in load_checklist()["strategies"]:
+        if s["id"] == strategy:
+            return frozenset(
+                step["id"]
+                for section in s["sections"]
+                if section.get("optional")
+                for step in section["steps"]
+            )
+    raise KeyError(strategy)
+
+
 class UnknownStepError(LookupError):
     """這個攻略沒有這一步."""
 

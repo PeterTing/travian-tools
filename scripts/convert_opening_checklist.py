@@ -518,7 +518,13 @@ class Converter:
             "name": spec["name"],
             "sheet": sheet,
             "parties": spec["parties"],
-            "total_steps": len(steps),
+            # 主進度只算必做的步驟；選做（便宜的文明點建築）另外算
+            "required_steps": sum(
+                len(sec["steps"]) for sec in sections if not sec["optional"]
+            ),
+            "optional_steps": sum(
+                len(sec["steps"]) for sec in sections if sec["optional"]
+            ),
             "sections": sections,
         }
 
@@ -776,6 +782,8 @@ class Converter:
                             "id": "extra-cp",
                             "title": "選做：便宜的文明點建築",
                             "tier": None,
+                            # 選做：不算進主進度（PM 決定），段落自己顯示完成數
+                            "optional": True,
                             "intro": extra_intro,
                             "steps": [],
                         }
@@ -792,6 +800,7 @@ class Converter:
                         "id": f"tier-{current_max}",
                         "title": f"任務等級 {current_max}",
                         "tier": current_max,
+                        "optional": False,
                         "intro": None,
                         "steps": [],
                     }
@@ -995,7 +1004,10 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("用「部族」，不用「種族」")
     args.output.write_text(text, encoding="utf-8")
     for s in data["strategies"]:
-        print(f"{s['id']}: {s['total_steps']} steps, {len(s['sections'])} sections")
+        print(
+            f"{s['id']}: {s['required_steps']} required + {s['optional_steps']} optional steps, "
+            f"{len(s['sections'])} sections"
+        )
     print(
         f"wrote {args.output.relative_to(REPO) if args.output.is_relative_to(REPO) else args.output}"
     )

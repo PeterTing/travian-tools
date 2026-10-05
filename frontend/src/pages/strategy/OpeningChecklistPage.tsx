@@ -10,6 +10,7 @@ import {
   OPENING_TRIBES,
   defaultOpenSection,
   formatAmount,
+  progressCounts,
   remainingSteps,
   resolveStep,
   type ResolvedStep,
@@ -158,8 +159,8 @@ export default function OpeningChecklistPage() {
     )
   }
 
-  const total = strategy.total_steps
-  const done = checked.size
+  // 主進度只算必做；選做段落自己顯示完成數
+  const { requiredDone: done, requiredTotal: total } = progressCounts(strategy.sections, checked)
   const canCheck = !!accountId && progressLoaded
 
   return (
@@ -323,7 +324,10 @@ function ChecklistSection({
           </span>
           <span className="flex items-center gap-1 text-xs text-muted-foreground">
             {remaining === 0 && <Check className="h-3.5 w-3.5 text-green-600" aria-hidden />}
-            {t('opening.sectionCount', { done: total - remaining, total })}
+            {t(section.optional ? 'opening.optionalCount' : 'opening.sectionCount', {
+              done: total - remaining,
+              total,
+            })}
           </span>
         </button>
       </h2>

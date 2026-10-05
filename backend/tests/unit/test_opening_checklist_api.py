@@ -21,7 +21,7 @@ from app.infrastructure.database.models.opening_checklist import (
 )
 from app.infrastructure.database.models.user import User
 from app.main import app
-from app.services.opening_checklist_service import step_order
+from app.services.opening_checklist_service import optional_step_ids, step_order
 
 AsUser = Callable[[str], TestClient]
 
@@ -121,8 +121,14 @@ class TestProgress:
         acc = _account(peter)
         body = peter.get(_url(acc["account_id"])).json()
         assert body["checked_step_ids"] == []
-        assert body["checked_count"] == 0
-        assert body["total_steps"] == len(step_order("4p-farm")) > 50
+        # 主進度只算必做；選做（便宜的文明點建築）另外算
+        assert body["required_checked"] == 0
+        assert body["required_total"] == 86
+        assert body["optional_checked"] == 0
+        assert body["optional_total"] == 15
+        assert body["required_total"] + body["optional_total"] == len(
+            step_order("4p-farm")
+        )
         assert body["world_id"] == acc["world_id"]
         assert body["strategy"] == "4p-farm"
 
@@ -137,7 +143,7 @@ class TestProgress:
         assert resp.json()["checked_step_ids"] == ["r003", "r016"]
         resp = _check(peter, acc, "r016", checked=False)
         assert resp.json()["checked_step_ids"] == ["r003"]
-        assert resp.json()["checked_count"] == 1
+        assert resp.json()["required_checked"] == 1
 
     def test_toggle_is_idempotent(self, as_user: AsUser, session: Session) -> None:
         peter = as_user("u-peter")
@@ -156,6 +162,39 @@ class TestProgress:
         assert _check(peter, acc, "r011", checked=False).status_code == 200
 
 
+class TestOptionalSteps:
+    """選做段落不算進主進度（PM 決定）."""
+
+    def test_optional_steps_do_not_count_toward_main_progress(
+        self, as_user: AsUser
+    ) -> None:
+        peter = as_user("u-peter")
+        acc = _account(peter)["account_id"]
+        optional = sorted(optional_step_ids("4p-farm"))
+        assert len(optional) == 15
+        resp = _check(peter, acc, optional[0])
+        body = resp.json()
+        assert body["required_checked"] == 0
+        assert body["optional_checked"] == 1
+        assert body["checked_step_ids"] == [optional[0]]
+
+    @pytest.mark.parametrize("strategy", ["4p-farm", "3p-sim"])
+    def test_all_required_done_is_complete_without_optional(
+        self, as_user: AsUser, strategy: str
+    ) -> None:
+        peter = as_user("u-peter")
+        acc = _account(peter)["account_id"]
+        optional = optional_step_ids(strategy)
+        required = [sid for sid in step_order(strategy) if sid not in optional]
+        for sid in required:
+            assert _check(peter, acc, sid, strategy=strategy).status_code == 200
+        body = peter.get(_url(acc, strategy)).json()
+        # 必做全部勾完＝100%，選做一個都沒勾也一樣
+        assert body["required_checked"] == body["required_total"] == len(required)
+        assert body["optional_checked"] == 0
+        assert body["optional_total"] == 15
+
+
 class TestIsolation:
     def test_per_strategy(self, as_user: AsUser) -> None:
         peter = as_user("u-peter")
@@ -166,7 +205,8 @@ class TestIsolation:
         sim = peter.get(_url(acc, "3p-sim")).json()
         assert farm["checked_step_ids"] == ["r003"]
         assert sim["checked_step_ids"] == ["r005"]
-        assert sim["total_steps"] == len(step_order("3p-sim"))
+        assert sim["required_total"] == 82
+        assert sim["optional_total"] == 15
 
     def test_per_account(self, as_user: AsUser) -> None:
         peter = as_user("u-peter")

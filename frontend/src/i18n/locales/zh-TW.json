@@ -745,6 +745,7 @@
     "progressLabel": "起手式進度",
     "progressCount": "{{done}} / {{total}} 步 · 內容來自 Peter 的 Excel",
     "sectionCount": "{{done}} / {{total}}",
+    "optionalCount": "選做 {{done}} / {{total}}",
     "remaining": "…還有 {{count}} 步",
     "sectionDone": "這段都做完了",
     "cost": "花費 {{value}}",
