@@ -822,7 +822,10 @@
     "buildingsCount": "{{count}} buildings",
     "buildingLevel": "Lv{{level}}",
     "population": "Pop {{value}}",
-    "fieldsSummary": "{{count}} fields"
+    "fieldsSummary": "{{count}} fields",
+    "selectVillage": "Choose a village to save into",
+    "saveFailed": "Could not save",
+    "emptyError": "Nothing to save from this parse"
   },
   "pathCalc": {
     "title": "Travel Time",

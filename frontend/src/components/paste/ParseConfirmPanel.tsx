@@ -182,11 +182,11 @@ export function ParseConfirmPanel({
   const handleSave = async () => {
     setError('')
     if (!saveable) {
-      setError('沒有可存的解析結果')
+      setError(t('paste.emptyError'))
       return
     }
     if (showVillage && villages.length > 0 && !villageId) {
-      setError('請選擇要存入的村莊')
+      setError(t('paste.selectVillage'))
       return
     }
     if (helpImprove) {
@@ -207,7 +207,7 @@ export function ParseConfirmPanel({
             : parseUtcOffsetDraft(utcOffsetDraft),
       })
     } catch (e) {
-      setError(e instanceof Error ? e.message : '存入失敗')
+      setError(e instanceof Error ? e.message : t('paste.saveFailed'))
     }
   }
 

@@ -919,7 +919,10 @@
     "buildingsCount": "建築 {{count}} 座",
     "buildingLevel": "Lv{{level}}",
     "population": "人口 {{value}}",
-    "fieldsSummary": "田地 {{count}} 格"
+    "fieldsSummary": "田地 {{count}} 格",
+    "selectVillage": "請選擇要存入的村莊",
+    "saveFailed": "存入失敗",
+    "emptyError": "沒有可存的解析結果"
   },
   "confirm": {},
   "pathCalc": {

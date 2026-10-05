@@ -35,7 +35,9 @@ describe('WorldSettings (UTC offset on the world)', () => {
   })
 
   it('saves a manual offset in minutes and can clear it again', async () => {
-    api.update.mockResolvedValueOnce({ ...ts3, utc_offset: 60 })
+    api.update
+      .mockResolvedValueOnce({ ...ts3, utc_offset: 60 })
+      .mockResolvedValueOnce({ ...ts3, utc_offset: null })
     render(<WorldSettings />)
     const select = await screen.findByLabelText('伺服器時區（UTC 時差）')
     fireEvent.change(select, { target: { value: '60' } })
@@ -43,6 +45,16 @@ describe('WorldSettings (UTC offset on the world)', () => {
     await waitFor(() => expect(api.update).toHaveBeenCalledWith('w-ts3', { utc_offset: 60 }))
     expect(await screen.findByTestId('utc-offset-w-ts3-summary')).toHaveTextContent('伺服器時差 UTC+1')
     expect(screen.getByTestId('utc-offset-w-ts3-change')).toHaveTextContent('更改')
+
+    // Clear back to null
+    fireEvent.click(screen.getByTestId('utc-offset-w-ts3-change'))
+    const select2 = await screen.findByLabelText('伺服器時區（UTC 時差）')
+    fireEvent.change(select2, { target: { value: '' } })
+    fireEvent.click(screen.getByRole('button', { name: '儲存' }))
+    await waitFor(() =>
+      expect(api.update).toHaveBeenLastCalledWith('w-ts3', { utc_offset: null }),
+    )
+    expect(await screen.findByLabelText('伺服器時區（UTC 時差）')).toHaveValue('')
   })
 
   it('collapses a set offset to one line and expands on 更改', async () => {
