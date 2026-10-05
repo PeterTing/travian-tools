@@ -114,7 +114,7 @@ export function ParseConfirmPanel({
     }
     if (helpImprove) {
       const ok = window.confirm(
-        '勾選後會把內容（含座標和玩家名稱）送出幫忙改進解析。確定要勾選並存入嗎？',
+        '此選項尚未接上送出。勾選只是預留，現在不會送出內容。仍要勾選並存入嗎？',
       )
       if (!ok) return
     }
@@ -321,9 +321,9 @@ export function ParseConfirmPanel({
             data-testid="help-improve"
           />
           <span>
-            把內容送出幫忙改進解析（預設關閉）
+            把內容送出幫忙改進解析（預設關閉 · 尚未送出）
             <span className="block text-xs text-muted-foreground">
-              勾選前提醒：內容裡有座標和玩家名稱。
+              勾了也不會現在送出。之後接上時會再提醒：內容裡有座標和玩家名稱。
             </span>
           </span>
         </label>

@@ -19,9 +19,9 @@ from app.services.sync_service import SyncService
 MAX_RAW_BYTES = 1_500_000
 DRAFT_TTL = timedelta(hours=2)
 
-INCOMING_KINDS = frozenset(
-    {"incoming_attack", "incoming_raid", "incoming_spy", "incoming_reinforcement"}
-)
+# 來襲列表與存檔一致：攻擊／突襲／偵察（增援另算，P0 不進來襲列表）
+INCOMING_KINDS = frozenset({"incoming_attack", "incoming_raid", "incoming_spy"})
+ARRIVAL_MATCH_TOLERANCE_SECONDS = 2
 
 
 def _utcnow() -> datetime:
@@ -201,7 +201,11 @@ class PasteService:
     ) -> dict[str, Any]:
         account = self._get_account(user_id, account_id)
         if account is None:
-            return {"success": False, "message": "找不到遊戲帳號或無權限"}
+            return {
+                "success": False,
+                "message": "找不到遊戲帳號或無權限",
+                "error_code": "forbidden",
+            }
 
         resolved_village_id = village_id or data.get("village_id")
         if resolved_village_id:
@@ -216,7 +220,11 @@ class PasteService:
                 .first()
             )
             if village is None:
-                return {"success": False, "message": "找不到選定的村莊"}
+                return {
+                    "success": False,
+                    "message": "找不到選定的村莊",
+                    "error_code": "forbidden",
+                }
         else:
             resolved_village_id = None
 
@@ -228,13 +236,8 @@ class PasteService:
                 data.get("incoming_reinforcements") or []
             )
 
-        # Only persist incoming attack/raid (P0-06 來襲列表); keep reinforcements too
-        to_save = [
-            m
-            for m in movements_in
-            if m.get("kind") in INCOMING_KINDS
-            or str(m.get("kind", "")).startswith("incoming_")
-        ]
+        # Only persist 來襲 (attack/raid/spy); reinforcements are not listed in P0-06
+        to_save = [m for m in movements_in if m.get("kind") in INCOMING_KINDS]
 
         # Existing incoming for this account (never auto-delete)
         existing = (
@@ -290,8 +293,34 @@ class PasteService:
         updated = 0
         saved_ids: list[str] = []
 
+        def existing_for_group(gk: tuple) -> list[TroopMovement]:
+            role, headline, arrival_key = gk
+            exact = existing_by_group.get(gk, [])
+            if exact or not arrival_key:
+                return list(exact)
+            # 允許抵達時間差 ±2 秒（重貼時 timer／時鐘可能差一秒）
+            try:
+                base = datetime.strptime(arrival_key, "%Y-%m-%dT%H:%M:%S")
+            except ValueError:
+                return []
+            found: list[TroopMovement] = []
+            used: set[str] = set()
+            for delta in range(
+                -ARRIVAL_MATCH_TOLERANCE_SECONDS, ARRIVAL_MATCH_TOLERANCE_SECONDS + 1
+            ):
+                if delta == 0:
+                    continue
+                alt_key = (base + timedelta(seconds=delta)).strftime(
+                    "%Y-%m-%dT%H:%M:%S"
+                )
+                for row in existing_by_group.get((role, headline, alt_key), []):
+                    if row.movement_id not in used:
+                        found.append(row)
+                        used.add(row.movement_id)
+            return found
+
         for gk, items in new_by_group.items():
-            old_rows = existing_by_group.get(gk, [])
+            old_rows = existing_for_group(gk)
             m = len(old_rows)
             for i, (_key, movement, arrival_at, arrival_key) in enumerate(items):
                 needs = (
@@ -386,7 +415,7 @@ class PasteService:
                 village_id=data.get("village_id") if isinstance(data, dict) else None,
             )
 
-        # village_overview / village_center: reuse SyncService shapes
+        # village_overview / village_center / reports / troop_statistics
         if page_type == "village_overview":
             from app.domain.schemas.sync import (
                 ProductionData,
@@ -420,6 +449,76 @@ class PasteService:
                 "created": 0,
                 "updated": 1 if ok else 0,
                 "total": 1 if ok else 0,
+                "error_code": None if ok else "forbidden",
+            }
+
+        if page_type == "village_center":
+            from app.domain.schemas.sync import (
+                BuildingData,
+                TroopData,
+                VillageCenterSync,
+            )
+
+            travian_id = data.get("travian_village_id")
+            selected = data.get("village_id")
+            # Extension/parser store Travian data-did in village_id; confirm UI may pass our UUID
+            if (
+                isinstance(selected, str)
+                and len(selected) == 36
+                and selected.count("-") == 4
+            ):
+                row = self.db.get(Village, selected)
+                if row is None or row.account_id != account_id:
+                    return {
+                        "success": False,
+                        "message": "找不到選定的村莊",
+                        "error_code": "forbidden",
+                    }
+                travian_id = row.travian_village_id or travian_id
+                village_name = data.get("village_name") or row.name
+                coordinate_x = (
+                    data.get("coordinate_x")
+                    if data.get("coordinate_x") is not None
+                    else row.coordinate_x
+                )
+                coordinate_y = (
+                    data.get("coordinate_y")
+                    if data.get("coordinate_y") is not None
+                    else row.coordinate_y
+                )
+                population = int(data.get("population") or row.population or 0)
+                is_capital = bool(data.get("is_capital") or row.is_capital)
+            else:
+                travian_id = travian_id or selected
+                village_name = data.get("village_name")
+                coordinate_x = data.get("coordinate_x")
+                coordinate_y = data.get("coordinate_y")
+                population = int(data.get("population") or 0)
+                is_capital = bool(data.get("is_capital") or False)
+
+            center_body = VillageCenterSync(
+                account_id=account_id,
+                village_id=str(travian_id) if travian_id else None,
+                village_name=village_name,
+                coordinate_x=coordinate_x,
+                coordinate_y=coordinate_y,
+                population=population,
+                is_capital=is_capital,
+                capital_village_id=data.get("capital_village_id"),
+                buildings=[BuildingData(**b) for b in (data.get("buildings") or [])],
+                troops=[TroopData(**tr) for tr in (data.get("troops") or [])],
+            )
+            ok, message, village_id = self.sync.sync_village_center(
+                user_id, center_body
+            )
+            return {
+                "success": ok,
+                "message": message,
+                "village_id": village_id,
+                "created": 0,
+                "updated": 1 if ok else 0,
+                "total": 1 if ok else 0,
+                "error_code": None if ok else "forbidden",
             }
 
         if page_type == "reports":
@@ -438,65 +537,85 @@ class PasteService:
                 "created": new_count,
                 "updated": updated_count,
                 "total": count,
+                "error_code": None if ok else "forbidden",
             }
 
+        if page_type == "troop_statistics":
+            from app.domain.schemas.sync import (
+                TroopData,
+                TroopStatisticsSync,
+                VillageTroopsData,
+            )
+
+            villages: list[VillageTroopsData] = []
+            for v in data.get("villages_troops") or []:
+                vid = str(v.get("village_id") or "")
+                if not vid:
+                    continue
+                villages.append(
+                    VillageTroopsData(
+                        village_id=vid,
+                        village_name=v.get("village_name"),
+                        troops=[TroopData(**tr) for tr in (v.get("troops") or [])],
+                    )
+                )
+            if not villages:
+                return {
+                    "success": False,
+                    "message": "軍隊統計沒有可存的村莊部隊",
+                    "created": 0,
+                    "updated": 0,
+                    "total": 0,
+                    "error_code": "unsupported",
+                }
+            troop_body = TroopStatisticsSync(
+                account_id=account_id, villages_troops=villages
+            )
+            ok, message, villages_synced, troops_synced = (
+                self.sync.sync_troop_statistics(user_id, troop_body)
+            )
+            if not ok or troops_synced == 0:
+                return {
+                    "success": False,
+                    "message": message if not ok else "軍隊統計沒有寫入任何部隊",
+                    "created": 0,
+                    "updated": 0,
+                    "total": 0,
+                    "error_code": "forbidden" if not ok else "unsupported",
+                }
+            return {
+                "success": True,
+                "message": message,
+                "created": troops_synced,
+                "updated": 0,
+                "total": troops_synced,
+                "villages_synced": villages_synced,
+            }
+
+        # statistics_* paste without a real writer must not fake success
         if page_type in (
             "statistics_overview",
             "statistics_resources",
-            "troop_statistics",
+            "statistics_culturepoints",
+            "statistics_troops",
         ):
-            # Upsert villages by name from statistics paste (minimal)
-            account = self._get_account(user_id, account_id)
-            if account is None:
-                return {"success": False, "message": "找不到遊戲帳號或無權限"}
-            villages = data.get("villages") or data.get("villages_troops") or []
-            created = updated = 0
-            for v in villages:
-                name = v.get("name") or v.get("village_name")
-                if not name:
-                    continue
-                existing = (
-                    self.db.query(Village)
-                    .filter(
-                        Village.account_id == account_id,
-                        Village.name == name,
-                    )
-                    .first()
-                )
-                if existing:
-                    if "wood" in v:
-                        existing.wood = int(v.get("wood") or 0)
-                        existing.clay = int(v.get("clay") or 0)
-                        existing.iron = int(v.get("iron") or 0)
-                        existing.crop = int(v.get("crop") or 0)
-                    updated += 1
-                else:
-                    # skip create without coordinates for safety
-                    if v.get("coordinate_x") is None:
-                        continue
-                    row = Village(
-                        account_id=account_id,
-                        name=name,
-                        coordinate_x=int(v["coordinate_x"]),
-                        coordinate_y=int(v.get("coordinate_y") or 0),
-                        wood=int(v.get("wood") or 0),
-                        clay=int(v.get("clay") or 0),
-                        iron=int(v.get("iron") or 0),
-                        crop=int(v.get("crop") or 0),
-                    )
-                    self.db.add(row)
-                    created += 1
-            self.db.commit()
             return {
-                "success": True,
-                "message": f"更新 {updated} 村"
-                + (f"、新增 {created}" if created else ""),
-                "created": created,
-                "updated": updated,
-                "total": created + updated,
+                "success": False,
+                "message": f"還不能存這種頁面：{page_type}",
+                "created": 0,
+                "updated": 0,
+                "total": 0,
+                "error_code": "unsupported",
             }
 
-        return {"success": False, "message": f"還不能存這種頁面：{page_type}"}
+        return {
+            "success": False,
+            "message": f"還不能存這種頁面：{page_type}",
+            "created": 0,
+            "updated": 0,
+            "total": 0,
+            "error_code": "unsupported",
+        }
 
     def list_incoming(
         self, user_id: str, account_id: str

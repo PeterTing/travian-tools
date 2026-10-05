@@ -148,10 +148,14 @@ def confirm_paste(
             server_time=data.server_time,
         )
     if not result.get("success"):
+        code = status.HTTP_403_FORBIDDEN
+        if result.get("error_code") == "unsupported":
+            code = status.HTTP_400_BAD_REQUEST
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=code,
             detail=result.get("message") or "存入失敗",
         )
+    # help_improve 尚未接上送出管線；前端標「尚未送出」
     _ = data.help_improve
     return ConfirmResponse(
         success=True,
