@@ -10,6 +10,8 @@ from app.domain.schemas.game_world import GameWorldUpdate
 from app.domain.schemas.paste import (
     ConfirmRequest,
     ConfirmResponse,
+    DiffPreviewRequest,
+    DiffPreviewResponse,
     DraftCreateRequest,
     DraftResponse,
     MovementCoordsUpdate,
@@ -85,6 +87,51 @@ def get_draft(
             status_code=status.HTTP_404_NOT_FOUND, detail="草稿不存在或已過期"
         )
     return _draft_response(draft)
+
+
+@router.post(
+    "/paste/preview-diff",
+    response_model=DiffPreviewResponse,
+    summary="集結點確認前預覽新增／更新筆數（不寫入）",
+)
+def preview_paste_diff(
+    data: DiffPreviewRequest,
+    db: DBSession,
+    current_user: CurrentUser,
+) -> DiffPreviewResponse:
+    if data.page_type != "rally_point":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="目前只有集結點支援預覽比對",
+        )
+    payload = dict(data.data or {})
+    if data.village_id:
+        payload["village_id"] = data.village_id
+    result = PasteService(db).preview_rally_diff(
+        current_user.user_id,
+        account_id=data.account_id,
+        data=payload,
+        capture_at=data.capture_at,
+        source=data.source,
+        server_time=data.server_time,
+        village_id=data.village_id,
+    )
+    if not result.get("success"):
+        code = status.HTTP_403_FORBIDDEN
+        if result.get("error_code") in ("unsupported", "empty_parse"):
+            code = status.HTTP_400_BAD_REQUEST
+        raise HTTPException(
+            status_code=code,
+            detail=result.get("message") or "預覽失敗",
+        )
+    return DiffPreviewResponse(
+        success=True,
+        message=str(result.get("message") or "ok"),
+        created=int(result.get("created") or 0),
+        updated=int(result.get("updated") or 0),
+        total=int(result.get("total") or 0),
+        village_id=result.get("village_id"),
+    )
 
 
 @router.post(
@@ -177,13 +224,19 @@ def list_movements(
     db: DBSession,
     current_user: CurrentUser,
     account_id: str = Query(...),
+    village_id: str | None = Query(
+        None, description="只顯示該村莊來襲；省略＝全部村莊"
+    ),
 ) -> MovementListResponse:
-    ok, message, rows = PasteService(db).list_incoming(current_user.user_id, account_id)
+    ok, message, rows = PasteService(db).list_incoming(
+        current_user.user_id, account_id, village_id=village_id
+    )
     if not ok:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=message)
     items = [
         MovementResponse(
             movement_id=r.movement_id,
+            village_id=r.village_id,
             kind=r.kind,
             role=r.role,
             headline=r.headline,
@@ -220,6 +273,7 @@ def patch_movement_coords(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=message)
     return MovementResponse(
         movement_id=row.movement_id,
+        village_id=row.village_id,
         kind=row.kind,
         role=row.role,
         headline=row.headline,

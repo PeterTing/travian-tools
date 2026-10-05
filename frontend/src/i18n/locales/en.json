@@ -51,6 +51,19 @@
     "battleSimulator": {
       "title": "Battle Simulator",
       "description": "Simulate attack and defense battle results"
+    },
+    "recentUploads": {
+      "title": "Recent uploads",
+      "empty": "No uploads yet. Confirmed pastes will show up here.",
+      "justNow": "just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{{count}} days ago"
+    },
+    "incoming": {
+      "villageFilter": "Village:",
+      "allVillages": "All villages"
     }
   },
   "notFound": {

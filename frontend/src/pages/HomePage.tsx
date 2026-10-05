@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -12,7 +12,21 @@ import {
   pageTypeLabel,
   PASTE_FORMAT_HELP,
 } from '@/lib/pasteFormat'
+import {
+  formatRecentUploadLine,
+  isSuccessfulSync,
+  relativeAgo,
+} from '@/lib/recentUploads'
 import { pasteApi, type Movement } from '@/services/pasteApi'
+import { syncApi, type SyncLog } from '@/services/syncApi'
+import { villageApi } from '@/services/villageApi'
+
+const RECENT_LIMIT = 5
+const ALL_VILLAGES = ''
+
+function incomingVillageStorageKey(accountId: string, worldId?: string | null): string {
+  return `tt:incomingVillage:${accountId}:${worldId || 'noworld'}`
+}
 
 function countdownLabel(arrivalAt: string | null | undefined, now: Date): string {
   if (!arrivalAt) return '—'
@@ -27,6 +41,25 @@ function countdownLabel(arrivalAt: string | null | undefined, now: Date): string
   return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`
 }
 
+function formatRelativeLabel(
+  ago: ReturnType<typeof relativeAgo>,
+  t: (key: string, opts?: Record<string, unknown>) => string,
+): string {
+  if (!ago) return '—'
+  switch (ago.key) {
+    case 'justNow':
+      return t('home.recentUploads.justNow')
+    case 'minutesAgo':
+      return t('home.recentUploads.minutesAgo', { count: ago.count })
+    case 'hoursAgo':
+      return t('home.recentUploads.hoursAgo', { count: ago.count })
+    case 'yesterday':
+      return t('home.recentUploads.yesterday')
+    case 'daysAgo':
+      return t('home.recentUploads.daysAgo', { count: ago.count })
+  }
+}
+
 export default function HomePage() {
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
@@ -38,13 +71,22 @@ export default function HomePage() {
   const [parseError, setParseError] = useState('')
   const [clipboardFailed, setClipboardFailed] = useState(false)
   const [movements, setMovements] = useState<Movement[]>([])
+  const [recentLogs, setRecentLogs] = useState<SyncLog[]>([])
+  const [villages, setVillages] = useState<
+    { village_id: string; name: string; coordinate_x: number; coordinate_y: number }[]
+  >([])
+  const [villageFilter, setVillageFilter] = useState<string>(ALL_VILLAGES)
   const [now, setNow] = useState(() => new Date())
   const [savedBanner, setSavedBanner] = useState('')
 
+  const accountId = currentAccount?.account_id ?? null
+  const worldId = currentAccount?.world_id ?? null
+
   useEffect(() => {
+    if (!movements.length) return
     const id = window.setInterval(() => setNow(new Date()), 1000)
     return () => window.clearInterval(id)
-  }, [])
+  }, [movements.length])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -55,22 +97,99 @@ export default function HomePage() {
     }
   }, [])
 
+  // Restore village filter per account+world
+  useEffect(() => {
+    if (!accountId) {
+      setVillageFilter(ALL_VILLAGES)
+      return
+    }
+    try {
+      const key = incomingVillageStorageKey(accountId, worldId)
+      const stored = localStorage.getItem(key)
+      setVillageFilter(stored ?? ALL_VILLAGES)
+    } catch {
+      setVillageFilter(ALL_VILLAGES)
+    }
+  }, [accountId, worldId])
+
+  const persistVillageFilter = (value: string) => {
+    setVillageFilter(value)
+    if (!accountId) return
+    try {
+      const key = incomingVillageStorageKey(accountId, worldId)
+      if (!value) localStorage.removeItem(key)
+      else localStorage.setItem(key, value)
+    } catch {
+      /* ignore quota */
+    }
+  }
+
+  const villageNameById = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const v of villages) map.set(v.village_id, v.name)
+    return map
+  }, [villages])
+
   const reloadMovements = useCallback(async () => {
-    if (!currentAccount) {
+    if (!accountId) {
       setMovements([])
       return
     }
     try {
-      const res = await pasteApi.listMovements(currentAccount.account_id)
+      const res = await pasteApi.listMovements(accountId, {
+        villageId: villageFilter || null,
+      })
       setMovements(res.movements)
     } catch {
       setMovements([])
     }
-  }, [currentAccount])
+  }, [accountId, villageFilter])
+
+  const reloadRecent = useCallback(async () => {
+    if (!accountId) {
+      setRecentLogs([])
+      return
+    }
+    try {
+      const res = await syncApi.getLogs({
+        account_id: accountId,
+        limit: RECENT_LIMIT * 2,
+      })
+      const ok = (res.logs || []).filter(isSuccessfulSync).slice(0, RECENT_LIMIT)
+      setRecentLogs(ok)
+    } catch {
+      setRecentLogs([])
+    }
+  }, [accountId])
+
+  const reloadVillages = useCallback(async () => {
+    if (!accountId) {
+      setVillages([])
+      return
+    }
+    try {
+      const res = await villageApi.getAll(accountId)
+      setVillages(
+        (res.villages || []).map((v) => ({
+          village_id: v.village_id,
+          name: v.name || v.village_id,
+          coordinate_x: v.coordinate_x ?? 0,
+          coordinate_y: v.coordinate_y ?? 0,
+        })),
+      )
+    } catch {
+      setVillages([])
+    }
+  }, [accountId])
 
   useEffect(() => {
     void reloadMovements()
   }, [reloadMovements])
+
+  useEffect(() => {
+    void reloadRecent()
+    void reloadVillages()
+  }, [reloadRecent, reloadVillages])
 
   const runParse = async (raw: string) => {
     if (!currentAccount) {
@@ -235,9 +354,73 @@ export default function HomePage() {
         </CardContent>
       </Card>
 
+      <Card data-testid="recent-uploads">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">{t('home.recentUploads.title')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!recentLogs.length ? (
+            <p
+              className="text-sm text-muted-foreground py-3"
+              data-testid="recent-uploads-empty"
+            >
+              {t('home.recentUploads.empty')}
+            </p>
+          ) : (
+            <ul className="divide-y rounded-md border" data-testid="recent-uploads-list">
+              {recentLogs.map((log) => {
+                const when = formatRelativeLabel(
+                  relativeAgo(log.completed_at || log.started_at, now),
+                  t,
+                )
+                const line = formatRecentUploadLine(
+                  log,
+                  log.village_id ? villageNameById.get(log.village_id) : null,
+                )
+                return (
+                  <li
+                    key={log.log_id}
+                    className="px-3 py-2 text-sm flex justify-between gap-2"
+                    data-testid="recent-upload-row"
+                  >
+                    <span className="min-w-0 truncate">{line}</span>
+                    <span className="text-xs text-muted-foreground shrink-0">{when}</span>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
       <Card data-testid="incoming-list">
         <CardHeader>
-          <CardTitle className="text-lg">來襲列表</CardTitle>
+          <div className="flex items-center gap-2 flex-wrap">
+            <CardTitle className="text-lg">來襲列表</CardTitle>
+            {villages.length > 0 && (
+              <label
+                className="ml-auto inline-flex items-center rounded-full border bg-background py-1 pl-3 pr-2 text-sm"
+                data-testid="incoming-village-filter"
+              >
+                <span className="text-muted-foreground">
+                  {t('home.incoming.villageFilter')}
+                </span>
+                <select
+                  className="cursor-pointer bg-transparent pr-1 font-medium outline-none max-w-[9rem]"
+                  value={villageFilter}
+                  onChange={(e) => persistVillageFilter(e.target.value)}
+                  aria-label={t('home.incoming.villageFilter')}
+                >
+                  <option value={ALL_VILLAGES}>{t('home.incoming.allVillages')}</option>
+                  {villages.map((v) => (
+                    <option key={v.village_id} value={v.village_id}>
+                      {v.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">
             依抵達時間排序，倒數每秒更新。資料來自最後一次存入的集結點。
           </p>

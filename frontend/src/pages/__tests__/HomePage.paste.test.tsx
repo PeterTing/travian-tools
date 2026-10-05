@@ -9,6 +9,17 @@ const pasteApi = vi.hoisted(() => ({
 }))
 vi.mock('@/services/pasteApi', () => ({ pasteApi }))
 
+const syncApi = vi.hoisted(() => ({
+  getLogs: vi.fn().mockResolvedValue({ logs: [], total: 0 }),
+}))
+vi.mock('@/services/syncApi', () => ({ syncApi }))
+
+vi.mock('@/services/villageApi', () => ({
+  villageApi: {
+    getAll: vi.fn().mockResolvedValue({ villages: [], total: 0 }),
+  },
+}))
+
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: true }),
 }))
@@ -17,6 +28,7 @@ vi.mock('@/contexts/CurrentAccountContext', () => ({
   useCurrentAccount: () => ({
     currentAccount: {
       account_id: 'acc-1',
+      world_id: 'w-1',
       player_name: 'Tester',
       server_name: 'ts11',
       server_url: 'https://ts11.x1.international.travian.com',

@@ -110,6 +110,19 @@
     "battleSimulator": {
       "title": "戰鬥模擬",
       "description": "模擬攻擊和防守的戰鬥結果"
+    },
+    "recentUploads": {
+      "title": "最近上傳",
+      "empty": "還沒有上傳紀錄。貼上並確認後會出現在這裡。",
+      "justNow": "剛剛",
+      "minutesAgo": "{{count}} 分鐘前",
+      "hoursAgo": "{{count}} 小時前",
+      "yesterday": "昨天",
+      "daysAgo": "{{count}} 天前"
+    },
+    "incoming": {
+      "villageFilter": "村莊：",
+      "allVillages": "全部村莊"
     }
   },
   "notFound": {

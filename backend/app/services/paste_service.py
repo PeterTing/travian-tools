@@ -9,10 +9,12 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.database.models.game_account import GameAccount
 from app.infrastructure.database.models.parse_draft import ParseDraft
+from app.infrastructure.database.models.sync_log import SyncStatus, SyncType
 from app.infrastructure.database.models.troop_movement import TroopMovement
 from app.infrastructure.database.models.village import Village
 from app.parsers import PageInput, parse_page
 from app.parsers.types import PageType
+from app.services.sync_log_service import SyncLogService
 from app.services.sync_service import SyncService
 
 # 貼上／草稿 HTML 上限（約 1.5 MB），避免拖垮 API
@@ -188,88 +190,80 @@ class PasteService:
                 return None, None
         return None, None
 
-    def confirm_rally(
+    def _resolve_rally_village_id(
         self,
-        user_id: str,
-        *,
         account_id: str,
+        village_id: str | None,
         data: dict[str, Any],
-        capture_at: datetime | None,
-        source: str,
-        server_time: str | None,
-        village_id: str | None = None,
-    ) -> dict[str, Any]:
-        account = self._get_account(user_id, account_id)
-        if account is None:
-            return {
-                "success": False,
-                "message": "找不到遊戲帳號或無權限",
-                "error_code": "forbidden",
-            }
-
+    ) -> tuple[str | None, dict[str, Any] | None]:
+        """Resolve UI/parser village id. On error return (None, error_dict)."""
         resolved_village_id = village_id or data.get("village_id")
-        if resolved_village_id:
-            from app.infrastructure.database.models.village import Village
+        if not resolved_village_id:
+            return None, None
 
+        village = (
+            self.db.query(Village)
+            .filter(
+                Village.village_id == resolved_village_id,
+                Village.account_id == account_id,
+            )
+            .first()
+        )
+        if village is None:
+            # Parser/extension may pass Travian data-did
             village = (
                 self.db.query(Village)
                 .filter(
-                    Village.village_id == resolved_village_id,
+                    Village.travian_village_id == str(resolved_village_id),
                     Village.account_id == account_id,
                 )
                 .first()
             )
-            if village is None:
-                # Parser/extension may pass Travian data-did
-                village = (
-                    self.db.query(Village)
-                    .filter(
-                        Village.travian_village_id == str(resolved_village_id),
-                        Village.account_id == account_id,
-                    )
-                    .first()
-                )
-            if village is None:
-                looks_uuid = (
-                    len(str(resolved_village_id)) == 36
-                    and str(resolved_village_id).count("-") == 4
-                )
-                # Explicit UI village UUID (or junk selection) must exist;
-                # bare Travian numeric ids without a row are optional.
-                if looks_uuid or not str(resolved_village_id).isdigit():
-                    return {
-                        "success": False,
-                        "message": "找不到選定的村莊",
-                        "error_code": "forbidden",
-                    }
-                resolved_village_id = None
-            else:
-                resolved_village_id = village.village_id
-        else:
-            resolved_village_id = None
+        if village is None:
+            looks_uuid = (
+                len(str(resolved_village_id)) == 36
+                and str(resolved_village_id).count("-") == 4
+            )
+            # Explicit UI village UUID (or junk selection) must exist;
+            # bare Travian numeric ids without a row are optional.
+            if looks_uuid or not str(resolved_village_id).isdigit():
+                return None, {
+                    "success": False,
+                    "message": "找不到選定的村莊",
+                    "error_code": "forbidden",
+                    "created": 0,
+                    "updated": 0,
+                    "total": 0,
+                }
+            return None, None
+        return village.village_id, None
 
-        captured = capture_at or _utcnow()
+    def _rally_to_save(self, data: dict[str, Any]) -> list[dict[str, Any]]:
         movements_in = list(data.get("movements") or [])
-        # also include incoming list if movements empty
         if not movements_in:
             movements_in = list(data.get("incoming") or []) + list(
                 data.get("incoming_reinforcements") or []
             )
+        return [m for m in movements_in if m.get("kind") in INCOMING_KINDS]
 
-        # Only persist 來襲 (attack/raid/spy); reinforcements are not listed in P0-06
-        to_save = [m for m in movements_in if m.get("kind") in INCOMING_KINDS]
-        if not to_save:
-            return {
-                "success": False,
-                "message": "集結點沒有可存的來襲（攻擊／突襲／偵查）。"
-                "駐軍不會當成來襲存入。",
-                "created": 0,
-                "updated": 0,
-                "total": 0,
-                "error_code": "empty_parse",
-            }
+    def _rally_diff_plan(
+        self,
+        *,
+        account_id: str,
+        data: dict[str, Any],
+        capture_at: datetime,
+        source: str,
+        server_time: str | None,
+        resolved_village_id: str | None,
+    ) -> tuple[int, int, list[tuple[str, TroopMovement | None, dict[str, Any]]]]:
+        """Same-second grouping, min(N,M) update, never delete.
 
-        # Existing incoming for this account (never auto-delete)
+        Returns (created, updated, actions) where each action is
+        ("update"|"create", existing_row_or_None, payload).
+        """
+        from collections import defaultdict
+
+        to_save = self._rally_to_save(data)
         existing = (
             self.db.query(TroopMovement)
             .filter(
@@ -282,7 +276,6 @@ class PasteService:
             .all()
         )
 
-        # Group by (role, headline-ish target, arrival_second_key)
         def group_key(m: dict[str, Any], arrival_key: str | None) -> tuple:
             return (
                 (m.get("role") or "").strip(),
@@ -290,21 +283,15 @@ class PasteService:
                 arrival_key or "",
             )
 
-        # Build new items with arrival keys
         prepared: list[tuple[tuple, dict, datetime | None, str | None]] = []
         for m in to_save:
             arrival_at, arrival_key = self._arrival_datetime(
-                capture_at=captured,
+                capture_at=capture_at,
                 timer_seconds=m.get("timer_seconds"),
                 arrival_time=m.get("arrival_time"),
                 server_time=server_time or data.get("server_time"),
             )
             prepared.append((group_key(m, arrival_key), m, arrival_at, arrival_key))
-
-        # Dedup within paste by group: keep order
-        # Match against existing: for each group, existing count M, new count N,
-        # update min(N,M), insert N-M. Never delete.
-        from collections import defaultdict
 
         new_by_group: dict[tuple, list] = defaultdict(list)
         for item in prepared:
@@ -319,16 +306,11 @@ class PasteService:
             )
             existing_by_group[gk].append(row)
 
-        created = 0
-        updated = 0
-        saved_ids: list[str] = []
-
         def existing_for_group(gk: tuple) -> list[TroopMovement]:
             role, headline, arrival_key = gk
             exact = existing_by_group.get(gk, [])
             if exact or not arrival_key:
                 return list(exact)
-            # 允許抵達時間差 ±2 秒（重貼時 timer／時鐘可能差一秒）
             try:
                 base = datetime.strptime(arrival_key, "%Y-%m-%dT%H:%M:%S")
             except ValueError:
@@ -349,9 +331,12 @@ class PasteService:
                         used.add(row.movement_id)
             return found
 
+        created = 0
+        updated = 0
+        actions: list[tuple[str, TroopMovement | None, dict[str, Any]]] = []
         for gk, items in new_by_group.items():
             old_rows = existing_for_group(gk)
-            m = len(old_rows)
+            m_count = len(old_rows)
             for i, (_key, movement, arrival_at, arrival_key) in enumerate(items):
                 needs = (
                     movement.get("coordinate_x") is None
@@ -371,18 +356,148 @@ class PasteService:
                     "raw_excerpt": movement.get("headline"),
                     "village_id": resolved_village_id,
                 }
-                if i < m:
-                    row = old_rows[i]
-                    for k, v in payload.items():
-                        setattr(row, k, v)
+                if i < m_count:
+                    actions.append(("update", old_rows[i], payload))
                     updated += 1
-                    saved_ids.append(row.movement_id)
                 else:
-                    row = TroopMovement(account_id=account_id, **payload)
-                    self.db.add(row)
-                    self.db.flush()
+                    actions.append(("create", None, payload))
                     created += 1
-                    saved_ids.append(row.movement_id)
+        return created, updated, actions
+
+    def preview_rally_diff(
+        self,
+        user_id: str,
+        *,
+        account_id: str,
+        data: dict[str, Any],
+        capture_at: datetime | None,
+        source: str,
+        server_time: str | None,
+        village_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Dry-run of confirm_rally dedupe; never writes."""
+        account = self._get_account(user_id, account_id)
+        if account is None:
+            return {
+                "success": False,
+                "message": "找不到遊戲帳號或無權限",
+                "error_code": "forbidden",
+                "created": 0,
+                "updated": 0,
+                "total": 0,
+            }
+
+        resolved_village_id, village_err = self._resolve_rally_village_id(
+            account_id, village_id, data
+        )
+        if village_err is not None:
+            return village_err
+
+        to_save = self._rally_to_save(data)
+        if not to_save:
+            return {
+                "success": False,
+                "message": "集結點沒有可存的來襲（攻擊／突襲／偵查）。"
+                "駐軍不會當成來襲存入。",
+                "created": 0,
+                "updated": 0,
+                "total": 0,
+                "error_code": "empty_parse",
+            }
+
+        captured = capture_at or _utcnow()
+        created, updated, _actions = self._rally_diff_plan(
+            account_id=account_id,
+            data=data,
+            capture_at=captured,
+            source=source,
+            server_time=server_time,
+            resolved_village_id=resolved_village_id,
+        )
+        return {
+            "success": True,
+            "message": f"新增 {created} · 更新 {updated}",
+            "created": created,
+            "updated": updated,
+            "total": created + updated,
+            "village_id": resolved_village_id,
+        }
+
+    def confirm_rally(
+        self,
+        user_id: str,
+        *,
+        account_id: str,
+        data: dict[str, Any],
+        capture_at: datetime | None,
+        source: str,
+        server_time: str | None,
+        village_id: str | None = None,
+    ) -> dict[str, Any]:
+        account = self._get_account(user_id, account_id)
+        if account is None:
+            return {
+                "success": False,
+                "message": "找不到遊戲帳號或無權限",
+                "error_code": "forbidden",
+            }
+
+        resolved_village_id, village_err = self._resolve_rally_village_id(
+            account_id, village_id, data
+        )
+        if village_err is not None:
+            return village_err
+
+        to_save = self._rally_to_save(data)
+        if not to_save:
+            return {
+                "success": False,
+                "message": "集結點沒有可存的來襲（攻擊／突襲／偵查）。"
+                "駐軍不會當成來襲存入。",
+                "created": 0,
+                "updated": 0,
+                "total": 0,
+                "error_code": "empty_parse",
+            }
+
+        captured = capture_at or _utcnow()
+        created, updated, actions = self._rally_diff_plan(
+            account_id=account_id,
+            data=data,
+            capture_at=captured,
+            source=source,
+            server_time=server_time,
+            resolved_village_id=resolved_village_id,
+        )
+
+        saved_ids: list[str] = []
+        for action, row, payload in actions:
+            if action == "update" and row is not None:
+                for k, v in payload.items():
+                    setattr(row, k, v)
+                saved_ids.append(row.movement_id)
+            else:
+                new_row = TroopMovement(account_id=account_id, **payload)
+                self.db.add(new_row)
+                self.db.flush()
+                saved_ids.append(new_row.movement_id)
+
+        # Recent uploads (P0-06): record successful rally paste in sync_logs
+        log_service = SyncLogService(self.db)
+        log = log_service.create_log(
+            user_id=user_id,
+            sync_type=SyncType.RALLY_POINT,
+            account_id=account_id,
+            village_id=resolved_village_id,
+        )
+        log_service.complete_log(
+            log,
+            SyncStatus.SUCCESS,
+            items_synced=created + updated,
+            items_created=created,
+            items_updated=updated,
+            message=f"已存入來襲：新增 {created}、更新 {updated}",
+        )
 
         self.db.commit()
         return {
@@ -686,24 +801,25 @@ class PasteService:
         }
 
     def list_incoming(
-        self, user_id: str, account_id: str
+        self,
+        user_id: str,
+        account_id: str,
+        village_id: str | None = None,
     ) -> tuple[bool, str, list[TroopMovement]]:
         account = self._get_account(user_id, account_id)
         if account is None:
             return False, "找不到遊戲帳號或無權限", []
-        rows = (
-            self.db.query(TroopMovement)
-            .filter(
-                TroopMovement.account_id == account_id,
-                TroopMovement.kind.in_(
-                    ["incoming_attack", "incoming_raid", "incoming_spy"]
-                ),
-            )
-            .order_by(
-                TroopMovement.arrival_at.is_(None), TroopMovement.arrival_at.asc()
-            )
-            .all()
+        query = self.db.query(TroopMovement).filter(
+            TroopMovement.account_id == account_id,
+            TroopMovement.kind.in_(
+                ["incoming_attack", "incoming_raid", "incoming_spy"]
+            ),
         )
+        if village_id:
+            query = query.filter(TroopMovement.village_id == village_id)
+        rows = query.order_by(
+            TroopMovement.arrival_at.is_(None), TroopMovement.arrival_at.asc()
+        ).all()
         return True, "ok", rows
 
     def update_movement_coords(

@@ -24,6 +24,7 @@ class SyncType(StrEnum):
     TROOPS = "troops"
     FULL = "full"
     MAP_SQL = "map_sql"
+    RALLY_POINT = "rally_point"
 
 
 class SyncStatus(StrEnum):

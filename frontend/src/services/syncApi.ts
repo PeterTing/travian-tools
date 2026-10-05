@@ -6,6 +6,7 @@ export type SyncType =
   | 'troops'
   | 'full'
   | 'map_sql'
+  | 'rally_point'
 
 export type SyncStatus = 'pending' | 'in_progress' | 'success' | 'failed'
 

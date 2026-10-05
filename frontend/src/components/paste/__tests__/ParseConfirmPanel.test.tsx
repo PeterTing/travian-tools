@@ -1,6 +1,17 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import i18n from '@/i18n/i18n'
+
+const pasteApi = vi.hoisted(() => ({
+  previewDiff: vi.fn().mockResolvedValue({
+    success: true,
+    message: '新增 1 · 更新 1',
+    created: 1,
+    updated: 1,
+    total: 2,
+  }),
+}))
+vi.mock('@/services/pasteApi', () => ({ pasteApi }))
 import { ParseConfirmPanel } from '../ParseConfirmPanel'
 
 const account = {
@@ -97,6 +108,70 @@ describe('ParseConfirmPanel', () => {
       />,
     )
     expect(screen.getByTestId('overview-population')).toHaveTextContent('人口 8')
+  })
+})
+
+
+describe('ParseConfirmPanel rally preview-diff', () => {
+  beforeAll(async () => {
+    await i18n.changeLanguage('zh-TW')
+  })
+
+  beforeEach(() => {
+    pasteApi.previewDiff.mockReset().mockResolvedValue({
+      success: true,
+      message: '新增 1 · 更新 1',
+      created: 1,
+      updated: 1,
+      total: 2,
+    })
+  })
+
+  it('shows 新增 N · 更新 M on label and CTA from preview-diff API', async () => {
+    const { waitFor } = await import('@testing-library/react')
+    render(
+      <ParseConfirmPanel
+        account={account}
+        state={{
+          pageType: 'rally_point',
+          data: {
+            incoming: [
+              {
+                kind: 'incoming_raid',
+                role: 'EnemyA',
+                headline: 'EnemyA 搶奪 Me',
+                coordinate_x: 1,
+                coordinate_y: 2,
+                timer_seconds: 100,
+                arrival_time: '12:01:40',
+              },
+              {
+                kind: 'incoming_attack',
+                role: 'EnemyB',
+                headline: 'EnemyB 攻擊 Me',
+                coordinate_x: null,
+                coordinate_y: null,
+                timer_seconds: 200,
+                arrival_time: '12:03:20',
+              },
+            ],
+          },
+          source: 'paste',
+        }}
+        villages={[]}
+        villageId={null}
+        onVillageIdChange={vi.fn()}
+        captureAt={new Date(2026, 9, 5, 12, 0)}
+        onCaptureAtChange={vi.fn()}
+        onDiscard={vi.fn()}
+        onSave={vi.fn()}
+      />,
+    )
+    await waitFor(() =>
+      expect(screen.getByTestId('rally-diff-label')).toHaveTextContent('新增 1 · 更新 1'),
+    )
+    expect(screen.getByTestId('confirm-save')).toHaveTextContent('存入 · 新增 1 · 更新 1')
+    expect(pasteApi.previewDiff).toHaveBeenCalled()
   })
 })
 
