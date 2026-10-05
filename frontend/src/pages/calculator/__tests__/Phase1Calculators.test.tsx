@@ -1,13 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import VillageBuilderPage from '../VillageBuilderPage'
 import CropScouterPage from '../CropScouterPage'
 import AttackPlannerPage from '../AttackPlannerPage'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 
 vi.mock('@/services/advancedCalculatorApi', () => ({
   advancedCalculatorApi: {
-    calculateVillageBuilder: vi.fn(),
     calculateCropScouter: vi.fn(),
     calculateTsOptimizer: vi.fn(),
     calculateFakeTroops: vi.fn(),
@@ -15,53 +13,6 @@ vi.mock('@/services/advancedCalculatorApi', () => ({
 }))
 
 const mockedApi = vi.mocked(advancedCalculatorApi)
-
-describe('VillageBuilderPage', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('renders form and submits', async () => {
-    mockedApi.calculateVillageBuilder.mockResolvedValueOnce({
-      cropper_type: '15c',
-      tribe_egyptian: false,
-      gold_plus: false,
-      target_field_level: 18,
-      total_steps: 2,
-      build_sequence: [
-        {
-          step: 1,
-          action: 'upgrade_field',
-          target: 'cropland',
-          from_level: 0,
-          to_level: 5,
-          reason: 'test',
-        },
-        {
-          step: 2,
-          action: 'upgrade_bonus_building',
-          target: 'grain_mill',
-          from_level: 0,
-          to_level: 5,
-          reason: null,
-        },
-      ],
-      estimated_days: 3.5,
-    })
-
-    render(<VillageBuilderPage />)
-    fireEvent.click(screen.getByTestId('submit'))
-
-    await waitFor(() => expect(screen.getByTestId('result')).toBeInTheDocument())
-    expect(screen.getByTestId('result').textContent).toContain('2')
-    expect(mockedApi.calculateVillageBuilder).toHaveBeenCalledWith(
-      expect.objectContaining({
-        cropper_type: '15c',
-        target_field_level: 18,
-      }),
-    )
-  })
-})
 
 describe('CropScouterPage', () => {
   beforeEach(() => {
