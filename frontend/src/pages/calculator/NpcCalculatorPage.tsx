@@ -95,7 +95,7 @@ export default function NpcCalculatorPage() {
 
           <h2 className="text-xl font-semibold mb-4">容量上限（選填）</h2>
           <p className="text-xs text-muted-foreground mb-3">
-            官方規則：NPC 分配不得超過倉庫／穀倉容量。
+            NPC 分配不得超過倉庫／穀倉容量。
           </p>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>

@@ -133,7 +133,7 @@
       "fromLevel": "起始等級",
       "toLevel": "目標等級",
       "mainBuildingLevel": "村莊大樓等級 (影響建造時間)",
-      "mainBuildingNote": "村莊大樓以 0.964^(等級−1) 縮短建造時間（Legends）",
+      "mainBuildingNote": "村莊大樓以 0.964^(等級−1) 縮短建造時間",
       "serverSpeed": "伺服器倍率",
       "serverSpeedOptions": {
         "1x": "1x",
@@ -244,7 +244,7 @@
       "cropUnit": "耗糧兵",
       "noResult": "請設定農田和消耗後點擊計算",
       "heroProduction": "英雄糧食產量 (/h)",
-      "heroProductionHint": "含資源點產出與固定 +6（S75／S141）",
+      "heroProductionHint": "含資源點產出與固定 +6",
       "heroConsumption": "英雄糧食消耗 (/h)",
       "heroConsumptionHint": "英雄在村時通常為 6",
       "serverSpeed": "伺服器速度",
@@ -767,6 +767,6 @@
     "recheck": "重新檢查",
     "noAccountSelected": "請選擇遊戲帳號以執行健康檢查",
     "protectionDays": "新手保護天數",
-    "protectionDaysHint": "依世界設定（x1 預設 5 天；S12）"
+    "protectionDaysHint": "依世界設定（x1 預設 5 天）"
   }
 }
