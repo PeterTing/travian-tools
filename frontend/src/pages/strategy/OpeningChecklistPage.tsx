@@ -493,7 +493,11 @@ function ReferenceBlock({
                             {row.hours ? t('opening.hoursValue', { value: formatAmount(row.hours) }) : '—'}
                           </span>
                           <span className="block tabular-nums">
-                            {row.cp_left != null ? t('opening.cpLeftValue', { value: formatAmount(row.cp_left) }) : ''}
+                            {row.cp_left == null
+                              ? ''
+                              : row.cp_left <= 0
+                                ? t('opening.cpReached') // 不顯示負數；Excel 的數字本身不改
+                                : t('opening.cpLeftValue', { value: formatAmount(row.cp_left) })}
                           </span>
                         </td>
                       </tr>

@@ -770,6 +770,7 @@
     "colTime": "時間／還差",
     "hoursValue": "{{value}} 小時",
     "cpLeftValue": "還差 {{value}} 文明點",
+    "cpReached": "已達",
     "tasksTitle": "任務獎勵",
     "tasksNote": "獎勵照英雄 {{level}} 級計算（Excel 的預設）。",
     "colTask": "任務",

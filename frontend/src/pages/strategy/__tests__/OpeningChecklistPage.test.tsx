@@ -224,6 +224,10 @@ describe('起手式清單 (P0-10)', () => {
     expect(screen.getByText('派對與文明點時間')).toBeInTheDocument()
     expect(screen.getByText('到第 1 場派對')).toBeInTheDocument()
     expect(screen.getByText('還差 1,109.75 文明點')).toBeInTheDocument()
+    // 還差 ≤ 0（-1.25、0）不顯示負數，改寫「已達」
+    expect(screen.getAllByText('已達')).toHaveLength(2)
+    expect(screen.queryByText(/還差 [−-]/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/還差 0 文明點/)).not.toBeInTheDocument()
     expect(screen.getByText('每日 50')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('tab', { name: '帳號的任務' }))
     expect(screen.getByText('英雄等級')).toBeInTheDocument()

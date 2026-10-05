@@ -588,6 +588,7 @@
     "colTime": "Time / left",
     "hoursValue": "{{value}} h",
     "cpLeftValue": "{{value}} CP left",
+    "cpReached": "Reached",
     "tasksTitle": "Task rewards",
     "tasksNote": "Rewards at hero level {{level}} (Excel default).",
     "colTask": "Task",
