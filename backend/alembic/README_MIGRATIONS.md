@@ -30,11 +30,21 @@ alembic check        # must print "No new upgrade operations detected."
 
 ## Existing (legacy) database
 
-Back it up first: `0002_drop_legacy` permanently deletes stored Travian
-passwords and all automation/conversation data.
+**Mandatory backup first.** Before upgrading *any* existing database through
+`0002_drop_legacy`, dump a full local backup. `0002_drop_legacy` permanently
+deletes stored Travian passwords and all automation/conversation data, and its
+downgrade restores nothing.
+
+* Keep the dump **local only** (e.g. `~/travian-tools-backups/`, outside the
+  repository). **Never commit it** and never upload it anywhere: it may contain
+  the old plaintext Travian passwords. `backups/` and `*.dump.sql*` are
+  git-ignored as a safety net.
+* Check the dump is non-empty and restorable before running the upgrade.
 
 ```bash
-mysqldump ... > backup.sql
+mkdir -p ~/travian-tools-backups
+mysqldump --single-transaction --routines --triggers <db_name> \
+  | gzip > ~/travian-tools-backups/<db_name>-$(date +%Y%m%d-%H%M%S).dump.sql.gz
 alembic stamp --purge 0001_baseline   # forget the old revision ids
 alembic upgrade head                   # runs 0002_drop_legacy
 alembic check                          # shows any remaining drift

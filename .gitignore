@@ -111,3 +111,8 @@ coverage/
 .gstack/
 
 .claude/worktrees/
+
+# Local database backups (never commit; may contain old credentials)
+backups/
+*.dump.sql
+*.dump.sql.gz

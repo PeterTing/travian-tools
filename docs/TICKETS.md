@@ -14,7 +14,7 @@
 
 | 分期 | 票數 | 完成 | 估計 |
 |---|---|---|---|
-| P0 | 11 | 0（P0-01 待 merge） | 14 到 17 人天，截圖辨識另計 |
+| P0 | 12 | 0（P0-01 待 merge） | 14 到 17 人天，截圖辨識另計 |
 | P1 | 8 | 0 | 15 到 20 人天 |
 | P2 | 5 | 0 | P1 完成後再估 |
 
@@ -77,6 +77,13 @@
 ### P0-11 RWD 外框 ⬜
 - 驗收：手機優先；導覽列不留 AI、執行、知識庫入口；戰鬥模擬先隱藏
 
+### P0-12 後端部署到 Cloud Run；擴充改指向正式網址 ⬜
+- 範圍：後端部署到 Cloud Run（GCP 專案 `artogo-travian-tools`）
+- 驗收：
+  - 擴充 `manifest.json` 的 `host_permissions` 從 `http://localhost:8000/*` 改成正式後端網址（只留這一個，必須是 https）；`background.js` 的 `API_BASE_URL` 一起改
+  - 維持只用 `activeTab`：不加回 `tabs`、`alarms`、Travian 網域的 host 權限或靜態 `content_scripts`；合規測試照樣要過
+  - 正式資料庫第一次升級前，先照 `backend/alembic/README_MIGRATIONS.md` 在本機 dump 備份（備份只留本機，不進 repo）
+
 ---
 
 ## P1：聯盟防守
@@ -122,3 +129,4 @@
 | 日期 | 版本 | 內容 |
 |---|---|---|
 | 2026-10-05 | v2.0 | 依 PRD v2 重排 P0 到 P2；v1 封存 |
+| 2026-10-05 | v2.0.1 | 新增 P0-12：Cloud Run 部署時擴充 `host_permissions` 改指向正式網址 |
