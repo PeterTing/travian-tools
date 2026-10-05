@@ -1,0 +1,341 @@
+/* Shared calculator layout for guide-ported calcs (P0-09).
+   Mobile: inputs on top, sticky results above bottom tabs.
+   ≥1024px: left inputs / right sticky results.
+   Tokens map onto shadcn HSL vars. */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  /* Room for fixed result panel + bottom tabs on phone */
+  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 11rem);
+}
+
+@media (min-width: 1024px) {
+  .wrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    padding-bottom: 0;
+  }
+}
+
+.intro {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  min-width: 0;
+}
+
+.intro h2 {
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.intro p {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.inputs,
+.output {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  padding: 1rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.inputs h4,
+.output h4 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: hsl(var(--primary));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem;
+}
+
+.output h4 + h4 {
+  margin-top: 1.25rem;
+}
+
+/*
+ * Live results panel.
+ * Phone: fixed above bottom tabs (z-30 < tab z-40) so sticky is visible and not covered.
+ * Desktop ≥1024: in-flow right column, sticky to top while scrolling.
+ */
+.output {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 0.5rem);
+  z-index: 30;
+  max-height: min(38vh, 16rem);
+  overflow-y: auto;
+  box-shadow: 0 -6px 20px hsl(var(--foreground) / 0.1);
+}
+
+@media (min-width: 1024px) {
+  .output {
+    position: sticky;
+    left: auto;
+    right: auto;
+    top: 1rem;
+    bottom: auto;
+    z-index: auto;
+    align-self: start;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    box-shadow: none;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.875rem;
+  min-width: 0;
+}
+
+.field label {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.field input,
+.field select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid hsl(var(--input));
+  border-radius: 0.375rem;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 0.875rem;
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0;
+  font-size: 0.875rem;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.stat span:first-child {
+  font-size: 0.7rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.stat strong {
+  font-size: 1.125rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.table th,
+.table td {
+  padding: 0.375rem 0.5rem;
+  border-bottom: 1px solid hsl(var(--border));
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  color: hsl(var(--muted-foreground));
+  font-weight: 500;
+}
+
+.best {
+  background: hsl(var(--primary) / 0.08);
+  font-weight: 600;
+}
+
+.muted {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.8125rem;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list li {
+  padding: 0.375rem 0;
+  border-bottom: 1px solid hsl(var(--border));
+  font-size: 0.875rem;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: hsl(var(--muted));
+  font-size: 0.75rem;
+  margin-right: 0.25rem;
+}
+
+.check input {
+  width: auto;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid hsl(var(--border));
+  font-size: 0.875rem;
+  min-width: 0;
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.label {
+  color: hsl(var(--muted-foreground));
+  min-width: 0;
+}
+
+.value {
+  color: hsl(var(--foreground));
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  text-align: right;
+  word-break: break-word;
+}
+
+.highlight {
+  color: hsl(var(--primary));
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.note {
+  margin-top: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.tableRowHi td {
+  background: hsl(var(--primary) / 0.08);
+  color: hsl(var(--primary));
+}
+
+.tableRowHi td:not(:first-child) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 28rem;
+  overflow-y: auto;
+}
+
+.steps li {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto auto;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid hsl(var(--border));
+  font-size: 0.8125rem;
+}
+
+.steps li:last-child {
+  border-bottom: 0;
+}
+
+.stepNum {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.stepCost {
+  color: hsl(var(--primary));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+}
+
+.stepTime {
+  color: hsl(var(--muted-foreground));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+}
+
+.btnRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.btnRow button {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.375rem;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.btnRow button:hover {
+  border-color: hsl(var(--foreground));
+}

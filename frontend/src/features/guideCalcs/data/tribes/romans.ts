@@ -1,0 +1,106 @@
+import type { Tribe } from '../tribes-types';
+
+export const romans: Tribe = {
+  id: 'romans',
+  name: { zh: '羅馬人', en: 'Romans' },
+  archetype: { zh: '平衡型', en: 'Balanced' },
+  difficulty: 1,
+  color: 'var(--tribe-romans)',
+  icon: '🏛️',
+  tagline: {
+    zh: '雙建築佇列 · 精兵強將',
+    en: 'Dual queue · Disciplined legions',
+  },
+  summary: {
+    zh: '羅馬人以均衡著稱：雙建築佇列可同時升資源田與其他建築，禁衛兵是全遊戲最強步兵防禦，將軍騎士是平衡型重騎兵。最適合第一次玩的人。',
+    en: 'Classic balanced tribe. The dual building queue lets you upgrade resource fields and other buildings simultaneously; Praetorians are the best infantry defenders in the game; Caesaris Riders are balanced heavy cavalry. Best pick for first-timers.',
+  },
+
+  heroPassive: {
+    zh: '英雄每技能點 +100 戰鬥力（其他部族 +80）',
+    en: 'Hero gains +100 fighting strength per skill point (other tribes gain +80)',
+  },
+
+  specials: [
+    { zh: '雙建築佇列（資源田 + 其他建築可同時建）', en: 'Dual building queue (resource fields + other buildings simultaneously)' },
+    { zh: '放牧水槽：降低騎兵穀物消耗', en: 'Horse Drinking Trough: reduces cavalry crop upkeep' },
+    { zh: '城牆（City Wall）每級 +3% 防禦，但血量最低', en: 'City Wall: +3% defense per level (highest of all walls), but lowest HP' },
+  ],
+
+  strengths: [
+    { zh: '雙佇列加速全面發展', en: 'Dual queue accelerates all-round development' },
+    { zh: '禁衛兵步兵防禦全遊戲第一', en: 'Praetorians: best infantry defense in the game' },
+    { zh: '英雄戰鬥力加成比他族高 25%', en: 'Hero fighting strength is 25% higher than other tribes' },
+  ],
+
+  weaknesses: [
+    { zh: '兵種成本高，早期經濟壓力大', en: 'Expensive troops, economic pressure early on' },
+    { zh: '沒有掠奪專用廉價單位', en: 'No dedicated cheap raiding unit' },
+  ],
+
+  wallType: { name: { zh: '城牆 (City Wall)', en: 'City Wall' }, bonusPerLevel: 0.03 },
+  merchant: { capacity: 500, speed: 16 },
+  defenseMix: { zh: '70% 禁衛兵 / 30% 古羅馬步兵', en: '70% Praetorians / 30% Legionnaires' },
+
+  units: [
+    { id: 'legionnaire', category: 'infantry',
+      name: { zh: '古羅馬步兵', en: 'Legionnaire' },
+      attack: 40, defInfantry: 35, defCavalry: 50, speed: 6, carry: 50, upkeep: 1,
+      cost: { wood: 120, clay: 100, iron: 150, crop: 30 }, trainTime: 2000,
+      role: { zh: '攻守兼備的基礎兵', en: 'Versatile basic unit' } },
+    { id: 'praetorian', category: 'infantry',
+      name: { zh: '禁衛兵', en: 'Praetorian' },
+      attack: 30, defInfantry: 65, defCavalry: 35, speed: 5, carry: 20, upkeep: 1,
+      cost: { wood: 100, clay: 130, iron: 160, crop: 70 }, trainTime: 2200,
+      role: { zh: '全遊戲最強步兵防禦', en: 'Best infantry defense in the game' } },
+    { id: 'imperian', category: 'infantry',
+      name: { zh: '帝國兵', en: 'Imperian' },
+      attack: 70, defInfantry: 40, defCavalry: 25, speed: 7, carry: 50, upkeep: 1,
+      cost: { wood: 150, clay: 160, iron: 210, crop: 80 }, trainTime: 2400,
+      role: { zh: '高攻擊步兵，主要 Off 單位', en: 'High-attack infantry, primary offensive unit' } },
+    { id: 'equitesLegati', category: 'scout',
+      name: { zh: '使者騎士', en: 'Equites Legati' },
+      attack: 0, defInfantry: 20, defCavalry: 10, speed: 16, carry: 0, upkeep: 2,
+      cost: { wood: 140, clay: 160, iron: 20, crop: 40 }, trainTime: 1700,
+      role: { zh: '最快偵察單位', en: 'Fastest scout unit' } },
+    { id: 'equitesImperatoris', category: 'cavalry',
+      name: { zh: '帝國騎士', en: 'Equites Imperatoris' },
+      attack: 120, defInfantry: 65, defCavalry: 50, speed: 14, carry: 100, upkeep: 3,
+      cost: { wood: 550, clay: 440, iron: 320, crop: 100 }, trainTime: 3300,
+      role: { zh: '平衡型重騎兵，可當農場主力', en: 'Balanced heavy cavalry, excellent raider' } },
+    { id: 'equitesCaesaris', category: 'cavalry',
+      name: { zh: '將軍騎士', en: 'Equites Caesaris' },
+      attack: 180, defInfantry: 80, defCavalry: 105, speed: 10, carry: 70, upkeep: 4,
+      cost: { wood: 550, clay: 640, iron: 800, crop: 180 }, trainTime: 4400,
+      role: { zh: '主要重錘騎兵，攻守兼備', en: 'Main hammer cavalry, attack + defense' } },
+    { id: 'ram', category: 'siege',
+      name: { zh: '衝撞車', en: 'Battering Ram' },
+      attack: 60, defInfantry: 30, defCavalry: 75, speed: 4, carry: 0, upkeep: 3,
+      cost: { wood: 900, clay: 360, iron: 500, crop: 70 }, trainTime: 4600,
+      role: { zh: '破牆必備', en: 'Wall breaker' } },
+    { id: 'fireCatapult', category: 'siege',
+      name: { zh: '火焰投石機', en: 'Fire Catapult' },
+      attack: 75, defInfantry: 60, defCavalry: 10, speed: 3, carry: 0, upkeep: 6,
+      cost: { wood: 950, clay: 1350, iron: 600, crop: 90 }, trainTime: 9000,
+      role: { zh: '摧毀建築', en: 'Destroys buildings' } },
+    { id: 'senator', category: 'chief',
+      name: { zh: '參議員', en: 'Senator' },
+      attack: 50, defInfantry: 40, defCavalry: 30, speed: 4, carry: 0, upkeep: 5,
+      cost: { wood: 30750, clay: 27200, iron: 45000, crop: 37500 }, trainTime: 90700,
+      role: { zh: '降敵忠誠、征服村莊', en: 'Reduces loyalty, conquers villages' } },
+    { id: 'settler', category: 'settler',
+      name: { zh: '開拓者', en: 'Settler' },
+      attack: 0, defInfantry: 80, defCavalry: 80, speed: 5, carry: 3000, upkeep: 1,
+      cost: { wood: 4600, clay: 4200, iron: 5800, crop: 4400 }, trainTime: 26900,
+      role: { zh: '建立新村莊', en: 'Establishes new villages' } },
+  ],
+
+  offTips: [
+    { zh: '首都建議不放 OFF — 羅馬人 cap 以發展為主，錘子放次級城（Palace/CC 村）', en: 'Keep OFF out of the capital — Roman cap should focus on production; hammer in a secondary village' },
+    { zh: '錘子主力：帝國兵 + 將軍騎士（Imperian + EC）', en: 'Hammer core: Imperian + Equites Caesaris' },
+  ],
+  defTips: [
+    { zh: '鐵砧：禁衛兵為主幹，搭配少量使者騎士作反偵察', en: 'Anvil: Praetorians as core + a few Legati for counter-scouting' },
+    { zh: '城牆優先升到 Lv 10 以上（每級 +3% 防禦，效果最好）', en: 'Wall to Lv 10+ (City Wall is the best per-level wall at +3%)' },
+  ],
+};

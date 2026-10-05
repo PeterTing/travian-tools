@@ -186,8 +186,8 @@ describe('AppShell (P0-11 RWD 外框)', () => {
     const main = screen.getByRole('main')
     expect(within(main).getByRole('heading', { level: 2, name: '打仗' })).toBeInTheDocument()
     expect(within(main).getByRole('heading', { level: 2, name: '發展' })).toBeInTheDocument()
-    expect(within(main).getByRole('link', { name: '路徑計算器' })).toHaveAttribute('href', '/calculator/path')
-    expect(within(main).getAllByRole('link')).toHaveLength(13)
+    expect(within(main).getByRole('link', { name: '移動時間' })).toHaveAttribute('href', '/calculator/path')
+    expect(within(main).getAllByRole('link')).toHaveLength(18)
   })
 
   it('desktop sidebar has the same content as the tabs + 更多', () => {

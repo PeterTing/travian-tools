@@ -38,4 +38,17 @@ module.exports = {
       },
     ],
   },
+
+  // guideCalcs：雙語 JSX 會讓 i18next/no-literal-string crash（/^+$/）。
+  // 只關這條；其餘 eslint 規則照常跑。
+  overrides: [
+    {
+      files: ['src/features/guideCalcs/**/*.{ts,tsx}'],
+      rules: {
+        'i18next/no-literal-string': 'off',
+        // Helpers (planGreedy, simulate, lumiBracket) exported for unit tests
+        'react-refresh/only-export-components': 'off',
+      },
+    },
+  ],
 }

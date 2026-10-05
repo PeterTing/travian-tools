@@ -1,214 +1,212 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
-import { Button } from '@/components/ui/button'
-import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
-import type { PathCalculatorRequest, PathCalculatorResponse } from '@/services/advancedCalculatorApi'
+import {
+  calculateTravelSeconds,
+  distanceOnMap,
+  formatTravelTime,
+} from '@/lib/travianFormulas'
 
+/**
+ * 移動時間（路徑）計算器 — 前端即時結果（S71 競技場公式與後端共用）。
+ * 版型：上方輸入、下方 sticky 結果；≥1024px 左右欄。
+ */
 export default function PathCalculatorPage() {
-  const [form, setForm] = useState<PathCalculatorRequest>({
-    start_x: 0,
-    start_y: 0,
-    target_x: 0,
-    target_y: 0,
-    unit_speed: 7,
-    tournament_square_level: 0,
-    hero_bonus: 0,
-    artifact_bonus: 'none',
-    server_speed: 1,
-  })
+  const { t } = useTranslation()
+  const [startX, setStartX] = useState(0)
+  const [startY, setStartY] = useState(0)
+  const [targetX, setTargetX] = useState(0)
+  const [targetY, setTargetY] = useState(0)
+  const [unitSpeed, setUnitSpeed] = useState(7)
+  const [tsLevel, setTsLevel] = useState(0)
+  const [heroBonus, setHeroBonus] = useState(0)
+  const [artifact, setArtifact] = useState<'none' | 'unique_2x' | 'village_2x'>('none')
+  const [serverSpeed, setServerSpeed] = useState(1)
+
   const { currentAccount } = useCurrentAccount()
   useEffect(() => {
     if (currentAccount?.server_speed) {
-      setForm((prev) => ({ ...prev, server_speed: currentAccount.server_speed }))
+      setServerSpeed(currentAccount.server_speed)
     }
-  }, [currentAccount])
-  const [result, setResult] = useState<PathCalculatorResponse | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  }, [currentAccount?.server_speed])
 
-  const handleChange = (field: keyof PathCalculatorRequest, value: string | number) => {
-    setForm((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const handleCalculate = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const res = await advancedCalculatorApi.calculatePath(form)
-      setResult(res)
-    } catch {
-      setError('計算失敗，請檢查輸入')
-    } finally {
-      setLoading(false)
+  const result = useMemo(() => {
+    const distance = distanceOnMap(startX, startY, targetX, targetY)
+    const artifactMultiplier = artifact === 'none' ? 1 : 2
+    const travelSeconds = calculateTravelSeconds({
+      distance,
+      unitSpeed,
+      serverSpeed,
+      tournamentSquareLevel: tsLevel,
+      heroBonusPercent: heroBonus,
+      artifactMultiplier,
+    })
+    const hours = travelSeconds / 3600
+    const arrivalSpeed = hours > 0 ? distance / hours : 0
+    return {
+      distance: Math.round(distance * 100) / 100,
+      travelSeconds,
+      formatted: formatTravelTime(travelSeconds),
+      arrivalSpeed: Math.round(arrivalSpeed * 100) / 100,
     }
-  }
+  }, [startX, startY, targetX, targetY, unitSpeed, tsLevel, heroBonus, artifact, serverSpeed])
+
+  const inputCls =
+    'w-full min-w-0 max-w-full rounded border border-input bg-background p-2 text-sm'
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">路徑計算器</h1>
+    <div className="mx-auto w-full max-w-5xl min-w-0 overflow-x-hidden px-3 py-4 sm:px-4">
+      <div className="mb-4 rounded-xl border bg-card p-4">
+        <h1 className="mb-2 text-xl font-semibold">{t('pathCalc.title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('pathCalc.intro')}</p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Input */}
-        <div className="border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">參數設定</h2>
+      <div className="flex min-w-0 flex-col gap-4 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px)+11rem)] lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:pb-0">
+        <div className="min-w-0 rounded-xl border bg-card p-4">
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
+            {t('pathCalc.inputs')}
+          </h2>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">起始 X</label>
+          <div className="mb-3 grid grid-cols-2 gap-2">
+            <label className="block min-w-0 text-xs text-muted-foreground">
+              {t('pathCalc.startX')}
               <input
                 type="number"
                 min={-200}
                 max={200}
-                value={form.start_x}
-                onChange={(e) => handleChange('start_x', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
+                value={startX}
+                onChange={(e) => setStartX(Number(e.target.value))}
+                className={`${inputCls} mt-1`}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">起始 Y</label>
+            </label>
+            <label className="block min-w-0 text-xs text-muted-foreground">
+              {t('pathCalc.startY')}
               <input
                 type="number"
                 min={-200}
                 max={200}
-                value={form.start_y}
-                onChange={(e) => handleChange('start_y', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
+                value={startY}
+                onChange={(e) => setStartY(Number(e.target.value))}
+                className={`${inputCls} mt-1`}
               />
-            </div>
+            </label>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">目標 X</label>
+          <div className="mb-3 grid grid-cols-2 gap-2">
+            <label className="block min-w-0 text-xs text-muted-foreground">
+              {t('pathCalc.targetX')}
               <input
                 type="number"
                 min={-200}
                 max={200}
-                value={form.target_x}
-                onChange={(e) => handleChange('target_x', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
+                value={targetX}
+                onChange={(e) => setTargetX(Number(e.target.value))}
+                className={`${inputCls} mt-1`}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">目標 Y</label>
+            </label>
+            <label className="block min-w-0 text-xs text-muted-foreground">
+              {t('pathCalc.targetY')}
               <input
                 type="number"
                 min={-200}
                 max={200}
-                value={form.target_y}
-                onChange={(e) => handleChange('target_y', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
+                value={targetY}
+                onChange={(e) => setTargetY(Number(e.target.value))}
+                className={`${inputCls} mt-1`}
               />
-            </div>
+            </label>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">部隊速度（格/小時）</label>
+          <label className="mb-3 block text-xs text-muted-foreground">
+            {t('pathCalc.unitSpeed')}
             <input
               type="number"
               min={1}
-              max={100}
-              value={form.unit_speed}
-              onChange={(e) => handleChange('unit_speed', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
+              value={unitSpeed}
+              onChange={(e) => setUnitSpeed(Number(e.target.value))}
+              className={`${inputCls} mt-1`}
             />
-          </div>
+          </label>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">競技場等級</label>
+          <label className="mb-3 block text-xs text-muted-foreground">
+            {t('pathCalc.tsLevel')}
             <input
               type="number"
               min={0}
               max={20}
-              value={form.tournament_square_level}
-              onChange={(e) => handleChange('tournament_square_level', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
+              value={tsLevel}
+              onChange={(e) => setTsLevel(Number(e.target.value))}
+              className={`${inputCls} mt-1`}
             />
-          </div>
+          </label>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">英雄速度加成 (%)</label>
+          <label className="mb-3 block text-xs text-muted-foreground">
+            {t('pathCalc.heroBonus')}
+            <input
+              type="number"
+              min={0}
+              value={heroBonus}
+              onChange={(e) => setHeroBonus(Number(e.target.value))}
+              className={`${inputCls} mt-1`}
+            />
+          </label>
+
+          <label className="mb-3 block text-xs text-muted-foreground">
+            {t('pathCalc.artifact')}
             <select
-              value={form.hero_bonus}
-              onChange={(e) => handleChange('hero_bonus', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
+              value={artifact}
+              onChange={(e) =>
+                setArtifact(e.target.value as 'none' | 'unique_2x' | 'village_2x')
+              }
+              className={`${inputCls} mt-1`}
             >
-              <option value={0}>無</option>
-              <option value={25}>25%</option>
-              <option value={50}>50%</option>
-              <option value={75}>75%</option>
+              <option value="none">{t('pathCalc.artifactNone')}</option>
+              <option value="unique_2x">{t('pathCalc.artifactUnique2x')}</option>
+              <option value="village_2x">{t('pathCalc.artifactVillage2x')}</option>
             </select>
-          </div>
+          </label>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">神器加成</label>
-            <select
-              value={form.artifact_bonus}
-              onChange={(e) => handleChange('artifact_bonus', e.target.value)}
-              className="w-full p-2 border rounded bg-background"
-            >
-              <option value="none">無</option>
-              <option value="account_1_5x">帳號級 1.5x</option>
-              <option value="unique_2x">唯一 2x</option>
-              <option value="village_2x">村莊 2x</option>
-            </select>
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">伺服器速度</label>
-            <select
-              value={form.server_speed}
-              onChange={(e) => handleChange('server_speed', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
-            >
-              <option value={1}>1x</option>
-              <option value={2}>2x</option>
-              <option value={3}>3x</option>
-              <option value={5}>5x</option>
-              <option value={10}>10x</option>
-            </select>
-          </div>
-
-          <Button onClick={handleCalculate} disabled={loading} className="w-full">
-            {loading ? '計算中...' : '計算'}
-          </Button>
-
-          {error && <p className="text-red-500 mt-4">{error}</p>}
+          <label className="block text-xs text-muted-foreground">
+            {t('pathCalc.serverSpeed')}
+            <input
+              type="number"
+              min={1}
+              step={0.5}
+              value={serverSpeed}
+              onChange={(e) => setServerSpeed(Number(e.target.value))}
+              className={`${inputCls} mt-1`}
+            />
+          </label>
         </div>
 
-        {/* Result */}
-        <div className="border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">計算結果</h2>
-
-          {result ? (
-            <div className="space-y-4">
-              <div className="p-4 bg-muted rounded">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-sm text-muted-foreground">距離</span>
-                    <p className="text-2xl font-bold">{result.distance} 格</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-muted-foreground">有效速度</span>
-                    <p className="text-2xl font-bold">{result.arrival_speed} 格/時</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 bg-primary/10 rounded text-center">
-                <span className="text-sm text-muted-foreground">行進時間</span>
-                <p className="text-3xl font-bold text-primary">
-                  {result.travel_time_formatted}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  ({result.travel_time_seconds.toLocaleString()} 秒)
-                </p>
-              </div>
+        <div className="fixed inset-x-3 bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px)+0.5rem)] z-30 max-h-[min(38vh,16rem)] min-w-0 overflow-y-auto rounded-xl border bg-card p-4 shadow-lg lg:static lg:inset-x-auto lg:bottom-auto lg:z-auto lg:max-h-[calc(100vh-2rem)] lg:self-start lg:shadow-none">
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
+            {t('pathCalc.results')}
+          </h2>
+          <dl className="space-y-3 text-sm">
+            <div className="flex justify-between gap-3 border-b pb-2">
+              <dt className="text-muted-foreground">{t('pathCalc.distance')}</dt>
+              <dd className="font-mono font-medium tabular-nums">
+                {result.distance} {t('pathCalc.fields')}
+              </dd>
             </div>
-          ) : (
-            <div className="text-center text-muted-foreground py-8">
-              輸入座標和速度後按「計算」
+            <div className="flex justify-between gap-3 border-b pb-2">
+              <dt className="text-muted-foreground">{t('pathCalc.travelTime')}</dt>
+              <dd className="font-mono text-base font-semibold tabular-nums text-primary">
+                {result.formatted}
+              </dd>
             </div>
-          )}
+            <div className="flex justify-between gap-3 border-b pb-2">
+              <dt className="text-muted-foreground">{t('pathCalc.seconds')}</dt>
+              <dd className="font-mono font-medium tabular-nums">{result.travelSeconds}</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">{t('pathCalc.effectiveSpeed')}</dt>
+              <dd className="font-mono font-medium tabular-nums">
+                {result.arrivalSpeed} {t('pathCalc.fieldsPerHour')}
+              </dd>
+            </div>
+          </dl>
         </div>
       </div>
     </div>

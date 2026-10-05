@@ -57,7 +57,7 @@
       "development": "發展"
     },
     "calcs": {
-      "path": "路徑計算器",
+      "path": "移動時間",
       "interception": "攔截計算器",
       "saveTroops": "避兵計算器",
       "pathSpeedTs": "TS 反推計算器",
@@ -66,7 +66,15 @@
       "culturePoints": "文化點計算器",
       "npc": "NPC 計算器",
       "technology": "科技計算器",
-      "cropScouter": "首都類型反推"
+      "cropScouter": "首都類型反推",
+      "launchSim": "出兵模擬",
+      "buildOrder": "建造順序",
+      "passiveCp": "文明點",
+      "fieldRoi": "田地 ROI",
+      "oasisRoi": "綠洲 ROI",
+      "cropSim": "糧食模擬",
+      "farming": "農場收益",
+      "tradeRoute": "貿易路線"
     },
     "stats": {
       "overview": "伺服器總覽",
@@ -83,7 +91,10 @@
       "signedInAs": "目前登入：{{name}}"
     },
     "calculatorsPage": {
-      "title": "計算器"
+      "title": "計算器",
+      "search": "搜尋計算器",
+      "searchPlaceholder": "搜尋計算器…",
+      "noResults": "沒有符合的計算器"
     }
   },
   "home": {
@@ -910,5 +921,29 @@
     "population": "人口 {{value}}",
     "fieldsSummary": "田地 {{count}} 格"
   },
-  "confirm": {}
+  "confirm": {},
+  "pathCalc": {
+    "title": "移動時間",
+    "intro": "算出部隊從一點走到另一點要多久。競技場只加快超過 20 格的那段路，每升一級快 20%。改數字時結果會立刻更新。",
+    "inputs": "輸入",
+    "results": "結果",
+    "startX": "起始 X",
+    "startY": "起始 Y",
+    "targetX": "目標 X",
+    "targetY": "目標 Y",
+    "unitSpeed": "單位速度（格／小時）",
+    "tsLevel": "競技場等級（0–20）",
+    "heroBonus": "英雄速度加成（%）",
+    "artifact": "神器",
+    "artifactNone": "無",
+    "artifactUnique2x": "獨特 2×",
+    "artifactVillage2x": "村莊 2×",
+    "serverSpeed": "伺服器速度",
+    "distance": "距離",
+    "fields": "格",
+    "travelTime": "行進時間",
+    "seconds": "秒數",
+    "effectiveSpeed": "有效速度",
+    "fieldsPerHour": "格／時"
+  }
 }

@@ -1,0 +1,106 @@
+import type { Tribe } from '../tribes-types';
+
+export const teutons: Tribe = {
+  id: 'teutons',
+  name: { zh: '日耳曼人', en: 'Teutons' },
+  archetype: { zh: '掠奪 / 進攻型', en: 'Raiders / Offense' },
+  difficulty: 2,
+  color: 'var(--tribe-teutons)',
+  icon: '⚔️',
+  tagline: {
+    zh: '全遊戲最便宜兵 · 極致掠奪',
+    en: 'Cheapest troops · Brutal raiding',
+  },
+  summary: {
+    zh: '進攻型代表：Clubswinger 是全遊戲最便宜最快訓練的單位，Teutonic Knight 攻擊力 150，商人載重 1000。但防禦差、牆最弱，容易被反擊。',
+    en: 'Signature aggressive tribe. Clubswingers are the cheapest and fastest-trained unit in the game. Teutonic Knights hit for 150 attack. Merchants carry 1000 each. But defense is weak and Earth Walls crumble under rams.',
+  },
+
+  heroPassive: {
+    zh: '英雄加入掠奪時，可多掠奪被掠奪村莊 20% 額外資源（早期超強）',
+    en: 'When hero joins a raid, plunders an extra 20% of the target\'s resources (very strong early)',
+  },
+
+  specials: [
+    { zh: '釀酒廠（Brewery）：全球 +20% 攻擊（代價是 +10% upkeep）', en: 'Brewery: global +20% attack (cost: +10% upkeep)' },
+    { zh: '商人容量 1000（最高）', en: 'Merchant capacity 1000 — highest of any tribe' },
+    { zh: '土牆（Earth Wall）血量最高但每級 +2% 防禦（較弱）', en: 'Earth Wall has the highest HP but only +2% defense per level' },
+  ],
+
+  strengths: [
+    { zh: 'Clubswinger 便宜、訓練最快，早期掠奪無人能敵', en: 'Cheap, fast-training Clubswingers dominate early raiding' },
+    { zh: '英雄被動讓早期掠奪收入遠超他族', en: 'Hero passive makes early plunder income significantly higher' },
+    { zh: '釀酒廠 (Brewery) + TK 組合是後期純 OFF 王者', en: 'Brewery + Teutonic Knight late-game is a top pure-offense combo' },
+  ],
+
+  weaknesses: [
+    { zh: 'Earth Wall 被 ram 輕易摧毀，鐵砧難顧', en: 'Earth Wall breaks easily under rams, anvils are vulnerable' },
+    { zh: '沒有高效防禦步兵（Spearman 較差）', en: 'No strong defensive infantry (Spearman is mediocre)' },
+  ],
+
+  wallType: { name: { zh: '土牆 (Earth Wall)', en: 'Earth Wall' }, bonusPerLevel: 0.02 },
+  merchant: { capacity: 1000, speed: 12 },
+  defenseMix: { zh: '70% 矛兵 / 30% 遊俠', en: '70% Spearman / 30% Paladin' },
+
+  units: [
+    { id: 'maceman', category: 'infantry',
+      name: { zh: '棍棒兵', en: 'Clubswinger' },
+      attack: 40, defInfantry: 20, defCavalry: 5, speed: 7, carry: 60, upkeep: 1,
+      cost: { wood: 95, clay: 75, iron: 40, crop: 40 }, trainTime: 900,
+      role: { zh: '全遊戲最便宜兵，初期農場主力', en: 'Cheapest unit in the game, early-game raiding core' } },
+    { id: 'spearman', category: 'infantry',
+      name: { zh: '矛兵', en: 'Spearman' },
+      attack: 10, defInfantry: 35, defCavalry: 60, speed: 7, carry: 40, upkeep: 1,
+      cost: { wood: 145, clay: 70, iron: 85, crop: 40 }, trainTime: 1400,
+      role: { zh: '防騎兵主力', en: 'Anti-cavalry backbone' } },
+    { id: 'axeman', category: 'infantry',
+      name: { zh: '斧頭兵', en: 'Axeman' },
+      attack: 60, defInfantry: 30, defCavalry: 30, speed: 6, carry: 50, upkeep: 1,
+      cost: { wood: 130, clay: 120, iron: 170, crop: 70 }, trainTime: 1500,
+      role: { zh: '中期攻擊步兵', en: 'Mid-game attacking infantry' } },
+    { id: 'scout', category: 'scout',
+      name: { zh: '偵察兵', en: 'Scout' },
+      attack: 0, defInfantry: 10, defCavalry: 5, speed: 9, carry: 0, upkeep: 1,
+      cost: { wood: 160, clay: 100, iron: 50, crop: 50 }, trainTime: 1400,
+      role: { zh: '步行偵察兵（較慢但便宜）', en: 'Foot scout (slower but cheap)' } },
+    { id: 'paladin', category: 'cavalry',
+      name: { zh: '遊俠', en: 'Paladin' },
+      attack: 55, defInfantry: 100, defCavalry: 40, speed: 10, carry: 110, upkeep: 2,
+      cost: { wood: 370, clay: 270, iron: 290, crop: 75 }, trainTime: 3000,
+      role: { zh: '高防騎兵 + farm 搬運', en: 'High-def cavalry + strong raider carry' } },
+    { id: 'tk', category: 'cavalry',
+      name: { zh: '條頓騎士', en: 'Teutonic Knight' },
+      attack: 150, defInfantry: 50, defCavalry: 75, speed: 9, carry: 80, upkeep: 3,
+      cost: { wood: 450, clay: 515, iron: 480, crop: 80 }, trainTime: 3700,
+      role: { zh: '日耳曼人主力攻擊騎兵', en: 'Main Teuton attacking cavalry' } },
+    { id: 'ram', category: 'siege',
+      name: { zh: '破城槌', en: 'Ram' },
+      attack: 65, defInfantry: 30, defCavalry: 80, speed: 4, carry: 0, upkeep: 3,
+      cost: { wood: 1000, clay: 300, iron: 350, crop: 70 }, trainTime: 4200,
+      role: { zh: '便宜的破牆器', en: 'Cheapest ram in the game' } },
+    { id: 'catapult', category: 'siege',
+      name: { zh: '弩炮', en: 'Catapult' },
+      attack: 50, defInfantry: 60, defCavalry: 10, speed: 3, carry: 0, upkeep: 6,
+      cost: { wood: 900, clay: 1200, iron: 600, crop: 60 }, trainTime: 9000,
+      role: { zh: '摧毀建築', en: 'Destroys buildings' } },
+    { id: 'chief', category: 'chief',
+      name: { zh: '司令官', en: 'Chief' },
+      attack: 40, defInfantry: 60, defCavalry: 40, speed: 4, carry: 0, upkeep: 4,
+      cost: { wood: 35500, clay: 26600, iron: 25000, crop: 27200 }, trainTime: 70500,
+      role: { zh: '日耳曼人 Chief 訓練最快', en: 'Teuton Chief trains fastest of any tribe' } },
+    { id: 'settler', category: 'settler',
+      name: { zh: '開拓者', en: 'Settler' },
+      attack: 10, defInfantry: 80, defCavalry: 80, speed: 5, carry: 3000, upkeep: 1,
+      cost: { wood: 5800, clay: 4400, iron: 4600, crop: 5200 }, trainTime: 31000,
+      role: { zh: '建立新村莊', en: 'Establishes new villages' } },
+  ],
+
+  offTips: [
+    { zh: '早期目標：訓 30–50 棍棒兵，開始掠奪 inactives', en: 'Early goal: 30–50 Clubswingers for farming inactives' },
+    { zh: '錘子主力：斧頭兵 + 條頓騎士 + 釀酒廠 (Brewery)', en: 'Hammer core: Axeman + TK + Brewery' },
+  ],
+  defTips: [
+    { zh: '鐵砧：矛兵 70% + 遊俠 30%', en: 'Anvil: 70% Spearman + 30% Paladin' },
+    { zh: '牆防較弱，多用部隊 def 為主', en: 'Wall defense is weak; rely on troop def, not wall bonus' },
+  ],
+};
