@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { fieldRoi, FIELD_COSTS, type ResourceType } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
+import CalcResultPanel from './CalcResultPanel';
 
 const TYPE_LABELS: Record<ResourceType, { zh: string; en: string }> = {
   wood: { zh: '🪵 木材', en: '🪵 Wood' },
@@ -100,12 +101,19 @@ export default function FieldRoiCalculator() {
           </label>
         </div>
 
-        <div className={s.output}>
-          <h4>{lang === 'en' ? 'Result' : '結果'}</h4>
+        <CalcResultPanel
+          lang={lang}
+          title={lang === 'en' ? 'Result' : '結果'}
+          primary={<>{result.roiDays.toFixed(2)} {lang === 'en' ? 'days' : '天'}</>}
+          secondary={
+            lang === 'en'
+              ? `Cost ${fmt(result.cost)} · +${fmt(result.productionGainPerDay)}/day`
+              : `成本 ${fmt(result.cost)} · 每天 +${fmt(result.productionGainPerDay)}`
+          }
+        >
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Upgrade cost (total)' : '升級成本（合計）'}</span><span className={s.value}>{fmt(result.cost)}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Production gain /hr' : '每小時產量增加'}</span><span className={s.value}>+{fmt(result.productionGainPerHour)}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Production gain /day' : '每天產量增加'}</span><span className={s.value}>+{fmt(result.productionGainPerDay)}</span></div>
-          <div className={s.row}><span className={s.label}>ROI</span><span className={`${s.value} ${s.highlight}`}>{result.roiDays.toFixed(2)} {lang === 'en' ? 'days' : '天'}</span></div>
 
           <div className={s.note}>
             {lang === 'en' ? 'Cost breakdown (W / C / I / Cr): ' : '成本拆解 (木 / 土 / 鐵 / 糧)：'}
@@ -126,7 +134,7 @@ export default function FieldRoiCalculator() {
               ))}
             </tbody>
           </table>
-        </div>
+        </CalcResultPanel>
       </div>
     </>
   );

@@ -83,7 +83,7 @@
   right: 0.75rem;
   bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 0.5rem);
   z-index: 30;
-  max-height: min(38vh, 16rem);
+  max-height: min(50vh, 22rem);
   overflow-y: auto;
   box-shadow: 0 -6px 20px hsl(var(--foreground) / 0.1);
 }
@@ -93,11 +93,12 @@
     position: sticky;
     left: auto;
     right: auto;
-    top: 1rem;
+    /* Clear AppHeader (h-14 = 3.5rem) + gap */
+    top: calc(3.5rem + 0.75rem);
     bottom: auto;
     z-index: auto;
     align-self: start;
-    max-height: calc(100vh - 2rem);
+    max-height: calc(100vh - 3.5rem - 1.5rem);
     overflow-y: auto;
     box-shadow: none;
   }
@@ -338,4 +339,75 @@
 
 .btnRow button:hover {
   border-color: hsl(var(--foreground));
+}
+
+
+/* Compact summary (phone fixed panel); desktop still shows full details below */
+.summaryTitle {
+  margin-bottom: 0.5rem !important;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.primary {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+  color: hsl(var(--foreground));
+}
+
+.secondary {
+  font-size: 0.8125rem;
+  color: hsl(var(--muted-foreground));
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+}
+
+.detailsToggle {
+  display: flex;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.375rem;
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  justify-content: center;
+}
+
+.detailsToggle:hover {
+  border-color: hsl(var(--foreground) / 0.35);
+}
+
+.details {
+  margin-top: 0.75rem;
+  min-width: 0;
+}
+
+.details[hidden] {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .detailsToggle {
+    display: none;
+  }
+  .details,
+  .details[hidden] {
+    display: block;
+  }
+  /* Desktop: primary slightly smaller so it fits the column */
+  .primary {
+    font-size: 1.375rem;
+  }
 }

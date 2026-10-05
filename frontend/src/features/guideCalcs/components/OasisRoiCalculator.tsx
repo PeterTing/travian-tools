@@ -5,6 +5,7 @@ import {
 } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
+import CalcResultPanel from './CalcResultPanel';
 
 const fmt = (n: number) => isFinite(n)
   ? (Math.abs(n) >= 1000 ? Math.round(n).toLocaleString('en-US') : n.toFixed(1).replace(/\.0$/, ''))
@@ -103,12 +104,19 @@ export default function OasisRoiCalculator() {
           </div>
         </div>
 
-        <div className={s.output}>
-          <h4>{lang === 'en' ? 'Result' : '結果'}</h4>
+        <CalcResultPanel
+          lang={lang}
+          title={lang === 'en' ? 'Result' : '結果'}
+          primary={<>{roi.toFixed(2)} {lang === 'en' ? 'days' : '天'}</>}
+          secondary={
+            lang === 'en'
+              ? `+${fmt(dailyGain)}/day · mansion cost ${fmt(hmCumulativeCost(hm))}`
+              : `每天 +${fmt(dailyGain)} · 英雄宅成本 ${fmt(hmCumulativeCost(hm))}`
+          }
+        >
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'HM cumulative cost' : '英雄宅累積成本'}</span><span className={s.value}>{fmt(hmCumulativeCost(hm))}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /hr from this oasis' : '此綠洲每小時產量'}</span><span className={s.value}>+{fmt(dailyGain / 24)}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /day' : '每天'}</span><span className={s.value}>+{fmt(dailyGain)}</span></div>
-          <div className={s.row}><span className={s.label}>ROI</span><span className={`${s.value} ${s.highlight}`}>{roi.toFixed(2)} {lang === 'en' ? 'days' : '天'}</span></div>
 
           <h4>{lang === 'en' ? 'Compare 3 mansion levels' : '比較三種英雄宅等級'}</h4>
           <table className={s.table}>
@@ -128,7 +136,7 @@ export default function OasisRoiCalculator() {
               })}
             </tbody>
           </table>
-        </div>
+        </CalcResultPanel>
       </div>
     </>
   );

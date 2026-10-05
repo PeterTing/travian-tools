@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
+import CalcResultPanel from './CalcResultPanel';
 
 interface UnitOpt { id: string; label: { zh: string; en: string }; carry: number; speed: number; cost: number }
 const UNITS: UnitOpt[] = [
@@ -98,10 +99,15 @@ export default function FarmingCalculator() {
           </div>
         </div>
 
-        <div className={s.output}>
+        <CalcResultPanel
+          lang={lang}
+          title={lang === 'en' ? 'Daily yield' : '每日收益'}
+          primary={<>{Math.round(calc.daily).toLocaleString()}</>}
+          secondary={rec.msg}
+        >
           <h4>{lang === 'en' ? 'Suggested size' : '建議兵數'}</h4>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Pop bracket' : '人口區間'}</span><span className={s.value}>{rec.bracket}</span></div>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Recommended count' : '建議兵數'}</span><span className={`${s.value} ${s.highlight}`}>{rec.msg}</span></div>
+          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Recommended count' : '建議兵數'}</span><span className={s.value}>{rec.msg}</span></div>
 
           <h4>{lang === 'en' ? 'Round-trip & haul' : '往返與搬運'}</h4>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way' : '單程'}</span><span className={s.value}>{fmtMin(calc.owMin)}</span></div>
@@ -116,7 +122,7 @@ export default function FarmingCalculator() {
               ? 'Daily yield uses the smaller of loot per raid and carry capacity, times raids per hour. For a new farm, try about 10 horses first; if others contest it, send only enough to fill one haul.'
               : '每日收益取「每次搶到的量」與「搬運上限」較小者，再乘每小時次數。新農場可先派約 10 匹馬探底；若常被搶，就降到剛好搬滿一次即可。'}
           </div>
-        </div>
+        </CalcResultPanel>
       </div>
     </>
   );

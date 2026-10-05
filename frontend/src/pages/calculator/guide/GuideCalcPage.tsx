@@ -6,7 +6,7 @@ import type { ComponentType } from 'react'
  */
 export default function GuideCalcPage({ Calc }: { Calc: ComponentType }) {
   return (
-    <div className="mx-auto w-full max-w-5xl min-w-0 overflow-x-hidden px-3 py-4 sm:px-4">
+    <div className="mx-auto w-full max-w-5xl min-w-0 overflow-x-clip px-3 py-4 sm:px-4">
       <Calc />
     </div>
   )

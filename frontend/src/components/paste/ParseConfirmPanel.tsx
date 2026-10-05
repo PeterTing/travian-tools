@@ -20,6 +20,7 @@ import {
 } from '@/lib/pasteFormat'
 import { pasteApi } from '@/services/pasteApi'
 import type { GameAccount } from '@/types/game'
+import { formatCountdownSeconds } from '@/lib/formatCountdown'
 
 export interface ConfirmState {
   pageType: string
@@ -140,9 +141,9 @@ export function ParseConfirmPanel({
       })
       .catch(() => {
         if (cancelled) return
-        // Fallback only if API fails: treat all as new (legacy frontend default)
-        setDiffCreated(incoming.length)
-        setDiffUpdated(0)
+        // Preview failed: keep save enabled but hide N/M hints (plain 「存入」)
+        setDiffCreated(null)
+        setDiffUpdated(null)
       })
       .finally(() => {
         if (!cancelled) setDiffLoading(false)
@@ -181,11 +182,11 @@ export function ParseConfirmPanel({
   const handleSave = async () => {
     setError('')
     if (!saveable) {
-      setError('沒有可存的解析結果')
+      setError(t('paste.emptyError'))
       return
     }
     if (showVillage && villages.length > 0 && !villageId) {
-      setError('請選擇要存入的村莊')
+      setError(t('paste.selectVillage'))
       return
     }
     if (helpImprove) {
@@ -206,7 +207,7 @@ export function ParseConfirmPanel({
             : parseUtcOffsetDraft(utcOffsetDraft),
       })
     } catch (e) {
-      setError(e instanceof Error ? e.message : '存入失敗')
+      setError(e instanceof Error ? e.message : t('paste.saveFailed'))
     }
   }
 
@@ -360,7 +361,7 @@ export function ParseConfirmPanel({
                       </div>
                       <div className="text-xs text-muted-foreground">
                         抵達 {String(m.arrival_time || '—')}
-                        {m.timer_seconds != null ? ` · 倒數 ${m.timer_seconds}s` : ''}
+                        {m.timer_seconds != null ? ` · 倒數 ${formatCountdownSeconds(Number(m.timer_seconds))}` : ''}
                       </div>
                     </div>
                     {needs ? (
@@ -566,7 +567,7 @@ export function ParseConfirmPanel({
                 ? `存入 · ${diffLabel}`
                 : diffLoading
                   ? '比對中…'
-                  : `存入 ${incoming.length} 筆`
+                  : '存入'
               : '存入'}
         </Button>
       </CardFooter>

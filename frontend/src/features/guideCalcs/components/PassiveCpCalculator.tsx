@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { cpAtLevel, CP_REQUIRED, type CpBuilding } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
+import CalcResultPanel from './CalcResultPanel';
 
 interface FieldDef { id: string; key: CpBuilding; label: string }
 
@@ -95,10 +96,12 @@ export default function PassiveCpCalculator() {
           </div>
         </div>
 
-        <div className={s.output}>
-          <h4>{lang === 'en' ? 'Daily passive CP' : '每日被動 CP'}</h4>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Total (incl. +2 baseline)' : '總計（含 +2 基礎）'}</span><span className={`${s.value} ${s.highlight}`}>{total} / {lang === 'en' ? 'day' : '天'}</span></div>
-
+        <CalcResultPanel
+          lang={lang}
+          title={lang === 'en' ? 'Daily passive CP' : '每日被動 CP'}
+          primary={<>{total} / {lang === 'en' ? 'day' : '天'}</>}
+          secondary={lang === 'en' ? 'Includes +2 empty-village baseline' : '含空村 +2 基礎產量'}
+        >
           <h4>{lang === 'en' ? 'Days to reach village #N' : '開村門檻所需天數'}</h4>
           <table className={s.table}>
             <thead><tr><th>#</th><th>{lang === 'en' ? 'CP req.' : '需求'}</th><th>{lang === 'en' ? 'Days passive' : '被動'}</th><th>{lang === 'en' ? '+1 great celeb/day' : '+大慶典/天'}</th></tr></thead>
@@ -133,7 +136,7 @@ export default function PassiveCpCalculator() {
               ? 'Culture points are account-wide — add up every village. A great celebration costs 5× a small one and gives +2,000 CP (about 60 hours at Town Hall 10).'
               : '文明點是整帳號共用，要把所有村莊加起來才準。大慶典花費是小慶典的 5 倍，一次加 2,000 點（城鎮廳 10 級大約 60 小時）。'}
           </div>
-        </div>
+        </CalcResultPanel>
       </div>
     </>
   );

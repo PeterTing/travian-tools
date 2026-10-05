@@ -486,11 +486,13 @@ async def calculate_crop_balance(request: CropBalanceRequest) -> CropBalanceResp
     """計算糧食平衡.
 
     人口為各建築 1..level 人口增量總和（非只取該級增量）。
-    英雄產量／消耗由呼叫端輸入（S75／S141；ts11：28+36+6−8−6=56）。
+    英雄產量／消耗由呼叫端輸入。
     """
+    # Hero crop numbers verified against support articles / ts11
+    # (28+36+6−8−6=56 net example).
     service = get_game_data_service()
 
-    # 人口 = 累加該建築從 1 級到目前等級的 population 增量（KIR / TS11）
+    # 人口 = 累加該建築從 1 級到目前等級的 population 增量
     population_consumption = 0
     for building_info in request.buildings:
         building_id = building_info.get("building_id")
