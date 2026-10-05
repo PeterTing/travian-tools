@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Travian Tools Helper",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Read the Travian: Legends page you are on (only when you click Sync) and send it to Travian Tools",
   "permissions": [
     "activeTab",
@@ -11,6 +11,12 @@
   "host_permissions": [
     "http://localhost:8000/*"
   ],
+  "externally_connectable": {
+    "matches": [
+      "http://localhost:5173/*",
+      "http://localhost:5174/*"
+    ]
+  },
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {

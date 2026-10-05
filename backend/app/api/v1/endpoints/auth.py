@@ -1,9 +1,14 @@
 """認證 API 端點."""
 
-from fastapi import APIRouter, HTTPException, status
+from datetime import UTC, datetime
+from typing import Annotated
 
-from app.core.dependencies import CurrentUser, DBSession
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials
+
+from app.core.dependencies import CurrentUser, DBSession, security
 from app.domain.schemas.auth import (
+    ExtensionTokenResponse,
     MessageResponse,
     TokenRefreshRequest,
     TokenResponse,
@@ -93,6 +98,36 @@ async def refresh_token(request: TokenRefreshRequest, db: DBSession) -> TokenRes
 async def get_me(current_user: CurrentUser) -> UserResponse:
     """取得當前使用者資訊."""
     return UserResponse.model_validate(current_user)
+
+
+@router.post(
+    "/extension-token",
+    response_model=ExtensionTokenResponse,
+    summary="換發擴充登入憑證",
+    description=(
+        "工具網站登入後呼叫，取得交給瀏覽器擴充的短效 Token（有到期時間）。"
+        "擴充專用 Token 不能再拿來換發。"
+    ),
+)
+async def create_extension_token(
+    current_user: CurrentUser,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)],
+) -> ExtensionTokenResponse:
+    """換發擴充登入憑證."""
+    if credentials and AuthService.is_extension_token(credentials.credentials):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="擴充憑證不能再換發新的憑證，請在工具網站登入",
+        )
+
+    token, expires_at = AuthService.create_extension_token(current_user.user_id)
+    expires_in = max(0, int((expires_at - datetime.now(UTC)).total_seconds()))
+    return ExtensionTokenResponse(
+        access_token=token,
+        expires_at=expires_at,
+        expires_in=expires_in,
+        user=UserResponse.model_validate(current_user),
+    )
 
 
 @router.post(

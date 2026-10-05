@@ -268,6 +268,31 @@ def test_extension_manifest_is_click_only() -> None:
     # test_extension_has_no_background_sync_triggers (no timers / requests).
 
 
+def test_extension_popup_has_no_input_boxes() -> None:
+    """The popup never asks for a password: no inputs at all (P0-04)."""
+    popup = EXTENSION / "popup" / "popup.html"
+    if not popup.exists():
+        pytest.skip("no extension popup")
+    html = popup.read_text(encoding="utf-8")
+    banned = re.compile(r"<input\b|<textarea\b|<form\b|contenteditable", re.I)
+    assert banned.search(html) is None, "popup.html must not contain input boxes"
+
+
+def test_extension_only_accepts_credentials_from_tool_site() -> None:
+    manifest_path = EXTENSION / "manifest.json"
+    if not manifest_path.exists():
+        pytest.skip("no browser extension")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    external = manifest.get("externally_connectable", {})
+    assert "ids" not in external, "other extensions must not talk to us"
+    matches = external.get("matches", [])
+    assert matches, "the tool site must be able to hand over the login credential"
+    for pattern in matches:
+        assert "travian" not in pattern.lower(), pattern
+        assert pattern not in ("<all_urls>", "*://*/*"), pattern
+        assert re.fullmatch(r"https?://[a-z0-9.-]+(:\d+)?/\*", pattern), pattern
+
+
 def test_only_map_sql_scheduler_schedules_jobs() -> None:
     pattern = re.compile(
         r"\b(?:BackgroundScheduler|AsyncIOScheduler|BlockingScheduler|add_job|"

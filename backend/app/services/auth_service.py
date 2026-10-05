@@ -10,6 +10,8 @@ from app.core.config import settings
 from app.domain.schemas.auth import TokenResponse, UserResponse
 from app.infrastructure.database.models.user import User
 
+EXTENSION_SCOPE = "extension"
+
 
 class AuthService:
     """認證服務類別."""
@@ -48,6 +50,40 @@ class AuthService:
             settings.JWT_SECRET_KEY,
             algorithm=settings.JWT_ALGORITHM,
         )
+
+    @staticmethod
+    def create_extension_token(user_id: str) -> tuple[str, datetime]:
+        """建立交給瀏覽器擴充的短效 Token.
+
+        仍是 ``type=access``，所以同步 API 可以直接使用；另外帶
+        ``scope=extension``，讓它不能再拿來換發新的擴充 Token。
+
+        Returns:
+            (token, 到期時間 UTC)
+        """
+        expire = datetime.now(UTC).replace(microsecond=0) + timedelta(
+            minutes=settings.JWT_EXTENSION_TOKEN_EXPIRE_MINUTES
+        )
+        payload = {
+            "sub": user_id,
+            "exp": expire,
+            "type": "access",
+            "scope": EXTENSION_SCOPE,
+        }
+        token = jwt.encode(
+            payload,
+            settings.JWT_SECRET_KEY,
+            algorithm=settings.JWT_ALGORITHM,
+        )
+        return token, expire
+
+    @classmethod
+    def is_extension_token(cls, token: str) -> bool:
+        """判斷 Token 是否為擴充專用 Token."""
+        payload = cls.decode_token(token)
+        if not payload:
+            return False
+        return payload.get("scope") == EXTENSION_SCOPE
 
     @staticmethod
     def create_refresh_token(user_id: str) -> str:

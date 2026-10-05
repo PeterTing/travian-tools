@@ -7,62 +7,38 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <h1>Travian Tools</h1>
+  <!-- 這個 popup 刻意不放任何輸入框：不輸入密碼，也絕對不問遊戲密碼。 -->
+  <main class="ext">
+    <header class="ext-head">
+      <b>Travian Tools</b>
+      <button id="logout-btn" type="button" class="link hidden">登出擴充</button>
     </header>
 
-    <!-- 未登入狀態 -->
-    <div id="login-section" class="section">
-      <h2>登入</h2>
-      <form id="login-form">
-        <div class="form-group">
-          <label for="email">電子郵件</label>
-          <input type="email" id="email" placeholder="your@email.com" required>
-        </div>
-        <div class="form-group">
-          <label for="password">密碼</label>
-          <input type="password" id="password" placeholder="密碼" required>
-        </div>
-        <button type="submit" class="btn btn-primary">登入</button>
-      </form>
-      <p class="hint">
-        還沒有帳號？<a href="http://localhost:3000/register" target="_blank">立即註冊</a>
-      </p>
-    </div>
+    <!-- 未登入：只有一顆按鈕，開新分頁到工具網站登入 -->
+    <section id="login-section" class="hidden">
+      <p class="small">還沒登入這個工具</p>
+      <button id="open-site-btn" type="button" class="btn p">在工具網站登入</button>
+      <p class="small note">會開新分頁到工具網站登入，登完回來就能用。這裡不輸入任何密碼，也絕對不問遊戲密碼。</p>
+    </section>
 
-    <!-- 已登入狀態 -->
-    <div id="main-section" class="section hidden">
-      <div class="user-info">
-        <span id="username"></span>
-        <button id="logout-btn" class="btn btn-small">登出</button>
-      </div>
-
-      <div class="accounts-section">
-        <h3>選擇遊戲帳號</h3>
+    <!-- 已登入 -->
+    <section id="main-section" class="hidden">
+      <p class="small">目前頁面：<span id="page-type">檢測中…</span></p>
+      <button id="sync-btn" type="button" class="btn p" disabled>上傳這一頁</button>
+      <p class="small note target">
+        <label for="account-select">存到</label>
         <select id="account-select">
-          <option value="">-- 選擇帳號 --</option>
+          <option value="">選擇遊戲帳號</option>
         </select>
-      </div>
+      </p>
+      <p class="small">不會自動上傳其他頁面。</p>
+      <p id="sync-result" class="sync-result" role="status"></p>
+      <p class="small meta"><span id="username"></span><span id="expiry"></span></p>
+    </section>
 
-      <div class="status-section">
-        <h3>頁面狀態</h3>
-        <div id="page-status" class="status-box">
-          <span class="status-label">當前頁面:</span>
-          <span id="page-type" class="status-value">檢測中...</span>
-        </div>
-      </div>
+    <p id="error-message" class="error-message hidden" role="alert"></p>
+  </main>
 
-      <div class="actions-section">
-        <button id="sync-btn" class="btn btn-primary" disabled>同步當前頁面</button>
-        <p id="sync-result" class="sync-result"></p>
-      </div>
-    </div>
-
-    <!-- 錯誤訊息 -->
-    <div id="error-message" class="error-message hidden"></div>
-  </div>
-
-  <script src="popup.js"></script>
+  <script type="module" src="popup.js"></script>
 </body>
 </html>

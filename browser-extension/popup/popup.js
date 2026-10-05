@@ -1,13 +1,20 @@
 /**
  * Travian Tools - Popup Script
+ *
+ * popup 裡沒有任何輸入框。沒登入時只顯示「在工具網站登入」，按下去開新分頁
+ * 到工具網站；登入後網站會把有到期時間的憑證交給擴充（見 background）。
  */
+
+import { TOOL_SITE_URL } from '../lib/config.js';
+import { describeExpiry } from '../lib/credential.js';
 
 // DOM 元素
 const loginSection = document.getElementById('login-section');
 const mainSection = document.getElementById('main-section');
-const loginForm = document.getElementById('login-form');
+const openSiteBtn = document.getElementById('open-site-btn');
 const logoutBtn = document.getElementById('logout-btn');
 const usernameEl = document.getElementById('username');
+const expiryEl = document.getElementById('expiry');
 const accountSelect = document.getElementById('account-select');
 const pageTypeEl = document.getElementById('page-type');
 const syncBtn = document.getElementById('sync-btn');
@@ -91,10 +98,14 @@ function updateUI() {
   if (currentAuth) {
     loginSection.classList.add('hidden');
     mainSection.classList.remove('hidden');
-    usernameEl.textContent = currentAuth.username || currentAuth.email || '使用者';
+    logoutBtn.classList.remove('hidden');
+    const user = currentAuth.user || {};
+    usernameEl.textContent = user.username || user.email || '已登入';
+    expiryEl.textContent = describeExpiry(currentAuth);
   } else {
     loginSection.classList.remove('hidden');
     mainSection.classList.add('hidden');
+    logoutBtn.classList.add('hidden');
   }
 }
 
@@ -104,13 +115,16 @@ function updateUI() {
 async function loadAccounts() {
   const result = await sendMessage('get_accounts');
   if (result.success && result.data?.accounts) {
-    accountSelect.innerHTML = '<option value="">-- 選擇帳號 --</option>';
+    accountSelect.innerHTML = '<option value="">選擇遊戲帳號</option>';
     result.data.accounts.forEach((account) => {
       const option = document.createElement('option');
       option.value = account.account_id;
-      option.textContent = `${account.server_name || account.server_url} (${account.player_name || '未知'})`;
+      option.textContent = `${account.player_name || '未命名'} · ${account.server_name || account.server_url}`;
       accountSelect.appendChild(option);
     });
+    if (result.data.accounts.length === 1) {
+      accountSelect.value = result.data.accounts[0].account_id;
+    }
   }
 }
 
@@ -144,16 +158,8 @@ async function detectPage() {
        currentPageType === 'troop_statistics');
     syncBtn.disabled = !canSync;
 
-    // 更新按鈕文字
-    if (currentPageType === 'reports') {
-      syncBtn.textContent = '同步報告';
-    } else if (currentPageType === 'troop_statistics') {
-      syncBtn.textContent = '同步軍隊統計';
-    } else {
-      syncBtn.textContent = '同步當前頁面';
-    }
   } else {
-    pageTypeEl.textContent = '無法檢測 (非 Travian 頁面)';
+    pageTypeEl.textContent = '不是 Travian 遊戲頁面';
     syncBtn.disabled = true;
   }
 }
@@ -168,7 +174,7 @@ async function syncData() {
   }
 
   syncBtn.disabled = true;
-  syncBtn.textContent = '同步中...';
+  syncBtn.textContent = '上傳中…';
   syncResultEl.textContent = '';
   syncResultEl.className = 'sync-result';
 
@@ -207,62 +213,47 @@ async function syncData() {
     }
 
     if (syncResult?.success) {
-      let successMsg = '同步成功！';
+      let successMsg = '上傳成功！';
       if (currentPageType === 'reports') {
-        successMsg = `同步成功！共 ${syncResult.data?.count || 0} 筆報告`;
+        successMsg = `上傳成功！共 ${syncResult.data?.count || 0} 筆報告`;
       } else if (currentPageType === 'troop_statistics') {
-        successMsg = `同步成功！${syncResult.data?.villages_synced || 0} 個村莊，${syncResult.data?.troops_synced || 0} 筆部隊`;
+        successMsg = `上傳成功！${syncResult.data?.villages_synced || 0} 個村莊，${syncResult.data?.troops_synced || 0} 筆部隊`;
       }
       syncResultEl.textContent = successMsg;
       syncResultEl.className = 'sync-result success';
     } else {
-      throw new Error(syncResult?.error || '同步失敗');
+      throw new Error(syncResult?.error || '上傳失敗');
     }
   } catch (error) {
     syncResultEl.textContent = `錯誤: ${error.message}`;
     syncResultEl.className = 'sync-result error';
 
     // 如果是認證錯誤，回到登入畫面
-    if (error.message.includes('登入已過期') || error.message.includes('401')) {
+    if (
+      error.message.includes('登入已過期') ||
+      error.message.includes('尚未登入') ||
+      error.message.includes('401')
+    ) {
       currentAuth = null;
       updateUI();
     }
   } finally {
     syncBtn.disabled = false;
-    if (currentPageType === 'reports') {
-      syncBtn.textContent = '同步報告';
-    } else if (currentPageType === 'troop_statistics') {
-      syncBtn.textContent = '同步軍隊統計';
-    } else {
-      syncBtn.textContent = '同步當前頁面';
-    }
+    syncBtn.textContent = '上傳這一頁';
   }
 }
 
 // 事件處理
-loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-
-  const result = await sendMessage('login', {
-    credentials: { email, password },
-  });
-
-  if (result.success) {
-    currentAuth = result.data;
-    updateUI();
-    await loadAccounts();
-    await detectPage();
-  } else {
-    showError(result.error || '登入失敗');
-  }
+openSiteBtn.addEventListener('click', () => {
+  // 只開一個新分頁到「工具網站」的登入頁，不碰任何遊戲分頁。
+  window.open(`${TOOL_SITE_URL}/login?from=extension`, '_blank', 'noopener');
+  window.close();
 });
 
 logoutBtn.addEventListener('click', async () => {
   await sendMessage('logout');
   currentAuth = null;
+  syncResultEl.textContent = '';
   updateUI();
 });
 
@@ -276,7 +267,7 @@ syncBtn.addEventListener('click', syncData);
 (async () => {
   // 檢查登入狀態
   const authResult = await sendMessage('get_auth');
-  if (authResult.success && authResult.data) {
+  if (authResult?.success && authResult.data) {
     currentAuth = authResult.data;
     updateUI();
     await loadAccounts();
@@ -284,6 +275,8 @@ syncBtn.addEventListener('click', syncData);
     updateUI();
   }
 
-  // 檢測當前頁面
-  await detectPage();
+  // 檢測當前頁面（沒登入就不用讀遊戲頁面）
+  if (currentAuth) {
+    await detectPage();
+  }
 })();
