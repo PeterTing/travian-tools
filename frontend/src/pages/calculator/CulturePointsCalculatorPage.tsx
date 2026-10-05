@@ -40,7 +40,7 @@ export default function CulturePointsCalculatorPage() {
         計算開設各村莊所需的文化點及預估日期。
       </p>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div>
           <label className="block text-sm font-medium mb-2">當前文化點</label>
           <input

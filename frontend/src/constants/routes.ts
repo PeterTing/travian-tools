@@ -20,6 +20,8 @@ export const ROUTES = {
 
   // 計算機
   CALCULATOR: {
+    // 計算器列表（手機底部「計算器」分頁）
+    INDEX: '/calculator',
     BUILDING: '/calculator/building',
     ROI: '/calculator/roi',
     BATTLE: '/calculator/battle',
@@ -39,6 +41,9 @@ export const ROUTES = {
 
   // 地圖
   MAP_SQL: '/map-sql',
+
+  // 更多（手機底部「更多」分頁：地圖、帳號管理、數據庫、統計、登出）
+  MORE: '/more',
 
   // 攻略（P0 只有起手式）
   STRATEGY: {

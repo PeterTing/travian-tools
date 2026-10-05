@@ -52,7 +52,7 @@ export default function InterceptionCalculatorPage() {
         計算何時派出攔截部隊，在攻擊者回程時於其村莊攔截。
       </p>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input */}
         <div className="border rounded-lg p-6 space-y-4">
           <h2 className="text-xl font-semibold">攻擊者村莊（敵方）</h2>

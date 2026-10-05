@@ -199,7 +199,7 @@ export default function GameAccountsPage({ startWithCreate = false }: GameAccoun
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {activeAccounts.map((account) => (
             <Card key={account.account_id}>
               <CardHeader>

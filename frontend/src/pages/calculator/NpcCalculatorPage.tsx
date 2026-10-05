@@ -58,7 +58,7 @@ export default function NpcCalculatorPage() {
       <h1 className="text-3xl font-bold mb-6">{t('calculator.npc.title')}</h1>
       <p className="text-muted-foreground mb-6">{t('calculator.npc.description')}</p>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">{t('calculator.npc.currentResources')}</h2>
           <div className="grid grid-cols-2 gap-4 mb-6">

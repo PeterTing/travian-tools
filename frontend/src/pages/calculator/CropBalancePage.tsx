@@ -185,7 +185,7 @@ export default function CropBalancePage() {
         {t('calculator.crop.description')}
       </p>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Input area */}
         <div className="space-y-6">
           {/* Crop production */}

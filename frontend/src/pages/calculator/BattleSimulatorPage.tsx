@@ -205,7 +205,7 @@ export default function BattleSimulatorPage() {
         {t('calculator.battle.unreliableNote')}
       </p>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Attacker */}
         <TroopSelector
           side="attacker"
@@ -263,7 +263,7 @@ export default function BattleSimulatorPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Attacker result */}
             <div className="border rounded p-4">
               <h3 className="font-semibold mb-4 text-center">{t('calculator.battle.attacker')}</h3>

@@ -301,7 +301,7 @@ function FakeTroopsForm() {
 
   return (
     <div className="border rounded-lg p-6">
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">目標人口</label>

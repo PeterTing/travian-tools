@@ -7,7 +7,9 @@ import { accountPlayerLabel, accountWorldLabel, updatedAgo } from '@/lib/account
 import type { GameAccount } from '@/types/game'
 
 const chipBase =
-  'inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs whitespace-nowrap bg-background hover:bg-muted'
+  'inline-flex min-w-0 items-center gap-1 rounded-full border px-3 py-1 text-xs whitespace-nowrap bg-background hover:bg-muted'
+/** 名字太長時截斷（手機頂部空間有限），完整名字在 title 和 aria-label */
+const chipText = 'min-w-0 max-w-[8rem] truncate'
 
 /** 頂部的「▾ 暱稱」「▾ 世界」兩顆按鈕，點任一個打開「切換帳號和世界」 */
 export default function AccountWorldSwitcher() {
@@ -53,24 +55,28 @@ export default function AccountWorldSwitcher() {
 
   return (
     <>
-      <div className="flex items-center gap-1">
+      <div className="flex min-w-0 items-center gap-1">
         <button
           type="button"
           className={`${chipBase} border-orange-500 text-orange-600 bg-orange-50`}
           aria-label={t('accountSwitcher.accountChip', { name: player })}
           aria-haspopup="dialog"
+          aria-expanded={open}
+          title={player}
           onClick={() => setOpen(true)}
         >
-          ▾ {player}
+          ▾ <span className={chipText}>{player}</span>
         </button>
         <button
           type="button"
           className={chipBase}
           aria-label={t('accountSwitcher.worldChip', { name: world })}
           aria-haspopup="dialog"
+          aria-expanded={open}
+          title={world}
           onClick={() => setOpen(true)}
         >
-          ▾ {world}
+          ▾ <span className={chipText}>{world}</span>
         </button>
       </div>
 

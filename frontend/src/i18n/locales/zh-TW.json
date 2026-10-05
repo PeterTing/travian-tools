@@ -40,7 +40,51 @@
     "cropBalance": "糧食平衡",
     "strategy": "攻略",
     "healthCheck": "健康檢查",
-    "openingChecklist": "起手式"
+    "openingChecklist": "起手式",
+    "statistics": "統計",
+    "sidebarLabel": "主選單",
+    "tabBarLabel": "主要分頁",
+    "skipToContent": "跳到主要內容",
+    "tabs": {
+      "home": "首頁",
+      "villages": "村莊",
+      "calculators": "計算器",
+      "strategy": "攻略",
+      "more": "更多"
+    },
+    "groups": {
+      "combat": "打仗",
+      "development": "發展"
+    },
+    "calcs": {
+      "path": "路徑計算器",
+      "interception": "攔截計算器",
+      "saveTroops": "避兵計算器",
+      "pathSpeedTs": "TS 反推計算器",
+      "attackPlanner": "攻擊規劃器",
+      "villageBuilder": "最佳建造順序",
+      "culturePoints": "文化點計算器",
+      "npc": "NPC 計算器",
+      "technology": "科技計算器",
+      "cropScouter": "首都類型反推"
+    },
+    "stats": {
+      "overview": "伺服器總覽",
+      "players": "玩家排名",
+      "alliances": "聯盟排名",
+      "conquests": "征服記錄",
+      "nameChanges": "改名記錄",
+      "inactives": "不活躍搜尋"
+    },
+    "more": {
+      "title": "更多",
+      "tools": "地圖與帳號",
+      "account": "網站帳號",
+      "signedInAs": "目前登入：{{name}}"
+    },
+    "calculatorsPage": {
+      "title": "計算器"
+    }
   },
   "home": {
     "title": "Travian Tools",

@@ -553,7 +553,51 @@
     "cropBalance": "Crop Balance",
     "strategy": "Guide",
     "healthCheck": "Health Check",
-    "openingChecklist": "Opening checklist"
+    "openingChecklist": "Opening checklist",
+    "statistics": "Statistics",
+    "sidebarLabel": "Main menu",
+    "tabBarLabel": "Main tabs",
+    "skipToContent": "Skip to main content",
+    "tabs": {
+      "home": "Home",
+      "villages": "Villages",
+      "calculators": "Calculators",
+      "strategy": "Guide",
+      "more": "More"
+    },
+    "groups": {
+      "combat": "Combat",
+      "development": "Development"
+    },
+    "calcs": {
+      "path": "Path Calculator",
+      "interception": "Interception Calculator",
+      "saveTroops": "Troop Evasion Calculator",
+      "pathSpeedTs": "TS Reverse Calculator",
+      "attackPlanner": "Attack Planner",
+      "villageBuilder": "Build Order Optimizer",
+      "culturePoints": "Culture Points Calculator",
+      "npc": "NPC Calculator",
+      "technology": "Technology Calculator",
+      "cropScouter": "Capital Type Finder"
+    },
+    "stats": {
+      "overview": "Server Overview",
+      "players": "Player Ranking",
+      "alliances": "Alliance Ranking",
+      "conquests": "Conquests",
+      "nameChanges": "Name Changes",
+      "inactives": "Inactive Search"
+    },
+    "more": {
+      "title": "More",
+      "tools": "Map & accounts",
+      "account": "Site account",
+      "signedInAs": "Signed in as {{name}}"
+    },
+    "calculatorsPage": {
+      "title": "Calculators"
+    }
   },
   "opening": {
     "title": "Opening checklist",

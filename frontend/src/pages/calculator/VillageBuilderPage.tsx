@@ -51,7 +51,7 @@ export default function VillageBuilderPage() {
         Brickyard / Iron Foundry（浪費 slot）。
       </p>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">參數設定</h2>
 

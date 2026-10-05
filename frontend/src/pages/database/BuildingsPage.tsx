@@ -109,7 +109,7 @@ export default function BuildingsPage() {
       {loading && <p className="text-center py-8">{t('common.loading')}</p>}
       {error && <p className="text-center py-8 text-red-500">{error}</p>}
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* 建築列表 */}
         <div className="md:col-span-1 border rounded-lg p-4 max-h-[600px] overflow-y-auto">
           <h2 className="text-lg font-semibold mb-4">

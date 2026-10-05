@@ -232,7 +232,7 @@ export default function VillageDetailPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div className="text-center p-3 bg-muted rounded-lg">
               <p className="text-xl font-bold">{syncStats?.total_syncs ?? 0}</p>
               <p className="text-xs text-muted-foreground">{t('sync.totalSyncs')}</p>
@@ -277,7 +277,7 @@ export default function VillageDetailPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* 基本資訊 */}
         <Card>
           <CardHeader>
