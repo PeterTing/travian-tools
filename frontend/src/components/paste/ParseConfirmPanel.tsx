@@ -18,6 +18,7 @@ import {
   pickDefaultVillageId,
   type VillagePick,
 } from '@/lib/pasteFormat'
+import { pasteApi } from '@/services/pasteApi'
 import type { GameAccount } from '@/types/game'
 
 export interface ConfirmState {
@@ -108,13 +109,64 @@ export function ParseConfirmPanel({
     [state.pageType, state.data],
   )
   const incoming = movements.filter((m) =>
-    String(m.kind || '').startsWith('incoming_'),
+    ['incoming_attack', 'incoming_raid', 'incoming_spy'].includes(String(m.kind || '')),
   )
-  const previewCreated = (state.data as { _preview_created?: number })._preview_created
-  const previewUpdated = (state.data as { _preview_updated?: number })._preview_updated
-  const createdHint =
-    previewCreated != null ? Number(previewCreated) : incoming.length
-  const updatedHint = previewUpdated != null ? Number(previewUpdated) : 0
+  const [diffCreated, setDiffCreated] = useState<number | null>(null)
+  const [diffUpdated, setDiffUpdated] = useState<number | null>(null)
+  const [diffLoading, setDiffLoading] = useState(false)
+
+  useEffect(() => {
+    if (state.pageType !== 'rally_point' || !incoming.length) {
+      setDiffCreated(null)
+      setDiffUpdated(null)
+      return
+    }
+    let cancelled = false
+    setDiffLoading(true)
+    void pasteApi
+      .previewDiff({
+        account_id: account.account_id,
+        page_type: 'rally_point',
+        data: state.data,
+        capture_at: captureAt.toISOString(),
+        server_time: state.serverTime,
+        source: state.source,
+        village_id: villageId,
+      })
+      .then((res) => {
+        if (cancelled) return
+        setDiffCreated(res.created)
+        setDiffUpdated(res.updated)
+      })
+      .catch(() => {
+        if (cancelled) return
+        // Fallback only if API fails: treat all as new (legacy frontend default)
+        setDiffCreated(incoming.length)
+        setDiffUpdated(0)
+      })
+      .finally(() => {
+        if (!cancelled) setDiffLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [
+    state.pageType,
+    state.data,
+    state.serverTime,
+    state.source,
+    account.account_id,
+    captureAt,
+    villageId,
+    incoming.length,
+  ])
+
+  const createdHint = diffCreated != null ? diffCreated : null
+  const updatedHint = diffUpdated != null ? diffUpdated : null
+  const diffLabel =
+    createdHint != null && updatedHint != null
+      ? `新增 ${createdHint} · 更新 ${updatedHint}`
+      : null
 
   const commitCaptureDraft = () => {
     const parsed = parseCaptureShort(captureDraft, captureAt)
@@ -280,14 +332,12 @@ export function ParseConfirmPanel({
 
         {state.pageType === 'rally_point' && (
           <div className="space-y-2" data-testid="rally-confirm-list">
-            <div className="text-sm">
+            <div className="text-sm" data-testid="rally-diff-label">
               來襲 {incoming.length} 筆
-              {createdHint || updatedHint ? (
-                <span className="text-muted-foreground">
-                  {' '}
-                  · 新增 {createdHint || Math.max(0, incoming.length - updatedHint)} · 更新{' '}
-                  {updatedHint}
-                </span>
+              {diffLoading ? (
+                <span className="text-muted-foreground"> · 比對中…</span>
+              ) : diffLabel ? (
+                <span className="text-muted-foreground"> · {diffLabel}</span>
               ) : null}
             </div>
             <ul className="divide-y rounded-md border">
@@ -512,7 +562,11 @@ export function ParseConfirmPanel({
           {saving
             ? '存入中…'
             : state.pageType === 'rally_point' && incoming.length > 0
-              ? `存入 ${incoming.length} 筆`
+              ? diffLabel
+                ? `存入 · ${diffLabel}`
+                : diffLoading
+                  ? '比對中…'
+                  : `存入 ${incoming.length} 筆`
               : '存入'}
         </Button>
       </CardFooter>

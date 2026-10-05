@@ -64,6 +64,27 @@ class ConfirmRequest(BaseModel):
     help_improve: bool = False
 
 
+class DiffPreviewRequest(BaseModel):
+    """Rally confirm dry-run: same body fields as confirm, no write."""
+
+    account_id: str
+    page_type: str = "rally_point"
+    data: dict[str, Any]
+    capture_at: datetime | None = None
+    server_time: str | None = None
+    source: str = "paste"
+    village_id: str | None = None
+
+
+class DiffPreviewResponse(BaseModel):
+    success: bool
+    message: str
+    created: int = 0
+    updated: int = 0
+    total: int = 0
+    village_id: str | None = None
+
+
 class ConfirmResponse(BaseModel):
     success: bool
     message: str
@@ -76,6 +97,7 @@ class ConfirmResponse(BaseModel):
 
 class MovementResponse(BaseModel):
     movement_id: str
+    village_id: str | None = None
     kind: str
     role: str | None = None
     headline: str | None = None

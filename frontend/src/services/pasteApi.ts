@@ -40,6 +40,25 @@ export interface ConfirmRequest {
   help_improve?: boolean
 }
 
+export interface DiffPreviewRequest {
+  account_id: string
+  page_type?: string
+  data: Record<string, unknown>
+  capture_at?: string | null
+  server_time?: string | null
+  source?: string
+  village_id?: string | null
+}
+
+export interface DiffPreviewResponse {
+  success: boolean
+  message: string
+  created: number
+  updated: number
+  total: number
+  village_id?: string | null
+}
+
 export interface ConfirmResponse {
   success: boolean
   message: string
@@ -52,6 +71,7 @@ export interface ConfirmResponse {
 
 export interface Movement {
   movement_id: string
+  village_id?: string | null
   kind: string
   role?: string | null
   headline?: string | null
@@ -86,9 +106,23 @@ export const pasteApi = {
     return data
   },
 
-  listMovements: async (accountId: string): Promise<{ movements: Movement[]; total: number }> => {
+  previewDiff: async (body: DiffPreviewRequest): Promise<DiffPreviewResponse> => {
+    const { data } = await api.post<DiffPreviewResponse>('/paste/preview-diff', {
+      page_type: 'rally_point',
+      ...body,
+    })
+    return data
+  },
+
+  listMovements: async (
+    accountId: string,
+    opts?: { villageId?: string | null },
+  ): Promise<{ movements: Movement[]; total: number }> => {
     const { data } = await api.get<{ movements: Movement[]; total: number }>('/movements', {
-      params: { account_id: accountId },
+      params: {
+        account_id: accountId,
+        ...(opts?.villageId ? { village_id: opts.villageId } : {}),
+      },
     })
     return data
   },
