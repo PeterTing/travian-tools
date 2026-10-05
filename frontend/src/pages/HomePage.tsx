@@ -85,18 +85,19 @@ export default function HomePage() {
         html: kind === 'html' ? content : undefined,
         text: kind === 'text' ? content : undefined,
       })
-      if (!result.ok && result.page_type === 'unknown') {
-        setParseError('認不出這是哪一頁。可能只複製到一部分。請在遊戲裡全選後再複製一次，或手動選類型。')
-        navigate('/paste/confirm', {
-          state: {
-            preview: result,
-            raw,
-            kind,
-            accountId: currentAccount.account_id,
-            captureAt: new Date().toISOString(),
-            unknown: true,
-          },
-        })
+      if (!result.ok) {
+        const warn = result.warnings?.[0]?.message
+        if (result.page_type === 'unknown') {
+          setParseError(
+            warn ||
+              '認不出這是哪一頁。可能只複製到一部分。請在遊戲裡全選後再複製一次，或手動選類型。',
+          )
+        } else {
+          setParseError(
+            warn ||
+              '認得出頁面類型，但沒有解析到可存的資料。請改貼 HTML（檢視原始碼）或用擴充上傳。',
+          )
+        }
         return
       }
       navigate('/paste/confirm', {

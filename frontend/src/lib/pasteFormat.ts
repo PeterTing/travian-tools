@@ -133,3 +133,48 @@ export function parseCaptureShort(text: string, base: Date): Date | null {
   if (Number.isNaN(next.getTime())) return null
   return next
 }
+
+
+/** 解析結果是否有足以存入的結構化資料（避免只剩 raw_text 仍可按存入） */
+export function parseResultIsSaveable(
+  pageType: string,
+  data: Record<string, unknown> | null | undefined,
+): boolean {
+  if (!data) return false
+  if (pageType === 'village_overview') {
+    const name = data.village_name
+    const x = data.coordinate_x
+    const y = data.coordinate_y
+    const hasId = Boolean(name) || (x != null && y != null)
+    const res = (data.resources as Record<string, number> | undefined) || {}
+    const prod = (data.production as Record<string, number> | undefined) || {}
+    const hasStock = ['wood', 'clay', 'iron', 'crop'].some((k) => Number(res[k] || 0) > 0)
+    const hasProd = ['wood', 'clay', 'iron', 'crop'].some((k) => Number(prod[k] || 0) !== 0)
+    const hasFields = Array.isArray(data.resource_fields) && data.resource_fields.length > 0
+    const hasTroops = Array.isArray(data.troops) && data.troops.length > 0
+    const hasVillages = Array.isArray(data.villages) && data.villages.length > 0
+    return Boolean(hasId || hasStock || hasProd || hasFields || hasTroops || hasVillages)
+  }
+  if (pageType === 'village_center') {
+    return Array.isArray(data.buildings) && data.buildings.length > 0
+  }
+  if (pageType === 'rally_point') {
+    const movements = (data.movements as unknown[]) || []
+    const incoming = (data.incoming as unknown[]) || []
+    const garrison = (data.garrison_own as unknown[]) || []
+    return movements.length + incoming.length + garrison.length > 0
+  }
+  if (pageType === 'troop_statistics') {
+    return Array.isArray(data.villages_troops) && data.villages_troops.length > 0
+  }
+  if (pageType === 'unknown') return false
+  // reports / others: allow if not only raw_text
+  const keys = Object.keys(data).filter((k) => k !== 'raw_text' && k !== '_text_notes')
+  return keys.some((k) => {
+    const v = data[k]
+    if (v == null) return false
+    if (Array.isArray(v)) return v.length > 0
+    if (typeof v === 'object') return Object.keys(v as object).length > 0
+    return true
+  })
+}

@@ -149,7 +149,7 @@ def confirm_paste(
         )
     if not result.get("success"):
         code = status.HTTP_403_FORBIDDEN
-        if result.get("error_code") == "unsupported":
+        if result.get("error_code") in ("unsupported", "empty_parse"):
             code = status.HTTP_400_BAD_REQUEST
         raise HTTPException(
             status_code=code,

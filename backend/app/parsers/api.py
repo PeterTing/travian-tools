@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from app.parsers.detect import detect_page_type
 from app.parsers.dorf1 import parse_dorf1
+from app.parsers.dorf1_text import parse_dorf1_text, village_overview_is_meaningful
 from app.parsers.dorf2 import parse_dorf2
+from app.parsers.dorf2_text import parse_dorf2_text, village_center_is_meaningful
 from app.parsers.rally_point import parse_rally_point_html, parse_rally_point_text
 from app.parsers.reports import parse_reports_list
 from app.parsers.server_time import parse_server_time
@@ -85,6 +87,61 @@ def parse_page(inp: PageInput) -> ParseResult:
             ok=False,
         )
 
+    if page_type == "village_overview" and not village_overview_is_meaningful(data):
+        warnings.append(
+            ParseWarning(
+                "PARSE_ERROR",
+                "認得出是村莊總覽，但純文字沒解析到村莊／資源／田地等可存資料。"
+                "請改貼 HTML（檢視原始碼）或用擴充上傳。",
+            )
+        )
+        # keep raw for debugging if parser returned almost nothing
+        if not data:
+            data = {"raw_text": text or ""}
+        elif "village_name" not in data and "raw_text" not in data:
+            data = {**data, "raw_text": text or ""}
+        return ParseResult(
+            page_type=page_type,
+            data=data,
+            warnings=warnings,
+            server_time=server_time or data.get("server_time"),
+            ok=False,
+        )
+    if page_type == "village_center" and not village_center_is_meaningful(data):
+        warnings.append(
+            ParseWarning(
+                "PARSE_ERROR",
+                "認得出是村莊中心，但純文字無法對應建築欄位，沒有可存資料。"
+                "請改貼 HTML 或用擴充上傳。",
+            )
+        )
+        return ParseResult(
+            page_type=page_type,
+            data=data,
+            warnings=warnings,
+            server_time=server_time or data.get("server_time"),
+            ok=False,
+        )
+    if page_type == "rally_point":
+        has_move = bool(
+            data.get("movements") or data.get("incoming") or data.get("garrison_own")
+        )
+        if not has_move:
+            warnings.append(
+                ParseWarning(
+                    "PARSE_ERROR",
+                    "認得出是集結點，但沒有解析到可存的部隊動向。"
+                    "請改貼 HTML 或用擴充上傳。",
+                )
+            )
+            return ParseResult(
+                page_type=page_type,
+                data=data,
+                warnings=warnings,
+                server_time=server_time or data.get("server_time"),
+                ok=False,
+            )
+
     return ParseResult(
         page_type=page_type,
         data=data,
@@ -117,18 +174,20 @@ def _parse_html(page_type: str, html: str) -> dict:
 
 
 def _parse_text(page_type: str, text: str) -> dict:
-    # P0-03：文字路徑先支援集結點與多村總覽表格（以 tab／空白分隔的列）。
-    # dorf1／dorf2 的貼上文字留待 P0-05 與 PM 確認格式。
+    if page_type == "village_overview":
+        return parse_dorf1_text(text)
+    if page_type == "village_center":
+        return parse_dorf2_text(text)
     if page_type == "rally_point" or page_type == "unknown":
         result = parse_rally_point_text(text)
         if (
             result["movements"]
             or result["garrison_own"]
             or result["garrison_stationed"]
+            or page_type == "rally_point"
         ):
             return result
     if page_type.startswith("statistics_") or page_type == "troop_statistics":
-        # 粗解析：多村資源文字表（名稱 + 四個數字）
         return {"raw_text": text, "villages": _parse_resource_text_table(text)}
     return {"raw_text": text}
 

@@ -421,8 +421,34 @@ class PasteService:
                 ProductionData,
                 ResourceData,
                 ResourceFieldData,
+                TroopData,
                 VillageOverviewSync,
             )
+            from app.parsers.dorf1_text import village_overview_is_meaningful
+
+            if not village_overview_is_meaningful(data):
+                return {
+                    "success": False,
+                    "message": "村莊總覽沒有可存的資料（缺少村莊／資源／田地）。"
+                    "不會建立空白村莊。",
+                    "created": 0,
+                    "updated": 0,
+                    "total": 0,
+                    "error_code": "empty_parse",
+                }
+
+            troop_rows = []
+            for tr in data.get("troops") or []:
+                if not isinstance(tr, dict) or not tr.get("troop_id"):
+                    continue
+                troop_rows.append(
+                    TroopData(
+                        troop_id=str(tr["troop_id"]),
+                        count=int(tr.get("count") or 0),
+                        location=str(tr.get("location") or "home"),
+                        is_training=bool(tr.get("is_training") or False),
+                    )
+                )
 
             body = VillageOverviewSync(
                 account_id=account_id,
@@ -439,7 +465,7 @@ class PasteService:
                 resource_fields=[
                     ResourceFieldData(**f) for f in (data.get("resource_fields") or [])
                 ],
-                troops=[],
+                troops=troop_rows,
             )
             ok, message, village_id = self.sync.sync_village_overview(user_id, body)
             return {
@@ -458,6 +484,18 @@ class PasteService:
                 TroopData,
                 VillageCenterSync,
             )
+            from app.parsers.dorf2_text import village_center_is_meaningful
+
+            if not village_center_is_meaningful(data):
+                return {
+                    "success": False,
+                    "message": "村莊中心沒有可存的建築資料。不會建立空白村莊。"
+                    "請改貼 HTML 或用擴充上傳。",
+                    "created": 0,
+                    "updated": 0,
+                    "total": 0,
+                    "error_code": "empty_parse",
+                }
 
             travian_id = data.get("travian_village_id")
             selected = data.get("village_id")

@@ -10,6 +10,7 @@ import {
   pageNeedsVillageSelector,
   pageTypeLabel,
   parseCaptureShort,
+  parseResultIsSaveable,
   pickDefaultVillageId,
   type VillagePick,
 } from '@/lib/pasteFormat'
@@ -87,6 +88,10 @@ export function ParseConfirmPanel({
   }, [showVillage, villages, villageId, state.data, onVillageIdChange])
 
   const movements = useMemo(() => asMovements(state.data), [state.data])
+  const saveable = useMemo(
+    () => parseResultIsSaveable(state.pageType, state.data),
+    [state.pageType, state.data],
+  )
   const incoming = movements.filter((m) =>
     String(m.kind || '').startsWith('incoming_'),
   )
@@ -108,6 +113,10 @@ export function ParseConfirmPanel({
 
   const handleSave = async () => {
     setError('')
+    if (!saveable) {
+      setError('沒有可存的解析結果')
+      return
+    }
     if (showVillage && villages.length > 0 && !villageId) {
       setError('請選擇要存入的村莊')
       return
@@ -303,14 +312,113 @@ export function ParseConfirmPanel({
           </div>
         )}
 
-        {state.pageType !== 'rally_point' && (
-          <pre
-            className="text-xs bg-muted/40 rounded-md p-3 overflow-auto max-h-64"
-            data-testid="generic-parse-json"
+        {!saveable && (
+          <div
+            className="rounded-md border border-amber-300 bg-amber-50 text-amber-950 text-sm px-3 py-2"
+            data-testid="parse-empty-state"
           >
-            {JSON.stringify(state.data, null, 2)}
-          </pre>
+            <b>沒有可存的解析結果</b>
+            <p className="mt-1 text-xs">
+              只認得出頁面類型，或只剩下原文。請回到首頁改貼 HTML（遊戲頁「檢視原始碼」）或用擴充上傳，再試一次。
+            </p>
+          </div>
         )}
+
+        {state.pageType === 'village_overview' && saveable && (
+          <div className="space-y-2 text-sm" data-testid="village-overview-preview">
+            <div className="font-medium">
+              {String(state.data.village_name || '（未知名）')}
+              {state.data.coordinate_x != null && state.data.coordinate_y != null
+                ? ` (${String(state.data.coordinate_x)}|${String(state.data.coordinate_y)})`
+                : ''}
+              {state.data.population ? (
+                <span className="text-muted-foreground font-normal">
+                  {' '}
+                  · 人口 {String(state.data.population)}
+                </span>
+              ) : null}
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+              {(['wood', 'clay', 'iron', 'crop'] as const).map((k) => {
+                const res = (state.data.resources as Record<string, number> | undefined)?.[k]
+                const prod = (state.data.production as Record<string, number> | undefined)?.[k]
+                const label = { wood: '木', clay: '泥', iron: '鐵', crop: '糧' }[k]
+                return (
+                  <div key={k} className="rounded-md border px-2 py-1.5">
+                    <div className="text-muted-foreground">{label}</div>
+                    <div className="font-mono">{res != null ? Number(res).toLocaleString() : '—'}</div>
+                    <div className="text-muted-foreground">
+                      產量 {prod != null ? Number(prod).toLocaleString() : '—'}/h
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            {Array.isArray(state.data.resource_fields) && state.data.resource_fields.length > 0 ? (
+              <div className="text-xs text-muted-foreground" data-testid="field-levels-summary">
+                田地 {state.data.resource_fields.length} 格
+                {state.data.village_type ? ` · ${String(state.data.village_type)}` : ''}
+                ：
+                {(state.data.resource_fields as { level?: number }[])
+                  .map((f) => f.level ?? '?')
+                  .join(', ')}
+              </div>
+            ) : (
+              <div className="text-xs text-amber-800">田地等級未從純文字拆出（仍可存資源／村莊）</div>
+            )}
+            {Array.isArray(state.data.troops) && state.data.troops.length > 0 ? (
+              <ul className="text-xs rounded-md border divide-y" data-testid="troop-preview">
+                {(
+                  state.data.troops as { name?: string; troop_id?: string; count?: number }[]
+                ).map((t, i) => (
+                  <li key={i} className="px-2 py-1 flex justify-between gap-2">
+                    <span>{t.name || t.troop_id}</span>
+                    <span className="font-mono">{Number(t.count || 0).toLocaleString()}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {Array.isArray(state.data.villages) && (state.data.villages as unknown[]).length > 1 ? (
+              <div className="text-xs text-muted-foreground">
+                村莊列表 {(state.data.villages as unknown[]).length} 村
+              </div>
+            ) : null}
+          </div>
+        )}
+
+        {state.pageType === 'village_center' && saveable && (
+          <div className="space-y-2 text-sm" data-testid="village-center-preview">
+            <div className="font-medium">
+              {String(state.data.village_name || '（未知名）')}
+              {state.data.coordinate_x != null && state.data.coordinate_y != null
+                ? ` (${String(state.data.coordinate_x)}|${String(state.data.coordinate_y)})`
+                : ''}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              建築 {Array.isArray(state.data.buildings) ? state.data.buildings.length : 0} 座
+              {Array.isArray(state.data.troops) && state.data.troops.length
+                ? ` · 部隊 ${state.data.troops.length} 種`
+                : ''}
+            </div>
+          </div>
+        )}
+
+        {state.pageType !== 'rally_point' &&
+          state.pageType !== 'village_overview' &&
+          state.pageType !== 'village_center' && (
+            <pre
+              className="text-xs bg-muted/40 rounded-md p-3 overflow-auto max-h-64"
+              data-testid="generic-parse-json"
+            >
+              {JSON.stringify(
+                Object.fromEntries(
+                  Object.entries(state.data || {}).filter(([k]) => k !== 'raw_text'),
+                ),
+                null,
+                2,
+              )}
+            </pre>
+          )}
 
         <label className="flex items-start gap-2 text-sm">
           <input
@@ -335,7 +443,11 @@ export function ParseConfirmPanel({
         <Button variant="outline" onClick={onDiscard} disabled={saving}>
           捨棄
         </Button>
-        <Button onClick={() => void handleSave()} disabled={saving} data-testid="confirm-save">
+        <Button
+          onClick={() => void handleSave()}
+          disabled={saving || !saveable}
+          data-testid="confirm-save"
+        >
           {saving
             ? '存入中…'
             : state.pageType === 'rally_point'
