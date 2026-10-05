@@ -120,3 +120,6 @@ backups/
 # Browser-extension signing key (kept outside the repo)
 *.pem
 *.crx
+
+# Source spreadsheets (e.g. opening checklist Excel; never commit)
+*.xlsx

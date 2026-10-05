@@ -57,7 +57,7 @@ export default function PathSpeedTsCalculatorPage() {
         根據已知的攻擊者座標、目標座標和行進時間，反推可能的部隊速度和競技場等級組合。
       </p>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input */}
         <div className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">已知條件</h2>

@@ -44,7 +44,7 @@ export default function CropScouterPage() {
         4446 / 3347）。以 crop-to-others 比例啟發式判斷。
       </p>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">偵查資料</h2>
           <div className="grid grid-cols-2 gap-4">

@@ -85,7 +85,7 @@ export default function RoiCalculatorPage() {
       <h1 className="text-3xl font-bold mb-6">{t('calculator.roi.title')}</h1>
       <p className="text-muted-foreground mb-6">{t('calculator.roi.description')}</p>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Input area */}
         <div className="space-y-6">
           {/* Resource field list */}
