@@ -6,6 +6,8 @@ import { CurrentAccountProvider } from '@/contexts/CurrentAccountContext'
 import AccountWorldSwitcher from '@/components/account/AccountWorldSwitcher'
 import { RequireAuth } from '@/components/auth'
 import HomePage from '@/pages/HomePage'
+import ParseConfirmPage from '@/pages/paste/ParseConfirmPage'
+import MovementCoordsPage from '@/pages/paste/MovementCoordsPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 // Auth pages
 import LoginPage from '@/pages/auth/LoginPage'
@@ -291,6 +293,30 @@ function AppContent() {
       <Navigation />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route
+          path="/paste/confirm"
+          element={
+            <RequireAuth>
+              <ParseConfirmPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/paste/confirm/:draftId"
+          element={
+            <RequireAuth>
+              <ParseConfirmPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/paste/movement/:movementId"
+          element={
+            <RequireAuth>
+              <MovementCoordsPage />
+            </RequireAuth>
+          }
+        />
         {/* Auth routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

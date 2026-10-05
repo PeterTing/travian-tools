@@ -88,15 +88,17 @@ async function sendToContent(action, data = {}) {
   return messageTab(tab.id, { action, ...data });
 }
 
-/** 組出給後端共用解析器的上傳內容（HTML，不是先在擴充端解析） */
+/** 組出解析草稿內容（HTML → /sync/draft → 工具網站確認畫面） */
 function buildUploadBody(pageType, accountId, data) {
   if (!data?.html) return null;
   return {
     account_id: accountId,
-    page_type: pageType || data.page_type || null,
+    kind: 'html',
+    content: data.html,
     url: data.url || null,
-    html: data.html,
+    page_type_hint: pageType || data.page_type || null,
     server_time: data.server_time || null,
+    source: 'extension',
   };
 }
 
@@ -239,14 +241,11 @@ async function syncData() {
     }
     const body = buildUploadBody(currentPageType, accountSelect.value, collectResult.data);
     const result = await uploadPage(currentPageType, body);
-
-    let successMsg = '上傳成功！';
-    if (currentPageType === 'reports') {
-      successMsg = `上傳成功！共 ${result?.count || 0} 筆報告`;
-    } else if (currentPageType === 'troop_statistics') {
-      successMsg = `上傳成功！${result?.villages_synced || 0} 個村莊，${result?.troops_synced || 0} 筆部隊`;
-    }
-    syncResultEl.textContent = successMsg;
+    const draftId = result?.draft_id;
+    if (!draftId) throw new Error('沒有拿到確認草稿');
+    const confirmUrl = `${TOOL_SITE_URL}/paste/confirm/${draftId}`;
+    window.open(confirmUrl, '_blank', 'noopener');
+    syncResultEl.textContent = '已打開工具網站的確認畫面，確認後才會存入。';
     syncResultEl.className = 'sync-result success';
   } catch (error) {
     syncResultEl.textContent = `錯誤: ${error.message}`;

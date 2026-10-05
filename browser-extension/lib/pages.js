@@ -19,10 +19,11 @@ export const PAGE_NAMES = Object.freeze({
  * 舊的 /sync/village-overview 等 JSON 端點仍保留給已安裝的舊版擴充。
  */
 export const UPLOAD_ENDPOINTS = Object.freeze({
-  village_overview: '/sync/page',
-  village_center: '/sync/page',
-  reports: '/sync/page',
-  troop_statistics: '/sync/page',
+  village_overview: '/sync/draft',
+  village_center: '/sync/draft',
+  reports: '/sync/draft',
+  troop_statistics: '/sync/draft',
+  rally_point: '/sync/draft',
 });
 
 /**
@@ -37,8 +38,8 @@ export function pageLabel(pageType) {
 /** 上傳按鈕不能按時，按鈕上方一定要有的說明（不讓使用者看到沒有理由的灰色按鈕） */
 export const UPLOAD_HINTS = Object.freeze({
   // 認不出的頁面（含非 Travian 分頁），以及認得但還不能上傳的頁面（英雄、地圖）
-  UNSUPPORTED_PAGE: '這一頁還不支援，請到村莊總覽再按',
-  // 集結點：認得，但上傳還在做（P0-05 存檔完成後拿掉這句，兩句都改回提到集結點）
+  UNSUPPORTED_PAGE: '這一頁還不支援，請到村莊總覽或集結點再按',
+  // 歷史：P0-04 暫用；P0-05 起集結點已可上傳，僅保留常數以免測試/舊碼引用
   RALLY_POINT_PENDING: '集結點的上傳還在做，目前請到村莊總覽再按',
   DETECTING: '正在讀取這一頁…',
   UPLOADING: '正在上傳這一頁…',
@@ -62,8 +63,6 @@ export function uploadState({
   let hint = '';
   if (detecting) {
     hint = UPLOAD_HINTS.DETECTING;
-  } else if (pageType === 'rally_point' && !Object.hasOwn(UPLOAD_ENDPOINTS, pageType)) {
-    hint = UPLOAD_HINTS.RALLY_POINT_PENDING;
   } else if (!Object.hasOwn(UPLOAD_ENDPOINTS, pageType ?? '')) {
     hint = UPLOAD_HINTS.UNSUPPORTED_PAGE;
   } else if (!hasAccounts) {

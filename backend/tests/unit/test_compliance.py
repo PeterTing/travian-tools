@@ -405,7 +405,7 @@ def test_extension_only_request_is_popup_upload_to_our_api() -> None:
     assert block
     endpoints = set(re.findall(r"'(/[^']+)'", block.group(1)))
     assert endpoints == {
-        "/sync/page",
+        "/sync/draft",
     }, endpoints
 
 
