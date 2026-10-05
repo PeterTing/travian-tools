@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { UtcOffsetField } from '@/components/world/UtcOffsetField'
+import { parseUtcOffsetDraft } from '@/lib/worldUrl'
 import { useTranslation } from 'react-i18next'
 import {
   emptyPasteReasonKey,
@@ -45,7 +47,8 @@ interface Props {
   }) => Promise<void>
   saving?: boolean
   askTimeDisplay?: boolean
-  askUtcOffset?: boolean
+  /** World's known UTC offset in minutes; null = unset (show editor); undefined = hide */
+  worldUtcOffset?: number | null
 }
 
 function asMovements(data: Record<string, unknown>) {
@@ -69,12 +72,15 @@ export function ParseConfirmPanel({
   onSave,
   saving,
   askTimeDisplay,
-  askUtcOffset,
+  worldUtcOffset,
 }: Props) {
   const { t } = useTranslation()
   const [helpImprove, setHelpImprove] = useState(false)
   const [timeDisplay, setTimeDisplay] = useState<'server' | 'local'>('server')
-  const [utcOffsetDraft, setUtcOffsetDraft] = useState('')
+  const [utcOffsetDraft, setUtcOffsetDraft] = useState(() =>
+    worldUtcOffset == null ? '' : String(worldUtcOffset),
+  )
+  const [utcEditing, setUtcEditing] = useState(() => worldUtcOffset == null)
   const [error, setError] = useState('')
   const [captureDraft, setCaptureDraft] = useState(() => formatCaptureShort(captureAt))
 
@@ -83,6 +89,12 @@ export function ParseConfirmPanel({
   useEffect(() => {
     setCaptureDraft(formatCaptureShort(captureAt))
   }, [captureAt])
+
+  useEffect(() => {
+    if (worldUtcOffset === undefined) return
+    setUtcOffsetDraft(worldUtcOffset == null ? '' : String(worldUtcOffset))
+    setUtcEditing(worldUtcOffset == null)
+  }, [worldUtcOffset])
 
   useEffect(() => {
     if (!showVillage) return
@@ -137,11 +149,9 @@ export function ParseConfirmPanel({
         timeDisplay: askTimeDisplay ? timeDisplay : undefined,
         localTimezone: askTimeDisplay && timeDisplay === 'local' ? 'Asia/Taipei' : undefined,
         utcOffset:
-          askUtcOffset && utcOffsetDraft !== ''
-            ? Number(utcOffsetDraft)
-            : askUtcOffset
-              ? null
-              : undefined,
+          worldUtcOffset === undefined
+            ? undefined
+            : parseUtcOffsetDraft(utcOffsetDraft),
       })
     } catch (e) {
       setError(e instanceof Error ? e.message : '存入失敗')
@@ -250,17 +260,20 @@ export function ParseConfirmPanel({
           </div>
         )}
 
-        {askUtcOffset && (
+        {worldUtcOffset !== undefined && (
           <div className="rounded-md border p-3 space-y-2" data-testid="ask-utc-offset">
-            <div className="font-medium text-sm">這個世界的伺服器 UTC 時差（分鐘）</div>
-            <p className="text-xs text-muted-foreground">
-              例如 UTC+1 = 60。不知道可留空，時間會照伺服器顯示、不換算。
-            </p>
-            <Input
-              value={utcOffsetDraft}
-              onChange={(e) => setUtcOffsetDraft(e.target.value)}
-              placeholder="60"
-              inputMode="numeric"
+            {worldUtcOffset == null || utcEditing ? (
+              <p className="text-xs text-muted-foreground">
+                {t('worldSettings.description')}
+              </p>
+            ) : null}
+            <UtcOffsetField
+              testIdPrefix="confirm-utc"
+              value={worldUtcOffset}
+              draft={utcOffsetDraft}
+              onDraftChange={setUtcOffsetDraft}
+              editing={utcEditing}
+              onEditingChange={setUtcEditing}
             />
           </div>
         )}

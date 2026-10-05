@@ -41,18 +41,18 @@ describe('WorldSettings (UTC offset on the world)', () => {
     fireEvent.change(select, { target: { value: '60' } })
     fireEvent.click(screen.getByRole('button', { name: '儲存' }))
     await waitFor(() => expect(api.update).toHaveBeenCalledWith('w-ts3', { utc_offset: 60 }))
-    expect(await screen.findByTestId('utc-offset-summary-w-ts3')).toHaveTextContent('伺服器時差 UTC+1')
-    expect(screen.getByTestId('utc-offset-change-w-ts3')).toHaveTextContent('更改')
+    expect(await screen.findByTestId('utc-offset-w-ts3-summary')).toHaveTextContent('伺服器時差 UTC+1')
+    expect(screen.getByTestId('utc-offset-w-ts3-change')).toHaveTextContent('更改')
   })
 
   it('collapses a set offset to one line and expands on 更改', async () => {
     api.getAll.mockResolvedValue({ worlds: [{ ...ts3, utc_offset: 60 }], total: 1 })
     render(<WorldSettings />)
-    const summary = await screen.findByTestId('utc-offset-summary-w-ts3')
+    const summary = await screen.findByTestId('utc-offset-w-ts3-summary')
     expect(summary).toHaveTextContent('伺服器時差 UTC+1')
     expect(screen.queryByLabelText('伺服器時區（UTC 時差）')).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getByTestId('utc-offset-change-w-ts3'))
+    fireEvent.click(screen.getByTestId('utc-offset-w-ts3-change'))
     expect(await screen.findByLabelText('伺服器時區（UTC 時差）')).toBeInTheDocument()
   })
 
