@@ -7,7 +7,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:i18next/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs', 'src/components/ui/**', 'src/features/guideCalcs/**'],
+  ignorePatterns: ['dist', '.eslintrc.cjs', 'src/components/ui/**'],
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh', 'i18next'],
   rules: {
@@ -38,4 +38,17 @@ module.exports = {
       },
     ],
   },
+
+  // guideCalcs：雙語 JSX 會讓 i18next/no-literal-string crash（/^+$/）。
+  // 只關這條；其餘 eslint 規則照常跑。
+  overrides: [
+    {
+      files: ['src/features/guideCalcs/**/*.{ts,tsx}'],
+      rules: {
+        'i18next/no-literal-string': 'off',
+        // Helpers (planGreedy, simulate, lumiBracket) exported for unit tests
+        'react-refresh/only-export-components': 'off',
+      },
+    },
+  ],
 }

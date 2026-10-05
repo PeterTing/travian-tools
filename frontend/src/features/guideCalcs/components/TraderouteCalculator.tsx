@@ -45,10 +45,10 @@ export default function TraderouteCalculator() {
   return (
     <>
       <div className={s.intro}>
-        <h2>{lang === 'en' ? 'Trade Route / Feeder Calculator' : '商路 / 糧商計算器'}</h2>
+        <h2>{lang === 'en' ? 'Trade Route' : '貿易路線'}</h2>
         <p>{lang === 'en'
-          ? "How many merchants are needed to haul a feeder's hourly surplus? Tribe sets base capacity & speed; Trade Office adds +10% capacity per level (max +200% at Lv 20). Roman exception: +20%/lv (max +400% at Lv 20). Lumi rule of thumb: within 60 fields, 1–2 merchants should suffice."
-          : '一個 feeder 每小時 surplus 要幾個商人才能搬完？部族決定基礎容量與速度；交易所每級 +10% 容量（Lv 20 最高 +200%）。羅馬人例外：+20%/級（Lv 20 最高 +400%）。Lumi 經驗法則：60 格內 1–2 個商人就夠。'}</p>
+          ? "How many merchants you need to move a feeder village's hourly surplus. Tribe sets base capacity and speed; each Trade Office level adds +10% capacity (Romans +20%). Within about 60 fields, one or two merchants are often enough."
+          : '算支援村每小時多出來的資源，要幾個商人才能搬完。部族決定基礎容量與速度；交易所每級多 10% 容量（羅馬人每級 20%）。大約 60 格以內，通常一到兩個商人就夠。'}</p>
       </div>
 
       <div className={s.wrapper}>
@@ -94,7 +94,7 @@ export default function TraderouteCalculator() {
 
         <div className={s.output}>
           <h4>{lang === 'en' ? 'Merchant specs' : '商人規格'}</h4>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Capacity per merchant (incl. TO)' : '每商人容量（含 TO）'}</span><span className={s.value}>{fmtInt(cap)}</span></div>
+          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Capacity per merchant (incl. Trade Office)' : '每商人容量（含交易所）'}</span><span className={s.value}>{fmtInt(cap)}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Speed' : '速度'}</span><span className={s.value}>{speed} {lang === 'en' ? 'tiles/hr' : '格/小時'}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way / round trip' : '單程 / 往返'}</span><span className={s.value}>{fmtHr(oneWay)} / {fmtHr(roundTrip)}</span></div>
 
@@ -112,8 +112,8 @@ export default function TraderouteCalculator() {
 
           <div className={s.note}>
             {lang === 'en'
-              ? 'Formula: trips/hr = surplus ÷ capacity; dedicated = trips × round-trip hours. If dedicated > available merchants, raise TO level or shorten distance.'
-              : '公式：trips/hr = surplus ÷ 容量；常駐 = trips × 往返小時。若常駐 > 可用商人，升 TO 或縮短距離。'}
+              ? 'If you need more merchants than you have, raise the Trade Office or shorten the distance.'
+              : '若算出來要的商人比你現有的多，就升交易所或縮短距離。'}
           </div>
         </div>
       </div>

@@ -10,8 +10,8 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  /* Leave room so sticky result clears bottom tabs on phone */
-  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 1rem);
+  /* Room for fixed result panel + bottom tabs on phone */
+  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 11rem);
 }
 
 @media (min-width: 1024px) {
@@ -72,18 +72,30 @@
   margin-top: 1.25rem;
 }
 
-/* Sticky live results: above bottom tabs on phone; top of column on desktop */
+/*
+ * Live results panel.
+ * Phone: fixed above bottom tabs (z-30 < tab z-40) so sticky is visible and not covered.
+ * Desktop ≥1024: in-flow right column, sticky to top while scrolling.
+ */
 .output {
-  position: sticky;
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
   bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 0.5rem);
-  z-index: 20;
-  box-shadow: 0 -4px 16px hsl(var(--foreground) / 0.06);
+  z-index: 30;
+  max-height: min(38vh, 16rem);
+  overflow-y: auto;
+  box-shadow: 0 -6px 20px hsl(var(--foreground) / 0.1);
 }
 
 @media (min-width: 1024px) {
   .output {
+    position: sticky;
+    left: auto;
+    right: auto;
     top: 1rem;
     bottom: auto;
+    z-index: auto;
     align-self: start;
     max-height: calc(100vh - 2rem);
     overflow-y: auto;

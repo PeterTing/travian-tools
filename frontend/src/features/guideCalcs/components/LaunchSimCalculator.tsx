@@ -28,8 +28,9 @@ interface Milestone {
 export function simulate(
   strategyId: StrategyId,
   prodPerHour: number,
-  _settlerTotalCost: number,
+  settlerTotalCost: number = 0,
 ): { totalHours: number; milestones: Milestone[]; allSteps: BuildStep[] } {
+  void settlerTotalCost; // reserved for future settler-cost milestones; kept for call-site compat
   const strategy = STRATEGIES[strategyId];
   const allSteps = [...common, ...strategy.branchSteps];
   const milestones: Milestone[] = [];
@@ -77,11 +78,11 @@ export default function LaunchSimCalculator() {
   return (
     <>
       <div className={s.intro}>
-        <h2>{lang === 'en' ? 'Launching Simulator (V1)' : '開局模擬器 (V1)'}</h2>
+        <h2>{lang === 'en' ? 'Launch Simulator' : '出兵模擬'}</h2>
         <p>
           {lang === 'en'
-            ? 'Estimate time-to-settle given your production rate and chosen strategy. Walks through the full build order (common 40 + branch steps) and sums cost / rate per step. Milestones (Parties + Settler training + final step) show cumulative time.'
-            : '依照你的產量和選擇的風格，估算結帳時間。走完完整 build order（共通 40 + 分支步驟），依 成本 / 產量 算出每一步耗時。里程碑（每場 Party + 訓練 Settler + 最後一步）顯示累計時間。'}
+            ? 'Estimate how long until you can settle, based on production and opening style. Shows milestones for parties, settler training, and the final step.'
+            : '依產量與開局風格，估算多久可以結帳開新村。會標出派對、訓練拓荒者與最後一步等里程碑時間。'}
         </p>
       </div>
 
@@ -126,8 +127,8 @@ export default function LaunchSimCalculator() {
 
           <div className={s.note}>
             {lang === 'en'
-              ? 'V1 does NOT model task rewards (which return ~15-25% of spend) or CP pacing. Actual settle is typically 10-25% FASTER than shown. Assumes 1x server speed.'
-              : 'V1 未納入任務獎勵（可回收 15-25% 成本）或 CP 調整，實際結帳通常比這裡顯示快 10-25%。假設 1x 伺服器速度。'}
+              ? 'Task rewards and culture-point timing are not included, so real settle is often a bit faster. Assumes 1× server speed.'
+              : '尚未計入任務獎勵與文明點節奏，實際結帳通常會再快一些。數字以 1 倍速伺服器為準。'}
           </div>
         </div>
 

@@ -826,7 +826,7 @@
   },
   "pathCalc": {
     "title": "Travel Time",
-    "intro": "Travel time between two points. Tournament Square only speeds the portion beyond 20 fields, +20% per level (S71). Results update live.",
+    "intro": "How long troops take to travel between two points. Tournament Square only speeds the stretch beyond 20 fields (+20% per level). Results update as you type.",
     "inputs": "Inputs",
     "results": "Results",
     "startX": "Start X",

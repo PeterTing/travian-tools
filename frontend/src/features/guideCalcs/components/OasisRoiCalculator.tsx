@@ -37,17 +37,18 @@ export default function OasisRoiCalculator() {
       total += counts[k as ResourceType] * base * (v ?? 0);
     });
     return total * 24 * (gold ? 1.25 : 1);
-  }, [cropper, fieldLv, oasisId, gold]);
+  }, [layout, fieldLv, oasisId, gold]);
 
   const roi = useMemo(() => hmCumulativeCost(hm) / dailyGain, [hm, dailyGain]);
 
   return (
     <>
       <div className={s.intro}>
-        <h2>{lang === 'en' ? 'Oasis ROI Calculator' : '綠洲 ROI 計算器'}</h2>
+        {/* HM costs from T4 formulas; see data/travian.ts + regression tests */}
+        <h2>{lang === 'en' ? 'Oasis ROI' : '綠洲回本'}</h2>
         <p>{lang === 'en'
-          ? "How many days does an oasis pay back the Hero's Mansion that captured it? HM Lv 10/15/20 → 1/2/3 oases. HM cost derived directly from kirilloid T4 source (base [80,120,70,90], k=1.33). Note: Lumi's published ROI table uses older HM costs ~5× higher — modern T4 makes oasis capture much cheaper than Lumi implies."
-          : "佔領綠洲所需的英雄宅多少天可回本？HM Lv 10/15/20 各可佔 1/2/3 塊。HM 成本依 kirilloid T4 原始碼（base [80,120,70,90], k=1.33）計算。注意：Lumi 指南內的 ROI 表格用的是舊版 HM 成本（約 5 倍高）；現代 T4 佔綠洲比 Lumi 數字短很多。"}</p>
+          ? "How many days until the Hero's Mansion that captured an oasis pays for itself. Mansion Lv 10 / 15 / 20 can hold 1 / 2 / 3 oases."
+          : '算佔領綠洲所需的英雄宅要幾天回本。英雄宅 10／15／20 級分別可佔 1／2／3 塊綠洲。'}</p>
       </div>
 
       <div className={s.wrapper}>
@@ -97,8 +98,8 @@ export default function OasisRoiCalculator() {
 
           <div className={s.note}>
             {lang === 'en'
-              ? 'Calculates only the gain from this single oasis. Hold multiple oases? Run this for each, or use the Field-ROI calculator with the combined oasis %.'
-              : '只計算此單一綠洲的每日增益。要佔多塊請分別評估，或在「資源田 ROI」裡用綠洲 % 疊加。'}
+              ? 'This is for one oasis. For several, run once each, or set the combined oasis % in Field ROI.'
+              : '這裡只算一塊綠洲。若佔多塊，請分開算，或到「田地回本」把綠洲％加總。'}
           </div>
         </div>
 
@@ -109,9 +110,9 @@ export default function OasisRoiCalculator() {
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /day' : '每天'}</span><span className={s.value}>+{fmt(dailyGain)}</span></div>
           <div className={s.row}><span className={s.label}>ROI</span><span className={`${s.value} ${s.highlight}`}>{roi.toFixed(2)} {lang === 'en' ? 'days' : '天'}</span></div>
 
-          <h4>{lang === 'en' ? 'Compare 3 HM levels' : '比較三種 HM 等級'}</h4>
+          <h4>{lang === 'en' ? 'Compare 3 mansion levels' : '比較三種英雄宅等級'}</h4>
           <table className={s.table}>
-            <thead><tr><th>HM</th><th>{lang === 'en' ? 'Cost' : '成本'}</th><th>ROI</th><th>{lang === 'en' ? 'Verdict' : '判斷'}</th></tr></thead>
+            <thead><tr><th>{lang === 'en' ? 'Mansion' : '英雄宅'}</th><th>{lang === 'en' ? 'Cost' : '成本'}</th><th>ROI</th><th>{lang === 'en' ? 'Verdict' : '判斷'}</th></tr></thead>
             <tbody>
               {[10, 15, 20].map(L => {
                 const c = hmCumulativeCost(L);

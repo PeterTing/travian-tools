@@ -49,10 +49,11 @@ export default function CropSimCalculator() {
   return (
     <>
       <div className={s.intro}>
-        <h2>{lang === 'en' ? 'Capital Crop / Total Production Simulator' : '首都糧食 / 總產量模擬器'}</h2>
+        {/* Table 1 reference numbers — see calculators.regression.test.ts */}
+        <h2>{lang === 'en' ? 'Crop Simulator' : '糧食模擬'}</h2>
         <p>{lang === 'en'
-          ? "Reproduces Lumi's Table 1: total capital production /hr (all 4 resources) with every bonus applied. Compare 15c / 9c / 7c / 6c. Egyptian Waterworks toggle scales crop oasis bonus by ×1.35. Validated against Lumi Table 1 (15c @ Lv 18 + Lv 5 BBs + 150% crop oasis + Plus gold + Egyptian): calculator Total /hr ≈ 136,920 vs Lumi 136,500 (+0.3%). Crop-only row at that cell is ≈126,840/hr; the remaining ≈10,080/hr comes from the three non-crop fields (1 each) at +50% (Plus+BBs)."
-          : '複現 Lumi Table 1：首都全資源（木土鐵糧）總和每小時產量。可比較 15c / 9c / 7c / 6c。埃及人供水系統會把糧綠洲加成 ×1.35。驗證對照 Lumi Table 1（15c Lv 18 + Lv 5 加成建築 + 150% 糧綠洲 + Plus 金 + 埃及人）：計算器 Total /hr ≈ 136,920，Lumi 136,500（誤差 +0.3%）。該格糧食列約 126,840/hr，剩下約 10,080/hr 來自三塊非糧田（各 1 塊，+50% 加成）。'}</p>
+          ? 'Estimates total capital production per hour (wood, clay, iron, and crop) with all bonuses. Compare 15c / 9c / 7c / 6c layouts. Egyptian Waterworks multiplies crop-oasis bonus by 1.35. Plus gold bonus is included when checked.'
+          : '估算首都每小時總產量（木、土、鐵、糧），可比較 15c／9c／7c／6c。埃及人的供水系統會讓糧綠洲加成再乘 1.35；有勾選 Plus 時一併算進去。'}</p>
       </div>
 
       <div className={s.wrapper}>
@@ -84,7 +85,7 @@ export default function CropSimCalculator() {
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Oasis bonuses (%)' : '綠洲加成 (%)'}</h4>
           <p style={{ fontSize: 11, color: 'var(--text-2)', margin: '0 0 8px' }}>
-            {lang === 'en' ? 'Per-village cap: 75% non-crop, 150% crop (3 oases max via HM Lv 20)' : '每村上限：木 / 土 / 鐵 75%、糧 150%（HM Lv 20 共 3 塊綠洲）'}
+            {lang === 'en' ? 'Per-village cap: 75% non-crop, 150% crop (up to 3 oases at Hero\'s Mansion 20)' : '每村上限：木／土／鐵 75%、糧 150%（英雄宅 20 級最多 3 塊綠洲）'}
           </p>
           <div className={s.fieldRow}>
             <div className={s.field}><label>Wood (max 75)</label><input type="number" min={0} max={75} value={oasis.wood} onChange={e => setOasis(p => ({ ...p, wood: +e.target.value }))} /></div>
@@ -133,7 +134,7 @@ export default function CropSimCalculator() {
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Crop /hr' : '糧食 /hr'}</span><span className={s.value}>{fmtInt(result.totals.crop)}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Total /hr' : '總計 /hr'}</span><span className={`${s.value} ${s.highlight}`}>{fmtInt(total)}</span></div>
 
-          <h4>{lang === 'en' ? 'Lumi Table 1 reference (Lv 18 maxed)' : 'Lumi Table 1 對照 (Lv 18 全滿)'}</h4>
+          <h4>{lang === 'en' ? 'Reference (Lv 18, fully buffed)' : '參考值（18 級、加成拉滿）'}</h4>
           <table className={s.table}>
             <thead><tr>
               <th>{lang === 'en' ? 'Layout' : '首都配置'}</th>

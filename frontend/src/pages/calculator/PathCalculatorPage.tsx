@@ -61,7 +61,7 @@ export default function PathCalculatorPage() {
         <p className="text-sm text-muted-foreground">{t('pathCalc.intro')}</p>
       </div>
 
-      <div className="flex min-w-0 flex-col gap-4 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px)+1rem)] lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:pb-0">
+      <div className="flex min-w-0 flex-col gap-4 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px)+11rem)] lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:pb-0">
         <div className="min-w-0 rounded-xl border bg-card p-4">
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
             {t('pathCalc.inputs')}
@@ -179,7 +179,7 @@ export default function PathCalculatorPage() {
           </label>
         </div>
 
-        <div className="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px)+0.5rem)] z-20 min-w-0 rounded-xl border bg-card p-4 shadow-lg lg:top-4 lg:bottom-auto lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto lg:shadow-none">
+        <div className="fixed inset-x-3 bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px)+0.5rem)] z-30 max-h-[min(38vh,16rem)] min-w-0 overflow-y-auto rounded-xl border bg-card p-4 shadow-lg lg:static lg:inset-x-auto lg:bottom-auto lg:z-auto lg:max-h-[calc(100vh-2rem)] lg:self-start lg:shadow-none">
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
             {t('pathCalc.results')}
           </h2>

@@ -52,15 +52,16 @@ export default function FarmingCalculator() {
     const troopCost = rec.n * unit.cost;
     const payback = daily > 0 ? troopCost / daily : Infinity;
     return { owMin, carryCap, maxRaidsHr, daily, troopCost, payback };
-  }, [pop, dist, unit, rec.n, freq, loot]);
+  }, [dist, unit, rec.n, freq, loot]);
 
   return (
     <>
       <div className={s.intro}>
-        <h2>{lang === 'en' ? 'Farming Calculator' : '農場效率計算器'}</h2>
+        {/* Pop brackets for horse counts — see lumiBracket() + regression tests */}
+        <h2>{lang === 'en' ? 'Farming Yield' : '農場收益'}</h2>
         <p>{lang === 'en'
-          ? "Lumi's troop sizing for inactive farm targets, with daily yield estimate. Pop brackets: <150 skip, 150-400 = 1 horse, 400-550 = 2, 550+ = 3-7 (5 default). Tune per-raid loot from your actual battle reports."
-          : 'Lumi 的目標農場兵數法則，含每日收益預估。人口分級：<150 略過、150-400 = 1 馬、400-550 = 2、550+ = 3-7（預設 5）。每次掠奪量請從實際戰報調整。'}</p>
+          ? 'Suggests how many horses to send to inactive targets and estimates daily loot. Under 150 pop: skip; 150–400: 1 horse; 400–550: 2; 550+: about 3–7 (default 5). Adjust loot per raid from your reports.'
+          : '估算打不活躍村該派幾匹馬、一天大概能搶多少。人口不到 150 略過；150–400 派 1 匹；400–550 派 2 匹；550 以上大約 3–7 匹（預設 5）。每次搶到的量請依戰報調整。'}</p>
       </div>
 
       <div className={s.wrapper}>
@@ -98,7 +99,7 @@ export default function FarmingCalculator() {
         </div>
 
         <div className={s.output}>
-          <h4>{lang === 'en' ? 'Lumi recommendation' : 'Lumi 建議'}</h4>
+          <h4>{lang === 'en' ? 'Suggested size' : '建議兵數'}</h4>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Pop bracket' : '人口區間'}</span><span className={s.value}>{rec.bracket}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Recommended count' : '建議兵數'}</span><span className={`${s.value} ${s.highlight}`}>{rec.msg}</span></div>
 
@@ -112,8 +113,8 @@ export default function FarmingCalculator() {
 
           <div className={s.note}>
             {lang === 'en'
-              ? 'Yield = min(per-raid loot, carry cap) × raids/hr × 24. Lumi: probe new farms with 10 horses; once contested, drop to a count that just fills one haul.'
-              : '收益 = min(每次掠奪量, 搬運上限) × 每小時次數 × 24。Lumi 提醒：新農場可先用 10 馬探底；一旦被搶就降到剛好搬滿一次的數量。'}
+              ? 'Daily yield uses the smaller of loot per raid and carry capacity, times raids per hour. For a new farm, try about 10 horses first; if others contest it, send only enough to fill one haul.'
+              : '每日收益取「每次搶到的量」與「搬運上限」較小者，再乘每小時次數。新農場可先派約 10 匹馬探底；若常被搶，就降到剛好搬滿一次即可。'}
           </div>
         </div>
       </div>

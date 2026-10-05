@@ -152,10 +152,11 @@ export default function BuildOrderCalculator() {
   return (
     <>
       <div className={s.intro}>
-        <h2>{lang === 'en' ? 'Capital / Village Build-Order Generator' : '首都 / 村莊建築順序產生器'}</h2>
+        {/* Greedy ROI planner algorithm — see planGreedy() + algorithm tests */}
+        <h2>{lang === 'en' ? 'Build Order' : '建造順序'}</h2>
         <p>{lang === 'en'
-          ? 'Greedy ROI planner: given current state, lists the next 20 best upgrades. Capitals unlock Lv 11–20; normal villages cap at Lv 10. Bonus buildings appear once prerequisites are met. Pair with Lumi pattern: non-crop all-to-7 → one to 10 → bonus building Lv 3 → next field to 9 …'
-          : '貪婪 ROI 規劃：依現況排出接下來 20 個最優升級。首都解鎖 Lv 11–20；一般村只到 Lv 10。加成建築前提達成後自動加入候選。建議搭配 Lumi 模式：非糧全到 Lv 7 → 一格到 10 → 加成建築 Lv 3 → 下一格到 9 …'}</p>
+          ? 'Suggests the next 20 upgrades from your current village. Capitals can go to field Lv 20; other villages stop at Lv 10. Bonus buildings appear when their requirements are met.'
+          : '依目前村莊狀態，建議接下來 20 個最划算的升級。首都資源田可升到 20 級，一般村最高 10 級；加成建築在條件達到後會自動出現。'}</p>
       </div>
 
       <div className={s.wrapper}>

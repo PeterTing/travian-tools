@@ -22,11 +22,14 @@ export default function FieldRoiCalculator() {
   const [oasis, setOasis] = useState(0);
   const [gold, setGold] = useState(true);
 
-  const opts = { goldBonus: gold ? 0.25 : 0, bonusBuildingPct: bonus, oasisPct: oasis };
-  const result = useMemo(() => fieldRoi(type, level, opts), [type, level, bonus, oasis, gold]);
+  const result = useMemo(() => {
+    const opts = { goldBonus: gold ? 0.25 : 0, bonusBuildingPct: bonus, oasisPct: oasis };
+    return fieldRoi(type, level, opts);
+  }, [type, level, bonus, oasis, gold]);
   const breakdown = FIELD_COSTS[type][level - 1];
 
   const compareRows = useMemo(() => {
+    const opts = { goldBonus: gold ? 0.25 : 0, bonusBuildingPct: bonus, oasisPct: oasis };
     const types: ResourceType[] = ['wood', 'clay', 'iron', 'crop'];
     const rows = types.map(t2 => ({ t: t2, r: fieldRoi(t2, level, opts) }));
     const minRoi = Math.min(...rows.map(r => r.r.roiDays));
@@ -36,10 +39,11 @@ export default function FieldRoiCalculator() {
   return (
     <>
       <div className={s.intro}>
-        <h2>{lang === 'en' ? 'Field ROI Calculator' : '資源田 ROI 計算器'}</h2>
+        {/* Validation vs Lumi Table 2 (Wood L7 = 6.46d) lives in calculators.regression.test.ts */}
+        <h2>{lang === 'en' ? 'Field ROI' : '田地回本'}</h2>
         <p>{lang === 'en'
-          ? 'Days to break even on a single field upgrade. Lower ROI = upgrade first. Lumi convention: L1 compares against zero production; L2+ against previous level. Bonuses stack additively (1 + bonus_building% + oasis% + gold%). Validated against Lumi Table 2 (Wood L7 = 6.46 days exact match).'
-          : '升一級資源田，幾天回本。ROI 越短越優先。Lumi 慣例：L1 比對 0 產量、L2+ 比對前一級。加成以加法疊加（1 + 加成建築% + 綠洲% + 金幣%）。已對照 Lumi Table 2 驗證（Wood L7 = 6.46 天完全吻合）。'}</p>
+          ? 'How many days until a field upgrade pays for itself. Fewer days = upgrade that field first. Building, oasis, and Plus bonuses all add together.'
+          : '升一級資源田要幾天回本，天數越少越值得先升。加成建築、綠洲與 Plus 金幣加成會一起算進去。'}</p>
       </div>
 
       <div className={s.wrapper}>
@@ -108,7 +112,7 @@ export default function FieldRoiCalculator() {
             {fmt(breakdown.wood)} / {fmt(breakdown.clay)} / {fmt(breakdown.iron)} / {fmt(breakdown.crop)}
           </div>
 
-          <h4>{lang === 'en' ? 'Compare 4 resources at this level' : '四種資源 ROI 對照（同等級、同參數）'}</h4>
+          <h4>{lang === 'en' ? 'Same level, all four resources' : '同等級四種資源比較'}</h4>
           <table className={s.table}>
             <thead><tr><th>{lang === 'en' ? 'Type' : '類型'}</th><th>{lang === 'en' ? 'Cost' : '成本'}</th><th>Δ /day</th><th>ROI ({lang === 'en' ? 'days' : '天'})</th></tr></thead>
             <tbody>

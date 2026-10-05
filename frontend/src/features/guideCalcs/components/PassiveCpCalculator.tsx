@@ -34,7 +34,7 @@ export default function PassiveCpCalculator() {
   const { lang } = useLang();
   const [levels, setLevels] = useState<Record<string, number>>(PRESETS.lumi);
   const set = (id: string, v: number) => setLevels(prev => ({ ...prev, [id]: Math.max(0, Math.min(20, v || 0)) }));
-  const apply = (preset: string) => setLevels(_prev => {
+  const apply = (preset: string) => setLevels(() => {
     const next: Record<string, number> = {};
     FIELDS.forEach(f => { next[f.id] = PRESETS[preset]?.[f.id] ?? 0; });
     return next;
@@ -55,12 +55,11 @@ export default function PassiveCpCalculator() {
   return (
     <>
       <div className={s.intro}>
-        <h2>{lang === 'en' ? 'Passive CP Calculator' : '被動 CP 計算器'}</h2>
-        {/* Breakdown: MB20=77 + Mkt20=115 + Emb20=153 + Acad20=153 + TH10=31 + baseline=2 = 531 CP/day
-            (round(base×1.2^L) per building; Lumi's "529" rounds the components individually differently) */}
+        <h2>{lang === 'en' ? 'Culture Points' : '文明點'}</h2>
+        {/* Preset 「常用」= MB20+Market20+Embassy20+Academy20+TH10 → 531 CP/day; see tests */}
         <p>{lang === 'en'
-          ? 'CP per day from a single village. Lumi recommends MB 20 + Market 20 + Embassy 20 + Academy 20 + Town Hall 10 = 531 CP/day per village (77 + 115 + 153 + 153 + 31 + 2 baseline). The 2,000-CP baseline includes a small constant +2 for an empty village.'
-          : '單村每天能產多少被動 CP。Lumi 建議：村莊大樓 20 + 市場 20 + 大使 20 + 研究院 20 + 城鎮廳 10 = 531 CP/天（77+115+153+153+31+2 基線）。基線含 +2（空村產量）。'}</p>
+          ? 'How many culture points one village produces per day. Raise building levels below, or tap a preset to fill common setups.'
+          : '看一個村莊每天能產出多少文明點。調整下面的建築等級，或點預設一鍵帶入常見配置。'}</p>
       </div>
 
       <div className={s.wrapper}>
@@ -90,7 +89,7 @@ export default function PassiveCpCalculator() {
           })}
 
           <div className={s.btnRow}>
-            <button onClick={() => apply('lumi')}>{lang === 'en' ? 'Lumi (531/d)' : 'Lumi (531/天)'}</button>
+            <button onClick={() => apply('lumi')}>{lang === 'en' ? 'Common (531/d)' : '常用（531／天）'}</button>
             <button onClick={() => apply('min')}>{lang === 'en' ? 'Bare-min' : '最小'}</button>
             <button onClick={() => apply('zero')}>{lang === 'en' ? 'Clear' : '清空'}</button>
           </div>
@@ -131,8 +130,8 @@ export default function PassiveCpCalculator() {
 
           <div className={s.note}>
             {lang === 'en'
-              ? 'CP is account-global — sum across all your villages for the true total. Great Celebration costs 5× a small one but gives +2,000 CP/cycle (60 hr at TH Lv 10).'
-              : 'CP 是帳號全域 ─ 多村加總才準。大慶典成本是小慶典的 5 倍但給 +2,000 CP/週期（城鎮廳 Lv 10 為 60 小時）。'}
+              ? 'Culture points are account-wide — add up every village. A great celebration costs 5× a small one and gives +2,000 CP (about 60 hours at Town Hall 10).'
+              : '文明點是整帳號共用，要把所有村莊加起來才準。大慶典花費是小慶典的 5 倍，一次加 2,000 點（城鎮廳 10 級大約 60 小時）。'}
           </div>
         </div>
       </div>
