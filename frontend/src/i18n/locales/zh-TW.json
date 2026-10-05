@@ -327,6 +327,8 @@
     "title": "遊戲帳號管理",
     "description": "管理您的 Travian 遊戲帳號",
     "noAccounts": "尚未新增任何遊戲帳號",
+    "allInactiveTitle": "沒有啟用中的帳號",
+    "allInactiveHint": "可以在下方『已停用』重新啟用，或新增一個遊戲帳號",
     "addAccount": "新增遊戲帳號",
     "editAccount": "編輯遊戲帳號",
     "deleteAccount": "刪除遊戲帳號",

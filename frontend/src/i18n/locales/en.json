@@ -313,6 +313,8 @@
     "title": "Game Account Management",
     "description": "Manage your Travian game accounts",
     "noAccounts": "No game accounts added yet",
+    "allInactiveTitle": "No active accounts",
+    "allInactiveHint": "Reactivate one under “Deactivated” below, or add a new game account.",
     "addAccount": "Add Game Account",
     "editAccount": "Edit Game Account",
     "deleteAccount": "Delete Game Account",
