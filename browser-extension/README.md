@@ -27,11 +27,24 @@
 
 ## 使用方式
 
-1. 安裝擴展後，登入 Travian 遊戲
+1. 安裝擴展後，到 `chrome://extensions/` 複製擴充 ID，設定到網站的 `VITE_EXTENSION_ID`（`.env`），重開前端
 2. 點擊瀏覽器工具列中的 Travian Tools 圖示
-3. 使用 Travian Tools 帳號登入
-4. 選擇要同步的遊戲帳號
-5. 在村莊頁面點擊「同步當前頁面」按鈕
+3. 沒登入時 popup 只有一顆「在工具網站登入」，會開新分頁到工具網站；在網站登入後，網站會把有到期時間的登入憑證交給擴充（popup 裡沒有任何輸入框，也不會問遊戲密碼）
+4. 回到遊戲分頁，再點一次圖示，選擇要存到哪個遊戲帳號
+5. 按「上傳這一頁」；不會自動上傳其他頁面
+
+### 登入憑證
+
+- 由工具網站在登入時（以及每次打開網站時）呼叫 `POST /api/v1/auth/extension-token` 換發，預設 8 小時到期（後端 `JWT_EXTENSION_TOKEN_EXPIRE_MINUTES`）
+- 只有 `manifest.json` 的 `externally_connectable.matches` 列出的網站能交憑證；background 還會再檢查一次來源（`lib/config.js` 的 `TRUSTED_SITE_ORIGINS`，兩邊要一致）
+- 過期就視為登出，讀取時自動清掉；擴充「登出擴充」與網站登出都會清掉
+- 正式網域在 P0-12 部署定案後，加到 `externally_connectable.matches` 與 `TRUSTED_SITE_ORIGINS`
+
+### 測試
+
+```bash
+cd browser-extension && node --test tests/
+```
 
 ## 開發
 
@@ -45,6 +58,10 @@ browser-extension/
 │   └── background.js
 ├── content/               # 內容腳本（點擊時才注入目前分頁）
 │   └── content.js
+├── lib/                   # 共用設定與登入憑證邏輯（純函式，有測試）
+│   ├── config.js
+│   └── credential.js
+├── tests/                 # node --test
 ├── popup/                 # 彈出視窗 UI
 │   ├── popup.html
 │   ├── popup.css

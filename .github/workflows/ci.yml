@@ -121,6 +121,31 @@ jobs:
       - name: Build
         run: pnpm build
 
+  # Browser extension (no dependencies; Node's built-in test runner)
+  extension:
+    name: Extension CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: browser-extension
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Syntax check
+        run: |
+          for f in background/background.js popup/popup.js lib/*.js content/content.js; do
+            node --check "$f"
+          done
+
+      - name: Run tests (credential expiry / clear, popup has no inputs)
+        run: node --test tests/
+
   # Docker Build Test
   docker:
     name: Docker Build Test

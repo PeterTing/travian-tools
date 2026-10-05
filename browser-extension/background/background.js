@@ -1,67 +1,49 @@
 /**
  * Travian Tools - Background Service Worker
- * 只處理 API 通訊與登入狀態。
+ * 只處理 API 通訊與登入狀態。登入憑證由工具網站交過來（有到期時間），
+ * 擴充自己不收帳號密碼。
  *
  * 合規：沒有任何計時器、alarm 或背景輪詢；只有使用者在 popup 點擊
  * 「同步當前頁面」時，才會讀取「目前分頁」並送到 Travian Tools 後端。
  * 擴充功能本身不會對 Travian 發出任何請求。
  */
 
-// 配置
-const CONFIG = {
-  API_BASE_URL: 'http://localhost:8000/api/v1',
-  DEBUG: true,
-};
+import { API_BASE_URL, TRUSTED_SITE_ORIGINS } from '../lib/config.js';
+import {
+  SITE_MESSAGE,
+  clearCredential,
+  isTrustedSender,
+  loadCredential,
+  saveCredential,
+} from '../lib/credential.js';
 
-// 工具函數
+const DEBUG = false;
+
 const log = (...args) => {
-  if (CONFIG.DEBUG) {
+  if (DEBUG) {
     console.log('[Travian Tools BG]', ...args);
   }
 };
 
-/**
- * 儲存管理
- */
-const Storage = {
-  async get(key) {
-    const result = await chrome.storage.local.get(key);
-    return result[key];
-  },
-
-  async set(key, value) {
-    await chrome.storage.local.set({ [key]: value });
-  },
-
-  async getAuth() {
-    return await this.get('auth');
-  },
-
-  async setAuth(auth) {
-    await this.set('auth', auth);
-  },
-
-  async clearAuth() {
-    await chrome.storage.local.remove('auth');
-  },
-};
+const storage = chrome.storage.local;
 
 /**
  * API 請求封裝
  */
 async function apiRequest(endpoint, options = {}) {
-  const auth = await Storage.getAuth();
+  const credential = await loadCredential(storage);
+  if (!credential) {
+    throw new Error('尚未登入，請在工具網站登入');
+  }
 
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
   };
 
-  if (auth?.access_token) {
-    headers['Authorization'] = `Bearer ${auth.access_token}`;
-  }
+  headers['Authorization'] = `Bearer ${credential.access_token}`;
 
-  const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
   });
@@ -80,8 +62,8 @@ async function apiRequest(endpoint, options = {}) {
     }
 
     if (response.status === 401) {
-      await Storage.clearAuth();
-      throw new Error('登入已過期，請重新登入');
+      await clearCredential(storage);
+      throw new Error('登入已過期，請在工具網站重新登入');
     }
 
     throw new Error(errorMessage);
@@ -162,6 +144,42 @@ async function syncTroopStatistics(accountId, villagesTroops) {
 }
 
 /**
+ * 工具網站透過 externally_connectable 交登入憑證過來。
+ *
+ * manifest 只允許工具網站連進來；這裡再檢查一次 sender 的 origin。
+ * 只接受「設定憑證」與「清除憑證」兩種訊息，不會因此去讀任何遊戲頁面。
+ */
+chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
+  if (!isTrustedSender(sender, TRUSTED_SITE_ORIGINS)) {
+    sendResponse({ success: false, error: 'Untrusted sender' });
+    return false;
+  }
+
+  const handleAsync = async () => {
+    switch (request?.type) {
+      case SITE_MESSAGE.PING:
+        return { success: true };
+      case SITE_MESSAGE.SET: {
+        const credential = await saveCredential(storage, request);
+        return credential
+          ? { success: true, expires_at: credential.expires_at }
+          : { success: false, error: 'Invalid or expired credential' };
+      }
+      case SITE_MESSAGE.CLEAR:
+        await clearCredential(storage);
+        return { success: true };
+      default:
+        return { success: false, error: 'Unknown message' };
+    }
+  };
+
+  handleAsync()
+    .then(sendResponse)
+    .catch((error) => sendResponse({ success: false, error: error.message }));
+  return true;
+});
+
+/**
  * 監聽來自 popup 或 content script 的消息
  */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -170,21 +188,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const handleAsync = async () => {
     try {
       switch (request.action) {
-        case 'login':
-          const loginResult = await apiRequest('/auth/login', {
-            method: 'POST',
-            body: JSON.stringify(request.credentials),
-          });
-          await Storage.setAuth(loginResult);
-          return { success: true, data: loginResult };
-
         case 'logout':
-          await Storage.clearAuth();
+          await clearCredential(storage);
           return { success: true };
 
-        case 'get_auth':
-          const auth = await Storage.getAuth();
-          return { success: true, data: auth };
+        case 'get_auth': {
+          const credential = await loadCredential(storage);
+          return {
+            success: true,
+            data: credential
+              ? { user: credential.user, expires_at: credential.expires_at }
+              : null,
+          };
+        }
 
         case 'sync_village_overview':
           const overviewResult = await syncVillageOverview(

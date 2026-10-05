@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    # 交給瀏覽器擴充的登入憑證有效時間（分鐘）。過期後擴充視為登出，
+    # 使用者再打開工具網站就會自動換發新的。
+    JWT_EXTENSION_TOKEN_EXPIRE_MINUTES: int = 480
 
     # map.sql 每日抓取（唯一允許連線至 Travian 的功能）
     # 只下載公開的 /map.sql：不帶 cookie/憑證、不用瀏覽器、固定排程。

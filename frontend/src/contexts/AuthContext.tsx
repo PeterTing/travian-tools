@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import authApi from '@/services/authApi'
+import { clearExtensionLogin, shareLoginWithExtension } from '@/services/extensionBridge'
 import type { UserResponse, UserLoginRequest, UserRegisterRequest } from '@/types/game'
 
 interface AuthContextType {
@@ -33,6 +34,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const userData = await authApi.getMe()
         setUser(userData)
+        // 每次打開網站都換一張新的給擴充，讓擴充的登入狀態跟網站一致
+        void shareLoginWithExtension()
       } catch {
         setUser(null)
       }
@@ -48,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await authApi.login(data)
     const userData = await authApi.getMe()
     setUser(userData)
+    void shareLoginWithExtension()
     navigate('/')
   }
 
@@ -57,7 +61,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    await authApi.logout()
+    try {
+      await authApi.logout()
+    } finally {
+      // 網站登出時，擴充也一起登出
+      await clearExtensionLogin()
+    }
     setUser(null)
     navigate('/login')
   }

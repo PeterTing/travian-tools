@@ -1,6 +1,7 @@
 """認證相關的 Pydantic Schema."""
 
 import re
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
@@ -58,6 +59,16 @@ class TokenResponse(BaseModel):
     token_type: str = Field(default="bearer", description="Token 類型")
 
 
+class ExtensionTokenResponse(BaseModel):
+    """交給瀏覽器擴充的短效登入憑證."""
+
+    access_token: str = Field(..., description="擴充專用存取 Token")
+    token_type: str = Field(default="bearer", description="Token 類型")
+    expires_at: datetime = Field(..., description="到期時間（UTC）")
+    expires_in: int = Field(..., description="幾秒後到期")
+    user: "UserResponse" = Field(..., description="登入的使用者")
+
+
 class TokenRefreshRequest(BaseModel):
     """Token 刷新請求."""
 
@@ -72,6 +83,9 @@ class UserResponse(BaseModel):
     email: str = Field(..., description="電子郵件")
 
     model_config = {"from_attributes": True}
+
+
+ExtensionTokenResponse.model_rebuild()
 
 
 class MessageResponse(BaseModel):

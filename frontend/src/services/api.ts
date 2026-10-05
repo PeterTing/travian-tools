@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { ROUTES } from '@/constants/routes'
+import { clearExtensionLogin } from './extensionBridge'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api/v1',
@@ -67,6 +68,7 @@ api.interceptors.response.use(
           return api(originalRequest)
         } catch {
           clearTokens()
+          await clearExtensionLogin()
           window.location.href = ROUTES.AUTH.LOGIN
         }
       }
