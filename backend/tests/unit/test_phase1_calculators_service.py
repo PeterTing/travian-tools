@@ -307,7 +307,7 @@ def test_ts_optimizer_invalid_iso_raises():
 
 
 def test_ts_optimizer_short_distance_skips_ts_bonus():
-    """Distance ≤ 30 fields: TS level has no effect (formula short-circuit)."""
+    """Distance ≤ 20 fields: TS level has no effect (S71)."""
     service = get_advanced_calculator_service()
     target_iso = "2030-05-01T12:00:00+00:00"
 

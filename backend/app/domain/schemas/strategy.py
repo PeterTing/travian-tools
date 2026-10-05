@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 class GamePhase(StrEnum):
     """遊戲階段枚舉."""
 
-    BEGINNER_PROTECTION = "beginner_protection"  # 新手保護期 (Day 1-3)
+    BEGINNER_PROTECTION = "beginner_protection"  # 新手保護期（天數依世界；x1 預設 5）
     EARLY_DEVELOPMENT = "early_development"  # 早期發展 (Day 1-7)
     MID_EXPANSION = "mid_expansion"  # 中期擴張 (Day 8-30)
     LATE_MID = "late_mid"  # 中後期 (Day 31-100)
@@ -31,6 +31,12 @@ class PhaseDetectionRequest(BaseModel):
     """遊戲階段判斷請求."""
 
     account_id: str = Field(..., description="遊戲帳號 ID")
+    beginner_protection_days: int = Field(
+        5,
+        ge=1,
+        le=30,
+        description="新手保護天數（依世界；x1=5、可延長；S12）",
+    )
 
 
 class PhaseStandard(BaseModel):
@@ -65,6 +71,12 @@ class HealthCheckRequest(BaseModel):
     """帳號健康檢查請求."""
 
     account_id: str = Field(..., description="遊戲帳號 ID")
+    beginner_protection_days: int = Field(
+        5,
+        ge=1,
+        le=30,
+        description="新手保護天數（依世界；x1=5；S12）",
+    )
 
 
 class HealthCheckItem(BaseModel):

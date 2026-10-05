@@ -120,21 +120,39 @@ class CropBalanceRequest(BaseModel):
         ..., description="建築列表，每項包含 building_id 和 level"
     )
     troops: list[BattleUnit] = Field(default_factory=list, description="部隊列表")
-    crop_fields_production: int = Field(0, ge=0, description="農田總產量/小時")
+    crop_fields_production: int = Field(
+        0, ge=0, description="農田總產量/小時（不含英雄）"
+    )
     oasis_bonus: float = Field(0, ge=0, description="糧食綠洲加成百分比")
+    hero_crop_production: int = Field(
+        0,
+        ge=0,
+        description="英雄糧食產量/小時（含資源點產出與固定 +6；S75/S141）",
+    )
+    hero_crop_consumption: int = Field(
+        0,
+        ge=0,
+        description="英雄糧食消耗/小時（英雄在村時通常為 6；S75）",
+    )
+    server_speed: float = Field(
+        1.0, gt=0, description="伺服器速度倍率（產量已由呼叫端折算時可忽略）"
+    )
 
 
 class CropBalanceResponse(BaseModel):
     """糧食平衡計算回應."""
 
     population_consumption: int  # 人口糧耗
-    troop_consumption: int  # 部隊糧耗
+    troop_consumption: int  # 部隊糧耗（含英雄消耗）
+    hero_consumption: int  # 英雄糧耗（從 troop_consumption 拆出方便 UI）
     total_consumption: int  # 總糧耗
-    crop_production: int  # 糧食產量
+    crop_production: int  # 糧食產量（田 + 英雄）
+    hero_production: int  # 英雄產量
     balance: int  # 結餘（正）或赤字（負）
     status: str  # "surplus", "balanced", "deficit", "critical"
     warning_message: str | None = None
     suggestions: list[str]
+    server_speed: float
 
 
 # ============ Helper Functions ============
@@ -159,11 +177,11 @@ def calculate_actual_build_time(
 ) -> int:
     """計算實際建造時間.
 
-    公式：實際時間 = 基礎時間 ÷ (1 + 本部等級 × 0.05) ÷ 伺服器倍率
+    Legends / T4（KIR；ts11 實測）：base × 0.964^(MB−1) ÷ speed，四捨五入到 10 秒。
     """
-    reduction_factor = 1 + main_building_level * 0.05
-    actual_time = base_time / reduction_factor / server_speed
-    return int(actual_time)
+    from app.utils.travian_formulas import calculate_build_time
+
+    return calculate_build_time(base_time, main_building_level, server_speed)
 
 
 # ============ API Endpoints ============
@@ -217,18 +235,18 @@ async def calculate_building_upgrade(
         total_crop += level_data.cost_crop
         total_build_time += level_data.build_time_base
         total_population += level_data.population
-        total_culture_points += level_data.culture_points
 
-    # 計算每日文化點產出增加
-    # cp_per_day 是該等級建築的每日文化點產出
-    # 升級帶來的增加 = 目標等級的 cp_per_day - 起始等級的 cp_per_day
+    # CP：每棟建築按「目前等級」的每日產出計算，不是把各級累加。
+    # buildings.json 的 culture_points 欄位對應 KIR 的該級每日 CP
+    # （round(base × 1.2^level)）；cp_per_day 欄位是舊的累加值，勿用。
     from_level_data = (
         building.get_level(request.from_level) if request.from_level > 0 else None
     )
     to_level_data = building.get_level(request.to_level)
 
-    from_cp_daily = from_level_data.cp_per_day if from_level_data else 0
-    to_cp_daily = to_level_data.cp_per_day if to_level_data else 0
+    from_cp_daily = from_level_data.culture_points if from_level_data else 0
+    to_cp_daily = to_level_data.culture_points if to_level_data else 0
+    total_culture_points = to_cp_daily  # 升級後該建築每日 CP
     culture_points_per_day = to_cp_daily - from_cp_daily
 
     # 計算實際建造時間（含本部加成）
@@ -466,44 +484,48 @@ async def simulate_battle(request: BattleSimulateRequest) -> BattleSimulateRespo
 async def calculate_crop_balance(request: CropBalanceRequest) -> CropBalanceResponse:
     """計算糧食平衡.
 
-    分析村莊的糧食產出與消耗，提供平衡建議。
+    人口為各建築 1..level 人口增量總和（非只取該級增量）。
+    英雄產量／消耗由呼叫端輸入（S75／S141；ts11：28+36+6−8−6=56）。
     """
     service = get_game_data_service()
 
-    # 計算建築人口消耗
+    # 人口 = 累加該建築從 1 級到目前等級的 population 增量（KIR / TS11）
     population_consumption = 0
     for building_info in request.buildings:
         building_id = building_info.get("building_id")
         level = building_info.get("level", 1)
 
-        if not building_id:
+        if not building_id or level <= 0:
             continue
 
         building = service.buildings.get_building(building_id)
-        if building:
-            level_data = building.get_level(level)
+        if not building:
+            continue
+        for lvl in range(1, level + 1):
+            level_data = building.get_level(lvl)
             if level_data:
                 population_consumption += level_data.population
 
-    # 計算部隊糧耗
-    troop_consumption = 0
+    # 部隊糧耗（不含英雄；英雄另計）
+    troop_only = 0
     for unit in request.troops:
         troop = service.troops.get_troop(unit.troop_id)
         if troop:
-            troop_consumption += troop.crop_consumption * unit.count
+            troop_only += troop.crop_consumption * unit.count
 
-    # 總消耗
+    hero_consumption = request.hero_crop_consumption
+    troop_consumption = troop_only + hero_consumption
     total_consumption = population_consumption + troop_consumption
 
-    # 糧食產量（含綠洲加成）
-    crop_production = int(
+    # 田產量（含綠洲）+ 英雄產量
+    fields_production = int(
         request.crop_fields_production * (1 + request.oasis_bonus / 100)
     )
+    hero_production = request.hero_crop_production
+    crop_production = fields_production + hero_production
 
-    # 結餘
     balance = crop_production - total_consumption
 
-    # 判斷狀態
     if balance >= total_consumption * 0.5:
         status = "surplus"
         warning = None
@@ -512,15 +534,14 @@ async def calculate_crop_balance(request: CropBalanceRequest) -> CropBalanceResp
         warning = None
     elif balance >= -total_consumption * 0.2:
         status = "deficit"
-        warning = "糧食小幅赤字，建議升級農田或減少部隊"
+        warning = "糧食小幅赤字，建議升級農場或減少部隊"
     else:
         status = "critical"
         warning = "糧食嚴重赤字！部隊可能開始餓死"
 
-    # 建議
     suggestions = []
     if status in ("deficit", "critical"):
-        suggestions.append("升級農田提高產量")
+        suggestions.append("升級農場提高產量")
         suggestions.append("佔領糧食綠洲")
         if troop_consumption > 0:
             suggestions.append("考慮將部分部隊駐紮到其他村莊")
@@ -529,10 +550,13 @@ async def calculate_crop_balance(request: CropBalanceRequest) -> CropBalanceResp
     return CropBalanceResponse(
         population_consumption=population_consumption,
         troop_consumption=troop_consumption,
+        hero_consumption=hero_consumption,
         total_consumption=total_consumption,
         crop_production=crop_production,
+        hero_production=hero_production,
         balance=balance,
         status=status,
         warning_message=warning,
         suggestions=suggestions,
+        server_speed=request.server_speed,
     )

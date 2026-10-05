@@ -27,6 +27,7 @@ export default function HealthCheckPage() {
   const [healthData, setHealthData] = useState<HealthCheckResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [protectionDays, setProtectionDays] = useState(5)
 
   // 載入帳號列表
   useEffect(() => {
@@ -52,7 +53,7 @@ export default function HealthCheckPage() {
       setIsLoading(true)
       setError(null)
       try {
-        const data = await healthCheck(selectedAccountId)
+        const data = await healthCheck(selectedAccountId, protectionDays)
         setHealthData(data)
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : '健康檢查失敗'
@@ -62,7 +63,7 @@ export default function HealthCheckPage() {
       }
     }
     runHealthCheck()
-  }, [selectedAccountId])
+  }, [selectedAccountId, protectionDays])
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -156,7 +157,7 @@ export default function HealthCheckPage() {
         {/* 標題和帳號選擇 */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">{t('health.title')}</h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
               <SelectTrigger className="w-[250px]">
                 <SelectValue placeholder={t('strategy.selectAccountPlaceholder')} />
@@ -169,6 +170,21 @@ export default function HealthCheckPage() {
                 ))}
               </SelectContent>
             </Select>
+            <div className="flex items-center gap-2">
+              <label className="text-sm whitespace-nowrap" htmlFor="protection-days">
+                {t('health.protectionDays')}
+              </label>
+              <input
+                id="protection-days"
+                type="number"
+                min={1}
+                max={30}
+                value={protectionDays}
+                onChange={(e) => setProtectionDays(Number(e.target.value) || 5)}
+                className="w-16 p-2 border rounded bg-background text-center"
+                title={t('health.protectionDaysHint')}
+              />
+            </div>
           </div>
         </div>
 

@@ -55,7 +55,8 @@ ROLE_ADJUSTMENTS = {
 
 PHASE_STANDARDS: dict[GamePhase, dict] = {
     GamePhase.BEGINNER_PROTECTION: {
-        "day_range": (1, 3),
+        # day_range 上界為預設 x1（5 天）；實際以 beginner_protection_days 覆寫（S12）
+        "day_range": (1, 5),
         "name_zh": "新手保護期",
         "description": "無法被攻擊的保護期，專注於完成新手任務和基礎建設",
         "standard": PhaseStandard(
@@ -187,11 +188,17 @@ class StrategyService:
         )
         return account
 
-    def _determine_phase(self, day: int) -> GamePhase:
-        """根據天數判斷遊戲階段."""
-        if day <= 3:
+    def _determine_phase(
+        self, day: int, beginner_protection_days: int = 5
+    ) -> GamePhase:
+        """根據天數判斷遊戲階段.
+
+        beginner_protection_days 依世界設定（S12）：x1 預設 5 天，可再延長。
+        """
+        protection = max(1, beginner_protection_days)
+        if day <= protection:
             return GamePhase.BEGINNER_PROTECTION
-        elif day <= 7:
+        elif day <= max(7, protection):
             return GamePhase.EARLY_DEVELOPMENT
         elif day <= 30:
             return GamePhase.MID_EXPANSION
@@ -346,7 +353,10 @@ class StrategyService:
         return recommendations[:5]  # 最多返回 5 條建議
 
     def detect_phase(
-        self, account_id: str, user_id: str
+        self,
+        account_id: str,
+        user_id: str,
+        beginner_protection_days: int = 5,
     ) -> PhaseDetectionResponse | None:
         """檢測遊戲階段."""
         account = self._verify_account_ownership(account_id, user_id)
@@ -365,9 +375,14 @@ class StrategyService:
             for troop in village.troop_instances or []:
                 total_troops += troop.count or 0
 
-        # 判斷階段
-        phase = self._determine_phase(day)
-        phase_info = PHASE_STANDARDS[phase]
+        # 判斷階段（保護天數可設定；S12）
+        phase = self._determine_phase(day, beginner_protection_days)
+        phase_info = dict(PHASE_STANDARDS[phase])
+        if phase == GamePhase.BEGINNER_PROTECTION:
+            phase_info = {
+                **phase_info,
+                "day_range": (1, beginner_protection_days),
+            }
 
         # 評估進度（根據玩家角色調整）
         progress_status, progress_description = self._evaluate_progress(
@@ -400,8 +415,17 @@ class StrategyService:
             recommendations=recommendations,
         )
 
-    def health_check(self, account_id: str, user_id: str) -> HealthCheckResponse | None:
-        """帳號健康檢查."""
+    def health_check(
+        self,
+        account_id: str,
+        user_id: str,
+        beginner_protection_days: int = 5,
+    ) -> HealthCheckResponse | None:
+        """帳號健康檢查.
+
+        beginner_protection_days: 新手保護天數（世界相關；S12）。
+        """
+        _ = beginner_protection_days  # reserved for phase-aware checks
         account = self._verify_account_ownership(account_id, user_id)
         if not account:
             return None

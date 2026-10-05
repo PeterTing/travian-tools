@@ -63,7 +63,7 @@ class TestPhaseStandards:
     def test_beginner_protection_standards(self):
         """測試新手保護期標準."""
         phase_info = PHASE_STANDARDS[GamePhase.BEGINNER_PROTECTION]
-        assert phase_info["day_range"] == (1, 3)
+        assert phase_info["day_range"] == (1, 5)
         assert phase_info["name_zh"] == "新手保護期"
 
         standard = phase_info["standard"]
@@ -133,15 +133,20 @@ class TestStrategyServiceDeterminePhase:
 
         assert service._determine_phase(1) == GamePhase.BEGINNER_PROTECTION
         assert service._determine_phase(2) == GamePhase.BEGINNER_PROTECTION
-        assert service._determine_phase(3) == GamePhase.BEGINNER_PROTECTION
+        assert service._determine_phase(5) == GamePhase.BEGINNER_PROTECTION
+        assert service._determine_phase(3, beginner_protection_days=3) == (
+            GamePhase.BEGINNER_PROTECTION
+        )
 
     def test_determine_phase_early_development(self):
         """測試早期發展期判斷."""
         service = StrategyService(None)  # type: ignore
 
-        assert service._determine_phase(4) == GamePhase.EARLY_DEVELOPMENT
-        assert service._determine_phase(5) == GamePhase.EARLY_DEVELOPMENT
+        assert service._determine_phase(6) == GamePhase.EARLY_DEVELOPMENT
         assert service._determine_phase(7) == GamePhase.EARLY_DEVELOPMENT
+        assert service._determine_phase(4, beginner_protection_days=3) == (
+            GamePhase.EARLY_DEVELOPMENT
+        )
 
     def test_determine_phase_mid_expansion(self):
         """測試中期擴張期判斷."""

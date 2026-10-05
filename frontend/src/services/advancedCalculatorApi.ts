@@ -85,12 +85,17 @@ export interface NpcCalculatorRequest {
   iron: number
   crop: number
   desired_ratios: Record<string, number>
+  warehouse_capacity?: number | null
+  granary_capacity?: number | null
 }
 
 export interface NpcCalculatorResponse {
   total_resources: number
   result: Record<string, number>
   difference: Record<string, number>
+  unallocated?: number
+  warehouse_capacity?: number | null
+  granary_capacity?: number | null
 }
 
 export interface SaveTroopsRequest {

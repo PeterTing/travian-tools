@@ -82,10 +82,10 @@ class TestHelperFunctions:
         assert t == pytest.approx(1.0)
 
     def test_calculate_travel_time_with_ts(self) -> None:
-        """含競技場的行進時間（距離 > 20）."""
-        # distance=100, speed=10, ts=10 → base 10h, ts_factor=3 → 10/3
+        """含競技場的行進時間（距離 > 20；S71：僅超過 20 格加速）."""
+        # 20/10 + 80/(10*3) = 2 + 2.666... = 4.666... hours
         t = _calculate_travel_time(100, 10, tournament_square_level=10)
-        assert t == pytest.approx(100 / 10 / 3)
+        assert t == pytest.approx(20 / 10 + 80 / (10 * 3))
 
     def test_calculate_travel_time_ts_no_effect_short_distance(self) -> None:
         """競技場對短距離（<= 20）無效."""
@@ -135,9 +135,8 @@ class TestPathCalculator:
         )
         res = service.calculate_path(req)
         assert res.distance == pytest.approx(50.0)
-        # Without TS: 50/10 = 5h = 18000s
-        # With TS 10: factor=3.0 → 5/3 ≈ 1.667h = 6000s
-        assert res.travel_time_seconds == 6000
+        # S71: 20/10 + 30/(10*3) hours = 2 + 1 = 3h = 10800s
+        assert res.travel_time_seconds == 10800
 
     def test_path_with_artifact(self, service: AdvancedCalculatorService) -> None:
         """含神器加成的路徑計算."""
@@ -293,10 +292,18 @@ class TestTechnologyCalculator:
         # 驗證第一個兵種（Legionnaire）
         leg = next(t for t in res.troops if t.troop_id == "legionnaire")
         assert leg.attack_values[0] == 40  # base, level 0
-        # level 10: 40 * 1.015^10
-        assert leg.attack_values[1] == round(40 * 1.015**10)
-        # level 20: 40 * 1.015^20
-        assert leg.attack_values[2] == round(40 * 1.015**20)
+        from app.utils.travian_formulas import (
+            round_smithy_display,
+            smithy_improved_value,
+        )
+
+        # Legends smithy (KIR / S187), upkeep 1 for legionnaire
+        assert leg.attack_values[1] == round_smithy_display(
+            smithy_improved_value(40, 1, 10)
+        )
+        assert leg.attack_values[2] == round_smithy_display(
+            smithy_improved_value(40, 1, 20)
+        )
 
     def test_unknown_tribe_returns_empty(
         self, service: AdvancedCalculatorService
@@ -421,8 +428,8 @@ class TestSaveTroopsCalculator:
             tournament_square_level=10,
         )
         res = service.calculate_save_troops(req)
-        # 基礎距離 40 > 20, TS factor = 3.0 → 40*3 = 120
-        assert res.ideal_distance == pytest.approx(120.0)
+        # one_way 4h, speed 10: time_to_20 = 2h; far 2h at 3× → +60; total 20+60=80
+        assert res.ideal_distance == pytest.approx(80.0)
 
 
 # ============ Path-Speed-TS Calculator 測試 ============

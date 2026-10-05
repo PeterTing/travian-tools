@@ -64,7 +64,7 @@ class TestResourcesAPI:
             "wood": ("伐木場", "Woodcutter"),
             "clay": ("黏土坑", "Clay Pit"),
             "iron": ("鐵礦場", "Iron Mine"),
-            "crop": ("農田", "Cropland"),
+            "crop": ("農場", "Cropland"),
         }
 
         for res_type in types:
@@ -111,7 +111,7 @@ class TestResourcesAPI:
 
         data = response.json()
         assert data["level"] == 0
-        assert data["production_per_hour"] == 2  # 基礎產量
+        assert data["production_per_hour"] == 3  # Legends L0
         assert data["total_cost"] == 0  # 等級 0 無成本
 
     def test_get_resource_level_max(self) -> None:

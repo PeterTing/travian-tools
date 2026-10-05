@@ -37,7 +37,11 @@ async def detect_game_phase(
         HTTPException: 帳號不存在或無權限
     """
     service = StrategyService(db)
-    result = service.detect_phase(request.account_id, current_user.user_id)
+    result = service.detect_phase(
+        request.account_id,
+        current_user.user_id,
+        beginner_protection_days=request.beginner_protection_days,
+    )
 
     if not result:
         raise HTTPException(
@@ -75,7 +79,11 @@ async def health_check(
         HTTPException: 帳號不存在或無權限
     """
     service = StrategyService(db)
-    result = service.health_check(request.account_id, current_user.user_id)
+    result = service.health_check(
+        request.account_id,
+        current_user.user_id,
+        beginner_protection_days=request.beginner_protection_days,
+    )
 
     if not result:
         raise HTTPException(

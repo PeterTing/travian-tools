@@ -119,7 +119,7 @@
       "fromLevel": "From Level",
       "toLevel": "To Level",
       "mainBuildingLevel": "Main Building Level (affects build time)",
-      "mainBuildingNote": "Each level reduces build time by 5%",
+      "mainBuildingNote": "Main Building shortens build time by 0.964^(level−1) (Legends)",
       "serverSpeed": "Server Speed",
       "serverSpeedOptions": {
         "1x": "1x",
@@ -185,7 +185,8 @@
       "defensePoints": "Defense Points",
       "vs": "vs",
       "remove": "×",
-      "lossFormat": "-{{losses}} / {{original}}"
+      "lossFormat": "-{{losses}} / {{original}}",
+      "unreliableNote": "Note: this simulator uses a simplified formula and is not meaningful for real combat. Do not rely on it for tactics."
     },
     "crop": {
       "title": "Crop Balance Calculator",
@@ -194,7 +195,7 @@
       "calcError": "Calculation failed",
       "cropProduction": "Crop Production Settings",
       "cropFieldsProduction": "Total Crop Field Production (/h)",
-      "cropFieldsHint": "Enter total production from all crop fields",
+      "cropFieldsHint": "Total cropland production (excluding hero)",
       "oasisBonus": "Oasis Bonus",
       "buildings": "Buildings",
       "addBuilding": "Add Building",
@@ -227,7 +228,14 @@
       "troopCapacity": "Troop Capacity Estimate",
       "troopCapacityHint": "Assuming all surplus is used for troops:",
       "cropUnit": "crop troops",
-      "noResult": "Please configure settings and click calculate"
+      "noResult": "Please configure settings and click calculate",
+      "heroProduction": "Hero crop production (/h)",
+      "heroProductionHint": "Resource points + fixed +6 (S75/S141)",
+      "heroConsumption": "Hero crop consumption (/h)",
+      "heroConsumptionHint": "Usually 6 while hero is in the village",
+      "serverSpeed": "Server speed",
+      "heroConsumptionResult": "Hero consumption",
+      "heroProductionResult": "Hero production"
     }
   },
   "tribes": {
@@ -604,7 +612,9 @@
     "suggestions": "Suggestions",
     "noSuggestions": "No suggestions at this time",
     "loadError": "Failed to load data",
-    "checkError": "Health check failed"
+    "checkError": "Health check failed",
+    "protectionDays": "Beginner protection days",
+    "protectionDaysHint": "World-dependent (x1 default 5 days; S12)"
   },
   "mapSql": {
     "title": "Map.sql Analyzer",

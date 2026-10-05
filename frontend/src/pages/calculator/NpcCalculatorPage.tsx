@@ -10,6 +10,8 @@ export default function NpcCalculatorPage() {
     iron: 0,
     crop: 0,
     desired_ratios: { wood: 1, clay: 1, iron: 1, crop: 1 },
+    warehouse_capacity: undefined,
+    granary_capacity: undefined,
   })
   const [result, setResult] = useState<NpcCalculatorResponse | null>(null)
   const [loading, setLoading] = useState(false)
@@ -91,6 +93,45 @@ export default function NpcCalculatorPage() {
             ))}
           </div>
 
+          <h2 className="text-xl font-semibold mb-4">容量上限（選填）</h2>
+          <p className="text-xs text-muted-foreground mb-3">
+            官方規則：NPC 分配不得超過倉庫／穀倉容量。
+          </p>
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium mb-2">倉庫容量</label>
+              <input
+                type="number"
+                min={0}
+                value={form.warehouse_capacity ?? ''}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    warehouse_capacity: e.target.value === '' ? undefined : Number(e.target.value),
+                  }))
+                }
+                className="w-full p-2 border rounded bg-background"
+                placeholder="木／磚／鐵上限"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">穀倉容量</label>
+              <input
+                type="number"
+                min={0}
+                value={form.granary_capacity ?? ''}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    granary_capacity: e.target.value === '' ? undefined : Number(e.target.value),
+                  }))
+                }
+                className="w-full p-2 border rounded bg-background"
+                placeholder="穀物上限"
+              />
+            </div>
+          </div>
+
           <Button onClick={handleCalculate} disabled={loading} className="w-full">
             {loading ? '計算中...' : '計算 NPC 分配'}
           </Button>
@@ -109,6 +150,11 @@ export default function NpcCalculatorPage() {
                 <p className="text-2xl font-bold">
                   {result.total_resources.toLocaleString()}
                 </p>
+                {(result.unallocated ?? 0) > 0 && (
+                  <p className="text-sm text-amber-700 dark:text-amber-400 mt-2">
+                    因容量限制未分配：{result.unallocated?.toLocaleString()}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
