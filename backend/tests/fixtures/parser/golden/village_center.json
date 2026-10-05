@@ -1,0 +1,144 @@
+{
+  "village_id": "56786",
+  "village_name": "Alpha",
+  "coordinate_x": -12,
+  "coordinate_y": 34,
+  "population": 777,
+  "is_capital": true,
+  "capital_village_id": "56786",
+  "buildings": [
+    {
+      "position": 19,
+      "building_id": "building_15",
+      "level": 10,
+      "is_upgrading": false
+    },
+    {
+      "position": 20,
+      "building_id": "building_16",
+      "level": 10,
+      "is_upgrading": true
+    },
+    {
+      "position": 21,
+      "building_id": "building_17",
+      "level": 10,
+      "is_upgrading": false
+    },
+    {
+      "position": 22,
+      "building_id": "building_18",
+      "level": 10,
+      "is_upgrading": false
+    },
+    {
+      "position": 23,
+      "building_id": "building_10",
+      "level": 10,
+      "is_upgrading": false
+    },
+    {
+      "position": 24,
+      "building_id": "building_11",
+      "level": 10,
+      "is_upgrading": false
+    },
+    {
+      "position": 25,
+      "building_id": "building_26",
+      "level": 10,
+      "is_upgrading": false
+    },
+    {
+      "position": 26,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 27,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 28,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 29,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 30,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 31,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 32,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 33,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 34,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 35,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 36,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 37,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 38,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 39,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    },
+    {
+      "position": 40,
+      "building_id": "building_0",
+      "level": 0,
+      "is_upgrading": false
+    }
+  ],
+  "troops": []
+}

@@ -13,18 +13,22 @@ export const PAGE_NAMES = Object.freeze({
   map: '地圖',
 });
 
-/** 可上傳的頁面類型 → 上傳 API（後端只讓擴充 Token 用這幾個） */
+/**
+ * 可上傳的頁面類型 → 上傳 API。
+ * P0-03：一律走 /sync/page，由後端共用解析器解析 HTML。
+ * 舊的 /sync/village-overview 等 JSON 端點仍保留給已安裝的舊版擴充。
+ */
 export const UPLOAD_ENDPOINTS = Object.freeze({
-  village_overview: '/sync/village-overview',
-  village_center: '/sync/village-center',
-  reports: '/sync/reports',
-  troop_statistics: '/sync/troop-statistics',
+  village_overview: '/sync/page',
+  village_center: '/sync/page',
+  reports: '/sync/page',
+  troop_statistics: '/sync/page',
 });
 
 /**
  * popup「目前頁面」要顯示的文字：只給好懂的名稱，不顯示 dorf1 之類的
  * 遊戲內部代號；不認得的頁面回傳空字串（不多顯示任何東西）。
- * 世界名（例如「村莊總覽 · ts3」）等 P0-03/P0-05 再加。
+ * 世界名（例如「村莊總覽 · ts3」）等 P0-05 再加。
  */
 export function pageLabel(pageType) {
   return Object.hasOwn(PAGE_NAMES, pageType ?? '') ? PAGE_NAMES[pageType] : '';
@@ -34,7 +38,7 @@ export function pageLabel(pageType) {
 export const UPLOAD_HINTS = Object.freeze({
   // 認不出的頁面（含非 Travian 分頁），以及認得但還不能上傳的頁面（英雄、地圖）
   UNSUPPORTED_PAGE: '這一頁還不支援，請到村莊總覽再按',
-  // 集結點：認得，但上傳還在做（P0-03/P0-05 完成後拿掉這句，兩句都改回提到集結點）
+  // 集結點：認得，但上傳還在做（P0-05 存檔完成後拿掉這句，兩句都改回提到集結點）
   RALLY_POINT_PENDING: '集結點的上傳還在做，目前請到村莊總覽再按',
   DETECTING: '正在讀取這一頁…',
   UPLOADING: '正在上傳這一頁…',

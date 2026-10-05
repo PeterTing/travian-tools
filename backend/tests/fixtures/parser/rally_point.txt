@@ -1,0 +1,25 @@
+來村軍團 (4)
+19·SourceVillage	 AttackerA 搶奪 TargetVillage
+(167|12)
+士兵	?	?	?	?	?	?	?	?	?	?	?
+到達
+在 14:07:11 時
+於 14:00:14
+19·SourceVillage	 AttackerA 攻擊 TargetVillage
+(167|12)
+士兵	?	?	?	?	?	?	?	?	?	?	?
+到達
+在 14:07:21 時
+來村的支援
+FriendVillage 支援 TargetVillage
+(3|4)
+士兵	30
+村內部隊
+TargetVillage 自軍
+士兵	120
+AllyVillage 的部隊
+士兵	50
+出擊軍團
+TargetVillage 搶奪 Oasis
+(50|60)
+士兵	10

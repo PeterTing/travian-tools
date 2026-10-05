@@ -1,0 +1,115 @@
+{
+  "village_id": "56786",
+  "village_name": "Alpha",
+  "coordinate_x": -12,
+  "coordinate_y": 34,
+  "population": 777,
+  "is_capital": true,
+  "village_type": "4-4-4-6",
+  "capital_village_id": "56786",
+  "resources": {
+    "wood": 12345,
+    "clay": 23456,
+    "iron": 34567,
+    "crop": 45678
+  },
+  "production": {
+    "wood": 1000,
+    "clay": 2000,
+    "iron": 3000,
+    "crop": -320
+  },
+  "resource_fields": [
+    {
+      "position": 1,
+      "resource_type": "wood",
+      "level": 6
+    },
+    {
+      "position": 2,
+      "resource_type": "wood",
+      "level": 7
+    },
+    {
+      "position": 3,
+      "resource_type": "wood",
+      "level": 8
+    },
+    {
+      "position": 4,
+      "resource_type": "wood",
+      "level": 9
+    },
+    {
+      "position": 5,
+      "resource_type": "clay",
+      "level": 5
+    },
+    {
+      "position": 6,
+      "resource_type": "clay",
+      "level": 6
+    },
+    {
+      "position": 7,
+      "resource_type": "clay",
+      "level": 7
+    },
+    {
+      "position": 8,
+      "resource_type": "clay",
+      "level": 8
+    },
+    {
+      "position": 9,
+      "resource_type": "iron",
+      "level": 9
+    },
+    {
+      "position": 10,
+      "resource_type": "iron",
+      "level": 5
+    },
+    {
+      "position": 11,
+      "resource_type": "iron",
+      "level": 6
+    },
+    {
+      "position": 12,
+      "resource_type": "iron",
+      "level": 7
+    },
+    {
+      "position": 13,
+      "resource_type": "crop",
+      "level": 8
+    },
+    {
+      "position": 14,
+      "resource_type": "crop",
+      "level": 9
+    },
+    {
+      "position": 15,
+      "resource_type": "crop",
+      "level": 5
+    },
+    {
+      "position": 16,
+      "resource_type": "crop",
+      "level": 6
+    },
+    {
+      "position": 17,
+      "resource_type": "crop",
+      "level": 7
+    },
+    {
+      "position": 18,
+      "resource_type": "crop",
+      "level": 8
+    }
+  ],
+  "troops": []
+}

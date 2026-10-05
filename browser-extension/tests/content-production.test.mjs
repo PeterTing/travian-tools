@@ -1,4 +1,4 @@
-// 村莊總覽（dorf1）產量表的讀法：糧食淨產量是負的時候要留住負號（村莊列表會標紅）
+// P0-03：擴充只送 HTML；產量負號由後端共用解析器處理（見 backend/tests/unit/parsers/test_numbers.py）
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
@@ -6,55 +6,66 @@ import vm from 'node:vm';
 
 const source = readFileSync(new URL('../content/content.js', import.meta.url), 'utf8');
 
-// 遊戲實際的格子：U+2212 負號，數字前後夾著 LRE/PDF 之類的方向控制字元
-const LRO = '\u202d';
-const PDF = '\u202c';
-const cell = (text) => ({ textContent: text });
-
-/** 在假的頁面裡載入 content.js（不連網、不碰 chrome API），回傳它的全域函式 */
-function loadContentScript(productionCells) {
-  const table = { querySelectorAll: () => productionCells };
+function loadContentScript(href) {
+  const clone = {
+    querySelectorAll(sel) {
+      const nodes = [];
+      if (String(sel).includes('script') || String(sel).includes('style')) {
+        nodes.push({ remove() {} });
+      }
+      return nodes;
+    },
+    outerHTML:
+      '<html><head></head><body><div id="servertime"><span id="tp1">10:00:00</span></div><script>x</script></body></html>',
+  };
   const context = {
     console: { log() {}, error() {}, warn() {} },
     chrome: { runtime: { onMessage: { addListener() {} } } },
-    window: { location: { href: 'https://ts3.x1.asia.travian.com/dorf1.php', pathname: '/dorf1.php', search: '' } },
-    document: {
-      getElementById: (id) => (id === 'production' ? table : null),
-      querySelector: () => null,
-      querySelectorAll: () => [],
+    window: {
+      location: { href, pathname: new URL(href).pathname, search: new URL(href).search },
     },
+    document: {
+      documentElement: { cloneNode: () => clone },
+      querySelector(sel) {
+        if (String(sel).includes('tp1') || String(sel).includes('servertime')) {
+          return { textContent: '10:00:00' };
+        }
+        return null;
+      },
+    },
+    Date,
   };
   vm.createContext(context);
   vm.runInContext(source, context);
   return context;
 }
 
-describe('content script: production table', () => {
-  it('keeps a negative net crop (game uses U+2212 wrapped in direction marks)', () => {
-    const page = loadContentScript([
-      cell(`${LRO}${LRO}820${PDF}${PDF}`),
-      cell('800'),
-      cell('1,900'),
-      cell(`${LRO}${LRO}\u2212320${PDF}${PDF}`),
-    ]);
-    assert.deepEqual({ ...page.parseProduction() }, { wood: 820, clay: 800, iron: 1900, crop: -320 });
+describe('content script: HTML payload for shared parser', () => {
+  it('detects dorf1 / dorf2 / rally / reports', () => {
+    assert.equal(
+      loadContentScript('https://ts3.x1.asia.travian.com/dorf1.php').getPageType(),
+      'village_overview',
+    );
+    assert.equal(
+      loadContentScript('https://ts3.x1.asia.travian.com/dorf2.php').getPageType(),
+      'village_center',
+    );
+    assert.equal(
+      loadContentScript('https://ts3.x1.asia.travian.com/build.php?id=39&gid=16&tt=1').getPageType(),
+      'rally_point',
+    );
+    assert.equal(
+      loadContentScript('https://ts3.x1.asia.travian.com/berichte.php').getPageType(),
+      'reports',
+    );
   });
 
-  it('reads positive and ASCII-minus values, with any thousands separator', () => {
-    const page = loadContentScript([cell('+1.240'), cell('2 100'), cell('0'), cell('-1,050')]);
-    assert.deepEqual({ ...page.parseProduction() }, { wood: 1240, clay: 2100, iron: 0, crop: -1050 });
-  });
-
-  it('parseSignedInt ignores a minus that is not in front of the number, and empty cells', () => {
-    const page = loadContentScript([]);
-    assert.equal(page.parseSignedInt('12-3'), 123);
-    assert.equal(page.parseSignedInt(''), 0);
-    assert.equal(page.parseSignedInt(undefined), 0);
-    assert.equal(page.parseSignedInt('\u2212 45 /h'), -45);
-  });
-
-  it('falls back to zeros when the table has fewer than four cells', () => {
-    const page = loadContentScript([cell('1')]);
-    assert.deepEqual({ ...page.parseProduction() }, { wood: 0, clay: 0, iron: 0, crop: 0 });
+  it('collectPagePayload returns html + url + server_time + page_type (scripts stripped)', () => {
+    const page = loadContentScript('https://ts3.x1.asia.travian.com/dorf1.php');
+    const payload = page.collectPagePayload();
+    assert.equal(payload.page_type, 'village_overview');
+    assert.match(payload.url, /dorf1\.php/);
+    assert.equal(payload.server_time, '10:00:00');
+    assert.match(payload.html, /<!DOCTYPE html>/);
   });
 });

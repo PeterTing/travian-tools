@@ -202,3 +202,53 @@ class ReportsSyncResponse(BaseModel):
     count: int = 0
     new_count: int = 0
     updated_count: int = 0
+
+
+class PageSyncRequest(BaseModel):
+    """擴充上傳整頁 HTML，由共用解析器解析後再同步."""
+
+    account_id: str
+    html: str = Field(..., min_length=1, description="去掉 script/style 的頁面 HTML")
+    url: str | None = None
+    page_type: str | None = Field(
+        None, description="擴充端判斷的頁面類型；可省略，後端會再偵測"
+    )
+    server_time: str | None = Field(
+        None, description="頁面上 #servertime 的 HH:MM:SS（可選）"
+    )
+
+
+class PageSyncResponse(BaseModel):
+    """/sync/page 回應：欄位相容各舊上傳端點的成功訊息."""
+
+    success: bool
+    message: str
+    synced_at: datetime
+    page_type: str | None = None
+    village_id: str | None = None
+    count: int = 0
+    new_count: int = 0
+    updated_count: int = 0
+    villages_synced: int = 0
+    troops_synced: int = 0
+
+
+class ParseRequest(BaseModel):
+    """預覽解析（不存檔），給 P0-05 確認畫面用."""
+
+    kind: str = Field("html", description="html | text | ocr")
+    html: str | None = None
+    text: str | None = None
+    ocr_lines: list[dict] | None = None
+    url: str | None = None
+    page_type_hint: str | None = None
+
+
+class ParseResponse(BaseModel):
+    """解析預覽結果."""
+
+    ok: bool
+    page_type: str
+    data: dict = Field(default_factory=dict)
+    warnings: list[dict] = Field(default_factory=list)
+    server_time: str | None = None
