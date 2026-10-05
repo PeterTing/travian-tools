@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     game_accounts,
     game_worlds,
     map_sql,
+    opening_checklist,
     parse,
     paste,
     reminders,
@@ -40,6 +41,7 @@ router.include_router(resources.router, prefix="/resources", tags=["resources"])
 router.include_router(map_sql.router)
 router.include_router(sync_logs.router)
 router.include_router(strategy.router)
+router.include_router(opening_checklist.router)
 router.include_router(reminders.router)
 router.include_router(statistics.router)
 router.include_router(

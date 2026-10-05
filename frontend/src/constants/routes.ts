@@ -39,4 +39,9 @@ export const ROUTES = {
 
   // 地圖
   MAP_SQL: '/map-sql',
+
+  // 攻略（P0 只有起手式）
+  STRATEGY: {
+    OPENING: '/strategy/opening',
+  },
 } as const

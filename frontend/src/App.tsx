@@ -50,7 +50,7 @@ import {
   InactiveSearchPage,
 } from '@/pages/statistics'
 // Strategy pages
-import { HealthCheckPage } from '@/pages/strategy'
+import { HealthCheckPage, OpeningChecklistPage } from '@/pages/strategy'
 import { Button } from '@/components/ui/button'
 
 function Navigation() {
@@ -248,16 +248,19 @@ function Navigation() {
                     {t('mapSql.title')}
                   </Button>
                 </Link>
+                {/* 攻略：P0 只有起手式，不留知識庫的空入口（P0-10） */}
                 <div className="relative group">
-                  <Button variant="ghost" size="sm">
-                    {t('nav.strategy')}
-                  </Button>
+                  <Link to={ROUTES.STRATEGY.OPENING}>
+                    <Button variant="ghost" size="sm">
+                      {t('nav.strategy')}
+                    </Button>
+                  </Link>
                   <div className="absolute top-full right-0 hidden group-hover:block bg-background border rounded shadow-lg py-2 min-w-[140px] z-50">
                     <Link
-                      to="/strategy/health-check"
+                      to={ROUTES.STRATEGY.OPENING}
                       className="block px-4 py-2 hover:bg-muted"
                     >
-                      {t('nav.healthCheck')}
+                      {t('nav.openingChecklist')}
                     </Link>
                   </div>
                 </div>
@@ -356,6 +359,7 @@ function AppContent() {
         <Route path="/villages/:villageId" element={<RequireAuth><VillageDetailPage /></RequireAuth>} />
         <Route path="/map-sql" element={<RequireAuth><MapSqlPage /></RequireAuth>} />
         {/* Strategy routes */}
+        <Route path={ROUTES.STRATEGY.OPENING} element={<RequireAuth><OpeningChecklistPage /></RequireAuth>} />
         <Route path="/strategy/health-check" element={<RequireAuth><HealthCheckPage /></RequireAuth>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
