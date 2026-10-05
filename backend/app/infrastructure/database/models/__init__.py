@@ -17,6 +17,9 @@ from app.infrastructure.database.models.map_data import (
     MapSnapshot,
     MapVillageData,
 )
+from app.infrastructure.database.models.opening_checklist import (
+    OpeningChecklistProgress,
+)
 from app.infrastructure.database.models.parse_draft import ParseDraft
 from app.infrastructure.database.models.reminder import (
     Notification,
@@ -45,6 +48,7 @@ __all__ = [
     "SyncLog",
     "TroopMovement",
     "ParseDraft",
+    "OpeningChecklistProgress",
     "MapSnapshot",
     "MapVillageData",
     "MapPlayerData",

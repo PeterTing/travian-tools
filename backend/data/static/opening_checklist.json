@@ -1,0 +1,5439 @@
+{
+ "version": 1,
+ "source": {
+  "file": "opening.xlsx",
+  "sha256": "75cfd816a73d63ab6a9c4d2a6f59f397167dd8713e1c3b3418611559cbf87b0d",
+  "sheets": {
+   "4p-farm": "4P - Farm",
+   "3p-sim": "3P - Sim"
+  },
+  "hero_level": 0,
+  "generated_by": "scripts/convert_opening_checklist.py"
+ },
+ "tribe_data": {
+  "settler_cost": {
+   "romans": 19000,
+   "gauls": 18100,
+   "teutons": 20000,
+   "egyptians": 21000,
+   "huns": 20900,
+   "vikings": null,
+   "spartans": null
+  },
+  "farm_unit": {
+   "romans": {
+    "en": "Equites Imperatoris",
+    "zh": "帝國騎兵",
+    "cost": 1410
+   },
+   "gauls": {
+    "en": "Theutates Thunders",
+    "zh": "雷法師",
+    "cost": 1090
+   },
+   "teutons": {
+    "en": "Clubswinger",
+    "zh": "棍棒兵",
+    "cost": 250
+   },
+   "egyptians": {
+    "en": "Slave Malitia",
+    "zh": "奴隸民兵",
+    "cost": 150
+   },
+   "huns": {
+    "en": "Steppe Rider",
+    "zh": "草原騎兵",
+    "cost": 895
+   },
+   "vikings": null,
+   "spartans": null
+  }
+ },
+ "strategies": [
+  {
+   "id": "4p-farm",
+   "name": "4P 農開",
+   "sheet": "4P - Farm",
+   "parties": 4,
+   "total_steps": 101,
+   "sections": [
+    {
+     "id": "tier-1",
+     "title": "任務等級 1",
+     "tier": 1,
+     "intro": null,
+     "steps": [
+      {
+       "id": "r003",
+       "row": 3,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": null,
+       "cp": 2,
+       "pop": 2,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": {
+        "zh": "派英雄進行時間最短的冒險來獲得一匹馬。然後開始打野！",
+        "en": "Send hero on the shortest adventure to get a horse. Then smash animals!",
+        "source": "4趴农开-已翻译!A3"
+       }
+      },
+      {
+       "id": "r004",
+       "row": 4,
+       "kind": "build",
+       "building": "伐木場",
+       "building_en": "Woodcutters",
+       "tier": 1,
+       "target": "一塊升到 2",
+       "target_en": "1x to 2",
+       "cost": null,
+       "cp": 1,
+       "pop": 3,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r005",
+       "row": 5,
+       "kind": "build",
+       "building": "農田",
+       "building_en": "Croplands",
+       "tier": 1,
+       "target": "一塊升到 2",
+       "target_en": "1x to 2",
+       "cost": null,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r006",
+       "row": 6,
+       "kind": "build",
+       "building": "集結點",
+       "building_en": "Rally Point",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": null,
+       "cp": 1,
+       "pop": 1,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": {
+        "zh": "啟用 25% 資源加成",
+        "en": "Activate 25% resc production bonus.",
+        "source": "4趴农开-已翻译!A6"
+       }
+      },
+      {
+       "id": "r007",
+       "row": 7,
+       "kind": "build",
+       "building": "泥坑",
+       "building_en": "Clay pits",
+       "tier": 1,
+       "target": "一塊升到 2",
+       "target_en": "1x to 2",
+       "cost": 420,
+       "cp": 1,
+       "pop": 3,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r008",
+       "row": 8,
+       "kind": "build",
+       "building": "鐵礦場",
+       "building_en": "Iron mines",
+       "tier": 1,
+       "target": "一塊升到 2",
+       "target_en": "1x to 2",
+       "cost": 720,
+       "cp": 1,
+       "pop": 5,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": {
+        "zh": "依可以打的綠洲數量，決定戰鬥力要點幾點。\n0 個綠洲：最多 2 點\n1～5 個綠洲：8 到 12 點\n6 個以上綠洲：12 點以上\n打野過程中使用任務獎勵的經驗值升級英雄，回復英雄的生命值，建議用模擬器看看打野會損失多少血量。將剩餘的技能點點到資源上。\n英雄幾乎不可能 24 小時打野，因此將一些點數投入到資源上能夠取得更多資源收入。",
+        "en": "Put points in strength according to the amount of oasis you can raid.\n0 oasis: max 2 points \n1-5 oasis: 8/12 points\n6+ oasis: 12(+) points\nUse the rewards to level up your hero to full health after smashing animals. Put the rest in resc production. \nThe chances of using your hero for 24h are very small and putting some extra points in resc production helps generating more resc when your hero can't clear any oasis anymore.",
+        "source": "4趴农开-已翻译!A8"
+       }
+      },
+      {
+       "id": "r009",
+       "row": 9,
+       "kind": "task",
+       "building": "任務：均衡發展",
+       "building_en": "Even growth",
+       "tier": 1,
+       "target": "每種資源田各一塊升到 2",
+       "target_en": "1x of all to 2",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 300,
+       "reward_exp": 5,
+       "why": null
+      },
+      {
+       "id": "r010",
+       "row": 10,
+       "kind": "build",
+       "building": "穀倉",
+       "building_en": "Granary",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 270,
+       "cp": 1,
+       "pop": 1,
+       "reward_res": 300,
+       "reward_exp": 5,
+       "why": null
+      },
+      {
+       "id": "r011",
+       "row": 11,
+       "kind": "build",
+       "building": "倉庫",
+       "building_en": "Warehouse",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 420,
+       "cp": 1,
+       "pop": 1,
+       "reward_res": 300,
+       "reward_exp": 5,
+       "why": null
+      }
+     ]
+    },
+    {
+     "id": "tier-2",
+     "title": "任務等級 2",
+     "tier": 2,
+     "intro": null,
+     "steps": [
+      {
+       "id": "r012",
+       "row": 12,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 555,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r013",
+       "row": 13,
+       "kind": "build",
+       "building": "穀倉",
+       "building_en": "Granary",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 790,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r014",
+       "row": 14,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 340,
+       "cp": 4,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r015",
+       "row": 15,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 990,
+       "cp": 1,
+       "pop": 4,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r016",
+       "row": 16,
+       "kind": "build",
+       "building": "所有農田",
+       "building_en": "All croplands",
+       "tier": 1,
+       "target": "全部升到 2",
+       "target_en": "all to 2",
+       "cost": 3325,
+       "cp": 5,
+       "pop": 0,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r017",
+       "row": 17,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 540,
+       "cp": 5,
+       "pop": 3,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r018",
+       "row": 18,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Cranny",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 130,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 300,
+       "reward_exp": 5,
+       "why": null
+      },
+      {
+       "id": "r019",
+       "row": 19,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Cranny",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 380,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r020",
+       "row": 20,
+       "kind": "build",
+       "building": "城牆",
+       "building_en": "City wall",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 400,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r021",
+       "row": 21,
+       "kind": "build",
+       "building": "城牆",
+       "building_en": "City wall",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 1170,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r022",
+       "row": 22,
+       "kind": "build",
+       "building": "所有伐木場",
+       "building_en": "All woodcutters",
+       "tier": 1,
+       "target": "全部升到 2",
+       "target_en": "all to 2",
+       "cost": 1995,
+       "cp": 3,
+       "pop": 9,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": {
+        "zh": "繼續打野，直到你需要走 1 小時以上，並且你確定能清掉那裡的動物。之後考慮去冒險 2（獎勵是資源）。冒險大約能獲得 2300 資源。",
+        "en": "Raid Oasis until you need to walk 1h+, of which you are sure you will clear the animals, after that considor to do adventure 2 (resc bounty). Adventure gives about 2300 resc.",
+        "source": "4趴农开-已翻译!A23"
+       }
+      },
+      {
+       "id": "r023",
+       "row": 23,
+       "kind": "build",
+       "building": "所有泥坑",
+       "building_en": "All clay pits",
+       "tier": 1,
+       "target": "全部升到 2",
+       "target_en": "all to 2",
+       "cost": 2010,
+       "cp": 3,
+       "pop": 9,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r024",
+       "row": 24,
+       "kind": "build",
+       "building": "所有鐵礦場",
+       "building_en": "All iron mines",
+       "tier": 1,
+       "target": "全部升到 2",
+       "target_en": "all to 2",
+       "cost": 2175,
+       "cp": 3,
+       "pop": 15,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r025",
+       "row": 25,
+       "kind": "task",
+       "building": "任務：完整經濟",
+       "building_en": "Complete economy",
+       "tier": 1,
+       "target": "所有資源田升到 2",
+       "target_en": "all res to 2",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r026",
+       "row": 26,
+       "kind": "task",
+       "building": "任務：人口",
+       "building_en": "Population",
+       "tier": 1,
+       "target": "人口達到 50",
+       "target_en": "50",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 1500,
+       "reward_exp": 25,
+       "why": null
+      },
+      {
+       "id": "r027",
+       "row": 27,
+       "kind": "build",
+       "building": "倉庫",
+       "building_en": "Warehouse",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 1220,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r028",
+       "row": 28,
+       "kind": "build",
+       "building": "兵營",
+       "building_en": "Barracs",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 730,
+       "cp": 1,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": {
+        "zh": "繼續打野，直到路程要 2 小時以上，此時你應考慮使用英雄的智慧之書洗點，將幾乎所有點數投入到資源產量中（適當保留一些戰鬥力用於冒險）。智慧之書可在冒險 6 中獲取，通常在開始遊戲後的 24 小時內就能得到。",
+        "en": "Continue to raid oasis until 2h+ walkig time, then you should consider to put almost all points in resc production with the book of wisdom for hero. Book is obtained in adventure 6, usually comes within 24h after starting.",
+        "source": "4趴农开-已翻译!A29"
+       }
+      },
+      {
+       "id": "r029",
+       "row": 29,
+       "kind": "build",
+       "building": "伐木場",
+       "building_en": "Woodcutters",
+       "tier": 2,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 1860,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r030",
+       "row": 30,
+       "kind": "build",
+       "building": "農田",
+       "building_en": "Croplands",
+       "tier": 2,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 1860,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r031",
+       "row": 31,
+       "kind": "build",
+       "building": "泥坑",
+       "building_en": "Clay pits",
+       "tier": 2,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 1870,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r032",
+       "row": 32,
+       "kind": "build",
+       "building": "鐵礦場",
+       "building_en": "Iron mines",
+       "tier": 2,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 2015,
+       "cp": 1,
+       "pop": 4,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r033",
+       "row": 33,
+       "kind": "task",
+       "building": "任務：均衡發展",
+       "building_en": "Even growth",
+       "tier": 2,
+       "target": "每種資源田各一塊升到 4",
+       "target_en": "1x of all to 4",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      }
+     ]
+    },
+    {
+     "id": "tier-3",
+     "title": "任務等級 3",
+     "tier": 3,
+     "intro": null,
+     "steps": [
+      {
+       "id": "r034",
+       "row": 34,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Cranny",
+       "tier": 3,
+       "target": "升到 6",
+       "target_en": "to 6",
+       "cost": 1065,
+       "cp": 1,
+       "pop": 1,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r035",
+       "row": 35,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": 3,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 2395,
+       "cp": 4,
+       "pop": 6,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r036",
+       "row": 36,
+       "kind": "task",
+       "building": "任務：文明點產量",
+       "building_en": "Culture point production",
+       "tier": 1,
+       "target": "每日文明點產量達到 50",
+       "target_en": "50",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 1500,
+       "reward_exp": 25,
+       "why": null
+      },
+      {
+       "id": "r037",
+       "row": 37,
+       "kind": "build",
+       "building": "兵營",
+       "building_en": "Barracs",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 2135,
+       "cp": 1,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r038",
+       "row": 38,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 510,
+       "cp": 5,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r039",
+       "row": 39,
+       "kind": "build",
+       "building": "一塊農田",
+       "building_en": "One cropland",
+       "tier": null,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 695,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r040",
+       "row": 40,
+       "kind": "build",
+       "building": "鐵匠鋪",
+       "building_en": "Smithy",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 1090,
+       "cp": 2,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": {
+        "zh": "打野要做多少兵很難說。Excel 裡有一些簡單的試算，可以幫你判斷划不划算。\n建議數量：\n- 騎兵 7 到 12 隻\n- 步兵 30 到 60 隻\n做兵的時機也很重要：綠洲要等動物全部清掉後才會開始產出，所以不建議一開始就做打野兵。最有效率的數量看情況，依附近綠洲的實際手感決定。",
+        "en": "For farming it will be difficult to determine how many units to make. In the sheet we added some general calculations which can help to determine if you can make it profitable. \nRecommended numbers are: \n- 7 to 12 for Cavalry \n- 30 to 60 for Infantery. \nTiming of making units is also important, oasis only produce after all animals are killed. So to start with farming units right away is not recommended. Most efficient amount of farm units is situational. Base this number on touch and feel results on nearby oasis.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r041",
+       "row": 41,
+       "kind": "build",
+       "building": "所有鐵礦場",
+       "building_en": "All iron mines",
+       "tier": 2,
+       "target": "全部升到 3",
+       "target_en": "all to 3",
+       "cost": 2265,
+       "cp": 3,
+       "pop": 6,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r042",
+       "row": 42,
+       "kind": "task",
+       "building": "任務：人口",
+       "building_en": "Population",
+       "tier": 2,
+       "target": "人口達到 100",
+       "target_en": "100",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 3000,
+       "reward_exp": 50,
+       "why": null
+      },
+      {
+       "id": "r043",
+       "row": 43,
+       "kind": "build",
+       "building": "所有農田",
+       "building_en": "All croplands",
+       "tier": 2,
+       "target": "全部升到 3",
+       "target_en": "all to 3",
+       "cost": 2780,
+       "cp": 4,
+       "pop": 0,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r044",
+       "row": 44,
+       "kind": "build",
+       "building": "所有伐木場",
+       "building_en": "All woodcutters",
+       "tier": 2,
+       "target": "全部升到 3",
+       "target_en": "all to 3",
+       "cost": 2085,
+       "cp": 3,
+       "pop": 3,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r045",
+       "row": 45,
+       "kind": "build",
+       "building": "所有泥坑",
+       "building_en": "All clay pits",
+       "tier": 2,
+       "target": "全部升到 3",
+       "target_en": "all to 3",
+       "cost": 2100,
+       "cp": 3,
+       "pop": 3,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      }
+     ]
+    },
+    {
+     "id": "tier-4",
+     "title": "任務等級 4",
+     "tier": 4,
+     "intro": null,
+     "steps": [
+      {
+       "id": "r046",
+       "row": 46,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Cranny",
+       "tier": 4,
+       "target": "升到 10",
+       "target_en": "to 10",
+       "cost": 3430,
+       "cp": 3,
+       "pop": 4,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r047",
+       "row": 47,
+       "kind": "build",
+       "building": "行宮",
+       "building_en": "Residence",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 1570,
+       "cp": 2,
+       "pop": 1,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r048",
+       "row": 48,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": 3,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 4290,
+       "cp": 6,
+       "pop": 10,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r049",
+       "row": 49,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Crannies",
+       "tier": null,
+       "target": "7 個升到 3",
+       "target_en": "7x to 3",
+       "cost": 3570,
+       "cp": 14,
+       "pop": 0,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r050",
+       "row": 50,
+       "kind": "build",
+       "building": "一塊農田",
+       "building_en": "One cropland",
+       "tier": null,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 1165,
+       "cp": 0,
+       "pop": 0,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r051",
+       "row": 51,
+       "kind": "build",
+       "building": "鐵匠鋪",
+       "building_en": "Smithy",
+       "tier": null,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 2570,
+       "cp": 1,
+       "pop": 4,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r052",
+       "row": 52,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": null,
+       "target": "升到 5",
+       "target_en": "to 5",
+       "cost": 3915,
+       "cp": 5,
+       "pop": 8,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r053",
+       "row": 53,
+       "kind": "task",
+       "building": "任務：文明點產量",
+       "building_en": "Culture point production",
+       "tier": 2,
+       "target": "每日文明點產量達到 100",
+       "target_en": "100",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 3000,
+       "reward_exp": 50,
+       "why": null
+      },
+      {
+       "id": "r054",
+       "row": 54,
+       "kind": "build",
+       "building": "一塊農田",
+       "building_en": "One cropland",
+       "tier": null,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 1165,
+       "cp": 0,
+       "pop": 0,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r055",
+       "row": 55,
+       "kind": "build",
+       "building": "馬廄",
+       "building_en": "Stable",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 720,
+       "cp": 2,
+       "pop": 5,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r056",
+       "row": 56,
+       "kind": "build",
+       "building": "馬廄",
+       "building_en": "Stable",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 2105,
+       "cp": 1,
+       "pop": 6,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null,
+       "by_tribe": {
+        "romans": {
+         "target": "升到 5",
+         "target_en": "to 5",
+         "cost": 5550,
+         "cp": 3,
+         "pop": 12
+        }
+       }
+      },
+      {
+       "id": "r057",
+       "row": 57,
+       "kind": "task",
+       "building": "任務：人口",
+       "building_en": "Population",
+       "tier": 3,
+       "target": "人口達到 150",
+       "target_en": "150",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 4500,
+       "reward_exp": 75,
+       "why": null
+      },
+      {
+       "id": "r058",
+       "row": 58,
+       "kind": "farm_unit_only",
+       "building": "倉庫",
+       "building_en": "Warehouse",
+       "target": "升到 5（只有帝國騎兵需要）",
+       "target_en": "to 5 (only applicable for EI)",
+       "tier": null,
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "skip": true,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": {
+        "zh": "重要提醒：雷法師、帝國騎兵和草原騎兵可以單獨派去沒有動物的綠洲！",
+        "en": "Important reminder: TT, EI & SR can be sent solo to an empty oasis!",
+        "source": "manual"
+       },
+       "by_tribe": {
+        "romans": {
+         "target": "升到 5",
+         "target_en": "to 5",
+         "cost": 2010,
+         "cp": 0,
+         "pop": 2,
+         "skip": false
+        }
+       }
+      },
+      {
+       "id": "r059",
+       "row": 59,
+       "kind": "research",
+       "building": "研究打野兵",
+       "building_en": "Research farm unit",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null,
+       "by_tribe": {
+        "romans": {
+         "building": "研究帝國騎兵",
+         "building_en": "Research Equites Imperatoris",
+         "cost": 8780,
+         "target": null,
+         "skip": false
+        },
+        "gauls": {
+         "building": "研究雷法師",
+         "building_en": "Research Theutates Thunders",
+         "cost": 6660,
+         "target": null,
+         "skip": false
+        },
+        "teutons": {
+         "building": "研究棍棒兵",
+         "building_en": "Research Clubswinger",
+         "cost": null,
+         "target": "基本兵種，不用研究",
+         "skip": true
+        },
+        "egyptians": {
+         "building": "研究奴隸民兵",
+         "building_en": "Research Slave Malitia",
+         "cost": null,
+         "target": "基本兵種，不用研究",
+         "skip": true
+        },
+        "huns": {
+         "building": "研究草原騎兵",
+         "building_en": "Research Steppe Rider",
+         "cost": 5570,
+         "target": null,
+         "skip": false
+        },
+        "vikings": {
+         "missing": "farm_unit"
+        },
+        "spartans": {
+         "missing": "farm_unit"
+        }
+       }
+      },
+      {
+       "id": "r060",
+       "row": 60,
+       "kind": "farm_units",
+       "building": "打野兵",
+       "building_en": "Farm units",
+       "target": "訓練 8 隻",
+       "target_en": "8 to make",
+       "tier": null,
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "count": 8,
+       "why": null,
+       "by_tribe": {
+        "romans": {
+         "building": "打野兵（帝國騎兵）",
+         "building_en": "Farm units (Equites Imperatoris)",
+         "cost": 11280
+        },
+        "gauls": {
+         "building": "打野兵（雷法師）",
+         "building_en": "Farm units (Theutates Thunders)",
+         "cost": 8720
+        },
+        "teutons": {
+         "building": "打野兵（棍棒兵）",
+         "building_en": "Farm units (Clubswinger)",
+         "cost": 2000
+        },
+        "egyptians": {
+         "building": "打野兵（奴隸民兵）",
+         "building_en": "Farm units (Slave Malitia)",
+         "cost": 1200
+        },
+        "huns": {
+         "building": "打野兵（草原騎兵）",
+         "building_en": "Farm units (Steppe Rider)",
+         "cost": 7160
+        },
+        "vikings": {
+         "missing": "farm_unit"
+        },
+        "spartans": {
+         "missing": "farm_unit"
+        }
+       }
+      },
+      {
+       "id": "r061",
+       "row": 61,
+       "kind": "task",
+       "building": "任務：完整經濟",
+       "building_en": "Complete economy",
+       "tier": 2,
+       "target": "所有資源田升到 4",
+       "target_en": "all res to 4",
+       "cost": 14280,
+       "cp": 0,
+       "pop": 12,
+       "reward_res": 4800,
+       "reward_exp": 80,
+       "why": {
+        "zh": "目標：12／16 小時內全部升到 4",
+        "en": "Goal: reach all 4 in 12/16h",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r062",
+       "row": 62,
+       "kind": "build",
+       "building": "所有農田",
+       "building_en": "All croplands",
+       "tier": 3,
+       "target": "全部升到 5",
+       "target_en": "all to 5",
+       "cost": 11670,
+       "cp": 0,
+       "pop": 0,
+       "reward_res": 2700,
+       "reward_exp": 45,
+       "why": null
+      },
+      {
+       "id": "r063",
+       "row": 63,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": 4,
+       "target": "升到 12",
+       "target_en": "to 12",
+       "cost": 9310,
+       "cp": 11,
+       "pop": 10,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": {
+        "zh": "人口和文明點的獎勵（Excel 裡標橘色的）要看馬廄升到 3 還是 5，請留意，不要太早把它算進來。",
+        "en": "Pop & CP rewards in orange are dependable on stable to 3 or 5. Please be aware of it and don't expect it prematurely.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r064",
+       "row": 64,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": 2,
+       "target": "升到 10",
+       "target_en": "to 10",
+       "cost": 15250,
+       "cp": 15,
+       "pop": 15,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r065",
+       "row": 65,
+       "kind": "build",
+       "building": "工場",
+       "building_en": "Workshop",
+       "tier": null,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 1895,
+       "cp": 4,
+       "pop": 3,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r066",
+       "row": 66,
+       "kind": "build",
+       "building": "城鎮廳",
+       "building_en": "Town hall",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 4220,
+       "cp": 6,
+       "pop": 4,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r067",
+       "row": 67,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 6",
+       "target_en": "to 6",
+       "cost": 6015,
+       "cp": 7,
+       "pop": 10,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r068",
+       "row": 68,
+       "kind": "task",
+       "building": "任務：文明點產量",
+       "building_en": "Culture point production",
+       "tier": 2,
+       "target": "每日文明點產量達到 150",
+       "target_en": "150",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 4500,
+       "reward_exp": 75,
+       "why": null
+      },
+      {
+       "id": "r069",
+       "row": 69,
+       "kind": "build",
+       "building": "倉庫",
+       "building_en": "Warehouse",
+       "tier": 3,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 5295,
+       "cp": 2,
+       "pop": 4,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null,
+       "by_tribe": {
+        "romans": {
+         "cost": 3285,
+         "cp": 2,
+         "pop": 2
+        }
+       }
+      },
+      {
+       "id": "r070",
+       "row": 70,
+       "kind": "build",
+       "building": "倉庫",
+       "building_en": "Warehouse",
+       "tier": null,
+       "target": "升到 8",
+       "target_en": "to 8",
+       "cost": 2360,
+       "cp": 0,
+       "pop": 1,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r071",
+       "row": 71,
+       "kind": "party",
+       "building": "第 1 場派對",
+       "building_en": "Party 1",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": 20330,
+       "cp": null,
+       "pop": null,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": {
+        "zh": "目標：最多 48 小時開第一場派對",
+        "en": "Goal: party 1 in max 48h",
+        "source": "4趴农开-已翻译!A62"
+       }
+      },
+      {
+       "id": "r072",
+       "row": 72,
+       "kind": "farm_units",
+       "building": "打野兵",
+       "building_en": "Farm units",
+       "target": "Excel 預設 0 隻，依 ROI 自己決定",
+       "target_en": "0 to make",
+       "tier": null,
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "count": 0,
+       "why": {
+        "zh": "這裡依 ROI 決定要升哪些資源田，或是多投資打野兵；別忘了你已經在打野，資源收入比較多。也許更該把重點放在文明點產量，因為要在 4 場派對內拓荒，文明點產量本來就得升。5 級資源田的 ROI：\n伐木場 67.4 小時\n泥坑 67.7 小時\n鐵礦場 82.5 小時\n農田 76.7 小時\nROI 以英雄 6 級領到的獎勵計算。不建議升鐵礦場，埃及人尤其不要。",
+        "en": "Check here which fields you want to upgrade based on ROI or invest more in farm units, bare in mind you already farm and have more resc income. Might be better to focus more on CP production, since that needs to be upgraded anyway to make it in 4 parties. Nonetheless ROI for the fields 5 are:\nWood - 67,4h\nClay - 67,7h\nIron - 82,5h\nCrop - 76,7h\nROI is calculated with the reward cashed with hero level 6. Iron mines are not recommended to do, especially for Egyptians a no-go.",
+        "source": "manual"
+       },
+       "by_tribe": {
+        "romans": {
+         "building": "打野兵（帝國騎兵）",
+         "building_en": "Farm units (Equites Imperatoris)",
+         "cost": 0
+        },
+        "gauls": {
+         "building": "打野兵（雷法師）",
+         "building_en": "Farm units (Theutates Thunders)",
+         "cost": 0
+        },
+        "teutons": {
+         "building": "打野兵（棍棒兵）",
+         "building_en": "Farm units (Clubswinger)",
+         "cost": 0
+        },
+        "egyptians": {
+         "building": "打野兵（奴隸民兵）",
+         "building_en": "Farm units (Slave Malitia)",
+         "cost": 0
+        },
+        "huns": {
+         "building": "打野兵（草原騎兵）",
+         "building_en": "Farm units (Steppe Rider)",
+         "cost": 0
+        },
+        "vikings": {
+         "missing": "farm_unit"
+        },
+        "spartans": {
+         "missing": "farm_unit"
+        }
+       }
+      },
+      {
+       "id": "r073",
+       "row": 73,
+       "kind": "build",
+       "building": "所有泥坑",
+       "building_en": "All clay pits",
+       "tier": 3,
+       "target": "全部升到 5",
+       "target_en": "all to 5",
+       "cost": 7760,
+       "cp": 0,
+       "pop": 4,
+       "reward_res": 2700,
+       "reward_exp": 45,
+       "why": null
+      },
+      {
+       "id": "r074",
+       "row": 74,
+       "kind": "build",
+       "building": "所有伐木場",
+       "building_en": "All woodcutters",
+       "tier": 3,
+       "target": "全部升到 5",
+       "target_en": "all to 5",
+       "cost": 7780,
+       "cp": 0,
+       "pop": 4,
+       "reward_res": 2700,
+       "reward_exp": 45,
+       "why": null
+      },
+      {
+       "id": "r075",
+       "row": 75,
+       "kind": "build",
+       "building": "所有鐵礦場",
+       "building_en": "All iron mines",
+       "tier": 3,
+       "target": "全部升到 5",
+       "target_en": "all to 5",
+       "cost": 8400,
+       "cp": 0,
+       "pop": 8,
+       "reward_res": 2700,
+       "reward_exp": 45,
+       "why": null
+      },
+      {
+       "id": "r076",
+       "row": 76,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": 4,
+       "target": "升到 12",
+       "target_en": "to 12",
+       "cost": 16655,
+       "cp": 16,
+       "pop": 15,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r077",
+       "row": 77,
+       "kind": "build",
+       "building": "穀倉",
+       "building_en": "Granary",
+       "tier": 3,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 3415,
+       "cp": 2,
+       "pop": 4,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r078",
+       "row": 78,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Crannies",
+       "tier": null,
+       "target": "7 個升到 7",
+       "target_en": "7x to 7",
+       "cost": 11445,
+       "cp": 14,
+       "pop": 14,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r079",
+       "row": 79,
+       "kind": "task",
+       "building": "任務：人口",
+       "building_en": "Population",
+       "tier": 4,
+       "target": "人口達到 250",
+       "target_en": "250",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 6000,
+       "reward_exp": 100,
+       "why": null
+      },
+      {
+       "id": "r080",
+       "row": 80,
+       "kind": "build",
+       "building": "行宮",
+       "building_en": "Residence",
+       "tier": null,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 4585,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r081",
+       "row": 81,
+       "kind": "build",
+       "building": "行宮",
+       "building_en": "Residence",
+       "tier": null,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 19810,
+       "cp": 4,
+       "pop": 4,
+       "reward_res": 3600,
+       "reward_exp": 60,
+       "why": null
+      },
+      {
+       "id": "r082",
+       "row": 82,
+       "kind": "party",
+       "building": "第 2 場派對",
+       "building_en": "Party 2",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": 20330,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r083",
+       "row": 83,
+       "kind": "build",
+       "building": "行宮",
+       "building_en": "Residence",
+       "tier": null,
+       "target": "升到 10",
+       "target_en": "to 10",
+       "cost": 34635,
+       "cp": 5,
+       "pop": 3,
+       "reward_res": 4800,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r084",
+       "row": 84,
+       "kind": "settlers",
+       "building": "拓荒者",
+       "building_en": "Train settler(s)",
+       "target": "訓練 1 個",
+       "target_en": "1",
+       "tier": null,
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "count": 1,
+       "why": null,
+       "by_tribe": {
+        "romans": {
+         "cost": 19000
+        },
+        "gauls": {
+         "cost": 18100
+        },
+        "teutons": {
+         "cost": 20000
+        },
+        "egyptians": {
+         "cost": 21000
+        },
+        "huns": {
+         "cost": 20900
+        },
+        "vikings": {
+         "missing": "settler_cost"
+        },
+        "spartans": {
+         "missing": "settler_cost"
+        }
+       }
+      },
+      {
+       "id": "r085",
+       "row": 85,
+       "kind": "party",
+       "building": "第 3 場派對",
+       "building_en": "Party 3",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": 20330,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r086",
+       "row": 86,
+       "kind": "settlers",
+       "building": "拓荒者",
+       "building_en": "Train settler(s)",
+       "target": "訓練 2 個",
+       "target_en": "2",
+       "tier": null,
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "count": 2,
+       "why": null,
+       "by_tribe": {
+        "romans": {
+         "cost": 38000
+        },
+        "gauls": {
+         "cost": 36200
+        },
+        "teutons": {
+         "cost": 40000
+        },
+        "egyptians": {
+         "cost": 42000
+        },
+        "huns": {
+         "cost": 41800
+        },
+        "vikings": {
+         "missing": "settler_cost"
+        },
+        "spartans": {
+         "missing": "settler_cost"
+        }
+       }
+      },
+      {
+       "id": "r087",
+       "row": 87,
+       "kind": "party",
+       "building": "第 4 場派對",
+       "building_en": "Party 4",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": 20330,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r088",
+       "row": 88,
+       "kind": "note",
+       "building": "開新村前先留 3000 資源",
+       "building_en": "Don't forget about the 3k resc for launching!",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": 3000,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      }
+     ]
+    },
+    {
+     "id": "extra-cp",
+     "title": "選做：便宜的文明點建築",
+     "tier": null,
+     "intro": {
+      "zh": "如果你推進得很快，可能會缺文明點，以下是一些建築，可以用比較少的資源換到文明點，同時如果你資源多，也可以選擇升級城鎮廳來縮短派對時間。",
+      "en": "If you went like really fast, due to a good spawn or bossing it yourself, you might run into some CP related issues. Speeding up the process before party 1 results in less time where CP gets generated by the CP production. To cope with this below an overview of the cheaper CP per resc buildings. \nSome tips regarding upgrading your town hall are also included. It can be profitable to upgrade your town hall to get the CP from a party faster.",
+      "source": "3趴兵开-已翻译!A91"
+     },
+     "steps": [
+      {
+       "id": "r095",
+       "row": 95,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 9",
+       "target_en": "to 9",
+       "cost": 9295,
+       "cp": 9,
+       "pop": 6,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1032.78,
+       "why": {
+        "zh": "進階：如果資源收入比需要的多，還有空間加快拓荒，可以考慮升級城鎮廳，縮短派對的時間，早點拿到派對的文明點。",
+        "en": "Pro tip: If resc income is more than you need and you have room for speeding up your settling time, check for upping your town hall to shorten the party duration and have CP of a party faster.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r096",
+       "row": 96,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": null,
+       "target": "升到 14",
+       "target_en": "to 14",
+       "cost": 8380,
+       "cp": 8,
+       "pop": 4,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1047.5,
+       "why": null
+      },
+      {
+       "id": "r097",
+       "row": 97,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": null,
+       "target": "升到 11",
+       "target_en": "to 11",
+       "cost": 6020,
+       "cp": 5,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1204,
+       "why": null
+      },
+      {
+       "id": "r098",
+       "row": 98,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": null,
+       "target": "升到 15",
+       "target_en": "to 15",
+       "cost": 6025,
+       "cp": 5,
+       "pop": 2,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1205,
+       "why": null
+      },
+      {
+       "id": "r099",
+       "row": 99,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 10",
+       "target_en": "to 10",
+       "cost": 4985,
+       "cp": 4,
+       "pop": 2,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1246.25,
+       "why": null
+      },
+      {
+       "id": "r100",
+       "row": 100,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": null,
+       "target": "升到 14",
+       "target_en": "to 14",
+       "cost": 14995,
+       "cp": 12,
+       "pop": 6,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1249.58,
+       "why": null
+      },
+      {
+       "id": "r101",
+       "row": 101,
+       "kind": "build",
+       "building": "集結點",
+       "building_en": "Rallypoint",
+       "tier": null,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 1250,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1250,
+       "why": null
+      },
+      {
+       "id": "r102",
+       "row": 102,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 11",
+       "target_en": "to 11",
+       "cost": 6375,
+       "cp": 5,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1275,
+       "why": null
+      },
+      {
+       "id": "r103",
+       "row": 103,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": null,
+       "target": "升到 12",
+       "target_en": "to 12",
+       "cost": 7710,
+       "cp": 6,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1285,
+       "why": {
+        "zh": "重要提醒：已經在排隊的派對，升級城鎮廳不會縮短它的時間。派對排隊中才提高文明點產量的話，增加的部分要等下一場派對開始才算。",
+        "en": "Important reminder: a party in queue will not be shortened in duration when upping TH. When upgrading CP (while having a party in queue) the increase will be given when next party starts.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r104",
+       "row": 104,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": null,
+       "target": "升到 16",
+       "target_en": "to 16",
+       "cost": 7710,
+       "cp": 6,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1285,
+       "why": null
+      },
+      {
+       "id": "r105",
+       "row": 105,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 12",
+       "target_en": "to 12",
+       "cost": 8160,
+       "cp": 6,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1360,
+       "why": null
+      },
+      {
+       "id": "r106",
+       "row": 106,
+       "kind": "task",
+       "building": "任務：文明點產量",
+       "building_en": "Culture point production",
+       "tier": 4,
+       "target": "每日文明點產量達到 250",
+       "target_en": "250",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 6000,
+       "reward_exp": 100,
+       "why": null
+      },
+      {
+       "id": "r107",
+       "row": 107,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": null,
+       "target": "升到 18",
+       "target_en": "to 18",
+       "cost": 22495,
+       "cp": 16,
+       "pop": 6,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1405.94,
+       "why": null
+      },
+      {
+       "id": "r108",
+       "row": 108,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": null,
+       "target": "升到 13",
+       "target_en": "to 13",
+       "cost": 9865,
+       "cp": 6,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1644.17,
+       "why": null
+      },
+      {
+       "id": "r109",
+       "row": 109,
+       "kind": "build",
+       "building": "所有山洞",
+       "building_en": "Cranny sims",
+       "tier": null,
+       "target": "全部升到 10",
+       "target_en": "All to 10",
+       "cost": 28600,
+       "cp": 20,
+       "pop": 30,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1430,
+       "why": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "3p-sim",
+   "name": "3P 兵開",
+   "sheet": "3P - Sim",
+   "parties": 3,
+   "total_steps": 97,
+   "sections": [
+    {
+     "id": "tier-1",
+     "title": "任務等級 1",
+     "tier": 1,
+     "intro": null,
+     "steps": [
+      {
+       "id": "r003",
+       "row": 3,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": null,
+       "cp": 2,
+       "pop": 2,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": {
+        "zh": "啟用 25% 資源加成",
+        "en": "Activate 25% bonus for Resources",
+        "source": "4趴农开-已翻译!A6"
+       }
+      },
+      {
+       "id": "r004",
+       "row": 4,
+       "kind": "build",
+       "building": "伐木場",
+       "building_en": "Woodcutters",
+       "tier": 1,
+       "target": "一塊升到 2",
+       "target_en": "1x to 2",
+       "cost": null,
+       "cp": 1,
+       "pop": 3,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r005",
+       "row": 5,
+       "kind": "build",
+       "building": "農田",
+       "building_en": "Croplands",
+       "tier": 1,
+       "target": "一塊升到 2",
+       "target_en": "1x to 2",
+       "cost": null,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": {
+        "zh": "英雄只去第一次冒險",
+        "en": "Send Hero only on first adventure",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r006",
+       "row": 6,
+       "kind": "build",
+       "building": "集結點",
+       "building_en": "Rally Point",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": null,
+       "cp": 1,
+       "pop": 1,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r007",
+       "row": 7,
+       "kind": "build",
+       "building": "泥坑",
+       "building_en": "Clay pits",
+       "tier": 1,
+       "target": "一塊升到 2",
+       "target_en": "1x to 2",
+       "cost": 420,
+       "cp": 1,
+       "pop": 3,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": {
+        "zh": "依可以打的綠洲數量，決定戰鬥力要點幾點。\n0 個綠洲：最多 2 點\n1～5 個綠洲：8 到 12 點\n6 個以上綠洲：12 點以上\n打野過程中使用任務獎勵的經驗值升級英雄，回復英雄的生命值，建議用模擬器看看打野會損失多少血量。將剩餘的技能點點到資源上。\n英雄幾乎不可能 24 小時打野，因此將一些點數投入到資源上能夠取得更多資源收入。",
+        "en": "Put points in strength according to the amount of oasis you can raid.\n0 oasis: max 2 points \n1-5 oasis: 8/12 points\n6+ oasis: 12(+) points\nUse the rewards to level up your hero to full health after smashing animals. Put the rest in resc production. \nThe chances of using your hero for 24h(+) are very small and putting some extra points in resc production helps generating more income, when your hero can't clear any oasis anymore.",
+        "source": "4趴农开-已翻译!A8"
+       }
+      },
+      {
+       "id": "r008",
+       "row": 8,
+       "kind": "build",
+       "building": "鐵礦場",
+       "building_en": "Iron mines",
+       "tier": 1,
+       "target": "一塊升到 2",
+       "target_en": "1x to 2",
+       "cost": 720,
+       "cp": 1,
+       "pop": 5,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r009",
+       "row": 9,
+       "kind": "task",
+       "building": "任務：均衡發展",
+       "building_en": "Even growth",
+       "tier": 1,
+       "target": "每種資源田各一塊升到 2",
+       "target_en": "1x of all to 2",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 300,
+       "reward_exp": 5,
+       "why": null
+      },
+      {
+       "id": "r010",
+       "row": 10,
+       "kind": "build",
+       "building": "穀倉",
+       "building_en": "Granary",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 270,
+       "cp": 1,
+       "pop": 1,
+       "reward_res": 300,
+       "reward_exp": 5,
+       "why": null
+      },
+      {
+       "id": "r011",
+       "row": 11,
+       "kind": "build",
+       "building": "倉庫",
+       "building_en": "Warehouse",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 420,
+       "cp": 1,
+       "pop": 1,
+       "reward_res": 300,
+       "reward_exp": 5,
+       "why": null
+      }
+     ]
+    },
+    {
+     "id": "tier-2",
+     "title": "任務等級 2",
+     "tier": 2,
+     "intro": null,
+     "steps": [
+      {
+       "id": "r012",
+       "row": 12,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 555,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r013",
+       "row": 13,
+       "kind": "build",
+       "building": "穀倉",
+       "building_en": "Granary",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 790,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r014",
+       "row": 14,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 340,
+       "cp": 4,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r015",
+       "row": 15,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 990,
+       "cp": 1,
+       "pop": 4,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r016",
+       "row": 16,
+       "kind": "build",
+       "building": "所有農田",
+       "building_en": "All croplands",
+       "tier": 1,
+       "target": "全部升到 2",
+       "target_en": "all to 2",
+       "cost": 3325,
+       "cp": 5,
+       "pop": 0,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r017",
+       "row": 17,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 540,
+       "cp": 5,
+       "pop": 3,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r018",
+       "row": 18,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Cranny",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 130,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 300,
+       "reward_exp": 5,
+       "why": null
+      },
+      {
+       "id": "r019",
+       "row": 19,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Cranny",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 380,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r020",
+       "row": 20,
+       "kind": "build",
+       "building": "城牆",
+       "building_en": "City wall",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 400,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r021",
+       "row": 21,
+       "kind": "build",
+       "building": "城牆",
+       "building_en": "City wall",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 1170,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": {
+        "zh": "持續打綠洲，直到要走 1 小時以上；之後考慮去冒險 2（資源）。冒險大約能拿到 2300 資源。",
+        "en": "Raid Oasis until you need to walk 1h+ then consider to do adventure 2 (resc). Adventure gives about 2300 resc.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r022",
+       "row": 22,
+       "kind": "build",
+       "building": "所有伐木場",
+       "building_en": "All woodcutters",
+       "tier": 1,
+       "target": "全部升到 2",
+       "target_en": "all to 2",
+       "cost": 1995,
+       "cp": 3,
+       "pop": 9,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r023",
+       "row": 23,
+       "kind": "build",
+       "building": "所有泥坑",
+       "building_en": "All clay pits",
+       "tier": 1,
+       "target": "全部升到 2",
+       "target_en": "all to 2",
+       "cost": 2010,
+       "cp": 3,
+       "pop": 9,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r024",
+       "row": 24,
+       "kind": "build",
+       "building": "所有鐵礦場",
+       "building_en": "All iron mines",
+       "tier": 1,
+       "target": "全部升到 2",
+       "target_en": "all to 2",
+       "cost": 2175,
+       "cp": 3,
+       "pop": 15,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r025",
+       "row": 25,
+       "kind": "task",
+       "building": "任務：完整經濟",
+       "building_en": "Complete economy",
+       "tier": 1,
+       "target": "所有資源田升到 2",
+       "target_en": "all res to 2",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": {
+        "zh": "繼續打野，直到路程要 2 小時以上，此時你應考慮使用英雄的智慧之書洗點，將幾乎所有點數投入到資源產量中（適當保留一些戰鬥力用於冒險）。智慧之書可在冒險 6 中獲取，通常在開始遊戲後的 24 小時內就能得到。",
+        "en": "Continue to raid oasis until 2h+ walkig time, then you should consider to put almost all points in resc production with the book of wisdom for hero. Book is obtained in adventure 6, usually comes within 24h after starting.",
+        "source": "4趴农开-已翻译!A29"
+       }
+      },
+      {
+       "id": "r026",
+       "row": 26,
+       "kind": "task",
+       "building": "任務：人口",
+       "building_en": "Population",
+       "tier": 1,
+       "target": "人口達到 50",
+       "target_en": "50",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 1500,
+       "reward_exp": 25,
+       "why": null
+      },
+      {
+       "id": "r027",
+       "row": 27,
+       "kind": "build",
+       "building": "倉庫",
+       "building_en": "Warehouse",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 1220,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r028",
+       "row": 28,
+       "kind": "build",
+       "building": "兵營",
+       "building_en": "Barracs",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 730,
+       "cp": 1,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r029",
+       "row": 29,
+       "kind": "build",
+       "building": "伐木場",
+       "building_en": "Woodcutters",
+       "tier": 2,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 1860,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r030",
+       "row": 30,
+       "kind": "build",
+       "building": "農田",
+       "building_en": "Croplands",
+       "tier": 2,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 1860,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r031",
+       "row": 31,
+       "kind": "build",
+       "building": "泥坑",
+       "building_en": "Clay pits",
+       "tier": 2,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 1870,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r032",
+       "row": 32,
+       "kind": "build",
+       "building": "鐵礦場",
+       "building_en": "Iron mines",
+       "tier": 2,
+       "target": "一塊升到 4",
+       "target_en": "1x to 4",
+       "cost": 2015,
+       "cp": 1,
+       "pop": 4,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r033",
+       "row": 33,
+       "kind": "task",
+       "building": "任務：均衡發展",
+       "building_en": "Even growth",
+       "tier": 2,
+       "target": "每種資源田各一塊升到 4",
+       "target_en": "1x of all to 4",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      }
+     ]
+    },
+    {
+     "id": "tier-3",
+     "title": "任務等級 3",
+     "tier": 3,
+     "intro": null,
+     "steps": [
+      {
+       "id": "r034",
+       "row": 34,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Cranny",
+       "tier": 3,
+       "target": "升到 6",
+       "target_en": "to 6",
+       "cost": 1065,
+       "cp": 1,
+       "pop": 1,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r035",
+       "row": 35,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": 3,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 2395,
+       "cp": 4,
+       "pop": 6,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r036",
+       "row": 36,
+       "kind": "task",
+       "building": "任務：文明點產量",
+       "building_en": "Culture point production",
+       "tier": 1,
+       "target": "每日文明點產量達到 50",
+       "target_en": "50",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 1500,
+       "reward_exp": 25,
+       "why": null
+      },
+      {
+       "id": "r037",
+       "row": 37,
+       "kind": "build",
+       "building": "兵營",
+       "building_en": "Barracs",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 2135,
+       "cp": 1,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r038",
+       "row": 38,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 510,
+       "cp": 5,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r039",
+       "row": 39,
+       "kind": "build",
+       "building": "一塊農田",
+       "building_en": "One cropland",
+       "tier": null,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 695,
+       "cp": 1,
+       "pop": 0,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r040",
+       "row": 40,
+       "kind": "build",
+       "building": "鐵匠鋪",
+       "building_en": "Smithy",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 1090,
+       "cp": 2,
+       "pop": 4,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r041",
+       "row": 41,
+       "kind": "build",
+       "building": "所有鐵礦場",
+       "building_en": "All iron mines",
+       "tier": 2,
+       "target": "全部升到 3",
+       "target_en": "all to 3",
+       "cost": 2265,
+       "cp": 3,
+       "pop": 6,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r042",
+       "row": 42,
+       "kind": "task",
+       "building": "任務：人口",
+       "building_en": "Population",
+       "tier": 2,
+       "target": "人口達到 100",
+       "target_en": "100",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 3000,
+       "reward_exp": 50,
+       "why": null
+      },
+      {
+       "id": "r043",
+       "row": 43,
+       "kind": "build",
+       "building": "所有農田",
+       "building_en": "All croplands",
+       "tier": 2,
+       "target": "全部升到 3",
+       "target_en": "all to 3",
+       "cost": 2780,
+       "cp": 4,
+       "pop": 0,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r044",
+       "row": 44,
+       "kind": "build",
+       "building": "所有伐木場",
+       "building_en": "All woodcutters",
+       "tier": 2,
+       "target": "全部升到 3",
+       "target_en": "all to 3",
+       "cost": 2085,
+       "cp": 3,
+       "pop": 3,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r045",
+       "row": 45,
+       "kind": "build",
+       "building": "所有泥坑",
+       "building_en": "All clay pits",
+       "tier": 2,
+       "target": "全部升到 3",
+       "target_en": "all to 3",
+       "cost": 2100,
+       "cp": 3,
+       "pop": 3,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": {
+        "zh": "目標：最多 2 小時到這一步",
+        "en": "Goal: get here in 2h max",
+        "source": "4趴农开-已翻译!A45"
+       }
+      }
+     ]
+    },
+    {
+     "id": "tier-4",
+     "title": "任務等級 4",
+     "tier": 4,
+     "intro": null,
+     "steps": [
+      {
+       "id": "r046",
+       "row": 46,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Cranny",
+       "tier": 4,
+       "target": "升到 10",
+       "target_en": "to 10",
+       "cost": 3430,
+       "cp": 3,
+       "pop": 4,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r047",
+       "row": 47,
+       "kind": "build",
+       "building": "行宮",
+       "building_en": "Residence",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 1570,
+       "cp": 2,
+       "pop": 1,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r048",
+       "row": 48,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": 3,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 4290,
+       "cp": 6,
+       "pop": 10,
+       "reward_res": 1800,
+       "reward_exp": 30,
+       "why": null
+      },
+      {
+       "id": "r049",
+       "row": 49,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Crannies",
+       "tier": null,
+       "target": "8 個升到 3",
+       "target_en": "8x to 3",
+       "cost": 4080,
+       "cp": 16,
+       "pop": 0,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r050",
+       "row": 50,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": null,
+       "target": "升到 2",
+       "target_en": "to 2",
+       "cost": 650,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": {
+        "zh": "目標：12 小時內所有資源田升到 4。",
+        "en": "Goal: get all fields on 4 in 12h.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r051",
+       "row": 51,
+       "kind": "task",
+       "building": "任務：文明點產量",
+       "building_en": "Culture point production",
+       "tier": 2,
+       "target": "每日文明點產量達到 100",
+       "target_en": "100",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 3000,
+       "reward_exp": 50,
+       "why": {
+        "zh": "建議：農田升到 6 級，因為每塊會多 1 點文明點產量。之後文明點的花費會越來越高，可以把一塊農田看成 1250 資源的文明點投資，這樣農田本身只算 2000，ROI 大約 66 小時，加上文明點換算的成本低，很划算。",
+        "en": "ADVICED: Lv6 crop fields are done due to the 1 CP prod it gives. Since CP costs rise later on, consider 1 crop to be a 1250 resc investment in CP. That makes the costs only 2000, ROI for the fields would then be 66 hours, which is reasonable beside the low CP per resc cost of the field itself.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r052",
+       "row": 52,
+       "kind": "task",
+       "building": "任務：完整經濟",
+       "building_en": "Complete economy",
+       "tier": 2,
+       "target": "所有資源田升到 4",
+       "target_en": "all res to 4",
+       "cost": 16610,
+       "cp": 0,
+       "pop": 12,
+       "reward_res": 4800,
+       "reward_exp": 80,
+       "why": null
+      },
+      {
+       "id": "r053",
+       "row": 53,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": 4,
+       "target": "升到 12",
+       "target_en": "to 12",
+       "cost": 9310,
+       "cp": 11,
+       "pop": 10,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r054",
+       "row": 54,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": null,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 830,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r055",
+       "row": 55,
+       "kind": "task",
+       "building": "任務：人口",
+       "building_en": "Population",
+       "tier": 3,
+       "target": "人口達到 150",
+       "target_en": "150",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 4500,
+       "reward_exp": 75,
+       "why": null
+      },
+      {
+       "id": "r056",
+       "row": 56,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": 2,
+       "target": "升到 10",
+       "target_en": "to 10",
+       "cost": 17685,
+       "cp": 18,
+       "pop": 19,
+       "reward_res": 1200,
+       "reward_exp": 20,
+       "why": null
+      },
+      {
+       "id": "r057",
+       "row": 57,
+       "kind": "build",
+       "building": "工場",
+       "building_en": "Workshop",
+       "tier": null,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 1895,
+       "cp": 4,
+       "pop": 3,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r058",
+       "row": 58,
+       "kind": "build",
+       "building": "城鎮廳",
+       "building_en": "Town hall",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 4220,
+       "cp": 6,
+       "pop": 4,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r059",
+       "row": 59,
+       "kind": "build",
+       "building": "所有農田",
+       "building_en": "All croplands",
+       "tier": 3,
+       "target": "全部升到 5",
+       "target_en": "all to 5",
+       "cost": 11670,
+       "cp": 0,
+       "pop": 0,
+       "reward_res": 2700,
+       "reward_exp": 45,
+       "why": {
+        "zh": "選做：穀物磨坊 1 級也是一個選項，搭配 6 級農田、算進任務獎勵的 ROI 是 63 小時。不過要拆掉一個山洞才有空地。",
+        "en": "OPTIONAL: Grain mill 1 is an option as with lv6 fields it has a ROI of 63h included the task reward. However it will require to demolish a cranny.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r060",
+       "row": 60,
+       "kind": "build",
+       "building": "所有泥坑",
+       "building_en": "All clay pits",
+       "tier": 3,
+       "target": "全部升到 5",
+       "target_en": "all to 5",
+       "cost": 7760,
+       "cp": 0,
+       "pop": 4,
+       "reward_res": 2700,
+       "reward_exp": 45,
+       "why": null
+      },
+      {
+       "id": "r061",
+       "row": 61,
+       "kind": "build",
+       "building": "所有伐木場",
+       "building_en": "All woodcutters",
+       "tier": 3,
+       "target": "全部升到 5",
+       "target_en": "all to 5",
+       "cost": 7780,
+       "cp": 0,
+       "pop": 4,
+       "reward_res": 2700,
+       "reward_exp": 45,
+       "why": null
+      },
+      {
+       "id": "r062",
+       "row": 62,
+       "kind": "build",
+       "building": "所有鐵礦場",
+       "building_en": "All iron mines",
+       "tier": 3,
+       "target": "全部升到 5",
+       "target_en": "all to 5",
+       "cost": 8400,
+       "cp": 0,
+       "pop": 8,
+       "reward_res": 2700,
+       "reward_exp": 45,
+       "why": null
+      },
+      {
+       "id": "r063",
+       "row": 63,
+       "kind": "build",
+       "building": "所有農田",
+       "building_en": "All croplands",
+       "tier": null,
+       "target": "全部升到 6",
+       "target_en": "all to 6",
+       "cost": 19500,
+       "cp": 6,
+       "pop": 6,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": {
+        "zh": "接下來是比較難的部分，請注意！\n如果你打野打得好，預計不到 48 小時就能開第一場派對，平常每小時產出的文明點會不夠，要靠提高文明點產量補回來。一定要算清楚你需要多少文明點、還差多少，再用下面的表補足。記得你有 3 場派對、至少 48 小時的產出可以補回少掉的文明點。",
+        "en": "So here comes the tricky part! Pay attention!\nIf you farmed well and you expect to do party 1 faster than 48h, you've too less CP generated from regular production/ hour. This needs to be compensated and this is done by upgrading your CP production. It is critical to calculate how much CP you need and therewith know how much you lack. Determine how much CP you need to compensate and use the table below to fix it. Remember you have 3 parties and at least 48h of production to compensate the missed CP.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r064",
+       "row": 64,
+       "kind": "build",
+       "building": "穀物磨坊",
+       "building_en": "Grain mill",
+       "tier": 1,
+       "target": "升到 1",
+       "target_en": "to 1",
+       "cost": 2560,
+       "cp": 1,
+       "pop": 3,
+       "reward_res": 600,
+       "reward_exp": 10,
+       "why": null
+      },
+      {
+       "id": "r065",
+       "row": 65,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": null,
+       "target": "升到 9",
+       "target_en": "to 9",
+       "cost": 4365,
+       "cp": 4,
+       "pop": 6,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r066",
+       "row": 66,
+       "kind": "task",
+       "building": "任務：文明點產量",
+       "building_en": "Culture point production",
+       "tier": 2,
+       "target": "每日文明點產量達到 150",
+       "target_en": "150",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 4500,
+       "reward_exp": 75,
+       "why": null
+      },
+      {
+       "id": "r067",
+       "row": 67,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": 4,
+       "target": "升到 12",
+       "target_en": "to 12",
+       "cost": 12290,
+       "cp": 12,
+       "pop": 9,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r068",
+       "row": 68,
+       "kind": "build",
+       "building": "山洞",
+       "building_en": "Crannies",
+       "tier": null,
+       "target": "8 個升到 7",
+       "target_en": "8x to 7",
+       "cost": 13080,
+       "cp": 16,
+       "pop": 16,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r069",
+       "row": 69,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 6",
+       "target_en": "to 6",
+       "cost": 6015,
+       "cp": 7,
+       "pop": 10,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r070",
+       "row": 70,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 9",
+       "target_en": "to 9",
+       "cost": 9295,
+       "cp": 9,
+       "pop": 6,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r071",
+       "row": 71,
+       "kind": "build",
+       "building": "行宮",
+       "building_en": "Residence",
+       "tier": 2,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 4585,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": null
+      },
+      {
+       "id": "r072",
+       "row": 72,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": null,
+       "target": "升到 14",
+       "target_en": "to 14",
+       "cost": 8380,
+       "cp": 8,
+       "pop": 4,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r073",
+       "row": 73,
+       "kind": "task",
+       "building": "任務：人口",
+       "building_en": "Population",
+       "tier": 4,
+       "target": "人口達到 250",
+       "target_en": "250",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 6000,
+       "reward_exp": 100,
+       "why": null
+      },
+      {
+       "id": "r074",
+       "row": 74,
+       "kind": "build",
+       "building": "穀倉",
+       "building_en": "Granary",
+       "tier": 3,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 3415,
+       "cp": 2,
+       "pop": 4,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r075",
+       "row": 75,
+       "kind": "build",
+       "building": "倉庫",
+       "building_en": "Warehouse",
+       "tier": 3,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 5295,
+       "cp": 2,
+       "pop": 4,
+       "reward_res": 900,
+       "reward_exp": 15,
+       "why": null
+      },
+      {
+       "id": "r076",
+       "row": 76,
+       "kind": "build",
+       "building": "行宮",
+       "building_en": "Residence",
+       "tier": 3,
+       "target": "升到 7",
+       "target_en": "to 7",
+       "cost": 19810,
+       "cp": 4,
+       "pop": 4,
+       "reward_res": 3600,
+       "reward_exp": 60,
+       "why": null
+      },
+      {
+       "id": "r077",
+       "row": 77,
+       "kind": "build",
+       "building": "倉庫",
+       "building_en": "Warehouse",
+       "tier": null,
+       "target": "升到 8",
+       "target_en": "to 8",
+       "cost": 2360,
+       "cp": 0,
+       "pop": 1,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r078",
+       "row": 78,
+       "kind": "party",
+       "building": "第 1 場派對",
+       "building_en": "Party 1",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": 20330,
+       "cp": null,
+       "pop": null,
+       "reward_res": 2400,
+       "reward_exp": 40,
+       "why": {
+        "zh": "目標：72 小時內開第一場派對",
+        "en": "Goal: get party 1 in 72h",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r079",
+       "row": 79,
+       "kind": "build",
+       "building": "行宮",
+       "building_en": "Residence",
+       "tier": 4,
+       "target": "升到 10",
+       "target_en": "to 10",
+       "cost": 34635,
+       "cp": 5,
+       "pop": 3,
+       "reward_res": 4800,
+       "reward_exp": 80,
+       "why": null
+      },
+      {
+       "id": "r080",
+       "row": 80,
+       "kind": "settlers",
+       "building": "拓荒者",
+       "building_en": "Train settler",
+       "target": "訓練 1 個",
+       "target_en": "1",
+       "tier": null,
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "count": 1,
+       "why": {
+        "zh": "拓荒者的花費依部族不同，請在上方選部族。",
+        "en": "For accurate settler costs select tribe above!",
+        "source": "manual"
+       },
+       "by_tribe": {
+        "romans": {
+         "cost": 19000
+        },
+        "gauls": {
+         "cost": 18100
+        },
+        "teutons": {
+         "cost": 20000
+        },
+        "egyptians": {
+         "cost": 21000
+        },
+        "huns": {
+         "cost": 20900
+        },
+        "vikings": {
+         "missing": "settler_cost"
+        },
+        "spartans": {
+         "missing": "settler_cost"
+        }
+       }
+      },
+      {
+       "id": "r081",
+       "row": 81,
+       "kind": "party",
+       "building": "第 2 場派對",
+       "building_en": "Party 2",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": 20330,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r082",
+       "row": 82,
+       "kind": "settlers",
+       "building": "拓荒者",
+       "building_en": "Train settlers",
+       "target": "訓練 2 個",
+       "target_en": "2",
+       "tier": null,
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "count": 2,
+       "why": null,
+       "by_tribe": {
+        "romans": {
+         "cost": 38000
+        },
+        "gauls": {
+         "cost": 36200
+        },
+        "teutons": {
+         "cost": 40000
+        },
+        "egyptians": {
+         "cost": 42000
+        },
+        "huns": {
+         "cost": 41800
+        },
+        "vikings": {
+         "missing": "settler_cost"
+        },
+        "spartans": {
+         "missing": "settler_cost"
+        }
+       }
+      },
+      {
+       "id": "r083",
+       "row": 83,
+       "kind": "party",
+       "building": "第 3 場派對",
+       "building_en": "Party 3",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": 20330,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      },
+      {
+       "id": "r084",
+       "row": 84,
+       "kind": "note",
+       "building": "開新村前先留 3000 資源",
+       "building_en": "Don't forget the 3k resc for launching!",
+       "target": null,
+       "target_en": null,
+       "tier": null,
+       "cost": 3000,
+       "cp": null,
+       "pop": null,
+       "reward_res": null,
+       "reward_exp": null,
+       "why": null
+      }
+     ]
+    },
+    {
+     "id": "extra-cp",
+     "title": "選做：便宜的文明點建築",
+     "tier": null,
+     "intro": {
+      "zh": "如果你推進得很快，可能會缺文明點，以下是一些建築，可以用比較少的資源換到文明點，同時如果你資源多，也可以選擇升級城鎮廳來縮短派對時間。",
+      "en": "If you went like really fast, due to a good spawn or bossing it yourself, you might run into some CP related issues. Speeding up the process before party 1 results in less time where CP gets generated by the CP production. To cope with this below an overview of the cheaper CP per resc buildings. \nSome tips regarding upgrading your town hall are also included. It can be profitable to upgrade your town hall to get the CP from a party faster.",
+      "source": "3趴兵开-已翻译!A91"
+     },
+     "steps": [
+      {
+       "id": "r090",
+       "row": 90,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 9",
+       "target_en": "to 9",
+       "cost": 9295,
+       "cp": 9,
+       "pop": 6,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1032.78,
+       "why": {
+        "zh": "進階：如果資源收入比需要的多，還有空間加快拓荒，可以考慮升級城鎮廳，縮短派對的時間，早點拿到派對的文明點。",
+        "en": "Pro tip: If resc income is more than you need and you have room for speeding up your settling time, check for upping your town hall to shorten the party duration and have CP of a party faster.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r091",
+       "row": 91,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": null,
+       "target": "升到 14",
+       "target_en": "to 14",
+       "cost": 8380,
+       "cp": 8,
+       "pop": 4,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1047.5,
+       "why": null
+      },
+      {
+       "id": "r092",
+       "row": 92,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": null,
+       "target": "升到 11",
+       "target_en": "to 11",
+       "cost": 6020,
+       "cp": 5,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1204,
+       "why": null
+      },
+      {
+       "id": "r093",
+       "row": 93,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": null,
+       "target": "升到 15",
+       "target_en": "to 15",
+       "cost": 6025,
+       "cp": 5,
+       "pop": 2,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1205,
+       "why": null
+      },
+      {
+       "id": "r094",
+       "row": 94,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 10",
+       "target_en": "to 10",
+       "cost": 4985,
+       "cp": 4,
+       "pop": 2,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1246.25,
+       "why": null
+      },
+      {
+       "id": "r095",
+       "row": 95,
+       "kind": "build",
+       "building": "市場",
+       "building_en": "Marketplace",
+       "tier": null,
+       "target": "升到 14",
+       "target_en": "to 14",
+       "cost": 14995,
+       "cp": 12,
+       "pop": 6,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1249.58,
+       "why": null
+      },
+      {
+       "id": "r096",
+       "row": 96,
+       "kind": "task",
+       "building": "任務：文明點產量",
+       "building_en": "Culture point production",
+       "tier": 4,
+       "target": "每日文明點產量達到 250",
+       "target_en": "250",
+       "cost": null,
+       "cp": null,
+       "pop": null,
+       "reward_res": 6000,
+       "reward_exp": 100,
+       "why": null
+      },
+      {
+       "id": "r097",
+       "row": 97,
+       "kind": "build",
+       "building": "集結點",
+       "building_en": "Rallypoint",
+       "tier": null,
+       "target": "升到 3",
+       "target_en": "to 3",
+       "cost": 1250,
+       "cp": 1,
+       "pop": 2,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1250,
+       "why": null
+      },
+      {
+       "id": "r098",
+       "row": 98,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 11",
+       "target_en": "to 11",
+       "cost": 6375,
+       "cp": 5,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1275,
+       "why": null
+      },
+      {
+       "id": "r099",
+       "row": 99,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": null,
+       "target": "升到 12",
+       "target_en": "to 12",
+       "cost": 7710,
+       "cp": 6,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1285,
+       "why": {
+        "zh": "重要提醒：已經在排隊的派對，升級城鎮廳不會縮短它的時間。派對排隊中才提高文明點產量的話，增加的部分要等下一場派對開始才算。",
+        "en": "Important reminder: a party in queue will not be shortened in duration when upping TH. When upgrading CP (while having a party in queue) the increase will be given when next party starts.",
+        "source": "manual"
+       }
+      },
+      {
+       "id": "r100",
+       "row": 100,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": null,
+       "target": "升到 16",
+       "target_en": "to 16",
+       "cost": 7710,
+       "cp": 6,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1285,
+       "why": null
+      },
+      {
+       "id": "r101",
+       "row": 101,
+       "kind": "build",
+       "building": "大使館",
+       "building_en": "Embassy",
+       "tier": null,
+       "target": "升到 12",
+       "target_en": "to 12",
+       "cost": 8160,
+       "cp": 6,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1360,
+       "why": null
+      },
+      {
+       "id": "r102",
+       "row": 102,
+       "kind": "build",
+       "building": "村莊大樓",
+       "building_en": "Main Building",
+       "tier": null,
+       "target": "升到 18",
+       "target_en": "to 18",
+       "cost": 22495,
+       "cp": 16,
+       "pop": 6,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1405.94,
+       "why": null
+      },
+      {
+       "id": "r103",
+       "row": 103,
+       "kind": "build",
+       "building": "研究院",
+       "building_en": "Academy",
+       "tier": null,
+       "target": "升到 13",
+       "target_en": "to 13",
+       "cost": 9865,
+       "cp": 6,
+       "pop": 3,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1644.17,
+       "why": null
+      },
+      {
+       "id": "r104",
+       "row": 104,
+       "kind": "build",
+       "building": "所有山洞",
+       "building_en": "Cranny sims",
+       "tier": null,
+       "target": "全部升到 10",
+       "target_en": "All to 10",
+       "cost": 28600,
+       "cp": 20,
+       "pop": 30,
+       "reward_res": null,
+       "reward_exp": null,
+       "res_per_cp": 1430,
+       "why": null
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "reference": {
+  "tasks": [
+   {
+    "title": "首村的任務",
+    "groups": [
+     {
+      "title": "一般",
+      "rows": [
+       {
+        "task": "文明點產量",
+        "tier": 1,
+        "target": "每日 50",
+        "reward_res": 1500,
+        "reward_exp": 25
+       },
+       {
+        "task": "文明點產量",
+        "tier": 2,
+        "target": "每日 100",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "文明點產量",
+        "tier": 3,
+        "target": "每日 150",
+        "reward_res": 4500,
+        "reward_exp": 75
+       },
+       {
+        "task": "文明點產量",
+        "tier": 4,
+        "target": "每日 250",
+        "reward_res": 6000,
+        "reward_exp": 100
+       },
+       {
+        "task": "文明點產量",
+        "tier": 5,
+        "target": "每日 350",
+        "reward_res": 7500,
+        "reward_exp": 125
+       },
+       {
+        "task": "文明點產量",
+        "tier": 6,
+        "target": "每日 500",
+        "reward_res": 9000,
+        "reward_exp": 150
+       },
+       {
+        "task": "文明點產量",
+        "tier": 7,
+        "target": "每日 750",
+        "reward_res": 10500,
+        "reward_exp": 175
+       },
+       {
+        "task": "人口",
+        "tier": 1,
+        "target": "達到 50",
+        "reward_res": 1500,
+        "reward_exp": 25
+       },
+       {
+        "task": "人口",
+        "tier": 2,
+        "target": "達到 100",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "人口",
+        "tier": 3,
+        "target": "達到 150",
+        "reward_res": 4500,
+        "reward_exp": 75
+       },
+       {
+        "task": "人口",
+        "tier": 4,
+        "target": "達到 250",
+        "reward_res": 6000,
+        "reward_exp": 100
+       },
+       {
+        "task": "人口",
+        "tier": 5,
+        "target": "達到 350",
+        "reward_res": 7500,
+        "reward_exp": 125
+       },
+       {
+        "task": "人口",
+        "tier": 6,
+        "target": "達到 500",
+        "reward_res": 9000,
+        "reward_exp": 150
+       },
+       {
+        "task": "人口",
+        "tier": 7,
+        "target": "達到 750",
+        "reward_res": 10500,
+        "reward_exp": 175
+       }
+      ]
+     },
+     {
+      "title": "資源",
+      "rows": [
+       {
+        "task": "農田",
+        "tier": 1,
+        "target": "升到 2",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "農田",
+        "tier": 2,
+        "target": "升到 4",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "農田",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "農田",
+        "tier": 4,
+        "target": "升到 10",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "伐木場",
+        "tier": 1,
+        "target": "升到 2",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "伐木場",
+        "tier": 2,
+        "target": "升到 4",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "伐木場",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "伐木場",
+        "tier": 4,
+        "target": "升到 10",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "泥坑",
+        "tier": 1,
+        "target": "升到 2",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "泥坑",
+        "tier": 2,
+        "target": "升到 4",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "泥坑",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "泥坑",
+        "tier": 4,
+        "target": "升到 10",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "鐵礦場",
+        "tier": 1,
+        "target": "升到 2",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "鐵礦場",
+        "tier": 2,
+        "target": "升到 4",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "鐵礦場",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "鐵礦場",
+        "tier": 4,
+        "target": "升到 10",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "所有農田",
+        "tier": 1,
+        "target": "升到 2",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "所有農田",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "所有農田",
+        "tier": 3,
+        "target": "升到 5",
+        "reward_res": 2700,
+        "reward_exp": 45
+       },
+       {
+        "task": "所有農田",
+        "tier": 4,
+        "target": "升到 8",
+        "reward_res": 3600,
+        "reward_exp": 60
+       },
+       {
+        "task": "所有農田",
+        "tier": 5,
+        "target": "升到 10",
+        "reward_res": 4500,
+        "reward_exp": 75
+       },
+       {
+        "task": "所有伐木場",
+        "tier": 1,
+        "target": "升到 2",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "所有伐木場",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "所有伐木場",
+        "tier": 3,
+        "target": "升到 5",
+        "reward_res": 2700,
+        "reward_exp": 45
+       },
+       {
+        "task": "所有伐木場",
+        "tier": 4,
+        "target": "升到 8",
+        "reward_res": 3600,
+        "reward_exp": 60
+       },
+       {
+        "task": "所有伐木場",
+        "tier": 5,
+        "target": "升到 10",
+        "reward_res": 4500,
+        "reward_exp": 75
+       },
+       {
+        "task": "所有泥坑",
+        "tier": 1,
+        "target": "升到 2",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "所有泥坑",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "所有泥坑",
+        "tier": 3,
+        "target": "升到 5",
+        "reward_res": 2700,
+        "reward_exp": 45
+       },
+       {
+        "task": "所有泥坑",
+        "tier": 4,
+        "target": "升到 8",
+        "reward_res": 3600,
+        "reward_exp": 60
+       },
+       {
+        "task": "所有泥坑",
+        "tier": 5,
+        "target": "升到 10",
+        "reward_res": 4500,
+        "reward_exp": 75
+       },
+       {
+        "task": "所有鐵礦場",
+        "tier": 1,
+        "target": "升到 2",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "所有鐵礦場",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "所有鐵礦場",
+        "tier": 3,
+        "target": "升到 5",
+        "reward_res": 2700,
+        "reward_exp": 45
+       },
+       {
+        "task": "所有鐵礦場",
+        "tier": 4,
+        "target": "升到 8",
+        "reward_res": 3600,
+        "reward_exp": 60
+       },
+       {
+        "task": "所有鐵礦場",
+        "tier": 5,
+        "target": "升到 10",
+        "reward_res": 4500,
+        "reward_exp": 75
+       },
+       {
+        "task": "均衡發展",
+        "tier": 1,
+        "target": "每種各一塊升到 2",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "均衡發展",
+        "tier": 2,
+        "target": "每種各一塊升到 4",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "均衡發展",
+        "tier": 3,
+        "target": "每種各一塊升到 7",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "均衡發展",
+        "tier": 4,
+        "target": "每種各一塊升到 10",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "所有資源田",
+        "tier": 1,
+        "target": "全部升到 2",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "所有資源田",
+        "tier": 2,
+        "target": "全部升到 4",
+        "reward_res": 4800,
+        "reward_exp": 80
+       },
+       {
+        "task": "所有資源田",
+        "tier": 3,
+        "target": "全部升到 7",
+        "reward_res": 7200,
+        "reward_exp": 120
+       },
+       {
+        "task": "所有資源田",
+        "tier": 4,
+        "target": "全部升到 8",
+        "reward_res": 9600,
+        "reward_exp": 160
+       },
+       {
+        "task": "所有資源田",
+        "tier": 5,
+        "target": "全部升到 9",
+        "reward_res": 12000,
+        "reward_exp": 200
+       },
+       {
+        "task": "所有資源田",
+        "tier": 6,
+        "target": "全部升到 10",
+        "reward_res": 14400,
+        "reward_exp": 240
+       }
+      ]
+     },
+     {
+      "title": "建築",
+      "rows": [
+       {
+        "task": "倉庫",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "倉庫",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "倉庫",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "倉庫",
+        "tier": 4,
+        "target": "升到 12",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "倉庫",
+        "tier": 5,
+        "target": "升到 20",
+        "reward_res": 1500,
+        "reward_exp": 25
+       },
+       {
+        "task": "穀倉",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "穀倉",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "穀倉",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "穀倉",
+        "tier": 4,
+        "target": "升到 12",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "穀倉",
+        "tier": 5,
+        "target": "升到 20",
+        "reward_res": 1500,
+        "reward_exp": 25
+       },
+       {
+        "task": "兵營",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "兵營",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "兵營",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "兵營",
+        "tier": 4,
+        "target": "升到 12",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "兵營",
+        "tier": 5,
+        "target": "升到 20",
+        "reward_res": 1500,
+        "reward_exp": 25
+       },
+       {
+        "task": "馬廄",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "馬廄",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "馬廄",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "馬廄",
+        "tier": 4,
+        "target": "升到 12",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "馬廄",
+        "tier": 5,
+        "target": "升到 20",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "研究院",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "研究院",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "研究院",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "鐵匠鋪",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "鐵匠鋪",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "鐵匠鋪",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "城鎮廳",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "城鎮廳",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 4800,
+        "reward_exp": 80
+       },
+       {
+        "task": "城鎮廳",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 7200,
+        "reward_exp": 120
+       },
+       {
+        "task": "工場",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "村莊大樓",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "村莊大樓",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "村莊大樓",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "村莊大樓",
+        "tier": 4,
+        "target": "升到 12",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "村莊大樓",
+        "tier": 5,
+        "target": "升到 20",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "山洞",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "山洞",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "山洞",
+        "tier": 3,
+        "target": "升到 6",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "山洞",
+        "tier": 4,
+        "target": "升到 10",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "市場",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "市場",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "市場",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "市場",
+        "tier": 4,
+        "target": "升到 12",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "市場",
+        "tier": 5,
+        "target": "升到 20",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "大使館",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "行宮／皇宮",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "行宮／皇宮",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "行宮／皇宮",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 3600,
+        "reward_exp": 60
+       },
+       {
+        "task": "行宮／皇宮",
+        "tier": 4,
+        "target": "升到 10",
+        "reward_res": 4800,
+        "reward_exp": 80
+       },
+       {
+        "task": "行宮／皇宮",
+        "tier": 5,
+        "target": "升到 20",
+        "reward_res": 6000,
+        "reward_exp": 100
+       },
+       {
+        "task": "城牆",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "城牆",
+        "tier": 2,
+        "target": "升到 3",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "城牆",
+        "tier": 3,
+        "target": "升到 7",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "城牆",
+        "tier": 4,
+        "target": "升到 12",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "城牆",
+        "tier": 5,
+        "target": "升到 20",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "集結點",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "集結點",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "集結點",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "鋸木廠",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "鋸木廠",
+        "tier": 2,
+        "target": "升到 5",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "磚廠",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "磚廠",
+        "tier": 2,
+        "target": "升到 5",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "鑄造廠",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "鑄造廠",
+        "tier": 2,
+        "target": "升到 5",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "穀物磨坊",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "穀物磨坊",
+        "tier": 2,
+        "target": "升到 5",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "麵包坊",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "麵包坊",
+        "tier": 2,
+        "target": "升到 5",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "派對",
+        "tier": 1,
+        "target": "1 場",
+        "reward_res": 2400,
+        "reward_exp": 40
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "title": "新村的任務",
+    "groups": [
+     {
+      "title": "一般",
+      "rows": [
+       {
+        "task": "文明點產量",
+        "tier": 1,
+        "target": "每日 50",
+        "reward_res": 1500,
+        "reward_exp": 25
+       },
+       {
+        "task": "文明點產量",
+        "tier": 2,
+        "target": "每日 100",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "文明點產量",
+        "tier": 3,
+        "target": "每日 150",
+        "reward_res": 4500,
+        "reward_exp": 75
+       },
+       {
+        "task": "文明點產量",
+        "tier": 4,
+        "target": "每日 250",
+        "reward_res": 6000,
+        "reward_exp": 100
+       },
+       {
+        "task": "文明點產量",
+        "tier": 5,
+        "target": "每日 350",
+        "reward_res": 7500,
+        "reward_exp": 125
+       },
+       {
+        "task": "文明點產量",
+        "tier": 6,
+        "target": "每日 500",
+        "reward_res": 9000,
+        "reward_exp": 150
+       },
+       {
+        "task": "文明點產量",
+        "tier": 7,
+        "target": "每日 750",
+        "reward_res": 10500,
+        "reward_exp": 175
+       },
+       {
+        "task": "人口",
+        "tier": 1,
+        "target": "達到 50",
+        "reward_res": 1500,
+        "reward_exp": 25
+       },
+       {
+        "task": "人口",
+        "tier": 2,
+        "target": "達到 100",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "人口",
+        "tier": 3,
+        "target": "達到 150",
+        "reward_res": 4500,
+        "reward_exp": 75
+       },
+       {
+        "task": "人口",
+        "tier": 4,
+        "target": "達到 250",
+        "reward_res": 6000,
+        "reward_exp": 100
+       },
+       {
+        "task": "人口",
+        "tier": 5,
+        "target": "達到 350",
+        "reward_res": 7500,
+        "reward_exp": 125
+       },
+       {
+        "task": "人口",
+        "tier": 6,
+        "target": "達到 500",
+        "reward_res": 9000,
+        "reward_exp": 150
+       },
+       {
+        "task": "人口",
+        "tier": 7,
+        "target": "達到 750",
+        "reward_res": 10500,
+        "reward_exp": 175
+       }
+      ]
+     },
+     {
+      "title": "資源",
+      "rows": [
+       {
+        "task": "均衡發展",
+        "tier": 1,
+        "target": "每種各一塊升到 2",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "均衡發展",
+        "tier": 2,
+        "target": "每種各一塊升到 4",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "均衡發展",
+        "tier": 3,
+        "target": "每種各一塊升到 7",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "均衡發展",
+        "tier": 4,
+        "target": "每種各一塊升到 10",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "所有資源田",
+        "tier": 1,
+        "target": "全部升到 2",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "所有資源田",
+        "tier": 2,
+        "target": "全部升到 4",
+        "reward_res": 4800,
+        "reward_exp": 80
+       },
+       {
+        "task": "所有資源田",
+        "tier": 3,
+        "target": "全部升到 7",
+        "reward_res": 7200,
+        "reward_exp": 120
+       },
+       {
+        "task": "所有資源田",
+        "tier": 4,
+        "target": "全部升到 8",
+        "reward_res": 9600,
+        "reward_exp": 160
+       },
+       {
+        "task": "所有資源田",
+        "tier": 5,
+        "target": "全部升到 9",
+        "reward_res": 12000,
+        "reward_exp": 200
+       },
+       {
+        "task": "所有資源田",
+        "tier": 6,
+        "target": "全部升到 10",
+        "reward_res": 14400,
+        "reward_exp": 240
+       }
+      ]
+     },
+     {
+      "title": "建築",
+      "rows": [
+       {
+        "task": "倉庫",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "倉庫",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "倉庫",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "穀倉",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "穀倉",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "穀倉",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 900,
+        "reward_exp": 15
+       },
+       {
+        "task": "兵營",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "研究院",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "城鎮廳",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "城鎮廳",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 4800,
+        "reward_exp": 80
+       },
+       {
+        "task": "城鎮廳",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 7200,
+        "reward_exp": 120
+       },
+       {
+        "task": "村莊大樓",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "村莊大樓",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "村莊大樓",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "山洞",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "山洞",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "市場",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "市場",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "市場",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "行宮／皇宮",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "行宮／皇宮",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "行宮／皇宮",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 3600,
+        "reward_exp": 60
+       },
+       {
+        "task": "城牆",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "城牆",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "城牆",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "集結點",
+        "tier": 1,
+        "target": "升到 1",
+        "reward_res": 300,
+        "reward_exp": 5
+       },
+       {
+        "task": "集結點",
+        "tier": 2,
+        "target": "升到 10",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "集結點",
+        "tier": 3,
+        "target": "升到 20",
+        "reward_res": 900,
+        "reward_exp": 15
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "title": "帳號的任務",
+    "groups": [
+     {
+      "title": "一般",
+      "rows": [
+       {
+        "task": "文明點產量",
+        "tier": 1,
+        "target": "每日 500",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "文明點產量",
+        "tier": 2,
+        "target": "每日 1000",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "文明點產量",
+        "tier": 3,
+        "target": "每日 1500",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "文明點產量",
+        "tier": 4,
+        "target": "每日 2000",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "文明點產量",
+        "tier": 5,
+        "target": "每日 2500",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "文明點產量",
+        "tier": 6,
+        "target": "每日 3000",
+        "reward_res": 3600,
+        "reward_exp": 60
+       },
+       {
+        "task": "文明點產量",
+        "tier": 7,
+        "target": "每日 3500",
+        "reward_res": 4200,
+        "reward_exp": 70
+       },
+       {
+        "task": "文明點產量",
+        "tier": 8,
+        "target": "每日 4000",
+        "reward_res": 4800,
+        "reward_exp": 80
+       },
+       {
+        "task": "文明點產量",
+        "tier": 9,
+        "target": "每日 4500",
+        "reward_res": 5400,
+        "reward_exp": 90
+       },
+       {
+        "task": "文明點產量",
+        "tier": 10,
+        "target": "每日 5000",
+        "reward_res": 6000,
+        "reward_exp": 100
+       },
+       {
+        "task": "文明點產量",
+        "tier": 11,
+        "target": "每日 5500",
+        "reward_res": 6600,
+        "reward_exp": 110
+       },
+       {
+        "task": "文明點產量",
+        "tier": 12,
+        "target": "每日 6000",
+        "reward_res": 7200,
+        "reward_exp": 120
+       },
+       {
+        "task": "文明點產量",
+        "tier": 13,
+        "target": "每日 6500",
+        "reward_res": 7800,
+        "reward_exp": 130
+       },
+       {
+        "task": "文明點產量",
+        "tier": 14,
+        "target": "每日 7000",
+        "reward_res": 8400,
+        "reward_exp": 140
+       },
+       {
+        "task": "文明點產量",
+        "tier": 15,
+        "target": "每日 7500",
+        "reward_res": 9000,
+        "reward_exp": 150
+       },
+       {
+        "task": "文明點產量",
+        "tier": 16,
+        "target": "每日 8000",
+        "reward_res": 9600,
+        "reward_exp": 160
+       },
+       {
+        "task": "文明點產量",
+        "tier": 17,
+        "target": "每日 8500",
+        "reward_res": 10200,
+        "reward_exp": 170
+       },
+       {
+        "task": "文明點產量",
+        "tier": 18,
+        "target": "每日 9000",
+        "reward_res": 10800,
+        "reward_exp": 180
+       },
+       {
+        "task": "文明點產量",
+        "tier": 19,
+        "target": "每日 9500",
+        "reward_res": 11400,
+        "reward_exp": 190
+       },
+       {
+        "task": "文明點產量",
+        "tier": 20,
+        "target": "每日 10000",
+        "reward_res": 12000,
+        "reward_exp": 200
+       },
+       {
+        "task": "文明點產量",
+        "tier": 21,
+        "target": "每日 10500",
+        "reward_res": 12600,
+        "reward_exp": 210
+       },
+       {
+        "task": "人口",
+        "tier": 1,
+        "target": "達到 500",
+        "reward_res": 600,
+        "reward_exp": 10
+       },
+       {
+        "task": "人口",
+        "tier": 2,
+        "target": "達到 1000",
+        "reward_res": 1200,
+        "reward_exp": 20
+       },
+       {
+        "task": "人口",
+        "tier": 3,
+        "target": "達到 1500",
+        "reward_res": 1800,
+        "reward_exp": 30
+       },
+       {
+        "task": "人口",
+        "tier": 4,
+        "target": "達到 2000",
+        "reward_res": 2400,
+        "reward_exp": 40
+       },
+       {
+        "task": "人口",
+        "tier": 5,
+        "target": "達到 2500",
+        "reward_res": 3000,
+        "reward_exp": 50
+       },
+       {
+        "task": "人口",
+        "tier": 6,
+        "target": "達到 3000",
+        "reward_res": 3600,
+        "reward_exp": 60
+       },
+       {
+        "task": "人口",
+        "tier": 7,
+        "target": "達到 3500",
+        "reward_res": 4200,
+        "reward_exp": 70
+       },
+       {
+        "task": "人口",
+        "tier": 8,
+        "target": "達到 4000",
+        "reward_res": 4800,
+        "reward_exp": 80
+       },
+       {
+        "task": "人口",
+        "tier": 9,
+        "target": "達到 4500",
+        "reward_res": 5400,
+        "reward_exp": 90
+       },
+       {
+        "task": "人口",
+        "tier": 10,
+        "target": "達到 5000",
+        "reward_res": 6000,
+        "reward_exp": 100
+       },
+       {
+        "task": "人口",
+        "tier": 11,
+        "target": "達到 5500",
+        "reward_res": 6600,
+        "reward_exp": 110
+       },
+       {
+        "task": "人口",
+        "tier": 12,
+        "target": "達到 6000",
+        "reward_res": 7200,
+        "reward_exp": 120
+       },
+       {
+        "task": "人口",
+        "tier": 13,
+        "target": "達到 6500",
+        "reward_res": 7800,
+        "reward_exp": 130
+       },
+       {
+        "task": "人口",
+        "tier": 14,
+        "target": "達到 7000",
+        "reward_res": 8400,
+        "reward_exp": 140
+       },
+       {
+        "task": "人口",
+        "tier": 15,
+        "target": "達到 7500",
+        "reward_res": 9000,
+        "reward_exp": 150
+       },
+       {
+        "task": "人口",
+        "tier": 16,
+        "target": "達到 8000",
+        "reward_res": 9600,
+        "reward_exp": 160
+       },
+       {
+        "task": "人口",
+        "tier": 17,
+        "target": "達到 8500",
+        "reward_res": 10200,
+        "reward_exp": 170
+       },
+       {
+        "task": "人口",
+        "tier": 18,
+        "target": "達到 9000",
+        "reward_res": 10800,
+        "reward_exp": 180
+       },
+       {
+        "task": "人口",
+        "tier": 19,
+        "target": "達到 9500",
+        "reward_res": 11400,
+        "reward_exp": 190
+       },
+       {
+        "task": "人口",
+        "tier": 20,
+        "target": "達到 10000",
+        "reward_res": 12000,
+        "reward_exp": 200
+       },
+       {
+        "task": "人口",
+        "tier": 21,
+        "target": "達到 10500",
+        "reward_res": 12600,
+        "reward_exp": 210
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "party_cp": {
+   "example_inputs": {
+    "production_per_hour": 2200,
+    "farming_per_hour": 250,
+    "cp_to_go": 1316
+   },
+   "phases": [
+    {
+     "title": "到第 1 場派對",
+     "rows": [
+      {
+       "res_label": "花費",
+       "resources": 15000,
+       "cp_label": "文明點產量（每日）",
+       "cp_value": 165,
+       "hours": 30,
+       "cp_left": 1109.75
+      },
+      {
+       "res_label": "任務獎勵",
+       "resources": 5330,
+       "cp_label": "城鎮廳等級",
+       "cp_value": 1,
+       "hours": 0,
+       "cp_left": 1109.75
+      },
+      {
+       "res_label": "第 1 場派對",
+       "resources": 20330,
+       "cp_label": "第 1 場派對的文明點",
+       "cp_value": 206,
+       "hours": 0,
+       "cp_left": 903.75
+      }
+     ]
+    },
+    {
+     "title": "到第 2 場派對",
+     "rows": [
+      {
+       "res_label": "花費",
+       "resources": 25700,
+       "cp_label": "文明點產量（每日）",
+       "cp_value": 206,
+       "hours": 24,
+       "cp_left": 697.75
+      },
+      {
+       "res_label": "任務獎勵",
+       "resources": 18100,
+       "cp_label": "城鎮廳等級",
+       "cp_value": 1,
+       "hours": 0,
+       "cp_left": 697.75
+      },
+      {
+       "res_label": "第 2 場派對",
+       "resources": 20330,
+       "cp_label": "第 2 場派對的文明點",
+       "cp_value": 233,
+       "hours": 0,
+       "cp_left": 464.75
+      }
+     ]
+    },
+    {
+     "title": "到第 3 場派對",
+     "rows": [
+      {
+       "res_label": "花費",
+       "resources": 36200,
+       "cp_label": "文明點產量（每日）",
+       "cp_value": 233,
+       "hours": 24,
+       "cp_left": 231.75
+      },
+      {
+       "res_label": "任務獎勵",
+       "resources": 0,
+       "cp_label": "城鎮廳等級",
+       "cp_value": 1,
+       "hours": 0,
+       "cp_left": 231.75
+      },
+      {
+       "res_label": "第 3 場派對",
+       "resources": 20330,
+       "cp_label": "第 3 場派對的文明點",
+       "cp_value": 233,
+       "hours": 0,
+       "cp_left": -1.25
+      }
+     ]
+    },
+    {
+     "title": "到第 4 場派對",
+     "rows": [
+      {
+       "res_label": "花費",
+       "resources": 0,
+       "cp_label": "文明點產量（每日）",
+       "cp_value": 178,
+       "hours": 24,
+       "cp_left": -179.25
+      },
+      {
+       "res_label": "任務獎勵",
+       "resources": 0,
+       "cp_label": "城鎮廳等級",
+       "cp_value": 1,
+       "hours": 0,
+       "cp_left": -179.25
+      },
+      {
+       "res_label": "第 4 場派對",
+       "resources": 20330,
+       "cp_label": "第 4 場派對的文明點",
+       "cp_value": 181,
+       "hours": 0,
+       "cp_left": -360.25
+      }
+     ]
+    }
+   ]
+  }
+ }
+}
