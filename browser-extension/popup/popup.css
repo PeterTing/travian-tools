@@ -43,8 +43,13 @@ body {
   margin: 4px 0 10px;
 }
 
-/* 兩行都沒顯示時（偵測中），按鈕跟標題之間留一點距離 */
-#unsupported-hint.hidden + .btn {
+/* 「目前頁面」和下面的說明文字靠近一點 */
+#page-line {
+  margin-bottom: 2px;
+}
+
+/* 可以上傳時（沒有說明文字），按鈕跟上一行之間留一點距離 */
+#upload-hint.hidden + .btn {
   margin-top: 10px;
 }
 

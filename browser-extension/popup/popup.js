@@ -10,7 +10,7 @@
 
 import { API_BASE_URL, TOOL_SITE_URL } from '../lib/config.js';
 import { clearCredential, describeExpiry, loadCredential } from '../lib/credential.js';
-import { UPLOAD_ENDPOINTS, pageLabel } from '../lib/pages.js';
+import { UPLOAD_ENDPOINTS, UPLOAD_HINTS, uploadState } from '../lib/pages.js';
 
 const storage = chrome.storage.local;
 
@@ -24,7 +24,7 @@ const expiryEl = document.getElementById('expiry');
 const accountSelect = document.getElementById('account-select');
 const pageLineEl = document.getElementById('page-line');
 const pageTypeEl = document.getElementById('page-type');
-const unsupportedHintEl = document.getElementById('unsupported-hint');
+const uploadHintEl = document.getElementById('upload-hint');
 const syncBtn = document.getElementById('sync-btn');
 const syncResultEl = document.getElementById('sync-result');
 const errorMessageEl = document.getElementById('error-message');
@@ -35,6 +35,7 @@ const TRAVIAN_PAGE = /^https:\/\/([a-z0-9-]+\.)*travian\.(com|tw|net)\//i;
 // 狀態
 let credential = null;
 let currentPageType = null;
+let detecting = true;
 
 function showError(message) {
   errorMessageEl.textContent = message;
@@ -195,19 +196,27 @@ function renderAccounts() {
   }
 }
 
+/** 依頁面與帳號狀態更新「目前頁面」、說明文字與按鈕；按鈕不能按時一定有說明 */
 function refreshSyncButton() {
-  syncBtn.disabled = !(accountSelect.value && UPLOAD_ENDPOINTS[currentPageType]);
+  const state = uploadState({
+    pageType: currentPageType,
+    detecting,
+    hasAccounts: (credential?.accounts || []).length > 0,
+    accountSelected: Boolean(accountSelect.value),
+  });
+  pageTypeEl.textContent = state.pageName;
+  pageLineEl.classList.toggle('hidden', !state.pageName);
+  uploadHintEl.textContent = state.hint;
+  uploadHintEl.classList.toggle('hidden', !state.hint);
+  syncBtn.disabled = !state.canUpload;
 }
 
 async function detectPage() {
+  detecting = true;
+  refreshSyncButton();
   const result = await sendToContent('get_page_type');
   currentPageType = result.success ? result.page_type : null;
-  const name = pageLabel(currentPageType);
-  // 有好懂的名稱才顯示「目前頁面」；認不出的頁面（含非遊戲頁面）改顯示
-  // 「這一頁還不支援…」，按鈕維持不能按
-  pageTypeEl.textContent = name || '';
-  pageLineEl.classList.toggle('hidden', !name);
-  unsupportedHintEl.classList.toggle('hidden', Boolean(name));
+  detecting = false;
   refreshSyncButton();
 }
 
@@ -219,6 +228,8 @@ async function syncData() {
 
   syncBtn.disabled = true;
   syncBtn.textContent = '上傳中…';
+  uploadHintEl.textContent = UPLOAD_HINTS.UPLOADING;
+  uploadHintEl.classList.remove('hidden');
   syncResultEl.textContent = '';
   syncResultEl.className = 'sync-result';
 

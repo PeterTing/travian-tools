@@ -29,3 +29,43 @@ export const UPLOAD_ENDPOINTS = Object.freeze({
 export function pageLabel(pageType) {
   return Object.hasOwn(PAGE_NAMES, pageType ?? '') ? PAGE_NAMES[pageType] : '';
 }
+
+/** 上傳按鈕不能按時，按鈕上方一定要有的說明（不讓使用者看到沒有理由的灰色按鈕） */
+export const UPLOAD_HINTS = Object.freeze({
+  // 認不出的頁面（含非 Travian 分頁），以及認得但還不能上傳的頁面（英雄、地圖）
+  UNSUPPORTED_PAGE: '這一頁還不支援，請到村莊總覽再按',
+  // 集結點：認得，但上傳還在做（P0-03/P0-05 完成後拿掉這句，兩句都改回提到集結點）
+  RALLY_POINT_PENDING: '集結點的上傳還在做，目前請到村莊總覽再按',
+  DETECTING: '正在讀取這一頁…',
+  UPLOADING: '正在上傳這一頁…',
+  NO_ACCOUNTS: '請先在工具網站新增遊戲帳號',
+  CHOOSE_ACCOUNT: '請在下方選擇要存到哪個遊戲帳號',
+});
+
+/**
+ * popup 上傳區的狀態（純函式）。
+ * @param {{pageType?: string|null, detecting?: boolean, hasAccounts?: boolean, accountSelected?: boolean}} input
+ * @returns {{pageName: string, canUpload: boolean, hint: string}}
+ *   canUpload 為 false 時 hint 一定不是空字串。
+ */
+export function uploadState({
+  pageType = null,
+  detecting = false,
+  hasAccounts = false,
+  accountSelected = false,
+} = {}) {
+  const pageName = detecting ? '' : pageLabel(pageType);
+  let hint = '';
+  if (detecting) {
+    hint = UPLOAD_HINTS.DETECTING;
+  } else if (pageType === 'rally_point' && !Object.hasOwn(UPLOAD_ENDPOINTS, pageType)) {
+    hint = UPLOAD_HINTS.RALLY_POINT_PENDING;
+  } else if (!Object.hasOwn(UPLOAD_ENDPOINTS, pageType ?? '')) {
+    hint = UPLOAD_HINTS.UNSUPPORTED_PAGE;
+  } else if (!hasAccounts) {
+    hint = UPLOAD_HINTS.NO_ACCOUNTS;
+  } else if (!accountSelected) {
+    hint = UPLOAD_HINTS.CHOOSE_ACCOUNT;
+  }
+  return { pageName, canUpload: hint === '', hint };
+}
