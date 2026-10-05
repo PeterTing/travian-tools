@@ -51,7 +51,8 @@ def create_village(
     "",
     response_model=VillageListResponse,
     summary="取得村莊列表",
-    description="取得當前用戶的所有村莊",
+    description="取得當前用戶的所有村莊；指定 account_id 時只回那個帳號的村莊，"
+    "並附上那個帳號最後一次貼上村莊資料的時間（last_pasted_at）",
 )
 def get_villages(
     db: DBSession,
@@ -61,14 +62,17 @@ def get_villages(
     """取得用戶的村莊列表."""
     service = VillageService(db)
 
+    last_pasted_at = None
     if account_id:
         villages = service.get_villages_by_account(account_id, current_user.user_id)
+        last_pasted_at = service.get_last_pasted_at(account_id, current_user.user_id)
     else:
         villages = service.get_all_villages_by_user(current_user.user_id)
 
     return VillageListResponse(
         villages=[VillageResponse.model_validate(v) for v in villages],
         total=len(villages),
+        last_pasted_at=last_pasted_at,
     )
 
 
@@ -104,6 +108,7 @@ def get_village(
         village_type=village.village_type,
         is_capital=village.is_capital,
         role=village.role,
+        crop_net_per_hour=village.crop_net_per_hour,
         last_updated=village.last_updated,
         created_at=village.created_at,
         buildings=[

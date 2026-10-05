@@ -68,7 +68,21 @@ function parseResources() {
 }
 
 /**
- * 解析產量
+ * 讀有正負號的整數（例如糧食淨產量「−320/h」）。
+ * 遊戲用 U+2212 當負號，前後還夾著方向控制字元；千分位可能是逗號、句點或空白。
+ * 只把第一個數字前面的負號當成正負號，其他非數字都略過。
+ */
+function parseSignedInt(text) {
+  const s = String(text ?? '').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '');
+  const firstDigit = s.search(/\d/);
+  if (firstDigit < 0) return 0;
+  const negative = /[-\u2212]/.test(s.slice(0, firstDigit));
+  const value = parseInt(s.replace(/\D/g, ''), 10) || 0;
+  return negative ? -value : value;
+}
+
+/**
+ * 解析產量（糧是扣掉消耗後的淨產量，可以是負的）
  */
 function parseProduction() {
   const production = {
@@ -83,10 +97,10 @@ function parseProduction() {
     if (productionTable) {
       const cells = productionTable.querySelectorAll('td.num');
       if (cells.length >= 4) {
-        production.wood = parseInt(cells[0].textContent.replace(/\D/g, ''), 10) || 0;
-        production.clay = parseInt(cells[1].textContent.replace(/\D/g, ''), 10) || 0;
-        production.iron = parseInt(cells[2].textContent.replace(/\D/g, ''), 10) || 0;
-        production.crop = parseInt(cells[3].textContent.replace(/\D/g, ''), 10) || 0;
+        production.wood = parseSignedInt(cells[0].textContent);
+        production.clay = parseSignedInt(cells[1].textContent);
+        production.iron = parseSignedInt(cells[2].textContent);
+        production.crop = parseSignedInt(cells[3].textContent);
       }
     }
   } catch (e) {

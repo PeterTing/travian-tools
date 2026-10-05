@@ -201,11 +201,33 @@ class TestGetVillages:
         mock_service_class.return_value.get_villages_by_account.return_value = (
             mock_villages
         )
+        mock_service_class.return_value.get_last_pasted_at.return_value = datetime(
+            2026, 10, 5, 3, 0, 0
+        )
 
         response = client.get("/villages?account_id=acc-123")
 
         assert response.status_code == 200
         mock_service_class.return_value.get_villages_by_account.assert_called_once()
+        mock_service_class.return_value.get_last_pasted_at.assert_called_once_with(
+            "acc-123", "user-123"
+        )
+        assert response.json()["last_pasted_at"] == "2026-10-05T03:00:00"
+
+    @patch("app.api.v1.endpoints.villages.VillageService")
+    def test_get_all_villages_has_no_paste_time(
+        self,
+        mock_service_class: MagicMock,
+        client: TestClient,
+    ) -> None:
+        """沒指定帳號時不算最後貼上時間."""
+        mock_service_class.return_value.get_all_villages_by_user.return_value = []
+
+        response = client.get("/villages")
+
+        assert response.status_code == 200
+        assert response.json()["last_pasted_at"] is None
+        mock_service_class.return_value.get_last_pasted_at.assert_not_called()
 
 
 class TestGetVillage:

@@ -1,5 +1,8 @@
 """村莊服務."""
 
+from datetime import datetime
+
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from app.domain.schemas.village import (
@@ -12,8 +15,14 @@ from app.domain.schemas.village import (
 )
 from app.infrastructure.database.models.building_instance import BuildingInstance
 from app.infrastructure.database.models.game_account import GameAccount
+from app.infrastructure.database.models.sync_log import SyncLog, SyncStatus, SyncType
 from app.infrastructure.database.models.troop_instance import TroopInstance
 from app.infrastructure.database.models.village import Village
+
+# 會寫入村莊人口、產量的上傳（擴充的村莊總覽 dorf1、村莊中心 dorf2）。
+# 戰報上傳也記成 FULL、軍隊統計只動部隊，都不算「村莊資料更新」。
+# P0-05 的貼上流程上線時，把它的同步類型加進來。
+VILLAGE_DATA_SYNC_TYPES = (SyncType.VILLAGE_OVERVIEW, SyncType.VILLAGE_CENTER)
 
 
 class VillageService:
@@ -85,6 +94,28 @@ class VillageService:
             .order_by(Village.created_at)
             .all()
         )
+
+    def get_last_pasted_at(self, account_id: str, user_id: str) -> datetime | None:
+        """這個帳號最後一次成功貼上／上傳村莊資料的時間（UTC，沒有過回 None）.
+
+        只看這個使用者自己、成功的村莊上傳；別人的帳號一律 None。
+        """
+        if not self._verify_account_ownership(account_id, user_id):
+            return None
+
+        latest: datetime | None = (
+            self.db.query(
+                func.max(func.coalesce(SyncLog.completed_at, SyncLog.started_at))
+            )
+            .filter(
+                SyncLog.user_id == user_id,
+                SyncLog.account_id == account_id,
+                SyncLog.status == SyncStatus.SUCCESS,
+                SyncLog.sync_type.in_(VILLAGE_DATA_SYNC_TYPES),
+            )
+            .scalar()
+        )
+        return latest
 
     def get_all_villages_by_user(self, user_id: str) -> list[Village]:
         """取得用戶所有村莊."""

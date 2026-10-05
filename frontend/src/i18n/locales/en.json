@@ -390,6 +390,28 @@
     "special": "Special"
   },
   "villages": {
+    "list": {
+      "title": "Villages",
+      "count": "{{count}} villages",
+      "sortLabel": "Sort: ",
+      "sortPopulation": "Population",
+      "sortCrop": "Crop",
+      "sortName": "Name",
+      "pastedJustNow": "Data was pasted just now.",
+      "pastedMinutesAgo": "Data was pasted {{count}} min ago.",
+      "pastedHoursAgo": "Data was pasted {{count}} h ago.",
+      "pastedYesterday": "Data was pasted yesterday.",
+      "pastedDaysAgo": "Data was pasted {{count}} days ago.",
+      "neverPasted": "Nothing has been pasted for this account yet; these villages were entered by hand.",
+      "howToUpdate": "To update, open the village overview in the game and upload it with the extension.",
+      "population": "Pop {{value}}",
+      "cropPerHour": "Crop {{value}}/h",
+      "cropUnknown": "Crop: no data yet",
+      "emptyTitle": "No villages for this account yet",
+      "emptyHint": "Open the village overview in the game and upload it with the extension, or add one by hand.",
+      "addManually": "+ Add a village by hand",
+      "openDetail": "Open {{name}}"
+    },
     "title": "Village Management",
     "description": "Manage your Travian villages",
     "noAccounts": "No game accounts added yet",
