@@ -13,6 +13,7 @@ import {
   EXTENSION_MESSAGE,
   clearExtensionLogin,
   getExtensionIds,
+  resendAccountsToExtension,
   shareLoginWithExtension,
 } from '../extensionBridge'
 
@@ -134,5 +135,29 @@ describe('extensionBridge', () => {
       { type: EXTENSION_MESSAGE.CLEAR },
       expect.any(Function)
     )
+  })
+
+  it('resendAccountsToExtension hands over the fresh account list', async () => {
+    post.mockResolvedValue({
+      data: {
+        access_token: 'ext.jwt.token2',
+        token_type: 'bearer',
+        expires_at: '2026-10-05T12:00:00Z',
+        expires_in: 28800,
+        user: { user_id: 'u1', username: 'petert', email: 'p@example.com' },
+      },
+    })
+    get.mockResolvedValue({
+      data: {
+        accounts: [{ account_id: 'a9', player_name: 'New', server_name: 'ts9', server_url: 'x' }],
+        total: 1,
+      },
+    })
+    const runtime = installChrome(() => ({ success: true }))
+    expect(await resendAccountsToExtension()).toBe(1)
+    expect(runtime.sendMessage.mock.calls[1][1]).toMatchObject({
+      type: EXTENSION_MESSAGE.SET,
+      accounts: [{ account_id: 'a9', label: 'New · ts9' }],
+    })
   })
 })

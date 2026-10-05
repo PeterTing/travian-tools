@@ -44,24 +44,23 @@ class AuthService:
         )
 
     @staticmethod
-    def create_access_token(user_id: str, token_version: int = 0) -> str:
-        """建立存取 Token（帶使用者的 token_version，登出後即失效）."""
+    def create_access_token(user_id: str) -> str:
+        """建立存取 Token."""
         expire = datetime.now(UTC) + timedelta(
             minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
         )
-        return AuthService._encode(
-            {"sub": user_id, "exp": expire, "type": "access", "ver": token_version}
-        )
+        return AuthService._encode({"sub": user_id, "exp": expire, "type": "access"})
 
     @staticmethod
     def create_extension_token(
-        user_id: str, token_version: int = 0
+        user_id: str, extension_token_version: int = 0
     ) -> tuple[str, datetime]:
         """建立交給瀏覽器擴充的短效 Token.
 
         ``scope=extension_upload``：只能用在 popup 會呼叫的上傳 API，
-        其他 API（含換發、刷新、帳號設定）一律 403。帶 ``ver``，
-        網站登出（token_version +1）後立刻失效。
+        其他 API（含換發、刷新、帳號設定）一律 403。帶 ``ver``
+        （使用者的 extension_token_version），網站登出（+1）後立刻失效。
+        網站自己的 access / refresh Token 不受影響。
 
         Returns:
             (token, 到期時間 UTC)
@@ -75,7 +74,7 @@ class AuthService:
                 "exp": expire,
                 "type": "access",
                 "scope": EXTENSION_SCOPE,
-                "ver": token_version,
+                "ver": extension_token_version,
             }
         )
         return token, expire
@@ -95,14 +94,12 @@ class AuthService:
         return cls.token_scope(token) == EXTENSION_SCOPE
 
     @staticmethod
-    def create_refresh_token(user_id: str, token_version: int = 0) -> str:
-        """建立刷新 Token（帶 token_version）."""
+    def create_refresh_token(user_id: str) -> str:
+        """建立刷新 Token."""
         expire = datetime.now(UTC) + timedelta(
             days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS
         )
-        return AuthService._encode(
-            {"sub": user_id, "exp": expire, "type": "refresh", "ver": token_version}
-        )
+        return AuthService._encode({"sub": user_id, "exp": expire, "type": "refresh"})
 
     @staticmethod
     def decode_token(token: str) -> dict[str, Any] | None:
@@ -120,26 +117,22 @@ class AuthService:
             return None
 
     @staticmethod
-    def user_token_version(user: User) -> int:
-        """使用者目前的 token_version（尚未有值時視為 0）."""
-        version = getattr(user, "token_version", 0)
+    def user_extension_token_version(user: User) -> int:
+        """使用者目前的 extension_token_version（尚未有值時視為 0）."""
+        version = getattr(user, "extension_token_version", 0)
         return version if isinstance(version, int) else 0
 
     @classmethod
-    def version_matches(cls, payload: dict[str, Any], user: User) -> bool:
-        """Token 裡的 ver 是否等於使用者目前的 token_version.
+    def extension_version_matches(cls, payload: dict[str, Any], user: User) -> bool:
+        """擴充 Token 的 ver 是否等於使用者目前的 extension_token_version."""
+        ver = payload.get("ver")
+        return isinstance(ver, int) and ver == cls.user_extension_token_version(user)
 
-        沒有 ver 的舊 Token 視為 0，所以部署當下已登入的人不會被踢掉；
-        第一次登出後就全部失效。
-        """
-        ver = payload.get("ver", 0)
-        return isinstance(ver, int) and ver == cls.user_token_version(user)
-
-    def revoke_tokens(self, user: User) -> int:
-        """撤銷這個使用者目前所有 Token（含擴充 Token）：token_version +1."""
-        user.token_version = self.user_token_version(user) + 1
+    def revoke_extension_tokens(self, user: User) -> int:
+        """撤銷這個使用者先前發出的所有擴充 Token（網站 Token 不受影響）."""
+        user.extension_token_version = self.user_extension_token_version(user) + 1
         self.db.commit()
-        return user.token_version
+        return user.extension_token_version
 
     def get_user_by_email(self, email: str) -> User | None:
         """根據 email 取得使用者."""
@@ -205,9 +198,8 @@ class AuthService:
         self.db.commit()
 
         # 產生 Token
-        version = self.user_token_version(user)
-        access_token = self.create_access_token(user.user_id, version)
-        refresh_token = self.create_refresh_token(user.user_id, version)
+        access_token = self.create_access_token(user.user_id)
+        refresh_token = self.create_refresh_token(user.user_id)
 
         return (
             TokenResponse(
@@ -242,13 +234,10 @@ class AuthService:
         user = self.get_user_by_id(user_id)
         if not user:
             return None, "使用者不存在"
-        if not self.version_matches(payload, user):
-            return None, "Token 已撤銷，請重新登入"
 
         # 產生新的 Token
-        version = self.user_token_version(user)
-        access_token = self.create_access_token(user.user_id, version)
-        new_refresh_token = self.create_refresh_token(user.user_id, version)
+        access_token = self.create_access_token(user.user_id)
+        new_refresh_token = self.create_refresh_token(user.user_id)
 
         return (
             TokenResponse(
@@ -259,7 +248,10 @@ class AuthService:
         )
 
     def authenticate(self, token: str) -> tuple[User | None, str | None]:
-        """驗證存取 Token，回傳 (使用者, scope)；無效、過期或已撤銷回傳 (None, None)."""
+        """驗證存取 Token，回傳 (使用者, scope)；無效、過期或已撤銷回傳 (None, None).
+
+        只有擴充 Token 會檢查 ver（extension_token_version）；網站 Token 照舊。
+        """
         payload = self.decode_token(token)
         if not payload or payload.get("type") != "access":
             return None, None
@@ -267,10 +259,18 @@ class AuthService:
         if not isinstance(user_id, str) or not user_id:
             return None, None
         user = self.get_user_by_id(user_id)
-        if not user or not self.version_matches(payload, user):
+        if not user:
             return None, None
         scope = payload.get("scope")
-        return user, scope if isinstance(scope, str) else None
+        if scope is None:
+            return user, None
+        if not isinstance(scope, str):
+            return None, None
+        if scope == EXTENSION_SCOPE and not self.extension_version_matches(
+            payload, user
+        ):
+            return None, None
+        return user, scope
 
     def get_current_user(self, token: str) -> User | None:
         """從 Token 取得當前使用者（不檢查 scope；scope 由 dependencies 把關）."""

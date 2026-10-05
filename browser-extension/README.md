@@ -39,7 +39,7 @@
 - 只有 `manifest.json` 的 `externally_connectable.matches` 列出的網站能交憑證；background 還會再檢查一次來源（`lib/config.js` 的 `TRUSTED_SITE_ORIGINS`，兩邊要一致）
 - 過期就視為登出，讀取時自動清掉；擴充「登出擴充」與網站登出都會清掉
 - 只能上傳（`scope=extension_upload`）：後端只有 popup 會呼叫的 4 個 `/sync/*` 上傳 API 接受，其他 API 一律 403；「存到」的帳號選項由網站跟憑證一起交過來
-- 伺服器端撤銷：網站登出會把使用者的 `token_version` +1，之前發出的擴充憑證立刻 401（popup 收到 401 會清掉本地憑證）
+- 伺服器端撤銷：網站登出會把使用者的 `extension_token_version` +1，之前發出的擴充憑證立刻 401（popup 收到 401 會清掉本地憑證）；網站自己在其他裝置的登入不受影響
 - 擴充沒有計時器、輪詢或自行發出的請求，背景程式只回應工具網站傳來的訊息；唯一的請求是 popup 按「上傳這一頁」時送到工具 API
 - 正式網域在 P0-12 部署定案後，加到 `externally_connectable.matches` 與 `TRUSTED_SITE_ORIGINS`
 

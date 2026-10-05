@@ -26,6 +26,24 @@ describe('popup.html', () => {
   });
 });
 
+describe('unrecognised page', () => {
+  const html = read('popup/popup.html');
+  const js = read('popup/popup.js');
+
+  it('shows the designer wording above the (disabled) upload button', () => {
+    const hint = html.match(/<p id="unsupported-hint"[^>]*>([^<]*)<\/p>/);
+    assert.ok(hint, 'hint line missing');
+    assert.equal(hint[1], '這一頁還不支援，請到集結點或村莊總覽再按');
+    assert.ok(html.indexOf('id="unsupported-hint"') < html.indexOf('id="sync-btn"'));
+    assert.match(html, /<button id="sync-btn"[^>]*\bdisabled\b/);
+  });
+
+  it('only shows the hint when the page has no friendly name', () => {
+    assert.match(js, /unsupportedHintEl\.classList\.toggle\('hidden', Boolean\(name\)\)/);
+    assert.match(js, /pageLineEl\.classList\.toggle\('hidden', !name\)/);
+  });
+});
+
 describe('popup.js', () => {
   const js = read('popup/popup.js');
 

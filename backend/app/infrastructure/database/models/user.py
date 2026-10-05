@@ -36,8 +36,9 @@ class User(Base):
     )
     last_login: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     preferences: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-    # 每次登出 +1；Token 裡的 ver 不等於這個值就視為已撤銷
-    token_version: Mapped[int] = mapped_column(
+    # 網站每次登出 +1；擴充 Token 裡的 ver 不等於這個值就視為已撤銷
+    # （只有擴充 Token 帶 ver；網站 access / refresh Token 不受影響）
+    extension_token_version: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
         default=0,

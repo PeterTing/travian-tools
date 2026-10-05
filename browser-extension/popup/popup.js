@@ -24,6 +24,7 @@ const expiryEl = document.getElementById('expiry');
 const accountSelect = document.getElementById('account-select');
 const pageLineEl = document.getElementById('page-line');
 const pageTypeEl = document.getElementById('page-type');
+const unsupportedHintEl = document.getElementById('unsupported-hint');
 const syncBtn = document.getElementById('sync-btn');
 const syncResultEl = document.getElementById('sync-result');
 const errorMessageEl = document.getElementById('error-message');
@@ -202,9 +203,11 @@ async function detectPage() {
   const result = await sendToContent('get_page_type');
   currentPageType = result.success ? result.page_type : null;
   const name = pageLabel(currentPageType);
-  // 有好懂的名稱才顯示，其餘（未知頁面、非遊戲頁面）不多顯示任何東西
+  // 有好懂的名稱才顯示「目前頁面」；認不出的頁面（含非遊戲頁面）改顯示
+  // 「這一頁還不支援…」，按鈕維持不能按
   pageTypeEl.textContent = name || '';
   pageLineEl.classList.toggle('hidden', !name);
+  unsupportedHintEl.classList.toggle('hidden', Boolean(name));
   refreshSyncButton();
 }
 

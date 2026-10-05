@@ -118,7 +118,7 @@ async def create_extension_token(current_user: CurrentUser) -> ExtensionTokenRes
     CurrentUser 已經擋掉擴充上傳 Token（403），所以擴充不能自己續期。
     """
     token, expires_at = AuthService.create_extension_token(
-        current_user.user_id, AuthService.user_token_version(current_user)
+        current_user.user_id, AuthService.user_extension_token_version(current_user)
     )
     expires_in = max(0, int((expires_at - datetime.now(UTC)).total_seconds()))
     return ExtensionTokenResponse(
@@ -133,13 +133,14 @@ async def create_extension_token(current_user: CurrentUser) -> ExtensionTokenRes
     "/logout",
     response_model=MessageResponse,
     summary="使用者登出",
-    description="登出並撤銷這個使用者先前發出的所有 Token（含擴充 Token）",
+    description="登出，並撤銷先前交給擴充的上傳 Token（網站 Token 不受影響）",
 )
 async def logout(current_user: CurrentUser, db: DBSession) -> MessageResponse:
     """使用者登出.
 
-    token_version +1：這個使用者先前發出的所有 Token（網站的 access / refresh
-    與交給擴充的上傳 Token）都會立刻失效（401）。
+    extension_token_version +1：先前交給擴充的上傳 Token 立刻失效（401）。
+    網站自己的 access / refresh Token 不受影響（其他裝置不會被登出；
+    「登出所有裝置」不在範圍內），前端照舊自行清除。
     """
-    AuthService(db).revoke_tokens(current_user)
+    AuthService(db).revoke_extension_tokens(current_user)
     return MessageResponse(message="登出成功")

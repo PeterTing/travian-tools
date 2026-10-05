@@ -1,4 +1,5 @@
 import api from './api'
+import { resendAccountsToExtension } from './extensionBridge'
 import type {
   GameAccount,
   GameAccountCreate,
@@ -6,12 +7,19 @@ import type {
   GameAccountUpdate,
 } from '@/types/game'
 
+/** 帳號清單變了（新增、修改、刪除）就把「存到」的選項重新交給擴充；失敗不影響操作 */
+function notifyExtension(): void {
+  resendAccountsToExtension().catch(() => undefined)
+}
+
 export const gameAccountApi = {
   /**
    * 建立遊戲帳號
    */
   create: async (data: GameAccountCreate): Promise<GameAccount> => {
     const response = await api.post<GameAccount>('/game-accounts', data)
+    // 帳號清單變了：擴充「存到」的選項也要更新
+    notifyExtension()
     return response.data
   },
 
@@ -44,6 +52,7 @@ export const gameAccountApi = {
       `/game-accounts/${accountId}`,
       data
     )
+    notifyExtension()
     return response.data
   },
 
@@ -52,6 +61,7 @@ export const gameAccountApi = {
    */
   delete: async (accountId: string): Promise<void> => {
     await api.delete(`/game-accounts/${accountId}`)
+    notifyExtension()
   },
 }
 

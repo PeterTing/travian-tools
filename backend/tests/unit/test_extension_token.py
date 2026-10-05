@@ -1,4 +1,4 @@
-"""擴充登入憑證：換發、只能上傳的 scope、登出撤銷（token_version）."""
+"""擴充登入憑證：換發、只能上傳的 scope、登出撤銷擴充 Token（extension_token_version）."""
 
 import importlib
 import pkgutil
@@ -34,7 +34,7 @@ class _FakeUser:
         self.user_id = "user-ext-1"
         self.username = "petert"
         self.email = "peter@example.com"
-        self.token_version = 0
+        self.extension_token_version = 0
 
 
 class _FakeQuery:
@@ -94,12 +94,14 @@ def _auth(token: str) -> dict[str, str]:
 
 
 def _ext(user: _FakeUser) -> str:
-    token, _ = AuthService.create_extension_token(user.user_id, user.token_version)
+    token, _ = AuthService.create_extension_token(
+        user.user_id, user.extension_token_version
+    )
     return token
 
 
 def _site(user: _FakeUser) -> str:
-    return AuthService.create_access_token(user.user_id, user.token_version)
+    return AuthService.create_access_token(user.user_id)
 
 
 @pytest.fixture
@@ -131,12 +133,16 @@ class TestCreateExtensionToken:
         assert before + ttl - timedelta(seconds=2) <= expires_at
         assert expires_at <= datetime.now(UTC) + ttl
 
-    def test_site_tokens_carry_version(self) -> None:
+    def test_site_tokens_have_no_version_or_scope(self) -> None:
+        """網站 access / refresh Token 維持原本格式（不帶 ver、不帶 scope）."""
         for token in (
-            AuthService.create_access_token("u1", 5),
-            AuthService.create_refresh_token("u1", 5),
+            AuthService.create_access_token("u1"),
+            AuthService.create_refresh_token("u1"),
         ):
-            assert AuthService.decode_token(token)["ver"] == 5  # type: ignore[index]
+            payload = AuthService.decode_token(token)
+            assert payload is not None
+            assert "ver" not in payload
+            assert "scope" not in payload
 
     def test_is_extension_token(self) -> None:
         ext, _ = AuthService.create_extension_token("u1")
@@ -164,7 +170,7 @@ class TestCreateExtensionToken:
     def test_site_token_mints_extension_token(
         self, client: TestClient, user: _FakeUser
     ) -> None:
-        user.token_version = 2
+        user.extension_token_version = 2
         resp = client.post("/api/v1/auth/extension-token", headers=_auth(_site(user)))
         assert resp.status_code == 200
         body = resp.json()
@@ -229,7 +235,7 @@ class TestUploadOnlyScope:
     def test_logout_403(self, client: TestClient, user: _FakeUser, db: _FakeDB) -> None:
         resp = client.post("/api/v1/auth/logout", headers=_auth(_ext(user)))
         assert resp.status_code == 403
-        assert user.token_version == 0
+        assert user.extension_token_version == 0
 
     def test_only_upload_routes_accept_extension_tokens(self) -> None:
         def uses(dep: Dependant, target: Any) -> bool:
@@ -269,77 +275,91 @@ class TestUploadOnlyScope:
 
 
 # --------------------------------------------------------------- revocation
-class TestLogoutRevokesTokens:
+class TestLogoutRevokesExtensionTokensOnly:
     def test_logout_rejects_earlier_extension_tokens(
         self, client: TestClient, user: _FakeUser, db: _FakeDB, fake_sync: None
     ) -> None:
         ext = _ext(user)
-        site = _site(user)
         body = {"account_id": "acc-1", "reports": []}
-        assert (
-            client.post(
-                "/api/v1/sync/reports", json=body, headers=_auth(ext)
-            ).status_code
-            == 200
-        )
+        ok = client.post("/api/v1/sync/reports", json=body, headers=_auth(ext))
+        assert ok.status_code == 200
 
-        resp = client.post("/api/v1/auth/logout", headers=_auth(site))
+        resp = client.post("/api/v1/auth/logout", headers=_auth(_site(user)))
         assert resp.status_code == 200
-        assert user.token_version == 1
+        assert user.extension_token_version == 1
         assert db.commits == 1
 
-        # 先前發出的擴充 Token 與網站 Token 都失效
-        assert (
-            client.post(
-                "/api/v1/sync/reports", json=body, headers=_auth(ext)
-            ).status_code
-            == 401
-        )
-        assert client.get("/api/v1/auth/me", headers=_auth(site)).status_code == 401
+        # 先前交給擴充的 Token 失效
+        old = client.post("/api/v1/sync/reports", json=body, headers=_auth(ext))
+        assert old.status_code == 401
 
-        # 重新登入後換發的新 Token 可用
-        fresh = _ext(user)
-        assert (
-            client.post(
-                "/api/v1/sync/reports", json=body, headers=_auth(fresh)
-            ).status_code
-            == 200
+        # 再次登入後換發的新擴充 Token 可用
+        fresh = client.post(
+            "/api/v1/sync/reports", json=body, headers=_auth(_ext(user))
         )
+        assert fresh.status_code == 200
 
-    def test_logout_revokes_refresh_token(
-        self, client: TestClient, user: _FakeUser
+    def test_other_device_site_tokens_survive_logout(
+        self, client: TestClient, user: _FakeUser, fake_sync: None
     ) -> None:
-        refresh = AuthService.create_refresh_token(user.user_id, user.token_version)
-        assert (
-            client.post("/api/v1/auth/logout", headers=_auth(_site(user))).status_code
-            == 200
-        )
-        resp = client.post("/api/v1/auth/refresh", json={"refresh_token": refresh})
-        assert resp.status_code == 401
+        """在「另一台裝置」登出前發出的網站 access / refresh Token 照常可用."""
+        other_access = AuthService.create_access_token(user.user_id)
+        other_refresh = AuthService.create_refresh_token(user.user_id)
 
-    def test_refresh_keeps_current_version(
-        self, client: TestClient, user: _FakeUser
-    ) -> None:
-        user.token_version = 4
-        refresh = AuthService.create_refresh_token(user.user_id, 4)
-        resp = client.post("/api/v1/auth/refresh", json={"refresh_token": refresh})
+        this_device = AuthService.create_access_token(user.user_id)
+        resp = client.post("/api/v1/auth/logout", headers=_auth(this_device))
         assert resp.status_code == 200
-        payload = AuthService.decode_token(resp.json()["access_token"])
-        assert payload is not None and payload["ver"] == 4
 
-    def test_tokens_without_version_count_as_zero(
+        me = client.get("/api/v1/auth/me", headers=_auth(other_access))
+        assert me.status_code == 200
+        upload = client.post(
+            "/api/v1/sync/reports",
+            json={"account_id": "acc-1", "reports": []},
+            headers=_auth(other_access),
+        )
+        assert upload.status_code == 200
+        refreshed = client.post(
+            "/api/v1/auth/refresh", json={"refresh_token": other_refresh}
+        )
+        assert refreshed.status_code == 200
+        assert (
+            client.get(
+                "/api/v1/auth/me", headers=_auth(refreshed.json()["access_token"])
+            ).status_code
+            == 200
+        )
+
+    def test_no_logout_all_devices_feature(self) -> None:
+        """「登出所有裝置」不在範圍內：沒有這種 API，網站 Token 也沒有版本可撤銷."""
+        paths = {path for path, _ in _api_routes()}
+        assert not any(re.search(r"logout[-_/]?all|revoke", p) for p in paths), paths
+        assert not hasattr(AuthService, "revoke_tokens")
+        from app.infrastructure.database.models.user import User
+
+        assert "token_version" not in User.__table__.columns
+        assert "extension_token_version" in User.__table__.columns
+
+    def test_extension_token_without_version_is_rejected(
         self, db: _FakeDB, user: _FakeUser
     ) -> None:
         legacy = jwt.encode(
             {
                 "sub": user.user_id,
                 "type": "access",
+                "scope": EXTENSION_SCOPE,
                 "exp": datetime.now(UTC) + timedelta(minutes=5),
             },
             settings.JWT_SECRET_KEY,
             algorithm=settings.JWT_ALGORITHM,
         )
+        assert AuthService(db).get_current_user(legacy) is None  # type: ignore[arg-type]
+
+    def test_revoke_extension_tokens_only_bumps_extension_version(
+        self, db: _FakeDB, user: _FakeUser
+    ) -> None:
         service = AuthService(db)  # type: ignore[arg-type]
-        assert service.get_current_user(legacy) is user
-        service.revoke_tokens(user)  # type: ignore[arg-type]
-        assert service.get_current_user(legacy) is None
+        site = AuthService.create_access_token(user.user_id)
+        ext = _ext(user)
+        assert service.revoke_extension_tokens(user) == 1  # type: ignore[arg-type]
+        assert service.get_current_user(site) is user
+        assert service.get_current_user(ext) is None

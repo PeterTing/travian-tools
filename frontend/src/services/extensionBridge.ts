@@ -128,6 +128,15 @@ export async function shareLoginWithExtension(): Promise<number> {
   }
 }
 
+/**
+ * 網站新增、修改或刪除遊戲帳號後呼叫：重新把「存到」的帳號清單交給擴充。
+ * 擴充只收完整憑證，所以這裡會一併換發新的擴充 Token（舊的到期就失效）。
+ * 沒裝擴充或沒設 ID 時什麼都不做；失敗不影響帳號操作。
+ */
+export function resendAccountsToExtension(): Promise<number> {
+  return shareLoginWithExtension()
+}
+
 /** 網站登出時呼叫：請擴充清掉憑證。 */
 export async function clearExtensionLogin(): Promise<void> {
   const runtime = getRuntime()
