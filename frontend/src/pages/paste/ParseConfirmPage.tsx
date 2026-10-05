@@ -38,7 +38,7 @@ export default function ParseConfirmPage() {
     nav.captureAt ? new Date(nav.captureAt) : new Date(),
   )
   const [askTimeDisplay, setAskTimeDisplay] = useState(false)
-  const [askUtcOffset, setAskUtcOffset] = useState(false)
+  const [worldUtcOffset, setWorldUtcOffset] = useState<number | null | undefined>(undefined)
   const [detectedBanner, setDetectedBanner] = useState('')
   const [villages, setVillages] = useState<VillagePick[]>([])
   const [villageId, setVillageId] = useState<string | null>(null)
@@ -118,11 +118,17 @@ export default function ParseConfirmPage() {
     let cancelled = false
     async function checkWorld() {
       try {
+        if (!account?.world_id) {
+          if (!cancelled) setWorldUtcOffset(undefined)
+          return
+        }
         const worlds = await gameWorldApi.getAll()
-        const world = worlds.worlds.find((w) => w.world_id === account?.world_id)
-        if (!cancelled) setAskUtcOffset(Boolean(account?.world_id) && world?.utc_offset == null)
+        const world = worlds.worlds.find((w) => w.world_id === account.world_id)
+        if (!cancelled) {
+          setWorldUtcOffset(world ? world.utc_offset : null)
+        }
       } catch {
-        if (!cancelled) setAskUtcOffset(false)
+        if (!cancelled) setWorldUtcOffset(undefined)
       }
     }
     void checkWorld()
@@ -243,7 +249,7 @@ export default function ParseConfirmPage() {
           onCaptureAtChange={setCaptureAt}
           saving={saving}
           askTimeDisplay={askTimeDisplay}
-          askUtcOffset={askUtcOffset}
+          worldUtcOffset={worldUtcOffset}
           onDiscard={() => navigate('/')}
           onSave={async (opts) => {
             setSaving(true)

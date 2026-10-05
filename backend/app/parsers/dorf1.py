@@ -9,6 +9,7 @@ from app.parsers.numbers import clean_number, parse_signed_int
 from app.parsers.village_list import (
     active_village,
     capital_village_id,
+    parse_page_population,
     parse_village_list,
 )
 
@@ -107,12 +108,13 @@ def parse_dorf1(html: str) -> dict:
     capital_id = capital_village_id(villages, html)
     resource_fields = parse_resource_fields(soup)
     village_id = active["village_id"] if active else None
+    population = (active["population"] if active else 0) or parse_page_population(soup)
     return {
         "village_id": village_id,
         "village_name": active["name"] if active else None,
         "coordinate_x": active["coordinate_x"] if active else None,
         "coordinate_y": active["coordinate_y"] if active else None,
-        "population": active["population"] if active else 0,
+        "population": population,
         "is_capital": bool(
             active
             and (

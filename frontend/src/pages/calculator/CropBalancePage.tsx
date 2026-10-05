@@ -267,6 +267,7 @@ export default function CropBalancePage() {
                   value={serverSpeed}
                   onChange={(e) => setServerSpeed(Number(e.target.value))}
                   className="w-full p-2 border rounded bg-background"
+                  data-testid="crop-server-speed"
                 >
                   <option value={1}>1x</option>
                   <option value={2}>2x</option>
@@ -274,6 +275,9 @@ export default function CropBalancePage() {
                   <option value={5}>5x</option>
                   <option value={10}>10x</option>
                 </select>
+                <p className="text-xs text-muted-foreground mt-1" data-testid="crop-server-speed-hint">
+                  {t('calculator.crop.serverSpeedHint')}
+                </p>
               </div>
             </div>
           </div>
@@ -410,12 +414,17 @@ export default function CropBalancePage() {
               </div>
 
               {/* Production */}
-              <div className="p-4 bg-green-50 dark:bg-green-950 rounded">
+              <div className="p-4 bg-green-50 dark:bg-green-950 rounded" data-testid="crop-production-result">
                 <h3 className="font-semibold text-green-800 dark:text-green-200 mb-3">
                   {t('calculator.crop.production')}
                 </h3>
                 <p className="text-2xl font-bold text-green-600">
                   {t('common.plusSymbol')}{result.crop_production.toLocaleString()}{t('common.perHour')}
+                </p>
+                <p className="text-sm text-muted-foreground mt-2" data-testid="hero-production-result">
+                  {t('calculator.crop.heroProductionResult')}:{' '}
+                  {result.hero_production.toLocaleString()}
+                  {t('common.perHour')}
                 </p>
               </div>
 
@@ -439,6 +448,14 @@ export default function CropBalancePage() {
                     </p>
                     <p className="text-xl font-bold">
                       {result.troop_consumption.toLocaleString()}{t('common.perHour')}
+                    </p>
+                  </div>
+                  <div className="col-span-2" data-testid="hero-consumption-result">
+                    <p className="text-sm text-muted-foreground">
+                      {t('calculator.crop.heroConsumptionResult')}
+                    </p>
+                    <p className="text-xl font-bold">
+                      {result.hero_consumption.toLocaleString()}{t('common.perHour')}
                     </p>
                   </div>
                 </div>

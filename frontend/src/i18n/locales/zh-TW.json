@@ -249,9 +249,32 @@
       "heroConsumptionHint": "英雄在村時通常為 6",
       "serverSpeed": "伺服器速度",
       "heroConsumptionResult": "英雄消耗",
-      "heroProductionResult": "英雄產量"
+      "heroProductionResult": "英雄產量",
+      "serverSpeedHint": "影響建造時間等公式；糧食產量請填遊戲裡已依伺服器速度顯示的數字，這裡不再另乘倍率。"
     },
-    "npc": {}
+    "npc": {
+      "title": "NPC 計算器",
+      "description": "將現有資源按指定比例重新分配（模擬 NPC 交易）。",
+      "currentResources": "當前資源",
+      "desiredRatio": "期望比例",
+      "capacityOptional": "容量上限（選填）",
+      "capacityHint": "NPC 分配不得超過倉庫／穀倉容量。",
+      "warehouseCapacity": "倉庫容量",
+      "granaryCapacity": "穀倉容量",
+      "warehousePlaceholder": "木／磚／鐵上限",
+      "granaryPlaceholder": "穀物上限",
+      "calculate": "計算 NPC 分配",
+      "calculating": "計算中...",
+      "results": "NPC 結果",
+      "totalResources": "總資源",
+      "unallocated": "因容量限制未分配：{{count}}",
+      "noResult": "輸入資源和比例後按「計算」",
+      "calcError": "計算失敗，請檢查輸入",
+      "wood": "木材",
+      "clay": "磚塊",
+      "iron": "鐵礦",
+      "crop": "穀物"
+    }
   },
   "tribes": {
     "romans": "羅馬",
@@ -330,7 +353,10 @@
     "save": "儲存",
     "saved": "已儲存",
     "saveError": "儲存失敗，請再試一次",
-    "empty": "新增遊戲帳號後，這裡會出現它所在的世界。"
+    "empty": "新增遊戲帳號後，這裡會出現它所在的世界。",
+    "summary": "伺服器時差 {{offset}}",
+    "change": "更改",
+    "collapse": "收合"
   },
   "gameAccounts": {
     "title": "遊戲帳號管理",
@@ -768,5 +794,20 @@
     "noAccountSelected": "請選擇遊戲帳號以執行健康檢查",
     "protectionDays": "新手保護天數",
     "protectionDaysHint": "依世界設定（x1 預設 5 天）"
-  }
+  },
+  "paste": {
+    "emptyRecognized": "認得出「{{page}}」，但沒有可存的資料。",
+    "emptyWhyRally": "這一頁只有駐軍／自軍，沒有來襲（攻擊／突襲／偵查）。",
+    "emptyWhyCenter": "村莊中心沒有拆出建築列表（純文字常常拆不出）。",
+    "emptyWhyOverview": "村莊總覽缺少村莊／資源／田地等可存欄位。",
+    "emptyWhyGeneric": "解析結果沒有足以存入的結構化資料。",
+    "emptyNextStep": "請到遊戲該頁按 Ctrl+U 看原始碼，再 Ctrl+A／Ctrl+C 貼到這裡，或用擴充上傳。",
+    "emptyTitle": "沒有可存的解析結果",
+    "homeEmptyFallback": "認得出頁面類型，但沒有可存的資料。請到遊戲該頁按 Ctrl+U 看原始碼，再 Ctrl+A／Ctrl+C 貼這裡，或用擴充上傳。",
+    "buildingsCount": "建築 {{count}} 座",
+    "buildingLevel": "Lv{{level}}",
+    "population": "人口 {{value}}",
+    "fieldsSummary": "田地 {{count}} 格"
+  },
+  "confirm": {}
 }

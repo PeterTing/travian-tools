@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
-import { looksLikeHtml, movementKindLabel, PASTE_FORMAT_HELP } from '@/lib/pasteFormat'
+import {
+  emptyPasteReasonKey,
+  looksLikeHtml,
+  movementKindLabel,
+  pageTypeLabel,
+  PASTE_FORMAT_HELP,
+} from '@/lib/pasteFormat'
 import { pasteApi, type Movement } from '@/services/pasteApi'
 
 function countdownLabel(arrivalAt: string | null | undefined, now: Date): string {
@@ -68,16 +74,19 @@ export default function HomePage() {
 
   const runParse = async (raw: string) => {
     if (!currentAccount) {
+      setSavedBanner('')
       setParseError('請先在頂部選擇遊戲帳號')
       return
     }
     const content = raw.trim()
     if (!content) {
+      setSavedBanner('')
       setParseError('請先貼上內容')
       return
     }
     setParsing(true)
     setParseError('')
+    setSavedBanner('')
     try {
       const kind = looksLikeHtml(content) ? 'html' : 'text'
       const result = await pasteApi.preview({
@@ -93,9 +102,10 @@ export default function HomePage() {
               '認不出這是哪一頁。可能只複製到一部分。請在遊戲裡全選後再複製一次，或手動選類型。',
           )
         } else {
+          const page = pageTypeLabel(result.page_type || 'unknown')
           setParseError(
             warn ||
-              '認得出頁面類型，但沒有解析到可存的資料。請改貼 HTML（檢視原始碼）或用擴充上傳。',
+              `${t('paste.emptyRecognized', { page })} ${t(emptyPasteReasonKey(result.page_type || 'unknown'))} ${t('paste.emptyNextStep')}`,
           )
         }
         return

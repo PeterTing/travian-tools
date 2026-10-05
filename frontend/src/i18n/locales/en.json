@@ -235,7 +235,31 @@
       "heroConsumptionHint": "Usually 6 while hero is in the village",
       "serverSpeed": "Server speed",
       "heroConsumptionResult": "Hero consumption",
-      "heroProductionResult": "Hero production"
+      "heroProductionResult": "Hero production",
+      "serverSpeedHint": "Affects build-time formulas; enter crop production as shown in-game (already scaled for server speed)—this field is not multiplied again."
+    },
+    "npc": {
+      "title": "NPC Calculator",
+      "description": "Redistribute current resources by a target ratio (simulates NPC trade).",
+      "currentResources": "Current resources",
+      "desiredRatio": "Desired ratio",
+      "capacityOptional": "Capacity limits (optional)",
+      "capacityHint": "NPC allocation cannot exceed warehouse / granary capacity.",
+      "warehouseCapacity": "Warehouse capacity",
+      "granaryCapacity": "Granary capacity",
+      "warehousePlaceholder": "Wood / clay / iron cap",
+      "granaryPlaceholder": "Crop cap",
+      "calculate": "Calculate NPC allocation",
+      "calculating": "Calculating...",
+      "results": "NPC result",
+      "totalResources": "Total resources",
+      "unallocated": "Unallocated due to capacity: {{count}}",
+      "noResult": "Enter resources and ratios, then calculate",
+      "calcError": "Calculation failed, please check inputs",
+      "wood": "Wood",
+      "clay": "Clay",
+      "iron": "Iron",
+      "crop": "Crop"
     }
   },
   "tribes": {
@@ -315,7 +339,10 @@
     "save": "Save",
     "saved": "Saved",
     "saveError": "Could not save, please try again",
-    "empty": "Worlds appear here after you add a game account."
+    "empty": "Worlds appear here after you add a game account.",
+    "summary": "Server offset {{offset}}",
+    "change": "Change",
+    "collapse": "Collapse"
   },
   "gameAccounts": {
     "title": "Game Account Management",
@@ -670,5 +697,19 @@
     "searchResultsCount": "Found {{count}} results",
     "clearSearch": "Clear Search",
     "showingFirst100": "Showing first 100 results only"
+  },
+  "paste": {
+    "emptyRecognized": "Recognized “{{page}}”, but there is nothing saveable.",
+    "emptyWhyRally": "This page only has garrison / own troops — no incoming (attack / raid / scout).",
+    "emptyWhyCenter": "Village center has no building list (plain text often cannot extract it).",
+    "emptyWhyOverview": "Village overview is missing village / resources / fields.",
+    "emptyWhyGeneric": "The parse result has no structured data worth saving.",
+    "emptyNextStep": "On that game page press Ctrl+U for view-source, then Ctrl+A / Ctrl+C and paste here, or use the extension upload.",
+    "emptyTitle": "Nothing to save",
+    "homeEmptyFallback": "Page type recognized, but nothing saveable. On the game page press Ctrl+U for view-source, then Ctrl+A / Ctrl+C and paste here, or use the extension upload.",
+    "buildingsCount": "{{count}} buildings",
+    "buildingLevel": "Lv{{level}}",
+    "population": "Pop {{value}}",
+    "fieldsSummary": "{{count}} fields"
   }
 }

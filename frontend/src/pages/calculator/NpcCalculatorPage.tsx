@@ -1,9 +1,21 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { NpcCalculatorRequest, NpcCalculatorResponse } from '@/services/advancedCalculatorApi'
 
+const RESOURCE_KEYS = ['wood', 'clay', 'iron', 'crop'] as const
+type ResourceKey = (typeof RESOURCE_KEYS)[number]
+
+const COLOR: Record<ResourceKey, string> = {
+  wood: 'text-amber-700 dark:text-amber-300',
+  clay: 'text-orange-700 dark:text-orange-300',
+  iron: 'text-slate-700 dark:text-slate-300',
+  crop: 'text-green-700 dark:text-green-300',
+}
+
 export default function NpcCalculatorPage() {
+  const { t } = useTranslation()
   const [form, setForm] = useState<NpcCalculatorRequest>({
     wood: 0,
     clay: 0,
@@ -17,7 +29,7 @@ export default function NpcCalculatorPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleResourceChange = (field: 'wood' | 'clay' | 'iron' | 'crop', value: number) => {
+  const handleResourceChange = (field: ResourceKey, value: number) => {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -35,52 +47,45 @@ export default function NpcCalculatorPage() {
       const res = await advancedCalculatorApi.calculateNpc(form)
       setResult(res)
     } catch {
-      setError('計算失敗，請檢查輸入')
+      setError(t('calculator.npc.calcError'))
     } finally {
       setLoading(false)
     }
   }
 
-  const resourceLabels = [
-    { key: 'wood', label: '木材', colorClass: 'text-amber-700 dark:text-amber-300' },
-    { key: 'clay', label: '磚塊', colorClass: 'text-orange-700 dark:text-orange-300' },
-    { key: 'iron', label: '鐵礦', colorClass: 'text-slate-700 dark:text-slate-300' },
-    { key: 'crop', label: '穀物', colorClass: 'text-green-700 dark:text-green-300' },
-  ] as const
-
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">NPC 計算器</h1>
-      <p className="text-muted-foreground mb-6">
-        將現有資源按指定比例重新分配（模擬 NPC 交易）。
-      </p>
+      <h1 className="text-3xl font-bold mb-6">{t('calculator.npc.title')}</h1>
+      <p className="text-muted-foreground mb-6">{t('calculator.npc.description')}</p>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Input */}
         <div className="border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">當前資源</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('calculator.npc.currentResources')}</h2>
           <div className="grid grid-cols-2 gap-4 mb-6">
-            {resourceLabels.map(({ key, label }) => (
+            {RESOURCE_KEYS.map((key) => (
               <div key={key}>
-                <label className="block text-sm font-medium mb-2">{label}</label>
+                <label className="block text-sm font-medium mb-2">
+                  {t(`calculator.npc.${key}`)}
+                </label>
                 <input
                   type="number"
                   min={0}
                   value={form[key]}
-                  onChange={(e) =>
-                    handleResourceChange(key, Number(e.target.value))
-                  }
+                  onChange={(e) => handleResourceChange(key, Number(e.target.value))}
                   className="w-full p-2 border rounded bg-background"
+                  data-testid={`npc-${key}`}
                 />
               </div>
             ))}
           </div>
 
-          <h2 className="text-xl font-semibold mb-4">期望比例</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('calculator.npc.desiredRatio')}</h2>
           <div className="grid grid-cols-4 gap-4 mb-6">
-            {resourceLabels.map(({ key, label }) => (
+            {RESOURCE_KEYS.map((key) => (
               <div key={key}>
-                <label className="block text-sm font-medium mb-2">{label}</label>
+                <label className="block text-sm font-medium mb-2">
+                  {t(`calculator.npc.${key}`)}
+                </label>
                 <input
                   type="number"
                   min={0}
@@ -88,18 +93,19 @@ export default function NpcCalculatorPage() {
                   value={form.desired_ratios[key] ?? 1}
                   onChange={(e) => handleRatioChange(key, Number(e.target.value))}
                   className="w-full p-2 border rounded bg-background"
+                  data-testid={`npc-ratio-${key}`}
                 />
               </div>
             ))}
           </div>
 
-          <h2 className="text-xl font-semibold mb-4">容量上限（選填）</h2>
-          <p className="text-xs text-muted-foreground mb-3">
-            NPC 分配不得超過倉庫／穀倉容量。
-          </p>
+          <h2 className="text-xl font-semibold mb-4">{t('calculator.npc.capacityOptional')}</h2>
+          <p className="text-xs text-muted-foreground mb-3">{t('calculator.npc.capacityHint')}</p>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <label className="block text-sm font-medium mb-2">倉庫容量</label>
+              <label className="block text-sm font-medium mb-2">
+                {t('calculator.npc.warehouseCapacity')}
+              </label>
               <input
                 type="number"
                 min={0}
@@ -111,11 +117,13 @@ export default function NpcCalculatorPage() {
                   }))
                 }
                 className="w-full p-2 border rounded bg-background"
-                placeholder="木／磚／鐵上限"
+                placeholder={t('calculator.npc.warehousePlaceholder')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">穀倉容量</label>
+              <label className="block text-sm font-medium mb-2">
+                {t('calculator.npc.granaryCapacity')}
+              </label>
               <input
                 type="number"
                 min={0}
@@ -127,40 +135,41 @@ export default function NpcCalculatorPage() {
                   }))
                 }
                 className="w-full p-2 border rounded bg-background"
-                placeholder="穀物上限"
+                placeholder={t('calculator.npc.granaryPlaceholder')}
               />
             </div>
           </div>
 
-          <Button onClick={handleCalculate} disabled={loading} className="w-full">
-            {loading ? '計算中...' : '計算 NPC 分配'}
+          <Button onClick={handleCalculate} disabled={loading} className="w-full" data-testid="npc-submit">
+            {loading ? t('calculator.npc.calculating') : t('calculator.npc.calculate')}
           </Button>
 
           {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
 
-        {/* Result */}
         <div className="border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">NPC 結果</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('calculator.npc.results')}</h2>
 
           {result ? (
-            <div className="space-y-4">
+            <div className="space-y-4" data-testid="npc-result">
               <div className="p-4 bg-muted rounded text-center">
-                <span className="text-sm text-muted-foreground">總資源</span>
-                <p className="text-2xl font-bold">
-                  {result.total_resources.toLocaleString()}
-                </p>
+                <span className="text-sm text-muted-foreground">
+                  {t('calculator.npc.totalResources')}
+                </span>
+                <p className="text-2xl font-bold">{result.total_resources.toLocaleString()}</p>
                 {(result.unallocated ?? 0) > 0 && (
                   <p className="text-sm text-amber-700 dark:text-amber-400 mt-2">
-                    因容量限制未分配：{result.unallocated?.toLocaleString()}
+                    {t('calculator.npc.unallocated', {
+                      count: result.unallocated ?? 0,
+                    })}
                   </p>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {resourceLabels.map(({ key, label, colorClass }) => (
+                {RESOURCE_KEYS.map((key) => (
                   <div key={key} className="p-3 border rounded">
-                    <span className={`text-sm ${colorClass}`}>{label}</span>
+                    <span className={`text-sm ${COLOR[key]}`}>{t(`calculator.npc.${key}`)}</span>
                     <p className="text-xl font-bold">
                       {(result.result[key] ?? 0).toLocaleString()}
                     </p>
@@ -181,9 +190,7 @@ export default function NpcCalculatorPage() {
               </div>
             </div>
           ) : (
-            <div className="text-center text-muted-foreground py-8">
-              輸入資源和比例後按「計算」
-            </div>
+            <div className="text-center text-muted-foreground py-8">{t('calculator.npc.noResult')}</div>
           )}
         </div>
       </div>

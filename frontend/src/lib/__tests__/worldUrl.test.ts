@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { describeServerUrl, formatUtcOffset, normalizeServerUrl, UTC_OFFSET_CHOICES } from '../worldUrl'
+import { describeServerUrl, formatUtcOffset, normalizeServerUrl, parseUtcOffsetDraft, UTC_OFFSET_CHOICES } from '../worldUrl'
 
 describe('normalizeServerUrl', () => {
   it.each([
@@ -42,5 +42,14 @@ describe('formatUtcOffset', () => {
     expect(Math.min(...UTC_OFFSET_CHOICES)).toBe(-720)
     expect(Math.max(...UTC_OFFSET_CHOICES)).toBe(840)
     expect(UTC_OFFSET_CHOICES.every((m) => m % 15 === 0)).toBe(true)
+  })
+})
+
+
+describe('parseUtcOffsetDraft', () => {
+  it('maps empty to null and numbers to minutes', () => {
+    expect(parseUtcOffsetDraft('')).toBeNull()
+    expect(parseUtcOffsetDraft('60')).toBe(60)
+    expect(parseUtcOffsetDraft('120')).toBe(120)
   })
 })

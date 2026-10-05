@@ -124,15 +124,16 @@ class CropBalanceRequest(BaseModel):
         0, ge=0, description="農田總產量/小時（不含英雄）"
     )
     oasis_bonus: float = Field(0, ge=0, description="糧食綠洲加成百分比")
+    # Hero crop numbers: S75 / S141
     hero_crop_production: int = Field(
         0,
         ge=0,
-        description="英雄糧食產量/小時（含資源點產出與固定 +6；S75/S141）",
+        description="英雄糧食產量/小時（含資源點產出與固定 +6）",
     )
     hero_crop_consumption: int = Field(
         0,
         ge=0,
-        description="英雄糧食消耗/小時（英雄在村時通常為 6；S75）",
+        description="英雄糧食消耗/小時（英雄在村時通常為 6）",
     )
     server_speed: float = Field(
         1.0, gt=0, description="伺服器速度倍率（產量已由呼叫端折算時可忽略）"

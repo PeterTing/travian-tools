@@ -82,3 +82,11 @@ export function formatUtcOffset(minutes: number): string {
   const rest = abs % 60
   return `UTC${sign}${hours}${rest ? `:${String(rest).padStart(2, '0')}` : ''}`
 }
+
+
+/** Parse draft string (minutes) for API; empty → null */
+export function parseUtcOffsetDraft(draft: string): number | null {
+  if (draft === '') return null
+  const n = Number(draft)
+  return Number.isFinite(n) ? n : null
+}

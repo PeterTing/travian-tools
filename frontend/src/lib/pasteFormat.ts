@@ -183,3 +183,18 @@ export function parseResultIsSaveable(
     return true
   })
 }
+
+
+/** i18n key for why a recognized page has nothing to save */
+export function emptyPasteReasonKey(pageType: string): string {
+  switch (pageType) {
+    case 'rally_point':
+      return 'paste.emptyWhyRally'
+    case 'village_center':
+      return 'paste.emptyWhyCenter'
+    case 'village_overview':
+      return 'paste.emptyWhyOverview'
+    default:
+      return 'paste.emptyWhyGeneric'
+  }
+}
