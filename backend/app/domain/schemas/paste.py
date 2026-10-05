@@ -56,6 +56,7 @@ class ConfirmRequest(BaseModel):
     capture_at: datetime | None = None
     server_time: str | None = None
     source: str = "paste"
+    village_id: str | None = None
     # 選填：第一次貼上時一併寫入
     time_display: str | None = None
     local_timezone: str | None = None

@@ -197,10 +197,28 @@ class PasteService:
         capture_at: datetime | None,
         source: str,
         server_time: str | None,
+        village_id: str | None = None,
     ) -> dict[str, Any]:
         account = self._get_account(user_id, account_id)
         if account is None:
             return {"success": False, "message": "找不到遊戲帳號或無權限"}
+
+        resolved_village_id = village_id or data.get("village_id")
+        if resolved_village_id:
+            from app.infrastructure.database.models.village import Village
+
+            village = (
+                self.db.query(Village)
+                .filter(
+                    Village.village_id == resolved_village_id,
+                    Village.account_id == account_id,
+                )
+                .first()
+            )
+            if village is None:
+                return {"success": False, "message": "找不到選定的村莊"}
+        else:
+            resolved_village_id = None
 
         captured = capture_at or _utcnow()
         movements_in = list(data.get("movements") or [])
@@ -292,6 +310,7 @@ class PasteService:
                     "troops_json": {"troops": movement.get("troops") or []},
                     "source": source,
                     "raw_excerpt": movement.get("headline"),
+                    "village_id": resolved_village_id,
                 }
                 if i < m:
                     row = old_rows[i]
@@ -314,6 +333,7 @@ class PasteService:
             "updated": updated,
             "total": created + updated,
             "movement_ids": saved_ids,
+            "village_id": resolved_village_id,
         }
 
     def confirm_from_draft(
@@ -363,6 +383,7 @@ class PasteService:
                 capture_at=capture_at,
                 source=source,
                 server_time=server_time,
+                village_id=data.get("village_id") if isinstance(data, dict) else None,
             )
 
         # village_overview / village_center: reuse SyncService shapes

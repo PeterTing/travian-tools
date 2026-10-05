@@ -124,6 +124,10 @@ def confirm_paste(
                 GameWorldUpdate(utc_offset=data.utc_offset),
             )
 
+    payload = dict(data.data or {})
+    if data.village_id:
+        payload["village_id"] = data.village_id
+
     service = PasteService(db)
     if data.draft_id:
         result = service.confirm_from_draft(
@@ -131,14 +135,14 @@ def confirm_paste(
             draft_id=data.draft_id,
             capture_at=data.capture_at,
             page_type_override=data.page_type,
-            parsed_override=data.data,
+            parsed_override=payload,
         )
     else:
         result = service.confirm_parsed(
             current_user.user_id,
             account_id=data.account_id,
             page_type=data.page_type,
-            data=data.data,
+            data=payload,
             capture_at=data.capture_at,
             source=data.source,
             server_time=data.server_time,

@@ -60,3 +60,76 @@ export function nearMidnight(d: Date = new Date()): boolean {
   const minutes = d.getHours() * 60 + d.getMinutes()
   return minutes >= 23 * 60 + 30 || minutes < 30
 }
+
+
+/** 確認畫面要不要顯示「村莊」列（線框：集結點有；多村總覽／戰報沒有單村選擇） */
+export function pageNeedsVillageSelector(pageType: string): boolean {
+  return pageType === 'rally_point' || pageType === 'village_center'
+}
+
+export interface VillagePick {
+  village_id: string
+  name: string
+  coordinate_x: number
+  coordinate_y: number
+  is_capital?: boolean
+}
+
+/** 預設村莊：解析結果指定 > 座標／名稱對上 > 首都 > 名單第一個 */
+export function pickDefaultVillageId(
+  villages: VillagePick[],
+  data?: Record<string, unknown> | null,
+): string | null {
+  if (!villages.length) return null
+  const byId = data?.village_id
+  if (typeof byId === 'string' && villages.some((v) => v.village_id === byId)) {
+    return byId
+  }
+  const name = data?.village_name
+  if (typeof name === 'string') {
+    const hit = villages.find((v) => v.name === name)
+    if (hit) return hit.village_id
+  }
+  const x = data?.coordinate_x
+  const y = data?.coordinate_y
+  if (typeof x === 'number' && typeof y === 'number') {
+    const hit = villages.find((v) => v.coordinate_x === x && v.coordinate_y === y)
+    if (hit) return hit.village_id
+  }
+  const capital = villages.find((v) => v.is_capital)
+  if (capital) return capital.village_id
+  return villages[0].village_id
+}
+
+export function formatVillageLabel(v: {
+  name: string
+  coordinate_x: number
+  coordinate_y: number
+}): string {
+  const y = v.coordinate_y < 0 ? `−${Math.abs(v.coordinate_y)}` : String(v.coordinate_y)
+  return `${v.name} (${v.coordinate_x}|${y})`
+}
+
+/** 線框擷取時間：MM/DD HH:MM（24 小時） */
+export function formatCaptureShort(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+/** 解析 MM/DD HH:MM；年沿用 base 的年。失敗回 null */
+export function parseCaptureShort(text: string, base: Date): Date | null {
+  const m = text.trim().match(/^(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})$/)
+  if (!m) return null
+  const month = Number(m[1])
+  const day = Number(m[2])
+  const hour = Number(m[3])
+  const minute = Number(m[4])
+  if (month < 1 || month > 12 || day < 1 || day > 31 || hour > 23 || minute > 59) {
+    return null
+  }
+  const next = new Date(base)
+  next.setMonth(month - 1, day)
+  next.setHours(hour, minute, 0, 0)
+  if (Number.isNaN(next.getTime())) return null
+  return next
+}

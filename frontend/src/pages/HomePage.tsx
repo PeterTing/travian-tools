@@ -193,14 +193,14 @@ export default function HomePage() {
             <Button
               variant="outline"
               disabled
-              title="截圖辨識是 P0-07"
+              title="即將推出"
               data-testid="upload-screenshot-btn"
             >
-              上傳截圖
+              上傳截圖（即將推出）
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            截圖辨識還在做（P0-07）。按鈕讀不到剪貼簿時，直接長按上面的框貼上也可以。
+            截圖辨識即將推出，現在請用貼上或擴充。按鈕讀不到剪貼簿時，直接長按上面的框貼上也可以。
             {clipboardFailed ? ' （剛才讀剪貼簿失敗，請改用輸入框）' : ''}
           </p>
           <details className="text-xs text-muted-foreground">

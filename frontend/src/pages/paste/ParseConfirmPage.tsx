@@ -1,11 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ParseConfirmPanel, type ConfirmState } from '@/components/paste/ParseConfirmPanel'
 import { Button } from '@/components/ui/button'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
-import { pageTypeLabel } from '@/lib/pasteFormat'
+import {
+  pageNeedsVillageSelector,
+  pageTypeLabel,
+  pickDefaultVillageId,
+  type VillagePick,
+} from '@/lib/pasteFormat'
 import { pasteApi, type ParsePreviewResponse } from '@/services/pasteApi'
 import { gameWorldApi } from '@/services/gameWorldApi'
+import { villageApi } from '@/services/villageApi'
 
 interface NavState {
   preview?: ParsePreviewResponse
@@ -34,6 +40,12 @@ export default function ParseConfirmPage() {
   const [askTimeDisplay, setAskTimeDisplay] = useState(false)
   const [askUtcOffset, setAskUtcOffset] = useState(false)
   const [detectedBanner, setDetectedBanner] = useState('')
+  const [villages, setVillages] = useState<VillagePick[]>([])
+  const [villageId, setVillageId] = useState<string | null>(null)
+
+  const onVillageIdChange = useCallback((id: string | null) => {
+    setVillageId(id)
+  }, [])
 
   const account = useMemo(() => {
     const id = nav.accountId || confirm?.data?.account_id
@@ -119,6 +131,46 @@ export default function ParseConfirmPage() {
     }
   }, [account])
 
+  useEffect(() => {
+    if (!account || !confirm) return
+    if (!pageNeedsVillageSelector(confirm.pageType) && !pageNeedsVillageSelector(manualType)) {
+      setVillages([])
+      return
+    }
+    let cancelled = false
+    async function loadVillages() {
+      try {
+        const res = await villageApi.getAll(account!.account_id)
+        if (cancelled) return
+        const rows: VillagePick[] = res.villages
+          .filter(
+            (v) =>
+              typeof v.name === 'string' &&
+              typeof v.coordinate_x === 'number' &&
+              typeof v.coordinate_y === 'number',
+          )
+          .map((v) => ({
+            village_id: v.village_id,
+            name: v.name as string,
+            coordinate_x: v.coordinate_x as number,
+            coordinate_y: v.coordinate_y as number,
+            is_capital: v.is_capital,
+          }))
+        setVillages(rows)
+        setVillageId((prev) => {
+          if (prev && rows.some((r) => r.village_id === prev)) return prev
+          return pickDefaultVillageId(rows, confirm!.data)
+        })
+      } catch {
+        if (!cancelled) setVillages([])
+      }
+    }
+    void loadVillages()
+    return () => {
+      cancelled = true
+    }
+  }, [account, confirm, manualType])
+
   if (loading) {
     return <div className="container mx-auto px-4 py-10 text-center">載入中…</div>
   }
@@ -137,7 +189,7 @@ export default function ParseConfirmPage() {
   const showTypePicker = confirm.pageType === 'unknown' || Boolean(nav.unknown)
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-lg space-y-4">
+    <div className="container mx-auto px-4 py-6 max-w-lg space-y-4 overflow-x-hidden">
       <div className="flex items-center gap-2 text-sm">
         <Link to="/" className="text-muted-foreground hover:underline">
           ‹ 回首頁
@@ -184,6 +236,9 @@ export default function ParseConfirmPage() {
         <ParseConfirmPanel
           account={account}
           state={confirm}
+          villages={villages}
+          villageId={villageId}
+          onVillageIdChange={onVillageIdChange}
           captureAt={captureAt}
           onCaptureAtChange={setCaptureAt}
           saving={saving}
@@ -193,14 +248,19 @@ export default function ParseConfirmPage() {
           onSave={async (opts) => {
             setSaving(true)
             try {
+              const data = { ...confirm.data }
+              if (opts.villageId) {
+                data.village_id = opts.villageId
+              }
               const result = await pasteApi.confirm({
                 account_id: account.account_id,
                 page_type: confirm.pageType,
-                data: confirm.data,
+                data,
                 draft_id: confirm.draftId,
                 capture_at: captureAt.toISOString(),
                 server_time: confirm.serverTime,
                 source: confirm.source,
+                village_id: opts.villageId ?? null,
                 time_display: opts.timeDisplay,
                 local_timezone: opts.localTimezone,
                 utc_offset: opts.utcOffset,

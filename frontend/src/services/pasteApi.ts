@@ -33,6 +33,7 @@ export interface ConfirmRequest {
   capture_at?: string | null
   server_time?: string | null
   source?: string
+  village_id?: string | null
   time_display?: string | null
   local_timezone?: string | null
   utc_offset?: number | null

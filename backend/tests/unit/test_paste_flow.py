@@ -208,3 +208,84 @@ def test_draft_then_confirm(client: TestClient) -> None:
         },
     )
     assert confirm.status_code == 200, confirm.text
+
+
+def test_rally_confirm_saves_village_id(client: TestClient) -> None:
+    account_id = _account(client)
+    village = client.post(
+        "/api/v1/villages",
+        json={
+            "account_id": account_id,
+            "name": "主村",
+            "coordinate_x": 10,
+            "coordinate_y": -3,
+            "is_capital": True,
+        },
+    )
+    assert village.status_code == 201, village.text
+    village_id = village.json()["village_id"]
+
+    other = client.post(
+        "/api/v1/villages",
+        json={
+            "account_id": account_id,
+            "name": "二村",
+            "coordinate_x": 12,
+            "coordinate_y": -1,
+            "is_capital": False,
+        },
+    )
+    assert other.status_code == 201, other.text
+
+    payload = {
+        "account_id": account_id,
+        "page_type": "rally_point",
+        "source": "paste",
+        "village_id": village_id,
+        "server_time": "10:00:00",
+        "capture_at": "2026-10-05T10:00:00",
+        "data": {
+            "server_time": "10:00:00",
+            "incoming": [
+                {
+                    "kind": "incoming_raid",
+                    "role": "EnemyA",
+                    "headline": "EnemyA 搶奪 主村",
+                    "coordinate_x": 1,
+                    "coordinate_y": 2,
+                    "timer_seconds": 3600,
+                    "arrival_time": "11:00:00",
+                    "troops": [],
+                }
+            ],
+            "movements": [],
+        },
+    }
+    resp = client.post("/api/v1/paste/confirm", json=payload)
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["village_id"] == village_id
+    assert body["created"] == 1
+
+    listed = client.get(f"/api/v1/movements?account_id={account_id}")
+    assert listed.status_code == 200
+    assert listed.json()["total"] == 1
+
+    # wrong village_id rejected
+    bad = dict(payload)
+    bad["village_id"] = "not-a-village"
+    bad["data"] = dict(payload["data"])
+    bad["data"]["incoming"] = [
+        {
+            "kind": "incoming_attack",
+            "role": "EnemyZ",
+            "headline": "EnemyZ 攻擊 主村",
+            "coordinate_x": 5,
+            "coordinate_y": 5,
+            "timer_seconds": 100,
+            "arrival_time": "10:01:40",
+            "troops": [],
+        }
+    ]
+    reject = client.post("/api/v1/paste/confirm", json=bad)
+    assert reject.status_code == 403
