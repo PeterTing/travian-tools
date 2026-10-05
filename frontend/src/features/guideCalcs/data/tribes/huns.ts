@@ -1,0 +1,107 @@
+import type { Tribe } from '../tribes-types';
+
+export const huns: Tribe = {
+  id: 'huns',
+  name: { zh: '匈奴', en: 'Huns' },
+  archetype: { zh: '騎兵 / 遠征型', en: 'Cavalry / Long-range' },
+  difficulty: 3,
+  color: 'var(--tribe-huns)',
+  icon: '🐴',
+  tagline: {
+    zh: '騎兵王者 · 指揮中心取代行宮',
+    en: 'Cavalry nation · Command Center replaces Residence',
+  },
+  summary: {
+    zh: '游牧騎兵族：Steppe Rider 速度 16 + 攻擊 120，Marauder 攻擊 180 是高遊速 OFF 騎兵；指揮中心（Command Center）取代行宮 / 皇宮，專為遠距離作戰設計。早期騎兵 farm 超強。',
+    en: 'Nomadic cavalry tribe. Steppe Rider: speed 16 + atk 120. Marauder: atk 180 fast offensive cavalry. Command Center replaces Residence/Palace, purpose-built for long-range operations. Early cavalry farming dominates.',
+  },
+
+  heroPassive: {
+    zh: '純騎兵軍隊 +3 格/小時（騎兵限定速度光環；隨伺服器速度縮放）',
+    en: '+3 fields/hr to armies containing only mounted units (cavalry-only speed aura; scales with server speed)',
+  },
+
+  specials: [
+    { zh: '指揮中心（Command Center）：匈奴獨有，取代行宮 / 皇宮', en: 'Command Center: Hun-exclusive, replaces Residence/Palace' },
+    { zh: 'Makeshift Wall：每級 +1.5% 防禦（最弱牆）', en: 'Makeshift Wall: +1.5% defense per level (weakest wall)' },
+    { zh: '大部分 OFF 單位都是騎兵', en: 'Most OFF units are cavalry' },
+  ],
+
+  strengths: [
+    { zh: 'Steppe Rider 早期 farm 速度 16 + 45 carry 最高效', en: 'Steppe Rider early farming at speed 16 is extremely efficient' },
+    { zh: 'Marauder 180 攻擊 + 速度 14 = 快速 OP 突破', en: 'Marauder: 180 atk + speed 14 = fast OP breakthroughs' },
+    { zh: '指揮中心使遠征更有效率（移動速度加成）', en: 'Command Center boosts long-distance operations' },
+  ],
+
+  weaknesses: [
+    { zh: 'Makeshift Wall 防禦最弱', en: 'Makeshift Wall has weakest defense bonus' },
+    { zh: '缺少 strong def 步兵', en: 'No strong defensive infantry' },
+    { zh: '騎兵 upkeep 重', en: 'Heavy cavalry upkeep' },
+  ],
+
+  wallType: { name: { zh: '臨時的墻 (Makeshift Wall)', en: 'Makeshift Wall' }, bonusPerLevel: 0.015 },
+  merchant: { capacity: 500, speed: 20 },
+  defenseMix: { zh: '50% Mercenary / 50% Marksman', en: '50% Mercenary / 50% Marksman' },
+
+  units: [
+    { id: 'mercenary', category: 'infantry',
+      name: { zh: '僱傭兵', en: 'Mercenary' },
+      attack: 35, defInfantry: 40, defCavalry: 30, speed: 6, carry: 50, upkeep: 1,
+      cost: { wood: 130, clay: 80, iron: 40, crop: 40 }, trainTime: 810,
+      role: { zh: '便宜的全能步兵', en: 'Cheap all-round infantry' } },
+    { id: 'bowman', category: 'infantry',
+      name: { zh: '弓箭手', en: 'Bowman' },
+      attack: 50, defInfantry: 30, defCavalry: 10, speed: 6, carry: 30, upkeep: 1,
+      cost: { wood: 140, clay: 110, iron: 60, crop: 60 }, trainTime: 1120,
+      role: { zh: '攻擊步兵', en: 'Attacking infantry' } },
+    { id: 'spotter', category: 'scout',
+      name: { zh: '探子', en: 'Spotter' },
+      attack: 0, defInfantry: 20, defCavalry: 10, speed: 19, carry: 0, upkeep: 2,
+      cost: { wood: 170, clay: 150, iron: 20, crop: 40 }, trainTime: 1360,
+      role: { zh: '全遊戲最快偵察（速度 19）', en: 'Fastest scout in the game (speed 19)' } },
+    { id: 'steppeRider', category: 'cavalry',
+      name: { zh: '草原騎士', en: 'Steppe Rider' },
+      attack: 120, defInfantry: 30, defCavalry: 15, speed: 16, carry: 75, upkeep: 2,
+      cost: { wood: 290, clay: 370, iron: 190, crop: 45 }, trainTime: 2400,
+      role: { zh: '早期 farm 王者 / 中期 OFF', en: 'Early farming king / mid-game offensive' } },
+    { id: 'marksman', category: 'cavalry',
+      name: { zh: '神射手', en: 'Marksman' },
+      attack: 110, defInfantry: 80, defCavalry: 70, speed: 15, carry: 105, upkeep: 2,
+      cost: { wood: 320, clay: 350, iron: 330, crop: 50 }, trainTime: 2480,
+      role: { zh: '全能騎兵（攻防兼備）', en: 'All-round cavalry (atk + def)' } },
+    { id: 'marauder', category: 'cavalry',
+      name: { zh: '掠奪者', en: 'Marauder' },
+      attack: 180, defInfantry: 60, defCavalry: 40, speed: 14, carry: 80, upkeep: 3,
+      cost: { wood: 450, clay: 560, iron: 610, crop: 140 }, trainTime: 2990,
+      role: { zh: '主力 OFF 騎兵（攻擊 180）', en: 'Main OFF cavalry (180 attack)' } },
+    { id: 'ram', category: 'siege',
+      name: { zh: '破城槌', en: 'Ram' },
+      attack: 65, defInfantry: 30, defCavalry: 90, speed: 4, carry: 0, upkeep: 3,
+      cost: { wood: 1060, clay: 330, iron: 360, crop: 70 }, trainTime: 4400,
+      role: { zh: '破牆', en: 'Wall breaker' } },
+    { id: 'catapult', category: 'siege',
+      name: { zh: '弩炮', en: 'Catapult' },
+      attack: 45, defInfantry: 55, defCavalry: 10, speed: 3, carry: 0, upkeep: 6,
+      cost: { wood: 950, clay: 1280, iron: 620, crop: 60 }, trainTime: 9000,
+      role: { zh: '摧毀建築', en: 'Destroys buildings' } },
+    { id: 'logades', category: 'chief',
+      name: { zh: '重步兵', en: '重步兵' },
+      attack: 50, defInfantry: 40, defCavalry: 30, speed: 5, carry: 0, upkeep: 4,
+      cost: { wood: 37200, clay: 27600, iron: 25200, crop: 27600 }, trainTime: 90700,
+      role: { zh: '降忠誠 / 征服', en: 'Reduces loyalty, conquers' } },
+    { id: 'settler', category: 'settler',
+      name: { zh: '開拓者', en: 'Settler' },
+      attack: 10, defInfantry: 80, defCavalry: 80, speed: 5, carry: 3000, upkeep: 1,
+      cost: { wood: 6100, clay: 4600, iron: 4800, crop: 5400 }, trainTime: 28950,
+      role: { zh: '建立新村莊', en: 'Establishes new villages' } },
+  ],
+
+  offTips: [
+    { zh: '早期錘子：純 Steppe Rider 或混 Marksman（速度相同）', en: 'Early hammer: pure Steppe Rider or mix with Marksman (same speed 16)' },
+    { zh: '主力錘子 Day 70+：Marauder + ram + cata', en: 'Late hammer: Marauder + rams + catas' },
+  ],
+  defTips: [
+    { zh: '鐵砧：Mercenary + Marksman（均衡）', en: 'Anvil: Mercenary + Marksman (balanced)' },
+    { zh: 'Makeshift Wall 最弱，依賴 Command Center + 部隊 def', en: 'Rely on Command Center + troop def; Makeshift Wall is weakest' },
+  ],
+};

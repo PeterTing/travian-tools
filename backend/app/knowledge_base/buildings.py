@@ -396,7 +396,7 @@ BUILDINGS_DATA = {
         "max_level": 20,
         "description": "增加部隊20格以外的移動速度",
         "requirements": ["集結點 15級"],
-        "speed_bonus": "每級+10%速度（超過20格的距離）",
+        "speed_bonus": "每級+20%速度（僅超過20格的距離加速；S71）",
     },
     "cranny": {
         "name_zh": "密藏室",

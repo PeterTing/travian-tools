@@ -14,7 +14,7 @@
 
 | 分期 | 票數 | 完成 | 估計 |
 |---|---|---|---|
-| P0 | 12 | 9（P0-01～04、P0-05、P0-06、P0-08、P0-10、P0-11） | 14 到 17 人天，截圖辨識另計 |
+| P0 | 12 | 9（P0-01～04、P0-05、P0-06、P0-08、P0-10、P0-11）＋P0-09 審核中 | 14 到 17 人天，截圖辨識另計 |
 | P1 | 8 | 0 | 15 到 20 人天 |
 | P2 | 5 | 0 | P1 完成後再估 |
 
@@ -86,7 +86,7 @@
   - 做完後（P0-03 多村總覽、P0-05 首頁貼上都完成時）：村莊列表的更新提示改回線框的寫法「要更新請到首頁貼上多村總覽」（現在是「要更新請到遊戲的村莊總覽，按擴充上傳。」，空狀態那句也一起改；`frontend/src/i18n/locales/*.json` 的 `villages.list.howToUpdate`、`villages.list.emptyHint`）
   - 擴充可以上傳集結點後：popup 兩句提示都改回提到集結點（「這一頁還不支援，請到村莊總覽再按」改成同時提到集結點與村莊總覽），並拿掉「集結點的上傳還在做，目前請到村莊總覽再按」（`browser-extension/lib/pages.js` 的 `UPLOAD_HINTS`）
 
-### P0-06 最簡單的來襲列表 🔄 審核中（[PR #17](https://github.com/PeterTing/travian-tools/pull/17)）
+### P0-06 最簡單的來襲列表 ✅（[#17](https://github.com/PeterTing/travian-tools/pull/17)，merge `4da35e85`）
 - 本 PR（#12／P0-05 併入）**已完成**：
   - [x] 首頁來襲列表：依抵達時間排序、倒數每秒更新
   - [x] 待補座標標黃，可點進去補座標
@@ -96,7 +96,7 @@
   - [x] 首頁「最近上傳」列表（線框①下方）：類型 · 摘要＋相對時間；成功上傳寫入 `sync_logs`（含 `RALLY_POINT`）
   - [x] 來襲列表依選定村莊篩選／只顯示該村（預設全部；選擇按帳號＋世界存 localStorage）
   - [x] 確認前「新增 N · 更新 M」改由後端 `POST /paste/preview-diff` 計算（與 confirm 同一去重邏輯，不寫入）
-- 進度：🔄 審核中（[PR #17](https://github.com/PeterTing/travian-tools/pull/17)）
+- 進度：✅ 已 merge（[#17](https://github.com/PeterTing/travian-tools/pull/17)，`4da35e85`）
 
 ### P0-07 截圖辨識：集結點與座標欄位 ⬜（RapidOCR 自架，含收集手機截圖）
 - 驗收：
@@ -109,8 +109,9 @@
 ### P0-08 `map.sql` 匯入 ✅（併在 P0-01）
 - 驗收：名字含單引號的村莊不會漏；部族與首都讀對欄位；可手動上傳 `.sql`／`.gz`
 
-### P0-09 計算器 ⬜（1.5 到 2 天）
+### P0-09 計算器 🔄 審核中（1.5 到 2 天）
 - 驗收：搬入 travian-guide 的 8 個計算器與測試；建造順序用 guide 的版本；競技場加速全專案統一（只有超過 20 格的距離加速，每級 +20%）
+- 進度：🔄 審核中（本 PR）
 
 ### P0-10 開局攻略清單 ✅
 - PR：[#15](https://github.com/PeterTing/travian-tools/pull/15)（已 merge，merge commit `f5bed0ec`）
@@ -173,6 +174,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-05 | v2.0.20 | P0-09 計算器送審：搬入 travian-guide 8 個計算器＋測試；建造順序／ROI／文明點以 guide 為準（舊頁 redirect）；移動時間改即時 sticky；競技場公式前後端共用（>20 格、每級 +20%）；列表頁加搜尋；P0-06（#17，`4da35e85`）已 merge |
 | 2026-10-05 | v2.0.19 | P0-06 其餘項送審（[PR #17](https://github.com/PeterTing/travian-tools/pull/17)）：首頁「最近上傳」（類型 · 摘要＋相對時間）、來襲依村莊篩選（沿用村莊列表 chip 下拉）、`POST /paste/preview-diff` 回傳「新增 N · 更新 M」且等於 confirm；sync_logs 加 `RALLY_POINT`；P0-11（#16，`1cd0be37`）已 merge |
 | 2026-10-05 | v2.0.15 | P0-05 標為完成（[#12](https://github.com/PeterTing/travian-tools/pull/12)，merge `9c7c8fa5`） |
 | 2026-10-05 | v2.0.16 | P0-10 起手式清單送審（[PR #15](https://github.com/PeterTing/travian-tools/pull/15)）：4P 農開／3P 兵開、部族只換拓荒者花費與打野兵、依任務等級分段、進度按帳號 × 世界 × 攻略存；主進度只算必做（4P 86 步、3P 82 步），「選做：便宜的文明點建築」15 步另外顯示完成數；導覽「策略」改「攻略」，只放起手式 |

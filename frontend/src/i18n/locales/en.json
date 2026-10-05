@@ -583,7 +583,7 @@
       "development": "Development"
     },
     "calcs": {
-      "path": "Path Calculator",
+      "path": "Travel Time",
       "interception": "Interception Calculator",
       "saveTroops": "Troop Evasion Calculator",
       "pathSpeedTs": "TS Reverse Calculator",
@@ -592,7 +592,15 @@
       "culturePoints": "Culture Points Calculator",
       "npc": "NPC Calculator",
       "technology": "Technology Calculator",
-      "cropScouter": "Capital Type Finder"
+      "cropScouter": "Capital Type Finder",
+      "launchSim": "Launch Simulator",
+      "buildOrder": "Build Order",
+      "passiveCp": "Culture Points",
+      "fieldRoi": "Field ROI",
+      "oasisRoi": "Oasis ROI",
+      "cropSim": "Crop Simulator",
+      "farming": "Farming Yield",
+      "tradeRoute": "Trade Route"
     },
     "stats": {
       "overview": "Server Overview",
@@ -609,7 +617,10 @@
       "signedInAs": "Signed in as {{name}}"
     },
     "calculatorsPage": {
-      "title": "Calculators"
+      "title": "Calculators",
+      "search": "Search calculators",
+      "searchPlaceholder": "Search calculators…",
+      "noResults": "No matching calculators"
     }
   },
   "opening": {
@@ -812,5 +823,29 @@
     "buildingLevel": "Lv{{level}}",
     "population": "Pop {{value}}",
     "fieldsSummary": "{{count}} fields"
+  },
+  "pathCalc": {
+    "title": "Travel Time",
+    "intro": "Travel time between two points. Tournament Square only speeds the portion beyond 20 fields, +20% per level (S71). Results update live.",
+    "inputs": "Inputs",
+    "results": "Results",
+    "startX": "Start X",
+    "startY": "Start Y",
+    "targetX": "Target X",
+    "targetY": "Target Y",
+    "unitSpeed": "Unit speed (fields/hour)",
+    "tsLevel": "Tournament Square level (0–20)",
+    "heroBonus": "Hero speed bonus (%)",
+    "artifact": "Artifact",
+    "artifactNone": "None",
+    "artifactUnique2x": "Unique 2×",
+    "artifactVillage2x": "Village 2×",
+    "serverSpeed": "Server speed",
+    "distance": "Distance",
+    "fields": "fields",
+    "travelTime": "Travel time",
+    "seconds": "Seconds",
+    "effectiveSpeed": "Effective speed",
+    "fieldsPerHour": "fields/h"
   }
 }

@@ -1,5 +1,5 @@
 /**
- * 外框導覽的內容（P0-11，照 P0 線框 v0.4「資訊架構」）
+ * 外框導覽的內容（P0-11，照 P0 線框 v0.4「資訊架構」；P0-09 計算器清單）
  *
  * 手機：底部 5 個分頁（首頁、村莊、計算器、攻略、更多）
  * 電腦（≥ 1024px）：左側選單，內容一樣
@@ -38,12 +38,16 @@ export const TABS: NavTab[] = [
   { id: 'more', labelKey: 'nav.tabs.more', to: ROUTES.MORE },
 ]
 
-/** 計算器（戰鬥模擬不在這裡：P1 重寫完才開） */
+/**
+ * 計算器（戰鬥模擬不在這裡：P1 重寫完才開）
+ * 打仗／發展以線框為準；guide 8 個為主，其餘既有工具排在後面。
+ */
 export const CALCULATOR_GROUPS: NavGroup[] = [
   {
     titleKey: 'nav.groups.combat',
     links: [
       { labelKey: 'nav.calcs.path', to: '/calculator/path' },
+      { labelKey: 'nav.calcs.launchSim', to: '/calculator/launch-sim' },
       { labelKey: 'nav.calcs.interception', to: '/calculator/interception' },
       { labelKey: 'nav.calcs.saveTroops', to: '/calculator/save-troops' },
       { labelKey: 'nav.calcs.pathSpeedTs', to: '/calculator/path-speed-ts' },
@@ -53,10 +57,14 @@ export const CALCULATOR_GROUPS: NavGroup[] = [
   {
     titleKey: 'nav.groups.development',
     links: [
+      { labelKey: 'nav.calcs.buildOrder', to: '/calculator/build-order' },
+      { labelKey: 'nav.calcs.passiveCp', to: '/calculator/passive-cp' },
+      { labelKey: 'nav.calcs.fieldRoi', to: '/calculator/field-roi' },
+      { labelKey: 'nav.calcs.oasisRoi', to: '/calculator/oasis-roi' },
+      { labelKey: 'nav.calcs.cropSim', to: '/calculator/crop-sim' },
+      { labelKey: 'nav.calcs.farming', to: '/calculator/farming' },
+      { labelKey: 'nav.calcs.tradeRoute', to: '/calculator/trade-route' },
       { labelKey: 'nav.buildingCalc', to: ROUTES.CALCULATOR.BUILDING },
-      { labelKey: 'nav.calcs.villageBuilder', to: '/calculator/village-builder' },
-      { labelKey: 'nav.calcs.culturePoints', to: '/calculator/culture-points' },
-      { labelKey: 'nav.roiCalc', to: ROUTES.CALCULATOR.ROI },
       { labelKey: 'nav.cropBalance', to: ROUTES.CALCULATOR.CROP },
       { labelKey: 'nav.calcs.npc', to: '/calculator/npc' },
       { labelKey: 'nav.calcs.technology', to: '/calculator/technology' },

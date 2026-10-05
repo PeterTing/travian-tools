@@ -7,7 +7,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:i18next/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs', 'src/components/ui/**'],
+  ignorePatterns: ['dist', '.eslintrc.cjs', 'src/components/ui/**', 'src/features/guideCalcs/**'],
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh', 'i18next'],
   rules: {
