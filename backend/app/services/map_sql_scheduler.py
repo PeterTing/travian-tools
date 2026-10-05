@@ -3,7 +3,8 @@
 * One job per day at ``MAP_SQL_FETCH_HOUR_UTC:MAP_SQL_FETCH_MINUTE_UTC`` (UTC).
 * For each distinct ``server_url`` of an active game account, fetch the public
   map.sql exactly once, sequentially. No retries within the same day.
-* Disabled unless ``MAP_SQL_DAILY_FETCH_ENABLED=true``.
+* On by default; set ``MAP_SQL_DAILY_FETCH_ENABLED=false`` to disable.
+  Nothing is fetched at startup, only at the scheduled time.
 * Also runs the daily sync-log cleanup (local DB only).
 """
 

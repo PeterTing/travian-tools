@@ -35,7 +35,8 @@ class Settings(BaseSettings):
 
     # map.sql 每日抓取（唯一允許連線至 Travian 的功能）
     # 只下載公開的 /map.sql：不帶 cookie/憑證、不用瀏覽器、固定排程。
-    MAP_SQL_DAILY_FETCH_ENABLED: bool = False
+    # 預設開啟（PM 決定）；設為 false 可停用。啟動時不會立即抓取，只在排程時間執行。
+    MAP_SQL_DAILY_FETCH_ENABLED: bool = True
     MAP_SQL_FETCH_HOUR_UTC: int = 4
     MAP_SQL_FETCH_MINUTE_UTC: int = 15
     MAP_SQL_USER_AGENT: str = (

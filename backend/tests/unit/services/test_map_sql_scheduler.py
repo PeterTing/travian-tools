@@ -16,7 +16,13 @@ def _jobs(enabled: bool, monkeypatch: pytest.MonkeyPatch) -> dict:
     return {job.id: job for job in sched.scheduler.get_jobs()}
 
 
-def test_fetch_job_disabled_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_fetch_job_enabled_by_default() -> None:
+    from app.core.config import Settings
+
+    assert Settings.model_fields["MAP_SQL_DAILY_FETCH_ENABLED"].default is True
+
+
+def test_fetch_job_can_be_disabled(monkeypatch: pytest.MonkeyPatch) -> None:
     jobs = _jobs(False, monkeypatch)
     assert mod.MAP_SQL_JOB_ID not in jobs
     assert mod.CLEANUP_JOB_ID in jobs
@@ -32,6 +38,24 @@ def test_fetch_job_is_a_fixed_daily_cron(monkeypatch: pytest.MonkeyPatch) -> Non
     assert fields["day"] == "*" and fields["day_of_week"] == "*"
     assert str(job.trigger.timezone) == "UTC"
     assert job.max_instances == 1
+
+
+def test_start_does_not_fetch_immediately(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(settings, "MAP_SQL_DAILY_FETCH_ENABLED", True)
+    sched = mod.MapSqlScheduler()
+    with patch.object(mod, "SnapshotService") as svc:
+        sched.start()
+        try:
+            job = sched.scheduler.get_job(mod.MAP_SQL_JOB_ID)
+            nxt = job.next_run_time
+            assert (nxt.hour, nxt.minute) == (
+                settings.MAP_SQL_FETCH_HOUR_UTC,
+                settings.MAP_SQL_FETCH_MINUTE_UTC,
+            )
+            assert nxt.utcoffset().total_seconds() == 0
+        finally:
+            sched.shutdown()
+        svc.assert_not_called()
 
 
 def test_daily_run_fetches_each_world_once() -> None:
