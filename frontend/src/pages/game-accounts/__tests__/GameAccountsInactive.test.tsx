@@ -195,4 +195,120 @@ describe('deactivated accounts on the management page', () => {
       expect(screen.queryByText('https://ts3.x1.asia.travian.com')).not.toBeInTheDocument()
     })
   })
+
+  describe('keeping 已停用 open while reactivating several in a row', () => {
+    const section = () => screen.getByTestId('inactive-accounts')
+    const toggle = () => within(section()).getByRole('button', { name: /已停用（\d+）/ })
+    const reactivate = (name: string) => {
+      const row = within(section()).getByText(name).closest('li')!
+      fireEvent.click(within(row).getByRole('button', { name: '重新啟用' }))
+    }
+
+    beforeEach(() => {
+      // 三個帳號全部停用
+      db.accounts = [
+        makeAccount({ is_active: false }),
+        makeAccount({ account_id: 'acc-alt', player_name: '小號', server_name: 'ts5', is_active: false }),
+        makeAccount({ account_id: 'acc-farm', player_name: '農場號', server_name: 'ts1', is_active: false }),
+      ]
+    })
+
+    it('first load: expanded when nothing is active (unchanged)', async () => {
+      renderPage()
+      await screen.findByTestId('all-inactive')
+      expect(toggle()).toHaveAttribute('aria-expanded', 'true')
+      expect(toggle()).toHaveTextContent('已停用（3）')
+    })
+
+    it('first load: collapsed when something is active (unchanged)', async () => {
+      db.accounts[0].is_active = true
+      renderPage()
+      await screen.findByRole('button', { name: '編輯遊戲帳號' })
+      expect(toggle()).toHaveAttribute('aria-expanded', 'false')
+      expect(within(section()).getByText('小號')).not.toBeVisible()
+    })
+
+    it('reactivating one of several keeps it expanded, so the next one is one tap away', async () => {
+      renderPage()
+      await screen.findByTestId('all-inactive')
+      reactivate('小號')
+      await waitFor(() => expect(toggle()).toHaveTextContent('已停用（2）'))
+      // 已經有啟用中的帳號了，但不會自動收起來
+      expect(screen.queryByTestId('all-inactive')).not.toBeInTheDocument()
+      expect(screen.getAllByRole('button', { name: '編輯遊戲帳號' })).toHaveLength(1)
+      expect(toggle()).toHaveAttribute('aria-expanded', 'true')
+      expect(within(section()).getByText('農場號')).toBeVisible()
+
+      // 馬上再按下一個
+      reactivate('農場號')
+      await waitFor(() => expect(toggle()).toHaveTextContent('已停用（1）'))
+      expect(toggle()).toHaveAttribute('aria-expanded', 'true')
+      expect(within(section()).getByText('PeterT')).toBeVisible()
+    })
+
+    it('reactivating one of several keeps it expanded when the user had opened it by hand', async () => {
+      db.accounts[0].is_active = true
+      renderPage()
+      await screen.findByRole('button', { name: '編輯遊戲帳號' })
+      fireEvent.click(toggle())
+      reactivate('小號')
+      await waitFor(() => expect(toggle()).toHaveTextContent('已停用（1）'))
+      expect(toggle()).toHaveAttribute('aria-expanded', 'true')
+      expect(within(section()).getByText('農場號')).toBeVisible()
+    })
+
+    it('reactivating the last one removes the section (nothing left to show)', async () => {
+      db.accounts = db.accounts.slice(0, 2)
+      renderPage()
+      await screen.findByTestId('all-inactive')
+      reactivate('小號')
+      await waitFor(() => expect(toggle()).toHaveTextContent('已停用（1）'))
+      reactivate('PeterT')
+      await waitFor(() => expect(screen.queryByTestId('inactive-accounts')).not.toBeInTheDocument())
+      expect(screen.getAllByRole('button', { name: '編輯遊戲帳號' })).toHaveLength(2)
+    })
+
+    it('respects a manual collapse: closing it while the reactivation is still saving keeps it closed', async () => {
+      let finishUpdate: () => void = () => undefined
+      gameAccountApi.update.mockImplementationOnce(
+        (id: string, data: GameAccountUpdate) =>
+          new Promise((resolve) => {
+            finishUpdate = () => {
+              const account = db.accounts.find((a) => a.account_id === id)!
+              Object.assign(account, data)
+              resolve({ ...account })
+            }
+          })
+      )
+      renderPage()
+      await screen.findByTestId('all-inactive')
+      reactivate('小號')
+      // 還在存的時候，使用者自己收起來
+      fireEvent.click(toggle())
+      expect(toggle()).toHaveAttribute('aria-expanded', 'false')
+      finishUpdate()
+
+      await waitFor(() => expect(toggle()).toHaveTextContent('已停用（2）'))
+      expect(screen.getAllByRole('button', { name: '編輯遊戲帳號' })).toHaveLength(1)
+      // 不會被重新打開
+      expect(toggle()).toHaveAttribute('aria-expanded', 'false')
+      expect(within(section()).getByText('農場號')).not.toBeVisible()
+
+      // 使用者自己再打開，也照他的
+      fireEvent.click(toggle())
+      expect(toggle()).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    it('respects a manual collapse on an all-deactivated page: it stays closed after the list reloads', async () => {
+      renderPage()
+      await screen.findByTestId('all-inactive')
+      fireEvent.click(toggle())
+      expect(toggle()).toHaveAttribute('aria-expanded', 'false')
+      // 新增表單打開再取消，回到清單（元件沒重建）：還是收起來
+      fireEvent.click(within(screen.getByTestId('all-inactive')).getByRole('button', { name: '新增遊戲帳號' }))
+      fireEvent.click(await screen.findByRole('button', { name: '取消' }))
+      await screen.findByTestId('all-inactive')
+      expect(toggle()).toHaveAttribute('aria-expanded', 'false')
+    })
+  })
 })
