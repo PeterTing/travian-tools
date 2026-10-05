@@ -86,7 +86,7 @@
   - 做完後（P0-03 多村總覽、P0-05 首頁貼上都完成時）：村莊列表的更新提示改回線框的寫法「要更新請到首頁貼上多村總覽」（現在是「要更新請到遊戲的村莊總覽，按擴充上傳。」，空狀態那句也一起改；`frontend/src/i18n/locales/*.json` 的 `villages.list.howToUpdate`、`villages.list.emptyHint`）
   - 擴充可以上傳集結點後：popup 兩句提示都改回提到集結點（「這一頁還不支援，請到村莊總覽再按」改成同時提到集結點與村莊總覽），並拿掉「集結點的上傳還在做，目前請到村莊總覽再按」（`browser-extension/lib/pages.js` 的 `UPLOAD_HINTS`）
 
-### P0-06 最簡單的來襲列表 🔄 審核中（其餘項；PR 待開）
+### P0-06 最簡單的來襲列表 🔄 審核中（[PR #17](https://github.com/PeterTing/travian-tools/pull/17)）
 - 本 PR（#12／P0-05 併入）**已完成**：
   - [x] 首頁來襲列表：依抵達時間排序、倒數每秒更新
   - [x] 待補座標標黃，可點進去補座標
@@ -96,7 +96,7 @@
   - [x] 首頁「最近上傳」列表（線框①下方）：類型 · 摘要＋相對時間；成功上傳寫入 `sync_logs`（含 `RALLY_POINT`）
   - [x] 來襲列表依選定村莊篩選／只顯示該村（預設全部；選擇按帳號＋世界存 localStorage）
   - [x] 確認前「新增 N · 更新 M」改由後端 `POST /paste/preview-diff` 計算（與 confirm 同一去重邏輯，不寫入）
-- 進度：🔄 審核中（PR 待開）
+- 進度：🔄 審核中（[PR #17](https://github.com/PeterTing/travian-tools/pull/17)）
 
 ### P0-07 截圖辨識：集結點與座標欄位 ⬜（RapidOCR 自架，含收集手機截圖）
 - 驗收：
@@ -173,7 +173,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
-| 2026-10-05 | v2.0.19 | P0-06 其餘項送審：首頁「最近上傳」（類型 · 摘要＋相對時間）、來襲依村莊篩選（沿用村莊列表 chip 下拉）、`POST /paste/preview-diff` 回傳「新增 N · 更新 M」且等於 confirm；sync_logs 加 `RALLY_POINT`；P0-11（#16，`1cd0be37`）已 merge |
+| 2026-10-05 | v2.0.19 | P0-06 其餘項送審（[PR #17](https://github.com/PeterTing/travian-tools/pull/17)）：首頁「最近上傳」（類型 · 摘要＋相對時間）、來襲依村莊篩選（沿用村莊列表 chip 下拉）、`POST /paste/preview-diff` 回傳「新增 N · 更新 M」且等於 confirm；sync_logs 加 `RALLY_POINT`；P0-11（#16，`1cd0be37`）已 merge |
 | 2026-10-05 | v2.0.15 | P0-05 標為完成（[#12](https://github.com/PeterTing/travian-tools/pull/12)，merge `9c7c8fa5`） |
 | 2026-10-05 | v2.0.16 | P0-10 起手式清單送審（[PR #15](https://github.com/PeterTing/travian-tools/pull/15)）：4P 農開／3P 兵開、部族只換拓荒者花費與打野兵、依任務等級分段、進度按帳號 × 世界 × 攻略存；主進度只算必做（4P 86 步、3P 82 步），「選做：便宜的文明點建築」15 步另外顯示完成數；導覽「策略」改「攻略」，只放起手式 |
 | 2026-10-05 | v2.0.17 | P0-10 標為完成（[#15](https://github.com/PeterTing/travian-tools/pull/15)，merge `f5bed0ec`） |
