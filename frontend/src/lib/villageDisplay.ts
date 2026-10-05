@@ -1,5 +1,5 @@
 import type { Village } from '@/types/game'
-import { updatedAgo } from '@/lib/accountDisplay'
+import { parseServerTime, updatedAgo } from '@/lib/accountDisplay'
 
 /** 線框稿用的負號是 U+2212（−），不是連字號 */
 const MINUS = '\u2212'
@@ -41,27 +41,57 @@ export function sortVillages(villages: Village[], key: VillageSortKey): Village[
 
 export type PastedAgo =
   | { key: 'neverPasted' }
-  | { key: 'pastedJustNow' }
-  | { key: 'pastedMinutesAgo'; count: number }
-  | { key: 'pastedHoursAgo'; count: number }
-  | { key: 'pastedYesterday' }
-  | { key: 'pastedDaysAgo'; count: number }
+  | { key: 'oldestJustNow' }
+  | { key: 'oldestMinutesAgo'; count: number }
+  | { key: 'oldestHoursAgo'; count: number }
+  | { key: 'oldestYesterday' }
+  | { key: 'oldestDaysAgo'; count: number }
 
-/** 「資料是 n 小時前貼上的」用的 i18n key（不到 1 分鐘＝剛剛、不到 1 小時用分鐘） */
-export function pastedAgo(lastPastedAt: string | null | undefined, now: Date = new Date()): PastedAgo {
-  const ago = updatedAgo(lastPastedAt ?? null, now)
+/** 「最舊的資料是 n 小時前貼上的」用的 i18n key（不到 1 分鐘＝剛剛、不到 1 小時用分鐘） */
+export function pastedAgo(oldestPastedAt: string | null | undefined, now: Date = new Date()): PastedAgo {
+  const ago = updatedAgo(oldestPastedAt ?? null, now)
   switch (ago.key) {
     case 'neverUpdated':
       return { key: 'neverPasted' }
     case 'updatedJustNow':
-      return { key: 'pastedJustNow' }
+      return { key: 'oldestJustNow' }
     case 'updatedMinutesAgo':
-      return { key: 'pastedMinutesAgo', count: ago.count }
+      return { key: 'oldestMinutesAgo', count: ago.count }
     case 'updatedHoursAgo':
-      return { key: 'pastedHoursAgo', count: ago.count }
+      return { key: 'oldestHoursAgo', count: ago.count }
     case 'updatedYesterday':
-      return { key: 'pastedYesterday' }
+      return { key: 'oldestYesterday' }
     case 'updatedDaysAgo':
-      return { key: 'pastedDaysAgo', count: ago.count }
+      return { key: 'oldestDaysAgo', count: ago.count }
   }
+}
+
+const HOUR = 60 * 60 * 1000
+/** 最舊的資料超過這麼久變黃 */
+export const WARN_AFTER_MS = 6 * HOUR
+/** 超過這麼久變紅、多一句「數字可能已經不準。」；單一村莊超過這麼久，那一列標出幾天前 */
+export const STALE_AFTER_MS = 24 * HOUR
+
+/** 提示的三種程度：中性（6 小時內）、黃（6 到 24 小時）、紅（超過 24 小時） */
+export type FreshnessLevel = 'neutral' | 'warn' | 'stale'
+
+/** 依最舊資料的時間決定提示的程度；從沒貼上過算中性 */
+export function freshnessLevel(oldestPastedAt: string | null | undefined, now: Date = new Date()): FreshnessLevel {
+  const then = parseServerTime(oldestPastedAt)
+  if (!then) return 'neutral'
+  const age = now.getTime() - then.getTime()
+  if (age < WARN_AFTER_MS) return 'neutral'
+  if (age <= STALE_AFTER_MS) return 'warn'
+  return 'stale'
+}
+
+export type RowAge = { key: 'rowYesterday' } | { key: 'rowDaysAgo'; count: number }
+
+/** 單一村莊的資料超過 24 小時才回「昨天」「n 天前」；其他（含從沒貼上過）回 null，不顯示 */
+export function staleRowAge(lastPastedAt: string | null | undefined, now: Date = new Date()): RowAge | null {
+  const then = parseServerTime(lastPastedAt)
+  if (!then || now.getTime() - then.getTime() <= STALE_AFTER_MS) return null
+  const ago = updatedAgo(lastPastedAt ?? null, now)
+  if (ago.key === 'updatedDaysAgo') return { key: 'rowDaysAgo', count: ago.count }
+  return { key: 'rowYesterday' }
 }

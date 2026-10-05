@@ -15,7 +15,7 @@ const authApi = vi.hoisted(() => ({
 // 假後端：帳號只回啟用中的（跟 getAll(false) 一樣）；村莊照帳號分開
 const db = vi.hoisted(() => ({
   accounts: [] as GameAccount[],
-  villages: {} as Record<string, VillageListResponse>,
+  villages: {} as Record<string, Village[]>,
 }))
 const gameAccountApi = vi.hoisted(() => ({
   getAll: vi.fn(async () => {
@@ -27,8 +27,14 @@ const gameAccountApi = vi.hoisted(() => ({
   delete: vi.fn(),
 }))
 const villageApi = vi.hoisted(() => ({
-  getAll: vi.fn(async (accountId?: string) => {
-    return db.villages[accountId ?? ''] ?? { villages: [], total: 0, last_pasted_at: null }
+  // 跟後端一樣：清單的 oldest_pasted_at＝貼上過的村莊裡最舊的那個（沒貼上過的不算）
+  getAll: vi.fn(async (accountId?: string): Promise<VillageListResponse> => {
+    const villages = db.villages[accountId ?? ''] ?? []
+    const times = villages
+      .map((v) => v.last_pasted_at)
+      .filter((t): t is string => !!t)
+      .sort()
+    return { villages, total: villages.length, oldest_pasted_at: times[0] ?? null }
   }),
   getById: vi.fn(),
   create: vi.fn(),
@@ -52,6 +58,7 @@ import App from '@/App'
 /** 後端回的時間是沒有時區標記的 UTC */
 const utcAgo = (minutes: number) =>
   new Date(Date.now() - minutes * 60000).toISOString().replace('Z', '').slice(0, 19)
+const HOURS = 60
 
 function village(overrides: Partial<Village>): Village {
   return {
@@ -65,14 +72,15 @@ function village(overrides: Partial<Village>): Village {
     is_capital: false,
     role: null,
     crop_net_per_hour: 1240,
+    last_pasted_at: utcAgo(2 * HOURS),
     last_updated: null,
     created_at: '2026-10-01T00:00:00',
     ...overrides,
   }
 }
 
-const TS3_VILLAGES: Village[] = [
-  village({ village_id: 'v-main', name: '主村', is_capital: true }),
+const ts3Villages = (): Village[] => [
+  village({ village_id: 'v-main', name: '主村', is_capital: true, last_pasted_at: utcAgo(10) }),
   village({
     village_id: 'v-2',
     name: '二村',
@@ -80,10 +88,33 @@ const TS3_VILLAGES: Village[] = [
     coordinate_y: -1,
     population: 540,
     crop_net_per_hour: -320,
+    last_pasted_at: utcAgo(2 * HOURS + 5),
   }),
-  village({ village_id: 'v-3', name: '三村', coordinate_x: 7, coordinate_y: 2, population: 433, crop_net_per_hour: 2100 }),
-  village({ village_id: 'v-new', name: '新村', coordinate_x: 15, coordinate_y: 4, population: 62, crop_net_per_hour: null }),
+  village({
+    village_id: 'v-3',
+    name: '三村',
+    coordinate_x: 7,
+    coordinate_y: 2,
+    population: 433,
+    crop_net_per_hour: 2100,
+    last_pasted_at: utcAgo(30),
+  }),
+  village({
+    village_id: 'v-new',
+    name: '新村',
+    coordinate_x: 15,
+    coordinate_y: 4,
+    population: 62,
+    crop_net_per_hour: null,
+    last_pasted_at: null,
+  }),
 ]
+
+/** 把某個村莊的貼上時間改成 minutes 分鐘前 */
+const pastedMinutesAgo = (villageId: string, minutes: number) => {
+  const target = db.villages['acc-ts3'].find((v) => v.village_id === villageId)!
+  target.last_pasted_at = utcAgo(minutes)
+}
 
 const renderPage = () =>
   render(
@@ -109,17 +140,18 @@ describe('village list (P0-02 slice 2)', () => {
       makeAccount({ account_id: 'acc-old', player_name: '舊號', village_count: 7, is_active: false }),
     ]
     db.villages = {
-      'acc-ts3': { villages: TS3_VILLAGES, total: 4, last_pasted_at: utcAgo(125) },
-      'acc-ts5': {
-        villages: [village({ village_id: 'v-t5', account_id: 'acc-ts5', name: 'T5 主村', coordinate_x: 0, coordinate_y: 0 })],
-        total: 1,
-        last_pasted_at: utcAgo(60 * 30),
-      },
-      'acc-old': {
-        villages: [village({ village_id: 'v-old', account_id: 'acc-old', name: '停用帳號的村' })],
-        total: 1,
-        last_pasted_at: null,
-      },
+      'acc-ts3': ts3Villages(),
+      'acc-ts5': [
+        village({
+          village_id: 'v-t5',
+          account_id: 'acc-ts5',
+          name: 'T5 主村',
+          coordinate_x: 0,
+          coordinate_y: 0,
+          last_pasted_at: utcAgo(30 * HOURS),
+        }),
+      ],
+      'acc-old': [village({ village_id: 'v-old', account_id: 'acc-old', name: '停用帳號的村' })],
     }
   })
 
@@ -174,33 +206,97 @@ describe('village list (P0-02 slice 2)', () => {
     expect(names()).toEqual(['三村', '主村', '二村', '新村'])
   })
 
-  it.each([
-    [0, '資料是剛剛貼上的。'],
-    [5, '資料是 5 分鐘前貼上的。'],
-    [125, '資料是 2 小時前貼上的。'],
-    [60 * 30, '資料是昨天貼上的。'],
-    [60 * 24 * 3 + 5, '資料是 3 天前貼上的。'],
-  ])('tells how long ago the data was pasted (%i min)', async (minutes, text) => {
-    db.villages['acc-ts3'].last_pasted_at = utcAgo(minutes)
+  const notice = () => screen.findByTestId('villages-paste-notice')
+  const HINT = '要更新請到遊戲的村莊總覽，按擴充上傳。'
+  const OUTDATED = '數字可能已經不準。'
+
+  it('words the notice by the OLDEST village (not the newest)', async () => {
     renderPage()
-    const notice = await screen.findByTestId('villages-paste-notice')
-    expect(notice).toHaveTextContent(text)
-    expect(notice).toHaveTextContent('要更新請到遊戲的村莊總覽，用擴充上傳。')
+    // 主村 10 分鐘前、三村 30 分鐘前、二村 2 小時 5 分前 → 看二村；新村沒貼上過不算
+    expect(await notice()).toHaveTextContent(`最舊的資料是 2 小時前貼上的。${HINT}`)
   })
 
-  it('says nothing was pasted yet when the villages were only entered by hand', async () => {
-    db.villages['acc-ts3'].last_pasted_at = null
+  it.each([
+    [0, '最舊的資料是剛剛貼上的。'],
+    [5, '最舊的資料是 5 分鐘前貼上的。'],
+    [125, '最舊的資料是 2 小時前貼上的。'],
+    [30 * HOURS, '最舊的資料是昨天貼上的。'],
+    [3 * 24 * HOURS + 5, '最舊的資料是 3 天前貼上的。'],
+  ])('oldest data %i min ago reads 「%s」', async (minutes, text) => {
+    db.villages['acc-ts3'] = [village({ village_id: 'v-only', last_pasted_at: utcAgo(minutes) })]
     renderPage()
-    const notice = await screen.findByTestId('villages-paste-notice')
-    expect(notice).toHaveTextContent('這個帳號還沒有貼上過資料，下面是手動輸入的。')
+    expect(await notice()).toHaveTextContent(text)
+  })
+
+  it.each([
+    [5 * HOURS + 59, 'neutral', 'bg-muted'],
+    [6 * HOURS, 'warn', 'bg-amber-50'],
+    [12 * HOURS, 'warn', 'bg-amber-50'],
+    [24 * HOURS - 1, 'warn', 'bg-amber-50'],
+    [24 * HOURS + 1, 'stale', 'bg-red-50'],
+    [5 * 24 * HOURS, 'stale', 'bg-red-50'],
+  ])('oldest data %i min ago → %s notice', async (minutes, level, background) => {
+    pastedMinutesAgo('v-2', minutes)
+    renderPage()
+    const box = await notice()
+    expect(box).toHaveAttribute('data-level', level)
+    expect(box).toHaveClass(background)
+    // 紅色不只靠顏色：多一句「數字可能已經不準。」
+    if (level === 'stale') {
+      expect(box).toHaveClass('text-red-800')
+      expect(box).toHaveTextContent(OUTDATED)
+      expect(box.textContent).toMatch(/貼上的。數字可能已經不準。要更新請/)
+    } else {
+      expect(box).not.toHaveTextContent(OUTDATED)
+    }
+    expect(box).toHaveTextContent(HINT)
+  })
+
+  it('neutral notice uses the muted tokens (wireframe --bg / --line / --mut)', async () => {
+    renderPage()
+    const box = await notice()
+    expect(box).toHaveAttribute('data-level', 'neutral')
+    expect(box).toHaveClass('bg-muted', 'border-border', 'text-muted-foreground')
+  })
+
+  it('marks 「n 天前」 at the end of a row only when that village is older than 24h', async () => {
+    pastedMinutesAgo('v-2', 3 * 24 * HOURS + 5)
+    pastedMinutesAgo('v-3', 24 * HOURS + 30)
+    pastedMinutesAgo('v-main', 24 * HOURS - 1) // 23 小時 59 分：不標
+    renderPage()
+    await waitFor(() => expect(rows()).toHaveLength(4))
+    const row = (name: string) => rows().find((r) => r.textContent?.includes(name))!
+
+    const second = within(row('二村')).getByTestId('village-age')
+    expect(second).toHaveTextContent('3 天前')
+    expect(second).toHaveClass('text-muted-foreground')
+    expect(row('二村')).toHaveTextContent('人口 540 · 糧 −320/h · 3 天前')
+    expect(within(row('三村')).getByTestId('village-age')).toHaveTextContent('昨天')
+    expect(within(row('主村')).queryByTestId('village-age')).not.toBeInTheDocument()
+    // 從沒貼上過的也不標
+    expect(within(row('新村')).queryByTestId('village-age')).not.toBeInTheDocument()
+  })
+
+  it('shows no row times at all when everything is fresh', async () => {
+    renderPage()
+    await waitFor(() => expect(rows()).toHaveLength(4))
+    expect(screen.queryAllByTestId('village-age')).toHaveLength(0)
+  })
+
+  it('says nothing was pasted yet (neutral) when the villages were only entered by hand', async () => {
+    db.villages['acc-ts3'] = [village({ village_id: 'v-hand', last_pasted_at: null })]
+    renderPage()
+    const box = await notice()
+    expect(box).toHaveTextContent('這個帳號還沒有貼上過資料，下面是手動輸入的。')
+    expect(box).toHaveAttribute('data-level', 'neutral')
   })
 
   it('shows an empty state (no notice, no list) when the account has no villages', async () => {
-    db.villages['acc-ts3'] = { villages: [], total: 0, last_pasted_at: null }
+    db.villages['acc-ts3'] = []
     renderPage()
     const empty = await screen.findByTestId('villages-empty')
     expect(empty).toHaveTextContent('這個帳號還沒有村莊資料')
-    expect(empty).toHaveTextContent('到遊戲的村莊總覽，用擴充上傳；也可以手動新增。')
+    expect(empty).toHaveTextContent('到遊戲的村莊總覽，按擴充上傳；也可以手動新增。')
     expect(within(empty).getByRole('button', { name: '＋ 手動新增村莊' })).toBeInTheDocument()
     expect(screen.queryByTestId('villages-paste-notice')).not.toBeInTheDocument()
     expect(screen.queryByTestId('village-list')).not.toBeInTheDocument()
@@ -226,7 +322,7 @@ describe('village list (P0-02 slice 2)', () => {
     expect(villageApi.getAll).toHaveBeenLastCalledWith('acc-ts5')
     expect(rows()[0]).toHaveTextContent('T5 主村')
     expect(screen.queryByText('二村')).not.toBeInTheDocument()
-    expect(screen.getByTestId('villages-paste-notice')).toHaveTextContent('資料是昨天貼上的。')
+    expect(screen.getByTestId('villages-paste-notice')).toHaveTextContent('最舊的資料是昨天貼上的。數字可能已經不準。')
   })
 
   it('a slow answer for the previous account never replaces the current one', async () => {
@@ -240,7 +336,7 @@ describe('village list (P0-02 slice 2)', () => {
     fireEvent.click(within(screen.getByRole('dialog')).getByText(/^條頓/))
     await waitFor(() => expect(rows()).toHaveLength(1))
 
-    releaseTs3(db.villages['acc-ts3'])
+    releaseTs3({ villages: db.villages['acc-ts3'], total: 4, oldest_pasted_at: null })
     await new Promise((resolve) => setTimeout(resolve, 0))
     expect(rows()).toHaveLength(1)
     expect(rows()[0]).toHaveTextContent('T5 主村')

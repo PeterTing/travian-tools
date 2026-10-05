@@ -182,6 +182,7 @@ class TestGetVillages:
         mock_service_class.return_value.get_all_villages_by_user.return_value = (
             mock_villages
         )
+        mock_service_class.return_value.get_last_pasted_by_village.return_value = {}
 
         response = client.get("/villages")
 
@@ -189,6 +190,7 @@ class TestGetVillages:
         data = response.json()
         assert data["total"] == 2
         assert len(data["villages"]) == 2
+        assert data["oldest_pasted_at"] is None
 
     @patch("app.api.v1.endpoints.villages.VillageService")
     def test_get_villages_by_account(
@@ -196,38 +198,50 @@ class TestGetVillages:
         mock_service_class: MagicMock,
         client: TestClient,
     ) -> None:
-        """測試按帳號篩選村莊."""
-        mock_villages = [create_mock_village()]
+        """測試按帳號篩選村莊；每列附上貼上時間，清單附上最舊的那個."""
+        mock_villages = [
+            create_mock_village(village_id="v1"),
+            create_mock_village(village_id="v2"),
+            create_mock_village(village_id="v3"),
+        ]
         mock_service_class.return_value.get_villages_by_account.return_value = (
             mock_villages
         )
-        mock_service_class.return_value.get_last_pasted_at.return_value = datetime(
-            2026, 10, 5, 3, 0, 0
-        )
+        mock_service_class.return_value.get_last_pasted_by_village.return_value = {
+            "v1": datetime(2026, 10, 5, 3, 0, 0),
+            "v2": datetime(2026, 10, 2, 1, 0, 0),
+        }
 
         response = client.get("/villages?account_id=acc-123")
 
         assert response.status_code == 200
         mock_service_class.return_value.get_villages_by_account.assert_called_once()
-        mock_service_class.return_value.get_last_pasted_at.assert_called_once_with(
-            "acc-123", "user-123"
+        mock_service_class.return_value.get_last_pasted_by_village.assert_called_once_with(
+            "user-123", "acc-123"
         )
-        assert response.json()["last_pasted_at"] == "2026-10-05T03:00:00"
+        data = response.json()
+        times = {v["village_id"]: v["last_pasted_at"] for v in data["villages"]}
+        assert times == {
+            "v1": "2026-10-05T03:00:00",
+            "v2": "2026-10-02T01:00:00",
+            "v3": None,
+        }
+        assert data["oldest_pasted_at"] == "2026-10-02T01:00:00"
 
     @patch("app.api.v1.endpoints.villages.VillageService")
-    def test_get_all_villages_has_no_paste_time(
+    def test_no_villages_no_paste_lookup(
         self,
         mock_service_class: MagicMock,
         client: TestClient,
     ) -> None:
-        """沒指定帳號時不算最後貼上時間."""
+        """沒有村莊就不查貼上時間."""
         mock_service_class.return_value.get_all_villages_by_user.return_value = []
 
         response = client.get("/villages")
 
         assert response.status_code == 200
-        assert response.json()["last_pasted_at"] is None
-        mock_service_class.return_value.get_last_pasted_at.assert_not_called()
+        assert response.json()["oldest_pasted_at"] is None
+        mock_service_class.return_value.get_last_pasted_by_village.assert_not_called()
 
 
 class TestGetVillage:
@@ -244,12 +258,16 @@ class TestGetVillage:
         mock_village.building_instances = [create_mock_building()]
         mock_village.troop_instances = [create_mock_troop()]
         mock_service_class.return_value.get_village_by_id.return_value = mock_village
+        mock_service_class.return_value.get_last_pasted_by_village.return_value = {
+            "village-123": datetime(2026, 10, 5, 3, 0, 0)
+        }
 
         response = client.get("/villages/village-123")
 
         assert response.status_code == 200
         data = response.json()
         assert data["village_id"] == "village-123"
+        assert data["last_pasted_at"] == "2026-10-05T03:00:00"
         assert len(data["buildings"]) == 1
         assert len(data["troops"]) == 1
 

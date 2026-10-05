@@ -189,21 +189,52 @@ class TestRows:
         assert detail["crop_net_per_hour"] == -320
 
 
-class TestLastPastedAt:
+def _village_id(client: TestClient, account_id: str, name: str) -> str:
+    rows = _list(client, account_id)["villages"]
+    return str(next(v["village_id"] for v in rows if v["name"] == name))
+
+
+def _log(
+    session: Session,
+    *,
+    village_id: str | None,
+    account_id: str,
+    at: datetime,
+    sync_type: SyncType = SyncType.VILLAGE_OVERVIEW,
+    status: SyncStatus = SyncStatus.SUCCESS,
+    user_id: str = "u-peter",
+) -> None:
+    session.add(
+        SyncLog(
+            log_id=f"log-{village_id}-{sync_type.value}-{status.value}-{at.isoformat()}-{user_id}",
+            user_id=user_id,
+            account_id=account_id,
+            village_id=village_id,
+            sync_type=sync_type,
+            status=status,
+            started_at=at,
+            completed_at=at,
+        )
+    )
+
+
+class TestPastedAt:
     def test_null_when_nothing_was_pasted(self, as_user) -> None:  # type: ignore[no-untyped-def]
         peter = as_user("u-peter")
         acc = _account(peter)
         body = _list(peter, acc)
         assert body["villages"] == []
-        assert body["last_pasted_at"] is None
+        assert body["oldest_pasted_at"] is None
 
     def test_manual_villages_do_not_count_as_a_paste(self, as_user) -> None:  # type: ignore[no-untyped-def]
         peter = as_user("u-peter")
         acc = _account(peter)
         peter.post("/api/v1/villages", json={"account_id": acc, "name": "手動"})
-        assert _list(peter, acc)["last_pasted_at"] is None
+        body = _list(peter, acc)
+        assert body["villages"][0]["last_pasted_at"] is None
+        assert body["oldest_pasted_at"] is None
 
-    def test_set_by_an_upload_in_utc(self, as_user) -> None:  # type: ignore[no-untyped-def]
+    def test_set_per_village_by_an_upload_in_utc(self, as_user) -> None:  # type: ignore[no-untyped-def]
         peter = as_user("u-peter")
         acc = _account(peter)
         before = datetime.utcnow().replace(microsecond=0)
@@ -211,53 +242,115 @@ class TestLastPastedAt:
             peter, acc, did="1", name="主村", x=1, y=1, population=10, crop=5
         )
         after = datetime.utcnow() + timedelta(seconds=1)
-        stamp = _list(peter, acc)["last_pasted_at"]
+        body = _list(peter, acc)
+        stamp = body["villages"][0]["last_pasted_at"]
         assert stamp is not None
         # 沒有時區標記＝UTC（前端照這個規則換算）
         assert not stamp.endswith("Z") and "+" not in stamp
         assert before <= _parse(stamp) <= after
+        assert body["oldest_pasted_at"] == stamp
+        # 詳情也有同一個時間
+        detail = peter.get(f"/api/v1/villages/{body['villages'][0]['village_id']}")
+        assert detail.json()["last_pasted_at"] == stamp
 
-    def test_latest_successful_village_upload_wins(
+    def test_each_village_uses_its_latest_successful_village_upload(
         self, as_user, session: Session
     ) -> None:  # type: ignore[no-untyped-def]
         peter = as_user("u-peter")
         acc = _account(peter)
+        _upload_overview(
+            peter, acc, did="1", name="主村", x=1, y=1, population=10, crop=5
+        )
+        main = _village_id(peter, acc, "主村")
+        session.query(SyncLog).delete()
         now = datetime(2026, 10, 5, 3, 0, 0)
 
-        def log(sync_type: SyncType, status: SyncStatus, hours_ago: float) -> None:
-            at = now - timedelta(hours=hours_ago)
-            session.add(
-                SyncLog(
-                    log_id=f"log-{sync_type.value}-{status.value}-{hours_ago}",
-                    user_id="u-peter",
-                    account_id=acc,
-                    sync_type=sync_type,
-                    status=status,
-                    started_at=at,
-                    completed_at=at,
-                )
+        _log(session, village_id=main, account_id=acc, at=now - timedelta(hours=5))
+        _log(
+            session,
+            village_id=main,
+            account_id=acc,
+            at=now - timedelta(hours=2),  # ← 這筆
+            sync_type=SyncType.VILLAGE_CENTER,
+        )
+        for sync_type, status, minutes in [
+            (SyncType.VILLAGE_OVERVIEW, SyncStatus.FAILED, 30),  # 失敗的不算
+            (SyncType.FULL, SyncStatus.SUCCESS, 12),  # 戰報上傳也記成 FULL，不算
+            (SyncType.TROOPS, SyncStatus.SUCCESS, 6),  # 軍隊統計不動人口和糧，不算
+        ]:
+            _log(
+                session,
+                village_id=main,
+                account_id=acc,
+                at=now - timedelta(minutes=minutes),
+                sync_type=sync_type,
+                status=status,
             )
-
-        log(SyncType.VILLAGE_OVERVIEW, SyncStatus.SUCCESS, 5)
-        log(SyncType.VILLAGE_CENTER, SyncStatus.SUCCESS, 2)  # ← 這筆
-        log(SyncType.VILLAGE_OVERVIEW, SyncStatus.FAILED, 0.5)  # 失敗的不算
-        log(SyncType.FULL, SyncStatus.SUCCESS, 0.2)  # 戰報上傳也記成 FULL，不算
-        log(SyncType.TROOPS, SyncStatus.SUCCESS, 0.1)  # 軍隊統計不動人口和糧，不算
         session.commit()
 
-        assert _list(peter, acc)["last_pasted_at"] == "2026-10-05T01:00:00"
+        assert _list(peter, acc)["villages"][0]["last_pasted_at"] == (
+            "2026-10-05T01:00:00"
+        )
 
-    def test_each_account_has_its_own_time(self, as_user) -> None:  # type: ignore[no-untyped-def]
+    def test_oldest_village_decides_the_notice(self, as_user, session: Session) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        acc = _account(peter)
+        for did, name in [("1", "主村"), ("2", "二村"), ("3", "三村")]:
+            _upload_overview(
+                peter, acc, did=did, name=name, x=int(did), y=0, population=10, crop=5
+            )
+        peter.post("/api/v1/villages", json={"account_id": acc, "name": "手動村"})
+        ids = {n: _village_id(peter, acc, n) for n in ["主村", "二村", "三村"]}
+        session.query(SyncLog).delete()
+        now = datetime(2026, 10, 5, 3, 0, 0)
+        _log(
+            session,
+            village_id=ids["主村"],
+            account_id=acc,
+            at=now - timedelta(minutes=10),
+        )
+        _log(
+            session, village_id=ids["二村"], account_id=acc, at=now - timedelta(days=3)
+        )
+        # 二村後來又上傳過，但失敗了：還是 3 天前
+        _log(
+            session,
+            village_id=ids["二村"],
+            account_id=acc,
+            at=now,
+            status=SyncStatus.FAILED,
+        )
+        _log(
+            session, village_id=ids["三村"], account_id=acc, at=now - timedelta(hours=7)
+        )
+        session.commit()
+
+        body = _list(peter, acc)
+        times = {v["name"]: v["last_pasted_at"] for v in body["villages"]}
+        assert times == {
+            "主村": "2026-10-05T02:50:00",
+            "二村": "2026-10-02T03:00:00",
+            "三村": "2026-10-04T20:00:00",
+            "手動村": None,  # 從沒貼上過：不算進最舊的
+        }
+        assert body["oldest_pasted_at"] == "2026-10-02T03:00:00"
+
+        # 二村重新上傳後，最舊的換成三村
+        _log(session, village_id=ids["二村"], account_id=acc, at=now)
+        session.commit()
+        assert _list(peter, acc)["oldest_pasted_at"] == "2026-10-04T20:00:00"
+
+    def test_each_account_has_its_own_times(self, as_user) -> None:  # type: ignore[no-untyped-def]
         peter = as_user("u-peter")
         ts3 = _account(peter)
         ts5 = _account(peter, server_url="https://ts5.x1.international.travian.com")
         _upload_overview(
             peter, ts3, did="1", name="主村", x=1, y=1, population=10, crop=5
         )
-        assert _list(peter, ts3)["last_pasted_at"] is not None
+        assert _list(peter, ts3)["oldest_pasted_at"] is not None
         body = _list(peter, ts5)
         assert body["villages"] == []
-        assert body["last_pasted_at"] is None
+        assert body["oldest_pasted_at"] is None
 
 
 class TestOtherUsersNeverSeeMyVillages:
@@ -273,7 +366,7 @@ class TestOtherUsersNeverSeeMyVillages:
 
         other = as_user("u-other")
         body = _list(other, acc)
-        assert body == {"villages": [], "total": 0, "last_pasted_at": None}
+        assert body == {"villages": [], "total": 0, "oldest_pasted_at": None}
         # 不指定帳號時也只有自己的（別人一個都沒有）
         assert other.get("/api/v1/villages").json()["villages"] == []
 
@@ -319,5 +412,36 @@ class TestOtherUsersNeverSeeMyVillages:
         peter = as_user("u-peter")
         body = _list(peter, acc)
         assert body["villages"] == []
-        assert body["last_pasted_at"] is None
+        assert body["oldest_pasted_at"] is None
         assert session.query(Village).count() == 0
+
+    def test_upload_records_of_other_users_never_count_for_my_villages(
+        self, as_user, session: Session
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        acc = _account(peter)
+        _upload_overview(
+            peter, acc, did="1", name="主村", x=1, y=1, population=10, crop=5
+        )
+        village_id = _village_id(peter, acc, "主村")
+        session.query(SyncLog).delete()
+        # 一筆記在別人名下、卻指到我村莊的成功記錄（正常流程不會發生）：不能讓我的時間變新
+        _log(
+            session,
+            village_id=village_id,
+            account_id=acc,
+            at=datetime(2026, 10, 5, 3, 0, 0),
+            user_id="u-other",
+        )
+        session.commit()
+        body = _list(peter, acc)
+        assert body["villages"][0]["last_pasted_at"] is None
+        assert body["oldest_pasted_at"] is None
+
+        # 別人不帶帳號查，也拿不到我的村莊和時間
+        other = as_user("u-other")
+        assert other.get("/api/v1/villages").json() == {
+            "villages": [],
+            "total": 0,
+            "oldest_pasted_at": None,
+        }

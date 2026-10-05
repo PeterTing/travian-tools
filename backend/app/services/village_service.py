@@ -95,27 +95,31 @@ class VillageService:
             .all()
         )
 
-    def get_last_pasted_at(self, account_id: str, user_id: str) -> datetime | None:
-        """這個帳號最後一次成功貼上／上傳村莊資料的時間（UTC，沒有過回 None）.
+    def get_last_pasted_by_village(
+        self, user_id: str, account_id: str | None = None
+    ) -> dict[str, datetime]:
+        """每個村莊最後一次成功貼上／上傳村莊資料的時間（UTC）.
 
-        只看這個使用者自己、成功的村莊上傳；別人的帳號一律 None。
+        來源是上傳記錄（sync_logs）：村莊總覽、村莊中心的上傳會記下是哪個村莊。
+        村莊的 last_updated 不可靠（網站上手動改也會動、資料沒變時又不會動），所以不用它。
+        只看這個使用者自己帳號裡的村莊；沒上傳過的村莊不會出現在結果裡。
         """
-        if not self._verify_account_ownership(account_id, user_id):
-            return None
-
-        latest: datetime | None = (
-            self.db.query(
-                func.max(func.coalesce(SyncLog.completed_at, SyncLog.started_at))
-            )
+        latest = func.max(func.coalesce(SyncLog.completed_at, SyncLog.started_at))
+        query = (
+            self.db.query(SyncLog.village_id, latest)
+            .join(Village, Village.village_id == SyncLog.village_id)
+            .join(GameAccount, GameAccount.account_id == Village.account_id)
             .filter(
+                GameAccount.user_id == user_id,
                 SyncLog.user_id == user_id,
-                SyncLog.account_id == account_id,
                 SyncLog.status == SyncStatus.SUCCESS,
                 SyncLog.sync_type.in_(VILLAGE_DATA_SYNC_TYPES),
             )
-            .scalar()
         )
-        return latest
+        if account_id is not None:
+            query = query.filter(Village.account_id == account_id)
+        rows = query.group_by(SyncLog.village_id).all()
+        return {village_id: at for village_id, at in rows if village_id and at}
 
     def get_all_villages_by_user(self, user_id: str) -> list[Village]:
         """取得用戶所有村莊."""

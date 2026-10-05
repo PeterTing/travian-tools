@@ -10,8 +10,11 @@ import {
   formatCoordinates,
   formatNumber,
   formatSignedNumber,
+  freshnessLevel,
   pastedAgo,
   sortVillages,
+  staleRowAge,
+  type FreshnessLevel,
   type VillageSortKey,
 } from '@/lib/villageDisplay'
 import { villageApi } from '@/services/villageApi'
@@ -26,9 +29,32 @@ const SORT_LABEL_KEYS: Record<VillageSortKey, string> = {
 }
 
 /**
+ * 提示的顏色，照線框的 CSS 變數對到網站現有的 token：
+ * 中性＝--bg / --line / --mut → bg-muted / border-border / text-muted-foreground；
+ * 黃＝線框的 .bw（#fffbeb / #fde68a）→ amber-50 / amber-200；
+ * 紅＝線框的 .be（#fef2f2 / #fecaca，--err 的淺底）→ red-50 / red-200，字用深紅 red-800。
+ */
+const NOTICE_CLASSES: Record<FreshnessLevel, string> = {
+  neutral: 'border-border bg-muted text-muted-foreground',
+  warn: 'border-amber-200 bg-amber-50 text-amber-900',
+  stale: 'border-red-200 bg-red-50 text-red-800',
+}
+
+/** 每分鐘更新一次「現在」，頁面開著時提示和顏色會跟著變 */
+function useNow(intervalMs = 60_000): Date {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), intervalMs)
+    return () => window.clearInterval(id)
+  }, [intervalMs])
+  return now
+}
+
+/**
  * 村莊列表（P0 線框稿 v0.4「村莊列表」）。
  * 只顯示頂部選的那個帳號＋世界（只會是啟用中的）；
- * 頂部提示「資料是 n 小時前貼上的」，每列：名稱＋座標，下面人口和每小時糧食淨產量（負的標紅）。
+ * 頂部提示「最舊的資料是 n 小時前貼上的」（照最舊的村莊分三種程度），
+ * 每列：名稱＋座標，下面人口和每小時糧食淨產量（負的標紅），超過 24 小時的村莊多標幾天前。
  */
 export default function VillagesPage() {
   const { t } = useTranslation()
@@ -37,16 +63,17 @@ export default function VillagesPage() {
   const { accounts, currentAccount, loading: accountsLoading, reload: reloadAccounts } = useCurrentAccount()
   const selectedAccountId = currentAccount?.account_id ?? ''
   const [villages, setVillages] = useState<Village[]>([])
-  const [lastPastedAt, setLastPastedAt] = useState<string | null>(null)
+  const [oldestPastedAt, setOldestPastedAt] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [sortKey, setSortKey] = useState<VillageSortKey>('population')
   const [reloadToken, setReloadToken] = useState(0)
+  const now = useNow()
 
   useEffect(() => {
     setVillages([])
-    setLastPastedAt(null)
+    setOldestPastedAt(null)
     setLoadError(false)
     if (!selectedAccountId) {
       setLoading(false)
@@ -60,7 +87,7 @@ export default function VillagesPage() {
       .then((response) => {
         if (stale) return
         setVillages(response.villages)
-        setLastPastedAt(response.last_pasted_at ?? null)
+        setOldestPastedAt(response.oldest_pasted_at ?? null)
       })
       .catch((error) => {
         if (stale) return
@@ -120,8 +147,9 @@ export default function VillagesPage() {
     )
   }
 
-  const ago = pastedAgo(lastPastedAt)
+  const ago = pastedAgo(oldestPastedAt, now)
   const agoText = 'count' in ago ? t(`villages.list.${ago.key}`, { count: ago.count }) : t(`villages.list.${ago.key}`)
+  const level = freshnessLevel(oldestPastedAt, now)
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-4 md:py-8">
@@ -172,15 +200,17 @@ export default function VillagesPage() {
           <div
             role="status"
             data-testid="villages-paste-notice"
-            className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
+            data-level={level}
+            className={`mb-3 rounded-lg border px-3 py-2 text-sm ${NOTICE_CLASSES[level]}`}
           >
             {agoText}
+            {level === 'stale' && t('villages.list.mayBeOutdated')}
             {t('villages.list.howToUpdate')}
           </div>
 
           <ul className="divide-y overflow-hidden rounded-lg border bg-card" data-testid="village-list">
             {rows.map((village) => (
-              <VillageRow key={village.village_id} village={village} />
+              <VillageRow key={village.village_id} village={village} now={now} />
             ))}
           </ul>
 
@@ -193,12 +223,14 @@ export default function VillagesPage() {
   )
 }
 
-function VillageRow({ village }: { village: Village }) {
+function VillageRow({ village, now }: { village: Village; now: Date }) {
   const { t } = useTranslation()
   const name = village.name || t('villages.unnamed')
   const coordinates = formatCoordinates(village.coordinate_x, village.coordinate_y)
   const crop = village.crop_net_per_hour
   const cropNegative = typeof crop === 'number' && crop < 0
+  // 平常不標時間；這個村莊的資料超過 24 小時才在第二行最後加灰字「n 天前」
+  const age = staleRowAge(village.last_pasted_at, now)
 
   return (
     <li data-testid="village-row">
@@ -230,6 +262,16 @@ function VillageRow({ village }: { village: Village }) {
                 ? t('villages.list.cropPerHour', { value: formatSignedNumber(crop) })
                 : t('villages.list.cropUnknown')}
             </span>
+            {age && (
+              <>
+                <span aria-hidden="true"> · </span>
+                <span data-testid="village-age" className="text-muted-foreground">
+                  {'count' in age
+                    ? t(`villages.list.${age.key}`, { count: age.count })
+                    : t(`villages.list.${age.key}`)}
+                </span>
+              </>
+            )}
           </div>
         </div>
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { formatCoordinates, formatNumber, formatSignedNumber, pastedAgo, sortVillages } from '../villageDisplay'
+import {
+  formatCoordinates,
+  formatNumber,
+  formatSignedNumber,
+  freshnessLevel,
+  pastedAgo,
+  sortVillages,
+  staleRowAge,
+} from '../villageDisplay'
 import type { Village } from '@/types/game'
 
 const now = new Date('2026-10-05T04:00:00Z')
@@ -40,17 +48,38 @@ describe('villageDisplay', () => {
     expect(formatCoordinates(null, 3)).toBeNull()
   })
 
-  it('describes the paste time: 剛剛, minutes, hours, yesterday, days, never', () => {
+  it('describes the oldest paste time: 剛剛, minutes, hours, yesterday, days, never', () => {
     expect(pastedAgo(null, now)).toEqual({ key: 'neverPasted' })
     expect(pastedAgo(undefined, now)).toEqual({ key: 'neverPasted' })
-    expect(pastedAgo('2026-10-05T03:59:30', now)).toEqual({ key: 'pastedJustNow' })
-    expect(pastedAgo('2026-10-05T03:15:00', now)).toEqual({ key: 'pastedMinutesAgo', count: 45 })
-    expect(pastedAgo('2026-10-05T03:00:00', now)).toEqual({ key: 'pastedHoursAgo', count: 1 })
-    expect(pastedAgo('2026-10-05T01:59:00', now)).toEqual({ key: 'pastedHoursAgo', count: 2 })
-    expect(pastedAgo('2026-10-04T03:00:00', now)).toEqual({ key: 'pastedYesterday' })
-    expect(pastedAgo('2026-10-01T03:00:00', now)).toEqual({ key: 'pastedDaysAgo', count: 4 })
+    expect(pastedAgo('2026-10-05T03:59:30', now)).toEqual({ key: 'oldestJustNow' })
+    expect(pastedAgo('2026-10-05T03:15:00', now)).toEqual({ key: 'oldestMinutesAgo', count: 45 })
+    expect(pastedAgo('2026-10-05T03:00:00', now)).toEqual({ key: 'oldestHoursAgo', count: 1 })
+    expect(pastedAgo('2026-10-05T01:59:00', now)).toEqual({ key: 'oldestHoursAgo', count: 2 })
+    expect(pastedAgo('2026-10-04T03:00:00', now)).toEqual({ key: 'oldestYesterday' })
+    expect(pastedAgo('2026-10-01T03:00:00', now)).toEqual({ key: 'oldestDaysAgo', count: 4 })
     // 有時區標記的照標記算
-    expect(pastedAgo('2026-10-05T11:00:00+08:00', now)).toEqual({ key: 'pastedHoursAgo', count: 1 })
+    expect(pastedAgo('2026-10-05T11:00:00+08:00', now)).toEqual({ key: 'oldestHoursAgo', count: 1 })
+  })
+
+  it('freshness: under 6h neutral, 6h to 24h yellow, over 24h red (exact boundaries)', () => {
+    // now = 2026-10-05T04:00:00Z
+    expect(freshnessLevel(null, now)).toBe('neutral')
+    expect(freshnessLevel('2026-10-05T03:59:00', now)).toBe('neutral')
+    expect(freshnessLevel('2026-10-04T22:01:00', now)).toBe('neutral') // 5h59
+    expect(freshnessLevel('2026-10-04T22:00:00', now)).toBe('warn') // 6h00
+    expect(freshnessLevel('2026-10-04T16:00:00', now)).toBe('warn') // 12h
+    expect(freshnessLevel('2026-10-04T04:00:00', now)).toBe('warn') // 24h00
+    expect(freshnessLevel('2026-10-04T03:59:59', now)).toBe('stale') // 24h00m01s
+    expect(freshnessLevel('2026-09-28T04:00:00', now)).toBe('stale')
+  })
+
+  it('row age only after 24h: 昨天, then n 天前', () => {
+    expect(staleRowAge(null, now)).toBeNull()
+    expect(staleRowAge('2026-10-05T03:00:00', now)).toBeNull()
+    expect(staleRowAge('2026-10-04T04:00:00', now)).toBeNull() // 剛好 24 小時
+    expect(staleRowAge('2026-10-04T03:59:00', now)).toEqual({ key: 'rowYesterday' })
+    expect(staleRowAge('2026-10-03T04:00:00', now)).toEqual({ key: 'rowDaysAgo', count: 2 })
+    expect(staleRowAge('2026-10-01T22:00:00', now)).toEqual({ key: 'rowDaysAgo', count: 3 })
   })
 
   it('sorts by population, crop (unknown last) or name without touching the input', () => {
