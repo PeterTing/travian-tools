@@ -21,7 +21,11 @@
     "openParen": "(",
     "closeParen": ")",
     "dot": ".",
-    "cropUnitFormat": "{{num}} 耗糧兵"
+    "cropUnitFormat": "{{num}} 耗糧兵",
+    "yes": "是",
+    "no": "否",
+    "error": "錯誤",
+    "success": "成功"
   },
   "nav": {
     "title": "Travian Tools",
@@ -466,12 +470,6 @@
       "mixed": "混合村",
       "ww": "世界奇蹟村"
     }
-  },
-  "common": {
-    "yes": "是",
-    "no": "否",
-    "error": "錯誤",
-    "success": "成功"
   },
   "sync": {
     "title": "同步狀態",
