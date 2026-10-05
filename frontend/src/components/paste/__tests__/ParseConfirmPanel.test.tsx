@@ -173,6 +173,48 @@ describe('ParseConfirmPanel rally preview-diff', () => {
     expect(screen.getByTestId('confirm-save')).toHaveTextContent('存入 · 新增 1 · 更新 1')
     expect(pasteApi.previewDiff).toHaveBeenCalled()
   })
+
+  it('falls back to plain 存入 when preview-diff fails (still saveable)', async () => {
+    const { waitFor } = await import('@testing-library/react')
+    pasteApi.previewDiff.mockReset().mockRejectedValueOnce(new Error('network'))
+    render(
+      <ParseConfirmPanel
+        account={account}
+        state={{
+          pageType: 'rally_point',
+          data: {
+            incoming: [
+              {
+                kind: 'incoming_raid',
+                role: 'EnemyA',
+                headline: 'EnemyA 搶奪 Me',
+                coordinate_x: 1,
+                coordinate_y: 2,
+                timer_seconds: 39600,
+                arrival_time: '23:00:00',
+              },
+            ],
+          },
+          source: 'paste',
+        }}
+        villages={[]}
+        villageId={null}
+        onVillageIdChange={vi.fn()}
+        captureAt={new Date(2026, 9, 5, 12, 0)}
+        onCaptureAtChange={vi.fn()}
+        onDiscard={vi.fn()}
+        onSave={vi.fn()}
+      />,
+    )
+    await waitFor(() => expect(pasteApi.previewDiff).toHaveBeenCalled())
+    await waitFor(() =>
+      expect(screen.getByTestId('confirm-save')).toHaveTextContent(/^存入$/),
+    )
+    expect(screen.getByTestId('rally-diff-label').textContent).not.toMatch(/新增|更新/)
+    expect(screen.getByTestId('confirm-save')).not.toBeDisabled()
+    // Human-readable countdown (not raw seconds)
+    expect(screen.getByTestId('rally-confirm-list').textContent).toMatch(/倒數 11:00:00/)
+  })
 })
 
 describe('ParseConfirmPanel UTC offset', () => {

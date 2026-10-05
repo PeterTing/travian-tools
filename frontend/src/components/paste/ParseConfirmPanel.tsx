@@ -141,9 +141,9 @@ export function ParseConfirmPanel({
       })
       .catch(() => {
         if (cancelled) return
-        // Fallback only if API fails: treat all as new (legacy frontend default)
-        setDiffCreated(incoming.length)
-        setDiffUpdated(0)
+        // Preview failed: keep save enabled but hide N/M hints (plain 「存入」)
+        setDiffCreated(null)
+        setDiffUpdated(null)
       })
       .finally(() => {
         if (!cancelled) setDiffLoading(false)
@@ -567,7 +567,7 @@ export function ParseConfirmPanel({
                 ? `存入 · ${diffLabel}`
                 : diffLoading
                   ? '比對中…'
-                  : `存入 ${incoming.length} 筆`
+                  : '存入'
               : '存入'}
         </Button>
       </CardFooter>
