@@ -10,13 +10,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -26,26 +19,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { gameAccountApi } from '@/services/gameAccountApi'
+import { ROUTES } from '@/constants/routes'
+import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
+import { accountPlayerLabel, accountWorldLabel } from '@/lib/accountDisplay'
 import { villageApi } from '@/services/villageApi'
-import type { GameAccount, Village } from '@/types/game'
+import type { Village } from '@/types/game'
 import VillageForm from './VillageForm'
 
 export default function VillagesPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
-  const [accounts, setAccounts] = useState<GameAccount[]>([])
-  const [selectedAccountId, setSelectedAccountId] = useState<string>('')
+  // 帳號和世界由頂部的切換決定，這頁只顯示目前選的那一組
+  const { accounts, currentAccount, loading: accountsLoading, reload: reloadAccounts } = useCurrentAccount()
+  const selectedAccountId = currentAccount?.account_id ?? ''
   const [villages, setVillages] = useState<Village[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingVillage, setEditingVillage] = useState<Village | null>(null)
   const [deleteVillageId, setDeleteVillageId] = useState<string | null>(null)
-
-  useEffect(() => {
-    loadAccounts()
-  }, [])
 
   useEffect(() => {
     if (selectedAccountId) {
@@ -54,21 +46,6 @@ export default function VillagesPage() {
       setVillages([])
     }
   }, [selectedAccountId])
-
-  const loadAccounts = async () => {
-    try {
-      setLoading(true)
-      const response = await gameAccountApi.getAll(true)
-      setAccounts(response.accounts)
-      if (response.accounts.length > 0) {
-        setSelectedAccountId(response.accounts[0].account_id)
-      }
-    } catch (error) {
-      console.error('Failed to load accounts:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const loadVillages = async (accountId: string) => {
     try {
@@ -104,6 +81,8 @@ export default function VillagesPage() {
       if (selectedAccountId) {
         await loadVillages(selectedAccountId)
       }
+      // 頂部切換清單裡的「N 村」也要跟著變
+      void reloadAccounts()
     } catch (error) {
       console.error('Failed to delete village:', error)
     } finally {
@@ -117,6 +96,7 @@ export default function VillagesPage() {
     if (selectedAccountId) {
       loadVillages(selectedAccountId)
     }
+    void reloadAccounts()
   }
 
   const handleFormCancel = () => {
@@ -141,7 +121,7 @@ export default function VillagesPage() {
     }
   }
 
-  if (loading && accounts.length === 0) {
+  if (accountsLoading && accounts.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center h-64">
@@ -159,7 +139,7 @@ export default function VillagesPage() {
             <p className="text-muted-foreground mb-4">
               {t('villages.noAccounts')}
             </p>
-            <Button onClick={() => navigate('/game-accounts')}>
+            <Button onClick={() => navigate(ROUTES.GAME_ACCOUNTS_NEW)}>
               {t('villages.goToAccounts')}
             </Button>
           </CardContent>
@@ -186,21 +166,12 @@ export default function VillagesPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">{t('villages.title')}</h1>
-          <p className="text-muted-foreground">{t('villages.description')}</p>
+          <p className="text-muted-foreground" data-testid="villages-current-account">
+            {currentAccount &&
+              `${accountPlayerLabel(currentAccount, t('accountSwitcher.unnamedPlayer'))} · ${accountWorldLabel(currentAccount)} · ${t('accountSwitcher.villageCount', { count: villages.length })}`}
+          </p>
         </div>
         <div className="flex items-center gap-4">
-          <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder={t('villages.selectAccount')} />
-            </SelectTrigger>
-            <SelectContent>
-              {accounts.map((account) => (
-                <SelectItem key={account.account_id} value={account.account_id}>
-                  {account.player_name || account.server_name || account.server_url}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Button onClick={handleCreate}>{t('villages.addVillage')}</Button>
         </div>
       </div>

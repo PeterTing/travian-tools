@@ -289,6 +289,25 @@
       "passwordMismatch": "兩次輸入的密碼不一致"
     }
   },
+  "accountSwitcher": {
+    "title": "切換帳號和世界",
+    "separateNote": "每個組合的資料完全分開。",
+    "addAccountOrWorld": "＋ 新增帳號或世界",
+    "noPasswordNote": "新增時只填暱稱、世界和部族，不會要求遊戲密碼。",
+    "accountChip": "目前帳號：{{name}}",
+    "worldChip": "目前世界：{{name}}",
+    "noAccount": "＋ 新增遊戲帳號",
+    "close": "關閉",
+    "villageCount": "{{count}} 村",
+    "updatedJustNow": "剛剛更新",
+    "updatedMinutesAgo": "{{count}} 分鐘前更新",
+    "updatedHoursAgo": "{{count}} 小時前更新",
+    "updatedYesterday": "昨天更新",
+    "updatedDaysAgo": "{{count}} 天前",
+    "neverUpdated": "還沒有資料",
+    "unnamedPlayer": "未命名",
+    "current": "目前選擇"
+  },
   "gameAccounts": {
     "title": "遊戲帳號管理",
     "description": "管理您的 Travian 遊戲帳號",
@@ -325,6 +344,12 @@
     "createError": "建立遊戲帳號失敗",
     "updateError": "更新遊戲帳號失敗",
     "deleteError": "刪除遊戲帳號失敗",
+    "timeDisplay": "遊戲裡顯示的時間",
+    "timeDisplayHint": "在遊戲的個人設定裡可以看到。之後貼上時會用這個設定換算時間。",
+    "timeDisplayAsk": "第一次貼上時再問",
+    "timeDisplayServer": "伺服器時間",
+    "timeDisplayLocal": "我的本地時間（{{tz}}）",
+    "villageCount": "村莊數",
     "validation": {
       "serverUrlRequired": "請輸入伺服器網址",
       "serverUrlFormat": "伺服器網址必須以 http:// 或 https:// 開頭"

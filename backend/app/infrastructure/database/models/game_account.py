@@ -38,6 +38,17 @@ class PlayerRole(enum.StrEnum):
     HYBRID = "hybrid"  # 混合型：平衡發展
 
 
+class TimeDisplay(enum.StrEnum):
+    """遊戲內時間顯示的是哪一種時間（每個帳號各自設定）.
+
+    貼上與截圖的文字只有時鐘時間，要靠這個設定換算成絕對時間。
+    None 代表還沒設定，第一次貼上時詢問。
+    """
+
+    SERVER = "server"  # 伺服器時間
+    LOCAL = "local"  # 使用者本地時間（時區見 local_timezone）
+
+
 class GameAccount(Base):
     """遊戲帳號資料表.
 
@@ -74,6 +85,21 @@ class GameAccount(Base):
         Enum(PlayerRole, values_callable=lambda x: [e.value for e in x]),
         nullable=True,
         default=None,
+    )
+
+    # 時間顯示時區：None = 還沒設定（第一次貼上時問）
+    time_display: Mapped[TimeDisplay | None] = mapped_column(
+        Enum(
+            TimeDisplay,
+            values_callable=lambda x: [e.value for e in x],
+            name="time_display",
+        ),
+        nullable=True,
+        default=None,
+    )
+    # 選「本地時間」時用的 IANA 時區，例如 Asia/Taipei
+    local_timezone: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, default=None
     )
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

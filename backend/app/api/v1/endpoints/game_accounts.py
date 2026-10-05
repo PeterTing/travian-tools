@@ -28,11 +28,19 @@ def _to_response(account: GameAccount) -> GameAccountResponse:
         alliance_name=account.alliance_name,
         server_start_date=account.server_start_date,
         player_role=account.player_role,
+        time_display=account.time_display,
+        local_timezone=account.local_timezone,
         is_active=account.is_active,
         last_updated=account.last_updated,
         created_at=account.created_at,
         current_server_day=account.current_server_day,
+        village_count=_village_count(account),
     )
+
+
+def _village_count(account: GameAccount) -> int:
+    villages = getattr(account, "villages", None)
+    return len(villages) if isinstance(villages, list) else 0
 
 
 @router.post(
@@ -109,7 +117,13 @@ def update_game_account(
 ) -> GameAccountResponse:
     """更新遊戲帳號."""
     service = GameAccountService(db)
-    account = service.update_account(account_id, current_user.user_id, data)
+    try:
+        account = service.update_account(account_id, current_user.user_id, data)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
     if not account:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

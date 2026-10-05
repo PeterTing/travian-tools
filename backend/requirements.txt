@@ -19,6 +19,9 @@ bcrypt>=4.0.0
 python-multipart>=0.0.6
 email-validator>=2.0.0
 
+# IANA time zones for the per-account time-display setting (slim images ship no tz database)
+tzdata>=2024.1
+
 # Scheduler
 apscheduler>=3.10.0
 

@@ -3,7 +3,7 @@
 from sqlalchemy.orm import Session
 
 from app.domain.schemas.game_account import GameAccountCreate, GameAccountUpdate
-from app.infrastructure.database.models.game_account import GameAccount
+from app.infrastructure.database.models.game_account import GameAccount, TimeDisplay
 
 
 class GameAccountService:
@@ -25,6 +25,8 @@ class GameAccountService:
             player_name=data.player_name,
             alliance_name=data.alliance_name,
             server_start_date=data.server_start_date,
+            time_display=data.time_display,
+            local_timezone=data.local_timezone,
         )
         self.db.add(account)
         self.db.commit()
@@ -65,6 +67,10 @@ class GameAccountService:
             return None
 
         update_data = data.model_dump(exclude_unset=True)
+        new_display = update_data.get("time_display", account.time_display)
+        new_timezone = update_data.get("local_timezone", account.local_timezone)
+        if new_display == TimeDisplay.LOCAL and not new_timezone:
+            raise ValueError("選「本地時間」時需要填時區")
         for field, value in update_data.items():
             setattr(account, field, value)
 

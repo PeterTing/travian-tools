@@ -8,7 +8,7 @@
  * 的資料送到 Travian Tools 的上傳 API。不會自動上傳其他頁面。
  */
 
-import { API_BASE_URL, TOOL_SITE_URL } from '../lib/config.js';
+import { ADD_ACCOUNT_PATH, API_BASE_URL, TOOL_SITE_URL } from '../lib/config.js';
 import { clearCredential, describeExpiry, loadCredential } from '../lib/credential.js';
 import { UPLOAD_ENDPOINTS, UPLOAD_HINTS, uploadState } from '../lib/pages.js';
 
@@ -206,9 +206,30 @@ function refreshSyncButton() {
   });
   pageTypeEl.textContent = state.pageName;
   pageLineEl.classList.toggle('hidden', !state.pageName);
-  uploadHintEl.textContent = state.hint;
+  if (state.hint === UPLOAD_HINTS.NO_ACCOUNTS) {
+    renderAddAccountLink(state.hint);
+  } else {
+    uploadHintEl.textContent = state.hint;
+  }
   uploadHintEl.classList.toggle('hidden', !state.hint);
   syncBtn.disabled = !state.canUpload;
+}
+
+/** 「請先在工具網站新增遊戲帳號」做成連結，點了開新分頁到工具網站的新增帳號頁 */
+function renderAddAccountLink(text) {
+  const link = document.createElement('a');
+  link.id = 'add-account-link';
+  link.href = `${TOOL_SITE_URL}${ADD_ACCOUNT_PATH}`;
+  link.textContent = text;
+  link.addEventListener('click', openAddAccountPage);
+  uploadHintEl.replaceChildren(link);
+}
+
+function openAddAccountPage(event) {
+  event.preventDefault();
+  // 和「在工具網站登入」一樣：只開一個新分頁到工具網站，不碰任何遊戲分頁。
+  window.open(`${TOOL_SITE_URL}${ADD_ACCOUNT_PATH}`, '_blank', 'noopener');
+  window.close();
 }
 
 async function detectPage() {

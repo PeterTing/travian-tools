@@ -1,6 +1,9 @@
 import { Routes, Route, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+import { ROUTES } from '@/constants/routes'
+import { CurrentAccountProvider } from '@/contexts/CurrentAccountContext'
+import AccountWorldSwitcher from '@/components/account/AccountWorldSwitcher'
 import { RequireAuth } from '@/components/auth'
 import HomePage from '@/pages/HomePage'
 import NotFoundPage from '@/pages/NotFoundPage'
@@ -60,6 +63,8 @@ function Navigation() {
             <Link to="/" className="font-bold text-lg">
               {t('nav.title')}
             </Link>
+            {/* 帳號和世界放在頂部、永遠看得到（P0 線框 v0.4） */}
+            {isAuthenticated && <AccountWorldSwitcher />}
             <div className="flex gap-4 text-sm">
               <div className="relative group">
                 <span className="cursor-pointer hover:text-primary">
@@ -319,6 +324,8 @@ function AppContent() {
         <Route path="/statistics/search/inactives" element={<InactiveSearchPage />} />
         {/* Protected routes - 需要登入 */}
         <Route path="/game-accounts" element={<RequireAuth><GameAccountsPage /></RequireAuth>} />
+        {/* 新增帳號或世界：頂部切換清單和擴充的「新增遊戲帳號」都連到這裡 */}
+        <Route path={ROUTES.GAME_ACCOUNTS_NEW} element={<RequireAuth><GameAccountsPage startWithCreate /></RequireAuth>} />
         <Route path="/villages" element={<RequireAuth><VillagesPage /></RequireAuth>} />
         <Route path="/villages/:villageId" element={<RequireAuth><VillageDetailPage /></RequireAuth>} />
         <Route path="/map-sql" element={<RequireAuth><MapSqlPage /></RequireAuth>} />
@@ -333,7 +340,9 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <CurrentAccountProvider>
+        <AppContent />
+      </CurrentAccountProvider>
     </AuthProvider>
   )
 }

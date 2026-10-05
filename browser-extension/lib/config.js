@@ -10,6 +10,9 @@ export const API_BASE_URL = 'http://localhost:8000/api/v1';
 /** 「在工具網站登入」要開的網址。 */
 export const TOOL_SITE_URL = 'http://localhost:5174';
 
+/** 工具網站「新增帳號或世界」的頁面（「請先在工具網站新增遊戲帳號」連到這裡）。 */
+export const ADD_ACCOUNT_PATH = '/game-accounts/new';
+
 /** 只有這些網站可以把登入憑證交給擴充。 */
 export const TRUSTED_SITE_ORIGINS = Object.freeze([
   'http://localhost:5173',

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -18,22 +19,44 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { ROUTES } from '@/constants/routes'
+import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { gameAccountApi } from '@/services/gameAccountApi'
 import type { GameAccount } from '@/types/game'
 import GameAccountForm from './GameAccountForm'
 
-export default function GameAccountsPage() {
+interface GameAccountsPageProps {
+  /** /game-accounts/new：一進來就打開新增表單 */
+  startWithCreate?: boolean
+}
+
+export default function GameAccountsPage({ startWithCreate = false }: GameAccountsPageProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { reload: reloadCurrentAccounts } = useCurrentAccount()
 
   const [accounts, setAccounts] = useState<GameAccount[]>([])
   const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
+  const [showForm, setShowForm] = useState(startWithCreate)
   const [editingAccount, setEditingAccount] = useState<GameAccount | null>(null)
   const [deleteAccountId, setDeleteAccountId] = useState<string | null>(null)
 
   useEffect(() => {
     loadAccounts()
   }, [])
+
+  // 從 /game-accounts 換到 /game-accounts/new 時元件不會重建，所以要另外打開表單
+  useEffect(() => {
+    if (startWithCreate) {
+      setEditingAccount(null)
+      setShowForm(true)
+    }
+  }, [startWithCreate])
+
+  /** 離開 /game-accounts/new，回到帳號清單 */
+  const leaveCreateRoute = () => {
+    if (startWithCreate) navigate(ROUTES.GAME_ACCOUNTS, { replace: true })
+  }
 
   const loadAccounts = async () => {
     try {
@@ -63,6 +86,7 @@ export default function GameAccountsPage() {
     try {
       await gameAccountApi.delete(deleteAccountId)
       await loadAccounts()
+      void reloadCurrentAccounts()
     } catch (error) {
       console.error('Failed to delete account:', error)
     } finally {
@@ -74,11 +98,15 @@ export default function GameAccountsPage() {
     setShowForm(false)
     setEditingAccount(null)
     loadAccounts()
+    // 頂部的帳號和世界切換也要看到新的清單
+    void reloadCurrentAccounts()
+    leaveCreateRoute()
   }
 
   const handleFormCancel = () => {
     setShowForm(false)
     setEditingAccount(null)
+    leaveCreateRoute()
   }
 
   if (loading) {
@@ -158,6 +186,20 @@ export default function GameAccountsPage() {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('gameAccounts.serverDay')}:</span>
                     <span>Day {account.current_server_day}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('gameAccounts.villageCount')}:</span>
+                    <span>{account.village_count ?? 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('gameAccounts.timeDisplay')}:</span>
+                    <span>
+                      {account.time_display === 'server'
+                        ? t('gameAccounts.timeDisplayServer')
+                        : account.time_display === 'local'
+                          ? t('gameAccounts.timeDisplayLocal', { tz: account.local_timezone ?? '' })
+                          : t('gameAccounts.timeDisplayAsk')}
+                    </span>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-4">

@@ -11,8 +11,15 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { browserTimeZone } from '@/lib/accountDisplay'
 import { gameAccountApi } from '@/services/gameAccountApi'
-import type { GameAccount, GameAccountCreate, GameAccountUpdate, TroopTribe } from '@/types/game'
+import type {
+  GameAccount,
+  GameAccountCreate,
+  GameAccountUpdate,
+  TimeDisplay,
+  TroopTribe,
+} from '@/types/game'
 
 interface GameAccountFormProps {
   account?: GameAccount | null
@@ -37,6 +44,11 @@ export default function GameAccountForm({
 }: GameAccountFormProps) {
   const { t } = useTranslation()
   const isEditing = !!account
+  // 選「我的本地時間」時存目前瀏覽器的時區；編輯時沿用原本存的
+  const localTimezone =
+    account?.time_display === 'local' && account.local_timezone
+      ? account.local_timezone
+      : browserTimeZone()
 
   const [formData, setFormData] = useState({
     server_url: account?.server_url || '',
@@ -47,12 +59,25 @@ export default function GameAccountForm({
     alliance_name: account?.alliance_name || '',
     server_start_date: account?.server_start_date || '',
     is_active: account?.is_active ?? true,
+    // '' 表示第一次貼上時再問
+    time_display: (account?.time_display ?? '') as TimeDisplay | '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const validateServerUrl = (url: string): boolean => {
     return url.startsWith('http://') || url.startsWith('https://')
+  }
+
+  /** 時間顯示設定：沒選就送 null（之後第一次貼上再問） */
+  const timeFields = (): Pick<GameAccountCreate, 'time_display' | 'local_timezone'> => {
+    if (formData.time_display === 'local') {
+      return { time_display: 'local', local_timezone: localTimezone }
+    }
+    if (formData.time_display === 'server') {
+      return { time_display: 'server', local_timezone: null }
+    }
+    return { time_display: null, local_timezone: null }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,6 +107,7 @@ export default function GameAccountForm({
           alliance_name: formData.alliance_name || undefined,
           server_start_date: formData.server_start_date || undefined,
           is_active: formData.is_active,
+          ...timeFields(),
         }
         await gameAccountApi.update(account.account_id, updateData)
       } else {
@@ -93,6 +119,7 @@ export default function GameAccountForm({
           player_name: formData.player_name || undefined,
           alliance_name: formData.alliance_name || undefined,
           server_start_date: formData.server_start_date || undefined,
+          ...timeFields(),
         }
         await gameAccountApi.create(createData)
       }
@@ -224,6 +251,23 @@ export default function GameAccountForm({
             <p className="text-xs text-muted-foreground">
               {t('gameAccounts.serverStartDateHint')}
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="time_display">{t('gameAccounts.timeDisplay')}</Label>
+            <select
+              id="time_display"
+              value={formData.time_display}
+              onChange={(e) =>
+                setFormData({ ...formData, time_display: e.target.value as TimeDisplay | '' })
+              }
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <option value="">{t('gameAccounts.timeDisplayAsk')}</option>
+              <option value="server">{t('gameAccounts.timeDisplayServer')}</option>
+              <option value="local">{t('gameAccounts.timeDisplayLocal', { tz: localTimezone })}</option>
+            </select>
+            <p className="text-xs text-muted-foreground">{t('gameAccounts.timeDisplayHint')}</p>
           </div>
 
           {isEditing && (

@@ -28,6 +28,8 @@ export const ROUTES = {
 
   // 遊戲帳號
   GAME_ACCOUNTS: '/game-accounts',
+  // 新增帳號或世界（擴充的「請先在工具網站新增遊戲帳號」也連到這裡）
+  GAME_ACCOUNTS_NEW: '/game-accounts/new',
 
   // 村莊
   VILLAGES: {
