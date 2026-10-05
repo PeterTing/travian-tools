@@ -42,7 +42,9 @@ export default function GameAccountsPage({ startWithCreate = false }: GameAccoun
   const [showForm, setShowForm] = useState(startWithCreate)
   const [editingAccount, setEditingAccount] = useState<GameAccount | null>(null)
   const [deleteAccountId, setDeleteAccountId] = useState<string | null>(null)
-  // null＝使用者還沒點過：全部都停用時預設展開，不然收起來
+  // 「已停用」展開或收起：null＝使用者還沒點過，照預設（全部都停用時展開，不然收起來）。
+  // 使用者自己點過（展開或收起）就照他的；按「重新啟用」時如果還沒點過，就把當下展開的狀態固定住，
+  // 連續重新啟用好幾個時不會因為有了啟用中的帳號而自動收起來。最後一個也重新啟用、清單空了，就回到預設。
   const [inactiveToggle, setInactiveToggle] = useState<boolean | null>(null)
   const [reactivatingId, setReactivatingId] = useState<string | null>(null)
   const [reactivateError, setReactivateError] = useState<string | null>(null)
@@ -70,13 +72,16 @@ export default function GameAccountsPage({ startWithCreate = false }: GameAccoun
     if (startWithCreate) navigate(ROUTES.GAME_ACCOUNTS, { replace: true })
   }
 
-  const loadAccounts = async () => {
+  /** 重新讀帳號清單；回傳讀到的清單，失敗回 null */
+  const loadAccounts = async (): Promise<GameAccount[] | null> => {
     try {
       setLoading(true)
       const response = await gameAccountApi.getAll(true)
       setAccounts(response.accounts)
+      return response.accounts
     } catch (error) {
       console.error('Failed to load accounts:', error)
+      return null
     } finally {
       setLoading(false)
     }
@@ -110,9 +115,13 @@ export default function GameAccountsPage({ startWithCreate = false }: GameAccoun
   const handleReactivate = async (account: GameAccount) => {
     setReactivateError(null)
     setReactivatingId(account.account_id)
+    // 按得到「重新啟用」就表示清單是展開的；使用者沒點過時固定成展開，點過（例如等待中收起來）就照他的
+    setInactiveToggle((prev) => prev ?? true)
     try {
       await gameAccountApi.update(account.account_id, { is_active: true })
-      await loadAccounts()
+      const remaining = await loadAccounts()
+      // 最後一個也重新啟用了：「已停用」整段消失，展開狀態回到預設
+      if (remaining && !remaining.some((a) => !a.is_active)) setInactiveToggle(null)
       void reloadCurrentAccounts()
     } catch (error) {
       console.error('Failed to reactivate account:', error)
