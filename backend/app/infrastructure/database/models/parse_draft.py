@@ -7,9 +7,13 @@ from datetime import datetime
 from typing import Any
 
 from sqlalchemy import JSON, DateTime, ForeignKey, String, Text, func
+from sqlalchemy.dialects.mysql import MEDIUMTEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
+
+# MySQL needs MEDIUMTEXT for full view-source HTML; SQLite keeps Text.
+_RawContent = Text().with_variant(MEDIUMTEXT(), "mysql")
 
 
 class ParseDraft(Base):
@@ -36,7 +40,7 @@ class ParseDraft(Base):
     raw_kind: Mapped[str] = mapped_column(
         String(10), default="html", server_default="html"
     )
-    raw_content: Mapped[str] = mapped_column(Text, nullable=False)
+    raw_content: Mapped[str] = mapped_column(_RawContent, nullable=False)
     parsed_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     warnings_json: Mapped[list[Any] | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

@@ -220,11 +220,31 @@ class PasteService:
                 .first()
             )
             if village is None:
-                return {
-                    "success": False,
-                    "message": "找不到選定的村莊",
-                    "error_code": "forbidden",
-                }
+                # Parser/extension may pass Travian data-did
+                village = (
+                    self.db.query(Village)
+                    .filter(
+                        Village.travian_village_id == str(resolved_village_id),
+                        Village.account_id == account_id,
+                    )
+                    .first()
+                )
+            if village is None:
+                looks_uuid = (
+                    len(str(resolved_village_id)) == 36
+                    and str(resolved_village_id).count("-") == 4
+                )
+                # Explicit UI village UUID (or junk selection) must exist;
+                # bare Travian numeric ids without a row are optional.
+                if looks_uuid or not str(resolved_village_id).isdigit():
+                    return {
+                        "success": False,
+                        "message": "找不到選定的村莊",
+                        "error_code": "forbidden",
+                    }
+                resolved_village_id = None
+            else:
+                resolved_village_id = village.village_id
         else:
             resolved_village_id = None
 
