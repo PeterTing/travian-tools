@@ -1,25 +1,17 @@
 /**
  * Travian Tools - Background Service Worker
- * 處理 API 通訊、狀態管理和定期同步
+ * 只處理 API 通訊與登入狀態。
+ *
+ * 合規：沒有任何計時器、alarm 或背景輪詢；只有使用者在 popup 點擊
+ * 「同步當前頁面」時，才會讀取「目前分頁」並送到 Travian Tools 後端。
+ * 擴充功能本身不會對 Travian 發出任何請求。
  */
 
 // 配置
 const CONFIG = {
   API_BASE_URL: 'http://localhost:8000/api/v1',
   DEBUG: true,
-  AUTO_SYNC_MIN_INTERVAL: 12, // 最小同步間隔（分鐘）
-  AUTO_SYNC_MAX_INTERVAL: 18, // 最大同步間隔（分鐘）
-  AUTO_SYNC_ALARM_NAME: 'travian-auto-sync',
 };
-
-/**
- * 產生隨機同步間隔（分鐘）
- */
-function getRandomInterval() {
-  const min = CONFIG.AUTO_SYNC_MIN_INTERVAL;
-  const max = CONFIG.AUTO_SYNC_MAX_INTERVAL;
-  return min + Math.random() * (max - min);
-}
 
 // 工具函數
 const log = (...args) => {
@@ -51,30 +43,6 @@ const Storage = {
 
   async clearAuth() {
     await chrome.storage.local.remove('auth');
-  },
-
-  async getAutoSyncEnabled() {
-    return (await this.get('autoSyncEnabled')) ?? false;
-  },
-
-  async setAutoSyncEnabled(enabled) {
-    await this.set('autoSyncEnabled', enabled);
-  },
-
-  async getSelectedAccountId() {
-    return await this.get('selectedAccountId');
-  },
-
-  async setSelectedAccountId(accountId) {
-    await this.set('selectedAccountId', accountId);
-  },
-
-  async getLastAutoSync() {
-    return await this.get('lastAutoSync');
-  },
-
-  async setLastAutoSync(timestamp) {
-    await this.set('lastAutoSync', timestamp);
   },
 };
 
@@ -194,184 +162,6 @@ async function syncTroopStatistics(accountId, villagesTroops) {
 }
 
 /**
- * 自動同步管理
- */
-const AutoSync = {
-  /**
-   * 啟動自動同步（使用隨機間隔）
-   */
-  async start() {
-    log('Starting auto-sync alarm...');
-    const interval = getRandomInterval();
-    await chrome.alarms.create(CONFIG.AUTO_SYNC_ALARM_NAME, {
-      delayInMinutes: interval,
-    });
-    await Storage.setAutoSyncEnabled(true);
-    log(`Auto-sync enabled, next sync in ${interval.toFixed(1)} minutes`);
-  },
-
-  /**
-   * 停止自動同步
-   */
-  async stop() {
-    log('Stopping auto-sync alarm...');
-    await chrome.alarms.clear(CONFIG.AUTO_SYNC_ALARM_NAME);
-    await Storage.setAutoSyncEnabled(false);
-    log('Auto-sync disabled');
-  },
-
-  /**
-   * 檢查並恢復自動同步狀態
-   */
-  async restore() {
-    const enabled = await Storage.getAutoSyncEnabled();
-    if (enabled) {
-      log('Restoring auto-sync from previous state...');
-      await this.start();
-    }
-  },
-
-  /**
-   * 執行自動同步
-   */
-  async execute() {
-    log('Executing auto-sync...');
-
-    const auth = await Storage.getAuth();
-    if (!auth) {
-      log('Auto-sync skipped: not logged in');
-      return { success: false, reason: 'not_logged_in' };
-    }
-
-    const accountId = await Storage.getSelectedAccountId();
-    if (!accountId) {
-      log('Auto-sync skipped: no account selected');
-      return { success: false, reason: 'no_account' };
-    }
-
-    // 找到所有 Travian 標籤頁
-    const travianTabs = await this.findTravianTabs();
-    if (travianTabs.length === 0) {
-      log('Auto-sync skipped: no Travian tabs open');
-      return { success: false, reason: 'no_tabs' };
-    }
-
-    let syncedCount = 0;
-    let errorCount = 0;
-
-    for (const tab of travianTabs) {
-      try {
-        const result = await this.syncTab(tab, accountId);
-        if (result.success) {
-          syncedCount++;
-        } else {
-          errorCount++;
-        }
-      } catch (error) {
-        log('Error syncing tab:', tab.id, error);
-        errorCount++;
-      }
-    }
-
-    await Storage.setLastAutoSync(Date.now());
-
-    log(`Auto-sync complete: ${syncedCount} synced, ${errorCount} errors`);
-    return { success: true, syncedCount, errorCount };
-  },
-
-  /**
-   * 找到所有 Travian 標籤頁
-   */
-  async findTravianTabs() {
-    const patterns = [
-      '*://*.travian.com/*',
-      '*://*.travian.tw/*',
-      '*://*.travian.net/*',
-      '*://*.x1.asia.travian.com/*',
-    ];
-
-    const allTabs = [];
-    for (const pattern of patterns) {
-      try {
-        const tabs = await chrome.tabs.query({ url: pattern });
-        allTabs.push(...tabs);
-      } catch {
-        // 忽略查詢錯誤
-      }
-    }
-
-    // 過濾重複的標籤頁
-    const uniqueTabs = allTabs.filter((tab, index, self) =>
-      index === self.findIndex(t => t.id === tab.id)
-    );
-
-    // 只保留 dorf1.php 或 dorf2.php 頁面
-    const villageTabs = uniqueTabs.filter(tab =>
-      tab.url?.includes('dorf1.php') || tab.url?.includes('dorf2.php')
-    );
-
-    log(`Found ${villageTabs.length} Travian village tabs`);
-    return villageTabs;
-  },
-
-  /**
-   * 同步單個標籤頁
-   */
-  async syncTab(tab, accountId) {
-    log(`Syncing tab ${tab.id}: ${tab.url}`);
-
-    return new Promise((resolve) => {
-      chrome.tabs.sendMessage(tab.id, { action: 'collect_data' }, async (response) => {
-        if (chrome.runtime.lastError) {
-          log('Content script error:', chrome.runtime.lastError.message);
-          resolve({ success: false, error: chrome.runtime.lastError.message });
-          return;
-        }
-
-        if (!response?.success) {
-          resolve({ success: false, error: response?.error || 'No response' });
-          return;
-        }
-
-        const data = response.data;
-        try {
-          if (data.page_type === 'village_overview') {
-            await syncVillageOverview(accountId, data);
-          } else if (data.page_type === 'village_center') {
-            await syncVillageCenter(accountId, data.village_id, data);
-          }
-          log(`Tab ${tab.id} synced successfully`);
-          resolve({ success: true });
-        } catch (error) {
-          log(`Tab ${tab.id} sync failed:`, error);
-          resolve({ success: false, error: error.message });
-        }
-      });
-    });
-  },
-};
-
-/**
- * 監聽 alarm 事件
- */
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === CONFIG.AUTO_SYNC_ALARM_NAME) {
-    log('Auto-sync alarm triggered');
-    await AutoSync.execute();
-
-    // 執行完後設定下一次的隨機間隔
-    const enabled = await Storage.getAutoSyncEnabled();
-    if (enabled) {
-      const nextInterval = getRandomInterval();
-      await chrome.alarms.create(CONFIG.AUTO_SYNC_ALARM_NAME, {
-        delayInMinutes: nextInterval,
-      });
-      log(`Next auto-sync in ${nextInterval.toFixed(1)} minutes`);
-    }
-  }
-});
-
-/**
  * 監聽來自 popup 或 content script 的消息
  */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -390,7 +180,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         case 'logout':
           await Storage.clearAuth();
-          await AutoSync.stop();
           return { success: true };
 
         case 'get_auth':
@@ -430,34 +219,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           );
           return { success: true, data: troopStatsResult };
 
-        // 自動同步相關
-        case 'get_auto_sync_status':
-          const autoSyncEnabled = await Storage.getAutoSyncEnabled();
-          const lastAutoSync = await Storage.getLastAutoSync();
-          const selectedAccountId = await Storage.getSelectedAccountId();
-          return {
-            success: true,
-            data: {
-              enabled: autoSyncEnabled,
-              lastSync: lastAutoSync,
-              accountId: selectedAccountId,
-              intervalMinutes: `${CONFIG.AUTO_SYNC_MIN_INTERVAL}-${CONFIG.AUTO_SYNC_MAX_INTERVAL}`,
-            },
-          };
-
-        case 'set_auto_sync':
-          if (request.enabled) {
-            await Storage.setSelectedAccountId(request.accountId);
-            await AutoSync.start();
-          } else {
-            await AutoSync.stop();
-          }
-          return { success: true };
-
-        case 'trigger_auto_sync':
-          const syncResult = await AutoSync.execute();
-          return { success: true, data: syncResult };
-
         default:
           return { success: false, error: 'Unknown action' };
       }
@@ -471,6 +232,4 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true; // 保持 message channel 開啟
 });
 
-// 初始化 - 恢復自動同步狀態
-AutoSync.restore();
 log('Background service worker started');

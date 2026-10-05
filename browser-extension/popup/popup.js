@@ -14,14 +14,6 @@ const syncBtn = document.getElementById('sync-btn');
 const syncResultEl = document.getElementById('sync-result');
 const errorMessageEl = document.getElementById('error-message');
 
-// 自動同步相關元素
-const autoSyncCheckbox = document.getElementById('auto-sync-checkbox');
-const autoSyncLabel = document.getElementById('auto-sync-label');
-const autoSyncStatus = document.getElementById('auto-sync-status');
-const syncIntervalEl = document.getElementById('sync-interval');
-const lastSyncTimeEl = document.getElementById('last-sync-time');
-const triggerSyncBtn = document.getElementById('trigger-sync-btn');
-
 // 狀態
 let currentAuth = null;
 let currentPageType = null;
@@ -47,17 +39,12 @@ async function sendMessage(action, data = {}) {
   });
 }
 
-/**
- * 發送消息到 content script
- */
-async function sendToContent(action, data = {}) {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id) {
-    return { success: false, error: 'No active tab' };
-  }
+// 只在 Travian 遊戲頁面上讀取（使用者點開 popup 時，activeTab 才授權目前分頁）
+const TRAVIAN_PAGE = /^https:\/\/([a-z0-9-]+\.)*travian\.(com|tw|net)\//i;
 
+function messageTab(tabId, message) {
   return new Promise((resolve) => {
-    chrome.tabs.sendMessage(tab.id, { action, ...data }, (response) => {
+    chrome.tabs.sendMessage(tabId, message, (response) => {
       if (chrome.runtime.lastError) {
         resolve({ success: false, error: chrome.runtime.lastError.message });
       } else {
@@ -65,6 +52,36 @@ async function sendToContent(action, data = {}) {
       }
     });
   });
+}
+
+/**
+ * 發送消息到目前分頁的 content script。
+ *
+ * content script 不會自動注入任何頁面；只有使用者點開 popup（activeTab）時，
+ * 才用 chrome.scripting 注入到「目前分頁」一次，然後只讀取該頁 DOM。
+ */
+async function sendToContent(action, data = {}) {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab?.id) {
+    return { success: false, error: 'No active tab' };
+  }
+  if (!tab.url || !TRAVIAN_PAGE.test(tab.url)) {
+    return { success: false, error: '目前分頁不是 Travian 遊戲頁面' };
+  }
+
+  const ping = await messageTab(tab.id, { action: 'ping' });
+  if (!ping.success) {
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content/content.js'],
+      });
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  return messageTab(tab.id, { action, ...data });
 }
 
 /**
@@ -251,103 +268,9 @@ logoutBtn.addEventListener('click', async () => {
 
 accountSelect.addEventListener('change', () => {
   detectPage();
-  updateAutoSyncUI();
 });
 
 syncBtn.addEventListener('click', syncData);
-
-// 自動同步相關事件
-autoSyncCheckbox.addEventListener('change', async () => {
-  const enabled = autoSyncCheckbox.checked;
-  const accountId = accountSelect.value;
-
-  if (enabled && !accountId) {
-    showError('請先選擇遊戲帳號');
-    autoSyncCheckbox.checked = false;
-    return;
-  }
-
-  autoSyncCheckbox.disabled = true;
-
-  try {
-    const result = await sendMessage('set_auto_sync', {
-      enabled,
-      accountId,
-    });
-
-    if (!result.success) {
-      throw new Error(result.error || '設定失敗');
-    }
-
-    updateAutoSyncUI();
-  } catch (error) {
-    showError(error.message);
-    autoSyncCheckbox.checked = !enabled;
-  } finally {
-    autoSyncCheckbox.disabled = false;
-  }
-});
-
-triggerSyncBtn.addEventListener('click', async () => {
-  triggerSyncBtn.disabled = true;
-  triggerSyncBtn.textContent = '同步中...';
-
-  try {
-    const result = await sendMessage('trigger_auto_sync');
-    if (result.success) {
-      const data = result.data;
-      if (data.success) {
-        syncResultEl.textContent = `同步完成！成功 ${data.syncedCount} 個，失敗 ${data.errorCount} 個`;
-        syncResultEl.className = 'sync-result success';
-      } else {
-        const reasons = {
-          not_logged_in: '尚未登入',
-          no_account: '未選擇帳號',
-          no_tabs: '未找到 Travian 分頁',
-        };
-        syncResultEl.textContent = `同步跳過：${reasons[data.reason] || data.reason}`;
-        syncResultEl.className = 'sync-result';
-      }
-      await updateAutoSyncUI();
-    } else {
-      throw new Error(result.error || '同步失敗');
-    }
-  } catch (error) {
-    syncResultEl.textContent = `錯誤: ${error.message}`;
-    syncResultEl.className = 'sync-result error';
-  } finally {
-    triggerSyncBtn.disabled = false;
-    triggerSyncBtn.textContent = '立即同步所有分頁';
-  }
-});
-
-/**
- * 更新自動同步 UI 狀態
- */
-async function updateAutoSyncUI() {
-  const result = await sendMessage('get_auto_sync_status');
-  if (!result.success) return;
-
-  const { enabled, lastSync, intervalMinutes } = result.data;
-
-  autoSyncCheckbox.checked = enabled;
-  autoSyncLabel.textContent = enabled ? '已啟用' : '已停用';
-
-  // 只有選擇了帳號才能啟用自動同步
-  autoSyncCheckbox.disabled = !accountSelect.value;
-
-  if (enabled) {
-    autoSyncStatus.classList.remove('hidden');
-    triggerSyncBtn.classList.remove('hidden');
-    syncIntervalEl.textContent = `${intervalMinutes} 分鐘 (隨機)`;
-    lastSyncTimeEl.textContent = lastSync
-      ? new Date(lastSync).toLocaleString()
-      : '從未';
-  } else {
-    autoSyncStatus.classList.add('hidden');
-    triggerSyncBtn.classList.add('hidden');
-  }
-}
 
 // 初始化
 (async () => {
@@ -357,7 +280,6 @@ async function updateAutoSyncUI() {
     currentAuth = authResult.data;
     updateUI();
     await loadAccounts();
-    await updateAutoSyncUI();
   } else {
     updateUI();
   }

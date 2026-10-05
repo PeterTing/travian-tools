@@ -4,8 +4,9 @@
 
 ## 功能
 
-- 自動檢測 Travian 遊戲頁面
-- 手動觸發同步當前頁面數據
+- 只在你點擊時讀取「目前分頁」：點開工具列圖示（activeTab）後按「同步當前頁面」
+- 沒有背景自動同步、計時器、輪詢，也不會讀取其他分頁或對 Travian 發出任何請求
+  （由 `backend/tests/unit/test_compliance.py` 在 CI 中檢查）
 - 支援村莊總覽 (dorf1.php) 和村莊中心 (dorf2.php) 頁面
 - 與 Travian Tools 後端 API 整合
 
@@ -40,16 +41,14 @@
 browser-extension/
 ├── manifest.json          # 擴展設定檔
 ├── icons/                 # 擴展圖示
-├── src/
-│   ├── background/        # 背景服務腳本
-│   │   └── background.js
-│   ├── content/           # 內容腳本 (注入遊戲頁面)
-│   │   ├── content.js
-│   │   └── content.css
-│   └── popup/             # 彈出視窗 UI
-│       ├── popup.html
-│       ├── popup.css
-│       └── popup.js
+├── background/            # 背景服務腳本（只負責呼叫 Travian Tools API）
+│   └── background.js
+├── content/               # 內容腳本（點擊時才注入目前分頁）
+│   └── content.js
+├── popup/                 # 彈出視窗 UI
+│   ├── popup.html
+│   ├── popup.css
+│   └── popup.js
 └── README.md
 ```
 

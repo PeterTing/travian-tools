@@ -2,18 +2,13 @@
   "manifest_version": 3,
   "name": "Travian Tools Helper",
   "version": "0.1.0",
-  "description": "Sync your Travian: Legends game data with Travian Tools",
+  "description": "Read the Travian: Legends page you are on (only when you click Sync) and send it to Travian Tools",
   "permissions": [
     "activeTab",
     "storage",
-    "alarms",
-    "tabs"
+    "scripting"
   ],
   "host_permissions": [
-    "*://*.travian.com/*",
-    "*://*.travian.tw/*",
-    "*://*.travian.net/*",
-    "*://*.x1.asia.travian.com/*",
     "http://localhost:8000/*"
   ],
   "action": {
@@ -28,19 +23,6 @@
     "service_worker": "background/background.js",
     "type": "module"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "*://*.travian.com/*",
-        "*://*.travian.tw/*",
-        "*://*.travian.net/*",
-        "*://*.x1.asia.travian.com/*"
-      ],
-      "js": ["content/content.js"],
-      "css": ["content/content.css"],
-      "run_at": "document_idle"
-    }
-  ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

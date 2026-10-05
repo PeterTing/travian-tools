@@ -8,7 +8,15 @@ Fails if
    network client (httpx, requests, aiohttp, urllib.request, socket, …) — the
    backend's only outbound HTTP is the public map.sql fetch;
 3. frontend / extension code issues a request (fetch, axios, XHR, WebSocket,
-   EventSource) to a Travian domain.
+   EventSource) to a Travian domain;
+4. the browser extension can sync without a user click: alarms, intervals,
+   timers whose callback syncs/collects, tab-event or navigation listeners,
+   enumerating tabs by URL, navigating/clicking pages, or manifest permissions
+   (alarms, tabs, webNavigation, Travian host permissions) that enable that.
+   The extension may only read the current tab when the user clicks
+   (activeTab);
+5. any backend module other than ``map_sql_scheduler`` creates a scheduler or
+   scheduled job.
 
 The fetcher itself is checked by ``tests/unit/services/test_map_sql_fetcher.py``
 (https + *.travian.com only, path fixed to /map.sql, no cookies, no redirects).
@@ -16,6 +24,7 @@ The fetcher itself is checked by ``tests/unit/services/test_map_sql_fetcher.py``
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -25,6 +34,8 @@ BACKEND = Path(__file__).resolve().parents[2]
 REPO = BACKEND.parent
 APP = BACKEND / "app"
 ALLOWED_NETWORK_MODULE = APP / "services" / "map_sql_fetcher.py"
+ALLOWED_SCHEDULER_MODULE = APP / "services" / "map_sql_scheduler.py"
+EXTENSION = REPO / "browser-extension"
 
 SKIP_DIRS = {"node_modules", ".venv", "venv", "dist", "build", "__pycache__", ".git"}
 SOURCE_SUFFIXES = {".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"}
@@ -163,6 +174,139 @@ def test_frontend_and_extension_never_request_travian() -> None:
             if JS_TRAVIAN_REQUEST.search(text):
                 offenders.append(_rel(path))
     assert offenders == [], f"request to a Travian domain in: {offenders}"
+
+
+# ---------------------------------------------------------------- extension
+EXT_BANNED = {
+    "chrome.alarms / browser.alarms": re.compile(r"\b(?:chrome|browser)\.alarms\b"),
+    "setInterval": re.compile(r"\bsetInterval\s*\("),
+    "requestAnimationFrame loop": re.compile(r"\brequestAnimationFrame\s*\("),
+    "tab/navigation event listener": re.compile(
+        r"\b(?:chrome|browser)\.(?:tabs\.on(?:Updated|Activated|Created|Replaced)"
+        r"|webNavigation|idle|windows\.onFocusChanged|runtime\.onStartup)\b"
+    ),
+    "enumerating tabs by URL": re.compile(
+        r"\b(?:chrome|browser)\.tabs\.query\s*\(\s*\{[^}]*\burl\s*:"
+    ),
+    "querying all tabs": re.compile(
+        r"\b(?:chrome|browser)\.tabs\.query\s*\(\s*\{\s*\}\s*\)"
+    ),
+    "navigating / reloading tabs": re.compile(
+        r"\b(?:chrome|browser)\.tabs\.(?:reload|update|create|duplicate)\s*\("
+        r"|\blocation\.(?:reload|assign|replace)\s*\(|\blocation\.href\s*="
+    ),
+    "synthetic clicks / form submits": re.compile(
+        r"\.click\s*\(\s*\)|\.submit\s*\(\s*\)|dispatchEvent\s*\(\s*new\s+MouseEvent"
+    ),
+}
+SYNC_WORDS = re.compile(
+    r"sync|collect|sendMessage|apiRequest|fetch|executeScript|XMLHttpRequest", re.I
+)
+EXT_BANNED_PERMISSIONS = {"alarms", "tabs", "webNavigation", "background", "debugger"}
+
+
+def _call_arguments(text: str, start: int) -> str:
+    """Return the text inside the parentheses that open at ``text[start]``."""
+    depth = 0
+    for i in range(start, len(text)):
+        if text[i] == "(":
+            depth += 1
+        elif text[i] == ")":
+            depth -= 1
+            if depth == 0:
+                return text[start + 1 : i]
+    return text[start + 1 :]
+
+
+def _timer_triggers_sync(text: str) -> list[str]:
+    """setTimeout / queueMicrotask callbacks that sync or collect page data."""
+    hits = []
+    for match in re.finditer(r"\b(?:setTimeout|queueMicrotask)\s*(\()", text):
+        args = _call_arguments(text, match.start(1))
+        if SYNC_WORDS.search(args):
+            hits.append(args.strip()[:80])
+    return hits
+
+
+def extension_violations(text: str) -> list[str]:
+    found = [name for name, pattern in EXT_BANNED.items() if pattern.search(text)]
+    found += [f"timer triggers sync: {h}" for h in _timer_triggers_sync(text)]
+    return found
+
+
+def test_extension_has_no_background_sync_triggers() -> None:
+    offenders = {}
+    for path in _iter_files(EXTENSION, SOURCE_SUFFIXES | {".html"}):
+        problems = extension_violations(
+            path.read_text(encoding="utf-8", errors="ignore")
+        )
+        if problems:
+            offenders[_rel(path)] = problems
+    assert offenders == {}, f"extension may only sync on user click: {offenders}"
+
+
+def test_extension_manifest_is_click_only() -> None:
+    manifest_path = EXTENSION / "manifest.json"
+    if not manifest_path.exists():
+        pytest.skip("no browser extension")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    permissions = set(manifest.get("permissions", [])) | set(
+        manifest.get("optional_permissions", [])
+    )
+    assert not permissions & EXT_BANNED_PERMISSIONS, (
+        permissions & EXT_BANNED_PERMISSIONS
+    )
+    assert "activeTab" in permissions
+    hosts = manifest.get("host_permissions", []) + manifest.get(
+        "optional_host_permissions", []
+    )
+    travian_hosts = [
+        h for h in hosts if "travian" in h.lower() or h in ("<all_urls>", "*://*/*")
+    ]
+    assert travian_hosts == [], f"use activeTab instead of host access: {travian_hosts}"
+    # Optional passive mode may use content_scripts, but they are covered by
+    # test_extension_has_no_background_sync_triggers (no timers / requests).
+
+
+def test_only_map_sql_scheduler_schedules_jobs() -> None:
+    pattern = re.compile(
+        r"\b(?:BackgroundScheduler|AsyncIOScheduler|BlockingScheduler|add_job|"
+        r"CronTrigger|IntervalTrigger|threading\.Timer|asyncio\.sleep|time\.sleep)\b"
+    )
+    offenders = [
+        _rel(path)
+        for path in _iter_files(APP, {".py"})
+        if path.resolve() != ALLOWED_SCHEDULER_MODULE.resolve()
+        and pattern.search(path.read_text(encoding="utf-8"))
+    ]
+    assert offenders == [], f"scheduling outside map_sql_scheduler: {offenders}"
+
+
+@pytest.mark.parametrize(
+    "snippet",
+    [
+        "chrome.alarms.create('x', { periodInMinutes: 15 })",
+        "setInterval(() => sync(), 60000)",
+        "setTimeout(() => { syncAll(); }, 900000)",
+        "setTimeout(async () => await chrome.runtime.sendMessage({action: 'x'}), 5)",
+        "chrome.tabs.query({ url: '*://*.travian.com/*' })",
+        "chrome.tabs.onUpdated.addListener(() => {})",
+        "chrome.tabs.reload(tab.id)",
+        "document.querySelector('#btn').click()",
+        "location.href = '/dorf2.php'",
+    ],
+)
+def test_extension_guard_detects_violations(snippet: str) -> None:
+    assert extension_violations(snippet)
+
+
+def test_extension_guard_allows_ui_timers() -> None:
+    ui_timer = (
+        "setTimeout(() => { el.classList.add('hidden'); }, 5000);\n"
+        "async function sendMessage(action) { return chrome.runtime.sendMessage({action}); }\n"
+        "const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });"
+    )
+    assert extension_violations(ui_timer) == []
 
 
 @pytest.mark.parametrize(
