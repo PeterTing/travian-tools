@@ -159,9 +159,16 @@ class TestDataIsSeparated:
         villages = other.get(
             "/api/v1/villages", params={"account_id": mine["account_id"]}
         )
-        assert villages.status_code in (200, 404)
-        if villages.status_code == 200:
-            assert villages.json()["villages"] == []
+        # 列表 API 依登入者過濾：別人的帳號 ID 查到的是空清單
+        assert villages.status_code == 200
+        assert villages.json()["villages"] == []
+
+    def test_other_users_cannot_delete_my_account(self, as_user) -> None:  # type: ignore[no-untyped-def]
+        mine = _create(as_user("u-peter"), player_name="PeterT")
+        resp = as_user("u-other").delete(f"/api/v1/game-accounts/{mine['account_id']}")
+        assert resp.status_code == 404
+        still = as_user("u-peter").get(f"/api/v1/game-accounts/{mine['account_id']}")
+        assert still.status_code == 200
 
 
 class TestTimeDisplaySetting:
