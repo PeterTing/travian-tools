@@ -53,6 +53,13 @@ body {
   margin-top: 10px;
 }
 
+/* 「請先在工具網站新增遊戲帳號」：可以點的連結 */
+#add-account-link {
+  color: var(--p);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .note {
   margin-top: 8px;
 }

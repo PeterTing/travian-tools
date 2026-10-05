@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, computed_field
 
 
 class TroopTribe(StrEnum):
-    """種族列表."""
+    """部族列表."""
 
     ROMANS = "romans"
     GAULS = "gauls"
@@ -46,7 +46,7 @@ class Troop(BaseModel):
     troop_id: str = Field(..., description="兵種 ID")
     name_zh: str = Field(..., description="中文名稱")
     name_en: str = Field(..., description="英文名稱")
-    tribe: TroopTribe = Field(..., description="所屬種族")
+    tribe: TroopTribe = Field(..., description="所屬部族")
     category: TroopCategory = Field(..., description="兵種類型")
 
     # 戰鬥屬性
@@ -125,7 +125,7 @@ class TroopData(BaseModel):
         return self.troops.get(troop_id)
 
     def get_troops_by_tribe(self, tribe: TroopTribe) -> list[Troop]:
-        """根據種族取得兵種列表."""
+        """根據部族取得兵種列表."""
         return [t for t in self.troops.values() if t.tribe == tribe]
 
     def get_troops_by_category(self, category: TroopCategory) -> list[Troop]:

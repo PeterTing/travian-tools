@@ -35,14 +35,14 @@ class TestTroopsAPI:
         assert "defense_cavalry" in troop
 
     def test_get_troops_by_tribe_filter(self) -> None:
-        """測試依種族篩選兵種."""
+        """測試依部族篩選兵種."""
         response = client.get("/api/v1/troops?tribe=romans")
         assert response.status_code == 200
 
         data = response.json()
         assert data["total"] > 0
 
-        # 所有兵種都應該是羅馬種族
+        # 所有兵種都應該是羅馬部族
         for troop in data["troops"]:
             assert troop["tribe"] == "romans"
 
@@ -59,7 +59,7 @@ class TestTroopsAPI:
             assert troop["category"] == "infantry"
 
     def test_get_troops_by_tribe_and_category(self) -> None:
-        """測試同時依種族和類型篩選."""
+        """測試同時依部族和類型篩選."""
         response = client.get("/api/v1/troops?tribe=romans&category=cavalry")
         assert response.status_code == 200
 
@@ -94,19 +94,19 @@ class TestTroopsAPI:
         assert data["total"] > 0
 
     def test_get_troops_by_tribe_path(self) -> None:
-        """測試取得特定種族的兵種（路徑參數）."""
+        """測試取得特定部族的兵種（路徑參數）."""
         response = client.get("/api/v1/troops/gauls")
         assert response.status_code == 200
 
         data = response.json()
         assert data["total"] > 0
 
-        # 所有兵種都應該是高盧種族
+        # 所有兵種都應該是高盧部族
         for troop in data["troops"]:
             assert troop["tribe"] == "gauls"
 
     def test_get_troops_by_tribe_with_category(self) -> None:
-        """測試取得特定種族特定類型的兵種."""
+        """測試取得特定部族特定類型的兵種."""
         response = client.get("/api/v1/troops/teutons?category=siege")
         assert response.status_code == 200
 
@@ -155,7 +155,7 @@ class TestTroopsAPI:
         assert "detail" in data
 
     def test_get_troop_detail_wrong_tribe(self) -> None:
-        """測試查詢錯誤種族的兵種."""
+        """測試查詢錯誤部族的兵種."""
         # legionnaire 是羅馬兵種，查詢高盧應該 404
         response = client.get("/api/v1/troops/gauls/legionnaire")
         assert response.status_code == 404
@@ -220,7 +220,7 @@ class TestTroopsAPI:
         assert elapsed < 200, f"Response time {elapsed:.2f}ms exceeds 200ms"
 
     def test_get_all_seven_tribes(self) -> None:
-        """測試取得所有 7 個種族的兵種."""
+        """測試取得所有 7 個部族的兵種."""
         tribes = [
             "romans",
             "gauls",

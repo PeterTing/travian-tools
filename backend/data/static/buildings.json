@@ -1385,7 +1385,7 @@
       "name_en": "Marketplace",
       "category": "trade",
       "max_level": 20,
-      "description_zh": "交易資源的建築。可與其他玩家買賣或贈送資源。每升一級增加 1 名商人，滿級可擁有 20 名商人。商人負重因種族而異。",
+      "description_zh": "交易資源的建築。可與其他玩家買賣或贈送資源。每升一級增加 1 名商人，滿級可擁有 20 名商人。商人負重因部族而異。",
       "description_en": "Building for trading resources. Buy, sell, or send resources to other players. Each level adds 1 merchant, max level provides 20 merchants. Merchant capacity varies by tribe.",
       "prerequisites": [
         {
@@ -2513,7 +2513,7 @@
       "name_en": "Cranny",
       "category": "storage",
       "max_level": 10,
-      "description_zh": "隱藏資源不被掠奪的建築。1 級可隱藏 200 資源，滿級可隱藏 2,000 資源。可建造多個藏匿處。高盧族藏匿處容量為其他種族的兩倍。",
+      "description_zh": "隱藏資源不被掠奪的建築。1 級可隱藏 200 資源，滿級可隱藏 2,000 資源。可建造多個藏匿處。高盧族藏匿處容量為其他部族的兩倍。",
       "description_en": "Building to hide resources from raiders. Level 1 hides 200 resources, max level hides 2,000. Multiple crannies can be built. Gauls have double cranny capacity.",
       "prerequisites": [],
       "levels": [

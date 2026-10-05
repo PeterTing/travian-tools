@@ -45,7 +45,7 @@ class MapSqlService:
     )
 
     # T4.x 官方 map.sql（`INSERT INTO `x_world` VALUES (...);`）欄位順序：
-    #   0 fieldId, 1 x, 2 y, 3 tid(種族), 4 vid, 5 village, 6 uid, 7 player,
+    #   0 fieldId, 1 x, 2 y, 3 tid(部族), 4 vid, 5 village, 6 uid, 7 player,
     #   8 aid, 9 alliance, 10 population, 11 region(NULL 或字串),
     #   12 capital(TRUE/FALSE), 13 city, 14 harbor, 15 victoryPoints
     # 舊版只有前 11 欄。字串可能含 \' 或 '' 跳脫。
@@ -196,7 +196,7 @@ class MapSqlService:
 
     def _parse_line(self, line: str) -> MapVillage | None:
         """解析單行 CSV/TSV 數據（SQL INSERT 由 parse_sql 處理）."""
-        # 非 SQL INSERT 行：相容舊的 CSV/TSV 匯出格式（第 3 欄為種族 id）
+        # 非 SQL INSERT 行：相容舊的 CSV/TSV 匯出格式（第 3 欄為部族 id）
         # 嘗試 CSV 格式正則表達式
         match = self.MAP_LINE_PATTERN.match(line)
         if match:

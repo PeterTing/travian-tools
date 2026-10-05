@@ -37,11 +37,16 @@ class TestGameAccountCreate:
         assert data.server_speed == 1
         assert data.tribe is None
 
-    def test_invalid_server_url_no_protocol(self) -> None:
-        """測試無協議的 URL."""
+    def test_server_url_without_protocol_gets_https(self) -> None:
+        """沒寫 https:// 也可以（P0-02：直接貼主機名稱或完整遊戲網址）."""
+        data = GameAccountCreate(server_url="ts1.travian.com")
+        assert data.server_url == "https://ts1.travian.com"
+
+    def test_invalid_server_url(self) -> None:
+        """不是網址的文字要擋下來."""
         with pytest.raises(ValidationError) as exc_info:
-            GameAccountCreate(server_url="ts1.travian.com")
-        assert "伺服器 URL 必須以 http:// 或 https:// 開頭" in str(exc_info.value)
+            GameAccountCreate(server_url="not a url")
+        assert "世界網址格式不對" in str(exc_info.value)
 
     def test_server_url_http_allowed(self) -> None:
         """測試 http 協議允許."""
@@ -125,7 +130,7 @@ class TestGameAccountUpdate:
         """測試更新時的 URL 驗證."""
         with pytest.raises(ValidationError) as exc_info:
             GameAccountUpdate(server_url="invalid-url")
-        assert "伺服器 URL 必須以 http:// 或 https:// 開頭" in str(exc_info.value)
+        assert "世界網址格式不對" in str(exc_info.value)
 
     def test_update_null_server_url_allowed(self) -> None:
         """測試更新時允許 None."""

@@ -8,7 +8,7 @@
  * 的資料送到 Travian Tools 的上傳 API。不會自動上傳其他頁面。
  */
 
-import { API_BASE_URL, TOOL_SITE_URL } from '../lib/config.js';
+import { ADD_ACCOUNT_PATH, API_BASE_URL, TOOL_SITE_URL } from '../lib/config.js';
 import { clearCredential, describeExpiry, loadCredential } from '../lib/credential.js';
 import { UPLOAD_ENDPOINTS, UPLOAD_HINTS, uploadState } from '../lib/pages.js';
 
@@ -22,6 +22,7 @@ const logoutBtn = document.getElementById('logout-btn');
 const usernameEl = document.getElementById('username');
 const expiryEl = document.getElementById('expiry');
 const accountSelect = document.getElementById('account-select');
+const targetRowEl = document.getElementById('target-row');
 const pageLineEl = document.getElementById('page-line');
 const pageTypeEl = document.getElementById('page-type');
 const uploadHintEl = document.getElementById('upload-hint');
@@ -191,9 +192,15 @@ function renderAccounts() {
     option.textContent = account.label;
     accountSelect.appendChild(option);
   }
-  if (accounts.length === 1) {
+  // 預設選網站目前選的帳號；這裡改選只影響這一次上傳，不寫回任何地方
+  const preferred = credential?.selected_account_id;
+  if (preferred && accounts.some((a) => a.account_id === preferred)) {
+    accountSelect.value = preferred;
+  } else if (accounts.length === 1) {
     accountSelect.value = accounts[0].account_id;
   }
+  // 還沒有遊戲帳號時上方已經有「請先在工具網站新增遊戲帳號」連結，整個「存到」那一行收起來
+  targetRowEl.classList.toggle('hidden', accounts.length === 0);
 }
 
 /** 依頁面與帳號狀態更新「目前頁面」、說明文字與按鈕；按鈕不能按時一定有說明 */
@@ -206,9 +213,30 @@ function refreshSyncButton() {
   });
   pageTypeEl.textContent = state.pageName;
   pageLineEl.classList.toggle('hidden', !state.pageName);
-  uploadHintEl.textContent = state.hint;
+  if (state.hint === UPLOAD_HINTS.NO_ACCOUNTS) {
+    renderAddAccountLink(state.hint);
+  } else {
+    uploadHintEl.textContent = state.hint;
+  }
   uploadHintEl.classList.toggle('hidden', !state.hint);
   syncBtn.disabled = !state.canUpload;
+}
+
+/** 「請先在工具網站新增遊戲帳號」做成連結，點了開新分頁到工具網站的新增帳號頁 */
+function renderAddAccountLink(text) {
+  const link = document.createElement('a');
+  link.id = 'add-account-link';
+  link.href = `${TOOL_SITE_URL}${ADD_ACCOUNT_PATH}`;
+  link.textContent = text;
+  link.addEventListener('click', openAddAccountPage);
+  uploadHintEl.replaceChildren(link);
+}
+
+function openAddAccountPage(event) {
+  event.preventDefault();
+  // 和「在工具網站登入」一樣：只開一個新分頁到工具網站，不碰任何遊戲分頁。
+  window.open(`${TOOL_SITE_URL}${ADD_ACCOUNT_PATH}`, '_blank', 'noopener');
+  window.close();
 }
 
 async function detectPage() {

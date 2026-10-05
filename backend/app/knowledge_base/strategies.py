@@ -17,7 +17,7 @@ EARLY_GAME_STRATEGIES = {
         "tribe_specific": {
             "romans": "可以雙蓋，但不要過度使用，資源田提升比建築優先",
             "gauls": "利用1.5倍密藏室保護資源，適合較和平的開局",
-            "teutons": "最佳早期掠奪種族，棍棒兵是最高效的早期單位",
+            "teutons": "最佳早期掠奪部族，棍棒兵是最高效的早期單位",
             "egyptians": "利用英雄資源加成，專注經濟發展",
             "huns": "適合有經驗的玩家，需要快速掠奪來彌補弱防禦",
         },
@@ -295,7 +295,7 @@ HERO_GUIDE = {
             "fighting_strength": {
                 "description": "增加英雄攻防值",
                 "tribe_bonus": {
-                    "romans": "+100每點（其他種族+80）",
+                    "romans": "+100每點（其他部族+80）",
                 },
             },
             "off_bonus": {

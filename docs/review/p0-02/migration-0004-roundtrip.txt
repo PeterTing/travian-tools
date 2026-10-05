@@ -1,0 +1,127 @@
+# 2026-10-05 12:33 PT · branch p0/accounts-world-switcher · commit d05ac3f
++ mariadb -e "DROP DATABASE IF EXISTS travian_p0_02_fresh; CREATE DATABASE travian_p0_02_fresh"
++ alembic upgrade 0003_ext_token_version
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_baseline, Baseline schema (squashed).
+INFO  [alembic.runtime.migration] Running upgrade 0001_baseline -> 0002_drop_legacy, Drop stored Travian credentials and the browser-automation tables.
+INFO  [alembic.runtime.migration] Running upgrade 0002_drop_legacy -> 0003_ext_token_version, Add users.extension_token_version for revoking extension tokens.
++ mariadb travian_p0_02_fresh -e "INSERT INTO users (user_id, username, email, password_hash, extension_token_version) VALUES ('u1','peter','p@example.com','x',0), ('u2','other','o@example.com','x',0);
+INSERT INTO game_accounts (account_id, user_id, server_url, server_speed, player_name, is_active) VALUES
+ ('a1','u1','https://ts3.x1.asia.travian.com',1,'PeterT',1),
+ ('a2','u1','https://TS3.x1.asia.travian.com/dorf1.php',1,'alt',1),
+ ('a3','u1','https://ts5.x1.asia.travian.com',1,'PeterT',1),
+ ('a4','u2','https://ts3.x1.asia.travian.com',1,'Other',1);"
+
+## upgrade
++ alembic upgrade head
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0003_ext_token_version -> 0004_time_and_worlds, Per-account time display + per-world UTC offset (P0-02).
++ alembic current
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+0004_time_and_worlds (head)
++ alembic check
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
++ mariadb travian_p0_02_fresh -e "SHOW COLUMNS FROM game_accounts WHERE Field IN ('time_display','local_timezone','world_id')"
++----------------+------------------------+------+-----+---------+-------+
+| Field          | Type                   | Null | Key | Default | Extra |
++----------------+------------------------+------+-----+---------+-------+
+| time_display   | enum('server','local') | YES  |     | NULL    |       |
+| local_timezone | varchar(64)            | YES  |     | NULL    |       |
+| world_id       | varchar(36)            | YES  | MUL | NULL    |       |
++----------------+------------------------+------+-----+---------+-------+
++ mariadb travian_p0_02_fresh -e "SHOW COLUMNS FROM game_worlds"
++------------+--------------+------+-----+---------------------+-------+
+| Field      | Type         | Null | Key | Default             | Extra |
++------------+--------------+------+-----+---------------------+-------+
+| world_id   | varchar(36)  | NO   | PRI | NULL                |       |
+| user_id    | varchar(36)  | NO   | MUL | NULL                |       |
+| server_url | varchar(200) | NO   |     | NULL                |       |
+| utc_offset | int(11)      | YES  |     | NULL                |       |
+| created_at | datetime     | NO   |     | current_timestamp() |       |
++------------+--------------+------+-----+---------------------+-------+
++ mariadb travian_p0_02_fresh -e "SELECT a.account_id, a.user_id, a.server_url, w.server_url AS world_url, w.utc_offset, a.time_display FROM game_accounts a LEFT JOIN game_worlds w ON w.world_id = a.world_id ORDER BY a.account_id"
++------------+---------+-------------------------------------------+---------------------------------+------------+--------------+
+| account_id | user_id | server_url                                | world_url                       | utc_offset | time_display |
++------------+---------+-------------------------------------------+---------------------------------+------------+--------------+
+| a1         | u1      | https://ts3.x1.asia.travian.com           | https://ts3.x1.asia.travian.com |       NULL | NULL         |
+| a2         | u1      | https://TS3.x1.asia.travian.com/dorf1.php | https://ts3.x1.asia.travian.com |       NULL | NULL         |
+| a3         | u1      | https://ts5.x1.asia.travian.com           | https://ts5.x1.asia.travian.com |       NULL | NULL         |
+| a4         | u2      | https://ts3.x1.asia.travian.com           | https://ts3.x1.asia.travian.com |       NULL | NULL         |
++------------+---------+-------------------------------------------+---------------------------------+------------+--------------+
++ mariadb travian_p0_02_fresh -e "SELECT COUNT(*) AS worlds FROM game_worlds"
++--------+
+| worlds |
++--------+
+|      3 |
++--------+
+
+## downgrade
++ alembic downgrade -1
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0004_time_and_worlds -> 0003_ext_token_version, Per-account time display + per-world UTC offset (P0-02).
++ alembic current
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+0003_ext_token_version
++ mariadb travian_p0_02_fresh -e "SHOW TABLES LIKE 'game_worlds'"
++ mariadb travian_p0_02_fresh -e "SELECT COUNT(*) AS new_columns_left FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'game_accounts' AND column_name IN ('world_id','time_display','local_timezone')"
++------------------+
+| new_columns_left |
++------------------+
+|                0 |
++------------------+
++ mariadb travian_p0_02_fresh -e "SELECT account_id, server_url, player_name FROM game_accounts ORDER BY account_id"
++------------+-------------------------------------------+-------------+
+| account_id | server_url                                | player_name |
++------------+-------------------------------------------+-------------+
+| a1         | https://ts3.x1.asia.travian.com           | PeterT      |
+| a2         | https://TS3.x1.asia.travian.com/dorf1.php | alt         |
+| a3         | https://ts5.x1.asia.travian.com           | PeterT      |
+| a4         | https://ts3.x1.asia.travian.com           | Other       |
++------------+-------------------------------------------+-------------+
+
+## upgrade again
++ alembic upgrade head
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0003_ext_token_version -> 0004_time_and_worlds, Per-account time display + per-world UTC offset (P0-02).
++ alembic current
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+0004_time_and_worlds (head)
++ alembic check
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
++ mariadb travian_p0_02_fresh -e "SELECT COUNT(*) AS worlds, SUM(utc_offset IS NULL) AS offsets_null FROM game_worlds"
++--------+--------------+
+| worlds | offsets_null |
++--------+--------------+
+|      3 |            3 |
++--------+--------------+
++ mariadb travian_p0_02_fresh -e "SELECT COUNT(*) AS accounts_without_world FROM game_accounts WHERE world_id IS NULL"
++------------------------+
+| accounts_without_world |
++------------------------+
+|                      0 |
++------------------------+
++ mariadb -e "DROP DATABASE travian_p0_02_fresh"
+# done

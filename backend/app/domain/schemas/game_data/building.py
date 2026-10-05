@@ -61,7 +61,7 @@ class Building(BaseModel):
     prerequisites: list[BuildingPrerequisite] = Field(
         default_factory=list, description="前置需求"
     )
-    tribe_specific: str | None = Field(None, description="種族限定（如城牆）")
+    tribe_specific: str | None = Field(None, description="部族限定（如城牆）")
     levels: list[BuildingLevel] = Field(..., min_length=1, description="各等級數據")
 
     def get_level(self, level: int) -> BuildingLevel | None:

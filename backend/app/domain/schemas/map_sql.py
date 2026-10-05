@@ -9,7 +9,7 @@ class MapVillage(BaseModel):
     # 座標範圍根據伺服器大小不同，不設限制
     x: int = Field(..., description="X 座標")
     y: int = Field(..., description="Y 座標")
-    tribe_id: int = Field(0, description="種族 id（map.sql 的 tid 欄）")
+    tribe_id: int = Field(0, description="部族 id（map.sql 的 tid 欄）")
     field_type: int = Field(
         0, description="已棄用：歷史上誤稱為地形，實際等同 tribe_id"
     )

@@ -317,7 +317,7 @@ function FakeTroopsForm() {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">攻擊方種族</label>
+            <label className="block text-sm font-medium mb-2">攻擊方部族</label>
             <select
               data-testid="tribe"
               value={form.attacker_tribe}

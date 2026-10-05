@@ -301,7 +301,7 @@ class TestTechnologyCalculator:
     def test_unknown_tribe_returns_empty(
         self, service: AdvancedCalculatorService
     ) -> None:
-        """不存在的種族回傳空列表."""
+        """不存在的部族回傳空列表."""
         req = TechnologyRequest(tribe="unknown", research_levels=[0, 10])
         res = service.calculate_technology(req)
         assert res.troops == []

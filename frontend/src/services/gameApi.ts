@@ -81,7 +81,7 @@ export const troopsApi = {
     return response.data
   },
 
-  // 取得特定種族兵種
+  // 取得特定部族兵種
   getTroopsByTribe: async (
     tribe: TroopTribe,
     category?: TroopCategory

@@ -7,6 +7,7 @@ from app.infrastructure.database.models.battle_report import (
 )
 from app.infrastructure.database.models.building_instance import BuildingInstance
 from app.infrastructure.database.models.game_account import GameAccount, TribeType
+from app.infrastructure.database.models.game_world import GameWorld
 from app.infrastructure.database.models.map_data import (
     MapAllianceData,
     MapConquest,
@@ -34,6 +35,7 @@ __all__ = [
     # Models
     "User",
     "GameAccount",
+    "GameWorld",
     "Village",
     "BuildingInstance",
     "TroopInstance",

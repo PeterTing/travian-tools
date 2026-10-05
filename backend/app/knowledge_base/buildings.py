@@ -410,7 +410,7 @@ BUILDINGS_DATA = {
         },
         "note": "條頓英雄可穿透20%密藏室",
     },
-    # 種族特殊建築
+    # 部族特殊建築
     "brewery": {
         "name_zh": "釀酒廠（條頓）",
         "name_en": "Brewery",

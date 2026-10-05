@@ -1091,7 +1091,7 @@ function parseTroopStatistics() {
       log(`  Table ${i}: id="${t.id}", class="${t.className}"`);
     });
 
-    // 找到所有軍隊表格（每個種族一個表格）
+    // 找到所有軍隊表格（每個部族一個表格）
     const tables = document.querySelectorAll('table#troops, table.troops');
 
     log('Found troop statistics tables:', tables.length);

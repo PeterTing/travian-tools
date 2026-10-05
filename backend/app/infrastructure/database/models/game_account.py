@@ -12,13 +12,14 @@ from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
     from app.infrastructure.database.models.battle_report import BattleReport
+    from app.infrastructure.database.models.game_world import GameWorld
     from app.infrastructure.database.models.sync_log import SyncLog
     from app.infrastructure.database.models.user import User
     from app.infrastructure.database.models.village import Village
 
 
 class TribeType(enum.StrEnum):
-    """種族類型枚舉."""
+    """部族類型枚舉."""
 
     ROMANS = "romans"
     GAULS = "gauls"
@@ -36,6 +37,17 @@ class PlayerRole(enum.StrEnum):
     DEFENDER = "defender"  # 防守手：重視防禦部隊、鐵砧村
     FARMER = "farmer"  # 經濟發展：重視資源產量、村莊數
     HYBRID = "hybrid"  # 混合型：平衡發展
+
+
+class TimeDisplay(enum.StrEnum):
+    """遊戲內時間顯示的是哪一種時間（每個帳號各自設定）.
+
+    貼上與截圖的文字只有時鐘時間，要靠這個設定換算成絕對時間。
+    None 代表還沒設定，第一次貼上時詢問。
+    """
+
+    SERVER = "server"  # 伺服器時間
+    LOCAL = "local"  # 使用者本地時間（時區見 local_timezone）
 
 
 class GameAccount(Base):
@@ -57,6 +69,13 @@ class GameAccount(Base):
         nullable=False,
     )
     server_url: Mapped[str] = mapped_column(String(200), nullable=False)
+    # 這個帳號所在的世界（伺服器的 UTC 時差等世界層級的資料放在那裡）
+    world_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("game_worlds.world_id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     server_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     server_speed: Mapped[int] = mapped_column(Integer, default=1)
     tribe: Mapped[TribeType | None] = mapped_column(
@@ -76,6 +95,21 @@ class GameAccount(Base):
         default=None,
     )
 
+    # 時間顯示時區：None = 還沒設定（第一次貼上時問）
+    time_display: Mapped[TimeDisplay | None] = mapped_column(
+        Enum(
+            TimeDisplay,
+            values_callable=lambda x: [e.value for e in x],
+            name="time_display",
+        ),
+        nullable=True,
+        default=None,
+    )
+    # 選「本地時間」時用的 IANA 時區，例如 Asia/Taipei
+    local_timezone: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, default=None
+    )
+
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_updated: Mapped[datetime | None] = mapped_column(
         DateTime,
@@ -89,6 +123,9 @@ class GameAccount(Base):
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="game_accounts")
+    world: Mapped["GameWorld | None"] = relationship(
+        "GameWorld", back_populates="accounts"
+    )
     villages: Mapped[list["Village"]] = relationship(
         "Village",
         back_populates="game_account",

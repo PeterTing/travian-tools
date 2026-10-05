@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     buildings,
     calculator,
     game_accounts,
+    game_worlds,
     map_sql,
     reminders,
     resources,
@@ -24,6 +25,7 @@ router = APIRouter()
 
 router.include_router(auth.router)
 router.include_router(game_accounts.router)
+router.include_router(game_worlds.router)
 router.include_router(villages.router)
 router.include_router(sync.router)
 router.include_router(tribes.router, prefix="/tribes", tags=["tribes"])

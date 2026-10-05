@@ -99,7 +99,7 @@ class BattleSimulateRequest(BaseModel):
     attacker_troops: list[BattleUnit] = Field(..., min_length=1)
     defender_troops: list[BattleUnit] = Field(default_factory=list)
     wall_level: int = Field(0, ge=0, le=20, description="城牆等級")
-    defender_tribe: str = Field("romans", description="防守方種族（影響城牆類型）")
+    defender_tribe: str = Field("romans", description="防守方部族（影響城牆類型）")
 
 
 class BattleSimulateResponse(BaseModel):

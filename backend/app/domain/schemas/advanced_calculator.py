@@ -96,7 +96,7 @@ class TechnologyRequest(BaseModel):
 
     tribe: str = Field(
         ...,
-        description="種族：romans, teutons, gauls, huns, egyptians, vikings, spartans",
+        description="部族：romans, teutons, gauls, huns, egyptians, vikings, spartans",
     )
     research_levels: list[int] = Field(
         default=[0, 5, 10, 15, 20], description="要比較的研究等級"
@@ -351,7 +351,7 @@ class FakeTroopsRequest(BaseModel):
     target_population: int = Field(..., ge=0, description="目標村莊人口")
     attacker_tribe: str = Field(
         ...,
-        description="攻擊者種族：'romans','teutons','gauls','huns','egyptians','spartans','vikings'",
+        description="攻擊者部族：'romans','teutons','gauls','huns','egyptians','spartans','vikings'",
     )
     include_catapults: bool = Field(True, description="是否包含催化彈（真打標配）")
     include_rams: bool = Field(True, description="是否包含破城槌")
