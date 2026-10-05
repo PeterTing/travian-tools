@@ -4,7 +4,7 @@ import {
   readSelectedAccountId as readStored,
   writeSelectedAccountId as writeStored,
 } from '@/services/currentAccountStore'
-import { resendAccountsToExtension } from '@/services/extensionBridge'
+import { sendSelectedAccountToExtension } from '@/services/extensionBridge'
 import { gameAccountApi } from '@/services/gameAccountApi'
 import type { GameAccount } from '@/types/game'
 
@@ -73,8 +73,8 @@ export function CurrentAccountProvider({ children }: { children: ReactNode }) {
     (accountId: string) => {
       setSelectedId(accountId)
       if (userId) writeStored(userId, accountId)
-      // 擴充「存到」的預設值跟著網站目前選的帳號走（沒裝擴充時什麼都不做）
-      resendAccountsToExtension().catch(() => undefined)
+      // 擴充「存到」的預設值跟著網站目前選的帳號走；只送帳號 ID，不換發 token
+      sendSelectedAccountToExtension(accountId).catch(() => undefined)
     },
     [userId]
   )

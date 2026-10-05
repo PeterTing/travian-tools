@@ -14,6 +14,7 @@ import {
   clearExtensionLogin,
   getExtensionIds,
   resendAccountsToExtension,
+  sendSelectedAccountToExtension,
   shareLoginWithExtension,
 } from '../extensionBridge'
 import { currentAccountStorageKey } from '../currentAccountStore'
@@ -197,5 +198,24 @@ describe('extensionBridge', () => {
       type: EXTENSION_MESSAGE.SET,
       accounts: [{ account_id: 'a9', label: 'New · ts9' }],
     })
+  })
+
+  it('switching accounts only sends the selected account id: no new token, no API call', async () => {
+    const runtime = installChrome(() => ({ success: true }))
+    expect(await sendSelectedAccountToExtension('a2')).toBe(1)
+    expect(post).not.toHaveBeenCalled()
+    expect(get).not.toHaveBeenCalled()
+    expect(runtime.sendMessage).toHaveBeenCalledTimes(1)
+    const message = runtime.sendMessage.mock.calls[0][1] as Record<string, unknown>
+    expect(message).toEqual({ type: EXTENSION_MESSAGE.SELECT, selected_account_id: 'a2' })
+    expect(message).not.toHaveProperty('access_token')
+  })
+
+  it('switching accounts does nothing without the extension', async () => {
+    expect(await sendSelectedAccountToExtension('a2')).toBe(0)
+    const runtime = installChrome(() => undefined)
+    expect(await sendSelectedAccountToExtension('a2')).toBe(0)
+    expect(runtime.sendMessage).toHaveBeenCalledTimes(1)
+    expect(post).not.toHaveBeenCalled()
   })
 })

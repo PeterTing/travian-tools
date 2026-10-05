@@ -25,6 +25,7 @@ vi.mock('@/services/gameWorldApi', () => ({
 vi.mock('@/services/extensionBridge', () => ({
   shareLoginWithExtension: vi.fn(async () => undefined),
   clearExtensionLogin: vi.fn(async () => undefined),
+  sendSelectedAccountToExtension: vi.fn(async () => 0),
 }))
 
 import App from '@/App'

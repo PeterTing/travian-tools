@@ -35,6 +35,8 @@ function normalizeAccounts(list) {
 export const SITE_MESSAGE = Object.freeze({
   SET: 'set_extension_token',
   CLEAR: 'clear_extension_token',
+  /** 網站切換帳號時只送這個：更新「存到」預設值，不換發 token */
+  SELECT: 'set_selected_account',
   PING: 'ping',
 });
 
@@ -106,6 +108,21 @@ export async function saveCredential(storage, input, now = Date.now()) {
   if (!credential) return null;
   await storage.set({ [CREDENTIAL_KEY]: credential });
   return credential;
+}
+
+/**
+ * 網站切換了目前的帳號：只更新已存憑證的 selected_account_id（token 不變）。
+ * 沒有有效憑證時什麼都不做；帳號不在清單裡就改成 null（popup 照舊選第一個）。
+ * @returns 更新後的憑證；沒有有效憑證時回傳 null
+ */
+export async function saveSelectedAccount(storage, accountId, now = Date.now()) {
+  const credential = await loadCredential(storage, now);
+  if (!credential) return null;
+  const accounts = Array.isArray(credential.accounts) ? credential.accounts : [];
+  const selected = accounts.some((a) => a.account_id === accountId) ? accountId : null;
+  const updated = { ...credential, selected_account_id: selected };
+  await storage.set({ [CREDENTIAL_KEY]: updated });
+  return updated;
 }
 
 /** 登出：清掉憑證（包含舊版 key）。 */

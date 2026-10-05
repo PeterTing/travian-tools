@@ -41,6 +41,8 @@ export const EXTENSION_MESSAGE = {
   PING: 'ping',
   SET: 'set_extension_token',
   CLEAR: 'clear_extension_token',
+  /** 只更新「存到」預設值，不帶 token */
+  SELECT: 'set_selected_account',
 } as const
 
 export function getExtensionIds(raw: string | undefined = import.meta.env.VITE_EXTENSION_ID): string[] {
@@ -142,6 +144,22 @@ export async function shareLoginWithExtension(): Promise<number> {
  */
 export function resendAccountsToExtension(): Promise<number> {
   return shareLoginWithExtension()
+}
+
+/**
+ * 網站切換目前的帳號時呼叫：只把新的 selected_account_id 交給擴充當「存到」預設值。
+ * 不換發擴充 Token（每個 token 活 8 小時，切換帳號不該多發）、不呼叫後端。
+ * 沒裝擴充、沒設 ID 或擴充還沒登入時什麼都不做。
+ * @returns 收下的擴充數量
+ */
+export async function sendSelectedAccountToExtension(accountId: string): Promise<number> {
+  const runtime = getRuntime()
+  const ids = getExtensionIds()
+  if (!runtime || ids.length === 0) return 0
+  const results = await Promise.all(
+    ids.map((id) => send(runtime, id, { type: EXTENSION_MESSAGE.SELECT, selected_account_id: accountId }))
+  )
+  return results.filter((r) => r?.success).length
 }
 
 /** 網站登出時呼叫：請擴充清掉憑證。 */

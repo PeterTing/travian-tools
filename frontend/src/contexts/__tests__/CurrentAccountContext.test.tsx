@@ -9,8 +9,12 @@ const getAll = vi.hoisted(() => vi.fn())
 
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth.state }))
 const resend = vi.hoisted(() => vi.fn())
+const sendSelected = vi.hoisted(() => vi.fn())
 vi.mock('@/services/gameAccountApi', () => ({ gameAccountApi: { getAll } }))
-vi.mock('@/services/extensionBridge', () => ({ resendAccountsToExtension: resend }))
+vi.mock('@/services/extensionBridge', () => ({
+  resendAccountsToExtension: resend,
+  sendSelectedAccountToExtension: sendSelected,
+}))
 
 import { CurrentAccountProvider, useCurrentAccount } from '../CurrentAccountContext'
 import { currentAccountStorageKey } from '@/services/currentAccountStore'
@@ -36,6 +40,7 @@ describe('CurrentAccountContext', () => {
     localStorage.clear()
     getAll.mockReset()
     resend.mockReset().mockResolvedValue(0)
+    sendSelected.mockReset().mockResolvedValue(0)
     auth.state = { user: { user_id: 'user-1' }, isAuthenticated: true }
   })
 
@@ -60,9 +65,12 @@ describe('CurrentAccountContext', () => {
     getAll.mockResolvedValue({ accounts: [ts3, ts5], total: 2 })
     renderProvider()
     await waitFor(() => expect(screen.getByTestId('current')).toHaveTextContent('acc-ts3'))
-    expect(resend).not.toHaveBeenCalled()
+    expect(sendSelected).not.toHaveBeenCalled()
     act(() => ctx.selectAccount('acc-ts5'))
-    expect(resend).toHaveBeenCalledTimes(1)
+    // 只送選的帳號 ID；不重送整包（那會換發新的擴充 token）
+    expect(sendSelected).toHaveBeenCalledTimes(1)
+    expect(sendSelected).toHaveBeenCalledWith('acc-ts5')
+    expect(resend).not.toHaveBeenCalled()
   })
 
   it('restores the remembered account on the next visit', async () => {

@@ -14,6 +14,7 @@ import {
   loadCredential,
   normalizeCredential,
   saveCredential,
+  saveSelectedAccount,
 } from '../lib/credential.js';
 import { TRUSTED_SITE_ORIGINS } from '../lib/config.js';
 
@@ -143,6 +144,41 @@ describe('saveCredential / clearCredential', () => {
     const storage = memoryStorage();
     assert.equal(await saveCredential(storage, { access_token: TOKEN, expires_at: NOW - 1 }, NOW), null);
     assert.deepEqual(storage.data, {});
+  });
+});
+
+describe('saveSelectedAccount (site switched account, no new token)', () => {
+  const stored = () => ({
+    access_token: TOKEN,
+    expires_at: NOW + 8 * HOUR,
+    user: null,
+    accounts: [
+      { account_id: 'a1', label: 'PeterT · ts3' },
+      { account_id: 'a2', label: 'PeterT · ts5' },
+    ],
+    selected_account_id: 'a1',
+  });
+
+  it('only changes selected_account_id; token, expiry and accounts stay', async () => {
+    const storage = memoryStorage({ [CREDENTIAL_KEY]: stored() });
+    const updated = await saveSelectedAccount(storage, 'a2', NOW);
+    assert.deepEqual(storage.data[CREDENTIAL_KEY], { ...stored(), selected_account_id: 'a2' });
+    assert.equal(updated.access_token, TOKEN);
+  });
+
+  it('falls back to null for an account that is not in the list', async () => {
+    const storage = memoryStorage({ [CREDENTIAL_KEY]: stored() });
+    await saveSelectedAccount(storage, 'someone-else', NOW);
+    assert.equal(storage.data[CREDENTIAL_KEY].selected_account_id, null);
+  });
+
+  it('does nothing without a valid credential', async () => {
+    const empty = memoryStorage();
+    assert.equal(await saveSelectedAccount(empty, 'a1', NOW), null);
+    assert.deepEqual(empty.data, {});
+    const expired = memoryStorage({ [CREDENTIAL_KEY]: { ...stored(), expires_at: NOW - 1 } });
+    assert.equal(await saveSelectedAccount(expired, 'a1', NOW), null);
+    assert.deepEqual(expired.data, {});
   });
 });
 
