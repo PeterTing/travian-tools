@@ -2,7 +2,7 @@
 
 | 項目 | 內容 |
 |---|---|
-| 版本 | v2.0.15（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
+| 版本 | v2.0.17（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
 | 更新日期 | 2026-10-05 |
 | 規格來源 | [`PRD.md`](PRD.md) |
 
@@ -14,7 +14,7 @@
 
 | 分期 | 票數 | 完成 | 估計 |
 |---|---|---|---|
-| P0 | 12 | 7（P0-01～04、P0-05、P0-06、P0-08） | 14 到 17 人天，截圖辨識另計 |
+| P0 | 12 | 8（P0-01～04、P0-05、P0-06、P0-08、P0-10） | 14 到 17 人天，截圖辨識另計 |
 | P1 | 8 | 0 | 15 到 20 人天 |
 | P2 | 5 | 0 | P1 完成後再估 |
 
@@ -111,7 +111,8 @@
 ### P0-09 計算器 ⬜（1.5 到 2 天）
 - 驗收：搬入 travian-guide 的 8 個計算器與測試；建造順序用 guide 的版本；競技場加速全專案統一（只有超過 20 格的距離加速，每級 +20%）
 
-### P0-10 開局攻略清單 🔄 審核中（[PR #15](https://github.com/PeterTing/travian-tools/pull/15)）
+### P0-10 開局攻略清單 ✅
+- PR：[#15](https://github.com/PeterTing/travian-tools/pull/15)（已 merge，merge commit `f5bed0ec`）
 - 驗收：內容取自 Peter 的 Excel（4P 農開、3P 兵開、任務、派對與文明點時間），可以逐項勾選，按帳號存
 - 做法：`scripts/convert_opening_checklist.py` 把 Excel 轉成 `backend/data/static/opening_checklist.json`（Excel 不進 repo）；進度按帳號 × 世界 × 攻略存；主進度只算必做步驟，選做段落（便宜的文明點建築）自己顯示完成數；攻略分頁只有起手式，參考（任務獎勵、派對與文明點時間）預設收起、只列數字
 
@@ -172,6 +173,7 @@
 |---|---|---|
 | 2026-10-05 | v2.0.15 | P0-05 標為完成（[#12](https://github.com/PeterTing/travian-tools/pull/12)，merge `9c7c8fa5`） |
 | 2026-10-05 | v2.0.16 | P0-10 起手式清單送審（[PR #15](https://github.com/PeterTing/travian-tools/pull/15)）：4P 農開／3P 兵開、部族只換拓荒者花費與打野兵、依任務等級分段、進度按帳號 × 世界 × 攻略存；主進度只算必做（4P 86 步、3P 82 步），「選做：便宜的文明點建築」15 步另外顯示完成數；導覽「策略」改「攻略」，只放起手式 |
+| 2026-10-05 | v2.0.17 | P0-10 標為完成（[#15](https://github.com/PeterTing/travian-tools/pull/15)，merge `f5bed0ec`） |
 | 2026-10-05 | v2.0 | 依 PRD v2 重排 P0 到 P2；v1 封存 |
 | 2026-10-05 | v2.0.1 | 新增 P0-12：Cloud Run 部署時擴充 `host_permissions` 改指向正式網址 |
 | 2026-10-05 | v2.0.2 | P0-04 驗收補上：popup 不放輸入框、沒登入只給「在工具網站登入」、擴充登入憑證有到期時間且登出一起清 |
