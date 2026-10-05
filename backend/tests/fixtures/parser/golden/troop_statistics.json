@@ -1,0 +1,28 @@
+{
+  "villages_troops": [
+    {
+      "village_id": "56786",
+      "village_name": "Alpha",
+      "troops": [
+        {
+          "troop_id": "troop_21",
+          "count": 100,
+          "location": "home",
+          "is_training": false
+        },
+        {
+          "troop_id": "troop_22",
+          "count": 20,
+          "location": "home",
+          "is_training": false
+        },
+        {
+          "troop_id": "troop_hero",
+          "count": 1,
+          "location": "home",
+          "is_training": false
+        }
+      ]
+    }
+  ]
+}

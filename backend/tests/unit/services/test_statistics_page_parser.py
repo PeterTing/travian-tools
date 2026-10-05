@@ -1,6 +1,6 @@
 """Tests for StatisticsPageParser.
 
-Uses actual HTML files saved at /tmp/travian-stats-*.html.
+Uses committed HTML fixtures under tests/fixtures/parser/statistics/.
 """
 
 import os
@@ -9,19 +9,14 @@ import pytest
 
 from app.services.statistics_page_parser import StatisticsPageParser
 
-# Skip all tests if HTML files are not available
-HTML_DIR = "/tmp"
-OVERVIEW_HTML = os.path.join(HTML_DIR, "travian-stats-overview.html")
-RESOURCES_HTML = os.path.join(HTML_DIR, "travian-stats-resources.html")
-CP_HTML = os.path.join(HTML_DIR, "travian-stats-culturepoints.html")
-TROOPS_HTML = os.path.join(HTML_DIR, "travian-stats-troops.html")
-
-html_files_exist = all(
-    os.path.exists(f) for f in [OVERVIEW_HTML, RESOURCES_HTML, CP_HTML, TROOPS_HTML]
+# Fixtures live in the repo (P0-03); previously skipped when /tmp files were missing.
+FIXTURES = os.path.join(
+    os.path.dirname(__file__), "..", "..", "fixtures", "parser", "statistics"
 )
-pytestmark = pytest.mark.skipif(
-    not html_files_exist, reason="HTML fixture files not found in /tmp"
-)
+OVERVIEW_HTML = os.path.join(FIXTURES, "overview.html")
+RESOURCES_HTML = os.path.join(FIXTURES, "resources.html")
+CP_HTML = os.path.join(FIXTURES, "culturepoints.html")
+TROOPS_HTML = os.path.join(FIXTURES, "troops.html")
 
 
 def _read(path: str) -> str:

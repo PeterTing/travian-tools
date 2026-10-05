@@ -5,7 +5,7 @@
  * 到工具網站；登入後網站會把有到期時間、只能上傳的憑證交給擴充（background）。
  *
  * 這裡是擴充唯一會發出請求的地方：使用者按「上傳這一頁」時，把目前分頁讀到
- * 的資料送到 Travian Tools 的上傳 API。不會自動上傳其他頁面。
+ * 的 HTML 送到 Travian Tools 的共用解析器上傳 API。不會自動上傳其他頁面。
  */
 
 import { ADD_ACCOUNT_PATH, API_BASE_URL, TOOL_SITE_URL } from '../lib/config.js';
@@ -88,45 +88,16 @@ async function sendToContent(action, data = {}) {
   return messageTab(tab.id, { action, ...data });
 }
 
-/** 依頁面類型組出上傳內容 */
+/** 組出給後端共用解析器的上傳內容（HTML，不是先在擴充端解析） */
 function buildUploadBody(pageType, accountId, data) {
-  switch (pageType) {
-    case 'village_overview':
-      return {
-        account_id: accountId,
-        village_id: data.village_id,
-        village_name: data.village_name,
-        coordinate_x: data.coordinate_x,
-        coordinate_y: data.coordinate_y,
-        population: data.population || 0,
-        is_capital: data.is_capital || false,
-        village_type: data.village_type || null,
-        capital_village_id: data.capital_village_id || null,
-        resources: data.resources,
-        production: data.production,
-        resource_fields: data.resource_fields || [],
-        troops: data.troops || [],
-      };
-    case 'village_center':
-      return {
-        account_id: accountId,
-        village_id: data.village_id,
-        village_name: data.village_name,
-        coordinate_x: data.coordinate_x,
-        coordinate_y: data.coordinate_y,
-        population: data.population || 0,
-        is_capital: data.is_capital || false,
-        capital_village_id: data.capital_village_id || null,
-        buildings: data.buildings || [],
-        troops: data.troops || [],
-      };
-    case 'reports':
-      return { account_id: accountId, reports: data.reports || [] };
-    case 'troop_statistics':
-      return { account_id: accountId, villages_troops: data.villages_troops || [] };
-    default:
-      return null;
-  }
+  if (!data?.html) return null;
+  return {
+    account_id: accountId,
+    page_type: pageType || data.page_type || null,
+    url: data.url || null,
+    html: data.html,
+    server_time: data.server_time || null,
+  };
 }
 
 /** 把這一頁送到 Travian Tools 的上傳 API（擴充唯一的請求） */

@@ -8,6 +8,8 @@ from app.core.dependencies import CurrentUser, DBSession, UploadUser
 from app.domain.schemas.sync import (
     FullSync,
     FullSyncResponse,
+    PageSyncRequest,
+    PageSyncResponse,
     ReportsSync,
     ReportsSyncResponse,
     SyncResponse,
@@ -17,6 +19,7 @@ from app.domain.schemas.sync import (
     VillageCenterSync,
     VillageOverviewSync,
 )
+from app.services.page_sync_service import PageSyncService
 from app.services.sync_service import SyncService
 
 router = APIRouter(prefix="/sync", tags=["sync"])
@@ -210,4 +213,47 @@ def sync_troop_statistics(
         synced_at=datetime.now(),
         villages_synced=villages_synced,
         troops_synced=troops_synced,
+    )
+
+
+@router.post(
+    "/page",
+    response_model=PageSyncResponse,
+    summary="同步整頁 HTML",
+    description="擴充上傳整頁 HTML，由共用解析器解析後再寫入（不存原始 HTML）",
+)
+def sync_page(
+    data: PageSyncRequest,
+    db: DBSession,
+    current_user: UploadUser,
+) -> PageSyncResponse:
+    """同步整頁（P0-03 共用解析器）。"""
+    service = PageSyncService(db)
+    result = service.sync_page(
+        current_user.user_id,
+        account_id=data.account_id,
+        html=data.html,
+        url=data.url,
+        page_type=data.page_type,
+        server_time=data.server_time,
+    )
+    if not result.get("success"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST
+            if "還在做" in str(result.get("message", ""))
+            or "還不能" in str(result.get("message", ""))
+            else status.HTTP_403_FORBIDDEN,
+            detail=result.get("message") or "同步失敗",
+        )
+    return PageSyncResponse(
+        success=True,
+        message=str(result.get("message") or "ok"),
+        synced_at=datetime.now(),
+        page_type=result.get("page_type"),
+        village_id=result.get("village_id"),
+        count=int(result.get("count") or 0),
+        new_count=int(result.get("new_count") or 0),
+        updated_count=int(result.get("updated_count") or 0),
+        villages_synced=int(result.get("villages_synced") or 0),
+        troops_synced=int(result.get("troops_synced") or 0),
     )
