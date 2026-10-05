@@ -44,7 +44,7 @@ export default function TechnologyCalculatorPage() {
 
       <div className="flex gap-4 mb-6 items-end">
         <div>
-          <label className="block text-sm font-medium mb-2">種族</label>
+          <label className="block text-sm font-medium mb-2">部族</label>
           <select
             value={form.tribe}
             onChange={(e) => setForm((prev) => ({ ...prev, tribe: e.target.value }))}

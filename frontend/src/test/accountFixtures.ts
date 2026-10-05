@@ -6,6 +6,7 @@ export function makeAccount(overrides: Partial<GameAccount> = {}): GameAccount {
     account_id: 'acc-ts3',
     user_id: 'user-1',
     server_url: 'https://ts3.x1.international.travian.com',
+    world_id: 'world-ts3',
     server_name: 'ts3',
     server_speed: 1,
     tribe: 'gauls',

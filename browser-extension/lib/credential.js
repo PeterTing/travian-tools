@@ -2,9 +2,10 @@
  * 擴充登入憑證（純函式，方便測試）。
  *
  * 憑證只會由工具網站透過 externally_connectable 交過來，格式：
- *   { access_token, expires_at (ISO 字串或毫秒), user?, accounts? }
+ *   { access_token, expires_at (ISO 字串或毫秒), user?, accounts?, selected_account_id? }
  * accounts 是「存到哪個遊戲帳號」的選項（網站交過來；擴充 Token 只能上傳，
- * 不能自己去讀帳號列表）。
+ * 不能自己去讀帳號列表）。selected_account_id 是網站目前選的帳號，popup 拿來
+ * 當「存到」的預設值；popup 裡改選只影響那一次上傳，不會寫回這裡或網站。
  * 存在 chrome.storage.local 的 `credential` key。過期就視為登出，並在讀取時清掉。
  * popup 裡沒有任何輸入框，擴充自己不處理帳號密碼。
  */
@@ -63,11 +64,15 @@ export function normalizeCredential(input, now = Date.now()) {
         email: typeof input.user.email === 'string' ? input.user.email : '',
       }
     : null;
+  const accounts = normalizeAccounts(input.accounts);
+  const selected = input.selected_account_id;
   return {
     access_token: token,
     expires_at: expiresAt,
     user,
-    accounts: normalizeAccounts(input.accounts),
+    accounts,
+    // 只接受清單裡有的帳號
+    selected_account_id: accounts.some((a) => a.account_id === selected) ? selected : null,
   };
 }
 

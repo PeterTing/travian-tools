@@ -10,6 +10,7 @@ from app.infrastructure.database.models.game_account import (
     TimeDisplay,
     TribeType,
 )
+from app.utils.world_url import describe_server_url, normalize_server_url
 
 
 def _validate_timezone(v: str | None) -> str | None:
@@ -31,10 +32,19 @@ def _validate_timezone(v: str | None) -> str | None:
 class GameAccountBase(BaseModel):
     """遊戲帳號基礎 Schema."""
 
-    server_url: str = Field(..., min_length=1, max_length=200, description="伺服器 URL")
-    server_name: str | None = Field(None, max_length=50, description="伺服器名稱")
-    server_speed: int = Field(1, ge=1, le=10, description="伺服器速度倍率")
-    tribe: TribeType | None = Field(None, description="種族")
+    server_url: str = Field(
+        ...,
+        min_length=1,
+        max_length=200,
+        description="世界（伺服器網址）；可以直接貼遊戲裡的完整網址，只會留下 scheme + host",
+    )
+    server_name: str | None = Field(
+        None, max_length=50, description="伺服器名稱；不填就從網址推（例如 ts3 亞洲服）"
+    )
+    server_speed: int | None = Field(
+        None, ge=1, le=10, description="伺服器速度倍率；不填就從網址推，推不出來是 1"
+    )
+    tribe: TribeType | None = Field(None, description="部族")
     player_name: str | None = Field(None, max_length=50, description="遊戲內玩家名稱")
     alliance_name: str | None = Field(None, max_length=50, description="聯盟名稱")
     server_start_date: date | None = Field(
@@ -71,17 +81,22 @@ class GameAccountBase(BaseModel):
     @field_validator("server_url")
     @classmethod
     def validate_server_url(cls, v: str) -> str:
-        """驗證伺服器 URL 格式."""
-        v = v.strip()
-        if not v.startswith(("http://", "https://")):
-            raise ValueError("伺服器 URL 必須以 http:// 或 https:// 開頭")
-        return v
+        """正規化世界網址（貼完整遊戲網址也可以）."""
+        return normalize_server_url(v)
 
 
 class GameAccountCreate(GameAccountBase):
     """建立遊戲帳號請求."""
 
-    pass
+    @model_validator(mode="after")
+    def fill_from_server_url(self) -> "GameAccountCreate":
+        """沒填的伺服器名稱、速度從網址推（推不出來：名稱留空、速度 1）."""
+        info = describe_server_url(self.server_url)
+        if not self.server_name:
+            self.server_name = info.server_name
+        if self.server_speed is None:
+            self.server_speed = info.server_speed or 1
+        return self
 
 
 class GameAccountUpdate(BaseModel):
@@ -121,13 +136,10 @@ class GameAccountUpdate(BaseModel):
     @field_validator("server_url")
     @classmethod
     def validate_server_url(cls, v: str | None) -> str | None:
-        """驗證伺服器 URL 格式."""
+        """正規化世界網址（貼完整遊戲網址也可以）."""
         if v is None:
             return v
-        v = v.strip()
-        if not v.startswith(("http://", "https://")):
-            raise ValueError("伺服器 URL 必須以 http:// 或 https:// 開頭")
-        return v
+        return normalize_server_url(v)
 
 
 class GameAccountResponse(BaseModel):
@@ -136,6 +148,9 @@ class GameAccountResponse(BaseModel):
     account_id: str
     user_id: str
     server_url: str
+    world_id: str | None = Field(
+        None, description="所在世界；UTC 時差等世界設定見 /game-worlds"
+    )
     server_name: str | None
     server_speed: int
     tribe: TribeType | None

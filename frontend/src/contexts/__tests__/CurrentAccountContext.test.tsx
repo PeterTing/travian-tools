@@ -8,13 +8,12 @@ const auth = vi.hoisted(() => ({
 const getAll = vi.hoisted(() => vi.fn())
 
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth.state }))
+const resend = vi.hoisted(() => vi.fn())
 vi.mock('@/services/gameAccountApi', () => ({ gameAccountApi: { getAll } }))
+vi.mock('@/services/extensionBridge', () => ({ resendAccountsToExtension: resend }))
 
-import {
-  CurrentAccountProvider,
-  currentAccountStorageKey,
-  useCurrentAccount,
-} from '../CurrentAccountContext'
+import { CurrentAccountProvider, useCurrentAccount } from '../CurrentAccountContext'
+import { currentAccountStorageKey } from '@/services/currentAccountStore'
 
 const ts3 = makeAccount()
 const ts5 = makeAccount({ account_id: 'acc-ts5', server_name: 'ts5', tribe: 'teutons' })
@@ -36,6 +35,7 @@ describe('CurrentAccountContext', () => {
   beforeEach(() => {
     localStorage.clear()
     getAll.mockReset()
+    resend.mockReset().mockResolvedValue(0)
     auth.state = { user: { user_id: 'user-1' }, isAuthenticated: true }
   })
 
@@ -54,6 +54,15 @@ describe('CurrentAccountContext', () => {
     expect(screen.getByTestId('current')).toHaveTextContent('acc-ts5')
     expect(localStorage.getItem(currentAccountStorageKey('user-1'))).toBe('acc-ts5')
     expect(localStorage.getItem(currentAccountStorageKey('user-2'))).toBeNull()
+  })
+
+  it('tells the extension when the site selection changes (its 「存到」 default follows)', async () => {
+    getAll.mockResolvedValue({ accounts: [ts3, ts5], total: 2 })
+    renderProvider()
+    await waitFor(() => expect(screen.getByTestId('current')).toHaveTextContent('acc-ts3'))
+    expect(resend).not.toHaveBeenCalled()
+    act(() => ctx.selectAccount('acc-ts5'))
+    expect(resend).toHaveBeenCalledTimes(1)
   })
 
   it('restores the remembered account on the next visit', async () => {

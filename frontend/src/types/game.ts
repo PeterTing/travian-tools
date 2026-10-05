@@ -371,6 +371,8 @@ export interface GameAccount {
   account_id: string
   user_id: string
   server_url: string
+  /** 所在世界；伺服器的 UTC 時差在世界上（見 GameWorld） */
+  world_id: string | null
   server_name: string | null
   server_speed: number
   tribe: TroopTribe | null
@@ -388,6 +390,24 @@ export interface GameAccount {
   local_timezone: string | null
   /** 這個帳號＋世界存了幾個村莊 */
   village_count: number
+}
+
+/** 遊戲世界：同一個網站使用者在同一個伺服器網址共用一筆 */
+export interface GameWorld {
+  world_id: string
+  server_url: string
+  /** 伺服器時間的 UTC 時差（分鐘，例如 UTC+1 = 60）；null = 不換算，照伺服器時間顯示 */
+  utc_offset: number | null
+  account_count: number
+}
+
+export interface GameWorldListResponse {
+  worlds: GameWorld[]
+  total: number
+}
+
+export interface GameWorldUpdate {
+  utc_offset?: number | null
 }
 
 export interface GameAccountListResponse {

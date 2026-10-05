@@ -16,6 +16,7 @@ import {
   resendAccountsToExtension,
   shareLoginWithExtension,
 } from '../extensionBridge'
+import { currentAccountStorageKey } from '../currentAccountStore'
 
 const EXT_ID = 'abcdefghijklmnopabcdefghijklmnop'
 
@@ -36,6 +37,7 @@ function installChrome(handler: (id: string, message: { type: string }) => { suc
 
 describe('extensionBridge', () => {
   beforeEach(() => {
+    localStorage.clear()
     vi.stubEnv('VITE_EXTENSION_ID', EXT_ID)
     post.mockReset()
     get.mockReset()
@@ -102,7 +104,43 @@ describe('extensionBridge', () => {
         { account_id: 'a1', label: 'PeterT · ts3' },
         { account_id: 'a2', label: '未命名 · https://ts5.example' },
       ],
+      // 沒有記住的選擇時，和頂部切換一樣預設第一個
+      selected_account_id: 'a1',
     })
+  })
+
+  it('defaults 「存到」 to the account currently selected on the site', async () => {
+    localStorage.setItem(currentAccountStorageKey('u1'), 'a2')
+    post.mockResolvedValue({
+      data: {
+        access_token: 'ext.jwt.token',
+        token_type: 'bearer',
+        expires_at: '2026-10-05T11:00:00Z',
+        expires_in: 28800,
+        user: { user_id: 'u1', username: 'petert', email: 'p@example.com' },
+      },
+    })
+    const runtime = installChrome(() => ({ success: true }))
+    expect(await shareLoginWithExtension()).toBe(1)
+    expect(runtime.sendMessage.mock.calls[1][1]).toMatchObject({ selected_account_id: 'a2' })
+    // 只讀不寫：交給擴充不會改到網站的選擇
+    expect(localStorage.getItem(currentAccountStorageKey('u1'))).toBe('a2')
+  })
+
+  it('falls back to the first account when the remembered one is gone', async () => {
+    localStorage.setItem(currentAccountStorageKey('u1'), 'deleted')
+    post.mockResolvedValue({
+      data: {
+        access_token: 'ext.jwt.token',
+        token_type: 'bearer',
+        expires_at: '2026-10-05T11:00:00Z',
+        expires_in: 28800,
+        user: { user_id: 'u1', username: 'petert', email: 'p@example.com' },
+      },
+    })
+    const runtime = installChrome(() => ({ success: true }))
+    await shareLoginWithExtension()
+    expect(runtime.sendMessage.mock.calls[1][1]).toMatchObject({ selected_account_id: 'a1' })
   })
 
   it('still hands over the token when the account list cannot be loaded', async () => {
@@ -118,7 +156,7 @@ describe('extensionBridge', () => {
     })
     const runtime = installChrome(() => ({ success: true }))
     expect(await shareLoginWithExtension()).toBe(1)
-    expect(runtime.sendMessage.mock.calls[1][1]).toMatchObject({ accounts: [] })
+    expect(runtime.sendMessage.mock.calls[1][1]).toMatchObject({ accounts: [], selected_account_id: null })
   })
 
   it('swallows backend errors so site login still works', async () => {

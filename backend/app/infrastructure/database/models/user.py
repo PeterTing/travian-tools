@@ -11,6 +11,7 @@ from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
     from app.infrastructure.database.models.game_account import GameAccount
+    from app.infrastructure.database.models.game_world import GameWorld
     from app.infrastructure.database.models.sync_log import SyncLog
 
 
@@ -49,6 +50,10 @@ class User(Base):
     game_accounts: Mapped[list["GameAccount"]] = relationship(
         "GameAccount",
         back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    game_worlds: Mapped[list["GameWorld"]] = relationship(
+        "GameWorld",
         cascade="all, delete-orphan",
     )
     sync_logs: Mapped[list["SyncLog"]] = relationship(

@@ -1,5 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import {
+  readSelectedAccountId as readStored,
+  writeSelectedAccountId as writeStored,
+} from '@/services/currentAccountStore'
+import { resendAccountsToExtension } from '@/services/extensionBridge'
 import { gameAccountApi } from '@/services/gameAccountApi'
 import type { GameAccount } from '@/types/game'
 
@@ -16,27 +21,6 @@ interface CurrentAccountContextType {
 
 const CurrentAccountContext = createContext<CurrentAccountContextType | undefined>(undefined)
 
-/** 每個網站使用者各自記住上次選的帳號＋世界 */
-// eslint-disable-next-line react-refresh/only-export-components
-export function currentAccountStorageKey(userId: string): string {
-  return `travian.currentAccount.${userId}`
-}
-
-function readStored(userId: string): string | null {
-  try {
-    return localStorage.getItem(currentAccountStorageKey(userId))
-  } catch {
-    return null
-  }
-}
-
-function writeStored(userId: string, accountId: string): void {
-  try {
-    localStorage.setItem(currentAccountStorageKey(userId), accountId)
-  } catch {
-    // 無痕模式等情況存不了，就只在這次開啟期間記住
-  }
-}
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useCurrentAccount() {
@@ -89,6 +73,8 @@ export function CurrentAccountProvider({ children }: { children: ReactNode }) {
     (accountId: string) => {
       setSelectedId(accountId)
       if (userId) writeStored(userId, accountId)
+      // 擴充「存到」的預設值跟著網站目前選的帳號走（沒裝擴充時什麼都不做）
+      resendAccountsToExtension().catch(() => undefined)
     },
     [userId]
   )

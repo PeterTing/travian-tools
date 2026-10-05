@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { browserTimeZone } from '@/lib/accountDisplay'
+import { ALLOWED_SPEEDS, describeServerUrl } from '@/lib/worldUrl'
 import { gameAccountApi } from '@/services/gameAccountApi'
 import type {
   GameAccount,
@@ -37,6 +38,15 @@ const TRIBES: TroopTribe[] = [
   'spartans',
 ]
 
+const selectClass =
+  'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+
+/**
+ * 新增／編輯遊戲帳號。
+ * 必填只有三個：世界（伺服器網址，可以直接貼遊戲網址）、部族、遊戲內名稱。
+ * 伺服器名稱和速度從網址自動帶入；其他都收在「更多設定（選填）」，預設收起來。
+ * 這個表單沒有任何密碼欄位。
+ */
 export default function GameAccountForm({
   account,
   onSuccess,
@@ -52,22 +62,24 @@ export default function GameAccountForm({
 
   const [formData, setFormData] = useState({
     server_url: account?.server_url || '',
-    server_name: account?.server_name || '',
-    server_speed: account?.server_speed || 1,
     tribe: account?.tribe || '',
     player_name: account?.player_name || '',
+    // 以下在「更多設定（選填）」
+    server_name: account?.server_name || '',
+    // '' 表示從網址自動判斷
+    server_speed: account ? String(account.server_speed) : '',
     alliance_name: account?.alliance_name || '',
     server_start_date: account?.server_start_date || '',
     is_active: account?.is_active ?? true,
     // '' 表示第一次貼上時再問
     time_display: (account?.time_display ?? '') as TimeDisplay | '',
   })
+  const [showMore, setShowMore] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const validateServerUrl = (url: string): boolean => {
-    return url.startsWith('http://') || url.startsWith('https://')
-  }
+  const world = useMemo(() => describeServerUrl(formData.server_url), [formData.server_url])
+  const autoSpeed = world?.serverSpeed ?? null
 
   /** 時間顯示設定：沒選就送 null（之後第一次貼上再問） */
   const timeFields = (): Pick<GameAccountCreate, 'time_display' | 'local_timezone'> => {
@@ -85,56 +97,54 @@ export default function GameAccountForm({
     setError(null)
 
     if (!formData.server_url.trim()) {
-      setError(t('gameAccounts.validation.serverUrlRequired'))
+      setError(t('gameAccounts.validation.worldRequired'))
+      return
+    }
+    if (!world) {
+      setError(t('gameAccounts.validation.worldFormat'))
+      return
+    }
+    if (!formData.tribe) {
+      setError(t('gameAccounts.validation.tribeRequired'))
+      return
+    }
+    if (!formData.player_name.trim()) {
+      setError(t('gameAccounts.validation.playerNameRequired'))
       return
     }
 
-    if (!validateServerUrl(formData.server_url)) {
-      setError(t('gameAccounts.validation.serverUrlFormat'))
-      return
+    const common = {
+      server_url: world.serverUrl,
+      tribe: formData.tribe as TroopTribe,
+      player_name: formData.player_name.trim(),
+      // 沒填就交給後端從網址推
+      server_name: formData.server_name.trim() || world.serverName || undefined,
+      server_speed: formData.server_speed ? Number(formData.server_speed) : (autoSpeed ?? undefined),
+      alliance_name: formData.alliance_name.trim() || undefined,
+      server_start_date: formData.server_start_date || undefined,
+      ...timeFields(),
     }
 
     try {
       setLoading(true)
-
       if (isEditing && account) {
-        const updateData: GameAccountUpdate = {
-          server_url: formData.server_url,
-          server_name: formData.server_name || undefined,
-          server_speed: formData.server_speed,
-          tribe: formData.tribe as TroopTribe || undefined,
-          player_name: formData.player_name || undefined,
-          alliance_name: formData.alliance_name || undefined,
-          server_start_date: formData.server_start_date || undefined,
-          is_active: formData.is_active,
-          ...timeFields(),
-        }
+        const updateData: GameAccountUpdate = { ...common, is_active: formData.is_active }
         await gameAccountApi.update(account.account_id, updateData)
       } else {
-        const createData: GameAccountCreate = {
-          server_url: formData.server_url,
-          server_name: formData.server_name || undefined,
-          server_speed: formData.server_speed,
-          tribe: formData.tribe as TroopTribe || undefined,
-          player_name: formData.player_name || undefined,
-          alliance_name: formData.alliance_name || undefined,
-          server_start_date: formData.server_start_date || undefined,
-          ...timeFields(),
-        }
+        const createData: GameAccountCreate = common
         await gameAccountApi.create(createData)
       }
-
       onSuccess()
-    } catch (err) {
-      setError(
-        isEditing
-          ? t('gameAccounts.updateError')
-          : t('gameAccounts.createError')
-      )
+    } catch {
+      setError(isEditing ? t('gameAccounts.updateError') : t('gameAccounts.createError'))
     } finally {
       setLoading(false)
     }
   }
+
+  const detected: string[] = []
+  if (world?.serverName) detected.push(world.serverName)
+  if (autoSpeed) detected.push(t('gameAccounts.worldSpeed', { speed: autoSpeed }))
 
   return (
     <Card>
@@ -142,10 +152,10 @@ export default function GameAccountForm({
         <CardTitle>
           {isEditing ? t('gameAccounts.editAccount') : t('gameAccounts.addAccount')}
         </CardTitle>
-        <CardDescription>{t('gameAccounts.description')}</CardDescription>
+        <CardDescription>{t('gameAccounts.formIntro')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
@@ -153,57 +163,34 @@ export default function GameAccountForm({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="server_url">{t('gameAccounts.serverUrl')} *</Label>
+            <Label htmlFor="server_url">{t('gameAccounts.world')} *</Label>
             <Input
               id="server_url"
               value={formData.server_url}
-              onChange={(e) =>
-                setFormData({ ...formData, server_url: e.target.value })
-              }
-              placeholder={t('gameAccounts.serverUrlPlaceholder')}
+              onChange={(e) => setFormData({ ...formData, server_url: e.target.value })}
+              placeholder={t('gameAccounts.worldPlaceholder')}
+              autoComplete="off"
+              inputMode="url"
+              aria-describedby="server_url_hint"
               required
             />
+            <p id="server_url_hint" className="text-xs text-muted-foreground" data-testid="world-hint">
+              {world
+                ? [t('gameAccounts.worldSavedAs', { url: world.serverUrl }), ...detected].join(' · ')
+                : formData.server_url.trim()
+                  ? t('gameAccounts.validation.worldFormat')
+                  : t('gameAccounts.worldHint')}
+            </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="server_name">{t('gameAccounts.serverName')}</Label>
-            <Input
-              id="server_name"
-              value={formData.server_name}
-              onChange={(e) =>
-                setFormData({ ...formData, server_name: e.target.value })
-              }
-              placeholder={t('gameAccounts.serverNamePlaceholder')}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="server_speed">{t('gameAccounts.serverSpeed')}</Label>
-            <select
-              id="server_speed"
-              value={formData.server_speed}
-              onChange={(e) =>
-                setFormData({ ...formData, server_speed: parseInt(e.target.value) })
-              }
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value={1}>1x</option>
-              <option value={2}>2x</option>
-              <option value={3}>3x</option>
-              <option value={5}>5x</option>
-              <option value={10}>10x</option>
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="tribe">{t('gameAccounts.tribe')}</Label>
+            <Label htmlFor="tribe">{t('gameAccounts.tribe')} *</Label>
             <select
               id="tribe"
               value={formData.tribe}
-              onChange={(e) =>
-                setFormData({ ...formData, tribe: e.target.value })
-              }
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              onChange={(e) => setFormData({ ...formData, tribe: e.target.value })}
+              className={selectClass}
+              required
             >
               <option value="">{t('gameAccounts.selectTribe')}</option>
               {TRIBES.map((tribe) => (
@@ -215,77 +202,116 @@ export default function GameAccountForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="player_name">{t('gameAccounts.playerName')}</Label>
+            <Label htmlFor="player_name">{t('gameAccounts.playerName')} *</Label>
             <Input
               id="player_name"
               value={formData.player_name}
-              onChange={(e) =>
-                setFormData({ ...formData, player_name: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, player_name: e.target.value })}
               placeholder={t('gameAccounts.playerNamePlaceholder')}
+              autoComplete="off"
+              required
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="alliance_name">{t('gameAccounts.allianceName')}</Label>
-            <Input
-              id="alliance_name"
-              value={formData.alliance_name}
-              onChange={(e) =>
-                setFormData({ ...formData, alliance_name: e.target.value })
-              }
-              placeholder={t('gameAccounts.allianceNamePlaceholder')}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="server_start_date">{t('gameAccounts.serverStartDate')}</Label>
-            <Input
-              id="server_start_date"
-              type="date"
-              value={formData.server_start_date}
-              onChange={(e) =>
-                setFormData({ ...formData, server_start_date: e.target.value })
-              }
-            />
-            <p className="text-xs text-muted-foreground">
-              {t('gameAccounts.serverStartDateHint')}
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="time_display">{t('gameAccounts.timeDisplay')}</Label>
-            <select
-              id="time_display"
-              value={formData.time_display}
-              onChange={(e) =>
-                setFormData({ ...formData, time_display: e.target.value as TimeDisplay | '' })
-              }
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          <div className="rounded-md border">
+            <button
+              type="button"
+              className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium"
+              aria-expanded={showMore}
+              aria-controls="more-settings"
+              onClick={() => setShowMore((v) => !v)}
             >
-              <option value="">{t('gameAccounts.timeDisplayAsk')}</option>
-              <option value="server">{t('gameAccounts.timeDisplayServer')}</option>
-              <option value="local">{t('gameAccounts.timeDisplayLocal', { tz: localTimezone })}</option>
-            </select>
-            <p className="text-xs text-muted-foreground">{t('gameAccounts.timeDisplayHint')}</p>
+              <span>{t('gameAccounts.moreSettings')}</span>
+              <span aria-hidden="true">{showMore ? '▾' : '▸'}</span>
+            </button>
+            <div id="more-settings" hidden={!showMore} className="space-y-4 border-t px-3 py-3">
+              <div className="space-y-2">
+                <Label htmlFor="server_name">{t('gameAccounts.serverName')}</Label>
+                <Input
+                  id="server_name"
+                  value={formData.server_name}
+                  onChange={(e) => setFormData({ ...formData, server_name: e.target.value })}
+                  placeholder={
+                    world?.serverName
+                      ? t('gameAccounts.autoValue', { value: world.serverName })
+                      : t('gameAccounts.serverNamePlaceholder')
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="server_speed">{t('gameAccounts.serverSpeed')}</Label>
+                <select
+                  id="server_speed"
+                  value={formData.server_speed}
+                  onChange={(e) => setFormData({ ...formData, server_speed: e.target.value })}
+                  className={selectClass}
+                >
+                  <option value="">
+                    {t('gameAccounts.autoValue', { value: `${autoSpeed ?? 1}x` })}
+                  </option>
+                  {ALLOWED_SPEEDS.map((speed) => (
+                    <option key={speed} value={String(speed)}>
+                      {speed}x
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="server_start_date">{t('gameAccounts.serverStartDate')}</Label>
+                <Input
+                  id="server_start_date"
+                  type="date"
+                  value={formData.server_start_date}
+                  onChange={(e) => setFormData({ ...formData, server_start_date: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground">{t('gameAccounts.serverStartDateHint')}</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="alliance_name">{t('gameAccounts.allianceName')}</Label>
+                <Input
+                  id="alliance_name"
+                  value={formData.alliance_name}
+                  onChange={(e) => setFormData({ ...formData, alliance_name: e.target.value })}
+                  placeholder={t('gameAccounts.allianceNamePlaceholder')}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="time_display">{t('gameAccounts.timeDisplay')}</Label>
+                <select
+                  id="time_display"
+                  value={formData.time_display}
+                  onChange={(e) =>
+                    setFormData({ ...formData, time_display: e.target.value as TimeDisplay | '' })
+                  }
+                  className={selectClass}
+                >
+                  <option value="">{t('gameAccounts.timeDisplayAsk')}</option>
+                  <option value="server">{t('gameAccounts.timeDisplayServer')}</option>
+                  <option value="local">{t('gameAccounts.timeDisplayLocal', { tz: localTimezone })}</option>
+                </select>
+                <p className="text-xs text-muted-foreground">{t('gameAccounts.timeDisplayHint')}</p>
+              </div>
+
+              {isEditing && (
+                <div className="flex items-center space-x-2">
+                  <input
+                    id="is_active"
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <Label htmlFor="is_active">{t('gameAccounts.isActive')}</Label>
+                </div>
+              )}
+            </div>
           </div>
 
-          {isEditing && (
-            <div className="flex items-center space-x-2">
-              <input
-                id="is_active"
-                type="checkbox"
-                checked={formData.is_active}
-                onChange={(e) =>
-                  setFormData({ ...formData, is_active: e.target.checked })
-                }
-                className="h-4 w-4 rounded border-gray-300"
-              />
-              <Label htmlFor="is_active">{t('gameAccounts.isActive')}</Label>
-            </div>
-          )}
-
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-2">
             <Button type="submit" disabled={loading} className="flex-1">
               {loading ? t('common.loading') : t('gameAccounts.save')}
             </Button>

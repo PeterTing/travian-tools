@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.domain.schemas.game_account import GameAccountCreate, GameAccountUpdate
 from app.infrastructure.database.models.game_account import GameAccount, TimeDisplay
+from app.services.game_world_service import GameWorldService
 
 
 class GameAccountService:
@@ -15,12 +16,14 @@ class GameAccountService:
 
     def create_account(self, user_id: str, data: GameAccountCreate) -> GameAccount:
         """建立遊戲帳號."""
-        # Pydantic 已經驗證並轉換 tribe 為 TribeType Enum
+        # Pydantic 已經驗證並轉換 tribe 為 TribeType Enum、正規化 server_url
+        world = GameWorldService(self.db).get_or_create(user_id, data.server_url)
         account = GameAccount(
             user_id=user_id,
             server_url=data.server_url,
+            world_id=world.world_id,
             server_name=data.server_name,
-            server_speed=data.server_speed,
+            server_speed=data.server_speed or 1,
             tribe=data.tribe,
             player_name=data.player_name,
             alliance_name=data.alliance_name,
@@ -71,8 +74,14 @@ class GameAccountService:
         new_timezone = update_data.get("local_timezone", account.local_timezone)
         if new_display == TimeDisplay.LOCAL and not new_timezone:
             raise ValueError("選「本地時間」時需要填時區")
+        if "server_speed" in update_data and update_data["server_speed"] is None:
+            del update_data["server_speed"]
         for field, value in update_data.items():
             setattr(account, field, value)
+        if "server_url" in update_data:
+            # 換了世界就接到那個世界（沒有就建一筆）
+            world = GameWorldService(self.db).get_or_create(user_id, account.server_url)
+            account.world_id = world.world_id
 
         self.db.commit()
         self.db.refresh(account)

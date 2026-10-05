@@ -41,7 +41,8 @@ class TravianKnowledgeBase:
     # 關鍵字到主題的映射
     TOPIC_KEYWORDS = {
         "tribe": [
-            "種族",
+            "部族",
+            "種族",  # 使用者可能還是這樣問，保留當搜尋同義詞
             "羅馬",
             "高盧",
             "條頓",
@@ -56,6 +57,7 @@ class TravianKnowledgeBase:
             "huns",
             "spartans",
             "vikings",
+            "選擇部族",
             "選擇種族",
         ],
         "troops": [
@@ -331,7 +333,7 @@ class TravianKnowledgeBase:
         return detected_topics
 
     def _detect_tribe(self, query: str) -> str | None:
-        """檢測查詢中提到的種族."""
+        """檢測查詢中提到的部族."""
         tribe_mapping = {
             "羅馬": "romans",
             "romans": "romans",
@@ -369,7 +371,7 @@ class TravianKnowledgeBase:
 
         Args:
             query: 用戶查詢
-            player_context: 玩家上下文（種族、天數等）
+            player_context: 玩家上下文（部族、天數等）
             max_results: 最大返回結果數
 
         Returns:
@@ -377,18 +379,18 @@ class TravianKnowledgeBase:
         """
         results = []
 
-        # 檢測主題和種族
+        # 檢測主題和部族
         topics = self._detect_topics(query)
         detected_tribe = self._detect_tribe(query)
 
-        # 如果有玩家上下文，優先使用玩家的種族
+        # 如果有玩家上下文，優先使用玩家的部族
         player_tribe = None
         if player_context:
             player_tribe = player_context.get("tribe")
             if player_tribe:
                 player_tribe = player_tribe.lower()
 
-        # 使用的種族（優先使用查詢中的種族，其次是玩家種族）
+        # 使用的部族（優先使用查詢中的部族，其次是玩家部族）
         active_tribe = detected_tribe or player_tribe
 
         # 根據主題檢索
@@ -449,24 +451,24 @@ class TravianKnowledgeBase:
         return unique_results[:max_results]
 
     def _retrieve_tribe_info(self, tribe: str | None, query: str) -> list[dict]:
-        """檢索種族資訊."""
+        """檢索部族資訊."""
         results = []
 
         if tribe and tribe in self.tribes:
             tribe_data = self.tribes[tribe]
             results.append(
                 {
-                    "title": f"{tribe_data['name_zh']}種族特性",
+                    "title": f"{tribe_data['name_zh']}部族特性",
                     "content": self._format_tribe_summary(tribe_data),
                     "relevance": "high",
                 }
             )
 
-        # 如果問到種族比較，提供比較資訊
+        # 如果問到部族比較，提供比較資訊
         if "比較" in query or "選擇" in query or "哪個" in query:
             results.append(
                 {
-                    "title": "種族選擇建議",
+                    "title": "部族選擇建議",
                     "content": self._format_tribe_comparison(),
                     "relevance": "high",
                 }
@@ -504,7 +506,7 @@ class TravianKnowledgeBase:
                             )
                             break
 
-        # 如果有指定種族，列出該種族的兵種
+        # 如果有指定部族，列出該部族的兵種
         if tribe and tribe in self.tribes:
             tribe_data = self.tribes[tribe]
             results.append(
@@ -787,7 +789,7 @@ class TravianKnowledgeBase:
     # ========== 格式化方法 ==========
 
     def _format_tribe_summary(self, tribe_data: dict) -> str:
-        """格式化種族摘要."""
+        """格式化部族摘要."""
         lines = [
             f"**{tribe_data['name_zh']} ({tribe_data['name_en']})**",
             f"描述: {tribe_data['description']}",
@@ -822,8 +824,8 @@ class TravianKnowledgeBase:
         return "\n".join(lines)
 
     def _format_tribe_comparison(self) -> str:
-        """格式化種族比較."""
-        return """**種族選擇建議:**
+        """格式化部族比較."""
+        return """**部族選擇建議:**
 
 **新手推薦:**
 - 羅馬: 可以雙蓋，發展速度最快
@@ -842,7 +844,7 @@ class TravianKnowledgeBase:
 - 斯巴達: 最強單位，神殿可恢復60%部隊"""
 
     def _format_tribe_troops(self, tribe_data: dict) -> str:
-        """格式化種族兵種列表."""
+        """格式化部族兵種列表."""
         lines = [f"**{tribe_data['name_zh']}兵種:**\n"]
 
         for _troop_key, troop in tribe_data.get("troops", {}).items():

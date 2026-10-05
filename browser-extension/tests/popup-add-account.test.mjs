@@ -1,118 +1,14 @@
 // popup「請先在工具網站新增遊戲帳號」連結：用最小的假 DOM／chrome 實際跑 popup.js
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { afterEach, describe, it, mock } from 'node:test';
+import { afterEach, describe, it } from 'node:test';
 
 import { ADD_ACCOUNT_PATH, TOOL_SITE_URL, TRUSTED_SITE_ORIGINS } from '../lib/config.js';
 import { UPLOAD_HINTS } from '../lib/pages.js';
-
-class FakeElement {
-  constructor(tag, id = '') {
-    this.tagName = tag.toUpperCase();
-    this.id = id;
-    this.children = [];
-    this.listeners = {};
-    this.value = '';
-    this.disabled = false;
-    this.href = '';
-    this.className = '';
-    this._text = '';
-    const classes = new Set();
-    this.classList = {
-      add: (c) => classes.add(c),
-      remove: (c) => classes.delete(c),
-      contains: (c) => classes.has(c),
-      toggle: (c, force) => (force ? classes.add(c) : classes.delete(c)),
-    };
-  }
-
-  get textContent() {
-    return this.children.length ? this.children.map((c) => c.textContent).join('') : this._text;
-  }
-
-  set textContent(value) {
-    this.children = [];
-    this._text = String(value);
-  }
-
-  appendChild(child) {
-    this.children.push(child);
-    return child;
-  }
-
-  replaceChildren(...children) {
-    this._text = '';
-    this.children = children;
-  }
-
-  addEventListener(type, fn) {
-    (this.listeners[type] ??= []).push(fn);
-  }
-
-  /** 模擬使用者按下（只呼叫我們註冊的 click 監聽器） */
-  press() {
-    const event = { defaultPrevented: false, preventDefault() { this.defaultPrevented = true; } };
-    for (const fn of this.listeners.click ?? []) fn(event);
-    return event;
-  }
-}
-
-const POPUP_IDS = [
-  'login-section', 'main-section', 'open-site-btn', 'logout-btn', 'username', 'expiry',
-  'account-select', 'page-line', 'page-type', 'upload-hint', 'sync-btn', 'sync-result',
-  'error-message',
-];
-
-let run = 0;
-
-/** 裝好假環境後載入一份新的 popup.js，等它讀完目前頁面 */
-async function openPopup({ accounts }) {
-  const elements = Object.fromEntries(POPUP_IDS.map((id) => [id, new FakeElement('div', id)]));
-  const opened = mock.fn();
-  const closed = mock.fn();
-  globalThis.document = {
-    getElementById: (id) => elements[id] ?? null,
-    createElement: (tag) => new FakeElement(tag),
-  };
-  globalThis.window = { open: opened, close: closed };
-  globalThis.chrome = {
-    runtime: { lastError: undefined },
-    storage: {
-      local: {
-        get: async () => ({
-          credential: {
-            access_token: 'test-token',
-            expires_at: Date.now() + 60 * 60 * 1000,
-            user: { username: 'peter' },
-            accounts,
-          },
-        }),
-        set: async () => {},
-        remove: async () => {},
-      },
-    },
-    tabs: {
-      query: async () => [{ id: 1, url: 'https://ts3.x1.international.travian.com/dorf1.php' }],
-      sendMessage: (_tabId, message, callback) =>
-        callback(message.action === 'ping' ? { success: true } : { success: true, page_type: 'village_overview' }),
-    },
-    scripting: { executeScript: async () => {} },
-  };
-  run += 1;
-  await import(`../popup/popup.js?run=${run}`);
-  const hint = elements['upload-hint'];
-  for (let i = 0; i < 50 && hint.textContent === UPLOAD_HINTS.DETECTING; i += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }
-  return { elements, opened, closed };
-}
+import { openPopup, resetPopupGlobals } from './helpers/fakePopup.mjs';
 
 describe('popup「請先在工具網站新增遊戲帳號」', () => {
-  afterEach(() => {
-    delete globalThis.document;
-    delete globalThis.window;
-    delete globalThis.chrome;
-  });
+  afterEach(resetPopupGlobals);
 
   it('is a link when the user has no game account yet', async () => {
     const { elements } = await openPopup({ accounts: [] });
@@ -125,6 +21,11 @@ describe('popup「請先在工具網站新增遊戲帳號」', () => {
     assert.equal(link.textContent, UPLOAD_HINTS.NO_ACCOUNTS);
     assert.equal(link.href, `${TOOL_SITE_URL}/game-accounts/new`);
     assert.equal(elements['sync-btn'].disabled, true);
+  });
+
+  it('hides the whole 「存到」 row while the link is shown', async () => {
+    const { elements } = await openPopup({ accounts: [] });
+    assert.equal(elements['target-row'].classList.contains('hidden'), true);
   });
 
   it('opens the tool site add-account page in a new tab, like the login button', async () => {

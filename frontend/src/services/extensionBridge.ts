@@ -12,6 +12,7 @@
  * 分隔多個）；設成空字串就什麼都不做。
  */
 import api from './api'
+import { resolveSelectedAccountId } from './currentAccountStore'
 import type { GameAccountListResponse, UserResponse } from '@/types/game'
 
 export interface ExtensionTokenResponse {
@@ -111,6 +112,11 @@ export async function shareLoginWithExtension(): Promise<number> {
       api.post<ExtensionTokenResponse>('/auth/extension-token'),
       loadAccountChoices(),
     ])
+    // 「存到」預設選網站目前選的帳號；擴充那邊改選不會寫回網站
+    const selected_account_id = resolveSelectedAccountId(
+      data.user.user_id,
+      accounts.map((a) => a.account_id)
+    )
     const results = await Promise.all(
       targets.map((id) =>
         send(runtime, id, {
@@ -119,6 +125,7 @@ export async function shareLoginWithExtension(): Promise<number> {
           expires_at: data.expires_at,
           user: { username: data.user.username, email: data.user.email },
           accounts,
+          selected_account_id,
         })
       )
     )

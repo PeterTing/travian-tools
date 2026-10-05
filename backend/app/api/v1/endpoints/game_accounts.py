@@ -21,6 +21,7 @@ def _to_response(account: GameAccount) -> GameAccountResponse:
         account_id=account.account_id,
         user_id=account.user_id,
         server_url=account.server_url,
+        world_id=account.world_id,
         server_name=account.server_name,
         server_speed=account.server_speed,
         tribe=account.tribe,

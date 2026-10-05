@@ -19,6 +19,9 @@ const gameAccountApi = vi.hoisted(() => ({
 }))
 vi.mock('@/services/authApi', () => ({ default: authApi }))
 vi.mock('@/services/gameAccountApi', () => ({ gameAccountApi }))
+vi.mock('@/services/gameWorldApi', () => ({
+  gameWorldApi: { getAll: vi.fn(async () => ({ worlds: [], total: 0 })), update: vi.fn() },
+}))
 vi.mock('@/services/extensionBridge', () => ({
   shareLoginWithExtension: vi.fn(async () => undefined),
   clearExtensionLogin: vi.fn(async () => undefined),

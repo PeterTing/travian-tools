@@ -54,6 +54,7 @@ describe('normalizeCredential', () => {
       expires_at: NOW + 8 * HOUR,
       user: { username: 'petert', email: 'p@example.com' },
       accounts: [],
+      selected_account_id: null,
     });
   });
 

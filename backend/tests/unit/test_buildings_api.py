@@ -191,7 +191,7 @@ class TestBuildingsAPI:
             assert "level" in prereq
 
     def test_get_tribe_specific_building(self) -> None:
-        """測試取得種族限定建築."""
+        """測試取得部族限定建築."""
         # 羅馬城牆
         response = client.get("/api/v1/buildings/city_wall")
         assert response.status_code == 200

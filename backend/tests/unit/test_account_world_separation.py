@@ -247,3 +247,110 @@ class TestTimeDisplaySetting:
             GameAccountCreate(server_url="https://ts3.example", local_timezone=tz)
         with pytest.raises(ValidationError):
             GameAccountUpdate(local_timezone=tz)
+
+
+class TestWorlds:
+    """世界：同一使用者 × 同一伺服器網址共用一筆；UTC 時差放在世界上."""
+
+    def test_pasted_game_url_is_normalized_and_fills_name_and_speed(
+        self, as_user
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        resp = peter.post(
+            "/api/v1/game-accounts",
+            json={
+                "server_url": "https://ts20.x3.europe.travian.com/dorf1.php?newdid=123",
+                "player_name": "PeterT",
+                "tribe": "gauls",
+            },
+        )
+        assert resp.status_code == 201, resp.text
+        body = resp.json()
+        assert body["server_url"] == "https://ts20.x3.europe.travian.com"
+        assert body["server_name"] == "ts20 歐洲服"
+        assert body["server_speed"] == 3
+        assert body["world_id"]
+
+    def test_explicit_name_and_speed_win_over_the_url(self, as_user) -> None:  # type: ignore[no-untyped-def]
+        body = _create(
+            as_user("u-peter"),
+            server_url="ts20.x3.europe.travian.com",
+            server_name="我的速服",
+            server_speed=5,
+        )
+        assert body["server_name"] == "我的速服"
+        assert body["server_speed"] == 5
+
+    def test_accounts_in_the_same_world_share_one_world(self, as_user) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        a = _create(
+            peter,
+            server_url="https://ts3.x1.asia.travian.com/dorf2.php",
+            player_name="PeterT",
+        )
+        b = _create(peter, server_url="TS3.x1.asia.travian.com", player_name="小號")
+        c = _create(
+            peter, server_url="https://ts5.x1.asia.travian.com", player_name="PeterT"
+        )
+        assert a["world_id"] == b["world_id"] != c["world_id"]
+
+        worlds = peter.get("/api/v1/game-worlds").json()
+        assert worlds["total"] == 2
+        by_url = {w["server_url"]: w for w in worlds["worlds"]}
+        assert by_url["https://ts3.x1.asia.travian.com"]["account_count"] == 2
+        assert by_url["https://ts5.x1.asia.travian.com"]["account_count"] == 1
+        assert all(w["utc_offset"] is None for w in worlds["worlds"])
+
+    def test_worlds_are_per_site_user(self, as_user) -> None:  # type: ignore[no-untyped-def]
+        mine = _create(as_user("u-peter"))
+        theirs = _create(as_user("u-other"))
+        assert mine["world_id"] != theirs["world_id"]
+        assert as_user("u-other").get("/api/v1/game-worlds").json()["total"] == 1
+        # 不能改別人的世界
+        resp = as_user("u-other").patch(
+            f"/api/v1/game-worlds/{mine['world_id']}", json={"utc_offset": 60}
+        )
+        assert resp.status_code == 404
+
+    def test_utc_offset_is_edited_by_hand_and_can_be_cleared(self, as_user) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        world_id = _create(peter)["world_id"]
+        url = f"/api/v1/game-worlds/{world_id}"
+        assert peter.patch(url, json={"utc_offset": 60}).json()["utc_offset"] == 60
+        assert peter.patch(url, json={"utc_offset": -210}).json()["utc_offset"] == -210
+        assert peter.patch(url, json={"utc_offset": None}).json()["utc_offset"] is None
+        assert peter.patch(url, json={}).status_code == 200
+
+    @pytest.mark.parametrize("offset", [61, -721, 841, 7])
+    def test_utc_offset_must_be_a_real_offset(self, as_user, offset: int) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        world_id = _create(peter)["world_id"]
+        resp = peter.patch(
+            f"/api/v1/game-worlds/{world_id}", json={"utc_offset": offset}
+        )
+        assert resp.status_code == 422
+
+    def test_world_offset_does_not_touch_the_account_time_display(
+        self, as_user
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        account = _create(peter, time_display="local", local_timezone="Asia/Taipei")
+        peter.patch(
+            f"/api/v1/game-worlds/{account['world_id']}", json={"utc_offset": 60}
+        )
+        again = peter.get(f"/api/v1/game-accounts/{account['account_id']}").json()
+        assert again["time_display"] == "local"
+        assert again["local_timezone"] == "Asia/Taipei"
+
+    def test_changing_the_server_url_moves_the_account_to_that_world(
+        self, as_user
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        a = _create(peter, server_url="https://ts3.x1.asia.travian.com")
+        b = _create(peter, server_url="https://ts5.x1.asia.travian.com")
+        resp = peter.put(
+            f"/api/v1/game-accounts/{a['account_id']}",
+            json={"server_url": "https://ts5.x1.asia.travian.com/karte.php"},
+        )
+        assert resp.status_code == 200, resp.text
+        assert resp.json()["world_id"] == b["world_id"]

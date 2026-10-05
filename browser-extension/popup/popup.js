@@ -22,6 +22,7 @@ const logoutBtn = document.getElementById('logout-btn');
 const usernameEl = document.getElementById('username');
 const expiryEl = document.getElementById('expiry');
 const accountSelect = document.getElementById('account-select');
+const targetRowEl = document.getElementById('target-row');
 const pageLineEl = document.getElementById('page-line');
 const pageTypeEl = document.getElementById('page-type');
 const uploadHintEl = document.getElementById('upload-hint');
@@ -191,9 +192,15 @@ function renderAccounts() {
     option.textContent = account.label;
     accountSelect.appendChild(option);
   }
-  if (accounts.length === 1) {
+  // 預設選網站目前選的帳號；這裡改選只影響這一次上傳，不寫回任何地方
+  const preferred = credential?.selected_account_id;
+  if (preferred && accounts.some((a) => a.account_id === preferred)) {
+    accountSelect.value = preferred;
+  } else if (accounts.length === 1) {
     accountSelect.value = accounts[0].account_id;
   }
+  // 還沒有遊戲帳號時上方已經有「請先在工具網站新增遊戲帳號」連結，整個「存到」那一行收起來
+  targetRowEl.classList.toggle('hidden', accounts.length === 0);
 }
 
 /** 依頁面與帳號狀態更新「目前頁面」、說明文字與按鈕；按鈕不能按時一定有說明 */

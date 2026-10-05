@@ -71,7 +71,7 @@ export default function TroopsPage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">兵種數據庫</h1>
 
-      {/* 種族篩選 */}
+      {/* 部族篩選 */}
       <div className="flex flex-wrap gap-2 mb-4">
         {TRIBES.map((t) => (
           <Button
@@ -188,7 +188,7 @@ export default function TroopsPage() {
                   <table className="w-full text-sm">
                     <tbody>
                       <tr className="border-b">
-                        <td className="py-2 text-muted-foreground">種族</td>
+                        <td className="py-2 text-muted-foreground">部族</td>
                         <td className="py-2 text-right">{selectedTroop.tribe}</td>
                       </tr>
                       <tr className="border-b">

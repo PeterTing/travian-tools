@@ -24,6 +24,7 @@ import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { gameAccountApi } from '@/services/gameAccountApi'
 import type { GameAccount } from '@/types/game'
 import GameAccountForm from './GameAccountForm'
+import WorldSettings from './WorldSettings'
 
 interface GameAccountsPageProps {
   /** /game-accounts/new：一進來就打開新增表單 */
@@ -224,6 +225,8 @@ export default function GameAccountsPage({ startWithCreate = false }: GameAccoun
           ))}
         </div>
       )}
+
+      <WorldSettings refreshKey={accounts.map((a) => `${a.account_id}:${a.world_id}`).join(',')} />
 
       <AlertDialog open={!!deleteAccountId} onOpenChange={() => setDeleteAccountId(null)}>
         <AlertDialogContent>

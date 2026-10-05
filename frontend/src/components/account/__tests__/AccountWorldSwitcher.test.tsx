@@ -10,7 +10,8 @@ vi.mock('@/contexts/AuthContext', () => ({
 }))
 vi.mock('@/services/gameAccountApi', () => ({ gameAccountApi: { getAll } }))
 
-import { CurrentAccountProvider, currentAccountStorageKey } from '@/contexts/CurrentAccountContext'
+import { CurrentAccountProvider } from '@/contexts/CurrentAccountContext'
+import { currentAccountStorageKey } from '@/services/currentAccountStore'
 import AccountWorldSwitcher from '../AccountWorldSwitcher'
 
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60000).toISOString()
@@ -72,7 +73,7 @@ describe('AccountWorldSwitcher', () => {
     expect(within(sheet).getByText('高盧 · 8 村 · 2 分鐘前更新')).toBeInTheDocument()
     expect(within(sheet).getByText('條頓 · 3 村 · 昨天更新')).toBeInTheDocument()
     expect(within(sheet).getByText('羅馬 · 1 村 · 3 天前')).toBeInTheDocument()
-    expect(within(sheet).getByText('新增時只填暱稱、世界和部族，不會要求遊戲密碼。')).toBeInTheDocument()
+    expect(within(sheet).getByText('新增時只填世界、部族和遊戲內名稱，不會要求遊戲密碼。')).toBeInTheDocument()
     // 目前這組打勾
     const rows = within(sheet).getAllByRole('button', { current: true })
     expect(rows).toHaveLength(1)

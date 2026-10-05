@@ -91,13 +91,13 @@ class TroopCompareResponse(BaseModel):
 
 @router.get("", response_model=TroopListResponse)
 async def get_troops(
-    tribe: TroopTribe | None = Query(None, description="依種族篩選"),
+    tribe: TroopTribe | None = Query(None, description="依部族篩選"),
     category: TroopCategory | None = Query(None, description="依類型篩選"),
     search: str | None = Query(None, description="搜尋兵種名稱（中英文）"),
 ) -> TroopListResponse:
     """取得所有兵種列表.
 
-    可依種族、類型篩選，或搜尋中英文名稱。
+    可依部族、類型篩選，或搜尋中英文名稱。
     """
     service = get_game_data_service()
     troops_data = service.troops
@@ -218,10 +218,10 @@ async def get_troops_by_tribe(
     tribe: TroopTribe,
     category: TroopCategory | None = Query(None, description="依類型篩選"),
 ) -> TroopListResponse:
-    """取得特定種族的所有兵種.
+    """取得特定部族的所有兵種.
 
     Args:
-        tribe: 種族（romans, gauls, teutons, huns, egyptians, vikings, spartans）
+        tribe: 部族（romans, gauls, teutons, huns, egyptians, vikings, spartans）
         category: 兵種類型（可選）
     """
     service = get_game_data_service()
@@ -255,7 +255,7 @@ async def get_troop_detail(tribe: TroopTribe, troop_id: str) -> TroopDetailRespo
     """取得單一兵種完整資料.
 
     Args:
-        tribe: 種族
+        tribe: 部族
         troop_id: 兵種 ID（如 legionnaire, phalanx）
     """
     service = get_game_data_service()

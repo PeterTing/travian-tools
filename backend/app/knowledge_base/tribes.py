@@ -1,4 +1,4 @@
-"""Travian 種族資料庫."""
+"""Travian 部族資料庫."""
 
 TRIBES_DATA = {
     "romans": {
@@ -10,7 +10,7 @@ TRIBES_DATA = {
             "可同時建造建築物和資源田（雙建）",
             "步兵防禦力極強（禁衛兵是最佳反步兵單位）",
             "騎兵攻擊力高（帝國騎兵攻擊力最高）",
-            "英雄每點力量+100（其他種族+80）",
+            "英雄每點力量+100（其他部族+80）",
         ],
         "weaknesses": [
             "部隊訓練成本高、時間長",
@@ -165,12 +165,12 @@ TRIBES_DATA = {
         "playstyle": "適合新手，防禦為主但也可攻擊",
         "strengths": [
             "擁有遊戲中最快的單位（德魯伊騎兵、探路者、雷神騎兵）",
-            "密藏室容量是其他種族的1.5倍",
+            "密藏室容量是其他部族的1.5倍",
             "方陣兵是最佳的全能防禦步兵",
             "商人速度快（24格/小時）",
         ],
         "weaknesses": [
-            "攻城槌是所有種族中最弱的",
+            "攻城槌是所有部族中最弱的",
             "不適合建造世界奇觀攻擊部隊",
             "攻擊力相對較弱",
         ],
@@ -271,7 +271,7 @@ TRIBES_DATA = {
                 "upkeep": 3,
                 "cost": {"wood": 690, "clay": 540, "iron": 660, "crop": 130},
                 "training_time": "1:15:00",
-                "role": "破壞城牆（所有種族中最弱）",
+                "role": "破壞城牆（所有部族中最弱）",
             },
             "trebuchet": {
                 "name_zh": "投石車",
@@ -317,7 +317,7 @@ TRIBES_DATA = {
     "teutons": {
         "name_zh": "條頓",
         "name_en": "Teutons",
-        "description": "最具侵略性的種族，部隊便宜且訓練快速，商人載重量最大",
+        "description": "最具侵略性的部族，部隊便宜且訓練快速，商人載重量最大",
         "playstyle": "適合積極掠奪的玩家",
         "strengths": [
             "棍棒兵是最便宜、訓練最快的單位，早期掠奪之王",
@@ -954,7 +954,7 @@ TRIBES_DATA = {
         ],
         "special_building": {
             "name": "維京港口 (Viking Harbor)",
-            "effect": "可建造更快的掠奪船（24格/小時，其他種族18格/小時）",
+            "effect": "可建造更快的掠奪船（24格/小時，其他部族18格/小時）",
         },
         "merchant": {"capacity": 750, "speed": 18},
         "hero_bonus": "攻擊和掠奪時可降低敵方村莊5%忠誠度",
@@ -1096,7 +1096,7 @@ TRIBES_DATA = {
 
 
 def get_tribe_info(tribe_name: str) -> dict | None:
-    """取得種族資訊."""
+    """取得部族資訊."""
     tribe_key = tribe_name.lower()
     # 支援中文名稱查詢
     name_mapping = {
@@ -1114,7 +1114,7 @@ def get_tribe_info(tribe_name: str) -> dict | None:
 
 
 def get_all_tribes() -> dict:
-    """取得所有種族資訊."""
+    """取得所有部族資訊."""
     return TRIBES_DATA
 
 

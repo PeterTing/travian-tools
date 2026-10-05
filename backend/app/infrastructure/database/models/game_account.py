@@ -12,13 +12,14 @@ from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
     from app.infrastructure.database.models.battle_report import BattleReport
+    from app.infrastructure.database.models.game_world import GameWorld
     from app.infrastructure.database.models.sync_log import SyncLog
     from app.infrastructure.database.models.user import User
     from app.infrastructure.database.models.village import Village
 
 
 class TribeType(enum.StrEnum):
-    """種族類型枚舉."""
+    """部族類型枚舉."""
 
     ROMANS = "romans"
     GAULS = "gauls"
@@ -68,6 +69,13 @@ class GameAccount(Base):
         nullable=False,
     )
     server_url: Mapped[str] = mapped_column(String(200), nullable=False)
+    # 這個帳號所在的世界（伺服器的 UTC 時差等世界層級的資料放在那裡）
+    world_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("game_worlds.world_id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     server_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     server_speed: Mapped[int] = mapped_column(Integer, default=1)
     tribe: Mapped[TribeType | None] = mapped_column(
@@ -115,6 +123,9 @@ class GameAccount(Base):
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="game_accounts")
+    world: Mapped["GameWorld | None"] = relationship(
+        "GameWorld", back_populates="accounts"
+    )
     villages: Mapped[list["Village"]] = relationship(
         "Village",
         back_populates="game_account",
