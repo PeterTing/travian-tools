@@ -14,7 +14,7 @@
 
 | 分期 | 票數 | 完成 | 估計 |
 |---|---|---|---|
-| P0 | 12 | 9（P0-01～04、P0-05、P0-06、P0-08、P0-10、P0-11）＋P0-09 審核中 | 14 到 17 人天，截圖辨識另計 |
+| P0 | 12 | 9（P0-01～04、P0-05、P0-06、P0-08、P0-10、P0-11）＋P0-09 | 14 到 17 人天，截圖辨識另計 |
 | P1 | 8 | 0 | 15 到 20 人天 |
 | P2 | 5 | 0 | P1 完成後再估 |
 
@@ -109,9 +109,9 @@
 ### P0-08 `map.sql` 匯入 ✅（併在 P0-01）
 - 驗收：名字含單引號的村莊不會漏；部族與首都讀對欄位；可手動上傳 `.sql`／`.gz`
 
-### P0-09 計算器 🔄 審核中（1.5 到 2 天）
+### P0-09 計算器 ✅（[#18](https://github.com/PeterTing/travian-tools/pull/18)，merge `364dc5e2`）
 - 驗收：搬入 travian-guide 的 8 個計算器與測試；建造順序用 guide 的版本；競技場加速全專案統一（只有超過 20 格的距離加速，每級 +20%）
-- 進度：🔄 審核中（本 PR）
+- 進度：✅ 已 merge（[#18](https://github.com/PeterTing/travian-tools/pull/18)，`364dc5e2`）
 
 ### P0-10 開局攻略清單 ✅
 - PR：[#15](https://github.com/PeterTing/travian-tools/pull/15)（已 merge，merge commit `f5bed0ec`）
@@ -174,6 +174,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-05 | v2.0.21 | 非擋項清理（本 PR）：手機計算器結果精簡（主結果＋輔資訊／明細收合）、桌機 sticky 避開頂欄、刪 #18 redirect 舊頁、確認倒數人讀格式、preview-diff 失敗降級、#14 WorldSettings 清空測試／crop docstring／空確認 i18n；P0-09（#18，`364dc5e2`）已 merge |
 | 2026-10-05 | v2.0.20 | P0-09 計算器送審：搬入 travian-guide 8 個計算器＋測試；建造順序／ROI／文明點以 guide 為準（舊頁 redirect）；移動時間改即時 sticky；競技場公式前後端共用（>20 格、每級 +20%）；列表頁加搜尋；P0-06（#17，`4da35e85`）已 merge |
 | 2026-10-05 | v2.0.19 | P0-06 其餘項送審（[PR #17](https://github.com/PeterTing/travian-tools/pull/17)）：首頁「最近上傳」（類型 · 摘要＋相對時間）、來襲依村莊篩選（沿用村莊列表 chip 下拉）、`POST /paste/preview-diff` 回傳「新增 N · 更新 M」且等於 confirm；sync_logs 加 `RALLY_POINT`；P0-11（#16，`1cd0be37`）已 merge |
 | 2026-10-05 | v2.0.15 | P0-05 標為完成（[#12](https://github.com/PeterTing/travian-tools/pull/12)，merge `9c7c8fa5`） |
