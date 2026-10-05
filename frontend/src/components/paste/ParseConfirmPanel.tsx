@@ -450,8 +450,8 @@ export function ParseConfirmPanel({
         >
           {saving
             ? '存入中…'
-            : state.pageType === 'rally_point'
-              ? `存入 ${incoming.length || ''} 筆`.trim()
+            : state.pageType === 'rally_point' && incoming.length > 0
+              ? `存入 ${incoming.length} 筆`
               : '存入'}
         </Button>
       </CardFooter>
