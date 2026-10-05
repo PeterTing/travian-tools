@@ -414,3 +414,66 @@ class TestWorlds:
         ).json()
         assert (body["server_name"], body["server_speed"]) == ("自訂名稱", 2)
         assert body["world_id"] == a["world_id"]
+
+
+class TestDeactivatedAccounts:
+    """停用：管理頁看得到也能重新啟用；切換和村莊頁只用啟用中的；不刪資料."""
+
+    def test_deactivate_hides_reactivate_restores_and_keeps_the_data(
+        self, as_user, session: Session
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        main = _create(peter, player_name="PeterT")
+        alt = _create(peter, player_name="小號", server_url="ts5.x1.asia.travian.com")
+        session.add(
+            Village(
+                account_id=alt["account_id"],
+                name="小號主村",
+                coordinate_x=1,
+                coordinate_y=2,
+            )
+        )
+        session.commit()
+        url = f"/api/v1/game-accounts/{alt['account_id']}"
+
+        resp = peter.put(url, json={"is_active": False})
+        assert resp.status_code == 200 and resp.json()["is_active"] is False
+
+        # 切換和村莊頁用的清單（預設）只有啟用中的
+        active = peter.get("/api/v1/game-accounts").json()["accounts"]
+        assert [a["account_id"] for a in active] == [main["account_id"]]
+        # 管理頁用 include_inactive=true，停用的也在，資料還在
+        everything = peter.get(
+            "/api/v1/game-accounts", params={"include_inactive": True}
+        ).json()["accounts"]
+        by_id = {a["account_id"]: a for a in everything}
+        assert set(by_id) == {main["account_id"], alt["account_id"]}
+        assert by_id[alt["account_id"]]["is_active"] is False
+        assert by_id[alt["account_id"]]["village_count"] == 1
+
+        back = peter.put(url, json={"is_active": True}).json()
+        assert back["is_active"] is True
+        assert back["world_id"] == alt["world_id"]
+        assert back["village_count"] == 1
+        active = peter.get("/api/v1/game-accounts").json()["accounts"]
+        assert {a["account_id"] for a in active} == {
+            main["account_id"],
+            alt["account_id"],
+        }
+
+    def test_others_cannot_reactivate_my_account(self, as_user) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        alt = _create(peter, player_name="小號")
+        peter.put(
+            f"/api/v1/game-accounts/{alt['account_id']}", json={"is_active": False}
+        )
+        resp = as_user("u-other").put(
+            f"/api/v1/game-accounts/{alt['account_id']}", json={"is_active": True}
+        )
+        assert resp.status_code == 404
+        assert (
+            as_user("u-other")
+            .get("/api/v1/game-accounts", params={"include_inactive": True})
+            .json()["total"]
+            == 0
+        )
