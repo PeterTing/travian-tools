@@ -4,7 +4,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, status
 
-from app.core.dependencies import CurrentUser, DBSession
+from app.core.dependencies import CurrentUser, DBSession, UploadUser
 from app.domain.schemas.sync import (
     FullSync,
     FullSyncResponse,
@@ -31,7 +31,7 @@ router = APIRouter(prefix="/sync", tags=["sync"])
 def sync_village_overview(
     data: VillageOverviewSync,
     db: DBSession,
-    current_user: CurrentUser,
+    current_user: UploadUser,
 ) -> SyncResponse:
     """同步村莊總覽數據."""
     service = SyncService(db)
@@ -62,7 +62,7 @@ def sync_village_overview(
 def sync_village_center(
     data: VillageCenterSync,
     db: DBSession,
-    current_user: CurrentUser,
+    current_user: UploadUser,
 ) -> SyncResponse:
     """同步村莊中心數據."""
     service = SyncService(db)
@@ -157,7 +157,7 @@ def sync_full(
 def sync_reports(
     data: ReportsSync,
     db: DBSession,
-    current_user: CurrentUser,
+    current_user: UploadUser,
 ) -> ReportsSyncResponse:
     """同步報告數據."""
     service = SyncService(db)
@@ -190,7 +190,7 @@ def sync_reports(
 def sync_troop_statistics(
     data: TroopStatisticsSync,
     db: DBSession,
-    current_user: CurrentUser,
+    current_user: UploadUser,
 ) -> TroopStatisticsSyncResponse:
     """同步軍隊統計數據."""
     service = SyncService(db)

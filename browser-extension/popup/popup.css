@@ -43,6 +43,11 @@ body {
   margin: 4px 0 10px;
 }
 
+/* 「目前頁面」沒有可顯示的名稱時，按鈕跟標題之間留一點距離 */
+#page-line.hidden + .btn {
+  margin-top: 10px;
+}
+
 .note {
   margin-top: 8px;
 }

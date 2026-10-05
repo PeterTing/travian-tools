@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, DateTime, String, func
+from sqlalchemy import JSON, DateTime, Integer, String, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base
@@ -36,6 +36,13 @@ class User(Base):
     )
     last_login: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     preferences: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # 每次登出 +1；Token 裡的 ver 不等於這個值就視為已撤銷
+    token_version: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+    )
 
     # Relationships
     game_accounts: Mapped[list["GameAccount"]] = relationship(

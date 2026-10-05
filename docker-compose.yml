@@ -51,7 +51,7 @@ services:
     restart: unless-stopped
     environment:
       - VITE_API_URL=http://localhost:8000/api/v1
-      - VITE_EXTENSION_ID=${VITE_EXTENSION_ID:-}
+      - VITE_EXTENSION_ID=${VITE_EXTENSION_ID-nkgbmaokaapljaciiifbhgohlejmdcdn}
     ports:
       - "5174:5174"
     volumes:

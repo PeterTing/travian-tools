@@ -293,6 +293,151 @@ def test_extension_only_accepts_credentials_from_tool_site() -> None:
         assert re.fullmatch(r"https?://[a-z0-9.-]+(:\d+)?/\*", pattern), pattern
 
 
+# ------------------------------------------- extension: background / requests
+# P0-04 驗收原文（TICKETS.md 與 background.js 開頭都要有這句，下面的測試負責驗證）
+BACKGROUND_SENTENCE = (
+    "擴充沒有計時器、輪詢或自行發出的請求，背景程式只回應工具網站傳來的訊息。"
+)
+JS_NETWORK_CALL = re.compile(
+    r"\bfetch\s*\(|\bXMLHttpRequest\b|\bnew\s+WebSocket\b|\bEventSource\b"
+    r"|\bsendBeacon\s*\(|\baxios\b|\$\.(?:ajax|get|post)\s*\(|\bimportScripts\s*\("
+)
+BACKGROUND_BANNED = re.compile(
+    r"\b(?:chrome|browser)\.alarms\b|\bsetInterval\s*\(|\bsetTimeout\s*\("
+    r"|\bqueueMicrotask\s*\(|\brequestAnimationFrame\s*\("
+    r"|\b(?:chrome|browser)\.(?:tabs|scripting|webRequest|declarativeNetRequest)\b"
+)
+JS_IMPORT = re.compile(r"""^\s*import\s[^;]*?from\s+['"](\.[^'"]+)['"]""", re.M)
+
+
+def _shipped_extension_files() -> list[Path]:
+    """Extension files that actually ship (node tests are excluded)."""
+    return [
+        p
+        for p in _iter_files(EXTENSION, SOURCE_SUFFIXES | {".html"})
+        if "tests" not in p.relative_to(EXTENSION).parts
+    ]
+
+
+def _js_code(path: Path) -> str:
+    """Source without comments, so prose can mention fetch / timers."""
+    text = path.read_text(encoding="utf-8")
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    return re.sub(r"(?m)(^|[^:\\])//.*$", r"\1", text)
+
+
+def _background_modules() -> list[Path]:
+    """background.js plus every local module it imports (transitively)."""
+    entry = EXTENSION / "background" / "background.js"
+    seen: list[Path] = []
+    todo = [entry]
+    while todo:
+        path = todo.pop().resolve()
+        if path in seen or not path.exists():
+            continue
+        seen.append(path)
+        for rel in JS_IMPORT.findall(path.read_text(encoding="utf-8")):
+            todo.append(path.parent / rel)
+    return seen
+
+
+def test_extension_background_sentence_is_documented() -> None:
+    tickets = (REPO / "docs" / "TICKETS.md").read_text(encoding="utf-8")
+    section = re.search(r"### P0-04 .*?(?=\n### )", tickets, re.S)
+    assert section, "P0-04 section missing"
+    assert BACKGROUND_SENTENCE in section.group(0)
+    assert "沒有背景程式" not in section.group(0)
+    background = EXTENSION / "background" / "background.js"
+    assert BACKGROUND_SENTENCE in background.read_text(encoding="utf-8")
+
+
+def test_extension_background_has_no_timers_or_requests() -> None:
+    """「沒有計時器、輪詢或自行發出的請求」：background 與它 import 的模組."""
+    modules = _background_modules()
+    assert len(modules) >= 2, modules  # background.js + lib modules
+    offenders = {}
+    for path in modules:
+        code = _js_code(path)
+        hits = BACKGROUND_BANNED.findall(code) + JS_NETWORK_CALL.findall(code)
+        if hits:
+            offenders[_rel(path)] = hits
+    assert offenders == {}, f"background must stay passive: {offenders}"
+
+
+def test_extension_background_only_answers_messages() -> None:
+    """「背景程式只回應工具網站傳來的訊息」：只註冊 onMessageExternal / onMessage."""
+    code = _js_code(EXTENSION / "background" / "background.js")
+    listeners = re.findall(r"([\w.]+)\.addListener\s*\(", code)
+    assert listeners, "background must register the site-message handler"
+    allowed = {"chrome.runtime.onMessageExternal", "chrome.runtime.onMessage"}
+    assert set(listeners) <= allowed, listeners
+    assert "chrome.runtime.onMessageExternal" in listeners
+    assert "isTrustedSender(" in code, "site messages must be origin-checked"
+    # no other event hooks (onInstalled, onStartup, onConnect, …)
+    others = re.findall(r"\bchrome\.\w+\.on\w+", code)
+    assert set(others) <= allowed, others
+
+
+def test_extension_only_request_is_popup_upload_to_our_api() -> None:
+    """擴充唯一的請求是 popup 把這一頁上傳到我們的 API."""
+    calls = {}
+    for path in _shipped_extension_files():
+        code = _js_code(path) if path.suffix != ".html" else path.read_text("utf-8")
+        hits = JS_NETWORK_CALL.findall(code)
+        if hits:
+            calls[_rel(path)] = hits
+    assert calls == {"browser-extension/popup/popup.js": ["fetch("]}, calls
+
+    popup = _js_code(EXTENSION / "popup" / "popup.js")
+    assert re.search(r"\bfetch\(`\$\{API_BASE_URL\}\$\{endpoint\}`", popup)
+    assert re.search(r"const endpoint = UPLOAD_ENDPOINTS\[", popup)
+
+    config = (EXTENSION / "lib" / "config.js").read_text(encoding="utf-8")
+    api_base = re.search(r"API_BASE_URL\s*=\s*'([^']+)'", config)
+    assert api_base, "API_BASE_URL must be a literal"
+    manifest = json.loads((EXTENSION / "manifest.json").read_text(encoding="utf-8"))
+    origin = re.match(r"https?://[^/]+", api_base.group(1))
+    assert origin and f"{origin.group(0)}/*" in manifest["host_permissions"]
+    assert "travian" not in api_base.group(1).lower()
+
+    pages = (EXTENSION / "lib" / "pages.js").read_text(encoding="utf-8")
+    block = re.search(r"UPLOAD_ENDPOINTS = Object\.freeze\(\{(.*?)\}\)", pages, re.S)
+    assert block
+    endpoints = set(re.findall(r"'(/[^']+)'", block.group(1)))
+    assert endpoints == {
+        "/sync/village-overview",
+        "/sync/village-center",
+        "/sync/reports",
+        "/sync/troop-statistics",
+    }, endpoints
+
+
+@pytest.mark.parametrize(
+    "snippet",
+    [
+        "setTimeout(() => {}, 10)",
+        "setInterval(tick, 1000)",
+        "chrome.alarms.create('x', {})",
+        "chrome.tabs.query({ active: true })",
+    ],
+)
+def test_background_guard_detects_timers(snippet: str) -> None:
+    assert BACKGROUND_BANNED.search(snippet)
+
+
+@pytest.mark.parametrize(
+    "snippet",
+    [
+        "fetch(url)",
+        "new XMLHttpRequest()",
+        "new WebSocket(u)",
+        "navigator.sendBeacon(u)",
+    ],
+)
+def test_network_guard_detects_requests(snippet: str) -> None:
+    assert JS_NETWORK_CALL.search(snippet)
+
+
 def test_only_map_sql_scheduler_schedules_jobs() -> None:
     pattern = re.compile(
         r"\b(?:BackgroundScheduler|AsyncIOScheduler|BlockingScheduler|add_job|"

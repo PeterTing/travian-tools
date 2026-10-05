@@ -2,7 +2,9 @@
  * 擴充登入憑證（純函式，方便測試）。
  *
  * 憑證只會由工具網站透過 externally_connectable 交過來，格式：
- *   { access_token, expires_at (ISO 字串或毫秒), user? }
+ *   { access_token, expires_at (ISO 字串或毫秒), user?, accounts? }
+ * accounts 是「存到哪個遊戲帳號」的選項（網站交過來；擴充 Token 只能上傳，
+ * 不能自己去讀帳號列表）。
  * 存在 chrome.storage.local 的 `credential` key。過期就視為登出，並在讀取時清掉。
  * popup 裡沒有任何輸入框，擴充自己不處理帳號密碼。
  */
@@ -14,6 +16,20 @@ export const LEGACY_AUTH_KEY = 'auth';
 export const MAX_LIFETIME_MS = 24 * 60 * 60 * 1000;
 /** 判斷過期時預留的緩衝，避免送出去途中剛好過期。 */
 export const EXPIRY_SKEW_MS = 30 * 1000;
+
+/** 最多帶幾個遊戲帳號選項 */
+export const MAX_ACCOUNTS = 50;
+
+function normalizeAccounts(list) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .filter((a) => a && typeof a.account_id === 'string' && a.account_id)
+    .slice(0, MAX_ACCOUNTS)
+    .map((a) => ({
+      account_id: a.account_id.slice(0, 64),
+      label: String(a.label ?? a.account_id).slice(0, 80),
+    }));
+}
 
 export const SITE_MESSAGE = Object.freeze({
   SET: 'set_extension_token',
@@ -47,7 +63,12 @@ export function normalizeCredential(input, now = Date.now()) {
         email: typeof input.user.email === 'string' ? input.user.email : '',
       }
     : null;
-  return { access_token: token, expires_at: expiresAt, user };
+  return {
+    access_token: token,
+    expires_at: expiresAt,
+    user,
+    accounts: normalizeAccounts(input.accounts),
+  };
 }
 
 export function isExpired(credential, now = Date.now()) {

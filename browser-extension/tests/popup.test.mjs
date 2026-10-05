@@ -31,7 +31,12 @@ describe('popup.js', () => {
 
   it('never asks for or sends credentials', () => {
     assert.doesNotMatch(js, /password/i);
-    assert.doesNotMatch(js, /sendMessage\('login'/);
+    assert.doesNotMatch(js, /runtime\.sendMessage\(/);
+  });
+
+  it('has exactly one request: the upload to our API', () => {
+    assert.equal(js.match(/\bfetch\s*\(/g).length, 1);
+    assert.match(js, /fetch\(`\$\{API_BASE_URL\}\$\{endpoint\}`/);
   });
 
   it('opens the tool site (and only the tool site) in a new tab', () => {
