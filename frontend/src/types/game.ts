@@ -346,8 +346,6 @@ export interface GameAccountCreate {
   alliance_name?: string
   server_start_date?: string
   player_role?: PlayerRole
-  login_email?: string
-  login_password?: string
 }
 
 export interface GameAccountUpdate {
@@ -360,8 +358,6 @@ export interface GameAccountUpdate {
   server_start_date?: string
   is_active?: boolean
   player_role?: PlayerRole
-  login_email?: string
-  login_password?: string
 }
 
 export interface GameAccount {
@@ -379,8 +375,6 @@ export interface GameAccount {
   is_active: boolean
   last_updated: string | null
   created_at: string
-  login_email: string | null
-  login_password: string | null
 }
 
 export interface GameAccountListResponse {

@@ -1,20 +1,4 @@
 services:
-  # Redis for ARQ task queue
-  redis:
-    image: redis:7-alpine
-    container_name: travian-tools-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      timeout: 5s
-      retries: 5
-    networks:
-      - travian-network
-
   # MySQL Database
   db:
     image: mysql:8.0
@@ -45,17 +29,12 @@ services:
       - ./backend/.env
     environment:
       - DEBUG=true
-      - CHROME_HEADLESS=true
-      - DISPLAY=:99
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - travian_chrome_profile:/root/.travian_chrome_profile
     depends_on:
       db:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     command: /docker-entrypoint.sh
     networks:
@@ -85,9 +64,7 @@ services:
 
 volumes:
   mysql_data:
-  redis_data:
   frontend_node_modules:
-  travian_chrome_profile:
 
 networks:
   travian-network:

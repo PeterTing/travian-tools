@@ -1,6 +1,9 @@
 /**
  * Travian Tools - Content Script
- * 在 Travian 遊戲頁面中執行，負責抓取頁面數據
+ *
+ * 不會自動注入任何頁面：只有使用者點開擴充功能 popup 時，才透過
+ * activeTab + chrome.scripting 注入到「目前分頁」，並且只在收到 popup
+ * 的訊息時讀取該頁 DOM。不發出網路請求、不點擊、不導航、不使用計時器。
  */
 
 // 配置

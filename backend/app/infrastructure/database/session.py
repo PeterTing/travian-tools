@@ -1,5 +1,7 @@
 """資料庫 Session 設定."""
 
+from typing import Any
+
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 
@@ -26,7 +28,7 @@ engine = create_engine(
 
 # 設定連接時使用 utf8mb4 編碼
 @event.listens_for(engine, "connect")
-def set_charset(dbapi_connection, connection_record):
+def set_charset(dbapi_connection: Any, connection_record: Any) -> None:
     """在每個連接建立時設定字元編碼為 utf8mb4."""
     cursor = dbapi_connection.cursor()
     cursor.execute("SET NAMES utf8mb4")

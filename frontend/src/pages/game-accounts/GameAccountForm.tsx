@@ -47,8 +47,6 @@ export default function GameAccountForm({
     alliance_name: account?.alliance_name || '',
     server_start_date: account?.server_start_date || '',
     is_active: account?.is_active ?? true,
-    login_email: account?.login_email || '',
-    login_password: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -84,8 +82,6 @@ export default function GameAccountForm({
           alliance_name: formData.alliance_name || undefined,
           server_start_date: formData.server_start_date || undefined,
           is_active: formData.is_active,
-          login_email: formData.login_email || undefined,
-          login_password: formData.login_password || undefined,
         }
         await gameAccountApi.update(account.account_id, updateData)
       } else {
@@ -97,8 +93,6 @@ export default function GameAccountForm({
           player_name: formData.player_name || undefined,
           alliance_name: formData.alliance_name || undefined,
           server_start_date: formData.server_start_date || undefined,
-          login_email: formData.login_email || undefined,
-          login_password: formData.login_password || undefined,
         }
         await gameAccountApi.create(createData)
       }
@@ -142,37 +136,6 @@ export default function GameAccountForm({
               placeholder={t('gameAccounts.serverUrlPlaceholder')}
               required
             />
-          </div>
-
-          <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
-            <div>
-              <p className="text-sm font-medium mb-1">Travian 遊戲登入憑證</p>
-              <p className="text-xs text-muted-foreground">用於自動同步村莊資料。不填則無法使用同步功能。</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="login_email">Travian 登入 Email</Label>
-              <Input
-                id="login_email"
-                type="email"
-                value={formData.login_email}
-                onChange={(e) =>
-                  setFormData({ ...formData, login_email: e.target.value })
-                }
-                placeholder="your-travian-email@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="login_password">Travian 登入密碼</Label>
-              <Input
-                id="login_password"
-                type="password"
-                value={formData.login_password}
-                onChange={(e) =>
-                  setFormData({ ...formData, login_password: e.target.value })
-                }
-                placeholder={isEditing ? '留空表示不修改' : '輸入 Travian 遊戲密碼'}
-              />
-            </div>
           </div>
 
           <div className="space-y-2">

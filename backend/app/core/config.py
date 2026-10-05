@@ -33,30 +33,16 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # Claude API 設定
-    ANTHROPIC_API_KEY: str = ""
-    CLAUDE_MODEL: str = "claude-sonnet-4-20250514"
-    CLAUDE_MAX_TOKENS: int = 4096
-    CLAUDE_TEMPERATURE: float = 0.7
-    ANTHROPIC_BASE_URL: str = ""  # 可選：自訂 API base URL (例如 proxy)
-
-    # Travian 登入憑證（用於自動化抓取）
-    TRAVIAN_LOGIN_EMAIL: str = ""
-    TRAVIAN_LOGIN_PASSWORD: str = ""
-
-    # Redis 設定（用於 ARQ 任務隊列）
-    REDIS_HOST: str = "redis"
-    REDIS_PORT: int = 6379
-    REDIS_DB: int = 0
-
-    @property
-    def redis_settings(self) -> dict:
-        """取得 Redis 連線設定."""
-        return {
-            "host": self.REDIS_HOST,
-            "port": self.REDIS_PORT,
-            "database": self.REDIS_DB,
-        }
+    # map.sql 每日抓取（唯一允許連線至 Travian 的功能）
+    # 只下載公開的 /map.sql：不帶 cookie/憑證、不用瀏覽器、固定排程。
+    # 預設開啟（PM 決定）；設為 false 可停用。啟動時不會立即抓取，只在排程時間執行。
+    MAP_SQL_DAILY_FETCH_ENABLED: bool = True
+    MAP_SQL_FETCH_HOUR_UTC: int = 4
+    MAP_SQL_FETCH_MINUTE_UTC: int = 15
+    MAP_SQL_USER_AGENT: str = (
+        "travian-tools-mapsql/0.1 (+https://github.com/PeterTing/travian-tools; "
+        "public map.sql, once per day)"
+    )
 
     @property
     def cors_origins_list(self) -> list[str]:

@@ -33,7 +33,6 @@ import { GameAccountsPage } from '@/pages/game-accounts'
 // Village pages
 import VillagesPage from '@/pages/villages/VillagesPage'
 import VillageDetailPage from '@/pages/villages/VillageDetailPage'
-// DashboardPage removed — village management is now unified in VillagesPage
 // Map pages
 import MapSqlPage from '@/pages/map/MapSqlPage'
 // Statistics pages
@@ -46,7 +45,7 @@ import {
   InactiveSearchPage,
 } from '@/pages/statistics'
 // Strategy pages
-import { AIAdvisorPage, HealthCheckPage } from '@/pages/strategy'
+import { HealthCheckPage } from '@/pages/strategy'
 import { Button } from '@/components/ui/button'
 
 function Navigation() {
@@ -248,12 +247,6 @@ function Navigation() {
                   </Button>
                   <div className="absolute top-full right-0 hidden group-hover:block bg-background border rounded shadow-lg py-2 min-w-[140px] z-50">
                     <Link
-                      to="/strategy/advisor"
-                      className="block px-4 py-2 hover:bg-muted"
-                    >
-                      {t('nav.aiAdvisor')}
-                    </Link>
-                    <Link
                       to="/strategy/health-check"
                       className="block px-4 py-2 hover:bg-muted"
                     >
@@ -330,7 +323,6 @@ function AppContent() {
         <Route path="/villages/:villageId" element={<RequireAuth><VillageDetailPage /></RequireAuth>} />
         <Route path="/map-sql" element={<RequireAuth><MapSqlPage /></RequireAuth>} />
         {/* Strategy routes */}
-        <Route path="/strategy/advisor" element={<RequireAuth><AIAdvisorPage /></RequireAuth>} />
         <Route path="/strategy/health-check" element={<RequireAuth><HealthCheckPage /></RequireAuth>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

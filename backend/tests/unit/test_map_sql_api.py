@@ -225,3 +225,52 @@ class TestSaveMapSql:
         assert data["success"] is True
         assert data["players_found"] == 2
         assert data["alliances_found"] == 2
+
+
+T46_LINE = (
+    "INSERT INTO `x_world` VALUES (1,0,0,1,10,'Gaul\\'s',1,'P',0,'',100,"
+    "'Region',TRUE,NULL,NULL,NULL);\n"
+)
+
+
+class TestUploadMapSql:
+    """手動上傳 map.sql 測試."""
+
+    def test_upload_plain_sql(self, client: TestClient) -> None:
+        response = client.post(
+            "/map-sql/upload",
+            data={"account_id": "acc-123"},
+            files={"file": ("map.sql", T46_LINE.encode(), "text/plain")},
+        )
+        assert response.status_code == 200
+        assert response.json()["success"] is True
+
+    def test_upload_gzip(self, client: TestClient) -> None:
+        import gzip
+
+        response = client.post(
+            "/map-sql/upload",
+            data={"account_id": "acc-123"},
+            files={
+                "file": (
+                    "map.sql.gz",
+                    gzip.compress(T46_LINE.encode()),
+                    "application/gzip",
+                )
+            },
+        )
+        assert response.status_code == 200
+
+    def test_upload_corrupt_gzip_is_400(self, client: TestClient) -> None:
+        response = client.post(
+            "/map-sql/upload",
+            data={"account_id": "acc-123"},
+            files={"file": ("map.sql.gz", b"\x1f\x8bbroken", "application/gzip")},
+        )
+        assert response.status_code == 400
+
+    def test_no_server_side_download_endpoints(self, client: TestClient) -> None:
+        for path in ("/map-sql/download", "/map-sql/download-and-save"):
+            assert client.post(
+                path, json={"server_url": "https://ts1.travian.com"}
+            ).status_code in (404, 405)

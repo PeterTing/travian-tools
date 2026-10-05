@@ -11,16 +11,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
-    from app.infrastructure.database.models.automation_settings import (
-        VillageAutoUpgradeConfig,
-    )
     from app.infrastructure.database.models.building_instance import BuildingInstance
-    from app.infrastructure.database.models.completion_event import CompletionEvent
-    from app.infrastructure.database.models.execution_task import ExecutionTask
     from app.infrastructure.database.models.game_account import GameAccount
-    from app.infrastructure.database.models.resource_transport import (
-        VillageTransportConfig,
-    )
     from app.infrastructure.database.models.sync_log import SyncLog
     from app.infrastructure.database.models.troop_instance import TroopInstance
 
@@ -137,28 +129,6 @@ class Village(Base):
     )
     sync_logs: Mapped[list["SyncLog"]] = relationship(
         "SyncLog",
-        back_populates="village",
-        cascade="all, delete-orphan",
-    )
-    execution_tasks: Mapped[list["ExecutionTask"]] = relationship(
-        "ExecutionTask",
-        back_populates="village",
-        cascade="all, delete-orphan",
-    )
-    transport_config: Mapped["VillageTransportConfig"] = relationship(
-        "VillageTransportConfig",
-        back_populates="village",
-        uselist=False,
-        cascade="all, delete-orphan",
-    )
-    auto_upgrade_config: Mapped["VillageAutoUpgradeConfig"] = relationship(
-        "VillageAutoUpgradeConfig",
-        back_populates="village",
-        uselist=False,
-        cascade="all, delete-orphan",
-    )
-    completion_events: Mapped[list["CompletionEvent"]] = relationship(
-        "CompletionEvent",
         back_populates="village",
         cascade="all, delete-orphan",
     )

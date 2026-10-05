@@ -11,6 +11,8 @@ jobs:
   backend:
     name: Backend CI
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: mysql+mysqlconnector://root:test_password@127.0.0.1:3306/travian_tools_test
     defaults:
       run:
         working-directory: backend
@@ -47,6 +49,17 @@ jobs:
         run: |
           ruff check .
 
+      - name: Compliance guard (no browser automation / Travian traffic except map.sql)
+        run: |
+          pytest tests/unit/test_compliance.py --no-cov -q
+
+      - name: Migrations build the exact model schema
+        env:
+          DATABASE_URL: mysql+mysqlconnector://root:test_password@localhost:3306/travian_tools_test
+        run: |
+          alembic upgrade head
+          alembic check
+
       - name: Type check with mypy
         run: |
           mypy app --ignore-missing-imports
@@ -58,9 +71,13 @@ jobs:
           pytest --cov=app --cov-report=xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        # Optional reporting: v3 uploader is deprecated and fails TLS; never
+        # let a coverage upload outage fail the build.
+        uses: codecov/codecov-action@v5
+        continue-on-error: true
         with:
-          file: ./backend/coverage.xml
+          fail_ci_if_error: false
+          files: ./backend/coverage.xml
           flags: backend
           name: backend-coverage
 

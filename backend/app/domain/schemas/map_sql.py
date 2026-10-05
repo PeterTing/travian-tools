@@ -9,7 +9,12 @@ class MapVillage(BaseModel):
     # 座標範圍根據伺服器大小不同，不設限制
     x: int = Field(..., description="X 座標")
     y: int = Field(..., description="Y 座標")
-    field_type: int = Field(0, description="地形類型")
+    tribe_id: int = Field(0, description="種族 id（map.sql 的 tid 欄）")
+    field_type: int = Field(
+        0, description="已棄用：歷史上誤稱為地形，實際等同 tribe_id"
+    )
+    map_field_id: int | None = Field(None, description="地圖格 id（map.sql 第 1 欄）")
+    region: str | None = Field(None, description="區域名稱（有區域的伺服器）")
     village_id: int | None = Field(None, description="村莊 ID")
     village_name: str | None = Field(None, description="村莊名稱")
     player_id: int | None = Field(None, description="玩家 ID")
@@ -57,18 +62,6 @@ class MapParseResponse(BaseModel):
     total_villages: int
     total_players: int
     total_alliances: int
-
-
-class MapDownloadRequest(BaseModel):
-    """Map.sql 下載請求."""
-
-    server_url: str = Field(..., description="伺服器網址，如 https://ts1.travian.com")
-
-
-class MapDownloadAndSaveRequest(BaseModel):
-    """Map.sql 下載並儲存請求."""
-
-    account_id: str = Field(..., description="遊戲帳號 ID")
 
 
 class MapSaveRequest(BaseModel):

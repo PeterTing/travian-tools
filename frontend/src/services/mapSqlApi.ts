@@ -61,21 +61,14 @@ export const mapSqlApi = {
   },
 
   /**
-   * 從伺服器下載並解析 map.sql
+   * 手動上傳 map.sql（純文字或 .gz）並儲存到帳號
    */
-  download: async (serverUrl: string): Promise<MapParseResponse> => {
-    const response = await api.post<MapParseResponse>('/map-sql/download', {
-      server_url: serverUrl,
-    })
-    return response.data
-  },
-
-  /**
-   * 從遊戲帳號的伺服器下載 map.sql 並儲存
-   */
-  downloadAndSave: async (accountId: string): Promise<MapSaveResponse> => {
-    const response = await api.post<MapSaveResponse>('/map-sql/download-and-save', {
-      account_id: accountId,
+  upload: async (accountId: string, file: File): Promise<MapSaveResponse> => {
+    const form = new FormData()
+    form.append('account_id', accountId)
+    form.append('file', file)
+    const response = await api.post<MapSaveResponse>('/map-sql/upload', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     })
     return response.data
   },

@@ -45,7 +45,7 @@ export default function MapSqlPage() {
   const [parseResult, setParseResult] = useState<MapParseResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [downloading, setDownloading] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('villages')
@@ -75,21 +75,32 @@ export default function MapSqlPage() {
     }
   }
 
-  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const content = e.target?.result as string
+    setSelectedFile(file)
+    setParseResult(null)
+    setSearchResults(null)
+    setError(null)
+    setSuccess(null)
+    try {
+      // map.sql.gz 在瀏覽器端解壓以便預覽解析；儲存時直接把原檔上傳給後端
+      const content =
+        file.name.endsWith('.gz') && typeof DecompressionStream !== 'undefined'
+          ? await new Response(
+              file.stream().pipeThrough(new DecompressionStream('gzip')),
+            ).text()
+          : file.name.endsWith('.gz')
+            ? ''
+            : await file.text()
       setSqlContent(content)
-      setParseResult(null)
-      setSearchResults(null)
-      setError(null)
-      setSuccess(null)
+    } catch (err) {
+      console.error('Failed to read file:', err)
+      setSqlContent('')
+      setError(t('mapSql.parseError'))
     }
-    reader.readAsText(file)
-  }, [])
+  }, [t])
 
   const handleParse = async () => {
     if (!sqlContent.trim()) {
@@ -117,7 +128,7 @@ export default function MapSqlPage() {
   }
 
   const handleSave = async () => {
-    if (!sqlContent.trim() || !selectedAccountId) {
+    if (!selectedFile || !selectedAccountId) {
       setError(t('mapSql.selectAccountFirst'))
       return
     }
@@ -126,7 +137,7 @@ export default function MapSqlPage() {
     setError(null)
     setSuccess(null)
     try {
-      const result = await mapSqlApi.save(selectedAccountId, sqlContent)
+      const result = await mapSqlApi.upload(selectedAccountId, selectedFile)
       if (result.success) {
         setSuccess(result.message)
       } else {
@@ -137,67 +148,6 @@ export default function MapSqlPage() {
       setError(t('mapSql.saveError'))
     } finally {
       setSaving(false)
-    }
-  }
-
-  const handleDownloadAndSave = async () => {
-    if (!selectedAccountId) {
-      setError(t('mapSql.selectAccountFirst'))
-      return
-    }
-
-    const account = accounts.find(a => a.account_id === selectedAccountId)
-    if (!account?.server_url) {
-      setError(t('mapSql.noServerUrl'))
-      return
-    }
-
-    setDownloading(true)
-    setError(null)
-    setSuccess(null)
-    try {
-      const result = await mapSqlApi.downloadAndSave(selectedAccountId)
-      if (result.success) {
-        setSuccess(result.message)
-      } else {
-        setError(result.message)
-      }
-    } catch (err) {
-      console.error('Download and save error:', err)
-      setError(t('mapSql.downloadError'))
-    } finally {
-      setDownloading(false)
-    }
-  }
-
-  const handleDownloadAndParse = async () => {
-    if (!selectedAccountId) {
-      setError(t('mapSql.selectAccountFirst'))
-      return
-    }
-
-    const account = accounts.find(a => a.account_id === selectedAccountId)
-    if (!account?.server_url) {
-      setError(t('mapSql.noServerUrl'))
-      return
-    }
-
-    setDownloading(true)
-    setError(null)
-    setSuccess(null)
-    try {
-      const result = await mapSqlApi.download(account.server_url)
-      setParseResult(result)
-      setSuccess(t('mapSql.downloadParseSuccess', {
-        villages: result.total_villages,
-        players: result.total_players,
-        alliances: result.total_alliances
-      }))
-    } catch (err) {
-      console.error('Download error:', err)
-      setError(t('mapSql.downloadError'))
-    } finally {
-      setDownloading(false)
     }
   }
 
@@ -371,11 +321,11 @@ export default function MapSqlPage() {
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Auto Download Card */}
+        {/* Account + daily public map.sql fetch */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('mapSql.autoDownloadTitle')}</CardTitle>
-            <CardDescription>{t('mapSql.autoDownloadDescription')}</CardDescription>
+            <CardTitle>{t('mapSql.dailyFetchTitle')}</CardTitle>
+            <CardDescription>{t('mapSql.dailyFetchDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -400,21 +350,7 @@ export default function MapSqlPage() {
               </div>
             )}
 
-            <div className="flex gap-2">
-              <Button
-                onClick={handleDownloadAndParse}
-                disabled={downloading || !selectedAccountId}
-              >
-                {downloading ? t('common.loading') : t('mapSql.downloadAndParse')}
-              </Button>
-              <Button
-                onClick={handleDownloadAndSave}
-                disabled={downloading || !selectedAccountId}
-                variant="secondary"
-              >
-                {downloading ? t('common.loading') : t('mapSql.downloadAndSave')}
-              </Button>
-            </div>
+            <p className="text-sm text-muted-foreground">{t('mapSql.dailyFetchSchedule')}</p>
           </CardContent>
         </Card>
 
@@ -430,7 +366,7 @@ export default function MapSqlPage() {
               <Input
                 id="file"
                 type="file"
-                accept=".sql,.txt"
+                accept=".sql,.txt,.gz"
                 onChange={handleFileUpload}
                 className="mt-1"
               />
@@ -448,7 +384,7 @@ export default function MapSqlPage() {
               </Button>
               <Button
                 onClick={handleSave}
-                disabled={saving || !sqlContent || !selectedAccountId}
+                disabled={saving || !selectedFile || !selectedAccountId}
                 variant="secondary"
               >
                 {saving ? t('common.loading') : t('mapSql.saveToDb')}
