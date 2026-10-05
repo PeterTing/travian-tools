@@ -53,16 +53,16 @@
 
 ### 3.3 截圖辨識
 
-- 引擎：RapidOCR（PaddleOCR 小模型的 ONNX 版），跑在 Cloud Run。Gemini（Vertex AI）的比較結果出來後，再決定是否改用或並用。
+- 引擎：RapidOCR（PaddleOCR 小模型的 ONNX 版）自架在 Cloud Run，P0 只用它。P1 再加 Gemini 2.5 Flash（Vertex AI，us-central1）複查不是全部 ok 的截圖。實測 Gemini 單獨使用時有 0.6% 讀錯卻標成 ok，所以不能單獨靠它。
 - 實測：18 張桌機截圖，全部欄位 99.3% 正確，時間 100%，座標 98.4%；標成正確卻讀錯的是 0／246。上線前要再收 50 到 100 張手機截圖驗證，樣本由使用者勾選同意後收集（預設關閉）。
 - 欄位狀態：
   - **待補**：讀不到，可以先存，之後補。
   - **低信心**：可能讀錯，必須確認才能存入。
-- 低信心不能只看 OCR 分數，要加規則檢查，回傳原因代碼（多個原因時，最嚴重的排第一）：`OCR_LOW_SCORE`、`TIME_FORMAT_INVALID`、`COORD_OUT_OF_RANGE`、`COORD_MAP_MISMATCH`、`COUNTDOWN_ARRIVAL_MISMATCH`、`OVERLAP_MISMATCH`、`NUMBER_FORMAT_INVALID`、`RESOURCE_OVER_CAPACITY`、`LAYOUT_AMBIGUOUS`、`DUPLICATE_VALUE`、`TEXT_TOO_SMALL`、`NO_CROSS_CHECK`、`CROP_RECHECK_MISMATCH`；`TRUNCATED_AT_EDGE` 搭配「待補」狀態使用。
+- 低信心不能只看 OCR 分數，要加規則檢查，回傳原因代碼（多個原因時，最嚴重的排第一）：`OCR_LOW_SCORE`、`TIME_FORMAT_INVALID`、`COORD_OUT_OF_RANGE`、`COORD_MAP_MISMATCH`、`COUNTDOWN_ARRIVAL_MISMATCH`、`OVERLAP_MISMATCH`、`NUMBER_FORMAT_INVALID`、`RESOURCE_OVER_CAPACITY`、`LAYOUT_AMBIGUOUS`、`DUPLICATE_VALUE`、`TEXT_TOO_SMALL`、`NO_CROSS_CHECK`、`CROP_RECHECK_MISMATCH`；P1 加入 Gemini 複查後再加 `MODEL_UNSURE`、`ENGINE_MISMATCH`、`SINGLE_ENGINE`。`TRUNCATED_AT_EDGE`、`PARSE_ERROR` 搭配「待補」狀態使用。
 - `COORD_MAP_MISMATCH`：拿座標去查 `map.sql`，看村名和玩家名對不對得上。對不上只標低信心、不直接判錯，因為地圖每天才更新一次。
 - 攻擊方座標不論信心高低，都附上截圖縮圖讓人核對。
 - 等待：每張約 2 到 3 秒，進度條最多跑 5 秒，超過就提示「比平常久」（也涵蓋冷啟動）。
-- 成本：開始付費前要先經過 Peter 同意。預算警示設在 `artogo-travian-tools`，每月 20 美元，用到 50%、90%、100% 時各通知一次。
+- 成本：Gemini 複查每張約 0.0013 美元，Peter 自己用每月約 0.4 美元，一個聯盟約 5 美元。預算警示設在 `artogo-travian-tools`，每月 20 美元，用到 50%、90%、100% 時各通知一次；另外設每分鐘請求數上限當硬上限。不保留常駐主機，冷啟動交給「比平常久」的提示處理。
 
 ## 4. 功能範圍與分期
 
@@ -86,7 +86,7 @@
 
 - 反推 TS 等級（用第一波攻擊的距離、兵種和實際飛行時間）
 - 戰報解析（攻擊、防守、偵查）。需要樣本頁，排在 P1 後段
-- 村莊總覽與戰報的截圖辨識
+- 村莊總覽與戰報的截圖辨識；加上 Gemini 複查（約 2 到 3 天）
 - 聯盟群組與權限；登錄重要目標與敵方攻擊村
 - 真假攻判斷與偵查時間表：算每個攻擊村打每個目標的出兵時間，排偵查去看兵在不在家
 - 戰鬥模擬器重寫；修正鐵匠鋪公式
@@ -117,7 +117,7 @@
 
 - 前端：React + Vite + Tailwind（pnpm monorepo），中英雙語
 - 後端：FastAPI + MySQL
-- 部署：Cloud Run（GCP 專案 `artogo-travian-tools`）。要不要保留一台常駐來避免冷啟動，等 Gemini 的成本出來再決定
+- 部署：Cloud Run（GCP 專案 `artogo-travian-tools`），不保留常駐主機
 - 擴充：Chrome Manifest V3，只申請 `activeTab`
 
 ### 資料模型（摘要）
@@ -130,8 +130,8 @@ Alliance → Member、Target、EnemyAttackerVillage、IncomingAttack（來源、
 
 | 事項 | 誰決定 | 狀態 |
 |---|---|---|
-| 截圖辨識用 RapidOCR 還是 Gemini | PM（依實測結果） | 等 Gemini 比較 |
-| Cloud Run 要不要保留一台常駐 | PM（依成本） | 等 Gemini 比較 |
+| 截圖辨識引擎 | PM | ✅ RapidOCR 為主；P1 加 Gemini 複查 |
+| Cloud Run 常駐 | PM | ✅ 不保留 |
 | 戰報與多村總覽的 HTML 樣本頁 | Peter 提供 | P1 開始前給就好 |
 | 各村莊角色的目標建築模板 | Peter 或聯盟老玩家 | P2 前 |
 
