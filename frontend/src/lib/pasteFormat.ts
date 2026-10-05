@@ -159,10 +159,15 @@ export function parseResultIsSaveable(
     return Array.isArray(data.buildings) && data.buildings.length > 0
   }
   if (pageType === 'rally_point') {
-    const movements = (data.movements as unknown[]) || []
-    const incoming = (data.incoming as unknown[]) || []
-    const garrison = (data.garrison_own as unknown[]) || []
-    return movements.length + incoming.length + garrison.length > 0
+    const movements = (data.movements as Record<string, unknown>[]) || []
+    const incoming = (data.incoming as Record<string, unknown>[]) || []
+    const fromMovements = movements.filter((m) =>
+      String(m.kind || '').startsWith('incoming_'),
+    )
+    const fromIncoming = incoming.filter((m) =>
+      ['incoming_attack', 'incoming_raid', 'incoming_spy'].includes(String(m.kind || '')),
+    )
+    return fromMovements.length + fromIncoming.length > 0
   }
   if (pageType === 'troop_statistics') {
     return Array.isArray(data.villages_troops) && data.villages_troops.length > 0

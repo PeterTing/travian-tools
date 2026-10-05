@@ -124,7 +124,10 @@ def parse_page(inp: PageInput) -> ParseResult:
         )
     if page_type == "rally_point":
         has_move = bool(
-            data.get("movements") or data.get("incoming") or data.get("garrison_own")
+            data.get("movements")
+            or data.get("incoming")
+            or data.get("garrison_own")
+            or data.get("garrison_stationed")
         )
         if not has_move:
             warnings.append(

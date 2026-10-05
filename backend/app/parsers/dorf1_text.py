@@ -94,31 +94,33 @@ def _parse_production(lines: list[str]) -> dict[str, int]:
 
 
 def _parse_stock(lines: list[str]) -> dict[str, int]:
-    """從開頭數列推倉庫／資源：warehouse, wood, clay, iron, granary, crop。"""
+    """從開頭數列推資源存量。
+
+    Ctrl+A 常見序列：… gold silver warehouse wood clay iron granary crop …
+    或以「倉庫容量 ≥ 資源」對出六連數字。
+    """
     resources = {"wood": 0, "clay": 0, "iron": 0, "crop": 0}
     nums: list[int] = []
-    for ln in lines[:20]:
-        if not ln or re.search(r"[\u4e00-\u9fffA-Za-z]", ln):
-            # 允許純數字／逗號行
-            if not re.fullmatch(r"[\d,.\s]+", ln):
-                if nums and len(nums) >= 6:
-                    break
-                continue
+    for ln in lines[:25]:
+        if not ln:
+            continue
         if re.fullmatch(r"[\d,.\s]+", ln):
             nums.append(clean_number(ln))
-    # gold, silver, warehouse, wood, clay, iron, granary, crop, …
-    if len(nums) >= 8:
-        resources["wood"] = nums[3]
-        resources["clay"] = nums[4]
-        resources["iron"] = nums[5]
-        resources["crop"] = nums[7]
-    elif len(nums) >= 4:
-        # fallback: last four as resources
+            continue
+        if nums and len(nums) >= 6:
+            break
+    best: tuple[int, int, int, int] | None = None
+    for i in range(len(nums) - 5):
+        wcap, wood, clay, iron, gcap, crop = nums[i : i + 6]
+        if wcap < 100 or gcap < 100:
+            continue
+        if wood > wcap or clay > wcap or iron > wcap or crop > gcap:
+            continue
+        best = (wood, clay, iron, crop)
+        # 繼續找：後面較靠近產量的較準，但同一頁通常只有一組
+    if best:
         resources["wood"], resources["clay"], resources["iron"], resources["crop"] = (
-            nums[-4],
-            nums[-3],
-            nums[-2],
-            nums[-1],
+            best
         )
     return resources
 

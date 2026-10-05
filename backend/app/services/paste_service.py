@@ -238,6 +238,16 @@ class PasteService:
 
         # Only persist 來襲 (attack/raid/spy); reinforcements are not listed in P0-06
         to_save = [m for m in movements_in if m.get("kind") in INCOMING_KINDS]
+        if not to_save:
+            return {
+                "success": False,
+                "message": "集結點沒有可存的來襲（攻擊／突襲／偵查）。"
+                "駐軍不會當成來襲存入。",
+                "created": 0,
+                "updated": 0,
+                "total": 0,
+                "error_code": "empty_parse",
+            }
 
         # Existing incoming for this account (never auto-delete)
         existing = (

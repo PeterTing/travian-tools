@@ -14,7 +14,12 @@ from typing import Any
 
 from bs4 import BeautifulSoup, Tag
 
-from app.parsers.numbers import parse_coordinate_text, parse_signed_int, strip_bidi
+from app.parsers.numbers import (
+    parse_coordinate_text,
+    parse_coords_pair,
+    parse_signed_int,
+    strip_bidi,
+)
 from app.parsers.server_time import parse_server_time
 from app.parsers.village_list import active_village, parse_village_list
 
@@ -277,6 +282,80 @@ def parse_rally_point_html(html: str) -> dict[str, Any]:
     }
 
 
+def _parse_garrison_from_plain_text(text: str) -> tuple[list[dict], list[dict]]:
+    """解析「在本村…部隊」區塊的自軍／他軍列（純文字）。"""
+    own: list[dict] = []
+    stationed: list[dict] = []
+    if not re.search(r"在本村|村內部隊|Troops in this village", text, re.I):
+        return own, stationed
+    lines = [strip_bidi(ln).strip() for ln in text.splitlines() if ln.strip()]
+    i = 0
+    while i < len(lines):
+        ln = lines[i]
+        if re.search(r"在他村", ln):
+            break
+        if "自軍" in ln or re.search(r"的士兵", ln):
+            role = ln.split("\t")[0].replace("自軍", "").strip() or ln
+            kind_own = "自軍" in ln
+            coords = None
+            troops: list[dict] = []
+            # look ahead for coords + unit header + 士兵 counts
+            names: list[str] = []
+            for look in lines[i + 1 : i + 12]:
+                c = parse_coords_pair(look)
+                if c and coords is None:
+                    coords = c
+                    # same line may also have unit names after coords
+                    rest = look
+                    # strip coords portion
+                    rest = re.sub(r"\([^)]*\)", " ", look)
+                    maybe = [n for n in re.split(r"\s+|\t+", rest) if n]
+                    if maybe and any(
+                        "兵" in n or n == "英雄" or "騎" in n for n in maybe
+                    ):
+                        names = maybe
+                if ("方陣" in look or "英雄" in look or "劍士" in look) and not names:
+                    names = [
+                        n
+                        for n in re.split(r"\s+|\t+", look)
+                        if n and parse_coords_pair(n) is None
+                    ]
+                if look.startswith("士兵"):
+                    counts = [
+                        parse_signed_int(p) for p in re.split(r"\s+|\t+", look)[1:]
+                    ]
+                    for ni, name in enumerate(names):
+                        if name in ("士兵",):
+                            continue
+                        cnt = counts[ni] if ni < len(counts) else 0
+                        if cnt:
+                            troops.append(
+                                {
+                                    "troop_id": f"troop_{name}",
+                                    "name": name,
+                                    "count": cnt,
+                                }
+                            )
+                    break
+            movement = {
+                "kind": "garrison",
+                "role": role,
+                "headline": "自軍" if kind_own else ln,
+                "coordinate_x": coords[0] if coords else None,
+                "coordinate_y": coords[1] if coords else None,
+                "timer_seconds": None,
+                "arrival_time": None,
+                "troops": troops,
+                "section": "garrison",
+            }
+            if kind_own:
+                own.append(movement)
+            else:
+                stationed.append(movement)
+        i += 1
+    return own, stationed
+
+
 def parse_rally_point_text(text: str) -> dict[str, Any]:
     """貼上文字／OCR 正規化後的集結點文字。
 
@@ -304,6 +383,9 @@ def parse_rally_point_text(text: str) -> dict[str, Any]:
             r"(.+?)\s+(搶奪|掠奪|攻擊|支援|Raid|Attack)\s+(.+)", line
         )
         if move_match and section != "unknown":
+            if re.search(r"Discord|玩家守則|條款|法律聲明|最新消息|首頁", line):
+                i += 1
+                continue
             verb = move_match.group(2)
             kind = "unknown"
             if section == "garrison":
@@ -355,9 +437,27 @@ def parse_rally_point_text(text: str) -> dict[str, Any]:
                     garrison_stationed.append(movement)
         i += 1
 
+    # zh-TW Ctrl+A：只有「在本村…部隊」+「自軍」時沒有「來源 搶奪 目標」列
+    if not (incoming or outgoing or garrison_own or garrison_stationed):
+        garrison_own, garrison_stationed = _parse_garrison_from_plain_text(text)
+
+    village_name = None
+    coords = None
+    for ln in lines:
+        c = parse_coords_pair(ln)
+        if c and coords is None:
+            coords = c
+        if "的村莊" in ln or re.match(r"^\S.{0,40}$", ln):
+            if "自軍" in ln:
+                village_name = ln.split("\t")[0].strip() or village_name
+    if garrison_own and not village_name:
+        village_name = garrison_own[0].get("role")
+
     return {
         "village_id": None,
-        "village_name": None,
+        "village_name": village_name,
+        "coordinate_x": coords[0] if coords else None,
+        "coordinate_y": coords[1] if coords else None,
         "server_time": None,
         "incoming": incoming,
         "incoming_reinforcements": incoming_reinforcements,
