@@ -1,8 +1,11 @@
 """P0-02 第二段：村莊列表（人口、糧食淨產量、最後貼上時間、只看得到自己的）.
 
+最後貼上時間只算村莊總覽（dorf1）的上傳；村莊中心（dorf2）不算。
+
 用 SQLite in-memory 跑真的 ORM 和真的上傳 API（不碰 MySQL、不連網）。
 """
 
+import uuid
 from collections.abc import Iterator
 from datetime import datetime, timedelta
 
@@ -101,6 +104,33 @@ def _upload_overview(
             "population": population,
             "resources": {"wood": 1000, "clay": 1000, "iron": 1000, "crop": 800},
             "production": {"wood": 820, "clay": 800, "iron": 900, "crop": crop},
+        },
+    )
+    return resp.status_code
+
+
+def _upload_center(
+    client: TestClient,
+    account_id: str,
+    *,
+    did: str,
+    name: str,
+    x: int,
+    y: int,
+    population: int,
+) -> int:
+    """跟擴充在村莊中心（dorf2）按上傳時送的一樣：有人口、沒有產量."""
+    resp = client.post(
+        "/api/v1/sync/village-center",
+        json={
+            "account_id": account_id,
+            "village_id": did,
+            "village_name": name,
+            "coordinate_x": x,
+            "coordinate_y": y,
+            "population": population,
+            "buildings": [],
+            "troops": [],
         },
     )
     return resp.status_code
@@ -206,7 +236,7 @@ def _log(
 ) -> None:
     session.add(
         SyncLog(
-            log_id=f"log-{village_id}-{sync_type.value}-{status.value}-{at.isoformat()}-{user_id}",
+            log_id=str(uuid.uuid4()),
             user_id=user_id,
             account_id=account_id,
             village_id=village_id,
@@ -253,7 +283,7 @@ class TestPastedAt:
         detail = peter.get(f"/api/v1/villages/{body['villages'][0]['village_id']}")
         assert detail.json()["last_pasted_at"] == stamp
 
-    def test_each_village_uses_its_latest_successful_village_upload(
+    def test_each_village_uses_its_latest_successful_overview_upload(
         self, as_user, session: Session
     ) -> None:  # type: ignore[no-untyped-def]
         peter = as_user("u-peter")
@@ -265,15 +295,16 @@ class TestPastedAt:
         session.query(SyncLog).delete()
         now = datetime(2026, 10, 5, 3, 0, 0)
 
-        _log(session, village_id=main, account_id=acc, at=now - timedelta(hours=5))
+        _log(session, village_id=main, account_id=acc, at=now - timedelta(hours=7))
         _log(
             session,
             village_id=main,
             account_id=acc,
-            at=now - timedelta(hours=2),  # ← 這筆
-            sync_type=SyncType.VILLAGE_CENTER,
+            at=now - timedelta(hours=5),  # ← 這筆
         )
         for sync_type, status, minutes in [
+            # 村莊中心（dorf2）比較新，但不帶產量，不算
+            (SyncType.VILLAGE_CENTER, SyncStatus.SUCCESS, 120),
             (SyncType.VILLAGE_OVERVIEW, SyncStatus.FAILED, 30),  # 失敗的不算
             (SyncType.FULL, SyncStatus.SUCCESS, 12),  # 戰報上傳也記成 FULL，不算
             (SyncType.TROOPS, SyncStatus.SUCCESS, 6),  # 軍隊統計不動人口和糧，不算
@@ -289,7 +320,7 @@ class TestPastedAt:
         session.commit()
 
         assert _list(peter, acc)["villages"][0]["last_pasted_at"] == (
-            "2026-10-05T01:00:00"
+            "2026-10-04T22:00:00"
         )
 
     def test_oldest_village_decides_the_notice(self, as_user, session: Session) -> None:  # type: ignore[no-untyped-def]
@@ -351,6 +382,114 @@ class TestPastedAt:
         body = _list(peter, ts5)
         assert body["villages"] == []
         assert body["oldest_pasted_at"] is None
+
+
+class TestVillageCenterUploadsDoNotCount:
+    """村莊中心（dorf2）只帶人口和建築、不帶產量：不能讓列表看起來是新的."""
+
+    def test_account_with_only_village_center_uploads_has_no_paste_time(
+        self, as_user
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        acc = _account(peter)
+        assert (
+            _upload_center(peter, acc, did="1", name="主村", x=10, y=-3, population=812)
+            == 200
+        )
+        assert (
+            _upload_center(peter, acc, did="2", name="二村", x=12, y=-1, population=540)
+            == 200
+        )
+
+        body = _list(peter, acc)
+        assert body["total"] == 2
+        assert {v["name"]: v["population"] for v in body["villages"]} == {
+            "主村": 812,
+            "二村": 540,
+        }
+        # 不是「剛剛」：沒有村莊總覽的資料，時間一律 null，糧也還沒有資料
+        assert [v["last_pasted_at"] for v in body["villages"]] == [None, None]
+        assert [v["crop_net_per_hour"] for v in body["villages"]] == [None, None]
+        assert body["oldest_pasted_at"] is None
+        detail = peter.get(f"/api/v1/villages/{body['villages'][0]['village_id']}")
+        assert detail.json()["last_pasted_at"] is None
+
+    def test_village_center_upload_after_overview_does_not_refresh_the_time(
+        self, as_user, session: Session
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        acc = _account(peter)
+        _upload_overview(
+            peter, acc, did="1", name="主村", x=1, y=1, population=10, crop=-50
+        )
+        village_id = _village_id(peter, acc, "主村")
+        # 把村莊總覽那筆改成 3 天前
+        three_days_ago = datetime.utcnow().replace(microsecond=0) - timedelta(days=3)
+        log = session.query(SyncLog).one()
+        log.started_at = log.completed_at = three_days_ago
+        session.commit()
+
+        # 真的走上傳 API 傳一次村莊中心（現在）
+        assert (
+            _upload_center(peter, acc, did="1", name="主村", x=1, y=1, population=12)
+            == 200
+        )
+        assert session.query(SyncLog).count() == 2
+
+        body = _list(peter, acc)
+        row = body["villages"][0]
+        assert row["village_id"] == village_id
+        assert row["population"] == 12  # 人口照樣更新
+        assert row["crop_net_per_hour"] == -50  # 糧還是村莊總覽那次的
+        # 時間還是 3 天前（每列的「n 天前」和頂部提示都照這個）
+        assert row["last_pasted_at"] == three_days_ago.isoformat()
+        assert body["oldest_pasted_at"] == three_days_ago.isoformat()
+
+    def test_newer_village_center_upload_does_not_move_the_oldest_village(
+        self, as_user, session: Session
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        acc = _account(peter)
+        for did, name in [("1", "主村"), ("2", "二村"), ("3", "三村")]:
+            _upload_overview(
+                peter, acc, did=did, name=name, x=int(did), y=0, population=10, crop=5
+            )
+        ids = {n: _village_id(peter, acc, n) for n in ["主村", "二村", "三村"]}
+        session.query(SyncLog).delete()
+        now = datetime(2026, 10, 5, 3, 0, 0)
+        _log(session, village_id=ids["主村"], account_id=acc, at=now)
+        _log(
+            session, village_id=ids["二村"], account_id=acc, at=now - timedelta(days=2)
+        )
+        _log(
+            session, village_id=ids["三村"], account_id=acc, at=now - timedelta(hours=8)
+        )
+        # 二村、三村之後都只上傳了村莊中心
+        for name in ["二村", "三村"]:
+            _log(
+                session,
+                village_id=ids[name],
+                account_id=acc,
+                at=now,
+                sync_type=SyncType.VILLAGE_CENTER,
+            )
+        # 只有村莊中心的第四個村莊：不算進最舊的
+        _upload_center(peter, acc, did="4", name="四村", x=4, y=0, population=99)
+        session.query(SyncLog).filter(
+            SyncLog.sync_type == SyncType.VILLAGE_CENTER,
+            SyncLog.completed_at > now,
+        ).update({"started_at": now, "completed_at": now})
+        session.commit()
+
+        body = _list(peter, acc)
+        times = {v["name"]: v["last_pasted_at"] for v in body["villages"]}
+        assert times == {
+            "主村": "2026-10-05T03:00:00",
+            "二村": "2026-10-03T03:00:00",  # 還是 2 天前 → 那一列標「2 天前」
+            "三村": "2026-10-04T19:00:00",
+            "四村": None,
+        }
+        assert body["oldest_pasted_at"] == "2026-10-03T03:00:00"
 
 
 class TestOtherUsersNeverSeeMyVillages:
