@@ -93,11 +93,12 @@
     position: sticky;
     left: auto;
     right: auto;
-    top: 1rem;
+    /* Clear AppHeader (h-14 = 3.5rem) + gap */
+    top: calc(3.5rem + 0.75rem);
     bottom: auto;
     z-index: auto;
     align-self: start;
-    max-height: calc(100vh - 2rem);
+    max-height: calc(100vh - 3.5rem - 1.5rem);
     overflow-y: auto;
     box-shadow: none;
   }
