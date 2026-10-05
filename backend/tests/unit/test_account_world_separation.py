@@ -16,7 +16,7 @@ import app.infrastructure.database.models  # noqa: F401  (register all tables)
 from app.core.dependencies import get_current_user, get_db
 from app.domain.schemas.game_account import GameAccountCreate, GameAccountUpdate
 from app.infrastructure.database.base import Base
-from app.infrastructure.database.models.game_account import TimeDisplay
+from app.infrastructure.database.models.game_account import GameAccount, TimeDisplay
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.village import Village
 from app.main import app
@@ -484,3 +484,73 @@ class TestDeactivatedAccounts:
             .json()["total"]
             == 0
         )
+
+    def test_owner_reads_it_back_deactivated_then_active_after_reactivating(
+        self, as_user, session: Session
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        alt = _create(peter, player_name="小號", server_url="ts5.x1.asia.travian.com")
+        url = f"/api/v1/game-accounts/{alt['account_id']}"
+
+        def read_back() -> tuple[bool, bool, bool]:
+            """單筆讀回、管理頁清單讀回、資料庫裡的值（都是重新讀，不看 PUT 的回應）."""
+            one = peter.get(url)
+            assert one.status_code == 200, one.text
+            listed = {
+                a["account_id"]: a
+                for a in peter.get(
+                    "/api/v1/game-accounts", params={"include_inactive": True}
+                ).json()["accounts"]
+            }
+            session.expire_all()
+            stored = session.get(GameAccount, alt["account_id"])
+            assert stored is not None
+            return (
+                one.json()["is_active"],
+                listed[alt["account_id"]]["is_active"],
+                stored.is_active,
+            )
+
+        assert read_back() == (True, True, True)
+
+        assert peter.put(url, json={"is_active": False}).status_code == 200
+        # 重新啟用之前：讀回來是停用的
+        assert read_back() == (False, False, False)
+        assert alt["account_id"] not in {
+            a["account_id"]
+            for a in peter.get("/api/v1/game-accounts").json()["accounts"]
+        }
+
+        assert peter.put(url, json={"is_active": True}).status_code == 200
+        # 重新啟用之後：讀回來是啟用中的，其他欄位沒變
+        assert read_back() == (True, True, True)
+        again = peter.get(url).json()
+        assert (again["player_name"], again["server_name"], again["world_id"]) == (
+            "小號",
+            alt["server_name"],
+            alt["world_id"],
+        )
+        assert alt["account_id"] in {
+            a["account_id"]
+            for a in peter.get("/api/v1/game-accounts").json()["accounts"]
+        }
+
+    def test_others_cannot_read_or_reactivate_and_it_stays_deactivated(
+        self, as_user, session: Session
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        alt = _create(peter, player_name="小號")
+        url = f"/api/v1/game-accounts/{alt['account_id']}"
+        peter.put(url, json={"is_active": False})
+
+        other = as_user("u-other")
+        assert other.get(url).status_code == 404
+        assert other.put(url, json={"is_active": True}).status_code == 404
+        assert other.get("/api/v1/game-accounts").json()["total"] == 0
+
+        # 別人的嘗試什麼都沒改：Peter 讀回來還是停用的
+        peter = as_user("u-peter")
+        assert peter.get(url).json()["is_active"] is False
+        session.expire_all()
+        stored = session.get(GameAccount, alt["account_id"])
+        assert stored is not None and stored.is_active is False

@@ -42,13 +42,16 @@ export default function GameAccountsPage({ startWithCreate = false }: GameAccoun
   const [showForm, setShowForm] = useState(startWithCreate)
   const [editingAccount, setEditingAccount] = useState<GameAccount | null>(null)
   const [deleteAccountId, setDeleteAccountId] = useState<string | null>(null)
-  const [showInactive, setShowInactive] = useState(false)
+  // null＝使用者還沒點過：全部都停用時預設展開，不然收起來
+  const [inactiveToggle, setInactiveToggle] = useState<boolean | null>(null)
   const [reactivatingId, setReactivatingId] = useState<string | null>(null)
   const [reactivateError, setReactivateError] = useState<string | null>(null)
 
   // 管理頁列出全部；停用的收在下面「已停用（n）」。頂部切換和村莊頁只用啟用中的
   const activeAccounts = accounts.filter((a) => a.is_active)
   const inactiveAccounts = accounts.filter((a) => !a.is_active)
+  const allInactive = activeAccounts.length === 0 && inactiveAccounts.length > 0
+  const showInactive = inactiveToggle ?? allInactive
 
   useEffect(() => {
     loadAccounts()
@@ -166,7 +169,18 @@ export default function GameAccountsPage({ startWithCreate = false }: GameAccoun
         <Button onClick={handleCreate}>{t('gameAccounts.addAccount')}</Button>
       </div>
 
-      {activeAccounts.length === 0 ? (
+      {allInactive ? (
+        // 有帳號但全部停用：說明可以在下面重新啟用，或新增一個
+        <Card data-testid="all-inactive">
+          <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+            <p className="font-medium">{t('gameAccounts.allInactiveTitle')}</p>
+            <p className="text-sm text-muted-foreground">{t('gameAccounts.allInactiveHint')}</p>
+            <Button className="mt-2" onClick={handleCreate}>
+              {t('gameAccounts.addAccount')}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : activeAccounts.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-muted-foreground mb-4">
@@ -181,9 +195,12 @@ export default function GameAccountsPage({ startWithCreate = false }: GameAccoun
             <Card key={account.account_id}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>{account.player_name || account.server_name || account.server_url}</span>
+                  <span>{accountPlayerLabel(account, accountWorldLabel(account))}</span>
                 </CardTitle>
-                <CardDescription>{account.server_url}</CardDescription>
+                {/* 副標題是世界名稱（例如 ts3 亞洲服）；沒填就從網址取（ts3），完整網址放在 title */}
+                <CardDescription data-testid="account-server" title={account.server_url}>
+                  {accountWorldLabel(account)}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 text-sm">
@@ -252,7 +269,7 @@ export default function GameAccountsPage({ startWithCreate = false }: GameAccoun
             className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-muted-foreground"
             aria-expanded={showInactive}
             aria-controls="inactive-account-list"
-            onClick={() => setShowInactive((v) => !v)}
+            onClick={() => setInactiveToggle(!showInactive)}
           >
             <span>{t('gameAccounts.inactiveSection', { count: inactiveAccounts.length })}</span>
             <span aria-hidden="true">{showInactive ? '▾' : '▸'}</span>
