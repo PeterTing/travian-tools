@@ -34,8 +34,8 @@
       "pnpm --filter frontend exec eslint --fix --max-warnings 0"
     ],
     "backend/**/*.py": [
-      "python3 -m ruff check --fix",
-      "python3 -m ruff format"
+      "backend/.venv/bin/python -m ruff check --fix",
+      "backend/.venv/bin/python -m ruff format"
     ]
   }
 }

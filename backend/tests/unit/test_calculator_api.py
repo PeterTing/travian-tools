@@ -412,15 +412,16 @@ class TestCalculatorHelpers:
         )
 
     def test_build_time_reduction_formula(self) -> None:
-        """測試建造時間減少公式."""
-        # 公式：實際時間 = 基礎時間 ÷ (1 + 本部等級 × 0.05)
+        """測試建造時間減少公式（Legends：base × 0.964^(MB−1)）."""
+        from app.utils.travian_formulas import calculate_build_time
+
         response = client.post(
             "/api/v1/calculator/building/upgrade",
             json={
                 "building_id": "main_building",
                 "from_level": 0,
                 "to_level": 1,
-                "main_building_level": 20,  # 最高等級
+                "main_building_level": 20,
                 "server_speed": 1.0,
             },
         )
@@ -429,9 +430,5 @@ class TestCalculatorHelpers:
         data = response.json()
         base_time = data["build_time_base"]
         actual_time = data["build_time_actual"]
-
-        # 本部等級 20: 減少 100% (1 + 20 * 0.05 = 2)
-        expected_reduction = 1 + 20 * 0.05
-        expected_actual = int(base_time / expected_reduction)
-
-        assert actual_time == expected_actual
+        assert actual_time == calculate_build_time(base_time, 20, 1.0)
+        assert actual_time < base_time

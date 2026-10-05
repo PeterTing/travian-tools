@@ -12,7 +12,7 @@ Source: Travian Support [Troops Speed Increase & Tournament Square](https://supp
 ## Speed Formula
 
 ```text
-threshold          = 30 fields   (fixed in game rules)
+threshold          = 20 fields   (S71; Legends — NOT the old 30)
 
 if distance <= threshold:
     travel_time = distance / unit_speed
@@ -32,7 +32,7 @@ Where:
 
 ## Speed Boost by Level
 
-| TS Level | Beyond-30 speed multiplier |
+| TS Level | Beyond-20 speed multiplier |
 |----------|----------------------------|
 | 0 | 1.0× (no TS) |
 | 5 | 2.0× |
@@ -45,11 +45,11 @@ Where:
 A Theutates Thunder (19 fields/h base) traveling **100 fields**:
 
 - No TS: 100 / 19 ≈ 5.26 h
-- TS Lv 20: threshold = 30/19 = 1.58 h; beyond = 70 / (19 × 5) = 0.74 h; total = **2.32 h** (56% faster)
+- TS Lv 20: threshold = 20/19 ≈ 1.05 h; beyond = 80 / (19 × 5) ≈ 0.84 h; total ≈ **1.89 h**
 
 ## Common Use Cases
 
-1. **Ops attacks > 30 fields**: TS is mandatory for cross-quadrant hammers.
+1. **Ops attacks > 20 fields**: TS is mandatory for cross-quadrant hammers.
 2. **Defense dodging** (hero follow-home prevention): change TS level between send and return so enemy can't precisely time a ghost wave back on your hammer.
 3. **Fake waves**: TS accelerates fakes too, reducing the defender's window to identify real vs fake.
 

@@ -70,7 +70,7 @@ class TestBuildingsAPI:
 
         data = response.json()
         assert data["building_id"] == "main_building"
-        assert data["name_zh"] == "本部"
+        assert data["name_zh"] == "村莊大樓"
         assert data["name_en"] == "Main Building"
         assert data["category"] == "infrastructure"
         assert data["max_level"] == 20

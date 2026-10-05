@@ -108,9 +108,9 @@ class TroopTechRow(BaseModel):
 
     troop_name: str
     troop_id: str
-    attack_values: list[int]  # 每個等級一個值
-    defense_infantry_values: list[int]
-    defense_cavalry_values: list[int]
+    attack_values: list[float]  # Legends smithy 可有小數（S187）
+    defense_infantry_values: list[float]
+    defense_cavalry_values: list[float]
 
 
 class TechnologyResponse(BaseModel):
@@ -135,6 +135,12 @@ class NpcCalculatorRequest(BaseModel):
         ...,
         description="期望資源分配比例，例如 {'wood': 1, 'clay': 1, 'iron': 1, 'crop': 1}",
     )
+    warehouse_capacity: int | None = Field(
+        None, ge=0, description="倉庫容量上限（木/磚/鐵；S38）"
+    )
+    granary_capacity: int | None = Field(
+        None, ge=0, description="穀倉容量上限（穀；S38）"
+    )
 
 
 class NpcCalculatorResponse(BaseModel):
@@ -143,6 +149,9 @@ class NpcCalculatorResponse(BaseModel):
     total_resources: int
     result: dict[str, int]  # {wood, clay, iron, crop}
     difference: dict[str, int]  # 與原本的差異
+    unallocated: int = 0  # 因容量限制無法分配的量
+    warehouse_capacity: int | None = None
+    granary_capacity: int | None = None
 
 
 # ============ Save Troops Calculator (避兵計算器) ============

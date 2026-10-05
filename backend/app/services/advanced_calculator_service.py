@@ -1,7 +1,6 @@
 """進階計算器服務 — 所有計算皆為無狀態、純公式計算."""
 
 import json
-import math
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -35,6 +34,13 @@ from app.domain.schemas.advanced_calculator import (
     VillageBuilderRequest,
     VillageBuilderResponse,
 )
+from app.utils.travian_formulas import (
+    TS_THRESHOLD_FIELDS,
+    calculate_travel_seconds,
+    distance_on_map,
+    round_smithy_display,
+    smithy_improved_value,
+)
 
 # 文化點需求表（Travian Legends）
 CP_REQUIREMENTS = [
@@ -65,13 +71,7 @@ MAP_SIZE = 401
 
 def _calculate_distance(x1: int, y1: int, x2: int, y2: int) -> float:
     """計算兩點間距離（考慮地圖環繞）."""
-    dx = abs(x2 - x1)
-    dy = abs(y2 - y1)
-    if dx > MAP_SIZE / 2:
-        dx = MAP_SIZE - dx
-    if dy > MAP_SIZE / 2:
-        dy = MAP_SIZE - dy
-    return math.sqrt(dx**2 + dy**2)
+    return distance_on_map(x1, y1, x2, y2, MAP_SIZE)
 
 
 def _format_travel_time(seconds: int) -> str:
@@ -84,6 +84,14 @@ def _format_travel_time(seconds: int) -> str:
     return f"{hours}h {minutes}m {secs}s"
 
 
+def _artifact_multiplier(artifact_bonus: str) -> float:
+    if artifact_bonus == "account_1_5x":
+        return 1.5
+    if artifact_bonus in ("unique_2x", "village_2x"):
+        return 2.0
+    return 1.0
+
+
 def _calculate_travel_time(
     distance: float,
     unit_speed: int,
@@ -92,27 +100,19 @@ def _calculate_travel_time(
     hero_bonus: int = 0,
     artifact_bonus: str = "none",
 ) -> float:
-    """計算旅行時間（小時）."""
-    effective_speed = float(unit_speed * server_speed)
+    """計算旅行時間（小時）.
 
-    # 神器加成（倍增速度）
-    if artifact_bonus == "account_1_5x":
-        effective_speed *= 1.5
-    elif artifact_bonus in ("unique_2x", "village_2x"):
-        effective_speed *= 2
-
-    travel_time_hours = distance / effective_speed
-
-    # TS 加成（距離 > 20 才生效）
-    if tournament_square_level > 0 and distance > 20:
-        ts_factor = 1 + (tournament_square_level * 0.2)
-        travel_time_hours /= ts_factor
-
-    # 英雄速度加成
-    if hero_bonus > 0:
-        travel_time_hours /= 1 + hero_bonus / 100
-
-    return travel_time_hours
+    競技場只加速超過 20 格的路段，每級 +20%（S71）。
+    """
+    seconds = calculate_travel_seconds(
+        distance=distance,
+        unit_speed=unit_speed,
+        server_speed=server_speed,
+        tournament_square_level=tournament_square_level,
+        hero_bonus_percent=hero_bonus,
+        artifact_multiplier=_artifact_multiplier(artifact_bonus),
+    )
+    return seconds / 3600.0
 
 
 def _load_troops_data() -> dict:
@@ -133,16 +133,15 @@ class AdvancedCalculatorService:
             request.start_x, request.start_y, request.target_x, request.target_y
         )
 
-        travel_time_hours = _calculate_travel_time(
+        travel_time_seconds = calculate_travel_seconds(
             distance=distance,
             unit_speed=request.unit_speed,
             server_speed=request.server_speed,
             tournament_square_level=request.tournament_square_level,
-            hero_bonus=request.hero_bonus,
-            artifact_bonus=request.artifact_bonus,
+            hero_bonus_percent=request.hero_bonus,
+            artifact_multiplier=_artifact_multiplier(request.artifact_bonus),
         )
-
-        travel_time_seconds = max(1, int(travel_time_hours * 3600))
+        travel_time_hours = travel_time_seconds / 3600.0
         arrival_speed = distance / travel_time_hours if travel_time_hours > 0 else 0
 
         return PathCalculatorResponse(
@@ -165,7 +164,7 @@ class AdvancedCalculatorService:
         )
         # 2. 攻擊者回程時間
         t_return_hours = d1 / (request.attacker_speed * request.server_speed)
-        t_return_seconds = int(t_return_hours * 3600)
+        t_return_seconds = max(1, int(round(t_return_hours * 3600)))
 
         # 3. 攻擊到達時間 → 回到家的時間
         attack_arrival = datetime.strptime(request.attack_arrival_time, "%H:%M:%S")
@@ -186,7 +185,7 @@ class AdvancedCalculatorService:
             server_speed=request.server_speed,
             tournament_square_level=request.catcher_ts_level,
         )
-        t_catch_seconds = int(t_catch_hours * 3600)
+        t_catch_seconds = max(1, int(round(t_catch_hours * 3600)))
 
         # 6. 發送時間 = 回到家時間 - 攔截者行進時間
         send_time = return_time - timedelta(seconds=t_catch_seconds)
@@ -259,11 +258,24 @@ class AdvancedCalculatorService:
             def_inf_values = []
             def_cav_values = []
 
+            # Legends smithy (KIR; S187): base+(base+300·upkeep/7)·(1.007^L−1)
+            upkeep = int(troop.get("crop_consumption", 1))
             for level in request.research_levels:
-                multiplier = 1.015**level
-                attack_values.append(round(troop["attack"] * multiplier))
-                def_inf_values.append(round(troop["defense_infantry"] * multiplier))
-                def_cav_values.append(round(troop["defense_cavalry"] * multiplier))
+                attack_values.append(
+                    round_smithy_display(
+                        smithy_improved_value(troop["attack"], upkeep, level)
+                    )
+                )
+                def_inf_values.append(
+                    round_smithy_display(
+                        smithy_improved_value(troop["defense_infantry"], upkeep, level)
+                    )
+                )
+                def_cav_values.append(
+                    round_smithy_display(
+                        smithy_improved_value(troop["defense_cavalry"], upkeep, level)
+                    )
+                )
 
             troop_rows.append(
                 TroopTechRow(
@@ -282,23 +294,31 @@ class AdvancedCalculatorService:
         )
 
     def calculate_npc(self, request: NpcCalculatorRequest) -> NpcCalculatorResponse:
-        """NPC 計算器 — 按比例重新分配資源."""
+        """NPC 計算器 — 按比例重新分配資源.
+
+        官方規則（S38）：重新分配後每種資源不得超過倉庫／穀倉容量。
+        """
         total = request.wood + request.clay + request.iron + request.crop
 
-        # 計算比例總和
         ratio_sum = sum(request.desired_ratios.values())
         if ratio_sum == 0:
-            # 避免除以零，等比分配
             ratio_sum = 4
-            ratios = {"wood": 1, "clay": 1, "iron": 1, "crop": 1}
+            ratios: dict[str, int] = {"wood": 1, "clay": 1, "iron": 1, "crop": 1}
         else:
             ratios = request.desired_ratios
 
+        warehouse = request.warehouse_capacity
+        granary = request.granary_capacity
+        caps: dict[str, int | None] = {
+            "wood": warehouse,
+            "clay": warehouse,
+            "iron": warehouse,
+            "crop": granary,
+        }
+
+        resource_keys = ["wood", "clay", "iron", "crop"]
         result: dict[str, int] = {}
         allocated = 0
-        resource_keys = ["wood", "clay", "iron", "crop"]
-
-        # 按比例分配，最後一個資源吸收捨入誤差
         for i, key in enumerate(resource_keys):
             ratio = ratios.get(key, 0)
             if i < len(resource_keys) - 1:
@@ -307,6 +327,30 @@ class AdvancedCalculatorService:
                 allocated += amount
             else:
                 result[key] = total - allocated
+
+        # Clamp to capacity (S38); leftover becomes unallocated.
+        unallocated = 0
+        if warehouse is not None or granary is not None:
+            for key in resource_keys:
+                cap = caps[key]
+                if cap is not None and result[key] > cap:
+                    unallocated += result[key] - cap
+                    result[key] = cap
+            # Try to redistribute unallocated into rooms under cap
+            changed = True
+            while unallocated > 0 and changed:
+                changed = False
+                for key in resource_keys:
+                    if unallocated <= 0:
+                        break
+                    cap = caps[key]
+                    room = unallocated if cap is None else max(0, cap - result[key])
+                    if room <= 0:
+                        continue
+                    take = min(room, unallocated)
+                    result[key] += take
+                    unallocated -= take
+                    changed = True
 
         difference = {
             "wood": result["wood"] - request.wood,
@@ -319,6 +363,9 @@ class AdvancedCalculatorService:
             total_resources=total,
             result=result,
             difference=difference,
+            unallocated=unallocated,
+            warehouse_capacity=warehouse,
+            granary_capacity=granary,
         )
 
     def calculate_save_troops(self, request: SaveTroopsRequest) -> SaveTroopsResponse:
@@ -328,16 +375,22 @@ class AdvancedCalculatorService:
         # 單程時間 = offline_hours / 2（去回各一半）
         one_way_hours = request.offline_hours / 2
 
-        # 理想距離（不考慮 TS 的基礎距離）
-        ideal_distance = one_way_hours * effective_speed
+        # 理想距離：前 20 格無 TS，超過部分受競技場加速（S71）
+        from app.utils.travian_formulas import (
+            tournament_square_bonus_factor,
+        )
 
-        # 如果有 TS 且距離 > 20，TS 會讓部隊跑得更遠
-        if request.tournament_square_level > 0 and ideal_distance > 20:
-            ts_factor = 1 + (request.tournament_square_level * 0.2)
-            ideal_distance *= ts_factor
+        threshold = TS_THRESHOLD_FIELDS
+        time_to_threshold = threshold / effective_speed
+        if request.tournament_square_level > 0 and one_way_hours > time_to_threshold:
+            bonus = tournament_square_bonus_factor(request.tournament_square_level)
+            far_hours = one_way_hours - time_to_threshold
+            ideal_distance = threshold + far_hours * effective_speed * bonus
+        else:
+            ideal_distance = one_way_hours * effective_speed
 
-        one_way_seconds = int(one_way_hours * 3600)
-        round_trip_seconds = int(request.offline_hours * 3600)
+        one_way_seconds = max(1, int(round(one_way_hours * 3600)))
+        round_trip_seconds = max(1, int(round(request.offline_hours * 3600)))
 
         return SaveTroopsResponse(
             ideal_distance=round(ideal_distance, 2),
@@ -378,7 +431,7 @@ class AdvancedCalculatorService:
                     server_speed=request.server_speed,
                     tournament_square_level=ts_level,
                 )
-                calc_seconds = int(calc_hours * 3600)
+                calc_seconds = max(1, int(round(calc_hours * 3600)))
 
                 if abs(calc_seconds - request.travel_time_seconds) <= tolerance:
                     possible_matches.append(
@@ -660,14 +713,14 @@ class AdvancedCalculatorService:
     ) -> TsOptimizerResponse:
         """Compute send times for multiple attackers to sync arrival.
 
-        Tournament Square formula (docs/knowledge/tournament-square-speed.md):
-          if distance ≤ 30: travel_time = distance / unit_speed
+        Tournament Square formula (S71; docs/knowledge/tournament-square-speed.md):
+          if distance ≤ 20: travel_time = distance / unit_speed
           else:
-            threshold_time = 30 / unit_speed
-            beyond_time    = (distance - 30) / (unit_speed × (1 + TS × 0.20))
+            threshold_time = 20 / unit_speed
+            beyond_time    = (distance - 20) / (unit_speed × (1 + TS × 0.20))
             travel_time    = threshold_time + beyond_time
 
-        Server speed divides total travel seconds.
+        Server speed divides total travel seconds. Times rounded to nearest second.
         """
         try:
             target_dt = datetime.fromisoformat(request.target_arrival)
@@ -694,15 +747,14 @@ class AdvancedCalculatorService:
 
         for wave_idx, (distance, atk) in enumerate(prepared):
             ts_level = atk.ts_level
-            if distance > 30:
-                near_seconds = (30 / atk.unit_speed) * 3600 / request.server_speed
-                effective_speed = atk.unit_speed * (1 + ts_level * 0.20)
-                far_seconds = (
-                    ((distance - 30) / effective_speed) * 3600 / request.server_speed
+            travel_sec = float(
+                calculate_travel_seconds(
+                    distance=distance,
+                    unit_speed=atk.unit_speed,
+                    server_speed=request.server_speed,
+                    tournament_square_level=ts_level,
                 )
-                travel_sec = near_seconds + far_seconds
-            else:
-                travel_sec = (distance / atk.unit_speed) * 3600 / request.server_speed
+            )
 
             send_dt = target_dt - timedelta(
                 seconds=travel_sec + wave_idx * request.wave_spacing_seconds

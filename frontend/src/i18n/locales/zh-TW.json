@@ -132,8 +132,8 @@
       "selectBuilding": "選擇建築",
       "fromLevel": "起始等級",
       "toLevel": "目標等級",
-      "mainBuildingLevel": "本部等級 (影響建造時間)",
-      "mainBuildingNote": "本部每升 1 級可縮短 5% 建造時間",
+      "mainBuildingLevel": "村莊大樓等級 (影響建造時間)",
+      "mainBuildingNote": "村莊大樓以 0.964^(等級−1) 縮短建造時間",
       "serverSpeed": "伺服器倍率",
       "serverSpeedOptions": {
         "1x": "1x",
@@ -199,7 +199,8 @@
       "defensePoints": "防禦點",
       "vs": "vs",
       "remove": "×",
-      "lossFormat": "-{{losses}} / {{original}}"
+      "lossFormat": "-{{losses}} / {{original}}",
+      "unreliableNote": "注意：此模擬器為簡化公式，目前無法代表遊戲內戰鬥結果，僅供參考，請勿依此做戰術決策。"
     },
     "crop": {
       "title": "糧食平衡計算器",
@@ -207,8 +208,8 @@
       "loadError": "載入數據失敗",
       "calcError": "計算失敗",
       "cropProduction": "糧食產量設定",
-      "cropFieldsProduction": "農田總產量 (/h)",
-      "cropFieldsHint": "輸入所有農田的總產量",
+      "cropFieldsProduction": "農場總產量 (/h)",
+      "cropFieldsHint": "輸入所有農場的總產量（不含英雄）",
       "oasisBonus": "綠洲加成",
       "buildings": "建築",
       "addBuilding": "新增建築",
@@ -241,8 +242,16 @@
       "troopCapacity": "可養兵力估算",
       "troopCapacityHint": "假設剩餘產量全部用於養兵：",
       "cropUnit": "耗糧兵",
-      "noResult": "請設定農田和消耗後點擊計算"
-    }
+      "noResult": "請設定農田和消耗後點擊計算",
+      "heroProduction": "英雄糧食產量 (/h)",
+      "heroProductionHint": "含資源點產出與固定 +6",
+      "heroConsumption": "英雄糧食消耗 (/h)",
+      "heroConsumptionHint": "英雄在村時通常為 6",
+      "serverSpeed": "伺服器速度",
+      "heroConsumptionResult": "英雄消耗",
+      "heroProductionResult": "英雄產量"
+    },
+    "npc": {}
   },
   "tribes": {
     "romans": "羅馬",
@@ -540,7 +549,7 @@
     "building_12": "鐵匠",
     "building_13": "兵工廠",
     "building_14": "比武場",
-    "building_15": "本部",
+    "building_15": "村莊大樓",
     "building_16": "集結點",
     "building_17": "市場",
     "building_18": "大使館",
@@ -756,6 +765,8 @@
     "detailedChecks": "詳細檢查項目",
     "suggestions": "建議",
     "recheck": "重新檢查",
-    "noAccountSelected": "請選擇遊戲帳號以執行健康檢查"
+    "noAccountSelected": "請選擇遊戲帳號以執行健康檢查",
+    "protectionDays": "新手保護天數",
+    "protectionDaysHint": "依世界設定（x1 預設 5 天）"
   }
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { calculatorApi, buildingsApi, troopsApi } from '@/services/gameApi'
@@ -32,6 +33,16 @@ export default function CropBalancePage() {
   ])
   const [cropFieldsProduction, setCropFieldsProduction] = useState(1000)
   const [oasisBonus, setOasisBonus] = useState(0)
+  const [heroCropProduction, setHeroCropProduction] = useState(0)
+  const [heroCropConsumption, setHeroCropConsumption] = useState(0)
+  const { currentAccount } = useCurrentAccount()
+  const [serverSpeed, setServerSpeed] = useState(1)
+
+  useEffect(() => {
+    if (currentAccount?.server_speed) {
+      setServerSpeed(currentAccount.server_speed)
+    }
+  }, [currentAccount])
 
   // Result state
   const [result, setResult] = useState<CropBalanceResponse | null>(null)
@@ -71,6 +82,9 @@ export default function CropBalancePage() {
         troops: validTroops.length > 0 ? validTroops : undefined,
         crop_fields_production: cropFieldsProduction,
         oasis_bonus: oasisBonus > 0 ? oasisBonus : undefined,
+        hero_crop_production: heroCropProduction,
+        hero_crop_consumption: heroCropConsumption,
+        server_speed: serverSpeed,
       }
 
       const response = await calculatorApi.calculateCropBalance(request)
@@ -211,6 +225,55 @@ export default function CropBalancePage() {
                   onChange={(e) => setOasisBonus(Number(e.target.value))}
                   className="w-full p-2 border rounded bg-background"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  {t('calculator.crop.heroProduction')}
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={heroCropProduction}
+                  onChange={(e) => setHeroCropProduction(Number(e.target.value))}
+                  className="w-full p-2 border rounded bg-background"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('calculator.crop.heroProductionHint')}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  {t('calculator.crop.heroConsumption')}
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={heroCropConsumption}
+                  onChange={(e) => setHeroCropConsumption(Number(e.target.value))}
+                  className="w-full p-2 border rounded bg-background"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('calculator.crop.heroConsumptionHint')}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  {t('calculator.crop.serverSpeed')}
+                </label>
+                <select
+                  value={serverSpeed}
+                  onChange={(e) => setServerSpeed(Number(e.target.value))}
+                  className="w-full p-2 border rounded bg-background"
+                >
+                  <option value={1}>1x</option>
+                  <option value={2}>2x</option>
+                  <option value={3}>3x</option>
+                  <option value={5}>5x</option>
+                  <option value={10}>10x</option>
+                </select>
               </div>
             </div>
           </div>

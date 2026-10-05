@@ -320,17 +320,23 @@ export interface CropBalanceRequest {
   troops?: BattleUnit[]
   crop_fields_production?: number
   oasis_bonus?: number
+  hero_crop_production?: number
+  hero_crop_consumption?: number
+  server_speed?: number
 }
 
 export interface CropBalanceResponse {
   population_consumption: number
   troop_consumption: number
+  hero_consumption: number
   total_consumption: number
   crop_production: number
+  hero_production: number
   balance: number
   status: 'surplus' | 'balanced' | 'deficit' | 'critical'
   warning_message: string | null
   suggestions: string[]
+  server_speed: number
 }
 
 // ============ 遊戲帳號類型 ============

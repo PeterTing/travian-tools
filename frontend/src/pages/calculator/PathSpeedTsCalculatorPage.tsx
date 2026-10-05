@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { PathSpeedTsRequest, PathSpeedTsResponse } from '@/services/advancedCalculatorApi'
@@ -12,6 +13,12 @@ export default function PathSpeedTsCalculatorPage() {
     travel_time_seconds: 3600,
     server_speed: 1,
   })
+  const { currentAccount } = useCurrentAccount()
+  useEffect(() => {
+    if (currentAccount?.server_speed) {
+      setForm((prev) => ({ ...prev, server_speed: currentAccount.server_speed }))
+    }
+  }, [currentAccount])
   const [timeInput, setTimeInput] = useState({ hours: 1, minutes: 0, seconds: 0 })
   const [result, setResult] = useState<PathSpeedTsResponse | null>(null)
   const [loading, setLoading] = useState(false)

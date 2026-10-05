@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { buildingsApi, calculatorApi } from '@/services/gameApi'
@@ -28,6 +29,13 @@ export default function BuildingCalculatorPage() {
   const [toLevel, setToLevel] = useState<number>(10)
   const [mainBuildingLevel, setMainBuildingLevel] = useState<number>(20)
   const [serverSpeed, setServerSpeed] = useState<number>(1)
+  const { currentAccount } = useCurrentAccount()
+
+  useEffect(() => {
+    if (currentAccount?.server_speed) {
+      setServerSpeed(currentAccount.server_speed)
+    }
+  }, [currentAccount])
   const [result, setResult] = useState<BuildingUpgradeResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

@@ -40,16 +40,24 @@ export interface HealthCheckResponse {
 
 // ============ API Functions ============
 
-export const detectPhase = async (accountId: string): Promise<PhaseDetectionResponse> => {
+export const detectPhase = async (
+  accountId: string,
+  beginnerProtectionDays = 5,
+): Promise<PhaseDetectionResponse> => {
   const response = await api.post<PhaseDetectionResponse>('/strategy/phase', {
     account_id: accountId,
+    beginner_protection_days: beginnerProtectionDays,
   })
   return response.data
 }
 
-export const healthCheck = async (accountId: string): Promise<HealthCheckResponse> => {
+export const healthCheck = async (
+  accountId: string,
+  beginnerProtectionDays = 5,
+): Promise<HealthCheckResponse> => {
   const response = await api.post<HealthCheckResponse>('/strategy/health-check', {
     account_id: accountId,
+    beginner_protection_days: beginnerProtectionDays,
   })
   return response.data
 }

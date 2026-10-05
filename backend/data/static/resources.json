@@ -9,7 +9,7 @@
       "levels": [
         {
           "level": 0,
-          "production_per_hour": 2,
+          "production_per_hour": 3,
           "cost_wood": 0,
           "cost_clay": 0,
           "cost_iron": 0,
@@ -249,7 +249,7 @@
       "levels": [
         {
           "level": 0,
-          "production_per_hour": 2,
+          "production_per_hour": 3,
           "cost_wood": 0,
           "cost_clay": 0,
           "cost_iron": 0,
@@ -489,7 +489,7 @@
       "levels": [
         {
           "level": 0,
-          "production_per_hour": 2,
+          "production_per_hour": 3,
           "cost_wood": 0,
           "cost_clay": 0,
           "cost_iron": 0,
@@ -722,14 +722,14 @@
     },
     "crop": {
       "resource_type": "crop",
-      "name_zh": "農田",
+      "name_zh": "農場",
       "name_en": "Cropland",
       "max_level": 10,
       "max_level_capital": 20,
       "levels": [
         {
           "level": 0,
-          "production_per_hour": 2,
+          "production_per_hour": 3,
           "cost_wood": 0,
           "cost_clay": 0,
           "cost_iron": 0,

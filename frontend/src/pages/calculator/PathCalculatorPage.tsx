@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { PathCalculatorRequest, PathCalculatorResponse } from '@/services/advancedCalculatorApi'
@@ -15,6 +16,12 @@ export default function PathCalculatorPage() {
     artifact_bonus: 'none',
     server_speed: 1,
   })
+  const { currentAccount } = useCurrentAccount()
+  useEffect(() => {
+    if (currentAccount?.server_speed) {
+      setForm((prev) => ({ ...prev, server_speed: currentAccount.server_speed }))
+    }
+  }, [currentAccount])
   const [result, setResult] = useState<PathCalculatorResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

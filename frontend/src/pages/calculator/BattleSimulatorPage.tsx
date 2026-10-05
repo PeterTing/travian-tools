@@ -200,7 +200,10 @@ export default function BattleSimulatorPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">{t('calculator.battle.title')}</h1>
-      <p className="text-muted-foreground mb-6">{t('calculator.battle.description')}</p>
+      <p className="text-muted-foreground mb-2">{t('calculator.battle.description')}</p>
+      <p className="text-sm text-amber-700 dark:text-amber-400 mb-6 border border-amber-300 dark:border-amber-700 rounded p-3 bg-amber-50 dark:bg-amber-950/40">
+        {t('calculator.battle.unreliableNote')}
+      </p>
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Attacker */}
