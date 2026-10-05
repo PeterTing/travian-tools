@@ -11,6 +11,8 @@ jobs:
   backend:
     name: Backend CI
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: mysql+mysqlconnector://root:test_password@127.0.0.1:3306/travian_tools_test
     defaults:
       run:
         working-directory: backend

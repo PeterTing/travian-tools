@@ -119,8 +119,9 @@ def _load_troops_data() -> dict:
     """載入兵種資料."""
     data_path = Path(__file__).parent.parent.parent / "data" / "static" / "troops.json"
     with open(data_path, encoding="utf-8") as f:
-        data = json.load(f)
-    return data.get("troops", data)
+        data: dict = json.load(f)
+    troops: dict = data.get("troops", data)
+    return troops
 
 
 class AdvancedCalculatorService:

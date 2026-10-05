@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime, timedelta
 
-from sqlalchemy import desc, func
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.domain.schemas.sync_log import SyncStatsResponse
@@ -78,7 +78,7 @@ class SyncLogService:
 
         total = query.count()
         logs = (
-            query.order_by(desc(SyncLog.started_at)).offset(offset).limit(limit).all()
+            query.order_by(SyncLog.started_at.desc()).offset(offset).limit(limit).all()
         )
 
         return logs, total
@@ -103,7 +103,7 @@ class SyncLogService:
         if village_id:
             query = query.filter(SyncLog.village_id == village_id)
 
-        return query.order_by(desc(SyncLog.started_at)).first()
+        return query.order_by(SyncLog.started_at.desc()).first()
 
     def get_sync_stats(
         self,
@@ -123,7 +123,7 @@ class SyncLogService:
         failed_syncs = base_query.filter(SyncLog.status == SyncStatus.FAILED).count()
 
         # 最後同步時間
-        last_sync = base_query.order_by(desc(SyncLog.started_at)).first()
+        last_sync = base_query.order_by(SyncLog.started_at.desc()).first()
         last_sync_at = last_sync.started_at if last_sync else None
 
         # 今日同步項目數

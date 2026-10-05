@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import InstrumentedAttribute, Session
 
 from app.domain.schemas.statistics import (
     AllianceRankingItem,
@@ -516,7 +516,7 @@ class StatisticsService:
         return paginated, total
 
     @staticmethod
-    def _get_player_sort_column(sort_by: str):
+    def _get_player_sort_column(sort_by: str) -> InstrumentedAttribute[int]:
         """取得玩家排序欄位."""
         sort_map = {
             "population": MapPlayerData.total_population,
@@ -525,7 +525,7 @@ class StatisticsService:
         return sort_map.get(sort_by, MapPlayerData.total_population)
 
     @staticmethod
-    def _get_alliance_sort_column(sort_by: str):
+    def _get_alliance_sort_column(sort_by: str) -> InstrumentedAttribute[int]:
         """取得聯盟排序欄位."""
         sort_map = {
             "population": MapAllianceData.total_population,

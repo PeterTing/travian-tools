@@ -8,7 +8,27 @@ from __future__ import annotations
 
 import re
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
+
+
+def _attr(tag: Tag, name: str) -> str:
+    """Return an HTML attribute as a plain string ("" if missing)."""
+    value = tag.get(name)
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    return " ".join(value)
+
+
+def _classes(tag: Tag) -> list[str]:
+    """Return the CSS classes of a tag as a list of strings."""
+    value = tag.get("class")
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return value.split()
+    return list(value)
 
 
 class StatisticsPageParser:
@@ -64,7 +84,7 @@ class StatisticsPageParser:
                 continue
 
             name = link.get_text(strip=True)
-            href = link.get("href", "")
+            href = _attr(link, "href")
             vid_match = re.search(r"newdid=(\d+)", href)
             travian_village_id = int(vid_match.group(1)) if vid_match else 0
 
@@ -79,7 +99,7 @@ class StatisticsPageParser:
             has_outgoing_attack = False
             if att_td:
                 for img in att_td.find_all("img"):
-                    img_classes = img.get("class", [])
+                    img_classes = _classes(img)
                     if "att1" in img_classes:
                         has_attack = True
                     if "att2" in img_classes:
@@ -124,7 +144,7 @@ class StatisticsPageParser:
         coords: dict[int, tuple[int, int]] = {}
 
         for entry in soup.select(".listEntry.village"):
-            did = entry.get("data-did", "")
+            did = _attr(entry, "data-did")
             if not did:
                 continue
             # Clean text and extract coordinates like (-47|144)
@@ -163,7 +183,7 @@ class StatisticsPageParser:
 
         for row in rows[1:]:  # skip header
             # Skip sum rows
-            row_classes = row.get("class", [])
+            row_classes = _classes(row)
             if "sum" in row_classes:
                 continue
 
@@ -222,7 +242,7 @@ class StatisticsPageParser:
         rows = table.find_all("tr")
 
         for row in rows[1:]:  # skip header
-            row_classes = row.get("class", [])
+            row_classes = _classes(row)
             if "sum" in row_classes:
                 continue
 
@@ -294,13 +314,13 @@ class StatisticsPageParser:
             for cell in header_row.find_all(["th", "td"])[1:]:
                 img = cell.find("img")
                 if img and img.get("alt"):
-                    troop_names.append(img["alt"])
+                    troop_names.append(_attr(img, "alt"))
 
             if not troop_names:
                 continue
 
             for row in table.find_all("tr")[1:]:
-                row_classes = row.get("class", [])
+                row_classes = _classes(row)
                 if "sum" in row_classes or "small" in row_classes:
                     continue
 
