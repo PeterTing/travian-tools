@@ -6,6 +6,7 @@ import type { StrategyId, BuildStep } from '../data/build-order';
 import type { TribeId } from '../data/travian';
 import { TRIBES } from '../data/tribes/index';
 import s from './calc.module.css';
+import CalcResultPanel from './CalcResultPanel';
 
 const TRIBE_ORDER: TribeId[] = ['romans', 'teutons', 'gauls', 'egyptians', 'huns', 'vikings', 'spartans'];
 
@@ -132,13 +133,19 @@ export default function LaunchSimCalculator() {
           </div>
         </div>
 
-        <div className={s.output}>
-          <h4>{lang === 'en' ? 'Estimated settle time' : '預估結帳時間'}</h4>
+        <CalcResultPanel
+          lang={lang}
+          title={lang === 'en' ? 'Estimated settle time' : '預估結帳時間'}
+          primary={<>{result.totalHours.toFixed(1)} h</>}
+          secondary={
+            lang === 'en'
+              ? `Day ${(result.totalHours / 24).toFixed(1)} · settlers ${settlerCost.toLocaleString()}`
+              : `第 ${(result.totalHours / 24).toFixed(1)} 天 · 拓荒者 ${settlerCost.toLocaleString()}`
+          }
+        >
           <div className={s.row}>
             <span className={s.label}>{lang === 'en' ? 'Total hours' : '總時數'}</span>
-            <span className={`${s.value} ${s.highlight}`}>
-              {result.totalHours.toFixed(1)} h
-            </span>
+            <span className={s.value}>{result.totalHours.toFixed(1)} h</span>
           </div>
           <div className={s.row}>
             <span className={s.label}>{lang === 'en' ? 'Server day' : '伺服器天'}</span>
@@ -149,7 +156,7 @@ export default function LaunchSimCalculator() {
             </span>
           </div>
           <div className={s.row}>
-            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x)' : 'Settler 成本（3 名）'}</span>
+            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x)' : '拓荒者成本（3 名）'}</span>
             <span className={s.value}>{settlerCost.toLocaleString()}</span>
           </div>
 
@@ -176,7 +183,7 @@ export default function LaunchSimCalculator() {
               ))}
             </tbody>
           </table>
-        </div>
+        </CalcResultPanel>
       </div>
     </>
   );

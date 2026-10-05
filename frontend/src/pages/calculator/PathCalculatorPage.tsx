@@ -6,13 +6,15 @@ import {
   distanceOnMap,
   formatTravelTime,
 } from '@/lib/travianFormulas'
+import CalcResultPanel from '@/features/guideCalcs/components/CalcResultPanel'
 
 /**
  * 移動時間（路徑）計算器 — 前端即時結果（S71 競技場公式與後端共用）。
  * 版型：上方輸入、下方 sticky 結果；≥1024px 左右欄。
  */
 export default function PathCalculatorPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const guideLang = (i18n.language || 'zh').toLowerCase().startsWith('zh') ? 'zh' : 'en'
   const [startX, setStartX] = useState(0)
   const [startY, setStartY] = useState(0)
   const [targetX, setTargetX] = useState(0)
@@ -179,10 +181,13 @@ export default function PathCalculatorPage() {
           </label>
         </div>
 
-        <div className="fixed inset-x-3 bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px)+0.5rem)] z-30 max-h-[min(38vh,16rem)] min-w-0 overflow-y-auto rounded-xl border bg-card p-4 shadow-lg lg:static lg:inset-x-auto lg:bottom-auto lg:z-auto lg:max-h-[calc(100vh-2rem)] lg:self-start lg:shadow-none">
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
-            {t('pathCalc.results')}
-          </h2>
+        <CalcResultPanel
+          lang={guideLang}
+          title={t('pathCalc.results')}
+          primary={<>{result.formatted}</>}
+          secondary={`${result.distance} ${t('pathCalc.fields')} · ${result.arrivalSpeed} ${t('pathCalc.fieldsPerHour')}`}
+          detailsLabel={{ zh: '明細', en: 'details' }}
+        >
           <dl className="space-y-3 text-sm">
             <div className="flex justify-between gap-3 border-b pb-2">
               <dt className="text-muted-foreground">{t('pathCalc.distance')}</dt>
@@ -192,9 +197,7 @@ export default function PathCalculatorPage() {
             </div>
             <div className="flex justify-between gap-3 border-b pb-2">
               <dt className="text-muted-foreground">{t('pathCalc.travelTime')}</dt>
-              <dd className="font-mono text-base font-semibold tabular-nums text-primary">
-                {result.formatted}
-              </dd>
+              <dd className="font-mono font-medium tabular-nums">{result.formatted}</dd>
             </div>
             <div className="flex justify-between gap-3 border-b pb-2">
               <dt className="text-muted-foreground">{t('pathCalc.seconds')}</dt>
@@ -207,7 +210,7 @@ export default function PathCalculatorPage() {
               </dd>
             </div>
           </dl>
-        </div>
+        </CalcResultPanel>
       </div>
     </div>
   )

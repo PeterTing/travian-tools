@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { MERCHANTS, merchantCapacity, type TribeId } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
+import CalcResultPanel from './CalcResultPanel';
 
 const fmtInt = (n: number) => isFinite(n) ? Math.round(n).toLocaleString('en-US') : '—';
 const fmtHr = (h: number) => {
@@ -92,7 +93,16 @@ export default function TraderouteCalculator() {
           </div>
         </div>
 
-        <div className={s.output}>
+        <CalcResultPanel
+          lang={lang}
+          title={lang === 'en' ? 'Merchants needed' : '所需商人'}
+          primary={<>{totalLabel}</>}
+          secondary={
+            lang === 'en'
+              ? `Cap ${fmtInt(cap)} · round trip ${fmtHr(roundTrip)}`
+              : `容量 ${fmtInt(cap)} · 往返 ${fmtHr(roundTrip)}`
+          }
+        >
           <h4>{lang === 'en' ? 'Merchant specs' : '商人規格'}</h4>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Capacity per merchant (incl. Trade Office)' : '每商人容量（含交易所）'}</span><span className={s.value}>{fmtInt(cap)}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Speed' : '速度'}</span><span className={s.value}>{speed} {lang === 'en' ? 'tiles/hr' : '格/小時'}</span></div>
@@ -115,7 +125,7 @@ export default function TraderouteCalculator() {
               ? 'If you need more merchants than you have, raise the Trade Office or shorten the distance.'
               : '若算出來要的商人比你現有的多，就升交易所或縮短距離。'}
           </div>
-        </div>
+        </CalcResultPanel>
       </div>
     </>
   );

@@ -6,6 +6,7 @@ import {
 } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
+import CalcResultPanel from './CalcResultPanel';
 
 export type BB = 'sawmill' | 'brickyard' | 'ironFoundry' | 'grainMill' | 'bakery';
 
@@ -200,7 +201,16 @@ export default function BuildOrderCalculator() {
           <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> Plus +25% gold</label>
         </div>
 
-        <div className={s.output}>
+        <CalcResultPanel
+          lang={lang}
+          title={lang === 'en' ? 'Next upgrades' : '接下來升級'}
+          primary={<>{formatDuration(plan.totalTime)}</>}
+          secondary={
+            lang === 'en'
+              ? `20 steps · cost ${plan.totalCost.toLocaleString()}`
+              : `20 步 · 成本 ${plan.totalCost.toLocaleString()}`
+          }
+        >
           <h4>{lang === 'en' ? 'Next 20 upgrades (lowest ROI first)' : '接下來 20 步（依 ROI 排序）'}</h4>
           <ol className={s.steps}>
             {plan.steps.map((st, i) => (
@@ -220,7 +230,7 @@ export default function BuildOrderCalculator() {
               ? 'Time uses MB speed-up (0.964^(MB Lv − 1)) but does not model dual queues, Roman-dual, gold instant-5m, or celebration speed-ups. Reality will be a bit faster.'
               : '時間已套用村莊大樓加速（0.964^(MB Lv − 1)），但未計入單/雙佇列、羅馬人雙隊、金幣 5 分鐘補時、慶典加速。實際略快。'}
           </div>
-        </div>
+        </CalcResultPanel>
       </div>
     </>
   );

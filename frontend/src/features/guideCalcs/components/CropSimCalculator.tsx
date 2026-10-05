@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { CROPPER_LAYOUTS, FIELD_PRODUCTION, type CropperId, type ResourceType } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
+import CalcResultPanel from './CalcResultPanel';
 
 const fmtInt = (n: number) => Math.round(n).toLocaleString('en-US');
 
@@ -100,7 +101,16 @@ export default function CropSimCalculator() {
           <label className={s.check}><input type="checkbox" checked={egypt} onChange={e => setEgypt(e.target.checked)} /> {lang === 'en' ? 'Egyptian (Waterworks ×1.35)' : '埃及人（供水系統 ×1.35）'}</label>
         </div>
 
-        <div className={s.output}>
+        <CalcResultPanel
+          lang={lang}
+          title={lang === 'en' ? 'Total /hr' : '總計 /hr'}
+          primary={<>{fmtInt(total)}</>}
+          secondary={
+            lang === 'en'
+              ? `Crop ${fmtInt(result.totals.crop)} · other ${fmtInt(nonCrop)}`
+              : `糧食 ${fmtInt(result.totals.crop)} · 其餘 ${fmtInt(nonCrop)}`
+          }
+        >
           <h4>{lang === 'en' ? 'Production breakdown /hr' : '產量分解 /hr'}</h4>
           <table className={s.table}>
             <thead><tr>
@@ -154,7 +164,7 @@ export default function CropSimCalculator() {
               ? 'All cells assume Lv 18 fields + all bonus buildings (Lv 5) + Plus +25% + Egyptian Waterworks. Columns = crop-oasis bonus tier: 150% = 3× 50% crop oases, 125% / 100% = fewer oases (or Waterworks inactive), 75% = minimal. Numbers are 1x-speed crop /hr. Toggle "Egyptian" + pick layout + set crop oasis in the calculator to reproduce any cell.'
               : '所有儲存格：Lv 18 田 + 全加成建築（Lv 5）+ Plus +25% + 埃及人供水系統（Waterworks）。欄位 = 糧綠洲加成層級：150% = 3 塊 50% 糧綠洲、125% / 100% = 綠洲較少（或供水系統未啟動）、75% = 最少。數字為 1x 速每小時糧產。計算器打開「埃及人」+ 選配置 + 設定糧綠洲加成即可重現任一格。'}
           </div>
-        </div>
+        </CalcResultPanel>
       </div>
     </>
   );
