@@ -102,6 +102,19 @@ describe('AccountWorldSwitcher', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
+  it('opens the sheet outside the sticky header so the bottom tab bar cannot cover it (P0-11)', async () => {
+    getAll.mockResolvedValue({ accounts: [ts3], total: 1 })
+    renderSwitcher()
+    const chip = await screen.findByRole('button', { name: '目前帳號：PeterT' })
+    expect(chip).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(chip)
+    expect(chip).toHaveAttribute('aria-expanded', 'true')
+    const overlay = screen.getByRole('dialog').parentElement
+    // 直接掛在 body 底下，不在頂部（sticky、自己一層）裡面
+    expect(overlay?.parentElement).toBe(document.body)
+    expect(overlay).toHaveClass('fixed', 'inset-0', 'z-[60]')
+  })
+
   it('goes to /game-accounts/new from ＋ 新增帳號或世界', async () => {
     getAll.mockResolvedValue({ accounts: [ts3], total: 1 })
     renderSwitcher()
