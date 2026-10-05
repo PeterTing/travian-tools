@@ -32,16 +32,16 @@ describe('uploadState', () => {
     for (const pageType of ['unknown', null, undefined, 'something_new']) {
       const state = uploadState({ pageType, ...ready });
       assert.equal(state.canUpload, false);
-      assert.equal(state.hint, '這一頁還不支援，請到村莊總覽再按');
+      assert.equal(state.hint, '這一頁還不支援，請到村莊總覽或集結點再按');
       assert.equal(state.pageName, '');
     }
   });
 
-  it('rally point: recognised, disabled + 「集結點的上傳還在做，目前請到村莊總覽再按」', () => {
+  it('rally point: recognised and can upload (opens confirm on the tool site)', () => {
     const state = uploadState({ pageType: 'rally_point', ...ready });
-    assert.equal(state.canUpload, false);
+    assert.equal(state.canUpload, true);
     assert.equal(state.pageName, '集結點');
-    assert.equal(state.hint, '集結點的上傳還在做，目前請到村莊總覽再按');
+    assert.equal(state.hint, '');
   });
 
   it('other recognised pages that cannot upload use the unsupported hint', () => {

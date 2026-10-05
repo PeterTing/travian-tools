@@ -207,7 +207,7 @@ describe('village list (P0-02 slice 2)', () => {
   })
 
   const notice = () => screen.findByTestId('villages-paste-notice')
-  const HINT = '要更新請到遊戲的村莊總覽，按擴充上傳。'
+  const HINT = '要更新請到首頁貼上多村總覽。'
   const OUTDATED = '數字可能已經不準。'
 
   it('words the notice by the OLDEST village (not the newest)', async () => {
@@ -284,7 +284,7 @@ describe('village list (P0-02 slice 2)', () => {
   })
 
   const NO_OVERVIEW_TITLE = '還沒有村莊總覽資料'
-  const NO_OVERVIEW_HINT = '人口和糧要從村莊總覽更新。請到遊戲的村莊總覽，按擴充上傳。'
+  const NO_OVERVIEW_HINT = '人口和糧要從村莊總覽更新。請到首頁貼上多村總覽。'
 
   it('dorf2-only account (village center uploads, never the overview): 還沒有村莊總覽資料, neutral, never 剛剛', async () => {
     // 後端只算村莊總覽（dorf1）：只上傳過村莊中心（dorf2）的村莊有人口、沒有糧、時間是 null
@@ -324,7 +324,7 @@ describe('village list (P0-02 slice 2)', () => {
       const box = await notice()
       expect(box.textContent).toBe(
         'The oldest data was pasted 3 days ago. The numbers may be out of date. ' +
-          'To update, open the village overview in the game and upload it with the extension.'
+          'To update, paste the multi-village overview on the home page.'
       )
     } finally {
       await i18n.changeLanguage('zh-TW')
@@ -336,7 +336,7 @@ describe('village list (P0-02 slice 2)', () => {
     renderPage()
     const empty = await screen.findByTestId('villages-empty')
     expect(empty).toHaveTextContent('這個帳號還沒有村莊資料')
-    expect(empty).toHaveTextContent('到遊戲的村莊總覽，按擴充上傳；也可以手動新增。')
+    expect(empty).toHaveTextContent('到首頁貼上多村總覽；也可以手動新增。')
     expect(within(empty).getByRole('button', { name: '＋ 手動新增村莊' })).toBeInTheDocument()
     expect(screen.queryByTestId('villages-paste-notice')).not.toBeInTheDocument()
     expect(screen.queryByTestId('village-list')).not.toBeInTheDocument()

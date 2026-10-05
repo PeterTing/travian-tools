@@ -95,6 +95,7 @@ class PageSyncService:
                 html=html,
                 url=url,
                 page_type_hint=hint,
+                captured_at=server_time,
             )
         )
         if not parsed.ok:
@@ -201,11 +202,23 @@ class PageSyncService:
             }
 
         if pt == "rally_point":
-            # P0-05／P0-06 才會把來襲寫入 DB；這裡只回解析成功，不存檔。
+            from app.services.paste_service import PasteService
+
+            saved = PasteService(self.db).confirm_rally(
+                user_id,
+                account_id=account_id,
+                data=data,
+                capture_at=None,
+                source="extension",
+                server_time=server_time or data.get("server_time"),
+            )
             return {
-                "success": False,
-                "message": "集結點的上傳還在做，目前請到村莊總覽再按",
+                "success": bool(saved.get("success")),
+                "message": saved.get("message") or "ok",
                 "page_type": pt,
+                "count": int(saved.get("total") or 0),
+                "new_count": int(saved.get("created") or 0),
+                "updated_count": int(saved.get("updated") or 0),
             }
 
         return {

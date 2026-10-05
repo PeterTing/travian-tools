@@ -242,6 +242,9 @@ class ParseRequest(BaseModel):
     ocr_lines: list[dict] | None = None
     url: str | None = None
     page_type_hint: str | None = None
+    server_time: str | None = Field(
+        None, description="頁面 #servertime 的 HH:MM:SS（可選）"
+    )
 
 
 class ParseResponse(BaseModel):

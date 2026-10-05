@@ -18,15 +18,16 @@ def parse_resources(soup: BeautifulSoup) -> dict[str, int]:
     stock = soup.select_one("#stockBar")
     if stock is not None:
         mapping = [
-            ("wood", ".lumber .value, [class*='lumber'] .value"),
-            ("clay", ".clay .value, [class*='clay'] .value"),
-            ("iron", ".iron .value, [class*='iron'] .value"),
-            ("crop", ".crop .value, [class*='crop'] .value"),
+            ("wood", ".lumber .value, [class*='lumber'] .value, #l1"),
+            ("clay", ".clay .value, [class*='clay'] .value, #l2"),
+            ("iron", ".iron .value, [class*='iron'] .value, #l3"),
+            ("crop", ".crop .value, [class*='crop'] .value, #l4"),
         ]
         for key, sel in mapping:
             el = stock.select_one(sel)
             if el is not None:
                 resources[key] = clean_number(el.get_text())
+    if any(resources.values()):
         return resources
     for key, eid in (("wood", "l1"), ("clay", "l2"), ("iron", "l3"), ("crop", "l4")):
         el = soup.select_one(f"#{eid}")

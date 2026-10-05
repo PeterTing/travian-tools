@@ -23,6 +23,7 @@ from app.services.auth_service import EXTENSION_SCOPE, AuthService
 # popup 會呼叫的上傳 API；只有這些接受擴充 Token
 UPLOAD_PATHS = {
     "/api/v1/sync/page",
+    "/api/v1/sync/draft",
     "/api/v1/sync/village-overview",
     "/api/v1/sync/village-center",
     "/api/v1/sync/reports",

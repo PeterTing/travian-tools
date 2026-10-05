@@ -17,6 +17,7 @@ from app.infrastructure.database.models.map_data import (
     MapSnapshot,
     MapVillageData,
 )
+from app.infrastructure.database.models.parse_draft import ParseDraft
 from app.infrastructure.database.models.reminder import (
     Notification,
     PushSubscription,
@@ -28,6 +29,7 @@ from app.infrastructure.database.models.troop_instance import (
     TroopInstance,
     TroopLocation,
 )
+from app.infrastructure.database.models.troop_movement import TroopMovement
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.village import Village, VillageRole, VillageType
 
@@ -41,6 +43,8 @@ __all__ = [
     "TroopInstance",
     "BattleReport",
     "SyncLog",
+    "TroopMovement",
+    "ParseDraft",
     "MapSnapshot",
     "MapVillageData",
     "MapPlayerData",
