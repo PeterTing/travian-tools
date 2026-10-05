@@ -51,7 +51,9 @@ def create_village(
     "",
     response_model=VillageListResponse,
     summary="取得村莊列表",
-    description="取得當前用戶的所有村莊",
+    description="取得當前用戶的所有村莊；指定 account_id 時只回那個帳號的村莊。"
+    "每個村莊附上最後一次貼上的時間（last_pasted_at），"
+    "清單附上資料最舊的那個時間（oldest_pasted_at）",
 )
 def get_villages(
     db: DBSession,
@@ -65,10 +67,23 @@ def get_villages(
         villages = service.get_villages_by_account(account_id, current_user.user_id)
     else:
         villages = service.get_all_villages_by_user(current_user.user_id)
+    pasted = (
+        service.get_last_pasted_by_village(current_user.user_id, account_id)
+        if villages
+        else {}
+    )
 
+    rows = [
+        VillageResponse.model_validate(v).model_copy(
+            update={"last_pasted_at": pasted.get(v.village_id)}
+        )
+        for v in villages
+    ]
+    times = [r.last_pasted_at for r in rows if r.last_pasted_at is not None]
     return VillageListResponse(
-        villages=[VillageResponse.model_validate(v) for v in villages],
-        total=len(villages),
+        villages=rows,
+        total=len(rows),
+        oldest_pasted_at=min(times) if times else None,
     )
 
 
@@ -104,6 +119,10 @@ def get_village(
         village_type=village.village_type,
         is_capital=village.is_capital,
         role=village.role,
+        crop_net_per_hour=village.crop_net_per_hour,
+        last_pasted_at=service.get_last_pasted_by_village(
+            current_user.user_id, village.account_id
+        ).get(village.village_id),
         last_updated=village.last_updated,
         created_at=village.created_at,
         buildings=[

@@ -452,6 +452,10 @@ export interface Village {
   village_type: VillageType | null
   is_capital: boolean
   role: VillageRole | null
+  /** 每小時糧食淨產量（已扣消耗，可以是負的）；還沒上傳過村莊總覽是 null */
+  crop_net_per_hour?: number | null
+  /** 這個村莊最後一次貼上／上傳村莊資料的時間（UTC，沒有時區標記）；沒有過是 null */
+  last_pasted_at?: string | null
   last_updated: string | null
   created_at: string
 }
@@ -464,6 +468,8 @@ export interface VillageDetail extends Village {
 export interface VillageListResponse {
   villages: Village[]
   total: number
+  /** 貼上過的村莊裡資料最舊的那個時間（UTC，沒有時區標記）；一個都沒有是 null */
+  oldest_pasted_at?: string | null
 }
 
 export interface VillageCreate {

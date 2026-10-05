@@ -18,9 +18,21 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { villageApi } from '@/services/villageApi'
 import { syncApi, type SyncLog, type SyncStats } from '@/services/syncApi'
 import type { VillageDetail } from '@/types/game'
+import VillageForm from './VillageForm'
 
 export default function VillageDetailPage() {
   const { t } = useTranslation()
@@ -33,6 +45,10 @@ export default function VillageDetailPage() {
   const [lastSync, setLastSync] = useState<SyncLog | null>(null)
   const [syncStats, setSyncStats] = useState<SyncStats | null>(null)
   const [syncLoading, setSyncLoading] = useState(false)
+  // 編輯、刪除從列表移到這裡（列表照線框只放名稱、座標、人口、糧）
+  const [editing, setEditing] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { reload: reloadAccounts } = useCurrentAccount()
 
   const loadVillage = useCallback(async (id: string) => {
     try {
@@ -110,6 +126,20 @@ export default function VillageDetailPage() {
     }
   }
 
+  const handleDelete = async () => {
+    if (!village) return
+    try {
+      await villageApi.delete(village.village_id)
+      // 頂部切換清單裡的「N 村」也要跟著變
+      void reloadAccounts()
+      navigate('/villages')
+    } catch (deleteError) {
+      console.error('Failed to delete village:', deleteError)
+    } finally {
+      setConfirmDelete(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -135,9 +165,25 @@ export default function VillageDetailPage() {
     )
   }
 
+  if (editing) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <VillageForm
+          accountId={village.account_id}
+          village={village}
+          onSuccess={() => {
+            setEditing(false)
+            void loadVillage(village.village_id)
+          }}
+          onCancel={() => setEditing(false)}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold">
             {village.name || t('villages.unnamed')}
@@ -146,10 +192,31 @@ export default function VillageDetailPage() {
             ({village.coordinate_x ?? '?'}, {village.coordinate_y ?? '?'})
           </p>
         </div>
-        <Button variant="outline" onClick={() => navigate('/villages')}>
-          {t('villages.backToList')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate('/villages')}>
+            {t('villages.backToList')}
+          </Button>
+          <Button variant="outline" onClick={() => setEditing(true)}>
+            {t('villages.edit')}
+          </Button>
+          <Button variant="destructive" onClick={() => setConfirmDelete(true)}>
+            {t('villages.delete')}
+          </Button>
+        </div>
       </div>
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('villages.deleteVillage')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('villages.deleteConfirm')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('villages.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>{t('villages.confirm')}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* 同步狀態 */}
       <Card className="mb-6">

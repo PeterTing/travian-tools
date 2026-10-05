@@ -15,6 +15,14 @@ export function accountWorldLabel(account: GameAccount): string {
   }
 }
 
+/** 後端回的時間；沒有時區標記時是 UTC。空的或讀不懂回 null */
+export function parseServerTime(value: string | null | undefined): Date | null {
+  if (!value) return null
+  const hasZone = /([zZ]|[+-]\d\d:?\d\d)$/.test(value)
+  const then = new Date(hasZone ? value : `${value}Z`)
+  return Number.isNaN(then.getTime()) ? null : then
+}
+
 export type UpdatedAgo =
   | { key: 'neverUpdated' }
   | { key: 'updatedJustNow' }
@@ -25,11 +33,8 @@ export type UpdatedAgo =
 
 /** 把最後更新時間換成「2 分鐘前更新」「昨天更新」「3 天前」這類說法的 i18n key */
 export function updatedAgo(lastUpdated: string | null, now: Date = new Date()): UpdatedAgo {
-  if (!lastUpdated) return { key: 'neverUpdated' }
-  // 後端回的時間沒有時區標記時是 UTC
-  const hasZone = /([zZ]|[+-]\d\d:?\d\d)$/.test(lastUpdated)
-  const then = new Date(hasZone ? lastUpdated : `${lastUpdated}Z`)
-  if (Number.isNaN(then.getTime())) return { key: 'neverUpdated' }
+  const then = parseServerTime(lastUpdated)
+  if (!then) return { key: 'neverUpdated' }
   const minutes = Math.floor((now.getTime() - then.getTime()) / 60000)
   if (minutes < 1) return { key: 'updatedJustNow' }
   if (minutes < 60) return { key: 'updatedMinutesAgo', count: minutes }

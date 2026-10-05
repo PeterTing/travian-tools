@@ -118,6 +118,15 @@ class VillageResponse(VillageBase):
 
     village_id: str
     account_id: str
+    crop_net_per_hour: int | None = Field(
+        None,
+        description="每小時糧食淨產量（已扣消耗，可以是負的）；還沒上傳過村莊總覽是 null",
+    )
+    last_pasted_at: datetime | None = Field(
+        None,
+        description="這個村莊最後一次成功貼上／上傳村莊資料的時間（UTC，"
+        "村莊總覽或村莊中心）；沒有過是 null",
+    )
     last_updated: datetime | None
     created_at: datetime
 
@@ -136,3 +145,8 @@ class VillageListResponse(BaseModel):
 
     villages: list[VillageResponse]
     total: int
+    oldest_pasted_at: datetime | None = Field(
+        None,
+        description="清單裡貼上過的村莊中，資料最舊的那個村莊的最後貼上時間（UTC）；"
+        "從沒貼上過的村莊不算；一個都沒有是 null",
+    )

@@ -133,5 +133,22 @@ class Village(Base):
         cascade="all, delete-orphan",
     )
 
+    @property
+    def crop_net_per_hour(self) -> int | None:
+        """每小時糧食淨產量（村莊總覽產量表的糧，已扣掉消耗，可以是負的）.
+
+        四種產量都是 0 代表還沒上傳過村莊總覽，回 None（畫面顯示「還沒有資料」），
+        不把它當成真的 0。
+        """
+        productions = (
+            self.wood_production,
+            self.clay_production,
+            self.iron_production,
+            self.crop_production,
+        )
+        if not any(productions):
+            return None
+        return self.crop_production or 0
+
     def __repr__(self) -> str:
         return f"<Village(village_id={self.village_id}, name={self.name})>"
