@@ -60,14 +60,21 @@ export default function GameAccountForm({
       ? account.local_timezone
       : browserTimeZone()
 
+  // 編輯時：存的名稱／速度就是從原網址推出來的，就當成「自動」（留空），
+  // 之後改網址才會跟著新網址走
+  const initialWorld = account ? describeServerUrl(account.server_url) : null
+  const initialName =
+    account?.server_name && account.server_name !== initialWorld?.serverName ? account.server_name : ''
+  const initialSpeed =
+    account && account.server_speed !== (initialWorld?.serverSpeed ?? 1) ? String(account.server_speed) : ''
+
   const [formData, setFormData] = useState({
     server_url: account?.server_url || '',
     tribe: account?.tribe || '',
     player_name: account?.player_name || '',
-    // 以下在「更多設定（選填）」
-    server_name: account?.server_name || '',
-    // '' 表示從網址自動判斷
-    server_speed: account ? String(account.server_speed) : '',
+    // 以下在「更多設定（選填）」；'' 表示從網址自動判斷
+    server_name: initialName,
+    server_speed: initialSpeed,
     alliance_name: account?.alliance_name || '',
     server_start_date: account?.server_start_date || '',
     is_active: account?.is_active ?? true,
@@ -75,10 +82,30 @@ export default function GameAccountForm({
     time_display: (account?.time_display ?? '') as TimeDisplay | '',
   })
   const [showMore, setShowMore] = useState(false)
+  // 使用者自己改過名稱／速度就不再自動清掉
+  const [touched, setTouched] = useState({ server_name: false, server_speed: false })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const world = useMemo(() => describeServerUrl(formData.server_url), [formData.server_url])
+
+  /**
+   * 改了世界網址：換到別的主機時，沒動過的名稱和速度改回「自動」，
+   * 從新網址重新推（不然頂部的世界和擴充「存到」會顯示舊的世界）。
+   */
+  const changeServerUrl = (value: string) => {
+    setFormData((prev) => {
+      const before = describeServerUrl(prev.server_url)?.serverUrl
+      const after = describeServerUrl(value)?.serverUrl
+      const hostChanged = !!after && after !== before
+      return {
+        ...prev,
+        server_url: value,
+        server_name: hostChanged && !touched.server_name ? '' : prev.server_name,
+        server_speed: hostChanged && !touched.server_speed ? '' : prev.server_speed,
+      }
+    })
+  }
   const autoSpeed = world?.serverSpeed ?? null
 
   /** 時間顯示設定：沒選就送 null（之後第一次貼上再問） */
@@ -167,7 +194,7 @@ export default function GameAccountForm({
             <Input
               id="server_url"
               value={formData.server_url}
-              onChange={(e) => setFormData({ ...formData, server_url: e.target.value })}
+              onChange={(e) => changeServerUrl(e.target.value)}
               placeholder={t('gameAccounts.worldPlaceholder')}
               autoComplete="off"
               inputMode="url"
@@ -230,7 +257,10 @@ export default function GameAccountForm({
                 <Input
                   id="server_name"
                   value={formData.server_name}
-                  onChange={(e) => setFormData({ ...formData, server_name: e.target.value })}
+                  onChange={(e) => {
+                    setTouched((prev) => ({ ...prev, server_name: true }))
+                    setFormData({ ...formData, server_name: e.target.value })
+                  }}
                   placeholder={
                     world?.serverName
                       ? t('gameAccounts.autoValue', { value: world.serverName })
@@ -244,7 +274,10 @@ export default function GameAccountForm({
                 <select
                   id="server_speed"
                   value={formData.server_speed}
-                  onChange={(e) => setFormData({ ...formData, server_speed: e.target.value })}
+                  onChange={(e) => {
+                    setTouched((prev) => ({ ...prev, server_speed: true }))
+                    setFormData({ ...formData, server_speed: e.target.value })
+                  }}
                   className={selectClass}
                 >
                   <option value="">

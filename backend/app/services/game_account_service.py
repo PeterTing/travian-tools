@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.domain.schemas.game_account import GameAccountCreate, GameAccountUpdate
 from app.infrastructure.database.models.game_account import GameAccount, TimeDisplay
 from app.services.game_world_service import GameWorldService
+from app.utils.world_url import describe_server_url
 
 
 class GameAccountService:
@@ -74,6 +75,19 @@ class GameAccountService:
         new_timezone = update_data.get("local_timezone", account.local_timezone)
         if new_display == TimeDisplay.LOCAL and not new_timezone:
             raise ValueError("選「本地時間」時需要填時區")
+        world_changed = (
+            "server_url" in update_data
+            and update_data["server_url"] is not None
+            and update_data["server_url"] != account.server_url
+        )
+        if world_changed:
+            # 換了世界：名稱和速度沒有明確給（沒送或送空）就從新網址重新推，
+            # 不然頂部的世界和擴充「存到」會顯示舊的世界
+            info = describe_server_url(update_data["server_url"])
+            if not update_data.get("server_name"):
+                update_data["server_name"] = info.server_name
+            if update_data.get("server_speed") is None:
+                update_data["server_speed"] = info.server_speed or 1
         if "server_speed" in update_data and update_data["server_speed"] is None:
             del update_data["server_speed"]
         for field, value in update_data.items():

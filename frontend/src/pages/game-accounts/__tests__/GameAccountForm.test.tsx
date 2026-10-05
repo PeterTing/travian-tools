@@ -166,4 +166,77 @@ describe('GameAccountForm time display (account setting, in 更多設定)', () =
       expect.objectContaining({ time_display: 'server', local_timezone: null })
     )
   })
+
+  describe('editing the world URL', () => {
+    const asiaTs3 = () =>
+      makeAccount({
+        server_url: 'https://ts3.x1.asia.travian.com',
+        server_name: 'ts3 亞洲服',
+        server_speed: 1,
+      })
+
+    it('treats the saved auto name and speed as automatic', () => {
+      renderForm(asiaTs3())
+      expect((screen.getByLabelText('伺服器名稱') as HTMLInputElement).value).toBe('')
+      expect(screen.getByLabelText('伺服器名稱')).toHaveAttribute('placeholder', '自動：ts3 亞洲服')
+      expect((screen.getByLabelText('伺服器速度') as HTMLSelectElement).value).toBe('')
+    })
+
+    it('re-derives name and speed from the new URL', async () => {
+      renderForm(asiaTs3())
+      fireEvent.change(screen.getByLabelText(/^世界/), { target: { value: GAME_URL } })
+      expect(screen.getByTestId('world-hint')).toHaveTextContent('ts20 歐洲服 · 3 倍速')
+      save()
+      await waitFor(() => expect(api.update).toHaveBeenCalled())
+      expect(api.update).toHaveBeenCalledWith(
+        'acc-ts3',
+        expect.objectContaining({
+          server_url: 'https://ts20.x3.europe.travian.com',
+          server_name: 'ts20 歐洲服',
+          server_speed: 3,
+        })
+      )
+    })
+
+    it('also drops an old hand-typed name and speed nobody touched in this edit', async () => {
+      renderForm(makeAccount({ server_url: 'https://ts3.x1.asia.travian.com', server_name: '主服', server_speed: 2 }))
+      expect((screen.getByLabelText('伺服器名稱') as HTMLInputElement).value).toBe('主服')
+      fireEvent.change(screen.getByLabelText(/^世界/), { target: { value: GAME_URL } })
+      expect((screen.getByLabelText('伺服器名稱') as HTMLInputElement).value).toBe('')
+      expect((screen.getByLabelText('伺服器速度') as HTMLSelectElement).value).toBe('')
+      save()
+      await waitFor(() => expect(api.update).toHaveBeenCalled())
+      expect(api.update).toHaveBeenCalledWith(
+        'acc-ts3',
+        expect.objectContaining({ server_name: 'ts20 歐洲服', server_speed: 3 })
+      )
+    })
+
+    it('keeps values typed in this edit when the URL changes', async () => {
+      renderForm(asiaTs3())
+      fireEvent.click(moreToggle())
+      fireEvent.change(screen.getByLabelText('伺服器名稱'), { target: { value: '我的速服' } })
+      fireEvent.change(screen.getByLabelText('伺服器速度'), { target: { value: '5' } })
+      fireEvent.change(screen.getByLabelText(/^世界/), { target: { value: GAME_URL } })
+      save()
+      await waitFor(() => expect(api.update).toHaveBeenCalled())
+      expect(api.update).toHaveBeenCalledWith(
+        'acc-ts3',
+        expect.objectContaining({ server_name: '我的速服', server_speed: 5 })
+      )
+    })
+
+    it('keeps name and speed when only the path changes', async () => {
+      renderForm(makeAccount({ server_url: 'https://ts3.x1.asia.travian.com', server_name: '主服', server_speed: 2 }))
+      fireEvent.change(screen.getByLabelText(/^世界/), {
+        target: { value: 'https://ts3.x1.asia.travian.com/dorf2.php' },
+      })
+      save()
+      await waitFor(() => expect(api.update).toHaveBeenCalled())
+      expect(api.update).toHaveBeenCalledWith(
+        'acc-ts3',
+        expect.objectContaining({ server_name: '主服', server_speed: 2 })
+      )
+    })
+  })
 })

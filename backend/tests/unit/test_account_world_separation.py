@@ -354,3 +354,63 @@ class TestWorlds:
         )
         assert resp.status_code == 200, resp.text
         assert resp.json()["world_id"] == b["world_id"]
+
+    def test_editing_the_world_url_rederives_name_and_speed(self, as_user) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        a = _create(
+            peter, server_url="https://ts3.x1.asia.travian.com", server_name=None
+        )
+        assert (a["server_name"], a["server_speed"]) == ("ts3 亞洲服", 1)
+        resp = peter.put(
+            f"/api/v1/game-accounts/{a['account_id']}",
+            json={"server_url": "https://ts20.x3.europe.travian.com/dorf1.php"},
+        )
+        assert resp.status_code == 200, resp.text
+        body = resp.json()
+        assert body["server_url"] == "https://ts20.x3.europe.travian.com"
+        assert (body["server_name"], body["server_speed"]) == ("ts20 歐洲服", 3)
+        assert body["world_id"] != a["world_id"]
+        worlds = {
+            w["world_id"]: w["server_url"]
+            for w in peter.get("/api/v1/game-worlds").json()["worlds"]
+        }
+        assert worlds[body["world_id"]] == "https://ts20.x3.europe.travian.com"
+
+    def test_editing_the_world_url_with_empty_name_and_speed_rederives(
+        self, as_user
+    ) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        a = _create(peter, server_url="https://ts3.x1.asia.travian.com")
+        body = peter.put(
+            f"/api/v1/game-accounts/{a['account_id']}",
+            json={
+                "server_url": "ts5.x2.america.travian.com",
+                "server_name": "",
+                "server_speed": None,
+            },
+        ).json()
+        assert body["server_speed"] == 2
+        assert body["server_name"].startswith("ts5")
+
+    def test_explicit_name_and_speed_win_when_the_url_changes(self, as_user) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        a = _create(peter)
+        body = peter.put(
+            f"/api/v1/game-accounts/{a['account_id']}",
+            json={
+                "server_url": "https://ts20.x3.europe.travian.com",
+                "server_name": "我的速服",
+                "server_speed": 5,
+            },
+        ).json()
+        assert (body["server_name"], body["server_speed"]) == ("我的速服", 5)
+
+    def test_same_url_keeps_name_and_speed(self, as_user) -> None:  # type: ignore[no-untyped-def]
+        peter = as_user("u-peter")
+        a = _create(peter, server_name="自訂名稱", server_speed=2)
+        body = peter.put(
+            f"/api/v1/game-accounts/{a['account_id']}",
+            json={"server_url": "https://ts3.x1.asia.travian.com/dorf1.php"},
+        ).json()
+        assert (body["server_name"], body["server_speed"]) == ("自訂名稱", 2)
+        assert body["world_id"] == a["world_id"]
