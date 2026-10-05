@@ -148,8 +148,18 @@ export default function VillagesPage() {
   }
 
   const ago = pastedAgo(oldestPastedAt, now)
-  const agoText = 'count' in ago ? t(`villages.list.${ago.key}`, { count: ago.count }) : t(`villages.list.${ago.key}`)
   const level = freshnessLevel(oldestPastedAt, now)
+  // 中文句子之間不空格，英文要空一格（sentenceGap）
+  const noticeText =
+    ago.key === 'noOverview'
+      ? ''
+      : [
+          'count' in ago ? t(`villages.list.${ago.key}`, { count: ago.count }) : t(`villages.list.${ago.key}`),
+          level === 'stale' ? t('villages.list.mayBeOutdated') : '',
+          t('villages.list.howToUpdate'),
+        ]
+          .filter(Boolean)
+          .join(t('villages.list.sentenceGap'))
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-4 md:py-8">
@@ -203,9 +213,17 @@ export default function VillagesPage() {
             data-level={level}
             className={`mb-3 rounded-lg border px-3 py-2 text-sm ${NOTICE_CLASSES[level]}`}
           >
-            {agoText}
-            {level === 'stale' && t('villages.list.mayBeOutdated')}
-            {t('villages.list.howToUpdate')}
+            {ago.key === 'noOverview' ? (
+              // 還沒有任何村莊總覽（dorf1）的資料：手動新增的，或只上傳過村莊中心（dorf2）
+              <>
+                <p className="font-medium" data-testid="villages-no-overview">
+                  {t('villages.list.noOverviewTitle')}
+                </p>
+                <p>{t('villages.list.noOverviewHint')}</p>
+              </>
+            ) : (
+              noticeText
+            )}
           </div>
 
           <ul className="divide-y overflow-hidden rounded-lg border bg-card" data-testid="village-list">

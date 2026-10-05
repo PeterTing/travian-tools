@@ -40,19 +40,22 @@ export function sortVillages(villages: Village[], key: VillageSortKey): Village[
 }
 
 export type PastedAgo =
-  | { key: 'neverPasted' }
+  | { key: 'noOverview' }
   | { key: 'oldestJustNow' }
   | { key: 'oldestMinutesAgo'; count: number }
   | { key: 'oldestHoursAgo'; count: number }
   | { key: 'oldestYesterday' }
   | { key: 'oldestDaysAgo'; count: number }
 
-/** 「最舊的資料是 n 小時前貼上的」用的 i18n key（不到 1 分鐘＝剛剛、不到 1 小時用分鐘） */
+/**
+ * 「最舊的資料是 n 小時前貼上的」用的 i18n key（不到 1 分鐘＝剛剛、不到 1 小時用分鐘）。
+ * 時間只算村莊總覽（dorf1）的上傳；一個都沒有（手動新增、只有村莊中心）是 noOverview。
+ */
 export function pastedAgo(oldestPastedAt: string | null | undefined, now: Date = new Date()): PastedAgo {
   const ago = updatedAgo(oldestPastedAt ?? null, now)
   switch (ago.key) {
     case 'neverUpdated':
-      return { key: 'neverPasted' }
+      return { key: 'noOverview' }
     case 'updatedJustNow':
       return { key: 'oldestJustNow' }
     case 'updatedMinutesAgo':
@@ -75,7 +78,7 @@ export const STALE_AFTER_MS = 24 * HOUR
 /** 提示的三種程度：中性（6 小時內）、黃（6 到 24 小時）、紅（超過 24 小時） */
 export type FreshnessLevel = 'neutral' | 'warn' | 'stale'
 
-/** 依最舊資料的時間決定提示的程度；從沒貼上過算中性 */
+/** 依最舊資料的時間決定提示的程度；沒有村莊總覽資料算中性 */
 export function freshnessLevel(oldestPastedAt: string | null | undefined, now: Date = new Date()): FreshnessLevel {
   const then = parseServerTime(oldestPastedAt)
   if (!then) return 'neutral'

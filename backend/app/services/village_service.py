@@ -19,10 +19,12 @@ from app.infrastructure.database.models.sync_log import SyncLog, SyncStatus, Syn
 from app.infrastructure.database.models.troop_instance import TroopInstance
 from app.infrastructure.database.models.village import Village
 
-# 會寫入村莊人口、產量的上傳（擴充的村莊總覽 dorf1、村莊中心 dorf2）。
-# 戰報上傳也記成 FULL、軍隊統計只動部隊，都不算「村莊資料更新」。
+# 村莊列表的「最舊的資料是 n 小時前貼上的」只算村莊總覽（dorf1）的上傳：
+# 列表顯示人口和糧，糧（產量）只有村莊總覽會更新。
+# 村莊中心（dorf2）只帶人口和建築、不帶產量，所以不算（PM 決定，2026-10-05）；
+# 戰報上傳也記成 FULL、軍隊統計只動部隊，也都不算。
 # P0-05 的貼上流程上線時，把它的同步類型加進來。
-VILLAGE_DATA_SYNC_TYPES = (SyncType.VILLAGE_OVERVIEW, SyncType.VILLAGE_CENTER)
+VILLAGE_DATA_SYNC_TYPES = (SyncType.VILLAGE_OVERVIEW,)
 
 
 class VillageService:
@@ -98,9 +100,10 @@ class VillageService:
     def get_last_pasted_by_village(
         self, user_id: str, account_id: str | None = None
     ) -> dict[str, datetime]:
-        """每個村莊最後一次成功貼上／上傳村莊資料的時間（UTC）.
+        """每個村莊最後一次成功上傳村莊總覽（dorf1）的時間（UTC）.
 
-        來源是上傳記錄（sync_logs）：村莊總覽、村莊中心的上傳會記下是哪個村莊。
+        來源是上傳記錄（sync_logs）：村莊總覽的上傳會記下是哪個村莊。
+        村莊中心（dorf2）的上傳不算（不帶產量，見 VILLAGE_DATA_SYNC_TYPES）。
         村莊的 last_updated 不可靠（網站上手動改也會動、資料沒變時又不會動），所以不用它。
         只看這個使用者自己帳號裡的村莊；沒上傳過的村莊不會出現在結果裡。
         """

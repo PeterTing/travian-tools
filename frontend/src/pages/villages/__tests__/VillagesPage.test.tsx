@@ -283,12 +283,52 @@ describe('village list (P0-02 slice 2)', () => {
     expect(screen.queryAllByTestId('village-age')).toHaveLength(0)
   })
 
-  it('says nothing was pasted yet (neutral) when the villages were only entered by hand', async () => {
+  const NO_OVERVIEW_TITLE = '還沒有村莊總覽資料'
+  const NO_OVERVIEW_HINT = '人口和糧要從村莊總覽更新。請到遊戲的村莊總覽，按擴充上傳。'
+
+  it('dorf2-only account (village center uploads, never the overview): 還沒有村莊總覽資料, neutral, never 剛剛', async () => {
+    // 後端只算村莊總覽（dorf1）：只上傳過村莊中心（dorf2）的村莊有人口、沒有糧、時間是 null
+    db.villages['acc-ts3'] = [
+      village({ village_id: 'v-c1', name: '主村', population: 812, crop_net_per_hour: null, last_pasted_at: null }),
+      village({ village_id: 'v-c2', name: '二村', population: 540, crop_net_per_hour: null, last_pasted_at: null }),
+    ]
+    renderPage()
+    const box = await notice()
+    expect(within(box).getByTestId('villages-no-overview')).toHaveTextContent(NO_OVERVIEW_TITLE)
+    expect(box).toHaveTextContent(`${NO_OVERVIEW_TITLE}${NO_OVERVIEW_HINT}`)
+    // 中性（線框 --bg / --line / --mut），不是新鮮的「剛剛」，也沒有黃／紅
+    expect(box).toHaveAttribute('data-level', 'neutral')
+    expect(box).toHaveClass('bg-muted', 'border-border', 'text-muted-foreground')
+    expect(box).not.toHaveTextContent('剛剛')
+    expect(box).not.toHaveTextContent('最舊的資料')
+    expect(box).not.toHaveTextContent(OUTDATED)
+    // 人口照樣顯示，糧還沒有資料，列上不標時間
+    await waitFor(() => expect(rows()).toHaveLength(2))
+    expect(rows()[0]).toHaveTextContent('人口 812 · 糧 還沒有資料')
+    expect(screen.queryAllByTestId('village-age')).toHaveLength(0)
+  })
+
+  it('hand-entered villages get the same 還沒有村莊總覽資料 notice', async () => {
     db.villages['acc-ts3'] = [village({ village_id: 'v-hand', last_pasted_at: null })]
     renderPage()
     const box = await notice()
-    expect(box).toHaveTextContent('這個帳號還沒有貼上過資料，下面是手動輸入的。')
+    expect(box).toHaveTextContent(NO_OVERVIEW_TITLE)
     expect(box).toHaveAttribute('data-level', 'neutral')
+  })
+
+  it('puts a space between sentences in English (none in Chinese)', async () => {
+    pastedMinutesAgo('v-2', 3 * 24 * HOURS)
+    await i18n.changeLanguage('en')
+    try {
+      renderPage()
+      const box = await notice()
+      expect(box.textContent).toBe(
+        'The oldest data was pasted 3 days ago. The numbers may be out of date. ' +
+          'To update, open the village overview in the game and upload it with the extension.'
+      )
+    } finally {
+      await i18n.changeLanguage('zh-TW')
+    }
   })
 
   it('shows an empty state (no notice, no list) when the account has no villages', async () => {

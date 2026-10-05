@@ -49,8 +49,8 @@ describe('villageDisplay', () => {
   })
 
   it('describes the oldest paste time: 剛剛, minutes, hours, yesterday, days, never', () => {
-    expect(pastedAgo(null, now)).toEqual({ key: 'neverPasted' })
-    expect(pastedAgo(undefined, now)).toEqual({ key: 'neverPasted' })
+    expect(pastedAgo(null, now)).toEqual({ key: 'noOverview' })
+    expect(pastedAgo(undefined, now)).toEqual({ key: 'noOverview' })
     expect(pastedAgo('2026-10-05T03:59:30', now)).toEqual({ key: 'oldestJustNow' })
     expect(pastedAgo('2026-10-05T03:15:00', now)).toEqual({ key: 'oldestMinutesAgo', count: 45 })
     expect(pastedAgo('2026-10-05T03:00:00', now)).toEqual({ key: 'oldestHoursAgo', count: 1 })
