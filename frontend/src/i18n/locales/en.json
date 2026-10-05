@@ -21,7 +21,11 @@
     "openParen": "(",
     "closeParen": ")",
     "dot": ".",
-    "cropUnitFormat": "{{num}}-crop troops"
+    "cropUnitFormat": "{{num}}-crop troops",
+    "yes": "Yes",
+    "no": "No",
+    "error": "Error",
+    "success": "Success"
   },
   "home": {
     "title": "Travian Tools",
@@ -404,12 +408,6 @@
       "mixed": "Mixed",
       "ww": "World Wonder"
     }
-  },
-  "common": {
-    "yes": "Yes",
-    "no": "No",
-    "error": "Error",
-    "success": "Success"
   },
   "sync": {
     "title": "Sync Status",

@@ -14,6 +14,24 @@ const resources = {
   },
 }
 
+/**
+ * Value for <html lang>, used for font selection and by screen readers.
+ * It does NOT change the native date input: Chrome formats it from the
+ * browser's UI language, not <html lang> (measured: an en-US Chrome still
+ * shows mm/dd/yyyy). Forcing 年/月/日 would mean replacing the native input;
+ * PM decided not to.
+ */
+export function htmlLangFor(language: string | undefined): string {
+  return language?.toLowerCase().startsWith('en') ? 'en' : 'zh-Hant'
+}
+
+function syncDocumentLang() {
+  if (typeof document === 'undefined') return
+  document.documentElement.lang = htmlLangFor(i18n.resolvedLanguage ?? i18n.language)
+}
+
+i18n.on('languageChanged', syncDocumentLang)
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -32,5 +50,7 @@ i18n
       console.warn(`🌐 Missing i18n key: "${key}"`)
     },
   })
+
+syncDocumentLang()
 
 export default i18n
