@@ -20,6 +20,7 @@ import {
 } from '@/lib/pasteFormat'
 import { pasteApi } from '@/services/pasteApi'
 import type { GameAccount } from '@/types/game'
+import { formatCountdownSeconds } from '@/lib/formatCountdown'
 
 export interface ConfirmState {
   pageType: string
@@ -360,7 +361,7 @@ export function ParseConfirmPanel({
                       </div>
                       <div className="text-xs text-muted-foreground">
                         抵達 {String(m.arrival_time || '—')}
-                        {m.timer_seconds != null ? ` · 倒數 ${m.timer_seconds}s` : ''}
+                        {m.timer_seconds != null ? ` · 倒數 ${formatCountdownSeconds(Number(m.timer_seconds))}` : ''}
                       </div>
                     </div>
                     {needs ? (

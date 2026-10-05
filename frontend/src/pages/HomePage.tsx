@@ -1,3 +1,4 @@
+import { formatCountdownSeconds } from '@/lib/formatCountdown'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -33,12 +34,7 @@ function countdownLabel(arrivalAt: string | null | undefined, now: Date): string
   const t = new Date(arrivalAt).getTime() - now.getTime()
   if (Number.isNaN(t)) return '—'
   if (t <= 0) return '已抵達'
-  const s = Math.floor(t / 1000)
-  const h = Math.floor(s / 3600)
-  const m = Math.floor((s % 3600) / 60)
-  const sec = s % 60
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`
+  return formatCountdownSeconds(Math.floor(t / 1000))
 }
 
 function formatRelativeLabel(
