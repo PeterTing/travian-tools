@@ -405,9 +405,12 @@ def parse_rally_point_text(text: str) -> dict[str, Any]:
             coords = None
             timer = None
             for look in lines[i + 1 : i + 6]:
-                c = re.search(r"\(\s*(-?\d+)\s*\|\s*(-?\d+)\s*\)", look)
-                if c and coords is None:
-                    coords = (int(c.group(1)), int(c.group(2)))
+                coord_match = re.search(r"\(\s*(-?\d+)\s*\|\s*(-?\d+)\s*\)", look)
+                if coord_match and coords is None:
+                    coords = (
+                        int(coord_match.group(1)),
+                        int(coord_match.group(2)),
+                    )
                 t = re.search(r"(\d+):(\d{2}):(\d{2})", look)
                 if t and timer is None and ("時" in look or "在" in look):
                     timer = (
@@ -442,11 +445,11 @@ def parse_rally_point_text(text: str) -> dict[str, Any]:
         garrison_own, garrison_stationed = _parse_garrison_from_plain_text(text)
 
     village_name = None
-    coords = None
+    village_coords: tuple[int, int] | None = None
     for ln in lines:
-        c = parse_coords_pair(ln)
-        if c and coords is None:
-            coords = c
+        pair = parse_coords_pair(ln)
+        if pair and village_coords is None:
+            village_coords = pair
         if "的村莊" in ln or re.match(r"^\S.{0,40}$", ln):
             if "自軍" in ln:
                 village_name = ln.split("\t")[0].strip() or village_name
@@ -456,8 +459,8 @@ def parse_rally_point_text(text: str) -> dict[str, Any]:
     return {
         "village_id": None,
         "village_name": village_name,
-        "coordinate_x": coords[0] if coords else None,
-        "coordinate_y": coords[1] if coords else None,
+        "coordinate_x": village_coords[0] if village_coords else None,
+        "coordinate_y": village_coords[1] if village_coords else None,
         "server_time": None,
         "incoming": incoming,
         "incoming_reinforcements": incoming_reinforcements,
