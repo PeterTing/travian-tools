@@ -15,8 +15,11 @@ const resources = {
 }
 
 /**
- * Value for <html lang>. Browsers use it for native controls (the date input
- * shows 年/月/日 under zh-Hant) and for font selection.
+ * Value for <html lang>, used for font selection and by screen readers.
+ * It does NOT change the native date input: Chrome formats it from the
+ * browser's UI language, not <html lang> (measured: an en-US Chrome still
+ * shows mm/dd/yyyy). Forcing 年/月/日 would mean replacing the native input;
+ * PM decided not to.
  */
 export function htmlLangFor(language: string | undefined): string {
   return language?.toLowerCase().startsWith('en') ? 'en' : 'zh-Hant'
