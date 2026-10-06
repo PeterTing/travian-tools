@@ -30,6 +30,8 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - DEBUG=false
+      # Required: at least 32 characters (backend refuses to start otherwise)
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:?set JWT_SECRET_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS}
     ports:
       - "8000:8000"

@@ -30,6 +30,29 @@
 
 後端 CORS：網頁來源只有 `CORS_ORIGINS`（正式＝工具網站網址）；擴充只允許 `CORS_EXTENSION_IDS`
 （預設是 manifest key 固定的 ID `nkgbmaokaapljaciiifbhgohlejmdcdn`），不再放行任意 `chrome-extension://`。
+`allow_credentials=False`：前端和擴充都只用 `Authorization: Bearer`，不用 cookie。
+
+正式環境（`DEBUG=false`）的後端設定守則：
+- `JWT_SECRET_KEY` 必須設定、至少 32 字元；沒設或用程式內建的預設值，後端**拒絕啟動**（錯誤訊息不含 secret）。
+  目前 Secret Manager 裡的值是 64 字元（只檢查長度，沒有印出）。
+- `/docs`、`/redoc`、`/api/v1/openapi.json` 只在 `DEBUG=true` 時提供，正式環境回 404。
+- `MAP_SQL_DAILY_FETCH_ENABLED=false`：見下面「已知限制」。
+
+## gcloud configuration
+
+部署腳本用專用的 gcloud configuration `travian-tools`（透過 `CLOUDSDK_ACTIVE_CONFIG_NAME`），
+同時每個指令仍明確帶 `--project artogo-travian-tools`。**不要切換全域的 active configuration**
+（其他 ARTOGO 工作依賴它）。第一次在新機器上建立：
+
+```bash
+gcloud config configurations create travian-tools --no-activate
+gcloud config set --configuration=travian-tools account dainy@artogo.co
+gcloud config set --configuration=travian-tools project artogo-travian-tools
+gcloud config set --configuration=travian-tools run/region asia-east1
+gcloud config set --configuration=travian-tools artifacts/location asia-east1
+```
+
+手動下指令時也用 `CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools gcloud ... --project artogo-travian-tools`。
 
 ## 部署步驟
 
@@ -52,10 +75,24 @@ scripts/deploy_cloud_run.sh deploy    # 部署 tt-api 與 tt-web
 
 ## 已知限制
 
-- **每日 map.sql 抓取不會可靠執行**：排程（APScheduler）跑在後端 process 裡，min-instances 0 時
-  沒有請求就沒有 instance 活著，04:15 UTC 的抓取不會觸發。要可靠執行需要另外加 Cloud Scheduler
-  （或 min-instances 1，費用較高）；目前先不加。
+- **每日 map.sql 抓取在正式環境關閉**（`MAP_SQL_DAILY_FETCH_ENABLED=false`）：排程（APScheduler）跑在
+  後端 process 裡，min-instances 0 時沒有請求就沒有 instance 活著，04:15 UTC 的抓取只會偶爾碰巧觸發，
+  所以乾脆明確關掉。要每天抓需要另外加 Cloud Scheduler（或 min-instances 1，費用較高）；目前先不加。
+- **Cloud SQL 只有 10 GB、沒有開 storage auto-increase**：硬碟滿了資料庫會變成唯讀／寫入失敗。
+  map.sql 快照（`map_snapshots`＋`map_villages`／`map_players`／`map_alliances`，每個世界每次匯入一份）是最會長大的資料，要定期看用量
+  （Console 的 Cloud SQL 監控「Storage usage」，或
+  `gcloud sql instances describe travian-tools-db --project artogo-travian-tools --format='value(settings.dataDiskSizeGb)'`
+  搭配 Cloud Monitoring 的 `database/disk/bytes_used`）；接近 80% 時先清舊快照或手動加大硬碟（加大不能再縮回）。
 - 共用核心的 `db-f1-micro` 不在 Cloud SQL SLA 保障內；流量變大再升級。
+
+## 待審核後才套用的線上變更（P0-12 review）
+
+以下三項**還沒有套用**，等幕僚長核准後再執行（指令和說明在 PR #20 描述裡）：
+
+1. `tt-api` 加上 `MAP_SQL_DAILY_FETCH_ENABLED=false`（只改環境變數，沿用同一個 image，會產生新 revision）
+2. Cloud SQL `travian-tools-db`：開 deletion protection、`sslMode=ENCRYPTED_ONLY`（**強制 SSL 會讓 instance 重啟**，有短暫停機；
+   Cloud Run 透過 Cloud SQL connector／unix socket 連線，本來就是加密的，不受影響）
+3. Artifact Registry `travian-tools`：cleanup policy 每個 image 只留最新 5 版（`deploy/artifact-registry-cleanup-policy.json`，先 dry-run）
 
 ## 費用估算（每月，USD）
 

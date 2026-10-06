@@ -24,7 +24,11 @@ def _preflight(client: TestClient, origin: str) -> dict[str, str]:
 
 
 def _settings(**overrides: str) -> Settings:
-    return Settings(DATABASE_URL="mysql+mysqlconnector://u:p@h/db", **overrides)  # type: ignore[arg-type]
+    return Settings(  # type: ignore[arg-type]
+        DATABASE_URL="mysql+mysqlconnector://u:p@h/db",
+        JWT_SECRET_KEY="test-only-" + "x" * 32,
+        **overrides,
+    )
 
 
 def test_default_regex_allows_only_our_extension_id() -> None:

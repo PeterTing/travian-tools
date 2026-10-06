@@ -8,6 +8,9 @@
 #
 # Every gcloud call names the project explicitly; the gcloud default project
 # on our machines is a different (production) project and must never be used.
+# On top of that the script runs under its own gcloud configuration
+# ("travian-tools", see docs/deploy-cloud-run.md) via CLOUDSDK_ACTIVE_CONFIG_NAME,
+# so it never depends on (or changes) the globally active configuration.
 # Secrets (DATABASE_URL, JWT_SECRET_KEY) live in Secret Manager and are only
 # referenced by name here; this script never reads or prints their values.
 set -euo pipefail
@@ -29,6 +32,12 @@ WEB_ORIGIN="https://${WEB_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"
 TAG="${TAG:-$(git rev-parse --short=7 HEAD)}"
 IMAGE_BASE="${REGION}-docker.pkg.dev/${PROJECT}/${REPO}"
 G=(--project "${PROJECT}" --quiet)
+
+export CLOUDSDK_ACTIVE_CONFIG_NAME="${CLOUDSDK_ACTIVE_CONFIG_NAME:-travian-tools}"
+if ! gcloud config configurations describe "${CLOUDSDK_ACTIVE_CONFIG_NAME}" >/dev/null 2>&1; then
+  echo "gcloud configuration '${CLOUDSDK_ACTIVE_CONFIG_NAME}' not found; create it first (docs/deploy-cloud-run.md)." >&2
+  exit 1
+fi
 
 cd "$(git rev-parse --show-toplevel)"
 
@@ -59,7 +68,7 @@ deploy() {
     --service-account "${RUN_SA}" \
     --add-cloudsql-instances "${SQL_INSTANCE}" \
     --set-secrets "DATABASE_URL=DATABASE_URL:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest" \
-    --set-env-vars "^@^DEBUG=false@RUN_MIGRATIONS=false@CORS_ORIGINS=${WEB_ORIGIN}" \
+    --set-env-vars "^@^DEBUG=false@RUN_MIGRATIONS=false@MAP_SQL_DAILY_FETCH_ENABLED=false@CORS_ORIGINS=${WEB_ORIGIN}" \
     --port 8000 --cpu 1 --memory 512Mi \
     --min-instances 0 --max-instances 2 --concurrency 40 --timeout 60s \
     --cpu-throttling --allow-unauthenticated

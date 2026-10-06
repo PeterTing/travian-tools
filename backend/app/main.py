@@ -3,6 +3,7 @@
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import TypedDict
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,14 +29,31 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     map_sql_scheduler.shutdown()
 
 
+class ApiDocsUrls(TypedDict):
+    """FastAPI 的三個 API 文件網址（None = 不提供）."""
+
+    openapi_url: str | None
+    docs_url: str | None
+    redoc_url: str | None
+
+
+def api_docs_urls(debug: bool) -> ApiDocsUrls:
+    """API 文件（/docs、/redoc、openapi.json）只在 DEBUG=true（本機開發）開放."""
+    if not debug:
+        return {"openapi_url": None, "docs_url": None, "redoc_url": None}
+    return {
+        "openapi_url": f"{settings.API_V1_PREFIX}/openapi.json",
+        "docs_url": "/docs",
+        "redoc_url": "/redoc",
+    }
+
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="Travian: Legends 助手系統 API",
     version=settings.VERSION,
-    openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
-    docs_url="/docs",
-    redoc_url="/redoc",
     lifespan=lifespan,
+    **api_docs_urls(settings.DEBUG),
 )
 
 # CORS 設定 - 限制允許的來源、方法和標頭
@@ -45,7 +63,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
     allow_origin_regex=settings.cors_origin_regex,
-    allow_credentials=True,
+    # 前端和擴充都只用 Authorization: Bearer，不用 cookie／credentials: 'include'
+    allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
     allow_headers=["Authorization", "Content-Type", "Accept"],
 )

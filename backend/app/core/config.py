@@ -2,9 +2,14 @@
 
 import re
 from functools import lru_cache
+from typing import Self
 
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# 公開在 repo 裡的預設值：只能在 DEBUG=true 時使用。
+DEFAULT_JWT_SECRET_KEY = "your-secret-key-change-in-production"
+MIN_JWT_SECRET_LENGTH = 32
 
 
 class Settings(BaseSettings):
@@ -14,6 +19,8 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
+        # 驗證錯誤不要把輸入值（DATABASE_URL、JWT_SECRET_KEY）印進 log
+        hide_input_in_errors=True,
     )
 
     # 基本設定
@@ -33,7 +40,9 @@ class Settings(BaseSettings):
     CORS_EXTENSION_IDS: str = "nkgbmaokaapljaciiifbhgohlejmdcdn"
 
     # JWT 認證設定
-    JWT_SECRET_KEY: str = "your-secret-key-change-in-production"
+    # 預設值只給本機開發（DEBUG=true）用；DEBUG=false 時必須另外設定、
+    # 至少 32 字元，否則啟動就失敗（見 _require_real_jwt_secret）。
+    JWT_SECRET_KEY: str = DEFAULT_JWT_SECRET_KEY
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -70,6 +79,26 @@ class Settings(BaseSettings):
         if not ids:
             return None
         return r"^chrome-extension://(" + "|".join(ids) + r")$"
+
+    @model_validator(mode="after")
+    def _require_real_jwt_secret(self) -> Self:
+        """正式環境（DEBUG=false）不能用公開的預設值或太短的 JWT secret.
+
+        錯誤訊息只說原因，不包含 secret 本身。
+        """
+        if self.DEBUG:
+            return self
+        if self.JWT_SECRET_KEY == DEFAULT_JWT_SECRET_KEY:
+            raise ValueError(
+                "JWT_SECRET_KEY must be set (the built-in default is only "
+                "allowed when DEBUG=true)"
+            )
+        if len(self.JWT_SECRET_KEY) < MIN_JWT_SECRET_LENGTH:
+            raise ValueError(
+                f"JWT_SECRET_KEY must be at least {MIN_JWT_SECRET_LENGTH} "
+                "characters when DEBUG=false"
+            )
+        return self
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod

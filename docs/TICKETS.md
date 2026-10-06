@@ -2,7 +2,7 @@
 
 | 項目 | 內容 |
 |---|---|
-| 版本 | v2.0.22（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
+| 版本 | v2.0.23（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
 | 更新日期 | 2026-10-06 |
 | 規格來源 | [`PRD.md`](PRD.md) |
 
@@ -131,7 +131,8 @@
   - 資料庫：Cloud SQL `travian-tools-db`（MySQL 8.4、`db-f1-micro`、單區、10 GB SSD），機密只放 Secret Manager（`DATABASE_URL`、`JWT_SECRET_KEY`）
   - Migration：Cloud Run Job `travian-tools-migrate` 跑 `alembic upgrade head && alembic check`（升到 `0008_sync_type_rally`，check 無差異）；**全新空庫，無需備份**
   - 後端 CORS 收緊：網頁只允許工具網站，擴充只允許固定 ID
-  - 已知限制：min-instances 0 時每日 map.sql 抓取不會可靠執行，要另加 Cloud Scheduler（這次不加）
+  - 已知限制：min-instances 0 時每日 map.sql 抓取不會可靠執行，正式環境設 `MAP_SQL_DAILY_FETCH_ENABLED=false` 明確關掉，要每天抓需另加 Cloud Scheduler（這次不加）；Cloud SQL 只有 10 GB、不自動長大，要盯 map.sql 快照用量
+  - 幕僚長審核（第一輪）修正：`DEBUG=false` 時拒絕預設或短於 32 字元的 `JWT_SECRET_KEY`；API 文件只在 DEBUG 開放；CORS `allow_credentials=False`；部署腳本改用專用 gcloud configuration `travian-tools`。線上變更（tt-api 關 map.sql 抓取、Cloud SQL deletion protection＋ENCRYPTED_ONLY、Artifact Registry 只留 5 版）等核准後才套用
   - 每月估計約 US$10–12（幾乎都是 Cloud SQL）
 - 驗收：
   - [x] 擴充 `manifest.json` 的 `host_permissions` 從 `http://localhost:8000/*` 改成正式後端網址（只留這一個，必須是 https）；`background.js` 的 `API_BASE_URL` 一起改（常數實際在 `browser-extension/lib/config.js`；`externally_connectable`／`TRUSTED_SITE_ORIGINS`／`TOOL_SITE_URL` 也改成正式前端，擴充 0.5.0）
@@ -183,6 +184,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-06 | v2.0.23 | P0-12 審核修正：`DEBUG=false` 時拒絕預設／短 JWT secret（docker-compose.prod 必填、CI 與測試帶測試用 key）；`/docs`、`/redoc`、`openapi.json` 只在 DEBUG 開放；CORS `allow_credentials=False`；部署腳本用專用 gcloud configuration、正式環境關每日 map.sql 抓取；文件補 Cloud SQL 10 GB 不自動長大要盯 map.sql 快照；三項線上變更的指令放 PR 等核准 |
 | 2026-10-06 | v2.0.22 | P0-12 送審：後端 `tt-api`＋前端 `tt-web` 上 Cloud Run（asia-east1、min-instances 0），Cloud SQL MySQL 8.4 db-f1-micro，機密在 Secret Manager；migration 改由 Cloud Run Job 跑（全新空庫無需備份）；entrypoint 拿掉固定 `--reload`；nginx 拿掉 `/api` 轉送；後端 CORS 只允許工具網站與固定擴充 ID；擴充改指向正式網址（0.5.0）；部署腳本與文件 `docs/deploy-cloud-run.md` |
 | 2026-10-05 | v2.0.21 | 非擋項清理（本 PR）：手機計算器結果精簡（主結果＋輔資訊／明細收合）、桌機 sticky 避開頂欄、刪 #18 redirect 舊頁、確認倒數人讀格式、preview-diff 失敗降級、#14 WorldSettings 清空測試／crop docstring／空確認 i18n；P0-09（#18，`364dc5e2`）已 merge |
 | 2026-10-05 | v2.0.20 | P0-09 計算器送審：搬入 travian-guide 8 個計算器＋測試；建造順序／ROI／文明點以 guide 為準（舊頁 redirect）；移動時間改即時 sticky；競技場公式前後端共用（>20 格、每級 +20%）；列表頁加搜尋；P0-06（#17，`4da35e85`）已 merge |
