@@ -1,0 +1,38 @@
+# Builds both images for Cloud Run (P0-12). Run from the repo root:
+#   gcloud builds submit --project artogo-travian-tools --region asia-east1 \
+#     --config deploy/cloudbuild.yaml --substitutions=_TAG=$(git rev-parse --short HEAD)
+# scripts/deploy_cloud_run.sh does this for you.
+substitutions:
+  _REGION: asia-east1
+  _REPO: travian-tools
+  _TAG: manual
+  _API_URL: https://tt-api-138672009807.asia-east1.run.app/api/v1
+  _EXTENSION_ID: nkgbmaokaapljaciiifbhgohlejmdcdn
+steps:
+  - id: backend
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/backend:${_TAG}
+      - backend
+  - id: frontend
+    name: gcr.io/cloud-builders/docker
+    waitFor: ['-']
+    args:
+      - build
+      - -f
+      - frontend/Dockerfile
+      - --build-arg
+      - VITE_API_URL=${_API_URL}
+      - --build-arg
+      - VITE_EXTENSION_ID=${_EXTENSION_ID}
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${_TAG}
+      - .
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/backend:${_TAG}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${_TAG}
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1800s

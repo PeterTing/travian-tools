@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Travian Tools Helper",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvq3t82YWYDloZdmxSW3mbmrbhmX+hvZarNPG/FSyFI54L0QqXHstSn9S5SgQ7RfnOfoItHrZN9Vqf9/oB5Wp3iRPi0QTqdDOuJV574kDy3d4QxcTQRiAHrqaGNDAEe23fFd/CMICH4t11hgjpk65MOmjSW40g+in5lswQyNzxqQgg8sn5pZL1bRf5OqoZ0eb7iRleb4Y5i9Tz8p9jy5lDyG3Ka0kS6ghsVvWLEMYgmHXnxZTfaLl83vWd2CtktuFRpa9v0/0/PNEgj1cXp74yOv1krMhI3EAIQKRqLv4pp3UkFoDe/bB3cil2a7WsNKXQG3H5YakV9B7KSZt1f7AXQIDAQAB",
   "description": "Read the Travian: Legends page you are on (only when you click Sync) and send the HTML to Travian Tools shared parser",
   "permissions": [
@@ -10,12 +10,11 @@
     "scripting"
   ],
   "host_permissions": [
-    "http://localhost:8000/*"
+    "https://tt-api-138672009807.asia-east1.run.app/*"
   ],
   "externally_connectable": {
     "matches": [
-      "http://localhost:5173/*",
-      "http://localhost:5174/*"
+      "https://tt-web-138672009807.asia-east1.run.app/*"
     ]
   },
   "action": {

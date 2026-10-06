@@ -1,5 +1,6 @@
 """應用程式配置."""
 
+import re
 from functools import lru_cache
 
 from pydantic import field_validator
@@ -25,7 +26,11 @@ class Settings(BaseSettings):
     DATABASE_URL: str
 
     # CORS 設定 - 生產環境應明確設定 (以逗號分隔的字串)
+    # 正式環境（Cloud Run）只放工具網站的正式網址，見 docs/deploy-cloud-run.md
     CORS_ORIGINS: str = ""
+    # 允許的擴充 ID（以逗號分隔）。預設是 manifest.json 的 key 固定下來的 ID；
+    # 不再接受任意 chrome-extension:// 來源。
+    CORS_EXTENSION_IDS: str = "nkgbmaokaapljaciiifbhgohlejmdcdn"
 
     # JWT 認證設定
     JWT_SECRET_KEY: str = "your-secret-key-change-in-production"
@@ -53,6 +58,18 @@ class Settings(BaseSettings):
         if not self.CORS_ORIGINS:
             return []
         return [i.strip() for i in self.CORS_ORIGINS.split(",") if i.strip()]
+
+    @property
+    def cors_origin_regex(self) -> str | None:
+        """只允許指定 ID 的擴充（chrome-extension://<id>）."""
+        ids = [
+            i.strip()
+            for i in self.CORS_EXTENSION_IDS.split(",")
+            if re.fullmatch(r"[a-p]{32}", i.strip())
+        ]
+        if not ids:
+            return None
+        return r"^chrome-extension://(" + "|".join(ids) + r")$"
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod

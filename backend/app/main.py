@@ -38,12 +38,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS 設定 - 限制允許的方法和標頭
-# 對於 Chrome 擴充功能，需要允許 chrome-extension:// origin
+# CORS 設定 - 限制允許的來源、方法和標頭
+# 網頁來源只看 CORS_ORIGINS（正式環境只有工具網站）；擴充只允許
+# CORS_EXTENSION_IDS 列出的 ID，不再放行任意 chrome-extension://。
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
-    allow_origin_regex=r"^chrome-extension://.*$",  # 允許所有 Chrome 擴充功能
+    allow_origin_regex=settings.cors_origin_regex,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
     allow_headers=["Authorization", "Content-Type", "Accept"],

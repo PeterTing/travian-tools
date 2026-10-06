@@ -81,7 +81,9 @@ describe('manifest.json', () => {
 
   it('adds no new permissions', () => {
     assert.deepEqual([...manifest.permissions].sort(), ['activeTab', 'scripting', 'storage']);
-    assert.deepEqual(manifest.host_permissions, ['http://localhost:8000/*']);
+    assert.deepEqual(manifest.host_permissions, [
+      'https://tt-api-138672009807.asia-east1.run.app/*',
+    ]);
     assert.equal(manifest.content_scripts, undefined);
   });
 });

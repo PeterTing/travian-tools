@@ -1,0 +1,16 @@
+# Keep local env files, caches and tests out of the image.
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+tests/
+.venv/
+venv/
+tmp/

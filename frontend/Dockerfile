@@ -19,6 +19,14 @@ RUN pnpm install --frozen-lockfile --filter travian-tools-frontend
 # Copy frontend source code
 COPY frontend/ ./frontend/
 
+# Build-time settings (Vite inlines them into the bundle).
+# VITE_API_URL must be the full backend API base, e.g.
+# https://tt-api-138672009807.asia-east1.run.app/api/v1
+ARG VITE_API_URL
+ARG VITE_EXTENSION_ID
+ENV VITE_API_URL=$VITE_API_URL \
+    VITE_EXTENSION_ID=$VITE_EXTENSION_ID
+
 # Build the application
 WORKDIR /app/frontend
 RUN pnpm build
@@ -32,7 +40,7 @@ COPY --from=builder /app/frontend/dist /usr/share/nginx/html
 # Copy nginx configuration
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port
-EXPOSE 80
+# Expose port (Cloud Run default)
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
