@@ -1,0 +1,21 @@
+# Builds the tt-ocr image (P0-07, RapidOCR). Run from the repo root:
+#   CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools gcloud builds submit --project artogo-travian-tools \
+#     --region asia-east1 --config deploy/cloudbuild-ocr.yaml --substitutions=_TAG=$(git rev-parse --short=7 HEAD)
+# scripts/deploy_cloud_run.sh build-ocr does this for you.
+substitutions:
+  _REGION: asia-east1
+  _REPO: travian-tools
+  _TAG: manual
+steps:
+  - id: ocr
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/ocr:${_TAG}
+      - ocr
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/ocr:${_TAG}
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1800s

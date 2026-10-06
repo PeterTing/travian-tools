@@ -4,9 +4,10 @@ Fails if
 1. any backend / frontend / extension source or dependency manifest pulls in a
    browser-automation library (playwright, selenium, puppeteer, …) or a
    virtual display (Xvfb) in Docker files;
-2. any backend module other than ``app/services/map_sql_fetcher.py`` imports a
-   network client (httpx, requests, aiohttp, urllib.request, socket, …) — the
-   backend's only outbound HTTP is the public map.sql fetch;
+2. any backend module other than ``app/services/map_sql_fetcher.py`` (public
+   map.sql) and ``app/services/ocr_client.py`` (our own tt-ocr service, P0-07)
+   imports a network client (httpx, requests, aiohttp, urllib.request, socket, …);
+   the OCR service itself (``ocr/app``) makes no outbound requests at all;
 3. frontend / extension code issues a request (fetch, axios, XHR, WebSocket,
    EventSource) to a Travian domain;
 4. the browser extension can sync without a user click: alarms, intervals,
@@ -34,6 +35,12 @@ BACKEND = Path(__file__).resolve().parents[2]
 REPO = BACKEND.parent
 APP = BACKEND / "app"
 ALLOWED_NETWORK_MODULE = APP / "services" / "map_sql_fetcher.py"
+OCR_CLIENT_MODULE = APP / "services" / "ocr_client.py"
+ALLOWED_NETWORK_MODULES = {
+    ALLOWED_NETWORK_MODULE.resolve(),
+    OCR_CLIENT_MODULE.resolve(),
+}
+OCR_SERVICE = REPO / "ocr"
 ALLOWED_SCHEDULER_MODULE = APP / "services" / "map_sql_scheduler.py"
 EXTENSION = REPO / "browser-extension"
 
@@ -88,7 +95,7 @@ def _iter_files(root: Path, suffixes: set[str]) -> list[Path]:
 
 
 def _source_roots() -> list[Path]:
-    return [BACKEND, REPO / "frontend", REPO / "browser-extension"]
+    return [BACKEND, REPO / "frontend", REPO / "browser-extension", OCR_SERVICE]
 
 
 def _rel(path: Path) -> str:
@@ -114,6 +121,8 @@ def test_no_browser_automation_imports() -> None:
         "backend/pyproject.toml",
         "backend/requirements.txt",
         "backend/requirements-dev.txt",
+        "ocr/requirements.txt",
+        "ocr/requirements-dev.txt",
         "package.json",
         "frontend/package.json",
         "browser-extension/package.json",
@@ -136,6 +145,7 @@ def test_no_browser_or_virtual_display_in_docker() -> None:
         *REPO.glob("docker-compose*.yml"),
         *BACKEND.glob("Dockerfile*"),
         BACKEND / "docker-entrypoint.sh",
+        *OCR_SERVICE.glob("Dockerfile*"),
     ]:
         if path.exists() and banned.search(path.read_text(encoding="utf-8")):
             offenders.append(_rel(path))
@@ -145,15 +155,38 @@ def test_no_browser_or_virtual_display_in_docker() -> None:
 def test_only_map_sql_fetcher_does_network_io() -> None:
     offenders = []
     for path in _iter_files(APP, {".py"}):
-        if path.resolve() == ALLOWED_NETWORK_MODULE.resolve():
+        if path.resolve() in ALLOWED_NETWORK_MODULES:
             continue
         text = path.read_text(encoding="utf-8")
         if PY_NETWORK_IMPORT.search(text) or PY_URLOPEN.search(text):
             offenders.append(_rel(path))
     assert offenders == [], (
-        "Only app/services/map_sql_fetcher.py may make outbound requests; "
-        f"network client used in: {offenders}"
+        "Only app/services/map_sql_fetcher.py and app/services/ocr_client.py may "
+        f"make outbound requests; network client used in: {offenders}"
     )
+
+
+def test_ocr_client_targets_only_our_ocr_service() -> None:
+    """tt-ocr client: configured URL (never a game host) + metadata ID token only."""
+    text = OCR_CLIENT_MODULE.read_text(encoding="utf-8")
+    code = text.split('"""', 2)[2]  # skip the module docstring
+    assert "follow_redirects=False" in code
+    assert '"travian" in host' in code  # rejects game hosts at construction
+    assert 'f"{self.base_url}/v1/ocr"' in code
+    hosts = set(re.findall(r"https?://([\w.-]+)", code))
+    assert hosts <= {"metadata.google.internal"}, hosts
+    assert not re.search(r"['\"]cookie['\"]", code, re.I)
+    assert not re.search(r"login|\.php|password\s*[=:]", code, re.I)
+
+
+def test_ocr_service_makes_no_outbound_requests() -> None:
+    offenders = []
+    for path in _iter_files(OCR_SERVICE / "app", {".py"}):
+        text = path.read_text(encoding="utf-8")
+        if PY_NETWORK_IMPORT.search(text) or PY_URLOPEN.search(text):
+            offenders.append(_rel(path))
+    assert (OCR_SERVICE / "app").exists()
+    assert offenders == [], f"ocr service must not make outbound requests: {offenders}"
 
 
 def test_fetcher_targets_only_public_map_sql() -> None:

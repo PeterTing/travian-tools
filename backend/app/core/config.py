@@ -61,6 +61,18 @@ class Settings(BaseSettings):
         "public map.sql, once per day)"
     )
 
+    # 截圖辨識（P0-07）：後端把使用者上傳的截圖轉給 tt-ocr（RapidOCR，自架 Cloud Run）。
+    # 沒設網址時截圖辨識關閉（API 回 503 OCR_UNAVAILABLE）。
+    # OCR_AUTH=id_token：用 Cloud Run metadata server 拿 ID token（tt-ocr 不開放匿名呼叫）；
+    # OCR_AUTH=none：只給本機開發（docker-compose 的 tt-ocr 容器）。
+    OCR_SERVICE_URL: str = ""
+    OCR_AUTH: str = "id_token"
+    OCR_TIMEOUT_SECONDS: float = 30.0
+    OCR_MAX_IMAGES: int = 4
+    OCR_MAX_IMAGE_BYTES: int = 8 * 1024 * 1024
+    # 每位使用者每分鐘最多幾張（硬上限；tt-ocr 另有 max-instances 2、concurrency 1）
+    OCR_RATE_LIMIT_PER_MINUTE: int = 12
+
     @property
     def cors_origins_list(self) -> list[str]:
         """取得 CORS origins 列表."""

@@ -948,5 +948,98 @@
     "seconds": "秒數",
     "effectiveSpeed": "有效速度",
     "fieldsPerHour": "格／時"
+  },
+  "ocr": {
+    "upload": {
+      "button": "上傳截圖",
+      "hint": "集結點截圖：手機、電腦都可以，一次最多 {{max}} 張（太長可以分兩張截，重疊的會自動去掉）。",
+      "tooMany": "一次最多 {{max}} 張截圖",
+      "needAccount": "請先在頂部選擇遊戲帳號"
+    },
+    "recognizing": {
+      "title": "辨識中…約 2–3 秒",
+      "slow": "比平常久，再等一下",
+      "merge": "兩張會合併成一份，重疊的那幾筆自動去掉。",
+      "coldStart": "伺服器閒置後的第一張可能多等 3–5 秒。",
+      "clockTip": "建議截圖時把右上角的伺服器時鐘一起截進去，時間會更準。",
+      "cancel": "取消",
+      "shotAlt": "截圖 {{n}}"
+    },
+    "failed": {
+      "title": "辨識失敗",
+      "titles": {
+        "OCR_NO_INCOMING": "沒有辨識到來襲",
+        "OCR_NOT_RALLY": "認不出是集結點",
+        "OCR_ALL_MISSING": "座標和時間都讀不到",
+        "OCR_UNAVAILABLE": "截圖辨識暫時不能用",
+        "OCR_TIMEOUT": "辨識太久沒回應",
+        "OCR_RATE_LIMITED": "辨識太頻繁了",
+        "OCR_BAD_IMAGE": "這張圖讀不了",
+        "OCR_IMAGE_TOO_LARGE": "圖片太大",
+        "OCR_TOO_MANY_IMAGES": "截圖太多張",
+        "OCR_NETWORK": "連不上伺服器"
+      },
+      "nothingSaved": "沒有存入任何資料。",
+      "retry": "重選截圖",
+      "usePaste": "改用貼上"
+    },
+    "confirm": {
+      "banner": "有 {{count}} 個欄位要你確認",
+      "bannerDetail": "標黃的地方辨識不太確定，請對照截圖逐一確認後才能存入。",
+      "allConfirmed": "標黃的欄位都確認好了。",
+      "missingNote": "有 {{count}} 個欄位讀不到，標成「待補」，可以先存、之後再補。",
+      "remaining": "還有 {{count}} 個要確認",
+      "moreReasons": "還有 {{count}} 個原因",
+      "manual": "手動輸入",
+      "ok": "確定",
+      "confirmValue": "確認 {{value}}",
+      "confirmed": "已確認{{field}} {{value}}",
+      "change": "改",
+      "badCoords": "座標格式像 -45|12",
+      "badTime": "時間格式像 2:41:10",
+      "zoomAlt": "截圖原處放大：{{field}}",
+      "timeSource": "時間來源",
+      "timeFromClock": "截圖裡的伺服器時鐘 {{clock}}",
+      "timeFromFile": "截圖檔案的時間（可以改）",
+      "timeFromNow": "上傳當下（可以改）",
+      "sourceBadge": "集結點 · 截圖"
+    },
+    "row": {
+      "from": "自",
+      "arrival": "抵達",
+      "countdown": "倒數",
+      "ok": "確定",
+      "needsConfirm": "要確認",
+      "missing": "待補",
+      "missingField": "{{field}}讀不到",
+      "thumbAlt": "攻擊方座標的截圖縮圖"
+    },
+    "fields": {
+      "coords": "座標",
+      "countdown": "倒數",
+      "arrival": "抵達時間"
+    },
+    "camera": {
+      "label": "從截圖讀座標",
+      "busy": "讀取中…",
+      "failed": "讀不到座標"
+    },
+    "reasons": {
+      "COORD_MAP_MISMATCH": "和地圖資料對不上（地圖每天更新一次，今天新建或改名的村莊也會這樣）",
+      "OVERLAP_MISMATCH": "兩張重疊截圖讀到不同值",
+      "COUNTDOWN_ARRIVAL_MISMATCH": "倒數和抵達時間對不起來",
+      "COORD_OUT_OF_RANGE": "座標超出地圖範圍",
+      "TIME_FORMAT_INVALID": "時間格式不對",
+      "NUMBER_FORMAT_INVALID": "數字格式不對",
+      "RESOURCE_OVER_CAPACITY": "資源超過倉庫容量",
+      "DUPLICATE_VALUE": "同一個值出現兩次，可能讀重複了",
+      "LAYOUT_AMBIGUOUS": "分不清這個值屬於哪一欄",
+      "TEXT_TOO_SMALL": "字太小，建議放大後再截一次",
+      "OCR_LOW_SCORE": "字跡辨識不太確定",
+      "CROP_RECHECK_MISMATCH": "放大重讀後結果不一樣",
+      "NO_CROSS_CHECK": "沒有其他欄位可以對照（嚴格模式）",
+      "TRUNCATED_AT_EDGE": "被截圖邊緣切掉了，可以補截一張",
+      "PARSE_ERROR": "這一欄讀不出來，請手動填"
+    }
   }
 }

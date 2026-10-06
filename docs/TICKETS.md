@@ -2,7 +2,7 @@
 
 | 項目 | 內容 |
 |---|---|
-| 版本 | v2.0.23（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
+| 版本 | v2.0.24（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
 | 更新日期 | 2026-10-06 |
 | 規格來源 | [`PRD.md`](PRD.md) |
 
@@ -15,7 +15,7 @@
 | 分期 | 票數 | 完成 | 估計 |
 |---|---|---|---|
 | P0 | 12 | 9（P0-01～04、P0-05、P0-06、P0-08、P0-10、P0-11）＋P0-09 | 14 到 17 人天，截圖辨識另計 |
-| P1 | 8 | 0 | 15 到 20 人天 |
+| P1 | 10 | 0 | 16 到 22 人天 |
 | P2 | 5 | 0 | P1 完成後再估 |
 
 ---
@@ -98,13 +98,20 @@
   - [x] 確認前「新增 N · 更新 M」改由後端 `POST /paste/preview-diff` 計算（與 confirm 同一去重邏輯，不寫入）
 - 進度：✅ 已 merge（[#17](https://github.com/PeterTing/travian-tools/pull/17)，`4da35e85`）
 
-### P0-07 截圖辨識：集結點與座標欄位 ⬜（RapidOCR 自架，含收集手機截圖）
+### P0-07 截圖辨識：集結點與座標欄位 🔄 審核中（RapidOCR 自架，含收集手機截圖）
+- PR：本 PR（設計師 → 幕僚長審核；**還沒部署**，tt-ocr 的建立／部署指令放在 PR 說明等核准）
+- 做法：
+  - 新服務 `tt-ocr`（`ocr/`）：RapidOCR 3.9.2（PP-OCRv6 small，ONNX），FastAPI，不存圖、不寫硬碟、不連外；Cloud Run 1 vCPU／1 GiB、min 0／max 2、concurrency 1、不開放匿名呼叫，只有 tt-api 的 service account 有 `roles/run.invoker`
+  - 後端 `POST /api/v1/ocr/rally`（預覽，不存）與 `POST /api/v1/ocr/coords`（座標欄位的相機按鈕）；tt-api → tt-ocr 用 metadata server 的 ID token；每人每分鐘最多 12 張、一次最多 4 張、每張 8 MB
+  - 解析（`app/parsers/rally_ocr.py`，純函式）：依版面切出每筆來襲（來源村／座標／倒數／抵達），兩張截圖依序合併、去掉重疊；有伺服器時鐘（桌機）就用它算擷取時間並交叉比對倒數與抵達；座標跟最新地圖快照比對
+  - 存入沿用 `POST /paste/confirm`（source=ocr）：還有沒確認的低信心欄位就擋；全部讀不到的那筆不存；讀不到的欄位（待補）照樣可存
+  - 前端：首頁「上傳截圖」→ 辨識中（線框 ②'，5 秒後改「比平常久，再等一下」）→ 確認畫面低信心模式（線框 ③'）；補座標頁加相機按鈕
 - 驗收：
-  - 欄位狀態分「待補」和「低信心」；低信心必須確認才能存入
-  - 回傳原因代碼，多個原因時最嚴重的排第一（清單見 PRD 3.3），含 `COORD_MAP_MISMATCH`
-  - 攻擊方座標一律附截圖縮圖
-  - 跑在 Cloud Run（`artogo-travian-tools`），每張 2 到 3 秒
-  - 用手機截圖實測悄悄讀錯的比例，列進 PR
+  - [x] 欄位狀態分「待補」和「低信心」；低信心必須確認才能存入（前端按鈕＋後端 confirm 都擋）
+  - [x] 回傳原因代碼，多個原因時最嚴重的排第一（清單見 PRD 3.3），含 `COORD_MAP_MISMATCH`；明確失敗 `OCR_NOT_RALLY`／`OCR_NO_INCOMING`／`OCR_ALL_MISSING`，不會存空資料卻回成功
+  - [x] 攻擊方座標一律附截圖縮圖（低信心欄位另有放大原處）
+  - [ ] 跑在 Cloud Run（`artogo-travian-tools`），每張 2 到 3 秒——本機 1 vCPU／1 GiB 容器實測暖機 1.8–2.6 秒、冷啟動多約 4 秒、記憶體高峰 458 MiB；等核准後部署再實測
+  - [ ] 用手機截圖實測悄悄讀錯的比例，列進 PR——目前樣本（真實 ts11 集結點概況×2、真實頁面骨架＋假來襲×2、降解析度／JPEG／切邊變體）42 個「確定」欄位悄悄讀錯 0 個；**還缺真實來襲的截圖**（帳號仍在新手保護）
 
 ### P0-08 `map.sql` 匯入 ✅（併在 P0-01）
 - 驗收：名字含單引號的村莊不會漏；部族與首都讀對欄位；可手動上傳 `.sql`／`.gz`
@@ -154,6 +161,8 @@
 | P1-06 | 戰鬥模擬器重寫 | 4 到 6 天 | 數值對照 kirilloid |
 | P1-07 | 偵查找田照 Friso 的規則重做 | 1.5 到 2 天 | |
 | P1-08 | 知識庫 | 約 1 天校對 | 以 travian-guide 為主體，舊內容逐條跟 kirilloid 校對 |
+| P1-09 | 每日 map.sql 改由 Cloud Scheduler 觸發（Cloud Run） | 0.5 到 1 天 | 正式環境現在 `MAP_SQL_DAILY_FETCH_ENABLED=false`：min-instances 0 時程序內排程不會可靠執行，兩個 instance 也可能各抓一次。做法：Cloud Scheduler 每天打一個只收 OIDC（Scheduler 專用 service account）的內部端點，同世界同一天只抓一次；合規測試的 map.sql 白名單照舊 |
+| P1-10 | 首頁：新使用者還沒有遊戲帳號時，「新增遊戲帳號」改成卡片最上方的主按鈕 | 0.5 天 | 設計師建議；現在是橘色文字連結（`frontend/src/pages/HomePage.tsx` 約 341–349 行） |
 
 ## P2：進階（P1 完成後再估）
 
@@ -184,6 +193,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-06 | v2.0.24 | P0-07 截圖辨識送審：新服務 `tt-ocr`（RapidOCR 自架，Cloud Run 1 vCPU／1 GiB，不開放匿名呼叫）、`/ocr/rally`＋`/ocr/coords`、確認畫面低信心模式（原因代碼、放大原處、選項／手動輸入、全部確認才能存）、待補不擋存、明確失敗；合規測試允許 `ocr_client` 只連 tt-ocr。新增 P1-09（Cloud Scheduler 觸發每日 map.sql）、P1-10（首頁新使用者「新增遊戲帳號」主按鈕） |
 | 2026-10-06 | v2.0.23 | P0-12 審核修正：`DEBUG=false` 時拒絕預設／短 JWT secret（docker-compose.prod 必填、CI 與測試帶測試用 key）；`/docs`、`/redoc`、`openapi.json` 只在 DEBUG 開放；CORS `allow_credentials=False`；部署腳本用專用 gcloud configuration、正式環境關每日 map.sql 抓取；文件補 Cloud SQL 10 GB 不自動長大要盯 map.sql 快照；三項線上變更的指令放 PR 等核准 |
 | 2026-10-06 | v2.0.22 | P0-12 送審：後端 `tt-api`＋前端 `tt-web` 上 Cloud Run（asia-east1、min-instances 0），Cloud SQL MySQL 8.4 db-f1-micro，機密在 Secret Manager；migration 改由 Cloud Run Job 跑（全新空庫無需備份）；entrypoint 拿掉固定 `--reload`；nginx 拿掉 `/api` 轉送；後端 CORS 只允許工具網站與固定擴充 ID；擴充改指向正式網址（0.5.0）；部署腳本與文件 `docs/deploy-cloud-run.md` |
 | 2026-10-05 | v2.0.21 | 非擋項清理（本 PR）：手機計算器結果精簡（主結果＋輔資訊／明細收合）、桌機 sticky 避開頂欄、刪 #18 redirect 舊頁、確認倒數人讀格式、preview-diff 失敗降級、#14 WorldSettings 清空測試／crop docstring／空確認 i18n；P0-09（#18，`364dc5e2`）已 merge |

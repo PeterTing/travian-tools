@@ -21,6 +21,15 @@ import {
 import { pasteApi } from '@/services/pasteApi'
 import type { GameAccount } from '@/types/game'
 import { formatCountdownSeconds } from '@/lib/formatCountdown'
+import { OcrMovementRow, type OcrImageRef } from '@/components/ocr/OcrMovementRow'
+import {
+  applyFieldValue,
+  countUnconfirmed,
+  ocrMeta,
+  OCR_FIELD_ORDER,
+  setFieldConfirmed,
+} from '@/lib/ocrFields'
+import type { OcrMeta } from '@/services/ocrApi'
 
 export interface ConfirmState {
   pageType: string
@@ -29,6 +38,12 @@ export interface ConfirmState {
   source: string
   draftId?: string | null
   warnings?: { code: string; message: string }[]
+  /** 截圖辨識（P0-07）：原圖（放大原處用）與辨識資訊 */
+  ocr?: {
+    meta: OcrMeta
+    images: OcrImageRef[]
+    timeSource: 'server_clock' | 'file' | 'now'
+  }
 }
 
 interface Props {
@@ -51,6 +66,8 @@ interface Props {
   askTimeDisplay?: boolean
   /** World's known UTC offset in minutes; null = unset (show editor); undefined = hide */
   worldUtcOffset?: number | null
+  /** 截圖辨識：使用者確認／修改欄位後回傳新的 data */
+  onDataChange?: (data: Record<string, unknown>) => void
 }
 
 function asMovements(data: Record<string, unknown>) {
@@ -75,6 +92,7 @@ export function ParseConfirmPanel({
   saving,
   askTimeDisplay,
   worldUtcOffset,
+  onDataChange,
 }: Props) {
   const { t } = useTranslation()
   const [helpImprove, setHelpImprove] = useState(false)
@@ -112,6 +130,15 @@ export function ParseConfirmPanel({
   const incoming = movements.filter((m) =>
     ['incoming_attack', 'incoming_raid', 'incoming_spy'].includes(String(m.kind || '')),
   )
+  const isOcr = state.source === 'ocr' && state.pageType === 'rally_point' && Boolean(state.ocr)
+  const unconfirmed = isOcr ? countUnconfirmed(incoming) : 0
+  const missingFields = isOcr
+    ? incoming.reduce((n, m) => {
+        const meta = ocrMeta(m)
+        return n + (meta ? OCR_FIELD_ORDER.filter((k) => meta.fields[k]?.status === 'missing').length : 0)
+      }, 0)
+    : 0
+  const hadLow = isOcr && (state.ocr?.meta.low_count ?? 0) > 0
   const [diffCreated, setDiffCreated] = useState<number | null>(null)
   const [diffUpdated, setDiffUpdated] = useState<number | null>(null)
   const [diffLoading, setDiffLoading] = useState(false)
@@ -183,6 +210,10 @@ export function ParseConfirmPanel({
     setError('')
     if (!saveable) {
       setError(t('paste.emptyError'))
+      return
+    }
+    if (unconfirmed > 0) {
+      setError(t('ocr.confirm.remaining', { count: unconfirmed }))
       return
     }
     if (showVillage && villages.length > 0 && !villageId) {
@@ -269,6 +300,18 @@ export function ParseConfirmPanel({
               aria-label="擷取時間 MM/DD HH:MM"
             />
           </div>
+          {isOcr && state.ocr && (
+            <>
+              <span className="text-muted-foreground">{t('ocr.confirm.timeSource')}</span>
+              <span className="min-w-0 text-xs" data-testid="ocr-time-source">
+                {state.ocr.timeSource === 'server_clock'
+                  ? t('ocr.confirm.timeFromClock', { clock: String(state.serverTime || '') })
+                  : state.ocr.timeSource === 'file'
+                    ? t('ocr.confirm.timeFromFile')
+                    : t('ocr.confirm.timeFromNow')}
+              </span>
+            </>
+          )}
         </div>
         {nearMidnight(captureAt) && (
           <div
@@ -276,6 +319,11 @@ export function ParseConfirmPanel({
             data-testid="midnight-banner"
           >
             手機貼上的內容沒有日期，這裡用貼上當下推算。快到午夜時請確認日期對不對。
+          </div>
+        )}
+        {isOcr && (
+          <div className="text-xs text-muted-foreground" data-testid="ocr-source-badge">
+            {t('ocr.confirm.sourceBadge')}
           </div>
         )}
         {state.source === 'extension' && (
@@ -341,6 +389,49 @@ export function ParseConfirmPanel({
                 <span className="text-muted-foreground"> · {diffLabel}</span>
               ) : null}
             </div>
+            {isOcr && unconfirmed > 0 && (
+              <div
+                className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-950"
+                data-testid="ocr-confirm-banner"
+              >
+                <b>{t('ocr.confirm.banner', { count: unconfirmed })}</b>
+                <div className="text-xs">{t('ocr.confirm.bannerDetail')}</div>
+              </div>
+            )}
+            {isOcr && unconfirmed === 0 && hadLow && (
+              <div
+                className="rounded-md border border-green-300 bg-green-50 px-3 py-2 text-xs text-green-900"
+                data-testid="ocr-all-confirmed"
+              >
+                ✓ {t('ocr.confirm.allConfirmed')}
+              </div>
+            )}
+            {isOcr && missingFields > 0 && (
+              <div className="text-xs text-amber-800" data-testid="ocr-missing-note">
+                {t('ocr.confirm.missingNote', { count: missingFields })}
+              </div>
+            )}
+            {isOcr && state.ocr ? (
+              <ul className="divide-y rounded-md border" data-testid="ocr-movement-list">
+                {incoming.map((m) => {
+                  const idx = movements.indexOf(m)
+                  return (
+                    <OcrMovementRow
+                      key={idx}
+                      movement={m}
+                      index={idx}
+                      images={state.ocr!.images}
+                      onApply={(i, name, value) =>
+                        onDataChange?.(applyFieldValue(state.data, i, name, value))
+                      }
+                      onConfirmed={(i, name, confirmed) =>
+                        onDataChange?.(setFieldConfirmed(state.data, i, name, confirmed))
+                      }
+                    />
+                  )
+                })}
+              </ul>
+            ) : (
             <ul className="divide-y rounded-md border">
               {incoming.map((m, i) => {
                 const needs =
@@ -376,6 +467,7 @@ export function ParseConfirmPanel({
                 <li className="px-3 py-4 text-sm text-muted-foreground">沒有辨識到來襲</li>
               )}
             </ul>
+            )}
           </div>
         )}
 
@@ -557,12 +649,14 @@ export function ParseConfirmPanel({
         </Button>
         <Button
           onClick={() => void handleSave()}
-          disabled={saving || !saveable}
+          disabled={saving || !saveable || unconfirmed > 0}
           data-testid="confirm-save"
         >
           {saving
             ? '存入中…'
-            : state.pageType === 'rally_point' && incoming.length > 0
+            : unconfirmed > 0
+              ? t('ocr.confirm.remaining', { count: unconfirmed })
+              : state.pageType === 'rally_point' && incoming.length > 0
               ? diffLabel
                 ? `存入 · ${diffLabel}`
                 : diffLoading

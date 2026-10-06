@@ -118,7 +118,11 @@ def preview_paste_diff(
     )
     if not result.get("success"):
         code = status.HTTP_403_FORBIDDEN
-        if result.get("error_code") in ("unsupported", "empty_parse"):
+        if result.get("error_code") in (
+            "unsupported",
+            "empty_parse",
+            "ocr_unconfirmed",
+        ):
             code = status.HTTP_400_BAD_REQUEST
         raise HTTPException(
             status_code=code,
@@ -196,7 +200,11 @@ def confirm_paste(
         )
     if not result.get("success"):
         code = status.HTTP_403_FORBIDDEN
-        if result.get("error_code") in ("unsupported", "empty_parse"):
+        if result.get("error_code") in (
+            "unsupported",
+            "empty_parse",
+            "ocr_unconfirmed",
+        ):
             code = status.HTTP_400_BAD_REQUEST
         raise HTTPException(
             status_code=code,

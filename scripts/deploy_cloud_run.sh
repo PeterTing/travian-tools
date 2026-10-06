@@ -5,6 +5,8 @@
 #   scripts/deploy_cloud_run.sh migrate   # Cloud Run Job: alembic upgrade head && alembic check
 #   scripts/deploy_cloud_run.sh deploy    # backend (tt-api) + frontend (tt-web)
 #   scripts/deploy_cloud_run.sh all       # build, migrate, deploy
+#   scripts/deploy_cloud_run.sh build-ocr   # P0-07: tt-ocr image (RapidOCR)
+#   scripts/deploy_cloud_run.sh deploy-ocr  # P0-07: tt-ocr service (IAM only) + invoker for tt-api
 #
 # Every gcloud call names the project explicitly; the gcloud default project
 # on our machines is a different (production) project and must never be used.
@@ -24,11 +26,15 @@ RUN_SA="travian-tools-run@${PROJECT}.iam.gserviceaccount.com"
 # Frontend (static nginx) runs as its own service account with no roles.
 WEB_SA="travian-tools-web@${PROJECT}.iam.gserviceaccount.com"
 BUILD_SA="projects/${PROJECT}/serviceAccounts/travian-tools-build@${PROJECT}.iam.gserviceaccount.com"
+# OCR (P0-07) runs as its own service account with no roles; only tt-api may invoke it.
+OCR_SA="travian-tools-ocr@${PROJECT}.iam.gserviceaccount.com"
 API_SERVICE="tt-api"
 WEB_SERVICE="tt-web"
+OCR_SERVICE="tt-ocr"
 MIGRATE_JOB="travian-tools-migrate"
 API_ORIGIN="https://${API_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"
 WEB_ORIGIN="https://${WEB_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"
+OCR_ORIGIN="https://${OCR_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"
 TAG="${TAG:-$(git rev-parse --short=7 HEAD)}"
 IMAGE_BASE="${REGION}-docker.pkg.dev/${PROJECT}/${REPO}"
 G=(--project "${PROJECT}" --quiet)
@@ -68,7 +74,7 @@ deploy() {
     --service-account "${RUN_SA}" \
     --add-cloudsql-instances "${SQL_INSTANCE}" \
     --set-secrets "DATABASE_URL=DATABASE_URL:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest" \
-    --set-env-vars "^@^DEBUG=false@RUN_MIGRATIONS=false@MAP_SQL_DAILY_FETCH_ENABLED=false@CORS_ORIGINS=${WEB_ORIGIN}" \
+    --set-env-vars "^@^DEBUG=false@RUN_MIGRATIONS=false@MAP_SQL_DAILY_FETCH_ENABLED=false@CORS_ORIGINS=${WEB_ORIGIN}@OCR_SERVICE_URL=${OCR_ORIGIN}" \
     --port 8000 --cpu 1 --memory 512Mi \
     --min-instances 0 --max-instances 2 --concurrency 40 --timeout 60s \
     --cpu-throttling --allow-unauthenticated
@@ -80,10 +86,32 @@ deploy() {
     --cpu-throttling --allow-unauthenticated
 }
 
+build_ocr() {
+  gcloud builds submit "${G[@]}" --region "${REGION}" \
+    --service-account "${BUILD_SA}" \
+    --config deploy/cloudbuild-ocr.yaml \
+    --substitutions "_TAG=${TAG}"
+}
+
+deploy_ocr() {
+  # No anonymous access: only tt-api's service account gets roles/run.invoker (ID token).
+  gcloud run deploy "${OCR_SERVICE}" "${G[@]}" --region "${REGION}" \
+    --image "${IMAGE_BASE}/ocr:${TAG}" \
+    --service-account "${OCR_SA}" \
+    --no-allow-unauthenticated \
+    --port 8080 --cpu 1 --memory 1Gi \
+    --min-instances 0 --max-instances 2 --concurrency 1 --timeout 60s \
+    --cpu-throttling
+  gcloud run services add-iam-policy-binding "${OCR_SERVICE}" "${G[@]}" --region "${REGION}" \
+    --member "serviceAccount:${RUN_SA}" --role roles/run.invoker
+}
+
 case "${1:-}" in
   build) build ;;
   migrate) migrate ;;
   deploy) deploy ;;
   all) build && migrate && deploy ;;
-  *) echo "usage: $0 build|migrate|deploy|all" >&2; exit 2 ;;
+  build-ocr) build_ocr ;;
+  deploy-ocr) deploy_ocr ;;
+  *) echo "usage: $0 build|migrate|deploy|all|build-ocr|deploy-ocr" >&2; exit 2 ;;
 esac

@@ -9,6 +9,8 @@ import {
   pickDefaultVillageId,
   type VillagePick,
 } from '@/lib/pasteFormat'
+import type { OcrImageRef } from '@/components/ocr/OcrMovementRow'
+import type { OcrMeta } from '@/services/ocrApi'
 import { pasteApi, type ParsePreviewResponse } from '@/services/pasteApi'
 import { gameWorldApi } from '@/services/gameWorldApi'
 import { villageApi } from '@/services/villageApi'
@@ -20,6 +22,11 @@ interface NavState {
   accountId?: string
   captureAt?: string
   unknown?: boolean
+  /** 'ocr' = 截圖辨識（P0-07） */
+  source?: string
+  ocr?: OcrMeta
+  images?: OcrImageRef[]
+  timeSource?: 'server_clock' | 'file' | 'now'
 }
 
 export default function ParseConfirmPage() {
@@ -84,19 +91,28 @@ export default function ParseConfirmPage() {
         return
       }
       if (nav.preview) {
+        const fromOcr = nav.source === 'ocr' && Boolean(nav.ocr)
         setConfirm({
           pageType: nav.preview.page_type,
           data: nav.preview.data,
           serverTime: nav.preview.server_time,
-          source: 'paste',
+          source: fromOcr ? 'ocr' : 'paste',
           warnings: nav.preview.warnings,
+          ocr:
+            fromOcr && nav.ocr
+              ? {
+                  meta: nav.ocr,
+                  images: nav.images || [],
+                  timeSource: nav.timeSource || 'now',
+                }
+              : undefined,
         })
         if (!nav.unknown && nav.preview.ok) {
           const incoming = Array.isArray(nav.preview.data.incoming)
             ? nav.preview.data.incoming.length
             : 0
           setDetectedBanner(
-            `✓ 認出來了：${pageTypeLabel(nav.preview.page_type)}` +
+            `✓ 認出來了：${pageTypeLabel(nav.preview.page_type)}${fromOcr ? '（截圖）' : ''}` +
               (nav.preview.page_type === 'rally_point' ? `，有 ${incoming} 筆來襲` : ''),
           )
         }
@@ -110,7 +126,7 @@ export default function ParseConfirmPage() {
     return () => {
       cancelled = true
     }
-  }, [draftId, nav.preview, nav.unknown, selectAccount])
+  }, [draftId, nav.preview, nav.unknown, nav.source, nav.ocr, nav.images, nav.timeSource, selectAccount])
 
   useEffect(() => {
     if (!account) return
@@ -250,6 +266,7 @@ export default function ParseConfirmPage() {
           saving={saving}
           askTimeDisplay={askTimeDisplay}
           worldUtcOffset={worldUtcOffset}
+          onDataChange={(data) => setConfirm((c) => (c ? { ...c, data } : c))}
           onDiscard={() => navigate('/')}
           onSave={async (opts) => {
             setSaving(true)
