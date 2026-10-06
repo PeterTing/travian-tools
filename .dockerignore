@@ -1,0 +1,20 @@
+# Keep the root docker build context small (frontend/Dockerfile builds from the repo root).
+.git/
+.github/
+.husky/
+.claude/
+**/node_modules/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/dist/
+**/.env
+backend/.env.*
+docs/
+designs/
+browser-extension/
+scripts/
+backups/
+*.dump.sql*

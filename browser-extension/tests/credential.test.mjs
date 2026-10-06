@@ -184,13 +184,14 @@ describe('saveSelectedAccount (site switched account, no new token)', () => {
 
 describe('isTrustedSender', () => {
   it('only trusts the tool site origins', () => {
-    assert.equal(isTrustedSender({ origin: 'http://localhost:5174' }, TRUSTED_SITE_ORIGINS), true);
-    assert.equal(
-      isTrustedSender({ url: 'http://localhost:5173/dashboard' }, TRUSTED_SITE_ORIGINS),
-      true,
-    );
+    const site = 'https://tt-web-138672009807.asia-east1.run.app';
+    assert.equal(isTrustedSender({ origin: site }, TRUSTED_SITE_ORIGINS), true);
+    assert.equal(isTrustedSender({ url: `${site}/dashboard` }, TRUSTED_SITE_ORIGINS), true);
+    // 正式版不再信任本機開發網址
+    assert.equal(isTrustedSender({ origin: 'http://localhost:5174' }, TRUSTED_SITE_ORIGINS), false);
+    assert.equal(isTrustedSender({ origin: `${site}.evil.test` }, TRUSTED_SITE_ORIGINS), false);
+    assert.equal(isTrustedSender({ origin: 'http://tt-web-138672009807.asia-east1.run.app' }, TRUSTED_SITE_ORIGINS), false);
     assert.equal(isTrustedSender({ origin: 'https://ts3.x1.asia.travian.com' }, TRUSTED_SITE_ORIGINS), false);
-    assert.equal(isTrustedSender({ origin: 'http://localhost:5174.evil.test' }, TRUSTED_SITE_ORIGINS), false);
     assert.equal(isTrustedSender({ url: 'not a url' }, TRUSTED_SITE_ORIGINS), false);
     assert.equal(isTrustedSender(undefined, TRUSTED_SITE_ORIGINS), false);
   });

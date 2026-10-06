@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: mysql+mysqlconnector://root:test_password@127.0.0.1:3306/travian_tools_test
+      # Test-only value: Settings refuse the public default when DEBUG is off.
+      JWT_SECRET_KEY: ci-test-only-jwt-secret-not-for-production-0123456789
     defaults:
       run:
         working-directory: backend

@@ -30,7 +30,11 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - DEBUG=false
+      # Required: at least 32 characters (backend refuses to start otherwise)
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:?set JWT_SECRET_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS}
+    ports:
+      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -40,12 +44,15 @@ services:
   # React Frontend (Production with Nginx)
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        # The SPA calls the backend directly (no nginx /api proxy any more)
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/v1}
     container_name: travian-tools-frontend
     restart: always
     ports:
-      - "80:80"
+      - "80:8080"
     depends_on:
       - backend
     networks:

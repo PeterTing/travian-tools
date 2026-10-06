@@ -1,9 +1,15 @@
 """應用程式配置."""
 
+import re
 from functools import lru_cache
+from typing import Self
 
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# 公開在 repo 裡的預設值：只能在 DEBUG=true 時使用。
+DEFAULT_JWT_SECRET_KEY = "your-secret-key-change-in-production"
+MIN_JWT_SECRET_LENGTH = 32
 
 
 class Settings(BaseSettings):
@@ -13,6 +19,8 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
+        # 驗證錯誤不要把輸入值（DATABASE_URL、JWT_SECRET_KEY）印進 log
+        hide_input_in_errors=True,
     )
 
     # 基本設定
@@ -25,10 +33,16 @@ class Settings(BaseSettings):
     DATABASE_URL: str
 
     # CORS 設定 - 生產環境應明確設定 (以逗號分隔的字串)
+    # 正式環境（Cloud Run）只放工具網站的正式網址，見 docs/deploy-cloud-run.md
     CORS_ORIGINS: str = ""
+    # 允許的擴充 ID（以逗號分隔）。預設是 manifest.json 的 key 固定下來的 ID；
+    # 不再接受任意 chrome-extension:// 來源。
+    CORS_EXTENSION_IDS: str = "nkgbmaokaapljaciiifbhgohlejmdcdn"
 
     # JWT 認證設定
-    JWT_SECRET_KEY: str = "your-secret-key-change-in-production"
+    # 預設值只給本機開發（DEBUG=true）用；DEBUG=false 時必須另外設定、
+    # 至少 32 字元，否則啟動就失敗（見 _require_real_jwt_secret）。
+    JWT_SECRET_KEY: str = DEFAULT_JWT_SECRET_KEY
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -53,6 +67,38 @@ class Settings(BaseSettings):
         if not self.CORS_ORIGINS:
             return []
         return [i.strip() for i in self.CORS_ORIGINS.split(",") if i.strip()]
+
+    @property
+    def cors_origin_regex(self) -> str | None:
+        """只允許指定 ID 的擴充（chrome-extension://<id>）."""
+        ids = [
+            i.strip()
+            for i in self.CORS_EXTENSION_IDS.split(",")
+            if re.fullmatch(r"[a-p]{32}", i.strip())
+        ]
+        if not ids:
+            return None
+        return r"^chrome-extension://(" + "|".join(ids) + r")$"
+
+    @model_validator(mode="after")
+    def _require_real_jwt_secret(self) -> Self:
+        """正式環境（DEBUG=false）不能用公開的預設值或太短的 JWT secret.
+
+        錯誤訊息只說原因，不包含 secret 本身。
+        """
+        if self.DEBUG:
+            return self
+        if self.JWT_SECRET_KEY == DEFAULT_JWT_SECRET_KEY:
+            raise ValueError(
+                "JWT_SECRET_KEY must be set (the built-in default is only "
+                "allowed when DEBUG=true)"
+            )
+        if len(self.JWT_SECRET_KEY) < MIN_JWT_SECRET_LENGTH:
+            raise ValueError(
+                f"JWT_SECRET_KEY must be at least {MIN_JWT_SECRET_LENGTH} "
+                "characters when DEBUG=false"
+            )
+        return self
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
