@@ -18,6 +18,8 @@ REGION="asia-east1"
 REPO="travian-tools"
 SQL_INSTANCE="${PROJECT}:${REGION}:travian-tools-db"
 RUN_SA="travian-tools-run@${PROJECT}.iam.gserviceaccount.com"
+# Frontend (static nginx) runs as its own service account with no roles.
+WEB_SA="travian-tools-web@${PROJECT}.iam.gserviceaccount.com"
 BUILD_SA="projects/${PROJECT}/serviceAccounts/travian-tools-build@${PROJECT}.iam.gserviceaccount.com"
 API_SERVICE="tt-api"
 WEB_SERVICE="tt-web"
@@ -63,6 +65,7 @@ deploy() {
     --cpu-throttling --allow-unauthenticated
   gcloud run deploy "${WEB_SERVICE}" "${G[@]}" --region "${REGION}" \
     --image "${IMAGE_BASE}/frontend:${TAG}" \
+    --service-account "${WEB_SA}" \
     --port 8080 --cpu 1 --memory 256Mi \
     --min-instances 0 --max-instances 2 --concurrency 80 --timeout 30s \
     --cpu-throttling --allow-unauthenticated

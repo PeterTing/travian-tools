@@ -14,6 +14,7 @@
 
 擴充（`browser-extension/manifest.json`、`lib/config.js`）只指向上面兩個網址：
 `host_permissions` 只有後端，`externally_connectable` / `TRUSTED_SITE_ORIGINS` 只有前端。
+本機開發要讓擴充連本機（`localhost:8000`／`localhost:5174`）時，暫時改這兩個檔案即可，**不要 commit**。
 
 ## 資源
 
@@ -23,7 +24,7 @@
 | 資料庫／使用者 | `travian_tools` / `travian`（密碼只在 Secret Manager 的 `DATABASE_URL` 裡） |
 | Secret Manager | `DATABASE_URL`、`JWT_SECRET_KEY`（隨機產生後直接寫入，沒有人看過值） |
 | Artifact Registry | `asia-east1-docker.pkg.dev/artogo-travian-tools/travian-tools/{backend,frontend}:<commit>` |
-| Service account | `travian-tools-run`（Cloud Run 執行：Cloud SQL client＋讀兩個 secret）、`travian-tools-build`（Cloud Build：寫 Artifact Registry） |
+| Service account | `travian-tools-run`（Cloud Run 執行：Cloud SQL client＋讀兩個 secret）、`travian-tools-build`（Cloud Build：寫 Artifact Registry）、`travian-tools-web`（前端，沒有任何權限） |
 | Cloud Run Job | `travian-tools-migrate`：`alembic upgrade head && alembic check` |
 | Cloud Run 服務 | `tt-api`（1 vCPU／512 MiB）、`tt-web`（nginx，1 vCPU／256 MiB）；兩個都 min-instances 0、max-instances 2、只在處理請求時計費 |
 

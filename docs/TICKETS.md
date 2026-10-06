@@ -2,8 +2,8 @@
 
 | 項目 | 內容 |
 |---|---|
-| 版本 | v2.0.19（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
-| 更新日期 | 2026-10-05 |
+| 版本 | v2.0.22（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
+| 更新日期 | 2026-10-06 |
 | 規格來源 | [`PRD.md`](PRD.md) |
 
 狀態：✅ 完成　🔄 進行中　⬜ 未開始　⏸ 等待中
@@ -122,13 +122,22 @@
 - 驗收：手機優先；導覽列不留 AI、執行、知識庫入口；戰鬥模擬先隱藏；手機寬度下頂部那排選單要收起來，不能讓「數據庫」被擠成直排
 - 做法（照線框 v0.4 與設計師決定）：手機頂部只放名稱＋帳號 ▾＋世界 ▾，底部 5 個分頁（首頁、村莊、計算器、攻略、更多），避開 safe area、內容底部留白；「更多」是一頁（`/more`：Map.sql 分析器、遊戲帳號管理、數據庫、統計、使用者與登出）；計算器分頁是列表頁（`/calculator`，分打仗／發展）；≥ 1024px 換成左側選單，內容一樣，數據庫和統計平常收起來；戰鬥模擬、健康檢查不放入口（路由保留）；390／768／1280／1440 各頁不橫向捲動
 
-### P0-12 後端部署到 Cloud Run；擴充改指向正式網址 ⬜
+### P0-12 後端部署到 Cloud Run；擴充改指向正式網址 🔄 審核中
 - 範圍：後端部署到 Cloud Run（GCP 專案 `artogo-travian-tools`）
+- 部署（2026-10-06，詳見 [`docs/deploy-cloud-run.md`](deploy-cloud-run.md)）：
+  - 後端 `tt-api`：https://tt-api-138672009807.asia-east1.run.app （`/health`、`/api/v1`）
+  - 前端 `tt-web`：https://tt-web-138672009807.asia-east1.run.app （一起上；nginx 不再轉送 `/api`，build 時寫入 API 網址）
+  - region `asia-east1`；兩個服務都 min-instances 0、max-instances 2；image tag `ed027fe`（本 PR 第一個 commit，main `6368ad5` 加上部署改動）
+  - 資料庫：Cloud SQL `travian-tools-db`（MySQL 8.4、`db-f1-micro`、單區、10 GB SSD），機密只放 Secret Manager（`DATABASE_URL`、`JWT_SECRET_KEY`）
+  - Migration：Cloud Run Job `travian-tools-migrate` 跑 `alembic upgrade head && alembic check`（升到 `0008_sync_type_rally`，check 無差異）；**全新空庫，無需備份**
+  - 後端 CORS 收緊：網頁只允許工具網站，擴充只允許固定 ID
+  - 已知限制：min-instances 0 時每日 map.sql 抓取不會可靠執行，要另加 Cloud Scheduler（這次不加）
+  - 每月估計約 US$10–12（幾乎都是 Cloud SQL）
 - 驗收：
-  - 擴充 `manifest.json` 的 `host_permissions` 從 `http://localhost:8000/*` 改成正式後端網址（只留這一個，必須是 https）；`background.js` 的 `API_BASE_URL` 一起改
-  - 維持只用 `activeTab`：不加回 `tabs`、`alarms`、Travian 網域的 host 權限或靜態 `content_scripts`；合規測試照樣要過
-  - 正式資料庫第一次升級前，先照 `backend/alembic/README_MIGRATIONS.md` 在本機 dump 備份（備份只留本機，不進 repo）
-  - 上線說明附上一句（`browser-extension/README.md`「村莊列表的資料」）：糧的增減看起來不對（特別是應該是負的卻顯示成正的），請到遊戲的村莊總覽，按擴充重新上傳；舊資料不會自動清掉
+  - [x] 擴充 `manifest.json` 的 `host_permissions` 從 `http://localhost:8000/*` 改成正式後端網址（只留這一個，必須是 https）；`background.js` 的 `API_BASE_URL` 一起改（常數實際在 `browser-extension/lib/config.js`；`externally_connectable`／`TRUSTED_SITE_ORIGINS`／`TOOL_SITE_URL` 也改成正式前端，擴充 0.5.0）
+  - [x] 維持只用 `activeTab`：不加回 `tabs`、`alarms`、Travian 網域的 host 權限或靜態 `content_scripts`；合規測試照樣要過（服務名刻意不含 `travian`，合規測試不用改）
+  - [x] 正式資料庫第一次升級前，先照 `backend/alembic/README_MIGRATIONS.md` 在本機 dump 備份（備份只留本機，不進 repo）——全新空庫，無需備份
+  - [x] 上線說明附上一句（main 已有）（`browser-extension/README.md`「村莊列表的資料」）：糧的增減看起來不對（特別是應該是負的卻顯示成正的），請到遊戲的村莊總覽，按擴充重新上傳；舊資料不會自動清掉
 
 ---
 
@@ -174,6 +183,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-06 | v2.0.22 | P0-12 送審：後端 `tt-api`＋前端 `tt-web` 上 Cloud Run（asia-east1、min-instances 0），Cloud SQL MySQL 8.4 db-f1-micro，機密在 Secret Manager；migration 改由 Cloud Run Job 跑（全新空庫無需備份）；entrypoint 拿掉固定 `--reload`；nginx 拿掉 `/api` 轉送；後端 CORS 只允許工具網站與固定擴充 ID；擴充改指向正式網址（0.5.0）；部署腳本與文件 `docs/deploy-cloud-run.md` |
 | 2026-10-05 | v2.0.21 | 非擋項清理（本 PR）：手機計算器結果精簡（主結果＋輔資訊／明細收合）、桌機 sticky 避開頂欄、刪 #18 redirect 舊頁、確認倒數人讀格式、preview-diff 失敗降級、#14 WorldSettings 清空測試／crop docstring／空確認 i18n；P0-09（#18，`364dc5e2`）已 merge |
 | 2026-10-05 | v2.0.20 | P0-09 計算器送審：搬入 travian-guide 8 個計算器＋測試；建造順序／ROI／文明點以 guide 為準（舊頁 redirect）；移動時間改即時 sticky；競技場公式前後端共用（>20 格、每級 +20%）；列表頁加搜尋；P0-06（#17，`4da35e85`）已 merge |
 | 2026-10-05 | v2.0.19 | P0-06 其餘項送審（[PR #17](https://github.com/PeterTing/travian-tools/pull/17)）：首頁「最近上傳」（類型 · 摘要＋相對時間）、來襲依村莊篩選（沿用村莊列表 chip 下拉）、`POST /paste/preview-diff` 回傳「新增 N · 更新 M」且等於 confirm；sync_logs 加 `RALLY_POINT`；P0-11（#16，`1cd0be37`）已 merge |
