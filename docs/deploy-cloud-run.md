@@ -22,7 +22,7 @@
 |---|---|
 | Cloud SQL | `travian-tools-db`：MySQL 8.4、Enterprise、`db-f1-micro`、單區（asia-east1）、10 GB SSD（不自動長大）、每日自動備份留 7 份 |
 | 資料庫／使用者 | `travian_tools` / `travian`（密碼只在 Secret Manager 的 `DATABASE_URL` 裡） |
-| Secret Manager | `DATABASE_URL`、`JWT_SECRET_KEY`（隨機產生後直接寫入，沒有人看過值） |
+| Secret Manager | `DATABASE_URL`、`JWT_SECRET_KEY`（建立時隨機產生，經 pipe 直接寫入 Secret Manager，沒有印出或存檔） |
 | Artifact Registry | `asia-east1-docker.pkg.dev/artogo-travian-tools/travian-tools/{backend,frontend}:<commit>` |
 | Service account | `travian-tools-run`（Cloud Run 執行：Cloud SQL client＋讀兩個 secret）、`travian-tools-build`（Cloud Build：寫 Artifact Registry）、`travian-tools-web`（前端，沒有任何權限） |
 | Cloud Run Job | `travian-tools-migrate`：`alembic upgrade head && alembic check` |
@@ -34,7 +34,7 @@
 
 正式環境（`DEBUG=false`）的後端設定守則：
 - `JWT_SECRET_KEY` 必須設定、至少 32 字元；沒設或用程式內建的預設值，後端**拒絕啟動**（錯誤訊息不含 secret）。
-  目前 Secret Manager 裡的值是 64 字元（只檢查長度，沒有印出）。
+  2026-10-06 檢查：從 Secret Manager 以 pipe 讀出 `JWT_SECRET_KEY`，只計算長度（64 字元）並比對不是預設值；值沒有印出、沒有存檔。
 - `/docs`、`/redoc`、`/api/v1/openapi.json` 只在 `DEBUG=true` 時提供，正式環境回 404。
 - `MAP_SQL_DAILY_FETCH_ENABLED=false`：見下面「已知限制」。
 
