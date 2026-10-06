@@ -85,14 +85,14 @@ scripts/deploy_cloud_run.sh deploy    # 部署 tt-api 與 tt-web
   搭配 Cloud Monitoring 的 `database/disk/bytes_used`）；接近 80% 時先清舊快照或手動加大硬碟（加大不能再縮回）。
 - 共用核心的 `db-f1-micro` 不在 Cloud SQL SLA 保障內；流量變大再升級。
 
-## 待審核後才套用的線上變更（P0-12 review）
+## 審核後套用的線上變更（P0-12 review，2026-10-06 幕僚長核准後套用）
 
-以下三項**還沒有套用**，等幕僚長核准後再執行（指令和說明在 PR #20 描述裡）：
-
-1. `tt-api` 加上 `MAP_SQL_DAILY_FETCH_ENABLED=false`（只改環境變數，沿用同一個 image，會產生新 revision）
-2. Cloud SQL `travian-tools-db`：開 deletion protection、`sslMode=ENCRYPTED_ONLY`（**強制 SSL 會讓 instance 重啟**，有短暫停機；
-   Cloud Run 透過 Cloud SQL connector／unix socket 連線，本來就是加密的，不受影響）
-3. Artifact Registry `travian-tools`：cleanup policy 每個 image 只留最新 5 版（`deploy/artifact-registry-cleanup-policy.json`，先 dry-run）
+1. `tt-api` 加上 `MAP_SQL_DAILY_FETCH_ENABLED=false`：只改環境變數，沿用同一個 image（revision `tt-api-00002-9w2`）
+2. Cloud SQL `travian-tools-db`：開 deletion protection、`sslMode=ENCRYPTED_ONLY`（沒有用舊的 `--require-ssl`）。
+   UPDATE 作業約 21 秒，log 裡沒看到引擎重啟；Cloud Run 透過 Cloud SQL connector／unix socket 連線，本來就是加密的，不受影響。
+   **要刪 instance 前必須先 `--no-deletion-protection`。**
+3. Artifact Registry `travian-tools`：cleanup policy 每個 package（backend、frontend）只留最新 **10** 版
+   （`deploy/artifact-registry-cleanup-policy.json`，直接 `--no-dry-run` 啟用）；cleanup 約每天背景跑一次
 
 ## 費用估算（每月，USD）
 

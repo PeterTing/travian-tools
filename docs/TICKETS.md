@@ -132,7 +132,7 @@
   - Migration：Cloud Run Job `travian-tools-migrate` 跑 `alembic upgrade head && alembic check`（升到 `0008_sync_type_rally`，check 無差異）；**全新空庫，無需備份**
   - 後端 CORS 收緊：網頁只允許工具網站，擴充只允許固定 ID
   - 已知限制：min-instances 0 時每日 map.sql 抓取不會可靠執行，正式環境設 `MAP_SQL_DAILY_FETCH_ENABLED=false` 明確關掉，要每天抓需另加 Cloud Scheduler（這次不加）；Cloud SQL 只有 10 GB、不自動長大，要盯 map.sql 快照用量
-  - 幕僚長審核（第一輪）修正：`DEBUG=false` 時拒絕預設或短於 32 字元的 `JWT_SECRET_KEY`；API 文件只在 DEBUG 開放；CORS `allow_credentials=False`；部署腳本改用專用 gcloud configuration `travian-tools`。線上變更（tt-api 關 map.sql 抓取、Cloud SQL deletion protection＋ENCRYPTED_ONLY、Artifact Registry 只留 5 版）等核准後才套用
+  - 幕僚長審核（第一輪）修正：`DEBUG=false` 時拒絕預設或短於 32 字元的 `JWT_SECRET_KEY`；API 文件只在 DEBUG 開放；CORS `allow_credentials=False`；部署腳本改用專用 gcloud configuration `travian-tools`。線上變更（tt-api 關 map.sql 抓取、Cloud SQL deletion protection＋ENCRYPTED_ONLY、Artifact Registry 每個 image 只留最新 10 版）已在核准後套用（2026-10-06）
   - 每月估計約 US$10–12（幾乎都是 Cloud SQL）
 - 驗收：
   - [x] 擴充 `manifest.json` 的 `host_permissions` 從 `http://localhost:8000/*` 改成正式後端網址（只留這一個，必須是 https）；`background.js` 的 `API_BASE_URL` 一起改（常數實際在 `browser-extension/lib/config.js`；`externally_connectable`／`TRUSTED_SITE_ORIGINS`／`TOOL_SITE_URL` 也改成正式前端，擴充 0.5.0）
