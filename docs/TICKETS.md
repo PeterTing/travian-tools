@@ -2,7 +2,7 @@
 
 | 項目 | 內容 |
 |---|---|
-| 版本 | v2.0.24（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
+| 版本 | v2.0.25（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
 | 更新日期 | 2026-10-06 |
 | 規格來源 | [`PRD.md`](PRD.md) |
 
@@ -99,7 +99,7 @@
 - 進度：✅ 已 merge（[#17](https://github.com/PeterTing/travian-tools/pull/17)，`4da35e85`）
 
 ### P0-07 截圖辨識：集結點與座標欄位 🔄 審核中（RapidOCR 自架，含收集手機截圖）
-- PR：本 PR（設計師 → 幕僚長審核；**還沒部署**，tt-ocr 的建立／部署指令放在 PR 說明等核准）
+- PR：[#21](https://github.com/PeterTing/travian-tools/pull/21)（設計師 → 幕僚長審核；**還沒部署**，tt-ocr 的建立／部署指令放在 PR 說明等核准）
 - 做法：
   - 新服務 `tt-ocr`（`ocr/`）：RapidOCR 3.9.2（PP-OCRv6 small，ONNX），FastAPI，不存圖、不寫硬碟、不連外；Cloud Run 1 vCPU／1 GiB、min 0／max 2、concurrency 1、不開放匿名呼叫，只有 tt-api 的 service account 有 `roles/run.invoker`
   - 後端 `POST /api/v1/ocr/rally`（預覽，不存）與 `POST /api/v1/ocr/coords`（座標欄位的相機按鈕）；tt-api → tt-ocr 用 metadata server 的 ID token；每人每分鐘最多 12 張、一次最多 4 張、每張 8 MB
@@ -193,6 +193,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-06 | v2.0.25 | P0-07 填上 PR 編號（#21） |
 | 2026-10-06 | v2.0.24 | P0-07 截圖辨識送審：新服務 `tt-ocr`（RapidOCR 自架，Cloud Run 1 vCPU／1 GiB，不開放匿名呼叫）、`/ocr/rally`＋`/ocr/coords`、確認畫面低信心模式（原因代碼、放大原處、選項／手動輸入、全部確認才能存）、待補不擋存、明確失敗；合規測試允許 `ocr_client` 只連 tt-ocr。新增 P1-09（Cloud Scheduler 觸發每日 map.sql）、P1-10（首頁新使用者「新增遊戲帳號」主按鈕） |
 | 2026-10-06 | v2.0.23 | P0-12 審核修正：`DEBUG=false` 時拒絕預設／短 JWT secret（docker-compose.prod 必填、CI 與測試帶測試用 key）；`/docs`、`/redoc`、`openapi.json` 只在 DEBUG 開放；CORS `allow_credentials=False`；部署腳本用專用 gcloud configuration、正式環境關每日 map.sql 抓取；文件補 Cloud SQL 10 GB 不自動長大要盯 map.sql 快照；三項線上變更的指令放 PR 等核准 |
 | 2026-10-06 | v2.0.22 | P0-12 送審：後端 `tt-api`＋前端 `tt-web` 上 Cloud Run（asia-east1、min-instances 0），Cloud SQL MySQL 8.4 db-f1-micro，機密在 Secret Manager；migration 改由 Cloud Run Job 跑（全新空庫無需備份）；entrypoint 拿掉固定 `--reload`；nginx 拿掉 `/api` 轉送；後端 CORS 只允許工具網站與固定擴充 ID；擴充改指向正式網址（0.5.0）；部署腳本與文件 `docs/deploy-cloud-run.md` |
