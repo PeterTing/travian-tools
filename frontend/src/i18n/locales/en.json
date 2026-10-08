@@ -866,7 +866,7 @@
       "title": "Recognizing… about 2–3 s",
       "slow": "Taking longer than usual, hang on",
       "merge": "Screenshots are merged; overlapping entries are removed.",
-      "coldStart": "The first screenshot after the server idles may take 3–5 s longer.",
+      "coldStart": "The first screenshot after the server has been idle may take about 15 seconds; it gets much faster after that.",
       "clockTip": "Include the server clock (top right) in the screenshot for more accurate times.",
       "cancel": "Cancel",
       "shotAlt": "Screenshot {{n}}"

@@ -3,7 +3,7 @@
 RapidOCR 3.9.2（PP-OCRv6 small，ONNX Runtime）包成一個很小的 FastAPI 服務，只做「圖 → 文字列＋位置」。
 版面解析、低信心／待補判斷都在後端（`backend/app/parsers/rally_ocr.py`）。
 
-- `GET /healthz` → `{status, engine}`
+- `GET /healthz` → `{status, engine}`（只在本機／容器內部用；Cloud Run 的 `*.run.app` 上 `/healthz` 是 Google 前端保留路徑，外面打一律 404。驗證匿名存取請打 `/`，應該是 403）
 - `POST /v1/ocr?recheck=true`，body 是原始圖片（`image/png`／`image/jpeg`／`image/webp`，≤ 8 MB、≤ 20M 像素）
   → `{engine, width, height, elapsed_ms, timing_ms, lines: [{text, score, box: [x0,y0,x1,y1], recheck}]}`
   - `box` 是原圖像素；含數字且分數 < 0.95 的列會把原圖該處放大 2 倍重讀一次（`recheck`），

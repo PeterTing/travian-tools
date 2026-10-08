@@ -73,7 +73,7 @@ scripts/deploy_cloud_run.sh deploy    # 部署 tt-api 與 tt-web
   `gcloud sql backups create --instance travian-tools-db --project artogo-travian-tools`
   需要 dump 到本機的話用 Cloud SQL Auth Proxy 連線後 `mysqldump`，**備份只留本機、不進 repo**。
 
-## 截圖辨識 `tt-ocr`（P0-07，**尚未部署**，等審核核准）
+## 截圖辨識 `tt-ocr`（P0-07，2026-10-09 已部署：`tt-ocr-00001-sf9`）
 
 | 項目 | 設定 |
 |---|---|
@@ -86,7 +86,7 @@ scripts/deploy_cloud_run.sh deploy    # 部署 tt-api 與 tt-web
 | 限制 | 每張 ≤ 8 MB、≤ 2000 萬像素（解碼前先讀表頭判斷，超過回 413；OpenCV 另設 `OPENCV_IO_MAX_IMAGE_PIXELS`）；tt-api 每人每分鐘 12 張（記憶體內計數，**每個 tt-api instance 各自計算**）、一次 4 張、整批總時限 50 秒（`OCR_TOTAL_DEADLINE_SECONDS`，要小於 tt-api 的 60 秒 timeout） |
 | cpu-boost | 保持開啟（新版 gcloud 建新服務的預設；tt-api、tt-web 線上也開著）：冷啟動可少約 6–7 秒，只在啟動那幾秒多一點費用 |
 
-部署（核准後，從 repo 根目錄）：
+部署（從 repo 根目錄；2026-10-09 第一次部署就是照這幾步）：
 
 ```bash
 export CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools
@@ -96,6 +96,24 @@ scripts/deploy_cloud_run.sh build-ocr    # Cloud Build → .../travian-tools/ocr
 scripts/deploy_cloud_run.sh deploy-ocr   # gcloud run deploy tt-ocr ＋ invoker 給 tt-api
 scripts/deploy_cloud_run.sh build && scripts/deploy_cloud_run.sh deploy   # tt-api（含 OCR_SERVICE_URL）＋ tt-web 新版
 ```
+
+部署後驗證：
+
+```bash
+# 匿名呼叫 tt-ocr 要被擋：打根目錄 /，應該是 403
+curl -s -o /dev/null -w '%{http_code}\n' https://tt-ocr-138672009807.asia-east1.run.app/
+# tt-api 的健康檢查是 /health（不是 /healthz），應該是 200
+curl -s -o /dev/null -w '%{http_code}\n' https://tt-api-138672009807.asia-east1.run.app/health
+# tt-ocr 的 service account 在專案層級不能有任何 role（輸出要是空的）
+gcloud projects get-iam-policy artogo-travian-tools --project artogo-travian-tools \
+  --flatten='bindings[].members' --filter='bindings.members:travian-tools-ocr@' --format='value(bindings.role)'
+```
+
+> **不要用 `/healthz` 驗證匿名存取**：`*.run.app` 上 `/healthz` 是 Google 前端保留的路徑，不管有沒有帶身分都回
+> Google 自己的 404 頁，請求根本不會進到容器，所以看不出 IAM 有沒有擋。`ocr/` 裡的 `GET /healthz` 只在本機或容器內部用得到。
+
+上線實測（2026-10-09，正式 tt-web 390 寬）：冷啟動從按上傳到出結果 13.3 秒（容器起來約 2.6 秒＋載模型 5.1 秒＋辨識 3.6 秒），
+暖機 4.2 秒（辨識 2.9 秒）。前端冷啟動文案因此寫「15 秒左右」。
 
 本機實測（`docker run --cpus 1 --memory 1g`，2026-10-06）：每張暖機 1.8–2.6 秒；冷啟動＝容器就緒約 4.1 秒＋第一張
 2.0–2.9 秒（比平常多約 4 秒，另加 Cloud Run 拉 image 的時間）；記憶體高峰 421–458 MiB；image 515 MB（未壓縮）。

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { ocrProgress } from '@/lib/ocrProgress'
 
-/** 進度條最多跑 5 秒；超過就改說「比平常久，再等一下」（設計稿 ②'） */
+/** 超過 5 秒就改說「比平常久，再等一下」（設計稿 ②'） */
 export const OCR_SLOW_AFTER_MS = 5000
 
 interface Props {
@@ -22,7 +23,8 @@ export function OcrRecognizing({ previews, startedAt, onCancel }: Props) {
 
   const elapsed = Math.max(0, now - startedAt)
   const slow = elapsed >= OCR_SLOW_AFTER_MS
-  const pct = slow ? 100 : Math.round(5 + (elapsed / OCR_SLOW_AFTER_MS) * 90)
+  // 結果回來就離開這個畫面（進確認頁），所以等待中永遠不會顯示 100%
+  const pct = ocrProgress(elapsed)
 
   return (
     <div className="space-y-3" data-testid="ocr-recognizing" aria-busy="true">
