@@ -852,6 +852,10 @@
     "fieldsPerHour": "fields/h"
   },
   "ocr": {
+    "beta": {
+      "label": "Beta",
+      "hint": "Screenshot recognition is in beta: check highlighted fields against the screenshot, or paste text instead."
+    },
     "upload": {
       "button": "Upload screenshot",
       "hint": "Rally point screenshots from phone or desktop, up to {{max}} at once (long pages can be split; overlaps are removed).",

@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import i18n from '@/i18n/i18n'
 import { ocrLowResResponse } from '@/test/ocrFixtures'
@@ -82,6 +82,7 @@ describe('HomePage screenshot upload (P0-07)', () => {
     recognizeRally.mockReturnValue(new Promise((r) => (resolve = r)))
     renderHome()
     expect(screen.getByTestId('upload-screenshot-btn')).not.toBeDisabled()
+    expect(within(screen.getByTestId('upload-screenshot-btn')).getByTestId('ocr-beta-tag')).toHaveTextContent('測試版')
 
     fireEvent.change(screen.getByTestId('upload-screenshot-input'), {
       target: { files: [shot()] },

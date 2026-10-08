@@ -12,6 +12,8 @@ interface Props {
   pad?: number
   label?: string
   testId?: string
+  /** warn＝要確認的欄位（黃框）；neutral＝已確定的欄位（灰框），免得跟要確認的搞混 */
+  tone?: 'warn' | 'neutral'
 }
 
 /**
@@ -27,6 +29,7 @@ export function CropZoom({
   pad = 0.35,
   label,
   testId = 'ocr-crop',
+  tone = 'warn',
 }: Props) {
   if (!src || !box || box.length < 4 || !imageWidth || !imageHeight) return null
   const [bx0, by0, bx1, by1] = box
@@ -44,7 +47,8 @@ export function CropZoom({
       role="img"
       aria-label={label}
       data-testid={testId}
-      className="rounded-md border border-amber-200 bg-white bg-no-repeat shadow-inner"
+      data-tone={tone}
+      className={`rounded-md border ${tone === 'neutral' ? 'border-gray-300' : 'border-amber-200'} bg-white bg-no-repeat shadow-inner`}
       style={{
         width: Math.round(w * scale),
         height: Math.round(h * scale),

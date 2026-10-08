@@ -71,6 +71,8 @@ describe('ParseConfirmPanel — OCR low confidence (③\')', () => {
     expect(rows).toHaveLength(3)
     // 攻擊方座標一律附縮圖；低信心欄位有放大原處
     expect(within(rows[0]).getByTestId('ocr-thumb')).toBeInTheDocument()
+    // 已確定欄位的縮圖用灰框，不跟要確認的黃框混
+    expect(within(rows[0]).getByTestId('ocr-thumb')).toHaveAttribute('data-tone', 'neutral')
     const low = within(rows[1]).getByTestId('ocr-low-field')
     expect(low).toHaveAttribute('data-field', 'coords')
     expect(within(low).getByTestId('ocr-reason')).toHaveTextContent('放大重讀後結果不一樣')

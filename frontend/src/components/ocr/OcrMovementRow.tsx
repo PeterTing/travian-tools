@@ -258,6 +258,7 @@ export function OcrMovementRow({ movement, index, images, onApply, onConfirmed }
           maxWidth={200}
           label={t('ocr.row.thumbAlt')}
           testId="ocr-thumb"
+          tone="neutral"
         />
       )}
       {missing.map((n) => (

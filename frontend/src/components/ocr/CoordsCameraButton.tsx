@@ -2,14 +2,17 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { ocrApi, type OcrCoordCandidate } from '@/services/ocrApi'
+import { OcrBetaTag } from './OcrBetaTag'
 
 interface Props {
   onPick: (x: number, y: number) => void
   size?: 'sm' | 'default'
+  /** 入口（例如補座標頁）顯示「測試版」；辨識結果裡的按鈕不用重複標 */
+  beta?: boolean
 }
 
 /** 座標欄位旁的相機按鈕：選一張截圖 → 讀出裡面的座標讓使用者挑（使用者按了才辨識） */
-export function CoordsCameraButton({ onPick, size = 'sm' }: Props) {
+export function CoordsCameraButton({ onPick, size = 'sm', beta = false }: Props) {
   const { t } = useTranslation()
   const input = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
@@ -46,18 +49,21 @@ export function CoordsCameraButton({ onPick, size = 'sm' }: Props) {
         data-testid="coords-camera-input"
         onChange={(e) => void onFile(e.target.files?.[0])}
       />
-      <Button
-        type="button"
-        size={size}
-        variant="outline"
-        disabled={busy}
-        onClick={() => input.current?.click()}
-        aria-label={t('ocr.camera.label')}
-        title={t('ocr.camera.label')}
-        data-testid="coords-camera-btn"
-      >
-        {busy ? t('ocr.camera.busy') : '📷'}
-      </Button>
+      <span className="inline-flex items-center gap-1">
+        <Button
+          type="button"
+          size={size}
+          variant="outline"
+          disabled={busy}
+          onClick={() => input.current?.click()}
+          aria-label={t('ocr.camera.label')}
+          title={t('ocr.camera.label')}
+          data-testid="coords-camera-btn"
+        >
+          {busy ? t('ocr.camera.busy') : '📷'}
+        </Button>
+        {beta && <OcrBetaTag />}
+      </span>
       {candidates.length > 0 && (
         <span className="flex flex-wrap gap-1" data-testid="coords-camera-candidates">
           {candidates.map((c) => (

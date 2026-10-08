@@ -50,6 +50,7 @@ export default function MovementCoordsPage() {
               value={x}
               onChange={(e) => setX(e.target.value)}
               placeholder="x"
+              className="min-w-0"
               inputMode="numeric"
               data-testid="coord-x"
             />
@@ -57,11 +58,13 @@ export default function MovementCoordsPage() {
               value={y}
               onChange={(e) => setY(e.target.value)}
               placeholder="y"
+              className="min-w-0"
               inputMode="numeric"
               data-testid="coord-y"
             />
             <CoordsCameraButton
               size="default"
+              beta
               onPick={(px, py) => {
                 setX(String(px))
                 setY(String(py))

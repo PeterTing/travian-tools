@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { OcrFailed } from '@/components/ocr/OcrFailed'
+import { OcrBetaTag } from '@/components/ocr/OcrBetaTag'
 import { OcrRecognizing } from '@/components/ocr/OcrRecognizing'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
@@ -448,6 +449,7 @@ export default function HomePage() {
                   data-testid="upload-screenshot-btn"
                 >
                   📷 {t('ocr.upload.button')}
+                  <OcrBetaTag />
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
