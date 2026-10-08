@@ -1,9 +1,12 @@
 import { formatCountdownSeconds } from '@/lib/formatCountdown'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { OcrFailed } from '@/components/ocr/OcrFailed'
+import { OcrBetaTag } from '@/components/ocr/OcrBetaTag'
+import { OcrRecognizing } from '@/components/ocr/OcrRecognizing'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import {
@@ -18,6 +21,8 @@ import {
   isSuccessfulSync,
   relativeAgo,
 } from '@/lib/recentUploads'
+import { defaultOcrCaptureAt } from '@/lib/ocrFields'
+import { OCR_MAX_IMAGES, ocrApi, toOcrError } from '@/services/ocrApi'
 import { pasteApi, type Movement } from '@/services/pasteApi'
 import { syncApi, type SyncLog } from '@/services/syncApi'
 import { villageApi } from '@/services/villageApi'
@@ -36,6 +41,11 @@ function countdownLabel(arrivalAt: string | null | undefined, now: Date): string
   if (t <= 0) return '已抵達'
   return formatCountdownSeconds(Math.floor(t / 1000))
 }
+
+type OcrState =
+  | { phase: 'idle' }
+  | { phase: 'recognizing'; previews: string[]; startedAt: number }
+  | { phase: 'failed'; code: string; message: string }
 
 function formatRelativeLabel(
   ago: ReturnType<typeof relativeAgo>,
@@ -74,6 +84,10 @@ export default function HomePage() {
   const [villageFilter, setVillageFilter] = useState<string>(ALL_VILLAGES)
   const [now, setNow] = useState(() => new Date())
   const [savedBanner, setSavedBanner] = useState('')
+  const [ocr, setOcr] = useState<OcrState>({ phase: 'idle' })
+  const ocrAbort = useRef<AbortController | null>(null)
+  const ocrPreviews = useRef<string[]>([])
+  const fileInput = useRef<HTMLInputElement>(null)
 
   const accountId = currentAccount?.account_id ?? null
   const worldId = currentAccount?.world_id ?? null
@@ -241,6 +255,90 @@ export default function HomePage() {
     }
   }
 
+  const dropPreviews = () => {
+    for (const u of ocrPreviews.current) URL.revokeObjectURL(u)
+    ocrPreviews.current = []
+  }
+
+  const onScreenshots = async (list: FileList | null) => {
+    const files = Array.from(list || [])
+    if (fileInput.current) fileInput.current.value = ''
+    if (!files.length) return
+    setSavedBanner('')
+    setParseError('')
+    if (!currentAccount) {
+      setParseError(t('ocr.upload.needAccount'))
+      return
+    }
+    if (files.length > OCR_MAX_IMAGES) {
+      setOcr({
+        phase: 'failed',
+        code: 'OCR_TOO_MANY_IMAGES',
+        message: t('ocr.upload.tooMany', { max: OCR_MAX_IMAGES }),
+      })
+      return
+    }
+    dropPreviews()
+    const previews = files.map((f) => URL.createObjectURL(f))
+    ocrPreviews.current = previews
+    const controller = new AbortController()
+    ocrAbort.current = controller
+    setOcr({ phase: 'recognizing', previews, startedAt: Date.now() })
+    try {
+      const result = await ocrApi.recognizeRally(
+        currentAccount.account_id,
+        files,
+        controller.signal,
+      )
+      const { captureAt, timeSource } = defaultOcrCaptureAt(
+        files,
+        result.ocr.capture_at_suggested,
+      )
+      const images = previews.map((url, i) => ({
+        url,
+        width: result.ocr.images[i]?.width ?? 0,
+        height: result.ocr.images[i]?.height ?? 0,
+      }))
+      ocrPreviews.current = [] // 交給確認畫面用（放大原處）
+      setOcr({ phase: 'idle' })
+      navigate('/paste/confirm', {
+        state: {
+          preview: {
+            ok: result.ok,
+            page_type: result.page_type,
+            data: result.data,
+            warnings: result.warnings,
+            server_time: result.server_time,
+          },
+          source: 'ocr',
+          ocr: result.ocr,
+          images,
+          timeSource,
+          accountId: currentAccount.account_id,
+          captureAt,
+        },
+      })
+    } catch (e) {
+      const err = toOcrError(e)
+      dropPreviews()
+      if (err.code === 'OCR_CANCELLED') {
+        setOcr({ phase: 'idle' })
+      } else {
+        setOcr({ phase: 'failed', code: err.code, message: err.message })
+      }
+    } finally {
+      ocrAbort.current = null
+    }
+  }
+
+  const cancelOcr = () => {
+    ocrAbort.current?.abort()
+    dropPreviews()
+    setOcr({ phase: 'idle' })
+  }
+
+  useEffect(() => () => ocrAbort.current?.abort(), [])
+
   const onClipboard = async () => {
     setClipboardFailed(false)
     try {
@@ -297,42 +395,74 @@ export default function HomePage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          <textarea
-            className="w-full min-h-[140px] rounded-md border bg-background p-3 text-sm"
-            placeholder="把遊戲頁面貼在這裡…"
-            value={pasteText}
-            onChange={(e) => setPasteText(e.target.value)}
-            data-testid="paste-textarea"
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            className="hidden"
+            data-testid="upload-screenshot-input"
+            onChange={(e) => void onScreenshots(e.target.files)}
           />
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => void onClipboard()} disabled={parsing || accountLoading}>
-              從剪貼簿貼上
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => void runParse(pasteText)}
-              disabled={parsing || !pasteText.trim()}
-              data-testid="parse-paste-btn"
-            >
-              {parsing ? '解析中…' : '解析這段文字'}
-            </Button>
-            <Button
-              variant="outline"
-              disabled
-              title="即將推出"
-              data-testid="upload-screenshot-btn"
-            >
-              上傳截圖（即將推出）
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            截圖辨識即將推出，現在請用貼上或擴充。按鈕讀不到剪貼簿時，直接長按上面的框貼上也可以。
-            {clipboardFailed ? ' （剛才讀剪貼簿失敗，請改用輸入框）' : ''}
-          </p>
-          <details className="text-xs text-muted-foreground">
-            <summary>文字格式說明</summary>
-            <pre className="mt-2 whitespace-pre-wrap">{PASTE_FORMAT_HELP}</pre>
-          </details>
+          {ocr.phase === 'recognizing' ? (
+            <OcrRecognizing
+              previews={ocr.previews}
+              startedAt={ocr.startedAt}
+              onCancel={cancelOcr}
+            />
+          ) : (
+            <>
+              {ocr.phase === 'failed' && (
+                <OcrFailed
+                  code={ocr.code}
+                  message={ocr.message}
+                  onRetry={() => {
+                    setOcr({ phase: 'idle' })
+                    fileInput.current?.click()
+                  }}
+                  onDismiss={() => setOcr({ phase: 'idle' })}
+                />
+              )}
+              <textarea
+                className="w-full min-h-[140px] rounded-md border bg-background p-3 text-sm"
+                placeholder="把遊戲頁面貼在這裡…"
+                value={pasteText}
+                onChange={(e) => setPasteText(e.target.value)}
+                data-testid="paste-textarea"
+              />
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={() => void onClipboard()} disabled={parsing || accountLoading}>
+                  從剪貼簿貼上
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => void runParse(pasteText)}
+                  disabled={parsing || !pasteText.trim()}
+                  data-testid="parse-paste-btn"
+                >
+                  {parsing ? '解析中…' : '解析這段文字'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => fileInput.current?.click()}
+                  disabled={parsing || accountLoading || !currentAccount}
+                  data-testid="upload-screenshot-btn"
+                >
+                  📷 {t('ocr.upload.button')}
+                  <OcrBetaTag />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t('ocr.upload.hint', { max: OCR_MAX_IMAGES })}
+                按鈕讀不到剪貼簿時，直接長按上面的框貼上也可以。
+                {clipboardFailed ? ' （剛才讀剪貼簿失敗，請改用輸入框）' : ''}
+              </p>
+              <details className="text-xs text-muted-foreground">
+                <summary>文字格式說明</summary>
+                <pre className="mt-2 whitespace-pre-wrap">{PASTE_FORMAT_HELP}</pre>
+              </details>
+            </>
+          )}
           {parseError && (
             <p className="text-sm text-destructive" data-testid="parse-error">
               {parseError}

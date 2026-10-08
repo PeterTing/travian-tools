@@ -123,6 +123,36 @@ jobs:
       - name: Build
         run: pnpm build
 
+  # OCR service (P0-07): RapidOCR on our own Cloud Run (tt-ocr); no outbound network
+  ocr:
+    name: OCR service CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ocr
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: |
+            ocr/requirements.txt
+            ocr/requirements-dev.txt
+
+      - name: Install dependencies (pinned, headless OpenCV)
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-deps -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run tests (API + real engine on rendered text)
+        run: |
+          python -m pytest -q
+
   # Browser extension (no dependencies; Node's built-in test runner)
   extension:
     name: Extension CI
@@ -152,7 +182,7 @@ jobs:
   docker:
     name: Docker Build Test
     runs-on: ubuntu-latest
-    needs: [backend, frontend]
+    needs: [backend, frontend, ocr]
 
     steps:
       - uses: actions/checkout@v4
@@ -176,5 +206,14 @@ jobs:
           file: ./frontend/Dockerfile
           push: false
           tags: travian-tools-frontend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build OCR Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ocr
+          push: false
+          tags: travian-tools-ocr:test
           cache-from: type=gha
           cache-to: type=gha,mode=max

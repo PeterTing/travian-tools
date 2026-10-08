@@ -246,6 +246,54 @@ class PasteService:
             )
         return [m for m in movements_in if m.get("kind") in INCOMING_KINDS]
 
+    @staticmethod
+    def _sanitize_ocr_rally(
+        data: dict[str, Any],
+    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
+        """截圖辨識（P0-07）的存入守門。
+
+        * 低信心欄位（status=low）沒有被使用者確認（confirmed=true）就不准存；
+        * 座標、倒數、抵達全部讀不到的那筆不存（待補欄位可以先存，之後補）。
+        """
+        movements = list(data.get("movements") or data.get("incoming") or [])
+        unconfirmed = 0
+        kept: list[dict[str, Any]] = []
+        for m in movements:
+            if not isinstance(m, dict):
+                continue
+            fields = (
+                ((m.get("ocr") or {}).get("fields") or {})
+                if isinstance(m.get("ocr"), dict)
+                else {}
+            )
+            for f in fields.values():
+                if (
+                    isinstance(f, dict)
+                    and f.get("status") == "low"
+                    and not f.get("confirmed")
+                ):
+                    unconfirmed += 1
+            readable = (
+                m.get("coordinate_x") is not None
+                or m.get("timer_seconds") is not None
+                or bool(m.get("arrival_time"))
+            )
+            if readable:
+                kept.append(m)
+        if unconfirmed:
+            return data, {
+                "success": False,
+                "message": f"還有 {unconfirmed} 個辨識不確定的欄位沒確認，確認後才能存入。",
+                "created": 0,
+                "updated": 0,
+                "total": 0,
+                "error_code": "ocr_unconfirmed",
+            }
+        cleaned = dict(data)
+        cleaned["movements"] = kept
+        cleaned["incoming"] = kept
+        return cleaned, None
+
     def _rally_diff_plan(
         self,
         *,
@@ -393,6 +441,11 @@ class PasteService:
         if village_err is not None:
             return village_err
 
+        if source == "ocr":
+            data, ocr_err = self._sanitize_ocr_rally(data)
+            if ocr_err is not None:
+                return ocr_err
+
         to_save = self._rally_to_save(data)
         if not to_save:
             return {
@@ -447,6 +500,11 @@ class PasteService:
         )
         if village_err is not None:
             return village_err
+
+        if source == "ocr":
+            data, ocr_err = self._sanitize_ocr_rally(data)
+            if ocr_err is not None:
+                return ocr_err
 
         to_save = self._rally_to_save(data)
         if not to_save:

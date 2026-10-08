@@ -850,5 +850,107 @@
     "seconds": "Seconds",
     "effectiveSpeed": "Effective speed",
     "fieldsPerHour": "fields/h"
+  },
+  "ocr": {
+    "beta": {
+      "label": "Beta",
+      "hint": "Screenshot recognition is in beta: check highlighted fields against the screenshot, or paste text instead."
+    },
+    "upload": {
+      "button": "Upload screenshot",
+      "hint": "Rally point screenshots from phone or desktop, up to {{max}} at once (long pages can be split; overlaps are removed).",
+      "tooMany": "Up to {{max}} screenshots at once",
+      "needAccount": "Choose a game account at the top first"
+    },
+    "recognizing": {
+      "title": "Recognizing… about 2–3 s",
+      "slow": "Taking longer than usual, hang on",
+      "merge": "Screenshots are merged; overlapping entries are removed.",
+      "coldStart": "The first screenshot after the server idles may take 3–5 s longer.",
+      "clockTip": "Include the server clock (top right) in the screenshot for more accurate times.",
+      "cancel": "Cancel",
+      "shotAlt": "Screenshot {{n}}"
+    },
+    "failed": {
+      "title": "Recognition failed",
+      "titles": {
+        "OCR_NO_INCOMING": "No incoming troops recognized",
+        "OCR_NOT_RALLY": "Not a rally point screenshot",
+        "OCR_ALL_MISSING": "No coordinates or times readable",
+        "OCR_UNAVAILABLE": "Screenshot recognition is unavailable",
+        "OCR_TIMEOUT": "Recognition took too long",
+        "OCR_RATE_LIMITED": "Too many recognitions",
+        "OCR_BAD_IMAGE": "Cannot read this image",
+        "OCR_IMAGE_TOO_LARGE": "Image too large",
+        "OCR_TOO_MANY_IMAGES": "Too many screenshots",
+        "OCR_NETWORK": "Cannot reach the server"
+      },
+      "bodies": {
+        "OCR_IMAGE_TOO_LARGE": "Take a plain phone screenshot. Don't zoom in or stitch images together.",
+        "OCR_TIMEOUT": "Try again with fewer screenshots at a time."
+      },
+      "nothingSaved": "Nothing was saved.",
+      "retry": "Pick screenshots again",
+      "usePaste": "Paste instead"
+    },
+    "confirm": {
+      "banner": "{{count}} field(s) need your confirmation",
+      "bannerDetail": "Highlighted values are uncertain. Check them against the screenshot before saving.",
+      "allConfirmed": "All highlighted fields are confirmed.",
+      "missingNote": "{{count}} field(s) unreadable, marked “to fill”. You can save now and fill them later.",
+      "remaining": "{{count}} left to confirm",
+      "moreReasons": "{{count}} more reason(s)",
+      "manual": "Type it",
+      "ok": "OK",
+      "confirmValue": "Confirm {{value}}",
+      "confirmed": "Confirmed {{field}} {{value}}",
+      "change": "Change",
+      "badCoords": "Coordinates look like -45|12",
+      "badTime": "Time looks like 2:41:10",
+      "zoomAlt": "Zoomed screenshot: {{field}}",
+      "timeSource": "Time source",
+      "timeFromClock": "Server clock in the screenshot {{clock}}",
+      "timeFromFile": "Screenshot file time (editable)",
+      "timeFromNow": "Upload time (editable)",
+      "sourceBadge": "Rally point · screenshot"
+    },
+    "row": {
+      "from": "from",
+      "arrival": "Arrives",
+      "countdown": "in",
+      "ok": "OK",
+      "needsConfirm": "Confirm",
+      "missing": "To fill",
+      "missingField": "{{field}} unreadable",
+      "thumbAlt": "Screenshot thumbnail of the attacker coordinates"
+    },
+    "fields": {
+      "coords": "Coordinates",
+      "countdown": "Countdown",
+      "arrival": "Arrival"
+    },
+    "camera": {
+      "label": "Read coordinates from a screenshot",
+      "busy": "Reading…",
+      "failed": "No coordinates found",
+      "timeout": "Recognition took too long. Please try again."
+    },
+    "reasons": {
+      "COORD_MAP_MISMATCH": "Does not match the map data (the map updates daily; new or renamed villages also show this)",
+      "OVERLAP_MISMATCH": "Two overlapping screenshots read different values",
+      "COUNTDOWN_ARRIVAL_MISMATCH": "Countdown and arrival time do not agree",
+      "COORD_OUT_OF_RANGE": "Coordinates are outside the map",
+      "TIME_FORMAT_INVALID": "Time format is wrong",
+      "NUMBER_FORMAT_INVALID": "Number format is wrong",
+      "RESOURCE_OVER_CAPACITY": "Resources exceed warehouse capacity",
+      "DUPLICATE_VALUE": "Same value appears twice, may be a duplicate read",
+      "LAYOUT_AMBIGUOUS": "Cannot tell which column this value belongs to",
+      "TEXT_TOO_SMALL": "Text too small; zoom in and take the screenshot again",
+      "OCR_LOW_SCORE": "Uncertain character recognition",
+      "CROP_RECHECK_MISMATCH": "Zoomed re-read gave a different result",
+      "NO_CROSS_CHECK": "No other field to cross-check (strict mode)",
+      "TRUNCATED_AT_EDGE": "Cut off by the screenshot edge; take another one",
+      "PARSE_ERROR": "Could not read this field; please fill it in"
+    }
   }
 }

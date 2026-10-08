@@ -1,0 +1,37 @@
+# tt-ocr runtime (P0-07). Installed with `pip install --no-deps` so the
+# headless OpenCV build replaces rapidocr's default opencv-python (no libGL).
+# Every transitive dependency is pinned here on purpose.
+rapidocr==3.9.2
+onnxruntime==1.30.0
+opencv-python-headless==4.12.0.88
+numpy==2.2.6
+pyclipper==1.4.0
+shapely==2.1.2
+six==1.17.0
+pyyaml==6.0.3
+pillow==12.3.0
+tqdm==4.70.1
+omegaconf==2.3.1
+antlr4-python3-runtime==4.9.3
+colorlog==6.12.0
+# rapidocr imports requests (model download helper). Models are baked into
+# the image at build time, so nothing is downloaded at runtime.
+requests==2.34.2
+urllib3==2.8.0
+idna==3.20
+certifi==2026.7.22
+charset-normalizer==3.5.2
+flatbuffers==25.12.19
+packaging==26.3
+protobuf==7.36.2
+fastapi==0.115.6
+starlette==0.41.3
+pydantic==2.13.5
+pydantic-core==2.46.5
+annotated-types==0.8.0
+typing-extensions==4.16.0
+typing-inspection==0.4.4
+anyio==4.15.1
+uvicorn==0.34.0
+h11==0.16.0
+click==8.5.0

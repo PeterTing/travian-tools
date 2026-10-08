@@ -73,6 +73,33 @@ scripts/deploy_cloud_run.sh deploy    # 部署 tt-api 與 tt-web
   `gcloud sql backups create --instance travian-tools-db --project artogo-travian-tools`
   需要 dump 到本機的話用 Cloud SQL Auth Proxy 連線後 `mysqldump`，**備份只留本機、不進 repo**。
 
+## 截圖辨識 `tt-ocr`（P0-07，**尚未部署**，等審核核准）
+
+| 項目 | 設定 |
+|---|---|
+| 服務 | `tt-ocr`（`ocr/`：RapidOCR 3.9.2 PP-OCRv6 small／ONNX，FastAPI；模型在 build 時放進 image） |
+| 規格 | 1 vCPU、1 GiB、min-instances 0、max-instances 2、concurrency 1、timeout 60s、請求計費（`--cpu-throttling`） |
+| 身分 | service account `travian-tools-ocr`（不給任何 role） |
+| 存取 | `--no-allow-unauthenticated`；只有 `tt-api` 的 `travian-tools-run` 有 `roles/run.invoker`。tt-api 從 metadata server 拿 audience＝tt-ocr 網址的 ID token |
+| 後端設定 | `tt-api` 加 `OCR_SERVICE_URL=https://tt-ocr-138672009807.asia-east1.run.app`（`OCR_AUTH` 預設 `id_token`）；沒設時截圖辨識回 503 `OCR_UNAVAILABLE` |
+| 資料 | 圖片只在記憶體裡辨識，不寫硬碟、不存資料庫、不連外 |
+| 限制 | 每張 ≤ 8 MB、≤ 2000 萬像素（解碼前先讀表頭判斷，超過回 413；OpenCV 另設 `OPENCV_IO_MAX_IMAGE_PIXELS`）；tt-api 每人每分鐘 12 張（記憶體內計數，**每個 tt-api instance 各自計算**）、一次 4 張、整批總時限 50 秒（`OCR_TOTAL_DEADLINE_SECONDS`，要小於 tt-api 的 60 秒 timeout） |
+| cpu-boost | 保持開啟（新版 gcloud 建新服務的預設；tt-api、tt-web 線上也開著）：冷啟動可少約 6–7 秒，只在啟動那幾秒多一點費用 |
+
+部署（核准後，從 repo 根目錄）：
+
+```bash
+export CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools
+gcloud iam service-accounts create travian-tools-ocr --project artogo-travian-tools \
+  --display-name "tt-ocr runtime (no roles)"
+scripts/deploy_cloud_run.sh build-ocr    # Cloud Build → .../travian-tools/ocr:<sha>
+scripts/deploy_cloud_run.sh deploy-ocr   # gcloud run deploy tt-ocr ＋ invoker 給 tt-api
+scripts/deploy_cloud_run.sh build && scripts/deploy_cloud_run.sh deploy   # tt-api（含 OCR_SERVICE_URL）＋ tt-web 新版
+```
+
+本機實測（`docker run --cpus 1 --memory 1g`，2026-10-06）：每張暖機 1.8–2.6 秒；冷啟動＝容器就緒約 4.1 秒＋第一張
+2.0–2.9 秒（比平常多約 4 秒，另加 Cloud Run 拉 image 的時間）；記憶體高峰 421–458 MiB；image 515 MB（未壓縮）。
+
 ## 已知限制
 
 - **每日 map.sql 抓取在正式環境關閉**（`MAP_SQL_DAILY_FETCH_ENABLED=false`）：排程（APScheduler）跑在
@@ -101,6 +128,7 @@ scripts/deploy_cloud_run.sh deploy    # 部署 tt-api 與 tt-web
 | Cloud SQL db-f1-micro（$0.0105/小時 × 730） | 約 $7.7 |
 | Cloud SQL 10 GB SSD＋備份 | 約 $2–4 |
 | Cloud Run 兩個服務（請求計費，在免費額度內） | 約 $0 |
+| Cloud Run `tt-ocr`（P0-07，未部署；每張約 2.5 vCPU 秒＋2.5 GiB 秒，每月 1,000 張仍在免費額度內） | 約 $0–1 |
 | Artifact Registry（0.5 GB 免費）、Secret Manager、Cloud Build（每天 120 分鐘免費） | 約 $0–0.5 |
 | **合計** | **約 $10–12** |
 

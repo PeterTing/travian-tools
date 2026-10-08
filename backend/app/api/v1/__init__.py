@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     game_accounts,
     game_worlds,
     map_sql,
+    ocr,
     opening_checklist,
     parse,
     paste,
@@ -33,6 +34,7 @@ router.include_router(villages.router)
 router.include_router(sync.router)
 router.include_router(parse.router)
 router.include_router(paste.router)
+router.include_router(ocr.router)
 router.include_router(tribes.router, prefix="/tribes", tags=["tribes"])
 router.include_router(calculator.router, prefix="/calculator", tags=["calculator"])
 router.include_router(buildings.router, prefix="/buildings", tags=["buildings"])

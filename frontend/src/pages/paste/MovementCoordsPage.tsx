@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { CoordsCameraButton } from '@/components/ocr/CoordsCameraButton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -44,11 +45,12 @@ export default function MovementCoordsPage() {
           <p className="text-sm text-muted-foreground">{row.headline || row.role}</p>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex gap-2">
+          <div className="flex items-start gap-2">
             <Input
               value={x}
               onChange={(e) => setX(e.target.value)}
               placeholder="x"
+              className="min-w-0"
               inputMode="numeric"
               data-testid="coord-x"
             />
@@ -56,8 +58,17 @@ export default function MovementCoordsPage() {
               value={y}
               onChange={(e) => setY(e.target.value)}
               placeholder="y"
+              className="min-w-0"
               inputMode="numeric"
               data-testid="coord-y"
+            />
+            <CoordsCameraButton
+              size="default"
+              beta
+              onPick={(px, py) => {
+                setX(String(px))
+                setY(String(py))
+              }}
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
