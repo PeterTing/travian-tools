@@ -13,9 +13,11 @@ interface Props {
  * 圖片太大、辨識太久這類有固定建議的錯誤用 `ocr.failed.bodies.<code>`，不顯示後端或通用訊息
  */
 export function OcrFailed({ code, message, onRetry, onDismiss }: Props) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const title = t(`ocr.failed.titles.${code}`, { defaultValue: t('ocr.failed.title') })
-  const body = t(`ocr.failed.bodies.${code}`, { defaultValue: message })
+  // 先查有沒有固定文案，避免其他錯誤碼每次都觸發「Missing i18n key」警告
+  const bodyKey = `ocr.failed.bodies.${code}`
+  const body = i18n.exists(bodyKey) ? t(bodyKey) : message
   return (
     <div
       className="space-y-2 rounded-md border border-red-300 bg-red-50 px-3 py-3 text-sm text-red-950"
