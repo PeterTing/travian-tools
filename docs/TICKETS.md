@@ -99,7 +99,7 @@
 - 進度：✅ 已 merge（[#17](https://github.com/PeterTing/travian-tools/pull/17)，`4da35e85`）
 
 ### P0-07 截圖辨識：集結點與座標欄位 ✅ 已 merge＋已部署（入口仍標「測試版」，見 P1-11）
-- PR：[#21](https://github.com/PeterTing/travian-tools/pull/21)（設計師 → 幕僚長審核通過；2026-10-09 01:29 PT merge，main `899ebfe`）
+- PR：[#21](https://github.com/PeterTing/travian-tools/pull/21)（設計師 → 幕僚長審核通過；2026-10-09 01:29（台北時間 UTC+8）merge，main `899ebfe`）
 - 部署（2026-10-09，`artogo-travian-tools`／asia-east1）：`tt-ocr-00001-sf9`（新服務，https://tt-ocr-138672009807.asia-east1.run.app ，不開放匿名）、`tt-api-00004-8hv`（加 `OCR_SERVICE_URL`）、`tt-web-00005-4nh`；各 100% 流量
 - 上線實測（正式 tt-web 390 寬、測試帳號 `p012smoke`、真實頁面骨架＋假來襲截圖）：冷啟動從按上傳到出結果 13.3 秒（tt-ocr 容器起來約 2.6 秒＋載模型 5.1 秒＋辨識 3.6 秒），暖機 4.2 秒（辨識 2.9 秒）；3 筆來襲的座標／倒數／抵達全部「確定」且正確；炸彈 PNG 經正式 tt-api 回 413 `OCR_IMAGE_TOO_LARGE`，tt-ocr 11 ms 擋掉、沒有重啟
 - 做法：
@@ -108,7 +108,7 @@
   - 解析（`app/parsers/rally_ocr.py`，純函式）：依版面切出每筆來襲（來源村／座標／倒數／抵達），兩張截圖依序合併、去掉重疊；有伺服器時鐘（桌機）就用它算擷取時間並交叉比對倒數與抵達；座標跟最新地圖快照比對
   - 防解壓縮炸彈：tt-ocr 解碼前先用 Pillow 讀圖檔表頭的尺寸，超過 2000 萬像素直接回 413 `image_too_large`（不解碼）；OpenCV 另設 `OPENCV_IO_MAX_IMAGE_PIXELS=20000000` 當第二道防線。tt-api 轉成 413 `OCR_IMAGE_TOO_LARGE`，前端顯示「圖片太大」失敗卡；逾時顯示「辨識太久」失敗卡，不顯示通用錯誤
   - 存入沿用 `POST /paste/confirm`（source=ocr）：還有沒確認的低信心欄位就擋；全部讀不到的那筆不存；讀不到的欄位（待補）照樣可存
-  - 前端：首頁「上傳截圖」→ 辨識中（線框 ②'，5 秒後改「比平常久，再等一下」；進度條越來越慢地逼近 90%，結果回來前不會跑滿；冷啟動文案「伺服器閒置後的第一張可能要等 15 秒左右，之後會快很多。」）→ 確認畫面低信心模式（線框 ③'）；補座標頁加相機按鈕
+  - 前端：首頁「上傳截圖」→ 辨識中（線框 ②'，5 秒後改「比平常久，再等一下」；進度條越來越慢地逼近 90%，結果回來前不會跑滿；冷啟動文案「伺服器閒置後的第一張可能要 15 秒左右，之後會快很多。」）→ 確認畫面低信心模式（線框 ③'）；補座標頁加相機按鈕
 - 驗收：
   - [x] 欄位狀態分「待補」和「低信心」；低信心必須確認才能存入（前端按鈕＋後端 confirm 都擋）
   - [x] 回傳原因代碼，多個原因時最嚴重的排第一（清單見 PRD 3.3），含 `COORD_MAP_MISMATCH`；明確失敗 `OCR_NOT_RALLY`／`OCR_NO_INCOMING`／`OCR_ALL_MISSING`，不會存空資料卻回成功

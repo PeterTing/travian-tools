@@ -22,7 +22,7 @@ describe('OcrRecognizing (②\')', () => {
     expect(screen.getAllByTestId('ocr-preview')).toHaveLength(2)
     expect(screen.getByText(/重疊的那幾筆自動去掉/)).toBeInTheDocument()
     expect(
-      screen.getByText('伺服器閒置後的第一張可能要等 15 秒左右，之後會快很多。'),
+      screen.getByText('伺服器閒置後的第一張可能要 15 秒左右，之後會快很多。'),
     ).toBeInTheDocument()
     const start = Number(screen.getByTestId('ocr-progress').getAttribute('aria-valuenow'))
 
