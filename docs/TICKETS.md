@@ -2,7 +2,7 @@
 
 | 項目 | 內容 |
 |---|---|
-| 版本 | v2.0.26（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
+| 版本 | v2.0.27（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
 | 更新日期 | 2026-10-09 |
 | 規格來源 | [`PRD.md`](PRD.md) |
 
@@ -15,7 +15,7 @@
 | 分期 | 票數 | 完成 | 估計 |
 |---|---|---|---|
 | P0 | 12 | 9（P0-01～04、P0-05、P0-06、P0-08、P0-10、P0-11）＋P0-09 | 14 到 17 人天，截圖辨識另計 |
-| P1 | 11 | 0 | 16 到 22 人天 |
+| P1 | 14 | 0 | 18 到 24 人天 |
 | P2 | 5 | 0 | P1 完成後再估 |
 
 ---
@@ -102,8 +102,9 @@
 - PR：[#21](https://github.com/PeterTing/travian-tools/pull/21)（設計師 → 幕僚長審核；**還沒部署**，tt-ocr 的建立／部署指令放在 PR 說明等核准）
 - 做法：
   - 新服務 `tt-ocr`（`ocr/`）：RapidOCR 3.9.2（PP-OCRv6 small，ONNX），FastAPI，不存圖、不寫硬碟、不連外；Cloud Run 1 vCPU／1 GiB、min 0／max 2、concurrency 1、不開放匿名呼叫，只有 tt-api 的 service account 有 `roles/run.invoker`
-  - 後端 `POST /api/v1/ocr/rally`（預覽，不存）與 `POST /api/v1/ocr/coords`（座標欄位的相機按鈕）；tt-api → tt-ocr 用 metadata server 的 ID token；每人每分鐘最多 12 張、一次最多 4 張、每張 8 MB
+  - 後端 `POST /api/v1/ocr/rally`（預覽，不存）與 `POST /api/v1/ocr/coords`（座標欄位的相機按鈕）；tt-api → tt-ocr 用 metadata server 的 ID token；每人每分鐘最多 12 張（記憶體內計數，每個 instance 各自計算）、一次最多 4 張、每張 8 MB；一次多張時整批總時限 50 秒（每張最多 30 秒，取剩餘時間較小者），超過回 504 `OCR_TIMEOUT`
   - 解析（`app/parsers/rally_ocr.py`，純函式）：依版面切出每筆來襲（來源村／座標／倒數／抵達），兩張截圖依序合併、去掉重疊；有伺服器時鐘（桌機）就用它算擷取時間並交叉比對倒數與抵達；座標跟最新地圖快照比對
+  - 防解壓縮炸彈：tt-ocr 解碼前先用 Pillow 讀圖檔表頭的尺寸，超過 2000 萬像素直接回 413 `image_too_large`（不解碼）；OpenCV 另設 `OPENCV_IO_MAX_IMAGE_PIXELS=20000000` 當第二道防線。tt-api 轉成 413 `OCR_IMAGE_TOO_LARGE`，前端顯示「圖片太大」失敗卡；逾時顯示「辨識太久」失敗卡，不顯示通用錯誤
   - 存入沿用 `POST /paste/confirm`（source=ocr）：還有沒確認的低信心欄位就擋；全部讀不到的那筆不存；讀不到的欄位（待補）照樣可存
   - 前端：首頁「上傳截圖」→ 辨識中（線框 ②'，5 秒後改「比平常久，再等一下」）→ 確認畫面低信心模式（線框 ③'）；補座標頁加相機按鈕
 - 驗收：
@@ -164,6 +165,9 @@
 | P1-09 | 每日 map.sql 改由 Cloud Scheduler 觸發（Cloud Run） | 0.5 到 1 天 | 正式環境現在 `MAP_SQL_DAILY_FETCH_ENABLED=false`：min-instances 0 時程序內排程不會可靠執行，兩個 instance 也可能各抓一次。做法：Cloud Scheduler 每天打一個只收 OIDC（Scheduler 專用 service account）的內部端點，同世界同一天只抓一次；合規測試的 map.sql 白名單照舊 |
 | P1-10 | 首頁：新使用者還沒有遊戲帳號時，「新增遊戲帳號」改成卡片最上方的主按鈕 | 0.5 天 | 設計師建議；現在是橘色文字連結（`frontend/src/pages/HomePage.tsx` 約 341–349 行） |
 | P1-11 | 截圖辨識拿掉「測試版」：第一次有真實來襲時，補集結點來襲截圖（手機＋桌機）當測試素材，重算「確定」欄位讀錯率 | 0.5 天 | PM 條件：P0-07 先上但入口標「測試版」（首頁「📷 上傳截圖」、補座標頁相機按鈕，元件 `OcrBetaTag`）。ts11 新手保護期間沒有真實來襲，現有來襲案例是真實頁面骨架＋假資料。觸發：ts11 第一次收到來襲。完成條件：真實截圖進 fixture、讀錯率重算寫進 PR、讀錯率 0 才拿掉標籤 |
+| P1-12 | 截圖辨識：低信心欄位的確認改用伺服器簽章 token | 1 天 | 幕僚長 #21 審核建議（之後開票）。現在 `/paste/confirm`（source=ocr）是依前端送回的欄位狀態判斷「低信心已確認」。改成 `/ocr/rally` 回一個簽章 token（含每個低信心欄位的位置與原值），confirm 時驗簽，不再信任前端送回的狀態 |
+| P1-13 | tt-ocr／tt-api 的 base image 鎖 digest | 0.5 天 | 幕僚長 #21 審核建議（之後開票）。`python:3.11-slim` 等改成 `@sha256:…`，搭配 Dependabot 或固定週期更新 |
+| P1-14 | 截圖上傳依 `Content-Length` 提前拒絕過大的請求 | 0.5 天 | 幕僚長 #21 審核建議（之後開票）。現在 tt-api 先把檔案讀進記憶體（上限 16 MB）才擋，tt-ocr 也是讀完 body 才比 8 MB；改成先看 `Content-Length`，超過就直接回 413，不讀 body |
 
 ## P2：進階（P1 完成後再估）
 
@@ -194,6 +198,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-09 | v2.0.27 | P0-07 依幕僚長審核（#21 B1）：tt-ocr 解碼前先讀圖檔表頭尺寸，超過 2000 萬像素回 413（防解壓縮炸彈），OpenCV 另設像素上限；tt-api 把 413／逾時分開回（413 `OCR_IMAGE_TOO_LARGE`、504 `OCR_TIMEOUT`），一次多張整批總時限 50 秒；前端「圖片太大」「辨識太久」失敗卡；每分鐘限量註明每個 instance 各自計算。新增 P1-12（低信心確認改簽章 token）、P1-13（base image 鎖 digest）、P1-14（依 Content-Length 提前拒絕過大上傳） |
 | 2026-10-09 | v2.0.26 | P0-07 依 PM／設計審核：首頁「📷 上傳截圖」與補座標頁相機按鈕旁標「測試版」；已確定欄位的縮圖外框改灰色；新增 P1-11（第一次真實來襲補截圖、重算讀錯率後拿掉測試版） |
 | 2026-10-06 | v2.0.25 | P0-07 填上 PR 編號（#21） |
 | 2026-10-06 | v2.0.24 | P0-07 截圖辨識送審：新服務 `tt-ocr`（RapidOCR 自架，Cloud Run 1 vCPU／1 GiB，不開放匿名呼叫）、`/ocr/rally`＋`/ocr/coords`、確認畫面低信心模式（原因代碼、放大原處、選項／手動輸入、全部確認才能存）、待補不擋存、明確失敗；合規測試允許 `ocr_client` 只連 tt-ocr。新增 P1-09（Cloud Scheduler 觸發每日 map.sql）、P1-10（首頁新使用者「新增遊戲帳號」主按鈕） |

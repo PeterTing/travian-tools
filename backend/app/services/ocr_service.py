@@ -27,7 +27,7 @@ from app.parsers.rally_ocr import (
     find_coordinate_candidates,
     parse_rally_ocr,
 )
-from app.services.ocr_client import OcrClient, OcrServiceError
+from app.services.ocr_client import TIMEOUT_MESSAGE, OcrClient, OcrServiceError
 
 ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp"}
 _MAGIC = {
@@ -48,7 +48,11 @@ class OcrFailure(Exception):
 
 
 class _RateLimiter:
-    """每位使用者每分鐘最多 N 張（單一 instance 記憶體內；tt-api 本身也有 max-instances）。"""
+    """每位使用者每分鐘最多 N 張。
+
+    記憶體內計數：是「每個 tt-api instance 各自計算」，不是全域上限
+    （tt-api 開到 N 個 instance 時，同一人最多可能 N × 上限）。
+    """
 
     def __init__(self) -> None:
         self._hits: dict[str, deque[float]] = {}
@@ -71,6 +75,13 @@ class _RateLimiter:
 
 
 rate_limiter = _RateLimiter()
+
+# tt-ocr 錯誤 → 給前端的 HTTP 狀態（前端依 code 顯示對應的失敗卡，不顯示通用錯誤）
+_SERVICE_ERROR_STATUS = {
+    "OCR_BAD_IMAGE": 400,
+    "OCR_IMAGE_TOO_LARGE": 413,
+    "OCR_TIMEOUT": 504,
+}
 
 _client_singleton: OcrClient | None = None
 _client_lock = threading.Lock()
@@ -172,13 +183,26 @@ class OcrService:
     def _recognize(
         self, images: list[tuple[bytes, str]]
     ) -> tuple[list[OcrPage], list[dict]]:
+        """依序送 tt-ocr，整批共用一個總時限（``OCR_TOTAL_DEADLINE_SECONDS``）。
+
+        最多 4 張 × 每張 30 秒會超過 tt-api 的 60 秒 request timeout（變成 504 HTML），
+        所以每張只給「剩下的時間」與單張上限取小，超過就明確回 ``OCR_TIMEOUT``。
+        """
         pages: list[OcrPage] = []
         timings: list[dict[str, Any]] = []
+        deadline = time.monotonic() + settings.OCR_TOTAL_DEADLINE_SECONDS
         for i, (data, ctype) in enumerate(images):
+            remaining = deadline - time.monotonic()
             try:
-                payload = self.client.recognize(data, ctype)
+                if remaining <= 0:
+                    raise OcrServiceError("OCR_TIMEOUT", TIMEOUT_MESSAGE)
+                payload = self.client.recognize(
+                    data,
+                    ctype,
+                    timeout_seconds=min(remaining, settings.OCR_TIMEOUT_SECONDS),
+                )
             except OcrServiceError as exc:
-                status = 400 if exc.code == "OCR_BAD_IMAGE" else 503
+                status = _SERVICE_ERROR_STATUS.get(exc.code, 503)
                 raise OcrFailure(exc.code, exc.message, status) from exc
             pages.append(OcrPage.from_service(i, payload))
             timings.append(

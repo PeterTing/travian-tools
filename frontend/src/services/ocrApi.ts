@@ -96,6 +96,13 @@ export function toOcrError(e: unknown): OcrRequestError {
       const d = detail as { code: string; message?: string }
       return new OcrRequestError(d.code, d.message || '辨識失敗')
     }
+    // 沒有 {code} 的 413／504（例如前面的代理或 Cloud Run 自己回的）也要對到專屬失敗卡
+    if (e.response?.status === 413) {
+      return new OcrRequestError('OCR_IMAGE_TOO_LARGE', '圖片太大')
+    }
+    if (e.response?.status === 504 || e.code === 'ECONNABORTED' || e.code === 'ETIMEDOUT') {
+      return new OcrRequestError('OCR_TIMEOUT', '辨識太久了，請一次少傳幾張截圖再試')
+    }
     if (typeof detail === 'string') return new OcrRequestError('OCR_FAILED', detail)
     if (!e.response) return new OcrRequestError('OCR_NETWORK', '連不上伺服器，請檢查網路後再試')
   }

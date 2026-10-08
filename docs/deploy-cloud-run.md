@@ -83,6 +83,8 @@ scripts/deploy_cloud_run.sh deploy    # 部署 tt-api 與 tt-web
 | 存取 | `--no-allow-unauthenticated`；只有 `tt-api` 的 `travian-tools-run` 有 `roles/run.invoker`。tt-api 從 metadata server 拿 audience＝tt-ocr 網址的 ID token |
 | 後端設定 | `tt-api` 加 `OCR_SERVICE_URL=https://tt-ocr-138672009807.asia-east1.run.app`（`OCR_AUTH` 預設 `id_token`）；沒設時截圖辨識回 503 `OCR_UNAVAILABLE` |
 | 資料 | 圖片只在記憶體裡辨識，不寫硬碟、不存資料庫、不連外 |
+| 限制 | 每張 ≤ 8 MB、≤ 2000 萬像素（解碼前先讀表頭判斷，超過回 413；OpenCV 另設 `OPENCV_IO_MAX_IMAGE_PIXELS`）；tt-api 每人每分鐘 12 張（記憶體內計數，**每個 tt-api instance 各自計算**）、一次 4 張、整批總時限 50 秒（`OCR_TOTAL_DEADLINE_SECONDS`，要小於 tt-api 的 60 秒 timeout） |
+| cpu-boost | 保持開啟（新版 gcloud 建新服務的預設；tt-api、tt-web 線上也開著）：冷啟動可少約 6–7 秒，只在啟動那幾秒多一點費用 |
 
 部署（核准後，從 repo 根目錄）：
 

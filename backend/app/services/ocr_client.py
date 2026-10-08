@@ -25,6 +25,7 @@ METADATA_IDENTITY_URL = (
 )
 _LOCAL_HOSTS = {"localhost", "127.0.0.1", "tt-ocr", "ocr", "host.docker.internal"}
 _TOKEN_TTL_SECONDS = 45 * 60  # Google ID token 有效 1 小時，提早換
+TIMEOUT_MESSAGE = "辨識太久了，請一次少傳幾張截圖再試"
 
 
 class OcrServiceError(Exception):
@@ -76,9 +77,11 @@ class OcrClient:
         self._token: str | None = None
         self._token_at = 0.0
 
-    def _client(self) -> httpx.Client:
+    def _client(self, timeout: httpx.Timeout | None = None) -> httpx.Client:
         return httpx.Client(
-            timeout=self.timeout, follow_redirects=False, transport=self._transport
+            timeout=timeout or self.timeout,
+            follow_redirects=False,
+            transport=self._transport,
         )
 
     def _id_token(self, client: httpx.Client) -> str:
@@ -98,9 +101,24 @@ class OcrClient:
         self._token_at = time.monotonic()
         return self._token
 
-    def recognize(self, image: bytes, content_type: str) -> dict[str, Any]:
-        """把一張圖送去 tt-ocr，回傳文字列（含框與放大重讀）。圖不會被存下來。"""
-        with self._client() as client:
+    def recognize(
+        self,
+        image: bytes,
+        content_type: str,
+        *,
+        timeout_seconds: float | None = None,
+    ) -> dict[str, Any]:
+        """把一張圖送去 tt-ocr，回傳文字列（含框與放大重讀）。圖不會被存下來。
+
+        ``timeout_seconds``：這一張最多等幾秒（呼叫端用來套整批的總時限）；
+        不給就用建構時的預設。
+        """
+        timeout: httpx.Timeout | None = None
+        if timeout_seconds is not None:
+            if timeout_seconds <= 0:
+                raise OcrServiceError("OCR_TIMEOUT", TIMEOUT_MESSAGE)
+            timeout = httpx.Timeout(timeout_seconds, connect=min(5.0, timeout_seconds))
+        with self._client(timeout) as client:
             headers = {"content-type": content_type}
             if self.auth == "id_token":
                 headers["authorization"] = f"Bearer {self._id_token(client)}"
@@ -110,14 +128,17 @@ class OcrClient:
                     f"{self.base_url}/v1/ocr", content=image, headers=headers
                 )
             except httpx.TimeoutException as exc:
-                raise OcrServiceError(
-                    "OCR_TIMEOUT", "辨識服務太久沒回應，請再試一次"
-                ) from exc
+                raise OcrServiceError("OCR_TIMEOUT", TIMEOUT_MESSAGE) from exc
             except httpx.HTTPError as exc:
                 raise OcrServiceError("OCR_UNAVAILABLE", "辨識服務暫時連不上") from exc
             elapsed_ms = int((time.perf_counter() - started) * 1000)
-        if res.status_code in (400, 413, 415):
-            raise OcrServiceError("OCR_BAD_IMAGE", "這張圖讀不了（格式不支援或太大）")
+        if res.status_code == 413:
+            # tt-ocr 從圖檔表頭就判定像素太多（解壓縮炸彈或超大長截圖）
+            raise OcrServiceError(
+                "OCR_IMAGE_TOO_LARGE", "圖片太大，請直接用手機截圖，不要放大或拼接"
+            )
+        if res.status_code in (400, 415):
+            raise OcrServiceError("OCR_BAD_IMAGE", "這張圖讀不了（格式不支援）")
         if res.status_code != 200:
             raise OcrServiceError("OCR_UNAVAILABLE", "辨識服務暫時無法使用")
         try:

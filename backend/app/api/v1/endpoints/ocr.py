@@ -53,7 +53,7 @@ def _read(upload: UploadFile) -> tuple[bytes, str | None]:
 
 
 _ERRORS: dict[int | str, dict[str, Any]] = {
-    code: {"model": OcrError} for code in (400, 403, 413, 415, 422, 429, 503)
+    code: {"model": OcrError} for code in (400, 403, 413, 415, 422, 429, 503, 504)
 }
 
 

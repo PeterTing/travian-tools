@@ -111,6 +111,26 @@ describe('HomePage screenshot upload (P0-07)', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalled()
   })
 
+  it.each([
+    ['OCR_IMAGE_TOO_LARGE', '圖片太大', '請直接用手機截圖，不要放大或拼接'],
+    ['OCR_TIMEOUT', '辨識太久', '建議一次少傳幾張截圖再試一次'],
+  ])('%s shows its own failure card, not the generic message', async (code, title, body) => {
+    recognizeRally.mockRejectedValue(new OcrRequestError(code, '後端通用訊息'))
+    renderHome()
+    fireEvent.change(screen.getByTestId('upload-screenshot-input'), {
+      target: { files: [shot()] },
+    })
+    const failed = await screen.findByTestId('ocr-failed')
+    expect(failed).toHaveAttribute('data-code', code)
+    expect(failed).toHaveTextContent(title)
+    expect(screen.getByTestId('ocr-failed-message')).toHaveTextContent(body)
+    expect(failed).not.toHaveTextContent('後端通用訊息')
+    expect(failed).not.toHaveTextContent('辨識失敗')
+    expect(within(failed).getByTestId('ocr-retry')).toHaveTextContent('重選截圖')
+    expect(within(failed).getByText('改用貼上')).toBeInTheDocument()
+    expect(failed).toHaveTextContent('沒有存入任何資料')
+  })
+
   it('rejects more than 4 screenshots without calling the service', async () => {
     renderHome()
     fireEvent.change(screen.getByTestId('upload-screenshot-input'), {

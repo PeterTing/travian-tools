@@ -10,6 +10,7 @@ import json
 from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -48,9 +49,17 @@ class FakeClient:
     def __init__(self, *payloads: dict[str, Any] | Exception) -> None:
         self.payloads = list(payloads)
         self.calls: list[tuple[int, str]] = []
+        self.timeouts: list[float | None] = []
 
-    def recognize(self, image: bytes, content_type: str) -> dict[str, Any]:
+    def recognize(
+        self,
+        image: bytes,
+        content_type: str,
+        *,
+        timeout_seconds: float | None = None,
+    ) -> dict[str, Any]:
         self.calls.append((len(image), content_type))
+        self.timeouts.append(timeout_seconds)
         item = self.payloads.pop(0) if len(self.payloads) > 1 else self.payloads[0]
         if isinstance(item, Exception):
             raise item
@@ -245,7 +254,8 @@ def test_rate_limited(
 @pytest.mark.parametrize(
     ("error", "status"),
     [
-        (OcrServiceError("OCR_TIMEOUT", "辨識服務太久沒回應"), 503),
+        (OcrServiceError("OCR_TIMEOUT", "辨識太久"), 504),
+        (OcrServiceError("OCR_IMAGE_TOO_LARGE", "圖片太大"), 413),
         (OcrServiceError("OCR_UNAVAILABLE", "連不上"), 503),
         (OcrServiceError("OCR_BAD_IMAGE", "讀不了"), 400),
     ],
@@ -257,6 +267,53 @@ def test_ocr_service_errors_are_explicit(
     resp = _post(client, _account(client))
     assert resp.status_code == status
     assert resp.json()["detail"]["code"] == error.code  # type: ignore[attr-defined]
+
+
+def test_batch_shares_one_total_deadline(
+    client: TestClient, fake, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # 4 張依序送：每張只拿「剩下的總時間」與單張上限取小，整批不超過 50 秒
+    clock = {"t": 1000.0}
+    fake_time = SimpleNamespace(
+        monotonic=lambda: clock["t"], perf_counter=lambda: clock["t"]
+    )
+    monkeypatch.setattr(ocr_service, "time", fake_time)  # 只換這個模組看到的時鐘
+    monkeypatch.setattr(settings, "OCR_TOTAL_DEADLINE_SECONDS", 50.0)
+    monkeypatch.setattr(settings, "OCR_TIMEOUT_SECONDS", 30.0)
+    page = fixture("synthetic-attack3-390")
+    c = fake(page)
+    real = c.recognize
+
+    def slow(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        out = real(*args, **kwargs)
+        clock["t"] += 20.0  # 每張花 20 秒
+        return out
+
+    c.recognize = slow  # type: ignore[method-assign]
+    resp = _post(client, _account(client), PNG, PNG, PNG, PNG)
+    assert resp.status_code == 504
+    assert resp.json()["detail"]["code"] == "OCR_TIMEOUT"
+    assert "少傳幾張" in resp.json()["detail"]["message"]
+    # 第 1 張 30（單張上限）、第 2 張 30、第 3 張只剩 10；第 4 張不送
+    assert c.timeouts == [30.0, 30.0, 10.0]
+
+
+def test_batch_deadline_passes_remaining_time_to_client(
+    client: TestClient, fake, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "OCR_TOTAL_DEADLINE_SECONDS", 50.0)
+    monkeypatch.setattr(settings, "OCR_TIMEOUT_SECONDS", 30.0)
+    c = fake(fixture("synthetic-attack3-390"), fixture("synthetic-attack3-390-part2"))
+    resp = _post(client, _account(client), PNG, PNG)
+    assert resp.status_code == 200
+    assert len(c.timeouts) == 2
+    assert all(t is not None and 0 < t <= 30.0 for t in c.timeouts)
+
+
+def test_default_total_deadline_fits_cloud_run_timeout() -> None:
+    # tt-api 的 Cloud Run request timeout 是 60 秒
+    assert settings.OCR_TOTAL_DEADLINE_SECONDS < 60
+    assert settings.OCR_TIMEOUT_SECONDS <= settings.OCR_TOTAL_DEADLINE_SECONDS
 
 
 def test_map_cross_check_uses_latest_snapshot(

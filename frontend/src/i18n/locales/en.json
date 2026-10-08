@@ -878,12 +878,16 @@
         "OCR_NOT_RALLY": "Not a rally point screenshot",
         "OCR_ALL_MISSING": "No coordinates or times readable",
         "OCR_UNAVAILABLE": "Screenshot recognition is unavailable",
-        "OCR_TIMEOUT": "Recognition timed out",
+        "OCR_TIMEOUT": "Recognition took too long",
         "OCR_RATE_LIMITED": "Too many recognitions",
         "OCR_BAD_IMAGE": "Cannot read this image",
         "OCR_IMAGE_TOO_LARGE": "Image too large",
         "OCR_TOO_MANY_IMAGES": "Too many screenshots",
         "OCR_NETWORK": "Cannot reach the server"
+      },
+      "bodies": {
+        "OCR_IMAGE_TOO_LARGE": "Take a plain phone screenshot. Don't zoom in or stitch images together.",
+        "OCR_TIMEOUT": "Try again with fewer screenshots at a time."
       },
       "nothingSaved": "Nothing was saved.",
       "retry": "Pick screenshots again",
@@ -928,7 +932,8 @@
     "camera": {
       "label": "Read coordinates from a screenshot",
       "busy": "Reading…",
-      "failed": "No coordinates found"
+      "failed": "No coordinates found",
+      "timeout": "Recognition took too long. Please try again."
     },
     "reasons": {
       "COORD_MAP_MISMATCH": "Does not match the map data (the map updates daily; new or renamed villages also show this)",

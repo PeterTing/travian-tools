@@ -6,25 +6,40 @@
   ``--no-allow-unauthenticated`` and only the backend's service account has
   ``roles/run.invoker``; Cloud Run rejects every other caller before the
   request reaches this process.
+* Decompression bombs: a tiny PNG can claim 30000x30000 pixels and make
+  ``cv2.imdecode`` allocate gigabytes before we ever see ``img.shape``. The
+  pixel count is therefore read from the image header with Pillow (no pixel
+  decode) and rejected with 413 first; OpenCV's own cap
+  (``OPENCV_IO_MAX_IMAGE_PIXELS``) is a second line of defence.
 """
 
 from __future__ import annotations
 
+import io
 import logging
 import os
 import time
+import warnings
 from contextlib import asynccontextmanager
 from typing import Any
 
-import cv2
-import numpy as np
-from fastapi import FastAPI, HTTPException, Query, Request
-from starlette.concurrency import run_in_threadpool
-
-from app.engine import ENGINE_NAME, Engine
-
 MAX_BYTES = int(os.environ.get("OCR_MAX_BYTES", str(8 * 1024 * 1024)))
 MAX_PIXELS = int(os.environ.get("OCR_MAX_PIXELS", str(20_000_000)))
+# OpenCV reads this cap from the environment; the Dockerfile sets it too.
+os.environ.setdefault("OPENCV_IO_MAX_IMAGE_PIXELS", str(MAX_PIXELS))
+
+import cv2  # noqa: E402
+import numpy as np  # noqa: E402
+from fastapi import FastAPI, HTTPException, Query, Request  # noqa: E402
+from PIL import Image, UnidentifiedImageError  # noqa: E402
+from starlette.concurrency import run_in_threadpool  # noqa: E402
+
+from app.engine import ENGINE_NAME, Engine  # noqa: E402
+
+# Only the formats we accept; Pillow never tries its other (larger) parsers.
+HEADER_FORMATS = ("PNG", "JPEG", "WEBP")
+IMAGE_TOO_LARGE = "image_too_large"
+NOT_DECODABLE = "not a decodable image"
 ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp"}
 
 log = logging.getLogger("tt-ocr")
@@ -56,6 +71,24 @@ app = FastAPI(
 )
 
 
+def header_pixels(body: bytes) -> int:
+    """Pixel count from the image header only (no pixel data is decoded).
+
+    Unreadable headers keep the old contract (400 "not a decodable image");
+    Pillow's own bomb guard (> ~179M pixels) also means "too large".
+    """
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", Image.DecompressionBombWarning)
+            with Image.open(io.BytesIO(body), formats=HEADER_FORMATS) as im:
+                w, h = im.size
+    except Image.DecompressionBombError:
+        raise HTTPException(status_code=413, detail=IMAGE_TOO_LARGE) from None
+    except (UnidentifiedImageError, OSError, ValueError, SyntaxError):
+        raise HTTPException(status_code=400, detail=NOT_DECODABLE) from None
+    return int(w) * int(h)
+
+
 @app.get("/healthz")
 def healthz() -> dict[str, str]:
     return {"status": "ok", "engine": ENGINE_NAME}
@@ -72,13 +105,20 @@ async def ocr(request: Request, recheck: bool = Query(True)) -> dict[str, Any]:
     if not body:
         raise HTTPException(status_code=400, detail="empty body")
     if len(body) > MAX_BYTES:
-        raise HTTPException(status_code=413, detail="image too large")
-    img = cv2.imdecode(np.frombuffer(body, dtype=np.uint8), cv2.IMREAD_COLOR)
+        raise HTTPException(status_code=413, detail=IMAGE_TOO_LARGE)
+    if header_pixels(body) > MAX_PIXELS:
+        raise HTTPException(status_code=413, detail=IMAGE_TOO_LARGE)
+    try:
+        img = cv2.imdecode(np.frombuffer(body, dtype=np.uint8), cv2.IMREAD_COLOR)
+    except cv2.error:
+        # OPENCV_IO_MAX_IMAGE_PIXELS tripped (header lied to Pillow, or a
+        # format quirk): still "too large", never a 5xx.
+        raise HTTPException(status_code=413, detail=IMAGE_TOO_LARGE) from None
     if img is None:
-        raise HTTPException(status_code=400, detail="not a decodable image")
+        raise HTTPException(status_code=400, detail=NOT_DECODABLE)
     h, w = img.shape[:2]
     if h * w > MAX_PIXELS:
-        raise HTTPException(status_code=413, detail="image has too many pixels")
+        raise HTTPException(status_code=413, detail=IMAGE_TOO_LARGE)
 
     started = time.perf_counter()
     result = await run_in_threadpool(get_engine().run, img, recheck)

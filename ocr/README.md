@@ -8,6 +8,9 @@ RapidOCR 3.9.2（PP-OCRv6 small，ONNX Runtime）包成一個很小的 FastAPI �
   → `{engine, width, height, elapsed_ms, timing_ms, lines: [{text, score, box: [x0,y0,x1,y1], recheck}]}`
   - `box` 是原圖像素；含數字且分數 < 0.95 的列會把原圖該處放大 2 倍重讀一次（`recheck`），
     後端用來判斷 `CROP_RECHECK_MISMATCH`
+- 太大回 413 `{"detail": "image_too_large"}`：位元組超過上限，或圖檔表頭宣稱的像素超過上限。像素是**解碼前**用 Pillow
+  只讀表頭判斷（防解壓縮炸彈：幾 KB 的 PNG 宣稱 30000×30000 會讓 `cv2.imdecode` 先吃掉好幾 GB）；
+  `OPENCV_IO_MAX_IMAGE_PIXELS`（Dockerfile 設 20M）是第二道防線，`cv2.error` 也回 413。讀不了的圖回 400
 - 不存圖、不寫硬碟、不連外（合規測試會檢查 `ocr/app` 沒有網路 import）；認證交給 Cloud Run IAM
   （部署時 `--no-allow-unauthenticated`，只有 tt-api 能呼叫）
 

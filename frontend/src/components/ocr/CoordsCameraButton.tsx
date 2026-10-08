@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { ocrApi, type OcrCoordCandidate } from '@/services/ocrApi'
+import { OcrRequestError, ocrApi, type OcrCoordCandidate } from '@/services/ocrApi'
 import { OcrBetaTag } from './OcrBetaTag'
 
 interface Props {
@@ -32,7 +32,15 @@ export function CoordsCameraButton({ onPick, size = 'sm', beta = false }: Props)
         setCandidates(res.candidates)
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('ocr.camera.failed'))
+      const code = e instanceof OcrRequestError ? e.code : ''
+      if (code === 'OCR_IMAGE_TOO_LARGE') {
+        // 圖片太大／辨識太久：顯示固定建議，不顯示通用錯誤
+        setError(`${t('ocr.failed.titles.OCR_IMAGE_TOO_LARGE')}：${t('ocr.failed.bodies.OCR_IMAGE_TOO_LARGE')}`)
+      } else if (code === 'OCR_TIMEOUT') {
+        setError(t('ocr.camera.timeout'))
+      } else {
+        setError(e instanceof Error ? e.message : t('ocr.camera.failed'))
+      }
     } finally {
       setBusy(false)
       if (input.current) input.current.value = ''

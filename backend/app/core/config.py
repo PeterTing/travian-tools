@@ -67,10 +67,14 @@ class Settings(BaseSettings):
     # OCR_AUTH=none：只給本機開發（docker-compose 的 tt-ocr 容器）。
     OCR_SERVICE_URL: str = ""
     OCR_AUTH: str = "id_token"
-    OCR_TIMEOUT_SECONDS: float = 30.0
+    OCR_TIMEOUT_SECONDS: float = 30.0  # 單張上限
+    # 一次上傳多張時整批的總時限：要小於 tt-api 的 Cloud Run request timeout（60 秒），
+    # 超過就回 504 OCR_TIMEOUT，而不是讓 Cloud Run 回 504 HTML。
+    OCR_TOTAL_DEADLINE_SECONDS: float = 50.0
     OCR_MAX_IMAGES: int = 4
     OCR_MAX_IMAGE_BYTES: int = 8 * 1024 * 1024
-    # 每位使用者每分鐘最多幾張（硬上限；tt-ocr 另有 max-instances 2、concurrency 1）
+    # 每位使用者每分鐘最多幾張（記憶體內計數，每個 tt-api instance 各自計算；
+    # tt-ocr 另有 max-instances 2、concurrency 1）
     OCR_RATE_LIMIT_PER_MINUTE: int = 12
 
     @property

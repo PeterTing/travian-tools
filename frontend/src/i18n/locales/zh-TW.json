@@ -976,12 +976,16 @@
         "OCR_NOT_RALLY": "認不出是集結點",
         "OCR_ALL_MISSING": "座標和時間都讀不到",
         "OCR_UNAVAILABLE": "截圖辨識暫時不能用",
-        "OCR_TIMEOUT": "辨識太久沒回應",
+        "OCR_TIMEOUT": "辨識太久",
         "OCR_RATE_LIMITED": "辨識太頻繁了",
         "OCR_BAD_IMAGE": "這張圖讀不了",
         "OCR_IMAGE_TOO_LARGE": "圖片太大",
         "OCR_TOO_MANY_IMAGES": "截圖太多張",
         "OCR_NETWORK": "連不上伺服器"
+      },
+      "bodies": {
+        "OCR_IMAGE_TOO_LARGE": "請直接用手機截圖，不要放大或拼接",
+        "OCR_TIMEOUT": "建議一次少傳幾張截圖再試一次"
       },
       "nothingSaved": "沒有存入任何資料。",
       "retry": "重選截圖",
@@ -1026,7 +1030,8 @@
     "camera": {
       "label": "從截圖讀座標",
       "busy": "讀取中…",
-      "failed": "讀不到座標"
+      "failed": "讀不到座標",
+      "timeout": "辨識太久，請再試一次"
     },
     "reasons": {
       "COORD_MAP_MISMATCH": "和地圖資料對不上（地圖每天更新一次，今天新建或改名的村莊也會這樣）",

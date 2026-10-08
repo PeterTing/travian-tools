@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import struct
+import zlib
+
 import cv2
 import numpy as np
 import pytest
@@ -48,6 +51,17 @@ def _png(w: int = 40, h: int = 20) -> bytes:
     ok, buf = cv2.imencode(".png", np.full((h, w, 3), 255, dtype=np.uint8))
     assert ok
     return buf.tobytes()
+
+
+def _header_only_png(w: int, h: int) -> bytes:
+    """Signature + IHDR + IEND, no pixel data: ~45 bytes that *claim* w x h."""
+
+    def chunk(kind: bytes, data: bytes) -> bytes:
+        crc = zlib.crc32(kind + data) & 0xFFFFFFFF
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", crc)
+
+    ihdr = struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0)  # 8-bit RGB
+    return b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr) + chunk(b"IEND", b"")
 
 
 def test_healthz(client: TestClient) -> None:
@@ -107,6 +121,65 @@ def test_rejects_too_many_pixels(
     monkeypatch.setattr(main, "MAX_PIXELS", 100)
     res = client.post("/v1/ocr", content=_png(), headers={"content-type": "image/png"})
     assert res.status_code == 413
+
+
+def test_header_bomb_is_rejected_before_decode(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # B1: a few bytes claiming 30000x30000 (900M px) must never reach
+    # cv2.imdecode, which would allocate ~2.7 GB before img.shape exists.
+    def must_not_decode(*_a: object, **_k: object) -> None:
+        raise AssertionError("cv2.imdecode called for an oversized header")
+
+    monkeypatch.setattr(main.cv2, "imdecode", must_not_decode)
+    body = _header_only_png(30000, 30000)
+    assert len(body) < 100
+    res = client.post("/v1/ocr", content=body, headers={"content-type": "image/png"})
+    assert res.status_code == 413
+    assert res.json()["detail"] == "image_too_large"
+    assert client.fake.calls == []  # type: ignore[attr-defined]
+
+
+def test_header_just_over_limit_is_rejected(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Below Pillow's own bomb guard: our MAX_PIXELS check is what stops it.
+    monkeypatch.setattr(main.cv2, "imdecode", lambda *_a, **_k: None)
+    body = _header_only_png(5000, 4001)  # 20,005,000 px > 20M
+    res = client.post("/v1/ocr", content=body, headers={"content-type": "image/png"})
+    assert res.status_code == 413
+    assert res.json()["detail"] == "image_too_large"
+
+
+def test_opencv_pixel_cap_error_is_413_not_500(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Second line of defence: OPENCV_IO_MAX_IMAGE_PIXELS makes imdecode raise
+    # cv2.error; that must surface as 413, never as a 5xx.
+    def capped(*_a: object, **_k: object) -> None:
+        raise cv2.error("pixels <= CV_IO_MAX_IMAGE_PIXELS")
+
+    monkeypatch.setattr(main.cv2, "imdecode", capped)
+    res = client.post("/v1/ocr", content=_png(), headers={"content-type": "image/png"})
+    assert res.status_code == 413
+    assert res.json()["detail"] == "image_too_large"
+
+
+def test_opencv_pixel_cap_is_configured() -> None:
+    import os
+
+    assert int(os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"]) <= 20_000_000
+
+
+def test_header_with_wrong_format_is_400(client: TestClient) -> None:
+    # Pillow only parses PNG/JPEG/WEBP headers; anything else keeps the old
+    # "not a decodable image" 400.
+    ok, bmp = cv2.imencode(".bmp", np.zeros((4, 4, 3), dtype=np.uint8))
+    assert ok
+    res = client.post(
+        "/v1/ocr", content=bmp.tobytes(), headers={"content-type": "image/png"}
+    )
+    assert res.status_code == 400
 
 
 def test_no_api_docs_exposed(client: TestClient) -> None:

@@ -85,7 +85,8 @@ def test_no_auth_mode_sends_no_token() -> None:
         ),
         (httpx.Response(500), "OCR_UNAVAILABLE"),
         (httpx.Response(403), "OCR_UNAVAILABLE"),
-        (httpx.Response(413), "OCR_BAD_IMAGE"),
+        (httpx.Response(413), "OCR_IMAGE_TOO_LARGE"),
+        (httpx.Response(400), "OCR_BAD_IMAGE"),
         (httpx.Response(415), "OCR_BAD_IMAGE"),
         (httpx.Response(200, text="not json"), "OCR_UNAVAILABLE"),
         (httpx.Response(200, json={"no": "lines"}), "OCR_UNAVAILABLE"),
@@ -125,3 +126,40 @@ def test_timeout_and_metadata_failure() -> None:
     with pytest.raises(OcrServiceError) as exc:
         client.recognize(b"img", "image/png")
     assert exc.value.code == "OCR_UNAVAILABLE"
+
+
+def test_per_call_timeout_overrides_default() -> None:
+    seen: list[dict[str, float | None]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request.extensions["timeout"])
+        return httpx.Response(200, json=OK)
+
+    client = OcrClient(
+        "http://localhost:1",
+        auth="none",
+        timeout_seconds=30.0,
+        transport=httpx.MockTransport(handler),
+    )
+    client.recognize(b"img", "image/png")
+    client.recognize(b"img", "image/png", timeout_seconds=7.5)
+    client.recognize(b"img", "image/png", timeout_seconds=2.0)
+    assert seen[0]["read"] == 30.0 and seen[0]["connect"] == 5.0
+    assert seen[1]["read"] == 7.5 and seen[1]["connect"] == 5.0
+    assert seen[2]["read"] == 2.0 and seen[2]["connect"] == 2.0
+
+
+def test_no_time_left_is_timeout_without_calling() -> None:
+    calls: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(str(request.url))
+        return httpx.Response(200, json=OK)
+
+    client = OcrClient(
+        "http://localhost:1", auth="none", transport=httpx.MockTransport(handler)
+    )
+    with pytest.raises(OcrServiceError) as exc:
+        client.recognize(b"img", "image/png", timeout_seconds=0)
+    assert exc.value.code == "OCR_TIMEOUT"
+    assert calls == []

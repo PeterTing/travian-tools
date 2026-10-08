@@ -9,6 +9,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     OCR_THREADS=1
 
+# Second line of defence against decompression bombs (the app rejects them
+# from the image header first): cv2.imdecode raises instead of allocating
+# gigabytes. Keep equal to OCR_MAX_PIXELS (20M).
+ENV OPENCV_IO_MAX_IMAGE_PIXELS=20000000
+
 WORKDIR /srv
 
 # libgomp: onnxruntime / OpenCV runtime dependency (headless build: no libGL).
