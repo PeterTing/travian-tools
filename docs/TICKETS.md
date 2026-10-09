@@ -14,7 +14,7 @@
 
 | 分期 | 票數 | 完成 | 估計 |
 |---|---|---|---|
-| P0 | 14 | 10（P0-01～04、P0-05、P0-06、P0-07、P0-08、P0-10、P0-11）＋P0-09 | 14 到 17 人天，截圖辨識另計；P0-13、P0-14 另計 |
+| P0 | 15 | 10（P0-01～04、P0-05、P0-06、P0-07、P0-08、P0-10、P0-11）＋P0-09 | 14 到 17 人天，截圖辨識另計；P0-13～P0-15 另計 |
 | P1 | 23 | 0 | 18.5 到 24.5 人天；P1-15～P1-23 另估 |
 | P2 | 5 | 0 | P1 完成後再估 |
 
@@ -159,7 +159,7 @@
   - 開村 CP 門檻只剩一份（`culture_points.json`，公式 round(1600/速度 × (村數−1)^2.3)，對官方 articles/51 全表 250 格一致）；`knowledge_base/strategies.py` 的 2,000／6,000／12,000／20,000 舊表刪掉改引用；只有 x1 二村 2,000 實測過，其他標「待驗證」
   - 標「待驗證」（灰色小標＋一句說明）：英雄宅與另外 22 棟還沒在 ts11 實測的建築（花費、時間，產生器每棟有 `verified` 旗標，實測後改 True 就拿掉）、小慶典糧、大慶典花費、石匠鋪等 4 棟的時間
   - 被動 CP 頁改名「CP 與開村」，內文用 CP、建築名稱顯示中文（跟資料庫頁同一份）；慶典時數欄補提示「慶典時長會隨城鎮廳等級變短，預設帶入城鎮廳 1 級的官方時長。」
-  - 程式註解不寫外部網站名稱，來源寫「遊戲內數值」
+  - 建築常數（`scripts/game_data/` 產生）的來源寫「遊戲內數值（T4），ts11 未實測」；建築時間公式寫「公式經 ts11 實測校正」。兵種資料的來源註解維持原本的真實出處（kirilloid、社群表、官方文章），查證見 P0-15
   - 幕僚長審核：凡不是 ts11 實測的建築（27 棟）花費和時間都標待驗證；建築資料庫與建築計算器頁首一行「除標 ✓ 的建築外，數值皆未在 ts11 實測」，每棟名稱旁一個標記（✓ 或待驗證），不逐格標
   - 每村每日 CP＝各建築 CP 加總，拿掉多算的空村 +2（ts11 加總＝遊戲顯示 12／天）；攻略配置 529／天，文件與計算器一致
   - 產量模擬：拿掉「含埃及供水」說法、金幣改乘 ×1.25、PDF 表 1 算錯的兩格標註
@@ -173,6 +173,29 @@
 - 來源：研究缺口 #3（T01）
 - 範圍：來襲紀錄補「對方上次上線時間」欄位 → 算出發兵時間窗 → 反推 TS 等級，結果寫回該筆來襲；附註欄（神器、錘子、feeder）
 - 依賴：P1-01 反推 TS 等級（公式已在 PathSpeedTs 計算器）
+
+### P0-15 兵種資料來源查證 ⬜（擋 IA v2.2 用到兵種資料的頁面）
+- 問題：兵種數值（7 族，含斯巴達）可能是整張表從 kirilloid 或社群表搬來的，違反「同類功能照公式自己重寫，外部網站只拿來比對」
+- 兩份資料都要查：
+  - 前端 `frontend/src/features/guideCalcs/data/tribes/*.ts`、`tribes-types.ts`、`build-order/tribe-cost.ts`（#18 從 travian-guide 搬入）
+  - 後端 `backend/data/static/troops.json`（2026-01 v1 建立）、`backend/app/knowledge_base/tribes.py`
+- 做法：
+  - 如果是整張表搬來的：逐兵種用遊戲內數值重建；ts11 看得到的先實測（高盧兵種：兵營／馬廄／研究院頁的花費、時間、攻防、速度、載重、糧耗），其他標「待驗證」
+  - 如果是自己寫的：附上證據（commit、對照紀錄）後關票
+- 目前用到兵種資料的頁面與端點：
+  - 前端資料（tribes／tribe-cost）：`/calculator/launch-sim`（開局模擬：拓荒者花費、部族資料）；`/calculator/farming`（農場收益：元件內寫死的 6 種兵速度與載重）；`/calculator/trade-route`（`travian.ts` 商人速度與載重，部族資料，一起查）
+  - 後端 `troops.json`：
+    - `GET /troops`、`/troops/compare`、`/troops/{tribe}`、`/troops/{tribe}/{troop_id}` → `/database/troops`（兵種資料庫）
+    - `POST /calculator/battle/simulate` → `/calculator/battle`（戰鬥模擬，已無入口、路由保留）
+    - `POST /calculator/crop/balance` → `/calculator/crop`（糧食平衡，兵種糧耗）
+    - `POST /advanced-calculator/technology` → `/calculator/technology`（鐵匠鋪，兵種攻防基礎值）
+    - `POST /advanced-calculator/path-speed-ts` → `/calculator/path-speed-ts`（反推 TS：速度對應兵種名稱）
+  - 速度由使用者自己填、沒有讀兵種表，但屬於 IA v2.2 要先藏起來的功能：`/calculator/path`（行軍時間）、`/calculator/interception`（攔截）、`/calculator/save-troops`（躲兵）、`/calculator/attack-planner`（TS 優化器；預設速度 6）
+- **PM 決定欄**：查證後若確定是搬來的，現有頁面要
+  - [ ] 下架（路由與入口一起拿掉，等重建）
+  - [ ] 保留，整頁標「待驗證」，逐兵種重建後拿掉
+- IA v2.2：這張票關掉之前，援軍可達、躲兵、行軍時間、假攻、練兵量、OP 規劃、反推 TS 的入口**直接藏起來**（不是變灰）
+- 初步查證（2026-10-09）：見 PR #24 說明
 
 ---
 
@@ -233,7 +256,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
-| 2026-10-09 | v2.0.30 | 新增 P0-13（[#24](https://github.com/PeterTing/travian-tools/pull/24)）：慶典 CP 改成日產量有上限、開村倒數、建築數值由 `scripts/game_data/` 公式產生並 ts11 校正（前後端同一份）、CP 門檻只剩一份、待驗證標示、產量模擬修正、拿掉佯攻兵量。依研究前 10 缺口新增 P0-14（來襲回報＋反推 TS）、P1-15～P1-21；新增 P1-22（建造隊列解析，給建造提醒）、P1-23（英雄頁解析，給英雄屬性） |
+| 2026-10-09 | v2.0.30 | 新增 P0-13（[#24](https://github.com/PeterTing/travian-tools/pull/24)）：慶典 CP 改成日產量有上限、開村倒數、建築數值由 `scripts/game_data/` 公式產生並 ts11 校正（前後端同一份）、CP 門檻只剩一份、待驗證標示、產量模擬修正、拿掉佯攻兵量。依研究前 10 缺口新增 P0-14（來襲回報＋反推 TS）、P1-15～P1-21；新增 P1-22（建造隊列解析，給建造提醒）、P1-23（英雄頁解析，給英雄屬性）。幕僚長審核：兵種資料的來源註解改回原本的真實出處，新增 P0-15「兵種資料來源查證」（擋 IA v2.2 用到兵種資料的頁面） |
 | 2026-10-09 | v2.0.29 | 工具網站自訂網域 `tr.tingcloud.tw` 送審：Cloud Run domain mapping（asia-east1 支援、免費、不開 LB）；tt-api `CORS_ORIGINS` 加新網域、保留 run.app；擴充 0.5.1 信任新網域；部署文件補指令與驗證步驟。線上變更（CORS 環境變數、domain mapping、Cloudflare CNAME）等審核與網域驗證後才做 |
 | 2026-10-09 | v2.0.28 | P0-07 已 merge（`899ebfe`）並部署（`tt-ocr-00001-sf9`、`tt-api-00004-8hv`、`tt-web-00005-4nh`），附上線實測；入口仍標「測試版」（P1-11）。冷啟動文案改「15 秒左右」、辨識中進度條改成逼近 90% 不跑滿；部署文件補匿名驗證改打 `/`（`/healthz` 被 Google 前端保留）。P1-14 補幕僚長 #21 核准時的備註：50 秒總時限要在拿 ID token 之後、每次送出前重算剩餘時間才是硬上限（httpx timeout 是分階段計算）；tt-api 逾時後 tt-ocr 仍會辨識完那張（只記錄）；估計 0.5 → 1 天 |
 | 2026-10-09 | v2.0.27 | P0-07 依幕僚長審核（#21 B1）：tt-ocr 解碼前先讀圖檔表頭尺寸，超過 2000 萬像素回 413（防解壓縮炸彈），OpenCV 另設像素上限；tt-api 把 413／逾時分開回（413 `OCR_IMAGE_TOO_LARGE`、504 `OCR_TIMEOUT`），一次多張整批總時限 50 秒；前端「圖片太大」「辨識太久」失敗卡；每分鐘限量註明每個 instance 各自計算。新增 P1-12（低信心確認改簽章 token）、P1-13（base image 鎖 digest）、P1-14（依 Content-Length 提前拒絕過大上傳） |

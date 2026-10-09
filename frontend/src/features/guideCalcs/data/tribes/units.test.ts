@@ -1,7 +1,7 @@
 /**
  * Snapshot tests pinning every unit's stats against the verified values
  * currently in the tribe data files. These were audited against
- * 遊戲內數值 (in-game values) + support.travian.com; this suite guards against
+ * kirilloid/travian + support.travian.com; this suite guards against
  * accidental regressions.
  *
  * Each `it` pins: attack, defInfantry, defCavalry, speed, carry, upkeep,

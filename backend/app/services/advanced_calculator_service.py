@@ -236,7 +236,7 @@ class AdvancedCalculatorService:
             def_inf_values = []
             def_cav_values = []
 
-            # Legends smithy (遊戲內數值; S187): base+(base+300·upkeep/7)·(1.007^L−1)
+            # Legends smithy (KIR; S187): base+(base+300·upkeep/7)·(1.007^L−1)
             upkeep = int(troop.get("crop_consumption", 1))
             for level in request.research_levels:
                 attack_values.append(
