@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { TRIBES, TRIBE_ORDER } from '@/features/guideCalcs/data/tribes'
 import { TRIBE_SETTLER_COST } from '@/features/guideCalcs/data/build-order/tribe-cost'
-import { tribeUnitSpeeds, unitSpeed, unitSpeedValue, UNIT_SPEED_TRIBES } from './unitSpeeds'
+import { isSpeedVerified, tribeUnitSpeeds, unitSpeed, unitSpeedValue, UNIT_SPEED_TRIBES } from './unitSpeeds'
 
 // ts11 遊戲內說明（2026-10-09 讀取），t1..t10。要改必須重新在 ts11 讀一次。
 const TS11_PINNED: Record<string, number[]> = {
@@ -23,14 +23,14 @@ describe('unit speeds (P0-15 phase 1)', () => {
       const rows = tribeUnitSpeeds(tribe)
       expect(rows.map(r => r.slot)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
       for (const r of rows) {
-        expect(['ts11', 'official', 'pending']).toContain(r.source)
+        expect(['ts11', 'official', 'official_pending', 'pending']).toContain(r.source)
         if (r.source === 'pending') {
           expect(r.speed).toBeNull()
         } else {
           expect(r.speed).toBeGreaterThan(0)
           expect(r.ref).toBeTruthy()
         }
-        if (r.source === 'official') expect(r.ref).toMatch(/^https:\/\/support\.travian\.com\//)
+        if (r.source === 'official' || r.source === 'official_pending') expect(r.ref).toMatch(/^https:\/\/support\.travian\.com\//)
       }
     }
   })
@@ -48,6 +48,11 @@ describe('unit speeds (P0-15 phase 1)', () => {
     expect(tribeUnitSpeeds('vikings').map(r => r.speed)).toEqual([7, 7, 5, 9, 12, 9, 4, 3, 5, 5])
     expect(tribeUnitSpeeds('spartans').map(r => r.speed)).toEqual([6, 9, 8, 6, 16, 9, null, null, null, null])
     expect(unitSpeedValue('spartans', 'ephor')).toBeNull()
+    expect(tribeUnitSpeeds('spartans').map(r => r.source)).toEqual([
+      ...Array(6).fill('official_pending'), ...Array(4).fill('pending'),
+    ])
+    expect(tribeUnitSpeeds('spartans').some(r => isSpeedVerified(r.source))).toBe(false)
+    expect(tribeUnitSpeeds('vikings').every(r => isSpeedVerified(r.source))).toBe(true)
   })
 
   it('tribe guide data reads the generated speed for every unit', () => {

@@ -47,7 +47,11 @@ Unit speed provenance ("source" field in UNIT_SPEEDS):
              GET /api/v1/manual/troop/N); raw text kept in
              scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json
   official = support.travian.com article (URL in UNIT_SPEED_SOURCES)
+  official_pending = number from an official page that itself says its numbers
+             come from a third-party calculator (S187) -> value kept, but shown
+             「待驗證」 and left out of reverse TS (PM decision 2026-10-09)
   pending  = no first-hand source yet -> speed is null and the UI shows 「待驗證」
+  When the in-game value and an official page disagree, the in-game value wins.
 
 Each PARAMS entry also has "verified": True only when ts11 has confirmed its
 cost base, multiplier and L1 time (src "ts11"). Every other building has
@@ -223,15 +227,17 @@ UNIT_SPEEDS: dict[str, list[tuple]] = {
         ("logades", "logades", "logades", 5, "ts11", 69),
         ("hun_settler", "settler", "settler", 5, "ts11", 70),
     ],
-    # ts11 has no Spartans. S187 lists infantry + cavalry only; siege, Ephor and
-    # settler have no official source yet -> null / 「待驗證」.
+    # ts11 has no Spartans. S187 lists infantry + cavalry only, and says its
+    # numbers come from a third-party calculator -> official_pending (value kept,
+    # 「待驗證」, not used by reverse TS). Siege, Ephor and settler have no
+    # official source yet -> null / 「待驗證」.
     "spartans": [
-        ("hoplite", "hoplite", "hoplite", 6, "official", "s187"),
-        ("sentinel", "sentinel", "sentinel", 9, "official", "s187"),
-        ("shieldsman", "shieldsman", "shieldsman", 8, "official", "s187"),
-        ("twinsteel_therion", "twinsteel", "twirler", 6, "official", "s187"),
-        ("elpida_rider", "elpida", "elpida_rider", 16, "official", "s187"),
-        ("corinthian_crusher", "corinthian", "corinthian_crusher", 9, "official", "s187"),
+        ("hoplite", "hoplite", "hoplite", 6, "official_pending", "s187"),
+        ("sentinel", "sentinel", "sentinel", 9, "official_pending", "s187"),
+        ("shieldsman", "shieldsman", "shieldsman", 8, "official_pending", "s187"),
+        ("twinsteel_therion", "twinsteel", "twirler", 6, "official_pending", "s187"),
+        ("elpida_rider", "elpida", "elpida_rider", 16, "official_pending", "s187"),
+        ("corinthian_crusher", "corinthian", "corinthian_crusher", 9, "official_pending", "s187"),
         ("spartan_ram", "ram", "ram", None, "pending", None),
         ("ballista", "ballista", "catapult", None, "pending", None),
         ("ephor", "ephor", "ephor", None, "pending", None),
@@ -425,7 +431,7 @@ def gen_unit_speeds() -> dict:
         for slot, (be_id, fe_id, kb_id, speed, src, ref) in enumerate(UNIT_SPEEDS[tribe], start=1):
             if src == "ts11":
                 ref_text = f"manual/troop/{ref}"
-            elif src == "official":
+            elif src in ("official", "official_pending"):
                 ref_text = UNIT_SPEED_SOURCES[ref]
             else:
                 ref_text = None
@@ -437,6 +443,7 @@ def gen_unit_speeds() -> dict:
         "unit": "fields/hour, x1, base speed (no Tournament Square / artefact / hero bonus)",
         "sources": {"ts11": UNIT_SPEED_SOURCES["ts11"],
                     "official": [UNIT_SPEED_SOURCES["s139"], UNIT_SPEED_SOURCES["s187"]],
+                    "official_pending": "官方說明頁，數字標示取自第三方計算器（待驗證，不列入反推 TS）",
                     "pending": "沒有第一手出處，速度留空（待驗證）"},
         "tribes": tribes,
     }

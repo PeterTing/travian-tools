@@ -390,12 +390,13 @@ class AdvancedCalculatorService:
         troops_data = _load_troops_data()
 
         # 建立速度 → 兵種名稱的對應（速度由 gen_game_data.py 產生，P0-15）。
-        # 速度是 None 的兵種（待驗證）不列入比對，另外回傳名單。
+        # 只用有第一手出處的速度（ts11 遊戲內說明／官方文章）；待驗證的兵種
+        # （目前是斯巴達 10 種）不列入比對，另外回傳名單。
         speed_to_units: dict[int, list[str]] = {}
         unverified_units: list[str] = []
         for troop in troops_data.values():
             spd = troop.get("speed")
-            if spd is None:
+            if spd is None or troop.get("speed_source") not in ("ts11", "official"):
                 unverified_units.append(f"{troop['name_en']} ({troop['tribe']})")
                 continue
             speed_to_units.setdefault(int(spd), []).append(troop["name_en"])

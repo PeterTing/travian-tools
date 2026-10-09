@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
+import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { PathSpeedTsRequest, PathSpeedTsResponse } from '@/services/advancedCalculatorApi'
 
@@ -216,9 +217,13 @@ export default function PathSpeedTsCalculatorPage() {
               )}
 
               {(result.unverified_units?.length ?? 0) > 0 && (
-                <p className="text-xs text-muted-foreground" data-testid="unverified-units-note">
-                  兵種速度來自 ts11 遊戲內說明與官方說明。以下兵種的速度還沒有第一手出處，沒有列入比對：
-                  {result.unverified_units?.join('、')}
+                <p
+                  className="flex items-center gap-2 text-xs text-muted-foreground"
+                  data-testid="unverified-units-note"
+                  title={result.unverified_units?.join('、')}
+                >
+                  <PendingVerifyChip />
+                  <span>斯巴達兵種速度待驗證，未列入反推</span>
                 </p>
               )}
             </div>

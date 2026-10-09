@@ -7,6 +7,7 @@
       "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
       "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
     ],
+    "official_pending": "官方說明頁，數字標示取自第三方計算器（待驗證，不列入反推 TS）",
     "pending": "沒有第一手出處，速度留空（待驗證）"
   },
   "tribes": {
@@ -477,7 +478,7 @@
         "fe_id": "hoplite",
         "kb_id": "hoplite",
         "speed": 6,
-        "source": "official",
+        "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
       },
       {
@@ -486,7 +487,7 @@
         "fe_id": "sentinel",
         "kb_id": "sentinel",
         "speed": 9,
-        "source": "official",
+        "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
       },
       {
@@ -495,7 +496,7 @@
         "fe_id": "shieldsman",
         "kb_id": "shieldsman",
         "speed": 8,
-        "source": "official",
+        "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
       },
       {
@@ -504,7 +505,7 @@
         "fe_id": "twinsteel",
         "kb_id": "twirler",
         "speed": 6,
-        "source": "official",
+        "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
       },
       {
@@ -513,7 +514,7 @@
         "fe_id": "elpida",
         "kb_id": "elpida_rider",
         "speed": 16,
-        "source": "official",
+        "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
       },
       {
@@ -522,7 +523,7 @@
         "fe_id": "corinthian",
         "kb_id": "corinthian_crusher",
         "speed": 9,
-        "source": "official",
+        "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
       },
       {

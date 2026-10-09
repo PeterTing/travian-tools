@@ -101,8 +101,8 @@ export type TroopCategory =
   | 'special'
   | 'settler'
 
-/** 兵種速度出處：ts11 遊戲內說明／官方文章／待驗證 */
-export type TroopSpeedSource = 'ts11' | 'official' | 'pending'
+/** 兵種速度出處：ts11 遊戲內說明／官方文章／官方頁但數字取自第三方計算器（待驗證）／待驗證 */
+export type TroopSpeedSource = 'ts11' | 'official' | 'official_pending' | 'pending'
 
 export interface TroopListItem {
   troop_id: string

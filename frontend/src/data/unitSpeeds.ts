@@ -7,11 +7,19 @@
  * 出處：
  * - ts11：在 ts11 遊戲內說明（兵種說明頁 manual/troop/N）讀到的數值
  * - official：support.travian.com 官方文章（ref 是網址）
+ * - official_pending：官方說明頁，但頁面寫數字取自第三方計算器（斯巴達步兵、騎兵）；
+ *   數字保留、畫面標「待驗證」、不列入反推 TS
  * - pending：還沒有第一手出處，速度是 null，畫面標「待驗證」
+ * 遊戲內說明跟官方頁不一致時，以遊戲內為準（匈奴傭兵 6）。
  */
 import gen from './unitSpeeds.gen.json'
 
-export type UnitSpeedSource = 'ts11' | 'official' | 'pending'
+export type UnitSpeedSource = 'ts11' | 'official' | 'official_pending' | 'pending'
+
+/** 有第一手出處（ts11 遊戲內說明或官方文章）；其餘畫面標「待驗證」 */
+export function isSpeedVerified(source: UnitSpeedSource): boolean {
+  return source === 'ts11' || source === 'official'
+}
 export type SpeedTribeId = 'romans' | 'teutons' | 'gauls' | 'egyptians' | 'huns' | 'spartans' | 'vikings'
 
 export interface UnitSpeedRow {

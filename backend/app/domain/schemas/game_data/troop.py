@@ -61,8 +61,11 @@ class Troop(BaseModel):
     speed: int | None = Field(
         ..., ge=1, description="速度（格/小時，x1）；None＝待驗證"
     )
-    speed_source: Literal["ts11", "official", "pending"] = Field(
-        ..., description="速度出處：ts11 遊戲內說明／官方文章／待驗證"
+    speed_source: Literal["ts11", "official", "official_pending", "pending"] = Field(
+        ...,
+        description=(
+            "速度出處：ts11 遊戲內說明／官方文章／官方頁但數字取自第三方計算器（待驗證）／待驗證"
+        ),
     )
     speed_ref: str | None = Field(
         None, description="速度出處細節（manual/troop/N 或官方網址）"

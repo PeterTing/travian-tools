@@ -5,7 +5,11 @@
      frontend/src/data/unitSpeeds.gen.json
 - ts11 = ts11 in-game help (manual/troop/N); raw text in
   scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json
-- official = support.travian.com; pending = no first-hand source (speed None)
+- official = support.travian.com
+- official_pending = official page whose numbers say they come from a third-party
+  calculator (S187, Spartan t1..t6): value kept, shown 「待驗證」, not used by reverse TS
+- pending = no first-hand source (speed None)
+- in-game beats official when they disagree (Hun Mercenary: ts11 6, S187 7)
 """
 
 from __future__ import annotations
@@ -91,13 +95,13 @@ def test_every_unit_of_every_tribe_has_a_speed_with_provenance():
         rows = data["tribes"][tribe]
         assert [r["slot"] for r in rows] == list(range(1, 11)), tribe
         for r in rows:
-            assert r["source"] in ("ts11", "official", "pending"), r
+            assert r["source"] in ("ts11", "official", "official_pending", "pending"), r
             if r["source"] == "pending":
                 assert r["speed"] is None and r["ref"] is None, r
             else:
                 assert isinstance(r["speed"], int) and r["speed"] >= 1, r
                 assert r["ref"], r
-            if r["source"] == "official":
+            if r["source"] in ("official", "official_pending"):
                 assert r["ref"].startswith(OFFICIAL_PREFIX), r
             if r["source"] == "ts11":
                 assert r["ref"].startswith("manual/troop/"), r
@@ -208,13 +212,57 @@ def test_reverse_ts_reads_new_speeds_and_skips_pending_units():
     for m in body["possible_matches"]:
         if m["unit_speed"] == 16:
             assert "Marksman" not in m["possible_units"]
-    # the four Spartan units without a first-hand source
-    assert sorted(body["unverified_units"]) == [
-        "Ballista (spartans)",
-        "Ephor (spartans)",
-        "Ram (spartans)",
-        "Settler (spartans)",
+    # all 10 Spartan units are left out (6 official_pending + 4 without a source)
+    spartans = [
+        "Hoplite",
+        "Sentinel",
+        "Shieldsman",
+        "Twinsteel Therion",
+        "Elpida Rider",
+        "Corinthian Crusher",
+        "Ram",
+        "Ballista",
+        "Ephor",
+        "Settler",
     ]
+    names = {n for t, n in _names_by_tribe("spartans")}
+    assert names == set(spartans)
+    assert sorted(body["unverified_units"]) == sorted(
+        f"{n} (spartans)" for n in spartans
+    )
+    for m in body["possible_matches"]:
+        for n in spartans:
+            assert f"{n} (spartans)" not in m["possible_units"]
+
+
+def test_reverse_ts_never_matches_a_spartan_unit():
+    # Hoplite / Twinsteel speed 6 over 6 fields = 1 h; only non-Spartan speed-6 units match
+    res = client.post(
+        "/api/v1/advanced-calculator/path-speed-ts",
+        json={
+            "attacker_x": 0,
+            "attacker_y": 0,
+            "target_x": 6,
+            "target_y": 0,
+            "travel_time_seconds": 3600,
+            "server_speed": 1,
+        },
+    )
+    body = res.json()
+    m6 = [
+        m
+        for m in body["possible_matches"]
+        if m["unit_speed"] == 6 and m["tournament_square_level"] == 0
+    ]
+    assert m6
+    assert "Hoplite" not in m6[0]["possible_units"]
+    assert "Twinsteel Therion" not in m6[0]["possible_units"]
+    assert "Mercenary" in m6[0]["possible_units"]  # in-game 6 beats S187's 7
+
+
+def _names_by_tribe(tribe: str) -> list[tuple[str, str]]:
+    troops = _load(BE_TROOPS)["troops"]
+    return [(t["tribe"], t["name_en"]) for t in troops.values() if t["tribe"] == tribe]
 
 
 def test_troop_endpoints_return_speed_source():
@@ -223,7 +271,7 @@ def test_troop_endpoints_return_speed_source():
     items = {t["troop_id"]: t for t in res.json()["troops"]}
     assert (
         items["hoplite"]["speed"] == 6
-        and items["hoplite"]["speed_source"] == "official"
+        and items["hoplite"]["speed_source"] == "official_pending"
     )
     assert (
         items["ephor"]["speed"] is None and items["ephor"]["speed_source"] == "pending"
@@ -233,3 +281,9 @@ def test_troop_endpoints_return_speed_source():
     assert detail["speed_ref"] == "manual/troop/21"
     cmp_ = client.get("/api/v1/troops/compare?troop_ids=ephor,ballista").json()
     assert cmp_["comparison_summary"]["best_speed"] == "待驗證"
+
+
+def test_spartan_speeds_are_all_pending():
+    rows = _rows("spartans")
+    assert [r["source"] for r in rows] == ["official_pending"] * 6 + ["pending"] * 4
+    assert all("187" in r["ref"] for r in rows[:6])
