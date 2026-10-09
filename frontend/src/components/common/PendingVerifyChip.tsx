@@ -26,6 +26,11 @@ function useOpenState(id: string) {
  * - 整個灰標是按鈕，點一下在這一行正下方展開兩行說明，再點一下收起；電腦和手機一樣只靠點，不靠 hover
  * - 點擊範圍用透明延伸補到 44×44，外觀不變
  * - 一頁同時只開一個；沒有關閉鈕、點外面不會關
+ *
+ * 說明塊對齊規則（設計師）：以灰標所在容器的內容左緣為準——
+ * - 一般文字行（灰標在句子裡或行首）：左邊跟灰標對齊；灰標太靠右放不下時往左移，整塊不超出這一行
+ * - 窄格子、表格（兵種詳情四格、開村門檻表、慶典表）：撐滿整張卡／整列的寬度
+ *   （PendingRow 加 fill；表格列 tableColSpan 自動 fill）
  */
 export default function PendingVerifyChip({ kind, className = '' }: PendingVerifyChipProps) {
   const { t } = useTranslation()
@@ -73,12 +78,13 @@ export default function PendingVerifyChip({ kind, className = '' }: PendingVerif
 }
 
 /** 展開的灰色說明：第一行哪個數字還沒核對，第二行現在的數字從哪裡來 */
-export function PendingNotePanel({ id, kind }: { id: string; kind: PendingKind }) {
+export function PendingNotePanel({ id, kind, fill = false }: { id: string; kind: PendingKind; fill?: boolean }) {
   const { t } = useTranslation()
   const keys = pendingNoteKeys(kind)
   const ref = useRef<HTMLSpanElement>(null)
-  // 左邊對齊灰標；灰標太靠右放不下時往左移，整塊不超出這一行
+  // 文字行：左邊對齊灰標；灰標太靠右放不下時往左移，整塊不超出這一行。fill：撐滿、從容器內容左緣開始
   useLayoutEffect(() => {
+    if (fill) return
     const el = ref.current
     const chip = document.getElementById(`${id}-chip`)
     const parent = el?.parentElement
@@ -95,14 +101,15 @@ export function PendingNotePanel({ id, kind }: { id: string; kind: PendingKind }
     place()
     window.addEventListener('resize', place)
     return () => window.removeEventListener('resize', place)
-  }, [id])
+  }, [id, fill])
   return (
     <span
       ref={ref}
       id={id}
       role="note"
       data-testid="pending-note-panel"
-      className="mt-1 block w-fit max-w-full rounded-md bg-gray-100 px-2 py-1.5 text-left text-xs font-normal leading-5 text-gray-700"
+      data-fill={fill ? 'true' : undefined}
+      className={`mt-1 block ${fill ? 'w-full' : 'w-fit max-w-full'} rounded-md bg-gray-100 px-2 py-1.5 text-left text-xs font-normal leading-5 text-gray-700`}
     >
       <span className="block" data-testid="pending-note-what">{t(keys.what)}</span>
       <span className="block" data-testid="pending-note-source">{t(keys.source)}</span>
@@ -117,10 +124,13 @@ export function PendingNotePanel({ id, kind }: { id: string; kind: PendingKind }
 export function PendingRow({
   as: Tag = 'div',
   tableColSpan,
+  fill,
   children,
   ...rest
 }: {
   as?: ElementType
+  /** 窄格子（例如兵種詳情四格）：說明撐滿整張卡的寬度，不跟灰標對齊 */
+  fill?: boolean
   /** 這一行是表格列（as="tr"）時：說明放在下一列、橫跨整張表的欄數 */
   tableColSpan?: number
   children: ReactNode
@@ -136,11 +146,11 @@ export function PendingRow({
       {open && chip && (tableColSpan ? (
         <tr data-testid="pending-note-row">
           <td colSpan={tableColSpan}>
-            <PendingNotePanel id={chip.id} kind={chip.kind as PendingKind} />
+            <PendingNotePanel fill id={chip.id} kind={chip.kind as PendingKind} />
           </td>
         </tr>
       ) : (
-        <PendingNotePanel id={chip.id} kind={chip.kind as PendingKind} />
+        <PendingNotePanel fill={fill} id={chip.id} kind={chip.kind as PendingKind} />
       ))}
     </>
   )

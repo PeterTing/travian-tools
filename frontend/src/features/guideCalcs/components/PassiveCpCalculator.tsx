@@ -194,7 +194,6 @@ export default function PassiveCpCalculator() {
   const great = celebration('great')
   const capSmall = celebrationCap('small', speed)
   const capGreat = celebrationCap('great', speed)
-  const anyUnverified = cd.rows.some(r => !r.verified)
 
   return (
     <>
@@ -322,14 +321,6 @@ export default function PassiveCpCalculator() {
               ))}
             </tbody>
           </table>
-          {anyUnverified && (
-            <PendingRow as="p" className="mb-3 mt-1" data-testid="cp-countdown-note">
-              <PendingVerifyChip kind="cpThreshold" />{' '}
-              <span className="text-xs text-gray-500">{en
-                ? 'Not yet confirmed in-game (only village 2 on x1, 2,000, is)'
-                : '這個數值還沒在遊戲裡實測確認（只有 x1 第 2 村 2,000 確認過）'}</span>
-            </PendingRow>
-          )}
 
           <h4>{en ? 'Celebration cost (x1)' : '慶典花費（x1）'}</h4>
           <table className={s.table} data-testid="cp-celebration-cost">
@@ -349,12 +340,6 @@ export default function PassiveCpCalculator() {
               </PendingRow>
             </tbody>
           </table>
-          <PendingRow as="p" className="mb-3 mt-1" data-testid="cp-celebration-note">
-            <PendingVerifyChip kind="celebration" />{' '}
-            <span className="text-xs text-gray-500">{en
-              ? 'Not yet confirmed in-game (small-celebration crop may be 500)'
-              : '這個數值還沒在遊戲裡實測確認（小慶典的糧也可能是 500）'}</span>
-          </PendingRow>
 
           <h4>{en ? 'Top contributors' : '最大貢獻建築'}</h4>
           <table className={s.table}>

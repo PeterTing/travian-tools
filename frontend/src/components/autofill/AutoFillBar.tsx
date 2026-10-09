@@ -85,9 +85,9 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
       </p>
 
       {showUnitLine && (
-        // 兩行都對齊灰標右邊的文字起點（懸掛縮排），不折到灰標底下
+        // 兩行都對齊灰標右邊的文字起點（懸掛縮排），不折到灰標底下；一個灰標管這兩行（autofillUnits）
         <PendingRow className="flex items-baseline gap-1 text-xs text-muted-foreground" data-testid="autofill-unit-pending">
-          <PendingVerifyChip className="shrink-0" kind="units" />
+          <PendingVerifyChip className="shrink-0" kind="autofillUnits" />
           <div className="min-w-0" data-testid="autofill-unit-pending-text">
             <p data-testid="autofill-unit-pending-line1">{t('autofill.unitPending')}</p>
             <p data-testid="autofill-unit-pending-line2">{t('autofill.unitPendingSpartan')}</p>

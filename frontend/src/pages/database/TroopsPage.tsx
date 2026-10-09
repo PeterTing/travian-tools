@@ -30,12 +30,10 @@ const CATEGORIES: { value: TroopCategory | 'all'; label: string }[] = [
 /** 官方頁數字取自第三方計算器的出處說明（P0-15，斯巴達步兵、騎兵） */
 const OFFICIAL_PENDING_SOURCE_TEXT = '官方說明頁，數字標示取自第三方計算器'
 
-/** 速度出處說明（P0-15）：ts11 遊戲內說明／官方文章／官方頁待驗證／待驗證 */
+/** 速度出處說明（P0-15）：只給已核對的速度用（ts11 遊戲內說明／官方說明）；待驗證的看灰標 */
 function speedSourceLabel(t: Pick<TroopDetail, 'speed_source' | 'speed_ref'>): string {
   if (t.speed_source === 'ts11') return 'ts11 遊戲內說明'
-  if (t.speed_source === 'official') return '官方說明'
-  if (t.speed_source === 'official_pending') return '官方說明頁（待驗證）'
-  return '待驗證'
+  return '官方說明'
 }
 
 /** 速度沒有第一手出處（null 或官方頁標示取自第三方計算器）就標「待驗證」 */
@@ -181,7 +179,7 @@ export default function TroopsPage() {
               {/* 戰鬥屬性 */}
               <div className="mb-6">
               {/* 速度的待驗證說明畫在四格下面（格子太窄，放格子裡會擠成好幾行） */}
-              <PendingRow className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <PendingRow fill className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 bg-red-50 dark:bg-red-950 rounded">
                   <p className="text-sm text-muted-foreground">攻擊力</p>
                   <p className="text-2xl font-bold text-red-600">
@@ -218,9 +216,12 @@ export default function TroopsPage() {
                       )}
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground" data-testid="troop-speed-source">
-                    {speedSourceLabel(selectedTroop)}
-                  </p>
+                  {/* 待驗證的速度：出處寫在灰標說明和卡片下面那行，卡片裡不再重複「官方說明頁（待驗證）」 */}
+                  {!isSpeedPending(selectedTroop) && (
+                    <p className="text-xs text-muted-foreground" data-testid="troop-speed-source">
+                      {speedSourceLabel(selectedTroop)}
+                    </p>
+                  )}
                 </div>
               </PendingRow>
               {selectedTroop.speed_source === 'official_pending' && (

@@ -51,6 +51,9 @@ describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
     expect(speed).toHaveTextContent('6')
     expect(within(speed).getAllByTestId('pending-verify-chip')).toHaveLength(1)
     expect(screen.getByTestId('troop-speed-official-pending-source')).toHaveTextContent(SOURCE_TEXT)
+    // 卡片裡不再重複「官方說明頁（待驗證）」；出處只寫在卡片下面那行和灰標說明
+    expect(screen.queryByTestId('troop-speed-source')).toBeNull()
+    expect(screen.queryByText('官方說明頁（待驗證）')).toBeNull()
   })
 
   it('detail, speed null: shows — with chip and no official source line', async () => {
@@ -59,7 +62,8 @@ describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
     const speed = await screen.findByTestId('troop-speed')
     expect(speed).toHaveTextContent('—')
     expect(within(speed).getAllByTestId('pending-verify-chip')).toHaveLength(1)
-    expect(screen.getByTestId('troop-speed-source')).toHaveTextContent('待驗證')
+    // 卡片裡不再另寫一行「待驗證」（只重複灰標）
+    expect(screen.queryByTestId('troop-speed-source')).toBeNull()
     expect(screen.queryByTestId('troop-speed-official-pending-source')).toBeNull()
   })
 
@@ -68,6 +72,7 @@ describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
     fireEvent.click(await screen.findByText('古羅馬步兵'))
     const speed = await screen.findByTestId('troop-speed')
     expect(within(speed).queryByTestId('pending-verify-chip')).toBeNull()
+    expect(screen.getByTestId('troop-speed-source')).toHaveTextContent('ts11 遊戲內說明')
     expect(screen.queryByText(SOURCE_TEXT)).toBeNull()
   })
 })

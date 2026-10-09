@@ -60,7 +60,7 @@ describe('「待驗證」灰標（P0-17）', () => {
     expect(b).toHaveAttribute('aria-expanded', 'true')
     const panels = screen.getAllByTestId('pending-note-panel')
     expect(panels).toHaveLength(1)
-    expect(panels[0]).toHaveTextContent('這棟建築的花費和建造時間還沒在 ts11 實際確認。')
+    expect(panels[0]).toHaveTextContent('建築數值還沒在 ts11 遊戲內核對。')
   })
 
   it('in a row, the panel goes below the whole row (after it), not between the chip and the text', () => {
@@ -75,6 +75,39 @@ describe('「待驗證」灰標（P0-17）', () => {
     const panel = screen.getByTestId('pending-note-panel')
     expect(row.contains(panel)).toBe(false)
     expect(row.nextElementSibling).toBe(panel)
+  })
+
+  it('alignment rule: text rows fit to the chip; narrow cells / tables fill the whole card or row', () => {
+    const { unmount } = page(
+      <PendingRow data-testid="row">
+        文字 <PendingVerifyChip kind="units" />
+      </PendingRow>,
+    )
+    fireEvent.click(screen.getByTestId('pending-verify-chip'))
+    expect(screen.getByTestId('pending-note-panel')).toHaveClass('w-fit', 'max-w-full')
+    unmount()
+
+    const r2 = page(
+      <PendingRow fill data-testid="grid">
+        <div><PendingVerifyChip kind="unitSpeedOfficialPending" /></div>
+      </PendingRow>,
+    )
+    fireEvent.click(screen.getByTestId('pending-verify-chip'))
+    let panel = screen.getByTestId('pending-note-panel')
+    expect(panel).toHaveClass('w-full')
+    expect(panel).toHaveAttribute('data-fill', 'true')
+    expect(panel.style.marginLeft).toBe('')
+    r2.unmount()
+
+    page(
+      <table><tbody>
+        <PendingRow as="tr" tableColSpan={2}><td>#3</td><td>1,000 <PendingVerifyChip kind="cpThreshold" /></td></PendingRow>
+      </tbody></table>,
+    )
+    fireEvent.click(screen.getByTestId('pending-verify-chip'))
+    panel = screen.getByTestId('pending-note-panel')
+    expect(panel).toHaveClass('w-full')
+    expect(panel.closest('td')).toHaveAttribute('colspan', '2')
   })
 
   it('does not expand on hover or focus, and has no close button / tap outside to close', () => {

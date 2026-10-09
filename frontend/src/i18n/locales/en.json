@@ -1116,37 +1116,41 @@
       "what": "Unit costs, upkeep and training times haven't been checked in-game on ts11 yet.",
       "source": "The current numbers are community-compiled and may be off."
     },
+    "autofillUnits": {
+      "what": "Unit costs, upkeep and training times haven't been checked in-game on ts11 yet; the current numbers are community-compiled.",
+      "source": "Spartan speeds only come from the official help page; reverse TS leaves Spartan units out."
+    },
     "spartanSpeed": {
-      "what": "Spartan unit speeds haven't been checked in-game on ts11 yet; reverse TS leaves Spartan units out.",
-      "source": "Six units use the official help page's numbers (the page says they come from a third-party calculator); ram, ballista, ephor and settler have no source yet."
+      "what": "Spartan speeds haven't been checked in-game on ts11 yet; reverse TS leaves Spartan units out.",
+      "source": "Spartan speeds only come from the official help page, which says they come from a third-party calculator; ram, ballista, ephor and settler have no reliable source yet."
     },
     "unitSpeedOfficialPending": {
-      "what": "This unit's speed hasn't been checked in-game on ts11 yet.",
-      "source": "The number is from the official help page, which says its numbers come from a third-party calculator."
+      "what": "Spartan speeds only come from the official help page, which says they come from a third-party calculator.",
+      "source": "Reverse TS leaves Spartan units out."
     },
     "unitSpeedNoSource": {
-      "what": "This unit's speed hasn't been checked in-game on ts11 yet.",
-      "source": "There is no official or in-game source yet, so no number is shown."
+      "what": "This unit's speed has no reliable source yet, so it is left blank.",
+      "source": "Reverse TS leaves Spartan units out."
     },
     "building": {
-      "what": "This building's costs and build times haven't been confirmed on ts11 yet.",
-      "source": "Levels are calculated from Travian T4 base values and formulas; confirmed buildings get a ✓."
+      "what": "Building numbers haven't been checked in-game on ts11 yet.",
+      "source": "We're still tracking down where the current numbers come from; they may be off."
     },
     "cpThreshold": {
-      "what": "This village CP threshold hasn't been confirmed on ts11 yet (only village 2 on x1, 2,000, is).",
-      "source": "It is calculated with the T4 village CP formula."
+      "what": "Village CP thresholds haven't been checked in-game on ts11 yet.",
+      "source": "Calculated with a formula for now; they may be off."
     },
     "celebration": {
       "what": "The small celebration's crop and the great celebration's cost haven't been confirmed on a ts11 Town Hall yet.",
-      "source": "Small-celebration crop 1,340 follows the opening build-order sheet (it may be 500); the great celebration's cost is the T4 value."
+      "source": "The small celebration's crop comes from the opening build-order sheet; the source of the great celebration's cost is still being checked."
     },
     "heroMansionCost": {
-      "what": "The Hero's Mansion cost hasn't been confirmed on ts11 yet.",
-      "source": "It uses the T4 values: 80 / 120 / 70 / 90, ×1.33 per level."
+      "what": "The Hero's Mansion cost hasn't been checked in-game on ts11 yet.",
+      "source": "We're still tracking down where the current numbers come from; they may be off."
     },
     "cropSim": {
-      "what": "Plus as ×1.25 (multiplied) and the Egyptian Waterworks +5% oasis bonus per level are not yet confirmed in-game.",
-      "source": "The formula matches the small guide's Table 1 cell by cell; neither item has an official statement."
+      "what": "Plus as ×1.25 (multiplied) and the Egyptian Waterworks +5% oasis bonus per level haven't been checked in-game on ts11 yet.",
+      "source": "Calculated with a community guide's formula; there is no official statement."
     }
   }
 }

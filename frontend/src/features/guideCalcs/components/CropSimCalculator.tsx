@@ -131,10 +131,7 @@ export default function CropSimCalculator() {
             />
           </div>
           <PendingRow as="p" className="text-xs text-gray-500">
-            <PendingVerifyChip kind="cropSim" />{' '}
-            {lang === 'en'
-              ? 'Plus ×1.25 multiplied (not added) and Waterworks +5% oasis bonus per level are not yet confirmed in-game.'
-              : 'Plus 用乘的（不是加的）、供水系統每級綠洲加成 +5%，都還沒在遊戲裡實測確認。'}
+            <PendingVerifyChip kind="cropSim" />
           </PendingRow>
         </div>
 
