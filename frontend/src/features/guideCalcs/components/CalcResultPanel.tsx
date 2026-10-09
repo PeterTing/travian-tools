@@ -1,9 +1,16 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import s from './calc.module.css'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import type { PendingKind } from '@/lib/pendingNotes'
 
 export interface CalcResultPanelProps {
   /** Optional small heading above the summary (e.g. 結果) */
   title?: string
+  /**
+   * 摘要的大數字是用「待驗證」資料算出來的：灰標放在標題（大數字的標籤）旁邊，不放在大數字旁。
+   * 手機收合時也看得到（P0-17 PM 規則：畫面上用待驗證資料算出的數字，旁邊都要有灰標）。
+   */
+  titlePending?: PendingKind | false
   /** Main result — large type on phone */
   primary: ReactNode
   /** One line of secondary info under the primary */
@@ -30,6 +37,7 @@ export const RESULT_PANEL_SPACE_CLASS = s.panelSpace
  */
 export default function CalcResultPanel({
   title,
+  titlePending = false,
   primary,
   secondary,
   children,
@@ -86,7 +94,15 @@ export default function CalcResultPanel({
 
   return (
     <div ref={rootRef} className={s.output} data-testid="calc-result-panel">
-      {title ? <h4 className={s.summaryTitle}>{title}</h4> : null}
+      {title && titlePending ? (
+        // 標題這一行至少 44px、垂直置中：灰標點擊範圍不碰到下面的大數字或「展開明細」
+        <PendingRow as="h4" className={`${s.summaryTitle} flex min-h-11 items-center gap-1`} data-testid="calc-result-title">
+          <span>{title}</span>
+          <PendingVerifyChip kind={titlePending} />
+        </PendingRow>
+      ) : title ? (
+        <h4 className={s.summaryTitle} data-testid="calc-result-title">{title}</h4>
+      ) : null}
 
       <div className={s.summary} data-testid="calc-result-summary">
         <div className={s.primary} data-testid="calc-result-primary">
@@ -128,5 +144,18 @@ export default function CalcResultPanel({
         </>
       ) : null}
     </div>
+  )
+}
+
+/**
+ * 摘要第二行裡、用「待驗證」資料算出的那一段（例如「英雄宅成本 17,805」）：字後面緊跟灰標。
+ * 這一段至少 44px 高、垂直置中，灰標的點擊範圍不會碰到下面的「展開明細」。
+ */
+export function SummaryPending({ kind, children, testId }: { kind: PendingKind; children: ReactNode; testId?: string }) {
+  return (
+    <PendingRow as="span" className="inline-flex min-h-11 flex-wrap items-center gap-x-1" data-testid={testId}>
+      <span>{children}</span>
+      <PendingVerifyChip kind={kind} />
+    </PendingRow>
   )
 }

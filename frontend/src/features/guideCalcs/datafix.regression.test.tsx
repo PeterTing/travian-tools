@@ -141,7 +141,7 @@ describe('PassiveCpCalculator UI', () => {
       expect(table.className, id).toMatch(/tapRows/)
     }
     const calcCss = readFileSync('src/features/guideCalcs/components/calc.module.css', 'utf8')
-    expect(calcCss).toMatch(/\.tapRows td \{\s*vertical-align: middle;/)
+    expect(calcCss).toMatch(/\.tapRows td,\s*\.tapRows th \{\s*vertical-align: middle;/)
   })
   it('shows small-celebration crop cost with 待驗證', () => {
     render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)

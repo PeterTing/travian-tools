@@ -6,7 +6,7 @@ import {
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
-import CalcResultPanel from './CalcResultPanel';
+import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const fmt = (n: number) => isFinite(n)
@@ -111,10 +111,15 @@ export default function OasisRoiCalculator() {
           lang={lang}
           title={lang === 'en' ? 'Result' : '結果'}
           primary={<>{roi.toFixed(2)} {lang === 'en' ? 'days' : '天'}</>}
+          titlePending="heroMansionCost"
           secondary={
-            lang === 'en'
-              ? `+${fmt(dailyGain)}/day · mansion cost ${fmt(hmCumulativeCost(hm))}`
-              : `每天 +${fmt(dailyGain)} · 英雄宅成本 ${fmt(hmCumulativeCost(hm))}`
+            // 英雄宅成本出現的每個地方都要跟著「待驗證」：手機收合時只看得到這一行
+            <>
+              {lang === 'en' ? `+${fmt(dailyGain)}/day · ` : `每天 +${fmt(dailyGain)} · `}
+              <SummaryPending kind="heroMansionCost" testId="oasis-summary-hm">
+                {lang === 'en' ? `mansion cost ${fmt(hmCumulativeCost(hm))}` : `英雄宅成本 ${fmt(hmCumulativeCost(hm))}`}
+              </SummaryPending>
+            </>
           }
         >
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'HM cumulative cost' : '英雄宅累積成本'} <PendingVerifyChip kind="heroMansionCost" /></span><span className={s.value}>{fmt(hmCumulativeCost(hm))}</span></PendingRow>
@@ -122,14 +127,22 @@ export default function OasisRoiCalculator() {
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /day' : '每天'}</span><span className={s.value}>+{fmt(dailyGain)}</span></div>
 
           <h4>{lang === 'en' ? 'Compare 3 mansion levels' : '比較三種英雄宅等級'}</h4>
-          <table className={s.table}>
-            <thead><tr><th>{lang === 'en' ? 'Mansion' : '英雄宅'}</th><th>{lang === 'en' ? 'Cost' : '成本'}</th><th>ROI</th><th>{lang === 'en' ? 'Verdict' : '判斷'}</th></tr></thead>
+          {/* 「成本」欄是英雄宅花費：表頭放一個灰標；每列 44px、垂直置中，點擊範圍不重疊 */}
+          <table className={`${s.table} ${s.tapRows}`} data-testid="oasis-hm-compare">
+            <thead>
+              <PendingRow as="tr" className="h-11" tableColSpan={4}>
+                <th>{lang === 'en' ? 'Mansion' : '英雄宅'}</th>
+                <th>{lang === 'en' ? 'Cost' : '成本'} <PendingVerifyChip kind="heroMansionCost" /></th>
+                <th>ROI</th>
+                <th>{lang === 'en' ? 'Verdict' : '判斷'}</th>
+              </PendingRow>
+            </thead>
             <tbody>
               {[10, 15, 20].map(L => {
                 const c = hmCumulativeCost(L);
                 const r = c / dailyGain;
                 return (
-                  <tr key={L} className={L === hm ? s.tableRowHi : ''}>
+                  <tr key={L} className={`h-11 ${L === hm ? s.tableRowHi : ''}`}>
                     <td>Lv {L}</td>
                     <td>{fmt(c)}</td>
                     <td>{r.toFixed(2)}</td>

@@ -139,6 +139,8 @@ export default function CropSimCalculator() {
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Total /hr' : '總計 /hr'}
+          // Plus ×1.25 用乘的、供水系統 +5%／級還沒核對：有用到才標
+          titlePending={gold || waterworks > 0 ? 'cropSim' : false}
           primary={<>{fmtInt(total)}</>}
           secondary={
             lang === 'en'

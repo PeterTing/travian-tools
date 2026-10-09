@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { cpAtLevel, type CpBuilding } from '../data/travian'
 import {
   SERVER_SPEEDS, villageRequirements, startCp, celebrationCap, celebrationCp, celebration,
-  isVillageCpVerified, buildingName, type ServerSpeed, type CelebrationKind,
+  isVillageCpVerified, isBuildingVerified, buildingName, type ServerSpeed, type CelebrationKind,
 } from '../../../data/gameData'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import Stepper from '@/components/common/Stepper'
@@ -174,6 +174,11 @@ export default function PassiveCpCalculator() {
 
   // 只算建築：遊戲沒有空村基礎產量（ts11：各棟 CP 加總＝遊戲顯示的 12／天）
   const total = useMemo(() => villageDailyCp(levels), [levels])
+  // 每日 CP 用到還沒在 ts11 核對的建築數值（等級 > 0 的建築裡有沒標 ✓ 的）→ 摘要標題旁放灰標
+  const usesUnverifiedBuilding = useMemo(
+    () => FIELDS.some(f => (levels[f.id] ?? 0) > 0 && f.ids.some(id => !isBuildingVerified(id))),
+    [levels],
+  )
 
   const breakdown = useMemo(() => FIELDS.map(f => ({
     label: fieldLabel(f, en),
@@ -290,6 +295,7 @@ export default function PassiveCpCalculator() {
         <CalcResultPanel
           lang={lang}
           title={en ? 'Daily passive CP' : '每日被動 CP'}
+          titlePending={usesUnverifiedBuilding ? 'building' : false}
           primary={<>{total} / {en ? 'day' : '天'}</>}
           secondary={mode === 'none'
             ? (en ? 'Buildings only; there is no empty-village base' : '只算建築，遊戲沒有空村基礎產量')

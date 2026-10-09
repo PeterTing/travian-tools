@@ -6,7 +6,7 @@ import {
 } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
-import CalcResultPanel from './CalcResultPanel';
+import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
 
@@ -209,7 +209,15 @@ export default function BuildOrderCalculator() {
           title={lang === 'en' ? 'Next upgrades' : '接下來升級'}
           primary={<>{formatDuration(plan.totalTime)}</>}
           secondary={
-            lang === 'en'
+            // 成本裡有加成建築（鋸木廠等，數值還沒在 ts11 核對）時，成本旁跟著灰標
+            plan.steps.some(x => x.kind === 'bb') ? (
+              <>
+                {lang === 'en' ? '20 steps · ' : '20 步 · '}
+                <SummaryPending kind="building" testId="build-order-summary-cost">
+                  {lang === 'en' ? `cost ${plan.totalCost.toLocaleString()}` : `成本 ${plan.totalCost.toLocaleString()}`}
+                </SummaryPending>
+              </>
+            ) : lang === 'en'
               ? `20 steps · cost ${plan.totalCost.toLocaleString()}`
               : `20 步 · 成本 ${plan.totalCost.toLocaleString()}`
           }

@@ -6,7 +6,7 @@ import type { StrategyId, BuildStep } from '../data/build-order';
 import type { TribeId } from '../data/travian';
 import { TRIBES } from '../data/tribes/index';
 import s from './calc.module.css';
-import CalcResultPanel from './CalcResultPanel';
+import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const TRIBE_ORDER: TribeId[] = ['romans', 'teutons', 'gauls', 'egyptians', 'huns', 'vikings', 'spartans'];
@@ -138,11 +138,16 @@ export default function LaunchSimCalculator() {
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Estimated settle time' : '預估結帳時間'}
+          // 拓荒者花費是社群整理的兵種數字（P0-18 還沒核對），結帳時間跟著它算
+          titlePending="units"
           primary={<>{result.totalHours.toFixed(1)} h</>}
           secondary={
-            lang === 'en'
-              ? `Day ${(result.totalHours / 24).toFixed(1)} · settlers ${settlerCost.toLocaleString()}`
-              : `第 ${(result.totalHours / 24).toFixed(1)} 天 · 拓荒者 ${settlerCost.toLocaleString()}`
+            <>
+              {lang === 'en' ? `Day ${(result.totalHours / 24).toFixed(1)} · ` : `第 ${(result.totalHours / 24).toFixed(1)} 天 · `}
+              <SummaryPending kind="units" testId="launch-sim-summary-settlers">
+                {lang === 'en' ? `settlers ${settlerCost.toLocaleString()}` : `拓荒者 ${settlerCost.toLocaleString()}`}
+              </SummaryPending>
+            </>
           }
         >
           <div className={s.row}>

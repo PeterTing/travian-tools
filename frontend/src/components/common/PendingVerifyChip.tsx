@@ -61,11 +61,12 @@ export default function PendingVerifyChip({ kind, className = '' }: PendingVerif
         type="button"
         id={`${panelId}-chip`}
         data-testid="pending-verify-chip"
+        data-kind={kind}
         aria-expanded={open}
         // 收合時說明塊不在畫面上：只有展開才指向它，不指向不存在的 id
         aria-controls={open ? panelId : undefined}
         onClick={onClick}
-        className={`relative inline-flex items-center gap-0.5 whitespace-nowrap rounded-full bg-gray-100 px-2 py-0.5 align-middle text-xs font-normal leading-4 text-gray-600 before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-full before:min-w-[44px] before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] ${className}`}
+        className={`relative inline-flex items-center gap-0.5 whitespace-nowrap rounded-full bg-gray-100 px-2 py-0.5 align-middle text-xs font-normal normal-case leading-4 tracking-normal text-gray-600 before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-full before:min-w-[44px] before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] ${className}`}
       >
         {t('common.pendingVerify')}
         <span aria-hidden="true" className="text-[1em] leading-none text-gray-500">
