@@ -5,6 +5,7 @@ import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import Stepper from '@/components/common/Stepper'
 
 const fmtInt = (n: number) => Math.round(n).toLocaleString('en-US');
 
@@ -120,9 +121,14 @@ export default function CropSimCalculator() {
           </div>
 
           <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> Plus +25% gold</label>
-          <div className={s.field}>
-            <label>{lang === 'en' ? 'Egyptian Waterworks level (0 = not Egyptian)' : '埃及供水系統等級（不是埃及填 0）'}</label>
-            <input type="number" min={0} max={20} value={waterworks} onChange={e => setWaterworks(Math.max(0, Math.min(20, +e.target.value || 0)))} />
+          <div className="mb-3.5">
+            <Stepper
+              label={lang === 'en' ? 'Egyptian Waterworks level (0 = not Egyptian)' : '埃及供水系統等級（不是埃及填 0）'}
+              value={waterworks}
+              onChange={setWaterworks}
+              min={0}
+              max={20}
+            />
           </div>
           <p className="text-xs text-gray-500">
             <PendingVerifyChip />{' '}

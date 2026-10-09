@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import PasteFab, { PASTE_FAB_CLEARANCE } from '@/components/paste/PasteFab'
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -162,7 +163,7 @@ export default function VillagesPage() {
           .join(t('villages.list.sentenceGap'))
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-4 md:py-8">
+    <div className={`container mx-auto max-w-3xl px-4 py-4 md:py-8 ${PASTE_FAB_CLEARANCE}`} data-testid="villages-root">
       <div className="mb-3 flex items-center gap-2">
         <h1 className="text-xl font-bold md:text-2xl">{t('villages.list.title')}</h1>
         <span className="text-sm text-muted-foreground" data-testid="village-count">
@@ -237,6 +238,7 @@ export default function VillagesPage() {
           </Button>
         </>
       )}
+      <PasteFab />
     </div>
   )
 }

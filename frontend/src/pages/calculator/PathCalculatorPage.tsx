@@ -6,8 +6,9 @@ import {
   distanceOnMap,
   formatTravelTime,
 } from '@/lib/travianFormulas'
-import CalcResultPanel from '@/features/guideCalcs/components/CalcResultPanel'
+import CalcResultPanel, { RESULT_PANEL_SPACE_CLASS } from '@/features/guideCalcs/components/CalcResultPanel'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import Stepper from '@/components/common/Stepper'
 
 /**
  * 行軍時間（路徑）計算器 — 前端即時結果（S71 競技場公式與後端共用）。
@@ -72,7 +73,7 @@ export default function PathCalculatorPage() {
       </div>
       <CalcBar />
 
-      <div className="flex min-w-0 flex-col gap-4 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px)+11rem)] lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:pb-0">
+      <div className={`flex min-w-0 flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 ${RESULT_PANEL_SPACE_CLASS}`}>
         <div className="min-w-0 rounded-xl border bg-card p-4">
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
             {t('pathCalc.inputs')}
@@ -139,17 +140,9 @@ export default function PathCalculatorPage() {
             />
           </label>
 
-          <label className="mb-3 block text-xs text-muted-foreground">
-            {t('pathCalc.tsLevel')}
-            <input
-              type="number"
-              min={0}
-              max={20}
-              value={tsLevel}
-              onChange={(e) => setTsLevel(Number(e.target.value))}
-              className={`${inputCls} mt-1`}
-            />
-          </label>
+          <div className="mb-3">
+            <Stepper label={t('pathCalc.tsLevel')} value={tsLevel} onChange={setTsLevel} min={0} max={20} testId="path-ts-level" />
+          </div>
 
           <label className="mb-3 block text-xs text-muted-foreground">
             {t('pathCalc.heroBonus')}

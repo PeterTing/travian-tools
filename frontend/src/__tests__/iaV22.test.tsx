@@ -27,7 +27,7 @@ import Stepper from '@/components/common/Stepper'
 import AutoFillBar from '@/components/autofill/AutoFillBar'
 import ExternalLinkList from '@/components/external/ExternalLinkList'
 import IncomingCard from '@/components/home/IncomingCard'
-import CpCard from '@/components/home/CpCard'
+import CpCard, { shortLocalStamp } from '@/components/home/CpCard'
 import { writeCpProgress } from '@/lib/cpProgress'
 import {
   deriveServerUtcOffset,
@@ -205,6 +205,42 @@ describe('IA v2.2', () => {
       expect(screen.getByTestId('cp-card-progress')).toHaveTextContent('846 / 8,000 CP')
       expect(screen.getByTestId('cp-card-progress')).toHaveTextContent('待驗證')
       expect(screen.getByText(/每天 \+48 → 約 150 天/)).toBeInTheDocument()
+    })
+
+    it('CP card ends with 「上次輸入：M/D HH:mm」 in local time, no weekday', () => {
+      writeCpProgress('acc-1', { currentCp: 846, dailyCp: 48, speed: 1 })
+      const saved = JSON.parse(localStorage.getItem('tt:cpProgress:acc-1')!)
+      saved.savedAt = new Date(2026, 9, 9, 22, 1).toISOString()
+      localStorage.setItem('tt:cpProgress:acc-1', JSON.stringify(saved))
+      render(
+        <MemoryRouter>
+          <CpCard accountId="acc-1" villageCount={2} speed={1} />
+        </MemoryRouter>,
+      )
+      const line = screen.getByTestId('cp-card-last-input')
+      expect(line).toHaveTextContent(/^上次輸入：10\/9 22:01$/)
+      expect(line.className).toContain('text-xs')
+      expect(line.className).toContain('text-muted-foreground')
+      // 是卡片最後一行
+      expect(screen.getByTestId('cp-card').lastElementChild).toBe(line)
+      expect(shortLocalStamp(new Date(2026, 0, 5, 7, 3).toISOString())).toBe('1/5 07:03')
+    })
+
+    it('CP card when CP was never entered: one line + 去輸入 button to CP 與開村, no progress or days', () => {
+      render(
+        <MemoryRouter>
+          <CpCard accountId="acc-never" villageCount={2} speed={1} />
+        </MemoryRouter>,
+      )
+      expect(screen.getByText('開三村 · CP')).toBeInTheDocument()
+      expect(screen.getByTestId('cp-card-empty')).toHaveTextContent('還沒填過目前 CP')
+      const go = screen.getByRole('link', { name: '去輸入' })
+      expect(go).toHaveAttribute('href', '/calculator/passive-cp')
+      expect(go.className).toContain('min-h-[44px]')
+      expect(screen.queryByTestId('cp-card-progress')).not.toBeInTheDocument()
+      expect(screen.queryByText(/天/)).not.toBeInTheDocument()
+      expect(screen.queryByTestId('cp-card-last-input')).not.toBeInTheDocument()
+      expect(screen.queryByText(/去算/)).not.toBeInTheDocument()
     })
 
     it('CP card for village 2 (ts11-verified) has no 待驗證', () => {

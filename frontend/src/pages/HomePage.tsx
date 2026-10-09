@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import PasteFab, { PASTE_FAB_CLEARANCE } from '@/components/paste/PasteFab'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { OcrFailed } from '@/components/ocr/OcrFailed'
@@ -58,12 +59,6 @@ function formatRelativeLabel(
       return t('home.recentUploads.daysAgo', { count: ago.count })
   }
 }
-
-/**
- * 「＋ 貼上」浮動按鈕高 48px，底部再留 16px：頁面最下面的內容捲到底也不會被它蓋住。
- * （底部分頁列的高度已由 AppShell 的 main 留好。）電腦版沒有浮動按鈕。
- */
-export const FAB_CLEARANCE = 'pb-[calc(48px+16px)] lg:pb-6'
 
 export default function HomePage() {
   const { t } = useTranslation()
@@ -575,7 +570,7 @@ export default function HomePage() {
 
   return (
     <div
-      className={`mx-auto w-full max-w-lg space-y-4 px-4 py-4 lg:max-w-[1080px] lg:px-6 lg:py-6 ${isEmpty ? '' : FAB_CLEARANCE}`}
+      className={`mx-auto w-full max-w-lg space-y-4 px-4 py-4 lg:max-w-[1080px] lg:px-6 lg:py-6 ${isEmpty ? '' : PASTE_FAB_CLEARANCE}`}
       data-testid="home-root"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -706,16 +701,7 @@ export default function HomePage() {
       </div>
 
       {/* 手機：右下角浮動「＋ 貼上」（電腦在頂列） */}
-      {showFab && (
-        <button
-          type="button"
-          onClick={focusPaste}
-          className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] right-4 z-30 inline-flex min-h-[48px] items-center gap-1 rounded-full bg-orange-600 px-5 text-sm font-semibold text-white shadow-lg lg:hidden"
-          data-testid="paste-fab"
-        >
-          ＋ {t('home.pasteFab')}
-        </button>
-      )}
+      {showFab && <PasteFab onClick={focusPaste} />}
     </div>
   )
 }

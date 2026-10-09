@@ -11,6 +11,7 @@ import type {
   BuildingUpgradeResponse,
 } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import Stepper from '@/components/common/Stepper'
 
 function formatTime(seconds: number): string {
   if (seconds < 60) return `${seconds}s`
@@ -147,16 +148,13 @@ export default function BuildingCalculatorPage() {
 
           {/* Main building level */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">
-              {t('calculator.building.mainBuildingLevel')}
-            </label>
-            <input
-              type="number"
+            <Stepper
+              label={t('calculator.building.mainBuildingLevel')}
+              value={mainBuildingLevel}
+              onChange={setMainBuildingLevel}
               min={0}
               max={20}
-              value={mainBuildingLevel}
-              onChange={(e) => setMainBuildingLevel(Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
+              testId="building-main-level"
             />
             <p className="text-xs text-muted-foreground mt-1">
               {t('calculator.building.mainBuildingNote')}

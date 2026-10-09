@@ -4,6 +4,7 @@ import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import Stepper from '@/components/common/Stepper'
 
 const fmtInt = (n: number) => isFinite(n) ? Math.round(n).toLocaleString('en-US') : '—';
 const fmtHr = (h: number) => {
@@ -74,9 +75,8 @@ export default function TraderouteCalculator() {
             </select>
           </div>
 
-          <div className={s.field}>
-            <label>{lang === 'en' ? 'Trade Office level (0–20)' : '交易所等級 (0–20)'}</label>
-            <input type="number" min={0} max={20} value={office} onChange={e => setOffice(+e.target.value)} />
+          <div className="mb-3.5">
+            <Stepper label={lang === 'en' ? 'Trade Office level (0–20)' : '交易所等級 (0–20)'} value={office} onChange={setOffice} min={0} max={20} />
           </div>
 
           <div className={s.field}>

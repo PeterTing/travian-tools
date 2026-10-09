@@ -84,6 +84,8 @@ describe('「已帶入」列的位置', () => {
       (el) => !bar.contains(el) && (el as HTMLInputElement).type !== 'hidden',
     )
     if (firstInput) expect(bar.compareDocumentPosition(firstInput) & FOLLOWING).toBeTruthy()
+    // 計算器頁不放「＋ 貼上」浮動按鈕（電腦頂列的還在）
+    expect(screen.queryByTestId('paste-fab')).not.toBeInTheDocument()
     cleanup()
   })
 })

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { SaveTroopsRequest, SaveTroopsResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import Stepper from '@/components/common/Stepper'
 
 export default function SaveTroopsCalculatorPage() {
   const [form, setForm] = useState<SaveTroopsRequest>({
@@ -103,14 +104,12 @@ export default function SaveTroopsCalculatorPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">競技場等級</label>
-            <input
-              type="number"
+            <Stepper
+              label="競技場等級"
+              value={form.tournament_square_level ?? 0}
+              onChange={(v) => handleChange('tournament_square_level', v)}
               min={0}
               max={20}
-              value={form.tournament_square_level}
-              onChange={(e) => handleChange('tournament_square_level', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
             />
           </div>
 
