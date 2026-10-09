@@ -53,6 +53,7 @@ vi.mock('@/contexts/CurrentAccountContext', () => ({
 }))
 
 import HomePage from '../HomePage'
+import IncomingListPage from '../calculator/IncomingListPage'
 
 describe('HomePage P0-06 remaining', () => {
   beforeAll(async () => {
@@ -85,7 +86,7 @@ describe('HomePage P0-06 remaining', () => {
     })
   })
 
-  it('shows 最近上傳 as 類型 · 摘要 + relative time', async () => {
+  it('shows the latest upload as one line: 最近：類型 · 摘要 · relative time', async () => {
     render(
       <MemoryRouter>
         <HomePage />
@@ -93,6 +94,7 @@ describe('HomePage P0-06 remaining', () => {
     )
     expect(await screen.findByTestId('recent-uploads')).toBeInTheDocument()
     const row = await screen.findByTestId('recent-upload-row')
+    expect(row).toHaveTextContent('最近：')
     expect(row).toHaveTextContent('集結點 · 3 筆來襲')
     expect(row).toHaveTextContent('3 分鐘前')
   })
@@ -109,10 +111,10 @@ describe('HomePage P0-06 remaining', () => {
     )
   })
 
-  it('filters incoming by village and persists choice', async () => {
+  it('incoming list page filters by village and persists choice', async () => {
     render(
       <MemoryRouter>
-        <HomePage />
+        <IncomingListPage />
       </MemoryRouter>,
     )
     const filter = await screen.findByTestId('incoming-village-filter')

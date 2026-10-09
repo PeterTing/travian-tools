@@ -79,7 +79,7 @@ export default function LaunchSimCalculator() {
   return (
     <>
       <div className={s.intro}>
-        <h2>{lang === 'en' ? 'Launch Simulator' : '出兵模擬'}</h2>
+        <h2>{lang === 'en' ? 'Opening timeline' : '開局時間表'}</h2>
         <p>
           {lang === 'en'
             ? 'Estimate how long until you can settle, based on production and opening style. Shows milestones for parties, settler training, and the final step.'

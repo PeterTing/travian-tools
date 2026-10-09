@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import {
   calculateTravelSeconds,
   distanceOnMap,
@@ -9,7 +9,7 @@ import {
 import CalcResultPanel from '@/features/guideCalcs/components/CalcResultPanel'
 
 /**
- * 移動時間（路徑）計算器 — 前端即時結果（S71 競技場公式與後端共用）。
+ * 行軍時間（路徑）計算器 — 前端即時結果（S71 競技場公式與後端共用）。
  * 版型：上方輸入、下方 sticky 結果；≥1024px 左右欄。
  */
 export default function PathCalculatorPage() {
@@ -25,12 +25,19 @@ export default function PathCalculatorPage() {
   const [artifact, setArtifact] = useState<'none' | 'unique_2x' | 'village_2x'>('none')
   const [serverSpeed, setServerSpeed] = useState(1)
 
-  const { currentAccount } = useCurrentAccount()
+  // 「已帶入」：伺服器速度跟帳號（或這頁的「更改」），出發座標用帶入的村莊
+  const fill = useAutoFill()
   useEffect(() => {
-    if (currentAccount?.server_speed) {
-      setServerSpeed(currentAccount.server_speed)
+    setServerSpeed(fill.speed)
+  }, [fill.speed])
+  const fillX = fill.village?.coordinate_x
+  const fillY = fill.village?.coordinate_y
+  useEffect(() => {
+    if (fillX != null && fillY != null) {
+      setStartX(fillX)
+      setStartY(fillY)
     }
-  }, [currentAccount?.server_speed])
+  }, [fillX, fillY])
 
   const result = useMemo(() => {
     const distance = distanceOnMap(startX, startY, targetX, targetY)

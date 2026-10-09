@@ -101,7 +101,7 @@ export default function OasisRoiCalculator() {
           <div className={s.note}>
             {lang === 'en'
               ? 'This is for one oasis. For several, run once each, or set the combined oasis % in Field ROI.'
-              : '這裡只算一塊綠洲。若佔多塊，請分開算，或到「田地回本」把綠洲％加總。'}
+              : '這裡只算一塊綠洲。若佔多塊，請分開算，或到「資源田與首都規劃」把綠洲％加總。'}
           </div>
         </div>
 

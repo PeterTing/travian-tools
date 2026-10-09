@@ -71,7 +71,7 @@ export default function CropSimCalculator() {
     <>
       <div className={s.intro}>
         {/* Table 1 reference numbers — see calculators.regression.test.ts */}
-        <h2>{lang === 'en' ? 'Crop Simulator' : '糧食模擬'}</h2>
+        <h2>{lang === 'en' ? 'Capital production' : '首都產量模擬'}</h2>
         <p>{lang === 'en'
           ? 'Estimates total capital production per hour (wood, clay, iron, and crop) with all bonuses. Compare 15c / 9c / 7c / 6c layouts. Plus +25% is multiplied on top of fields × (1 + bonus buildings + oasis).'
           : '估算首都每小時總產量（木、土、鐵、糧），可比較 15c／9c／7c／6c。算法：田產量 ×（1＋加成建築＋綠洲），有勾 Plus 再 ×1.25。'}</p>

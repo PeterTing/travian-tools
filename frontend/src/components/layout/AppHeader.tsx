@@ -28,6 +28,14 @@ export default function AppHeader() {
         <div className="ml-auto flex shrink-0 items-center gap-2">
           {isAuthenticated ? (
             <div className="hidden items-center gap-3 lg:flex" data-testid="header-user">
+              {/* 手機的浮動「＋ 貼上」在電腦改成頂列按鈕 */}
+              <Link
+                to={{ pathname: ROUTES.HOME, hash: 'paste' }}
+                className="inline-flex h-9 items-center rounded-md bg-orange-600 px-3 text-sm font-medium text-white hover:bg-orange-700"
+                data-testid="header-paste"
+              >
+                ＋ {t('home.pasteFab')}
+              </Link>
               <span className="max-w-[12rem] truncate text-sm text-muted-foreground">{user?.username}</span>
               <Button variant="outline" size="sm" onClick={logout}>
                 {t('auth.logout')}

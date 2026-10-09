@@ -351,6 +351,7 @@ def gen_buildings(current: dict) -> dict:
         cr["description_en"] = cr["description_en"].replace("Gauls have double", "Gauls get 1.5×")
     th = out["buildings"]["town_hall"]
     th["name_zh"] = "城鎮廳"  # the term used everywhere else in the app
+    out["buildings"]["palisade"]["name_zh"] = "木牆"  # IA v2.2 用詞統一：木牆（不用木柵欄）
     th["levels"][0]["effect_value"] = 500
     th["levels"][0]["effect_description"] = "小慶典 CP＝本村每日 CP 產量（x1 上限 500）"
     for lv in th["levels"][1:]:

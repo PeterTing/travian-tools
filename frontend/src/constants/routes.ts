@@ -26,6 +26,10 @@ export const ROUTES = {
     ROI: '/calculator/roi',
     BATTLE: '/calculator/battle',
     CROP: '/calculator/crop',
+    // 資源田與首都規劃（田地 ROI＋首都產量模擬合一頁）
+    FIELDS: '/calculator/fields',
+    // 來襲列表（計算器 › 防守；首頁來襲卡「全部 ›」）
+    INCOMING: '/calculator/incoming',
   },
 
   // 遊戲帳號
@@ -44,6 +48,8 @@ export const ROUTES = {
 
   // 更多（手機底部「更多」分頁：地圖、帳號管理、數據庫、統計、登出）
   MORE: '/more',
+  // 外部連結（8 個，只放連結，點了先提示即將離開）
+  EXTERNAL_LINKS: '/more/external',
 
   // 攻略（P0 只有起手式）
   STRATEGY: {

@@ -37,7 +37,7 @@ export default function TechnologyCalculatorPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">科技計算器</h1>
+      <h1 className="text-3xl font-bold mb-6">鐵匠升級</h1>
       <p className="text-muted-foreground mb-6">
         查看各研究等級下兵種的攻防數值變化。公式：base * 1.015^level
       </p>

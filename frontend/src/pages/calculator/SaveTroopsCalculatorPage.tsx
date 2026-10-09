@@ -42,7 +42,7 @@ export default function SaveTroopsCalculatorPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">避兵計算器</h1>
+      <h1 className="text-3xl font-bold mb-6">躲兵</h1>
       <p className="text-muted-foreground mb-6">
         計算部隊應派往多遠的距離，確保離線期間部隊在外安全。部隊會在離線期間往返，剛好在你上線時回來。
       </p>

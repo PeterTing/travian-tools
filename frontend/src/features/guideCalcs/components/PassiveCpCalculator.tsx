@@ -1,10 +1,14 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { cpAtLevel, type CpBuilding } from '../data/travian'
 import {
   SERVER_SPEEDS, villageRequirements, startCp, celebrationCap, celebrationCp, celebration,
   isVillageCpVerified, buildingName, type ServerSpeed, type CelebrationKind,
 } from '../../../data/gameData'
 import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import Stepper from '@/components/common/Stepper'
+import AutoFillBar, { AutoFillHint } from '@/components/autofill/AutoFillBar'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
+import { writeCpProgress } from '@/lib/cpProgress'
 import { useLang } from '../i18n/LangContext'
 import s from './calc.module.css'
 import CalcResultPanel from './CalcResultPanel'
@@ -106,23 +110,47 @@ const fmtDays = (d: number | null) => (d == null ? '—' : isFinite(d) ? d.toFix
 export default function PassiveCpCalculator() {
   const { lang } = useLang()
   const en = lang === 'en'
+  // 伺服器速度從帳號帶入（「已帶入」列）；在這頁改過就顯示「已手動修改 · 還原」
+  const fill = useAutoFill()
+  const accountSpeed = fill.speed as ServerSpeed
   const [levels, setLevels] = useState<Record<string, number>>(PRESETS.lumi)
-  const [speed, setSpeed] = useState<ServerSpeed>(1)
-  const [currentCp, setCurrentCp] = useState<number>(startCp(1))
+  const [manualSpeed, setManualSpeed] = useState<ServerSpeed | null>(null)
+  const speed: ServerSpeed = manualSpeed ?? accountSpeed
+  const [currentCp, setCurrentCp] = useState<number>(startCp(accountSpeed))
   const [otherCp, setOtherCp] = useState<number>(0)
   const [mode, setMode] = useState<CelebrationMode>('small')
-  const [hours, setHours] = useState<number>(TH1_HOURS[1])
-  const set = (id: string, v: number) => setLevels(prev => ({ ...prev, [id]: Math.max(0, Math.min(20, v || 0)) }))
+  const [hours, setHours] = useState<number>(TH1_HOURS[accountSpeed])
+  // 使用者動過輸入才記到首頁的「開村 · CP」卡（不記預設值）
+  const touched = useRef(false)
+  const set = (id: string, v: number) => {
+    touched.current = true
+    setLevels(prev => ({ ...prev, [id]: Math.max(0, Math.min(20, v || 0)) }))
+  }
   const apply = (preset: string) => setLevels(() => {
+    touched.current = true
     const next: Record<string, number> = {}
     FIELDS.forEach(f => { next[f.id] = PRESETS[preset]?.[f.id] ?? 0 })
     return next
   })
-  const changeSpeed = (sp: ServerSpeed) => {
-    setSpeed(sp)
+  const resetForSpeed = (sp: ServerSpeed) => {
     setCurrentCp(startCp(sp))
     setHours(TH1_HOURS[sp])
   }
+  const changeSpeed = (sp: ServerSpeed) => {
+    setManualSpeed(sp === accountSpeed ? null : sp)
+    resetForSpeed(sp)
+  }
+  const restoreSpeed = () => {
+    setManualSpeed(null)
+    resetForSpeed(accountSpeed)
+  }
+  // 帳號（或「已帶入」列）換了速度，跟著換預設值
+  const lastAccountSpeed = useRef(accountSpeed)
+  useEffect(() => {
+    if (lastAccountSpeed.current === accountSpeed) return
+    lastAccountSpeed.current = accountSpeed
+    if (manualSpeed == null) resetForSpeed(accountSpeed)
+  }, [accountSpeed, manualSpeed])
 
   // 只算建築：遊戲沒有空村基礎產量（ts11：各棟 CP 加總＝遊戲顯示的 12／天）
   const total = useMemo(() => villageDailyCp(levels), [levels])
@@ -136,6 +164,12 @@ export default function PassiveCpCalculator() {
   const cd = useMemo(() => villageCountdown({
     villageCp: total, otherVillagesCp: otherCp, currentCp, speed, mode, hoursPerCelebration: hours,
   }), [total, otherCp, currentCp, speed, mode, hours])
+
+  const accountId = fill.account?.account_id ?? null
+  useEffect(() => {
+    if (!touched.current) return
+    writeCpProgress(accountId, { currentCp, dailyCp: cd.accountCp, speed })
+  }, [accountId, currentCp, cd.accountCp, speed])
 
   const small = celebration('small')
   const great = celebration('great')
@@ -153,31 +187,26 @@ export default function PassiveCpCalculator() {
           : '看一個村莊每天能產出多少 CP、還要幾天能開下一村。調整下面的建築等級，或點預設一鍵帶入常見配置。'}</p>
       </div>
 
+      <AutoFillBar
+        assumption={en
+          ? `Assumes: x${speed} server · celebration CP = daily production (cap ${capSmall.toLocaleString()} / ${capGreat.toLocaleString()}), per the official rules`
+          : `假設：x${speed} 伺服器 · 慶典 CP＝每日產量（上限 ${capSmall.toLocaleString()}／${capGreat.toLocaleString()}）依官方說明`}
+      />
+
       <div className={s.wrapper}>
         <div className={s.inputs}>
           <h4>{en ? 'Building levels' : '建築等級'}</h4>
-          {Array.from({ length: Math.ceil(FIELDS.length / 2) }).map((_, idx) => {
-            const a = FIELDS[idx * 2]
-            const b = FIELDS[idx * 2 + 1]
-            return (
-              <div key={idx} className={s.fieldRow}>
-                {a && (
-                  <div className={s.field}>
-                    <label>{fieldLabel(a, en)}</label>
-                    <input type="number" min={0} max={20} value={levels[a.id] ?? 0}
-                           onChange={e => set(a.id, +e.target.value)} />
-                  </div>
-                )}
-                {b && (
-                  <div className={s.field}>
-                    <label>{fieldLabel(b, en)}</label>
-                    <input type="number" min={0} max={20} value={levels[b.id] ?? 0}
-                           onChange={e => set(b.id, +e.target.value)} />
-                  </div>
-                )}
-              </div>
-            )
-          })}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-3" data-testid="cp-levels">
+            {FIELDS.map(f => (
+              <Stepper
+                key={f.id}
+                label={fieldLabel(f, en)}
+                value={levels[f.id] ?? 0}
+                onChange={v => set(f.id, v)}
+                testId={`cp-level-${f.id}`}
+              />
+            ))}
+          </div>
 
           <div className={s.btnRow}>
             <button onClick={() => apply('lumi')}>{en ? `Common (${PRESET_LUMI_CP}/d)` : `常用（${PRESET_LUMI_CP}／天）`}</button>
@@ -185,25 +214,34 @@ export default function PassiveCpCalculator() {
             <button onClick={() => apply('zero')}>{en ? 'Clear' : '清空'}</button>
           </div>
 
-          <h4>{en ? 'Next-village countdown' : '開村倒數'}</h4>
+          {/* 預設按鈕和「開村倒數」標題之間留 16px（設計師） */}
+          <h4 style={{ marginTop: 16 }} data-testid="cp-countdown-heading">{en ? 'Next-village countdown' : '開村倒數'}</h4>
           <div className={s.fieldRow}>
             <div className={s.field}>
               <label>{en ? 'Server speed' : '伺服器速度'}</label>
               <select data-testid="cp-speed" value={speed} onChange={e => changeSpeed(+e.target.value as ServerSpeed)}>
                 {SERVER_SPEEDS.map(sp => <option key={sp} value={sp}>x{sp}</option>)}
               </select>
+              {fill.account && (
+                <AutoFillHint
+                  source={en ? 'From account' : '帳號帶入'}
+                  manual={manualSpeed != null}
+                  onRestore={restoreSpeed}
+                  testId="cp-speed-hint"
+                />
+              )}
             </div>
             <div className={s.field}>
               <label>{en ? 'CP you have now' : '目前已有 CP'}</label>
               <input data-testid="cp-current" type="number" min={0} value={currentCp}
-                     onChange={e => setCurrentCp(Math.max(0, +e.target.value || 0))} />
+                     onChange={e => { touched.current = true; setCurrentCp(Math.max(0, +e.target.value || 0)) }} />
             </div>
           </div>
           <div className={s.fieldRow}>
             <div className={s.field}>
               <label>{en ? 'Other villages CP/day' : '其他村每日 CP'}</label>
               <input data-testid="cp-other" type="number" min={0} value={otherCp}
-                     onChange={e => setOtherCp(Math.max(0, +e.target.value || 0))} />
+                     onChange={e => { touched.current = true; setOtherCp(Math.max(0, +e.target.value || 0)) }} />
             </div>
             <div className={s.field}>
               <label>{en ? 'Hours per celebration' : '一場慶典幾小時'}</label>

@@ -29,7 +29,10 @@
     "pendingVerify": "Unverified",
     "pendingVerifyNote": "Not yet confirmed in the game",
     "buildingVerifyLegend": "Except buildings marked ✓, these numbers have not been measured in ts11",
-    "verifiedTs11": "Measured in ts11"
+    "verifiedTs11": "Measured in ts11",
+    "cancel": "Cancel",
+    "decrease": "Decrease",
+    "increase": "Increase"
   },
   "home": {
     "title": "Travian Tools",
@@ -63,11 +66,84 @@
       "minutesAgo": "{{count}} min ago",
       "hoursAgo": "{{count}} h ago",
       "yesterday": "yesterday",
-      "daysAgo": "{{count}} days ago"
+      "daysAgo": "{{count}} days ago",
+      "latest": "Latest:"
     },
     "incoming": {
       "villageFilter": "Village:",
-      "allVillages": "All villages"
+      "allVillages": "All villages",
+      "listNote": "Sorted by arrival; countdowns update every second. From the last saved rally point.",
+      "none": "No incoming yet. Paste the rally point and they show up here.",
+      "arrived": "Arrived"
+    },
+    "todayTitle": "Today",
+    "pasteFab": "Paste",
+    "pasteCard": {
+      "title": "Paste a game page",
+      "hint": "Select all in the game, copy, and paste here (rally point, reports, village overview). On a computer you can also press Ctrl+V on the home page.",
+      "placeholder": "Open the rally point in the game → select all → copy, then paste here…"
+    },
+    "incomingCard": {
+      "title": "Incoming",
+      "nearest": "next lands at {{village}}",
+      "all": "All",
+      "from": "from",
+      "left": "in",
+      "needsCoords": "coordinates missing · fill in",
+      "noLastSeen": "Attacker’s last-online time is missing, so TS can’t be worked out yet",
+      "noLastSeenShort": "no last-online time",
+      "copy": "Copy for allies",
+      "copied": "Copied",
+      "next": "Next {{count}}",
+      "byArrival": "by arrival",
+      "unknownFrom": "from ???",
+      "unknownVillage": "unknown village",
+      "colTarget": "Target",
+      "colFrom": "From",
+      "colCountdown": "Countdown",
+      "colServer": "Server time",
+      "colLocal": "Local time",
+      "tableNote": "Sorted by arrival. Server time first, local time beside it (offset read from the pasted rally point or village page)."
+    },
+    "cpCard": {
+      "title": "Open {{n}} · CP",
+      "go": "Calculate",
+      "perDay": "+{{daily}} a day",
+      "days": "about {{days}} days",
+      "pendingNote": "The {{n}} threshold {{target}} is not confirmed in ts11 yet, so the days are unverified too.",
+      "source": "From the current CP and daily CP you last entered in “CP & new villages” (saved on this device only).",
+      "empty": "No CP yet: enter your current CP once in “CP & new villages” and your progress shows up here."
+    },
+    "villageOrdinal": {
+      "2": "village #2",
+      "3": "village #3",
+      "4": "village #4",
+      "5": "village #5",
+      "6": "village #6",
+      "7": "village #7",
+      "8": "village #8",
+      "9": "village #9",
+      "10": "village #10"
+    },
+    "pendingCard": {
+      "title": "Missing data",
+      "needsCoords": "Incoming without coordinates: {{village}}",
+      "noVillages": "No village data yet: paste the village overview"
+    },
+    "empty": {
+      "title": "Paste one game page first",
+      "subtitle": "One paste and we start counting down incoming attacks and your next village.",
+      "stepsTitle": "Three steps",
+      "step1": "Add a game account",
+      "step1Done": "Game account added",
+      "step1Detail": "tribe and speed set ·",
+      "step2": "Paste the rally point",
+      "step2Detail": "Reads incoming attacks and troops for the countdown",
+      "step3": "Paste the village overview or CP page",
+      "step3Detail": "Reads villages and CP for the next-village countdown",
+      "previewTitle": "After pasting you’ll see:",
+      "previewIncoming": "Incoming countdown · next arrival",
+      "previewCp": "Next-village progress · days left"
     }
   },
   "notFound": {
@@ -93,7 +169,7 @@
       "totalCost": "Total Cost",
       "buildTime": "Build Time",
       "population": "Population",
-      "culturePoints": "Culture Points",
+      "culturePoints": "CP",
       "effect": "Effect"
     },
     "troops": {
@@ -152,7 +228,7 @@
       "baseTime": "Base Time",
       "actualTime": "Actual Time",
       "populationIncrease": "Population Increase",
-      "culturePointsPerDay": "Daily CP Increase",
+      "culturePointsPerDay": "CP increase (per day)",
       "viewDetails": "View level details",
       "selectPrompt": "Please select a building and level range, then click calculate",
       "levelRange": "Lv.{{from}} → Lv.{{to}}",
@@ -359,7 +435,8 @@
     "empty": "Worlds appear here after you add a game account.",
     "summary": "Server offset {{offset}}",
     "change": "Change",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "derivedFromPage": "Worked out from the server clock on the pasted page; tap Change if it is wrong."
   },
   "gameAccounts": {
     "title": "Game Account Management",
@@ -564,7 +641,7 @@
     "buildings": "Buildings",
     "troops": "Troops",
     "resources": "Resources",
-    "buildingCalc": "Building Calculator",
+    "buildingCalc": "Building upgrade cost",
     "roiCalc": "ROI Calculator",
     "battleSim": "Battle Simulator",
     "cropBalance": "Crop Balance",
@@ -583,28 +660,33 @@
       "more": "More"
     },
     "groups": {
-      "combat": "Combat",
-      "development": "Development"
+      "combat": "Attack",
+      "development": "Develop",
+      "defense": "Defend",
+      "raid": "Raid",
+      "data": "Data"
     },
     "calcs": {
-      "path": "Travel Time",
-      "interception": "Interception Calculator",
-      "saveTroops": "Troop Evasion Calculator",
-      "pathSpeedTs": "TS Reverse Calculator",
-      "attackPlanner": "Attack Planner",
+      "path": "Travel time",
+      "interception": "Interception",
+      "saveTroops": "Hide troops",
+      "pathSpeedTs": "Reverse TS",
+      "attackPlanner": "OP planner",
       "villageBuilder": "Build Order Optimizer",
-      "culturePoints": "Culture Points Calculator",
-      "npc": "NPC Calculator",
-      "technology": "Technology Calculator",
+      "culturePoints": "CP calculator",
+      "npc": "Shopping list (NPC)",
+      "technology": "Smithy upgrades",
       "cropScouter": "Capital Type Finder",
-      "launchSim": "Launch Simulator",
+      "launchSim": "Opening timeline",
       "buildOrder": "Build Order",
       "passiveCp": "CP & new villages",
       "fieldRoi": "Field ROI",
       "oasisRoi": "Oasis ROI",
       "cropSim": "Crop Simulator",
       "farming": "Farming Yield",
-      "tradeRoute": "Trade Route"
+      "tradeRoute": "Trade routes",
+      "fields": "Fields & capital",
+      "incoming": "Incoming"
     },
     "stats": {
       "overview": "Server Overview",
@@ -618,14 +700,39 @@
       "title": "More",
       "tools": "Map & accounts",
       "account": "Site account",
-      "signedInAs": "Signed in as {{name}}"
+      "signedInAs": "Signed in as {{name}}",
+      "external": "External tools"
     },
     "calculatorsPage": {
       "title": "Calculators",
       "search": "Search calculators",
       "searchPlaceholder": "Search calculators…",
-      "noResults": "No matching calculators"
-    }
+      "noResults": "No matching calculators",
+      "segments": "Calculator categories"
+    },
+    "desc": {
+      "passiveCp": "Passive CP, celebrations, next-village countdown",
+      "fields": "Field payback for normal villages, capital production",
+      "buildOrder": "Build steps by village role",
+      "launchSim": "Party and settler timeline (was “Launch sim”)",
+      "npc": "How to NPC-trade (multi-building totals later)",
+      "tradeRoute": "Feeder routes and merchant trips",
+      "buildingCalc": "Resources and time to upgrade one building",
+      "path": "One-way travel time, synced arrivals",
+      "attackPlanner": "Send times for several villages landing together",
+      "technology": "Smithy upgrade cost and time",
+      "cropBalance": "Village crop income vs. upkeep",
+      "incoming": "Sorted by arrival, server time first",
+      "pathSpeedTs": "Work out the attacker’s TS level",
+      "interception": "Send times that intercept",
+      "saveTroops": "When to leave and come back",
+      "cropScouter": "Guess an enemy capital type from scouting (not crop scouting)",
+      "oasisRoi": "How long an oasis takes to pay back",
+      "farming": "Farm-list income"
+    },
+    "gameData": "Game data",
+    "externalLinks": "External links",
+    "incomingDot": "Unarrived incoming attacks"
   },
   "opening": {
     "title": "Opening checklist",
@@ -747,7 +854,7 @@
     },
     "checks": {
       "cropBalance": "Crop Balance",
-      "culturePoints": "Culture Points",
+      "culturePoints": "CP",
       "villageConfig": "Village Configuration",
       "troopTraining": "Troop Training",
       "resourceUtil": "Resource Utilization"
@@ -832,7 +939,7 @@
     "emptyError": "Nothing to save from this parse"
   },
   "pathCalc": {
-    "title": "Travel Time",
+    "title": "Travel time",
     "intro": "How long troops take to travel between two points. Tournament Square only speeds the stretch beyond 20 fields (+20% per level). Results update as you type.",
     "inputs": "Inputs",
     "results": "Results",
@@ -956,5 +1063,49 @@
       "TRUNCATED_AT_EDGE": "Cut off by the screenshot edge; take another one",
       "PARSE_ERROR": "Could not read this field; please fill it in"
     }
+  },
+  "time": {
+    "server": "Server",
+    "local": "Local",
+    "tomorrow": " (tomorrow)"
+  },
+  "autofill": {
+    "label": "Filled in:",
+    "noAccount": "No game account yet, using defaults (x1).",
+    "addAccount": "Add a game account",
+    "change": "Change",
+    "done": "Done",
+    "thisPageOnly": "(changed on this page)",
+    "offsetUnknown": "Time offset: set automatically once you paste a page",
+    "offsetKnown": "Time offset {{hours}} h (read from a pasted page)",
+    "unitPending": "Unit speeds and costs are not yet measured in ts11",
+    "speed": "Server speed",
+    "tribe": "Tribe",
+    "village": "Village",
+    "editNote": "Only changes this page, not your account settings; other pages keep the account values. The village is remembered as your default.",
+    "manual": "Edited by you",
+    "restore": "Restore",
+    "fromAccount": "From account"
+  },
+  "external": {
+    "heroRevive": "Hero revival",
+    "items": "Item list",
+    "serverNews": "Server news / versions",
+    "adventureDamage": "Adventure damage and rewards",
+    "adventureLoot": "Adventure loot",
+    "getterMap": "Alliance / player map",
+    "getterMapNote": "Opens the server list; pick your server",
+    "heroTracking": "Hero equipment tracking",
+    "travcoDual": "travco account and dual invites",
+    "travcoDualNote": "Profile → Dual membership invitations → send the link to your teammate",
+    "opensNewTab": "Opens a new tab",
+    "leaveTitle": "Leaving Travian Tools",
+    "leaveBody": "{{site}} opens in a new tab. It is not part of this site and is maintained by its owners.",
+    "leaveGo": "Go",
+    "intro": "Links only; the other sites maintain their data. You’ll be asked before a new tab opens."
+  },
+  "fields": {
+    "modeRoi": "Normal village",
+    "modeCapital": "Capital"
   }
 }

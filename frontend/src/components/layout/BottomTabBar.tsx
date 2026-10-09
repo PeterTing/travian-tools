@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { BookOpen, Calculator, Home, LayoutGrid, MoreHorizontal, type LucideIcon } from 'lucide-react'
+import { useAccountData } from '@/contexts/AccountDataContext'
 import { activeTabFor, TABS, type TabId } from './navItems'
 
 const ICONS: Record<TabId, LucideIcon> = {
@@ -20,6 +21,9 @@ export default function BottomTabBar() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const active = activeTabFor(pathname)
+  // 有未抵達的來襲：「首頁」加紅點（不放數字，數字留在首頁的來襲卡）
+  const { unarrivedIncoming } = useAccountData()
+  const hasIncoming = unarrivedIncoming.length > 0
 
   return (
     <nav
@@ -40,7 +44,17 @@ export default function BottomTabBar() {
                   isActive ? 'font-semibold text-orange-600' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Icon className="h-5 w-5" aria-hidden="true" />
+                <span className="relative">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                  {tab.id === 'home' && hasIncoming && (
+                    <span
+                      data-testid="tab-home-dot"
+                      role="status"
+                      aria-label={t('nav.incomingDot')}
+                      className="absolute -right-1 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-red-600"
+                    />
+                  )}
+                </span>
                 {t(tab.labelKey)}
               </Link>
             </li>

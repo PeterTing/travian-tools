@@ -1,11 +1,14 @@
 /**
- * 外框導覽的內容（P0-11，照 P0 線框 v0.4「資訊架構」；P0-09 計算器清單）
+ * 外框導覽（IA v2.2，設計師定案 2026-10-09）
  *
- * 手機：底部 5 個分頁（首頁、村莊、計算器、攻略、更多）
- * 電腦（≥ 1024px）：左側選單，內容一樣
+ * 手機：底部 5 個分頁不變（首頁、村莊、計算器、攻略、更多）。
+ *   「計算器」分頁用分段切 發展／打仗／防守／掠奪；「更多」放遊戲資料、外部工具、地圖、統計、帳號。
+ * 電腦（≥ 1024px）：左側選單，順序 首頁、村莊、發展、打仗、防守、掠奪、資料、攻略、更多；
+ *   每組可收合，同時只展開一組，會記住上次開的那組。
  *
- * 刻意不放：AI 助手、執行（P0-01 已移除）、知識庫（P1 才加，不留空入口）、
- * 戰鬥模擬（P1-06 重寫完成前先隱藏；路由還在，只是沒有入口）。
+ * 刻意不放：戰鬥模擬（P1-06 重寫前隱藏，/calculator/battle 轉回首頁）、
+ * P1／P2 還沒做的頁面（英雄配點、投石車數量、練兵量、援軍可達、查糧、綠洲掠奪、
+ * 綠洲動物、OP 出擊前清單）——做好才出現在選單裡，不留空入口。
  */
 import { ROUTES } from '@/constants/routes'
 
@@ -13,6 +16,8 @@ export interface NavLink {
   /** i18n key */
   labelKey: string
   to: string
+  /** 計算器列表上的一行說明（i18n key） */
+  descKey?: string
 }
 
 export interface NavGroup {
@@ -38,42 +43,75 @@ export const TABS: NavTab[] = [
   { id: 'more', labelKey: 'nav.tabs.more', to: ROUTES.MORE },
 ]
 
-/**
- * 計算器（戰鬥模擬不在這裡：P1 重寫完才開）
- * 打仗／發展以線框為準；guide 8 個為主，其餘既有工具排在後面。
- */
-export const CALCULATOR_GROUPS: NavGroup[] = [
+export type CalcSegmentId = 'development' | 'combat' | 'defense' | 'raid'
+
+export interface CalcSegment extends NavGroup {
+  id: CalcSegmentId
+}
+
+/** 計算器四段（手機分段＝電腦左側的四組，內容一致） */
+export const CALC_SEGMENTS: CalcSegment[] = [
   {
-    titleKey: 'nav.groups.combat',
+    id: 'development',
+    titleKey: 'nav.groups.development',
     links: [
-      { labelKey: 'nav.calcs.path', to: '/calculator/path' },
-      { labelKey: 'nav.calcs.launchSim', to: '/calculator/launch-sim' },
-      { labelKey: 'nav.calcs.interception', to: '/calculator/interception' },
-      { labelKey: 'nav.calcs.saveTroops', to: '/calculator/save-troops' },
-      { labelKey: 'nav.calcs.pathSpeedTs', to: '/calculator/path-speed-ts' },
-      { labelKey: 'nav.calcs.attackPlanner', to: '/calculator/attack-planner' },
+      { labelKey: 'nav.calcs.passiveCp', to: '/calculator/passive-cp', descKey: 'nav.desc.passiveCp' },
+      { labelKey: 'nav.calcs.fields', to: ROUTES.CALCULATOR.FIELDS, descKey: 'nav.desc.fields' },
+      { labelKey: 'nav.calcs.buildOrder', to: '/calculator/build-order', descKey: 'nav.desc.buildOrder' },
+      { labelKey: 'nav.calcs.launchSim', to: '/calculator/launch-sim', descKey: 'nav.desc.launchSim' },
+      { labelKey: 'nav.calcs.npc', to: '/calculator/npc', descKey: 'nav.desc.npc' },
+      { labelKey: 'nav.calcs.tradeRoute', to: '/calculator/trade-route', descKey: 'nav.desc.tradeRoute' },
+      { labelKey: 'nav.buildingCalc', to: ROUTES.CALCULATOR.BUILDING, descKey: 'nav.desc.buildingCalc' },
     ],
   },
   {
-    titleKey: 'nav.groups.development',
+    id: 'combat',
+    titleKey: 'nav.groups.combat',
     links: [
-      { labelKey: 'nav.calcs.buildOrder', to: '/calculator/build-order' },
-      { labelKey: 'nav.calcs.passiveCp', to: '/calculator/passive-cp' },
-      { labelKey: 'nav.calcs.fieldRoi', to: '/calculator/field-roi' },
-      { labelKey: 'nav.calcs.oasisRoi', to: '/calculator/oasis-roi' },
-      { labelKey: 'nav.calcs.cropSim', to: '/calculator/crop-sim' },
-      { labelKey: 'nav.calcs.farming', to: '/calculator/farming' },
-      { labelKey: 'nav.calcs.tradeRoute', to: '/calculator/trade-route' },
-      { labelKey: 'nav.buildingCalc', to: ROUTES.CALCULATOR.BUILDING },
-      { labelKey: 'nav.cropBalance', to: ROUTES.CALCULATOR.CROP },
-      { labelKey: 'nav.calcs.npc', to: '/calculator/npc' },
-      { labelKey: 'nav.calcs.technology', to: '/calculator/technology' },
-      { labelKey: 'nav.calcs.cropScouter', to: '/calculator/crop-scouter' },
+      { labelKey: 'nav.calcs.path', to: '/calculator/path', descKey: 'nav.desc.path' },
+      { labelKey: 'nav.calcs.attackPlanner', to: '/calculator/attack-planner', descKey: 'nav.desc.attackPlanner' },
+      { labelKey: 'nav.calcs.technology', to: '/calculator/technology', descKey: 'nav.desc.technology' },
+      { labelKey: 'nav.cropBalance', to: ROUTES.CALCULATOR.CROP, descKey: 'nav.desc.cropBalance' },
+    ],
+  },
+  {
+    id: 'defense',
+    titleKey: 'nav.groups.defense',
+    links: [
+      { labelKey: 'nav.calcs.incoming', to: ROUTES.CALCULATOR.INCOMING, descKey: 'nav.desc.incoming' },
+      { labelKey: 'nav.calcs.pathSpeedTs', to: '/calculator/path-speed-ts', descKey: 'nav.desc.pathSpeedTs' },
+      { labelKey: 'nav.calcs.interception', to: '/calculator/interception', descKey: 'nav.desc.interception' },
+      { labelKey: 'nav.calcs.saveTroops', to: '/calculator/save-troops', descKey: 'nav.desc.saveTroops' },
+      { labelKey: 'nav.calcs.cropScouter', to: '/calculator/crop-scouter', descKey: 'nav.desc.cropScouter' },
+    ],
+  },
+  {
+    id: 'raid',
+    titleKey: 'nav.groups.raid',
+    links: [
+      { labelKey: 'nav.calcs.oasisRoi', to: '/calculator/oasis-roi', descKey: 'nav.desc.oasisRoi' },
+      { labelKey: 'nav.calcs.farming', to: '/calculator/farming', descKey: 'nav.desc.farming' },
     ],
   },
 ]
 
-/** 攻略：P0 只有起手式 */
+/** 舊名稱保留（其他地方 import 用）：四段攤平 */
+export const CALCULATOR_GROUPS: NavGroup[] = CALC_SEGMENTS
+
+/** 遊戲資料（手機在「更多」，電腦在「資料」組） */
+export const GAME_DATA_LINKS: NavLink[] = [
+  { labelKey: 'nav.buildings', to: ROUTES.DATABASE.BUILDINGS },
+  { labelKey: 'nav.troops', to: ROUTES.DATABASE.TROOPS },
+  { labelKey: 'nav.resources', to: ROUTES.DATABASE.RESOURCES },
+]
+
+/** 電腦「資料」組：遊戲資料＋外部連結（8） */
+export const DATA_LINKS: NavLink[] = [
+  ...GAME_DATA_LINKS,
+  { labelKey: 'nav.externalLinks', to: ROUTES.EXTERNAL_LINKS },
+]
+
+/** 攻略：P0 只有開局清單 */
 export const STRATEGY_LINKS: NavLink[] = [
   { labelKey: 'nav.openingChecklist', to: ROUTES.STRATEGY.OPENING },
 ]
@@ -84,31 +122,42 @@ export const MORE_LINKS: NavLink[] = [
   { labelKey: 'gameAccounts.title', to: ROUTES.GAME_ACCOUNTS },
 ]
 
-/** 「更多」裡的參考資料 */
+export const STATISTICS_LINKS: NavLink[] = [
+  { labelKey: 'nav.stats.overview', to: '/statistics/overview' },
+  { labelKey: 'nav.stats.players', to: '/statistics/players' },
+  { labelKey: 'nav.stats.alliances', to: '/statistics/alliances' },
+  { labelKey: 'nav.stats.conquests', to: '/statistics/conquests' },
+  { labelKey: 'nav.stats.nameChanges', to: '/statistics/name-changes' },
+  { labelKey: 'nav.stats.inactives', to: '/statistics/search/inactives' },
+]
+
+/** 「更多」頁的分組（外部工具另外放，見 ExternalLinkList） */
 export const MORE_GROUPS: NavGroup[] = [
-  {
-    titleKey: 'nav.database',
-    links: [
-      { labelKey: 'nav.buildings', to: ROUTES.DATABASE.BUILDINGS },
-      { labelKey: 'nav.troops', to: ROUTES.DATABASE.TROOPS },
-      { labelKey: 'nav.resources', to: ROUTES.DATABASE.RESOURCES },
-    ],
-  },
-  {
-    titleKey: 'nav.statistics',
-    links: [
-      { labelKey: 'nav.stats.overview', to: '/statistics/overview' },
-      { labelKey: 'nav.stats.players', to: '/statistics/players' },
-      { labelKey: 'nav.stats.alliances', to: '/statistics/alliances' },
-      { labelKey: 'nav.stats.conquests', to: '/statistics/conquests' },
-      { labelKey: 'nav.stats.nameChanges', to: '/statistics/name-changes' },
-      { labelKey: 'nav.stats.inactives', to: '/statistics/search/inactives' },
-    ],
-  },
+  { titleKey: 'nav.gameData', links: GAME_DATA_LINKS },
+  { titleKey: 'nav.statistics', links: STATISTICS_LINKS },
+]
+
+/** 用到兵種資料（速度、花費、糧耗）的頁面：「已帶入」列多一行「待驗證」（TICKETS P0-15） */
+export const UNIT_DATA_ROUTES: readonly string[] = [
+  ROUTES.DATABASE.TROOPS,
+  ROUTES.CALCULATOR.CROP,
+  '/calculator/technology',
+  '/calculator/path-speed-ts',
+  '/calculator/launch-sim',
+  '/calculator/trade-route',
+  '/calculator/farming',
+  '/calculator/path',
+  '/calculator/interception',
+  '/calculator/save-troops',
+  '/calculator/attack-planner',
 ]
 
 const startsWithSegment = (pathname: string, prefix: string) =>
   pathname === prefix || pathname.startsWith(`${prefix}/`)
+
+export function usesUnitData(pathname: string): boolean {
+  return UNIT_DATA_ROUTES.some((p) => startsWithSegment(pathname, p))
+}
 
 /** 目前網址屬於哪一個底部分頁（登入、註冊等頁面不屬於任何分頁） */
 export function activeTabFor(pathname: string): TabId | null {
@@ -122,6 +171,14 @@ export function activeTabFor(pathname: string): TabId | null {
     )
   )
     return 'more'
+  return null
+}
+
+/** 某個計算器網址在哪一段（計算器列表預設打開那段） */
+export function segmentFor(pathname: string): CalcSegmentId | null {
+  for (const seg of CALC_SEGMENTS) {
+    if (seg.links.some((l) => startsWithSegment(pathname, l.to))) return seg.id
+  }
   return null
 }
 

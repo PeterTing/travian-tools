@@ -21,6 +21,8 @@ import {
 import { pasteApi } from '@/services/pasteApi'
 import type { GameAccount } from '@/types/game'
 import { formatCountdownSeconds } from '@/lib/formatCountdown'
+import { deriveServerUtcOffset } from '@/lib/serverTime'
+import { UTC_OFFSET_CHOICES } from '@/lib/worldUrl'
 import { OcrMovementRow, type OcrImageRef } from '@/components/ocr/OcrMovementRow'
 import {
   applyFieldValue,
@@ -110,11 +112,21 @@ export function ParseConfirmPanel({
     setCaptureDraft(formatCaptureShort(captureAt))
   }, [captureAt])
 
+  // IA v2.2：世界還沒有時差時，用頁面上的伺服器時鐘和貼上時間自動算，不請使用者填。
+  // 遊戲顯示的是本地時間（time_display = local）就不算，頁面上的鐘不是伺服器時間。
+  const showsServerClock = askTimeDisplay ? timeDisplay === 'server' : account.time_display !== 'local'
+  const derivedUtcOffset = useMemo(() => {
+    if (worldUtcOffset !== null || !showsServerClock) return null
+    const d = deriveServerUtcOffset(state.serverTime, captureAt)
+    return d != null && UTC_OFFSET_CHOICES.includes(d) ? d : null
+  }, [worldUtcOffset, showsServerClock, state.serverTime, captureAt])
+
   useEffect(() => {
     if (worldUtcOffset === undefined) return
-    setUtcOffsetDraft(worldUtcOffset == null ? '' : String(worldUtcOffset))
-    setUtcEditing(worldUtcOffset == null)
-  }, [worldUtcOffset])
+    const known = worldUtcOffset ?? derivedUtcOffset
+    setUtcOffsetDraft(known == null ? '' : String(known))
+    setUtcEditing(known == null)
+  }, [worldUtcOffset, derivedUtcOffset])
 
   useEffect(() => {
     if (!showVillage) return
@@ -363,14 +375,19 @@ export function ParseConfirmPanel({
 
         {worldUtcOffset !== undefined && (
           <div className="rounded-md border p-3 space-y-2" data-testid="ask-utc-offset">
-            {worldUtcOffset == null || utcEditing ? (
+            {(worldUtcOffset == null && derivedUtcOffset == null) || utcEditing ? (
               <p className="text-xs text-muted-foreground">
                 {t('worldSettings.description')}
               </p>
             ) : null}
+            {derivedUtcOffset != null && !utcEditing && (
+              <p className="text-xs text-muted-foreground" data-testid="confirm-utc-derived">
+                {t('worldSettings.derivedFromPage')}
+              </p>
+            )}
             <UtcOffsetField
               testIdPrefix="confirm-utc"
-              value={worldUtcOffset}
+              value={worldUtcOffset ?? derivedUtcOffset}
               draft={utcOffsetDraft}
               onDraftChange={setUtcOffsetDraft}
               editing={utcEditing}
