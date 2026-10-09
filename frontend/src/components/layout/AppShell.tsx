@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import AppHeader from './AppHeader'
 import BottomTabBar from './BottomTabBar'
 import Sidebar from './Sidebar'
+import { BOTTOM_NAV_CLEARANCE } from './bottomNav'
 
 /**
  * RWD 外框（P0-11，照 P0 線框 v0.4）
@@ -22,11 +23,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <AppHeader />
       <div className="lg:flex">
         <Sidebar />
-        {/* 手機：底部留出分頁的高度（含 safe area），內容不會被擋住；min-w-0 讓內容不會把版面撐寬 */}
-        <main
-          id="main-content"
-          className="min-w-0 flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom)+1rem)] lg:pb-0"
-        >
+        {/* 手機：底部留「分頁列高度＋16px」（含 safe area），所有頁面捲到底都不會被擋住；min-w-0 讓內容不會把版面撐寬 */}
+        <main id="main-content" className={`min-w-0 flex-1 ${BOTTOM_NAV_CLEARANCE}`} data-testid="app-main">
           {children}
         </main>
       </div>

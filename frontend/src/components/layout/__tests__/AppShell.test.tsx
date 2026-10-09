@@ -19,6 +19,7 @@ vi.mock('@/components/account/AccountWorldSwitcher', () => ({
 }))
 
 import AppShell from '../AppShell'
+import { BOTTOM_NAV_HEIGHT } from '../bottomNav'
 import {
   activeTabFor,
   CALC_SEGMENTS,
@@ -79,6 +80,21 @@ describe('AppShell (P0-11 RWD 外框)', () => {
     auth.logout.mockReset()
   })
 
+  it('every page leaves bottom-nav height + 16px at the bottom on phone, so nothing sits under the tab bar', () => {
+    for (const path of ['/', '/more', '/calculator', '/villages', '/calculator/attack-planner']) {
+      const { unmount } = renderShell(path)
+      const main = screen.getByTestId('app-main')
+      // 分頁列：h-14（3.5rem）＋上邊框 1px＋safe area；main 底部＝分頁列高度＋16px，電腦版沒有分頁列
+      expect(main.className).toContain('pb-[calc(3.5rem+1px+env(safe-area-inset-bottom)+16px)]')
+      expect(main.className).toContain('lg:pb-0')
+      expect(tabBar().className).toContain('border-t')
+      expect(tabBar().className).toContain('pb-[env(safe-area-inset-bottom)]')
+      expect(within(tabBar()).getAllByRole('link')[0].className).toContain('h-14')
+      unmount()
+    }
+    expect(BOTTOM_NAV_HEIGHT).toBe('calc(3.5rem + 1px + env(safe-area-inset-bottom))')
+  })
+
   it('phone: bottom tab bar has exactly 首頁／村莊／計算器／攻略／更多, fixed and hidden from 1024px', () => {
     renderShell('/')
     const bar = tabBar()
@@ -112,7 +128,7 @@ describe('AppShell (P0-11 RWD 外框)', () => {
   it('leaves room at the bottom of the content for the tab bar (phone only)', () => {
     renderShell('/')
     const main = screen.getByRole('main')
-    expect(main.className).toContain('pb-[calc(3.5rem+env(safe-area-inset-bottom)+1rem)]')
+    expect(main.className).toContain('pb-[calc(3.5rem+1px+env(safe-area-inset-bottom)+16px)]')
     expect(main).toHaveClass('lg:pb-0', 'min-w-0')
   })
 
