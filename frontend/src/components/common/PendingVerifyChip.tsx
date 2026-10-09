@@ -1,6 +1,6 @@
-import { useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ElementType, type HTMLAttributes, type MouseEvent, type ReactNode } from 'react'
+import { Fragment, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ElementType, type HTMLAttributes, type MouseEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { pendingNoteKeys, type PendingKind } from '@/lib/pendingNotes'
+import { pendingNoteKeys, splitClauses, type PendingKind } from '@/lib/pendingNotes'
 import { PendingRowContext, usePendingNoteGroup } from './PendingNoteGroup'
 
 interface PendingVerifyChipProps {
@@ -62,7 +62,8 @@ export default function PendingVerifyChip({ kind, className = '' }: PendingVerif
         id={`${panelId}-chip`}
         data-testid="pending-verify-chip"
         aria-expanded={open}
-        aria-controls={panelId}
+        // 收合時說明塊不在畫面上：只有展開才指向它，不指向不存在的 id
+        aria-controls={open ? panelId : undefined}
         onClick={onClick}
         className={`relative inline-flex items-center gap-0.5 whitespace-nowrap rounded-full bg-gray-100 px-2 py-0.5 align-middle text-xs font-normal leading-4 text-gray-600 before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-full before:min-w-[44px] before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] ${className}`}
       >
@@ -75,6 +76,21 @@ export default function PendingVerifyChip({ kind, className = '' }: PendingVerif
       {!row && open && <PendingNotePanel id={panelId} kind={kind} />}
     </>
   )
+}
+
+function clauses(text: string): ReactNode {
+  const parts = splitClauses(text)
+  if (parts.length < 2) return text
+  // 段尾的空白（英文）放在 inline-block 外面，不然會被吃掉、兩段黏在一起
+  return parts.map((p, i) => {
+    const body = p.replace(/ +$/, '')
+    return (
+      <Fragment key={i}>
+        <span className="inline-block" data-testid="pending-note-clause">{body}</span>
+        {body !== p && ' '}
+      </Fragment>
+    )
+  })
 }
 
 /** 展開的灰色說明：第一行哪個數字還沒核對，第二行現在的數字從哪裡來 */
@@ -111,8 +127,8 @@ export function PendingNotePanel({ id, kind, fill = false }: { id: string; kind:
       data-fill={fill ? 'true' : undefined}
       className={`mt-1 block ${fill ? 'w-full' : 'w-fit max-w-full'} rounded-md bg-gray-100 px-2 py-1.5 text-left text-xs font-normal leading-5 text-gray-700`}
     >
-      <span className="block" data-testid="pending-note-what">{t(keys.what)}</span>
-      <span className="block" data-testid="pending-note-source">{t(keys.source)}</span>
+      <span className="block" data-testid="pending-note-what">{clauses(t(keys.what))}</span>
+      <span className="block" data-testid="pending-note-source">{clauses(t(keys.source))}</span>
     </span>
   )
 }

@@ -1132,7 +1132,7 @@
     },
     "autofillUnits": {
       "what": "Unit costs, upkeep and training times haven't been checked in-game on ts11 yet; the current numbers are community-compiled.",
-      "source": "Spartan speeds only come from the official help page; reverse TS leaves Spartan units out."
+      "source": "Spartan speeds come from the official help page (which says the numbers come from a third-party calculator); reverse TS leaves Spartan units out."
     },
     "spartanSpeed": {
       "what": "Spartan speeds haven't been checked in-game on ts11 yet; reverse TS leaves Spartan units out.",

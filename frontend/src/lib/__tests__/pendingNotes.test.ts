@@ -62,6 +62,19 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
     expect(JSON.stringify(dict)).not.toContain('粮')
   })
 
+  it('no 「T4」 or 「粮」 in user-visible text of any .tsx file (comments ignored)', () => {
+    for (const [file, text] of Object.entries(sources)) {
+      if (file.includes('__tests__') || file.endsWith('.test.tsx')) continue
+      // 拿掉註解（// …、/* … */、JSX 的 {/* … */}），剩下的字串和 JSX 文字都是使用者可能看到的
+      const visible = text
+        .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|[^:'"`])\/\/.*$/gm, '$1')
+      expect(visible, file).not.toMatch(/T4/)
+      expect(visible, file).not.toContain('粮')
+    }
+  })
+
   it('the 已帶入 chip uses autofillUnits, whose two lines cover unit costs and Spartan speed', () => {
     const bar = Object.entries(sources).find(([f]) => f.endsWith('/components/autofill/AutoFillBar.tsx'))?.[1] ?? ''
     expect(bar).toMatch(/<PendingVerifyChip[^>]*kind="autofillUnits"/)

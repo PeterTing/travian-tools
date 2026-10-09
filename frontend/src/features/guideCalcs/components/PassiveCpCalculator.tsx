@@ -298,7 +298,8 @@ export default function PassiveCpCalculator() {
               : `辦一場${mode === 'small' ? '小' : '大'}慶典：+${cd.perCelebration} CP（上限 ${mode === 'small' ? capSmall : capGreat}）`)}
         >
           <h4>{en ? 'Days to reach village #N' : '開村門檻所需天數'}</h4>
-          <table className={s.table} data-testid="cp-countdown">
+          {/* 每一列至少 44px、數字垂直置中：灰標的 44px 點擊範圍剛好等於這一列，不會蓋到上一列的灰標 */}
+          <table className={`${s.table} ${s.tapRows}`} data-testid="cp-countdown">
             <thead>
               <tr>
                 <th>#</th>
@@ -309,7 +310,7 @@ export default function PassiveCpCalculator() {
             </thead>
             <tbody>
               {cd.rows.map(r => (
-                <PendingRow as="tr" tableColSpan={4} key={r.village}>
+                <PendingRow as="tr" className="h-11" tableColSpan={4} key={r.village}>
                   <td>#{r.village}</td>
                   <td>
                     {r.required.toLocaleString()}
@@ -323,17 +324,17 @@ export default function PassiveCpCalculator() {
           </table>
 
           <h4>{en ? 'Celebration cost (x1)' : '慶典花費（x1）'}</h4>
-          <table className={s.table} data-testid="cp-celebration-cost">
+          <table className={`${s.table} ${s.tapRows}`} data-testid="cp-celebration-cost">
             <thead>
               <tr><th>{en ? 'Type' : '種類'}</th><th>{en ? 'Wood / Clay / Iron' : '木／泥／鐵'}</th><th>{en ? 'Crop' : '糧'}</th></tr>
             </thead>
             <tbody>
-              <PendingRow as="tr" tableColSpan={3}>
+              <PendingRow as="tr" className="h-11" tableColSpan={3}>
                 <td>{en ? 'Small' : '小慶典'}</td>
                 <td>{small.cost.slice(0, 3).map(n => n.toLocaleString()).join(' / ')}</td>
                 <td>{small.cost[3].toLocaleString()}{small.pending.length > 0 && <> <PendingVerifyChip kind="celebration" /></>}</td>
               </PendingRow>
-              <PendingRow as="tr" tableColSpan={3}>
+              <PendingRow as="tr" className="h-11" tableColSpan={3}>
                 <td>{en ? 'Great' : '大慶典'}{great.pending.includes('cost') && <> <PendingVerifyChip kind="celebration" /></>}</td>
                 <td>{great.cost.slice(0, 3).map(n => n.toLocaleString()).join(' / ')}</td>
                 <td>{great.cost[3].toLocaleString()}</td>

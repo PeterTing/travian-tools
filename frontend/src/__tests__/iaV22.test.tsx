@@ -191,7 +191,7 @@ describe('IA v2.2', () => {
         /^兵種花費、糧耗、訓練時間還沒在 ts11 遊戲內核對，目前用的是社群整理的數字。$/,
       )
       expect(screen.getByTestId('pending-note-source')).toHaveTextContent(
-        /^斯巴達速度只有官方說明頁的數字，反推 TS 不會算斯巴達兵種。$/,
+        /^斯巴達速度取自官方說明頁（頁面標示數字來自第三方計算器），反推 TS 不會算斯巴達兵種。$/,
       )
     })
 

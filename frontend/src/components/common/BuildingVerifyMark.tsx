@@ -15,7 +15,6 @@ export default function BuildingVerifyMark({ buildingId, className = '' }: Build
       <span
         data-testid="verified-mark"
         className={`ml-1 align-middle text-sm text-green-600 ${className}`}
-        title={t('common.verifiedTs11')}
         aria-label={t('common.verifiedTs11')}
       >
         ✓

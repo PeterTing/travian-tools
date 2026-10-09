@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import i18n from '@/i18n/i18n'
 import PendingVerifyChip, { PendingRow } from '../PendingVerifyChip'
+import { splitClauses } from '@/lib/pendingNotes'
 import { PendingNoteGroupProvider } from '../PendingNoteGroup'
 
 const page = (children: ReactNode) => render(<PendingNoteGroupProvider>{children}</PendingNoteGroupProvider>)
@@ -18,7 +19,8 @@ describe('「待驗證」灰標（P0-17）', () => {
     expect(chip).toBe(screen.getByTestId('pending-verify-chip'))
     expect(chip).toHaveAttribute('type', 'button')
     expect(chip).toHaveAttribute('aria-expanded', 'false')
-    expect(chip.getAttribute('aria-controls')).toBeTruthy()
+    // 收合時說明塊不存在：不能指向不存在的 id
+    expect(chip).not.toHaveAttribute('aria-controls')
     expect(chip).toHaveTextContent('ⓘ')
     expect(chip).not.toHaveAttribute('title')
     expect(screen.queryByTestId('pending-note-panel')).toBeNull()
@@ -30,7 +32,9 @@ describe('「待驗證」灰標（P0-17）', () => {
     fireEvent.click(chip)
     expect(chip).toHaveAttribute('aria-expanded', 'true')
     const panel = screen.getByTestId('pending-note-panel')
+    expect(chip.getAttribute('aria-controls')).toBeTruthy()
     expect(panel.id).toBe(chip.getAttribute('aria-controls'))
+    expect(document.getElementById(chip.getAttribute('aria-controls')!)).toBe(panel)
     expect(within(panel).getByTestId('pending-note-what')).toHaveTextContent('兵種花費、糧耗、訓練時間還沒在 ts11 遊戲內核對。')
     expect(within(panel).getByTestId('pending-note-source')).toHaveTextContent('目前用的是社群整理的數字，可能有誤差。')
     // 12px 以上、在版面裡（不是浮動提示）
@@ -38,7 +42,45 @@ describe('「待驗證」灰標（P0-17）', () => {
     expect(panel.className).not.toMatch(/\b(absolute|fixed)\b/)
     fireEvent.click(chip)
     expect(chip).toHaveAttribute('aria-expanded', 'false')
+    expect(chip).not.toHaveAttribute('aria-controls')
     expect(screen.queryByTestId('pending-note-panel')).toBeNull()
+  })
+
+  it('every aria-controls on the page points to an element that exists (rows, tables, standalone)', () => {
+    page(
+      <>
+        <PendingRow><PendingVerifyChip kind="units" /> 一行</PendingRow>
+        <table><tbody><PendingRow as="tr" tableColSpan={1}><td><PendingVerifyChip kind="cpThreshold" /></td></PendingRow></tbody></table>
+        <PendingVerifyChip kind="building" />
+      </>,
+    )
+    const chips = screen.getAllByTestId('pending-verify-chip')
+    const check = () => {
+      for (const c of chips) {
+        const id = c.getAttribute('aria-controls')
+        if (id) expect(document.getElementById(id), id).not.toBeNull()
+      }
+    }
+    check()
+    for (const c of chips) { fireEvent.click(c); check() }
+  })
+
+  it('splits a line into clauses so it only wraps at commas, semicolons or parentheses', () => {
+    expect(splitClauses('斯巴達速度取自官方說明頁（頁面標示數字來自第三方計算器），反推 TS 不會算斯巴達兵種。')).toEqual([
+      '斯巴達速度取自官方說明頁', '（頁面標示數字來自第三方計算器），', '反推 TS 不會算斯巴達兵種。',
+    ])
+    expect(splitClauses('Spartan speeds come from the official help page (which says so); reverse TS leaves them out.')).toEqual([
+      'Spartan speeds come from the official help page ', '(which says so); ', 'reverse TS leaves them out.',
+    ])
+    expect(splitClauses('沒有標點的一句')).toEqual(['沒有標點的一句'])
+    page(<PendingVerifyChip kind="autofillUnits" />)
+    fireEvent.click(screen.getByTestId('pending-verify-chip'))
+    const src = screen.getByTestId('pending-note-source')
+    const segs = within(src).getAllByTestId('pending-note-clause')
+    expect(segs).toHaveLength(3)
+    for (const seg of segs) expect(seg).toHaveClass('inline-block')
+    // 切段不改文字
+    expect(src).toHaveTextContent(/^斯巴達速度取自官方說明頁（頁面標示數字來自第三方計算器），反推 TS 不會算斯巴達兵種。$/)
   })
 
   it('only one open per page: opening another closes the previous', () => {

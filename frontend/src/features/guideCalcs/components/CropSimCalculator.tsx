@@ -130,7 +130,8 @@ export default function CropSimCalculator() {
               max={20}
             />
           </div>
-          <PendingRow as="p" className="text-xs text-gray-500">
+          <PendingRow as="p" className="text-xs text-gray-500" data-testid="cropsim-pending">
+            <span>{lang === 'en' ? 'Plus / Waterworks bonus' : 'Plus／供水系統加成'}</span>{' '}
             <PendingVerifyChip kind="cropSim" />
           </PendingRow>
         </div>

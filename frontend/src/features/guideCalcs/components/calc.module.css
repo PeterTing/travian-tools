@@ -203,6 +203,12 @@
   font-weight: 500;
 }
 
+/* 有「待驗證」灰標的表：每一列至少 44px（列上加 h-11），內容垂直置中；
+   灰標的 44px 點擊範圍剛好落在自己這一列，不會蓋到上一列或下一列 */
+.tapRows td {
+  vertical-align: middle;
+}
+
 .best {
   background: hsl(var(--primary) / 0.08);
   font-weight: 600;

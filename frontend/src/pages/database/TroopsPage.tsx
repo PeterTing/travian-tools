@@ -34,7 +34,8 @@ const OFFICIAL_PENDING_SOURCE_TEXT = '官方說明頁，數字標示取自第三
 /** 速度出處說明（P0-15）：只給已核對的速度用（ts11 遊戲內說明／官方說明）；待驗證的看灰標 */
 function speedSourceLabel(t: Pick<TroopDetail, 'speed_source' | 'speed_ref'>): string {
   if (t.speed_source === 'ts11') return 'ts11 遊戲內說明'
-  return '官方說明'
+  if (t.speed_source === 'official') return '官方說明'
+  return ''
 }
 
 /** 速度沒有第一手出處（null 或官方頁標示取自第三方計算器）就標「待驗證」 */

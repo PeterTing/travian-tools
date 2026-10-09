@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import i18n from '@/i18n/i18n'
 import gen from '../../data/gameData.gen.json'
@@ -128,6 +129,19 @@ describe('PassiveCpCalculator UI', () => {
     expect(within(rows[1]!).queryByTestId('pending-verify-chip')).toBeNull()
     expect(within(rows[2]!).getByTestId('pending-verify-chip')).toBeInTheDocument()
     expect(screen.queryByText('+大慶典/天')).toBeNull()
+  })
+  it('chip tables: EVERY body row is at least 44px (h-11) with cells vertically centred, so 44px chip hit areas never reach the next row', () => {
+    render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
+    for (const id of ['cp-countdown', 'cp-celebration-cost']) {
+      const table = screen.getByTestId(id)
+      const rows = [...table.querySelectorAll('tbody > tr')].filter(r => r.getAttribute('data-testid') !== 'pending-note-row')
+      expect(rows.length, id).toBeGreaterThan(1)
+      // 有灰標和沒灰標的列都一樣高
+      for (const r of rows) expect(r, `${id} ${r.textContent}`).toHaveClass('h-11')
+      expect(table.className, id).toMatch(/tapRows/)
+    }
+    const calcCss = readFileSync('src/features/guideCalcs/components/calc.module.css', 'utf8')
+    expect(calcCss).toMatch(/\.tapRows td \{\s*vertical-align: middle;/)
   })
   it('shows small-celebration crop cost with 待驗證', () => {
     render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)

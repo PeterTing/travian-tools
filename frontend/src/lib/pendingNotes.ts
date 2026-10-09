@@ -39,3 +39,30 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
 export function pendingNoteKeys(kind: PendingKind): { what: string; source: string } {
   return { what: `pendingNotes.${kind}.what`, source: `pendingNotes.${kind}.source` }
 }
+
+/**
+ * 把一句說明切成「子句」：每段是 inline-block，所以換行只會發生在逗號、分號、句號或括號，
+ * 不會斷在詞中間（例如「官方說明頁」「第三方計算器」）。一段本身比一行還長時，段內才照常換行。
+ * 切點：「，」「；」「。」「、」「, 」「; 」之後，「（」「 (」之前，「）」「)」之後（後面緊跟標點就一起帶走）。
+ */
+export function splitClauses(text: string): string[] {
+  const parts: string[] = []
+  let cur = ''
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]!
+    if ((ch === '（' || (ch === '(' && cur.endsWith(' '))) && cur.trim()) {
+      parts.push(cur)
+      cur = ''
+    }
+    cur += ch
+    const next = text[i + 1] ?? ''
+    const breakAfter = /[，；。、]/.test(ch) || ((ch === ',' || ch === ';') && next === ' ') || ch === '）' || ch === ')'
+    if (breakAfter && !/[，；。、,;.]/.test(next)) {
+      if (next === ' ') { cur += ' '; i++ }
+      parts.push(cur)
+      cur = ''
+    }
+  }
+  if (cur) parts.push(cur)
+  return parts
+}
