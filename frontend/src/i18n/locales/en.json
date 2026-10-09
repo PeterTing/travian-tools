@@ -111,10 +111,9 @@
       "perDay": "+{{daily}} a day",
       "days": "about {{days}} days",
       "pendingNote": "The {{n}} threshold {{target}} is not confirmed in ts11 yet, so the days are unverified too.",
-      "source": "From the current CP and daily CP you last entered in “CP & new villages” (saved on this device only)",
       "empty": "No current CP entered yet",
       "enter": "Enter CP",
-      "lastInput": "Last entered: {{at}}"
+      "lastInput": "Last entered: {{at}} · saved on this device only"
     },
     "villageOrdinal": {
       "2": "village #2",

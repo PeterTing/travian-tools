@@ -207,7 +207,7 @@ describe('IA v2.2', () => {
       expect(screen.getByText(/每天 \+48 → 約 150 天/)).toBeInTheDocument()
     })
 
-    it('CP card ends with 「上次輸入：M/D HH:mm」 in local time, no weekday', () => {
+    it('CP card ends with 「上次輸入：M/D HH:mm · 只存在這台裝置」 in local time, no weekday, no tooltip', () => {
       writeCpProgress('acc-1', { currentCp: 846, dailyCp: 48, speed: 1 })
       const saved = JSON.parse(localStorage.getItem('tt:cpProgress:acc-1')!)
       saved.savedAt = new Date(2026, 9, 9, 22, 1).toISOString()
@@ -218,7 +218,9 @@ describe('IA v2.2', () => {
         </MemoryRouter>,
       )
       const line = screen.getByTestId('cp-card-last-input')
-      expect(line).toHaveTextContent(/^上次輸入：10\/9 22:01$/)
+      expect(line).toHaveTextContent(/^上次輸入：10\/9 22:01 · 只存在這台裝置$/)
+      // 手機不能 hover：說明直接寫在這行，不用 tooltip
+      expect(line).not.toHaveAttribute('title')
       expect(line.className).toContain('text-xs')
       expect(line.className).toContain('text-muted-foreground')
       // 是卡片最後一行

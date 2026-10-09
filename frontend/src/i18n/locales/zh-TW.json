@@ -211,10 +211,9 @@
       "perDay": "每天 +{{daily}}",
       "days": "約 {{days}} 天",
       "pendingNote": "{{n}}門檻 {{target}} 尚未在 ts11 確認，天數跟著標待驗證。",
-      "source": "數字來自你上次在「CP 與開村」填的目前 CP 和每日 CP（只存在這台裝置）",
       "empty": "還沒填過目前 CP",
       "enter": "去輸入",
-      "lastInput": "上次輸入：{{at}}"
+      "lastInput": "上次輸入：{{at}} · 只存在這台裝置"
     },
     "villageOrdinal": {
       "2": "二村",

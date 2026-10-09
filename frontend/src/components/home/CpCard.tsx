@@ -66,7 +66,7 @@ export default function CpCard({
             </p>
           )}
           {stamp && (
-            <p className="mt-1 text-xs text-muted-foreground" title={t('home.cpCard.source')} data-testid="cp-card-last-input">
+            <p className="mt-1 text-xs text-muted-foreground" data-testid="cp-card-last-input">
               {t('home.cpCard.lastInput', { at: stamp })}
             </p>
           )}
