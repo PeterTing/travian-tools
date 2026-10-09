@@ -7,6 +7,7 @@ import {
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 export type BB = 'sawmill' | 'brickyard' | 'ironFoundry' | 'grainMill' | 'bakery';
 
@@ -159,6 +160,7 @@ export default function BuildOrderCalculator() {
           ? 'Suggests the next 20 upgrades from your current village. Capitals can go to field Lv 20; other villages stop at Lv 10. Bonus buildings appear when their requirements are met.'
           : '依目前村莊狀態，建議接下來 20 個最划算的升級。首都資源田可升到 20 級，一般村最高 10 級；加成建築在條件達到後會自動出現。'}</p>
       </div>
+      <CalcBar />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>

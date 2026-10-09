@@ -10,6 +10,7 @@ import type {
   TroopListItem,
   BattleUnit,
 } from '@/types/game'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 interface BuildingEntry {
   building_id: string
@@ -184,6 +185,7 @@ export default function CropBalancePage() {
       <p className="text-muted-foreground mb-6">
         {t('calculator.crop.description')}
       </p>
+      <CalcBar />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Input area */}

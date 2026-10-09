@@ -10,6 +10,7 @@ import type {
   BuildingUpgradeRequest,
   BuildingUpgradeResponse,
 } from '@/types/game'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 function formatTime(seconds: number): string {
   if (seconds < 60) return `${seconds}s`
@@ -89,6 +90,7 @@ export default function BuildingCalculatorPage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-2">{t('calculator.building.title')}</h1>
       <BuildingVerifyLegend />
+      <CalcBar />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input area */}

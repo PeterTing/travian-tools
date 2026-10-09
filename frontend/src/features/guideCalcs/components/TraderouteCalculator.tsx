@@ -3,6 +3,7 @@ import { MERCHANTS, merchantCapacity, type TribeId } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const fmtInt = (n: number) => isFinite(n) ? Math.round(n).toLocaleString('en-US') : '—';
 const fmtHr = (h: number) => {
@@ -51,6 +52,7 @@ export default function TraderouteCalculator() {
           ? "How many merchants you need to move a feeder village's hourly surplus. Tribe sets base capacity and speed; each Trade Office level adds +10% capacity (Romans +20%). Within about 60 fields, one or two merchants are often enough."
           : '算支援村每小時多出來的資源，要幾個商人才能搬完。部族決定基礎容量與速度；交易所每級多 10% 容量（羅馬人每級 20%）。大約 60 格以內，通常一到兩個商人就夠。'}</p>
       </div>
+      <CalcBar />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>

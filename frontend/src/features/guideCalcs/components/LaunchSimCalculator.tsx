@@ -7,6 +7,7 @@ import type { TribeId } from '../data/travian';
 import { TRIBES } from '../data/tribes/index';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const TRIBE_ORDER: TribeId[] = ['romans', 'teutons', 'gauls', 'egyptians', 'huns', 'vikings', 'spartans'];
 
@@ -86,6 +87,7 @@ export default function LaunchSimCalculator() {
             : '依產量與開局風格，估算多久可以結帳開新村。會標出派對、訓練拓荒者與最後一步等里程碑時間。'}
         </p>
       </div>
+      <CalcBar />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { TechnologyRequest, TechnologyResponse } from '@/services/advancedCalculatorApi'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const TRIBES = [
   { value: 'romans', label: '羅馬' },
@@ -41,6 +42,7 @@ export default function TechnologyCalculatorPage() {
       <p className="text-muted-foreground mb-6">
         查看各研究等級下兵種的攻防數值變化。公式：base * 1.015^level
       </p>
+      <CalcBar />
 
       <div className="flex gap-4 mb-6 items-end">
         <div>

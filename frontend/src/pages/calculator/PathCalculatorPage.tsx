@@ -7,6 +7,7 @@ import {
   formatTravelTime,
 } from '@/lib/travianFormulas'
 import CalcResultPanel from '@/features/guideCalcs/components/CalcResultPanel'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 /**
  * 行軍時間（路徑）計算器 — 前端即時結果（S71 競技場公式與後端共用）。
@@ -69,6 +70,7 @@ export default function PathCalculatorPage() {
         <h1 className="mb-2 text-xl font-semibold">{t('pathCalc.title')}</h1>
         <p className="text-sm text-muted-foreground">{t('pathCalc.intro')}</p>
       </div>
+      <CalcBar />
 
       <div className="flex min-w-0 flex-col gap-4 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px)+11rem)] lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:pb-0">
         <div className="min-w-0 rounded-xl border bg-card p-4">

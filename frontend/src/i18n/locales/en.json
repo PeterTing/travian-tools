@@ -132,18 +132,18 @@
     },
     "empty": {
       "title": "Paste one game page first",
-      "subtitle": "One paste and we start counting down incoming attacks and your next village.",
+      "subtitle": "Paste your rally point once and we start counting down incoming attacks.",
       "stepsTitle": "Three steps",
       "step1": "Add a game account",
       "step1Done": "Game account added",
       "step1Detail": "tribe and speed set ·",
       "step2": "Paste the rally point",
       "step2Detail": "Reads incoming attacks and troops for the countdown",
-      "step3": "Paste the village overview or CP page",
-      "step3Detail": "Reads villages and CP for the next-village countdown",
+      "step3": "Enter your current CP once in “CP & new villages”",
+      "step3Detail": "Home will then show the next-village countdown",
       "previewTitle": "After pasting you’ll see:",
       "previewIncoming": "Incoming countdown · next arrival",
-      "previewCp": "Next-village progress · days left"
+      "previewCp": "Next-village progress · after you enter CP in “CP & new villages”"
     }
   },
   "notFound": {

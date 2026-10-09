@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { troopsApi } from '@/services/gameApi'
 import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const TRIBES: { value: TroopTribe | 'all'; label: string }[] = [
   { value: 'all', label: '全部' },
@@ -87,6 +88,7 @@ export default function TroopsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">兵種數據庫</h1>
+      <CalcBar />
 
       {/* 部族篩選 */}
       <div className="flex flex-wrap gap-2 mb-4">

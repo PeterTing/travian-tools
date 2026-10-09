@@ -6,6 +6,7 @@ import type {
   TsOptimizerRequest,
   TsOptimizerResponse,
 } from '@/services/advancedCalculatorApi'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 // 舊的「佯攻兵量」（目標人口 5% 的自編算法）已下架；
 // 之後照攻略規則（19 步兵＋1 投石）併進 OP 規劃重寫，見 docs/TICKETS.md。
@@ -16,6 +17,7 @@ export default function AttackPlannerPage() {
       <p className="text-muted-foreground mb-6">
         TS 優化器：同步多個攻擊者對同一目標的抵達時間。
       </p>
+      <CalcBar />
 
       <TsOptimizerForm />
     </div>

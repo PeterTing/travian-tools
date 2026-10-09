@@ -59,6 +59,12 @@ function formatRelativeLabel(
   }
 }
 
+/**
+ * 「＋ 貼上」浮動按鈕高 48px，底部再留 16px：頁面最下面的內容捲到底也不會被它蓋住。
+ * （底部分頁列的高度已由 AppShell 的 main 留好。）電腦版沒有浮動按鈕。
+ */
+export const FAB_CLEARANCE = 'pb-[calc(48px+16px)] lg:pb-6'
+
 export default function HomePage() {
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
@@ -66,8 +72,28 @@ export default function HomePage() {
   const navigate = useNavigate()
   const location = useLocation()
   const accountData = useAccountData()
-  const pasteCardRef = useRef<HTMLDivElement>(null)
+  const pasteCardRef = useRef<HTMLDivElement | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  // 右下角「＋ 貼上」只在貼上卡已經捲到畫面上方、看不到時才出現：
+  // 貼上卡在畫面裡（或還在下面、往下捲就到）時不顯示，免得蓋住來襲／開村卡和貼上框
+  const [pasteCardScrolledPast, setPasteCardScrolledPast] = useState(false)
+  const [pasteCardEl, setPasteCardEl] = useState<HTMLDivElement | null>(null)
+  const setPasteCardNode = useCallback((el: HTMLDivElement | null) => {
+    pasteCardRef.current = el
+    setPasteCardEl(el)
+  }, [])
+  useEffect(() => {
+    if (!pasteCardEl || typeof IntersectionObserver === 'undefined') {
+      setPasteCardScrolledPast(false)
+      return
+    }
+    const io = new IntersectionObserver((entries) => {
+      const entry = entries[entries.length - 1]
+      if (entry) setPasteCardScrolledPast(!entry.isIntersecting && entry.boundingClientRect.bottom <= 0)
+    })
+    io.observe(pasteCardEl)
+    return () => io.disconnect()
+  }, [pasteCardEl])
 
   const [pasteText, setPasteText] = useState('')
   const [parsing, setParsing] = useState(false)
@@ -386,7 +412,7 @@ export default function HomePage() {
   }
 
   const pasteCard = (
-    <div ref={pasteCardRef} className="scroll-mt-20" id="paste">
+    <div ref={setPasteCardNode} className="scroll-mt-20" id="paste">
       <Card data-testid="paste-home">
         <CardHeader className="pb-3">
           <CardTitle className="flex flex-wrap items-center gap-2 text-lg">
@@ -540,13 +566,18 @@ export default function HomePage() {
     />
   )
 
+  const showFab = !isEmpty && pasteCardScrolledPast
+
   const incomingCard =
     unarrived.length > 0 ? (
       <IncomingCard movements={unarrived} villageName={villageName} utcOffset={utcOffset} now={now} busy={busy} />
     ) : null
 
   return (
-    <div className="mx-auto w-full max-w-lg space-y-4 px-4 py-4 lg:max-w-[1080px] lg:px-6 lg:py-6">
+    <div
+      className={`mx-auto w-full max-w-lg space-y-4 px-4 py-4 lg:max-w-[1080px] lg:px-6 lg:py-6 ${isEmpty ? '' : FAB_CLEARANCE}`}
+      data-testid="home-root"
+    >
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h1 className="text-xl font-bold">{isEmpty ? t('home.empty.title') : t('home.todayTitle')}</h1>
         {!isEmpty && (
@@ -578,7 +609,9 @@ export default function HomePage() {
         - 方案 A：來襲 → 開村 → 貼上 → 待補；電腦左主欄（來襲、開村）＋右欄（貼上、待補）
       */}
       <div
-        className={`grid grid-cols-1 gap-4 lg:grid-cols-12 ${isEmpty ? '' : busy ? '' : 'lg:items-start'}`}
+        className={`grid grid-cols-1 gap-4 lg:grid-cols-12 ${
+          isEmpty || busy ? '' : `lg:items-start ${incomingCard ? 'lg:grid-rows-[auto_1fr]' : ''}`
+        }`}
         data-testid={isEmpty ? 'home-empty' : busy ? 'home-busy' : 'home-normal'}
       >
         {isEmpty && (
@@ -618,24 +651,31 @@ export default function HomePage() {
                 <span className="block text-xs text-muted-foreground">{t('home.empty.step2Detail')}</span>
               </span>
             </li>
-            <li className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs">3</span>
-              <span className="min-w-0">
-                <span className="block font-medium">{t('home.empty.step3')}</span>
-                <span className="block text-xs text-muted-foreground">{t('home.empty.step3Detail')}</span>
-              </span>
+            <li>
+              <Link
+                to="/calculator/passive-cp"
+                className="-mx-2 flex min-h-[44px] gap-3 rounded-md px-2 py-1 hover:bg-muted"
+                data-testid="home-step3-cp"
+              >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs">3</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium">{t('home.empty.step3')}</span>
+                  <span className="block text-xs text-muted-foreground">{t('home.empty.step3Detail')}</span>
+                </span>
+                <span aria-hidden className="self-center text-orange-600">›</span>
+              </Link>
             </li>
           </ol>
         </section>
         )}
         {!isEmpty && incomingCard && (
-          <div className={`order-1 min-w-0 ${busy ? 'lg:col-span-12' : 'lg:col-span-7 lg:col-start-1 lg:row-start-1'}`}>
+          <div className={`order-1 min-w-0 lg:self-start ${busy ? 'lg:col-span-12' : 'lg:col-span-7 lg:col-start-1 lg:row-start-1'}`}>
             {incomingCard}
           </div>
         )}
         {!isEmpty && (
           <div
-            className={`order-2 min-w-0 ${
+            className={`order-2 min-w-0 lg:self-start ${
               busy ? 'lg:col-span-6' : `lg:col-span-7 lg:col-start-1 ${incomingCard ? 'lg:row-start-2' : 'lg:row-start-1'}`
             }`}
           >
@@ -666,7 +706,7 @@ export default function HomePage() {
       </div>
 
       {/* 手機：右下角浮動「＋ 貼上」（電腦在頂列） */}
-      {!isEmpty && (
+      {showFab && (
         <button
           type="button"
           onClick={focusPaste}

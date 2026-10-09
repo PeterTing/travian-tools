@@ -232,18 +232,18 @@
     },
     "empty": {
       "title": "先貼一頁遊戲畫面",
-      "subtitle": "貼一次就會開始幫你算來襲倒數和開村進度。",
+      "subtitle": "貼一次集結點，就會開始幫你算來襲倒數。",
       "stepsTitle": "三步開始",
       "step1": "新增遊戲帳號",
       "step1Done": "新增遊戲帳號",
       "step1Detail": "部族、速度已設定 ·",
       "step2": "貼「集結點」",
       "step2Detail": "讀出來襲和部隊，首頁才會有來襲倒數",
-      "step3": "貼「村莊總覽」或「CP」頁",
-      "step3Detail": "讀出村莊和 CP，才能算開村倒數",
+      "step3": "到『CP 與開村』填一次目前 CP",
+      "step3Detail": "首頁就會顯示開村倒數",
       "previewTitle": "貼完後這裡會出現：",
       "previewIncoming": "來襲倒數 · 最近一筆抵達時間",
-      "previewCp": "開村進度 · 還要幾天"
+      "previewCp": "開村進度 · 在『CP 與開村』填過 CP 後顯示"
     }
   },
   "notFound": {

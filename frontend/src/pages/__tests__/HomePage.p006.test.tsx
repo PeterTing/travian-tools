@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import i18n from '@/i18n/i18n'
 
@@ -109,6 +109,77 @@ describe('HomePage P0-06 remaining', () => {
     expect(await screen.findByTestId('recent-uploads-empty')).toHaveTextContent(
       '還沒有上傳紀錄',
     )
+  })
+
+  it('shows ＋ 貼上 only after the paste card scrolled off the top, and always leaves room for it at the bottom', async () => {
+    const observers: { cb: IntersectionObserverCallback; el?: Element }[] = []
+    class FakeObserver {
+      cb: IntersectionObserverCallback
+      constructor(cb: IntersectionObserverCallback) {
+        this.cb = cb
+        observers.push({ cb })
+      }
+      observe(el: Element) {
+        observers[observers.length - 1].el = el
+      }
+      disconnect() {}
+      unobserve() {}
+      takeRecords() {
+        return []
+      }
+    }
+    vi.stubGlobal('IntersectionObserver', FakeObserver)
+    try {
+      render(
+        <MemoryRouter>
+          <HomePage />
+        </MemoryRouter>,
+      )
+      await screen.findByTestId('home-normal')
+      // 頁面底部永遠留出按鈕高度 + 16px，捲到底時最後的內容不會被蓋住
+      expect(screen.getByTestId('home-root').className).toContain('pb-[calc(48px+16px)]')
+
+      const obs = observers.find((o) => o.el?.id === 'paste')!
+      expect(obs).toBeTruthy()
+      const fire = (isIntersecting: boolean, top: number) =>
+        act(() =>
+          obs.cb(
+            [{ isIntersecting, target: obs.el!, boundingClientRect: { top, bottom: top + 400 } } as unknown as IntersectionObserverEntry],
+            {} as IntersectionObserver,
+          ),
+        )
+
+      // 貼上卡在畫面裡：不顯示
+      fire(true, 300)
+      expect(screen.queryByTestId('paste-fab')).not.toBeInTheDocument()
+      // 貼上卡還在下面（往下捲就到）：不顯示，免得蓋住來襲／開村卡
+      fire(false, 900)
+      expect(screen.queryByTestId('paste-fab')).not.toBeInTheDocument()
+      // 貼上卡已捲到上方看不到：顯示，點了回到貼上框
+      fire(false, -900)
+      expect(screen.getByTestId('paste-fab')).toBeInTheDocument()
+      fire(true, 100)
+      expect(screen.queryByTestId('paste-fab')).not.toBeInTheDocument()
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('empty state only promises what exists: rally point → countdown; step 3 opens CP 與開村', async () => {
+    syncApi.getLogs.mockResolvedValueOnce({ logs: [], total: 0 })
+    villageApi.getAll.mockResolvedValueOnce({ villages: [], total: 0 })
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    )
+    await screen.findByTestId('home-empty')
+    expect(screen.getByText('貼一次集結點，就會開始幫你算來襲倒數。')).toBeInTheDocument()
+    const step3 = screen.getByTestId('home-step3-cp')
+    expect(step3).toHaveAttribute('href', '/calculator/passive-cp')
+    expect(step3).toHaveTextContent('到『CP 與開村』填一次目前 CP')
+    expect(step3).toHaveTextContent('首頁就會顯示開村倒數')
+    expect(screen.queryByTestId('paste-fab')).not.toBeInTheDocument()
   })
 
   it('incoming list page filters by village and persists choice', async () => {

@@ -3,6 +3,7 @@ import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { SaveTroopsRequest, SaveTroopsResponse } from '@/services/advancedCalculatorApi'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 export default function SaveTroopsCalculatorPage() {
   const [form, setForm] = useState<SaveTroopsRequest>({
@@ -46,6 +47,7 @@ export default function SaveTroopsCalculatorPage() {
       <p className="text-muted-foreground mb-6">
         計算部隊應派往多遠的距離，確保離線期間部隊在外安全。部隊會在離線期間往返，剛好在你上線時回來。
       </p>
+      <CalcBar />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input */}

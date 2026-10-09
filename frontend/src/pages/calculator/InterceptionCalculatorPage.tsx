@@ -3,6 +3,7 @@ import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { InterceptionRequest, InterceptionResponse } from '@/services/advancedCalculatorApi'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 export default function InterceptionCalculatorPage() {
   const [form, setForm] = useState<InterceptionRequest>({
@@ -51,6 +52,7 @@ export default function InterceptionCalculatorPage() {
       <p className="text-muted-foreground mb-6">
         計算何時派出攔截部隊，在攻擊者回程時於其村莊攔截。
       </p>
+      <CalcBar />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input */}
