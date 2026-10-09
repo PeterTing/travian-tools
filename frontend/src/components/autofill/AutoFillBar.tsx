@@ -29,7 +29,7 @@ interface AutoFillBarProps {
  * 計算器最上面的「已帶入」列（IA v2.2）：
  *   已帶入：PeterT · ts11（x1・高盧）· 主村 (0|0)   更改
  *   時差 +6 小時（從貼上的頁面讀到）／時差：貼一頁就會自動設好
- *   〔待驗證〕兵種速度與花費尚未在 ts11 實測   ← 只在用到兵種資料的頁面
+ *   〔待驗證〕兵種花費、糧耗、訓練時間尚未在 ts11 核對；斯巴達速度待驗證   ← 只在用到兵種資料的頁面
  */
 export default function AutoFillBar({ usesVillage = true, unitData, assumption }: AutoFillBarProps) {
   const { t } = useTranslation()

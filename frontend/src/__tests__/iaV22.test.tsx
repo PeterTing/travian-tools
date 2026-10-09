@@ -157,7 +157,7 @@ describe('IA v2.2', () => {
     it('shows 兵種待驗證 on pages that use unit data, e.g. 行軍時間', () => {
       renderBar('/calculator/path')
       const line = screen.getByTestId('autofill-unit-pending')
-      expect(line).toHaveTextContent('兵種速度與花費尚未在 ts11 實測')
+      expect(line).toHaveTextContent('兵種花費、糧耗、訓練時間尚未在 ts11 核對；斯巴達速度待驗證')
       expect(within(line).getByTestId('pending-verify-chip')).toHaveTextContent('待驗證')
     })
   })

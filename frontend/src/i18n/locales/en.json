@@ -1079,7 +1079,7 @@
     "thisPageOnly": "(changed on this page)",
     "offsetUnknown": "Time offset: set automatically once you paste a page",
     "offsetKnown": "Time offset {{hours}} h (read from a pasted page)",
-    "unitPending": "Unit speeds and costs are not yet measured in ts11",
+    "unitPending": "Unit costs, upkeep and training times not yet checked on ts11; Spartan speeds unverified",
     "speed": "Server speed",
     "tribe": "Tribe",
     "village": "Village",
