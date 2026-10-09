@@ -259,20 +259,21 @@ function TsOptimizerForm() {
             </thead>
             <tbody>
               {result.results.map((r) => {
-                // 待驗證：這一列的攻擊者有競技場或靴子時，行進時間用了官方說明頁的公式（一列一個，P0-21）
+                // 待驗證：這一列的攻擊者有競技場或靴子時，建議 TS、發兵、行進時間用了官方說明頁的公式（一列一個，P0-21）
                 const atk = usedAttackers.find((a) => a.village_label === r.village_label)
                 const kinds = speedPendingKinds(atk?.ts_level ?? r.recommended_ts_level, atk?.hero_bonus ?? 0)
                 return (
                   // 列高 ≥ 44（p-3）：上下兩列灰標的點擊範圍（44×44）才不會疊在一起
                   <PendingRow as="tr" tableColSpan={5} key={r.village_label}>
-                    <td className="border p-3">{r.village_label}</td>
+                    {/* 一列一個灰標，放在列的標題（村莊）格：涵蓋建議 TS、發兵時間、行進時間 */}
+                    <td className="border p-3" data-testid="ts-row-title">
+                      {r.village_label}
+                      {kinds.length > 0 && <> <PendingVerifyChip kinds={kinds} /></>}
+                    </td>
                     <td className="border p-3">{r.distance}</td>
                     <td className="border p-3">{r.recommended_ts_level}</td>
                     <td className="border p-3 font-mono text-xs">{r.send_time}</td>
-                    <td className="border p-3" data-testid="ts-travel">
-                      {r.travel_time_formatted}
-                      {kinds.length > 0 && <> <PendingVerifyChip kinds={kinds} /></>}
-                    </td>
+                    <td className="border p-3" data-testid="ts-travel">{r.travel_time_formatted}</td>
                   </PendingRow>
                 )
               })}
@@ -284,14 +285,15 @@ function TsOptimizerForm() {
               const atk = usedAttackers.find((a) => a.village_label === r.village_label)
               const kinds = speedPendingKinds(atk?.ts_level ?? r.recommended_ts_level, atk?.hero_bonus ?? 0)
               return (
-                <div key={r.village_label} className="min-w-0 rounded-md border p-3 text-sm">
-                  <p className="font-medium">{r.village_label}</p>
-                  <p className="text-muted-foreground">距離 {r.distance} · 建議 TS {r.recommended_ts_level}</p>
-                  <p className="mt-1 break-all font-mono text-xs">發兵 {r.send_time}</p>
-                  <PendingRow as="p" className="mt-1" data-testid="ts-travel-card">
-                    行進 {r.travel_time_formatted}
+                <div key={r.village_label} className="min-w-0 rounded-md border p-3 text-sm" data-testid="ts-result-card">
+                  {/* 一張卡一個灰標，放在標題行（建議 TS、發兵時間、行進時間都用到行軍公式）；說明撐滿卡片內容寬（P0-21 設計師） */}
+                  <PendingRow as="p" fill className="font-medium" data-testid="ts-card-title">
+                    {r.village_label}
                     {kinds.length > 0 && <> <PendingVerifyChip kinds={kinds} /></>}
                   </PendingRow>
+                  <p className="text-muted-foreground">距離 {r.distance} · 建議 TS {r.recommended_ts_level}</p>
+                  <p className="mt-1 break-all font-mono text-xs">發兵 {r.send_time}</p>
+                  <p className="mt-1" data-testid="ts-travel-card">行進 {r.travel_time_formatted}</p>
                 </div>
               )
             })}

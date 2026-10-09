@@ -717,9 +717,10 @@ class AdvancedCalculatorService:
         # wave index lines up with send-time ordering
         prepared = []
         for atk in request.attackers:
-            dx = atk.x - request.target_x
-            dy = atk.y - request.target_y
-            distance = (dx * dx + dy * dy) ** 0.5
+            # 共用距離函式（含地圖環繞），跟其他工具一樣（P0-21）
+            distance = _calculate_distance(
+                atk.x, atk.y, request.target_x, request.target_y
+            )
             prepared.append((distance, atk))
         prepared.sort(key=lambda p: -p[0])
 

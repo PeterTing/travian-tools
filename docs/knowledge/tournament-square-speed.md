@@ -70,14 +70,14 @@ frontend mirror `frontend/src/lib/travianFormulas.ts` (`travelHours`, `calculate
 
 - **March time** (行軍時間, computed in the browser): arena + boots.
 - **Interception** (攔截): the interceptor (arena + boots) **and** the attacker's return trip (attacker arena + boots).
-- **Attack TS Optimizer** (OP 規劃): arena + boots per attacker.
+- **Attack TS Optimizer** (OP 規劃): arena + boots per attacker; distance uses the same wrap-around map distance as the other tools (it used plain Euclidean before P0-21).
 - **Reverse TS** (反推 TS): tries TS 0–20 with the boots % you enter.
 - **Save troops** (躲兵): inverse — how far you can go in half the offline time.
 
 Consistency cases shared by the frontend and backend tests: `docs/knowledge/travel-speed-cases.json`
-(same distance / speed / arena / boots → every tool returns the same seconds).
+(same distance / speed / arena / boots → every tool returns the same seconds; one case crosses the map edge and is given as coordinates).
 
-Not yet modelled: pennants/standards (官方說明頁: multiply the whole trip) — TICKETS P1-24.
+Not yet modelled in the shared formula: whole-trip multipliers — pennants/standards (官方說明頁: multiply the whole trip) and artefacts (only the march time page has an artefact field today) — TICKETS P1-24 「整趟倍率：旗幟和神器」.
 
 Every result that uses arena or boots shows the 「待驗證」 chip (`arenaSpeed` / `heroBootsSpeed` / `arenaBootsSpeed`):
 not yet checked in-game on ts11.

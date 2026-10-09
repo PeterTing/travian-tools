@@ -57,6 +57,8 @@ export default function InterceptionCalculatorPage() {
 
   const returnKinds = used ? speedPendingKinds(used.attacker_ts_level ?? 0, used.attacker_hero_bonus ?? 0) : []
   const catchKinds = used ? speedPendingKinds(used.catcher_ts_level ?? 0, used.catcher_hero_bonus ?? 0) : []
+  // 發送時間用到兩邊：先攻擊方（回到家時間）、再攔截者（行進時間），同一種只列一次
+  const sendKinds = [...new Set([...returnKinds, ...catchKinds])]
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -146,7 +148,7 @@ export default function InterceptionCalculatorPage() {
           {/* 攻擊方回程也照共用行軍公式：競技場、靴子只加快超過 20 格的路段（P0-21） */}
           <div>
             <Stepper
-              label="攻擊方競技場等級"
+              label="攻方競技場等級"
               value={form.attacker_ts_level ?? 0}
               onChange={(v) => handleChange('attacker_ts_level', v)}
               min={0}
@@ -155,7 +157,7 @@ export default function InterceptionCalculatorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">攻擊方英雄靴子速度加成（%）</label>
+            <label className="block text-sm font-medium mb-2">攻方英雄靴子速度加成（%）</label>
             <input
               type="number"
               min={0}
@@ -206,7 +208,7 @@ export default function InterceptionCalculatorPage() {
 
           <div>
             <Stepper
-              label="攔截者競技場等級"
+              label="攔截方競技場等級"
               value={form.catcher_ts_level ?? 0}
               onChange={(v) => handleChange('catcher_ts_level', v)}
               min={0}
@@ -215,7 +217,7 @@ export default function InterceptionCalculatorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">攔截者英雄靴子速度加成（%）</label>
+            <label className="block text-sm font-medium mb-2">攔截方英雄靴子速度加成（%）</label>
             <input
               type="number"
               min={0}
@@ -262,7 +264,11 @@ export default function InterceptionCalculatorPage() {
                 <p className="text-2xl font-bold">{result.attacker_return_time}</p>
               </div>
               <div className="p-4 bg-primary/10 rounded text-center">
-                <span className="text-sm text-muted-foreground">你應該在此時發送攔截部隊</span>
+                {/* 發送時間 ＝ 回到家時間 − 攔截行進時間：灰標放標籤後面，點開依序列出攻擊方、攔截者用到的種類（P0-21 設計師） */}
+                <PendingRow as="p" className="text-sm text-muted-foreground" data-testid="intercept-send-label">
+                  你應該在此時發送攔截部隊
+                  {sendKinds.length > 0 && <> <PendingVerifyChip kinds={sendKinds} /></>}
+                </PendingRow>
                 <p className="text-3xl font-bold text-primary">{result.send_time}</p>
               </div>
               {/* 390 寬一欄：灰標的說明要有整張卡的寬度（窄格子撐滿的規則） */}

@@ -1,5 +1,5 @@
 {
-  "_comment": "P0-21 一致性測試的共用案例（前端 travianFormulas.test.ts、後端 test_travel_speed_consistency.py 都讀這份）。seconds 是照官方說明頁 S71 手算：前 20 格原速，超過的路段 ×(1+競技場×0.2+靴子%)，四捨五入到秒。",
+  "_comment": "P0-21 一致性測試的共用案例（前端 travianFormulas.test.ts、後端 test_travel_speed_consistency.py 都讀這份）。seconds 是照官方說明頁 S71 手算：前 20 格原速，超過的路段 ×(1+競技場×0.2+靴子%)，四捨五入到秒。 有 from／to 的案例跨地圖邊緣（401×401 環繞）：每個工具都要用座標算，距離和秒數都一樣。",
   "cases": [
     {
       "distance": 10,
@@ -80,6 +80,22 @@
       "arenaLevel": 0,
       "bootsPercent": 0,
       "seconds": 108000
+    },
+    {
+      "from": [
+        -190,
+        0
+      ],
+      "to": [
+        180,
+        10
+      ],
+      "distance": 32.57299494980466,
+      "unitSpeed": 7,
+      "serverSpeed": 1,
+      "arenaLevel": 5,
+      "bootsPercent": 25,
+      "seconds": 13160
     }
   ]
 }

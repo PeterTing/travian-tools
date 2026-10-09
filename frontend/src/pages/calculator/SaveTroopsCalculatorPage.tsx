@@ -157,7 +157,13 @@ export default function SaveTroopsCalculatorPage() {
 
         {/* Result */}
         <div className="border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">計算結果</h2>
+          {/* 整區的數字（距離、時間、說明那句）都是同一份說明：一個灰標放在「計算結果」標題旁，說明在標題下面（P0-21 設計師） */}
+          <div className="mb-4">
+            <PendingRow fill data-testid="save-result-title">
+              <h2 className="inline text-xl font-semibold">計算結果</h2>
+              {saveKinds.length > 0 && <> <PendingVerifyChip kinds={saveKinds} /></>}
+            </PendingRow>
+          </div>
 
           {result ? (
             <div className="space-y-4">
@@ -177,12 +183,10 @@ export default function SaveTroopsCalculatorPage() {
                   <p className="text-xl font-bold">{result.return_time_formatted}</p>
                 </div>
               </div>
-              {/* 待驗證：有競技場或靴子時，距離用了官方說明頁的公式；放這一行，不放大數字旁（P0-21） */}
-              <PendingRow as="p" className="text-sm text-muted-foreground" data-testid="save-distance-line">
+              <p className="text-sm text-muted-foreground" data-testid="save-distance-line">
                 找一個距離約 {result.ideal_distance} 格的空地或綠洲，向它發送偵察或增援，
                 部隊就會在 {result.return_time_formatted} 後返回。
-                {saveKinds.length > 0 && <> <PendingVerifyChip kinds={saveKinds} /></>}
-              </PendingRow>
+              </p>
             </div>
           ) : (
             <div className="text-center text-muted-foreground py-8">

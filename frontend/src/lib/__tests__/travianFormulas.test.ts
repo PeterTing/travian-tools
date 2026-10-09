@@ -4,6 +4,7 @@ import {
   TS_THRESHOLD_FIELDS,
   calculateTravelSeconds,
   distanceForTravelHours,
+  distanceOnMap,
   farSpeedFactor,
   tournamentSquareBonusFactor,
   travelHours,
@@ -12,7 +13,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 // 前後端共用的一致性案例（P0-21）。用 fs 讀、不用 import：前端 Docker build 只有 frontend/，tsc 看不到 docs/
-interface TravelCase { distance: number; unitSpeed: number; serverSpeed: number; arenaLevel: number; bootsPercent: number; seconds: number }
+interface TravelCase { from?: [number, number]; to?: [number, number]; distance: number; unitSpeed: number; serverSpeed: number; arenaLevel: number; bootsPercent: number; seconds: number }
 const travelCases = JSON.parse(
   readFileSync(resolve(__dirname, '../../../../docs/knowledge/travel-speed-cases.json'), 'utf-8'),
 ) as { cases: TravelCase[] }
@@ -124,9 +125,12 @@ describe('Hero boots (P0-20, official help page S71): added to Tournament Square
 
 
 describe('P0-21 行軍速度公式統一：前後端同一份案例（docs/knowledge/travel-speed-cases.json）', () => {
-  it.each(travelCases.cases.map((c) => [`d${c.distance} v${c.unitSpeed}×${c.serverSpeed} ts${c.arenaLevel} boots${c.bootsPercent}`, c] as const))('%s', (_name, c) => {
+  it.each(travelCases.cases.map((c) => [`${c.from ? 'wrap ' : ''}d${c.distance} v${c.unitSpeed}×${c.serverSpeed} ts${c.arenaLevel} boots${c.bootsPercent}`, c] as const))('%s', (_name, c) => {
+    // 跨地圖邊緣的案例：用座標算距離（行軍時間頁用的 distanceOnMap，含 401 環繞）
+    const distance = c.from && c.to ? distanceOnMap(c.from[0], c.from[1], c.to[0], c.to[1]) : c.distance
+    expect(distance).toBeCloseTo(c.distance, 12)
     const opts = {
-      distance: c.distance,
+      distance,
       unitSpeed: c.unitSpeed,
       serverSpeed: c.serverSpeed,
       tournamentSquareLevel: c.arenaLevel,
@@ -137,7 +141,7 @@ describe('P0-21 行軍速度公式統一：前後端同一份案例（docs/knowl
     expect(Math.round(travelHours(opts) * 3600)).toBe(c.seconds)
     // 躲兵的反函數：走那麼久 → 回到同一個距離
     const back = distanceForTravelHours({ hours: travelHours(opts), unitSpeed: c.unitSpeed, serverSpeed: c.serverSpeed, tournamentSquareLevel: c.arenaLevel, heroBonusPercent: c.bootsPercent })
-    expect(back).toBeCloseTo(c.distance, 9)
+    expect(back).toBeCloseTo(distance, 9)
   })
 
   it('farSpeedFactor adds arena and boots (1 + 0.2×TS + boots%)', () => {

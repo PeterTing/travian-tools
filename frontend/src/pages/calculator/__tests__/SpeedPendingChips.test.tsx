@@ -48,7 +48,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
       attacker_return_time: '17:00:00', send_time: '14:30:00', travel_time_formatted: '2h 30m 0s', distance_to_attacker: 30,
     })
     render(<InterceptionCalculatorPage />)
-    setStepper('攻擊方競技場等級', 5)
+    setStepper('攻方競技場等級', 5)
     fireEvent.change(screen.getByTestId('attacker-boots'), { target: { value: '25' } })
     fireEvent.change(screen.getByTestId('catcher-boots'), { target: { value: '20' } })
     fireEvent.click(screen.getByRole('button', { name: '計算攔截時間' }))
@@ -56,9 +56,12 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     expect(api.calculateInterception).toHaveBeenCalledWith(expect.objectContaining({ attacker_ts_level: 5, attacker_hero_bonus: 25, catcher_hero_bonus: 20, catcher_ts_level: 0 }))
     expect(chipKinds(ret)).toEqual(['arenaBootsSpeed'])
     expect(chipKinds(screen.getByTestId('intercept-travel-label'))).toEqual(['heroBootsSpeed'])
-    expect(screen.getAllByTestId('pending-verify-chip')).toHaveLength(2)
-    expect(screen.getByText('攻擊方英雄靴子速度加成（%）')).toBeInTheDocument()
-    expect(screen.getByText('攔截者英雄靴子速度加成（%）')).toBeInTheDocument()
+    // 發送時間卡：依序列出攻方（回到家時間）、攔截方（行進時間）的種類
+    expect(chipKinds(screen.getByTestId('intercept-send-label'))).toEqual(['arenaBootsSpeed heroBootsSpeed'])
+    expect(screen.getAllByTestId('pending-verify-chip')).toHaveLength(3)
+    // 欄位名稱寫明是哪一方（設計師）
+    for (const l of ['攻方英雄靴子速度加成（%）', '攔截方英雄靴子速度加成（%）']) expect(screen.getByText(l)).toBeInTheDocument()
+    for (const l of ['攻方競技場等級', '攔截方競技場等級']) expect(screen.getByRole('group', { name: l })).toBeInTheDocument()
   })
 
   it('interception: all zero → no chip', async () => {
@@ -71,7 +74,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     expect(screen.queryAllByTestId('pending-verify-chip')).toHaveLength(0)
   })
 
-  it('TS optimizer: boots field per attacker; one chip per result row in the travel-time cell', async () => {
+  it('TS optimizer: boots field per attacker; one chip per result card / row on its title (village), none on the travel row', async () => {
     api.calculateTsOptimizer.mockResolvedValue({
       target_arrival: '2030-01-01T12:00:00+00:00',
       results: [{ village_label: 'Hammer-1', recommended_ts_level: 0, send_time: '2030-01-01T06:26:40+00:00', travel_time_formatted: '5:33:20', distance: 50 }],
@@ -81,10 +84,13 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     expect(screen.getAllByText('英雄靴子速度加成（%）').length).toBeGreaterThan(0)
     fireEvent.change(screen.getByTestId('attacker-boots'), { target: { value: '25' } })
     fireEvent.click(screen.getByTestId('ts-submit'))
-    const cell = await screen.findByTestId('ts-travel')
-    expect(chipKinds(screen.getByTestId('ts-travel-card'))).toEqual(['heroBootsSpeed'])
+    const title = await screen.findByTestId('ts-card-title')
     expect(api.calculateTsOptimizer).toHaveBeenCalledWith(expect.objectContaining({ attackers: [expect.objectContaining({ hero_bonus: 25, ts_level: 0 })] }))
-    expect(chipKinds(cell)).toEqual(['heroBootsSpeed'])
+    expect(title).toHaveTextContent('Hammer-1')
+    expect(chipKinds(title)).toEqual(['heroBootsSpeed'])
+    expect(chipKinds(screen.getByTestId('ts-row-title'))).toEqual(['heroBootsSpeed'])
+    expect(chipKinds(screen.getByTestId('ts-travel-card'))).toEqual([])
+    expect(chipKinds(screen.getByTestId('ts-travel'))).toEqual([])
   })
 
   it('reverse TS: boots field is sent; each match row gets the chip for its own arena level (none for TS 0 without boots)', async () => {
@@ -108,7 +114,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     expect(screen.getByText('英雄靴子速度加成（%）')).toBeInTheDocument()
   })
 
-  it('save troops: chip on the 「找一個距離約 X 格」 line, never beside the big distance', async () => {
+  it('save troops: one chip beside the 「計算結果」 section title, none in the sentence or beside the big distance', async () => {
     api.calculateSaveTroops.mockResolvedValue({ ideal_distance: 38, send_time_formatted: '4h 0m 0s', return_time_formatted: '8h 0m 0s' })
     render(<SaveTroopsCalculatorPage />)
     setStepper('競技場等級', 5)
@@ -116,7 +122,50 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     fireEvent.click(screen.getByRole('button', { name: '計算' }))
     const line = await screen.findByTestId('save-distance-line')
     expect(api.calculateSaveTroops).toHaveBeenCalledWith(expect.objectContaining({ tournament_square_level: 5, hero_bonus: 25 }))
-    expect(chipKinds(line)).toEqual(['arenaBootsSpeed'])
+    expect(chipKinds(line)).toEqual([])
+    const title = screen.getByTestId('save-result-title')
+    expect(title).toHaveTextContent('計算結果')
+    expect(chipKinds(title)).toEqual(['arenaBootsSpeed'])
     expect(screen.getAllByTestId('pending-verify-chip')).toHaveLength(1)
+  })
+})
+
+describe('新欄位不填：送出的值跟以前一樣（新欄位都是 0，後端預設也是 0；PM）', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('interception', async () => {
+    api.calculateInterception.mockResolvedValue({ attacker_return_time: '0', send_time: '0', travel_time_formatted: '0', distance_to_attacker: 0 })
+    render(<InterceptionCalculatorPage />)
+    fireEvent.click(screen.getByRole('button', { name: '計算攔截時間' }))
+    await screen.findByTestId('intercept-return-label')
+    expect(api.calculateInterception).toHaveBeenCalledWith(expect.objectContaining({ attacker_ts_level: 0, attacker_hero_bonus: 0, catcher_hero_bonus: 0, catcher_ts_level: 0 }))
+    expect(screen.queryAllByTestId('pending-verify-chip')).toHaveLength(0)
+  })
+
+  it('TS optimizer', async () => {
+    api.calculateTsOptimizer.mockResolvedValue({ target_arrival: '', results: [], warnings: [] })
+    render(<AttackPlannerPage />)
+    fireEvent.click(screen.getByTestId('ts-submit'))
+    await screen.findByTestId('ts-result')
+    expect(api.calculateTsOptimizer).toHaveBeenCalledWith(expect.objectContaining({ attackers: [expect.objectContaining({ hero_bonus: 0, ts_level: 0 })] }))
+  })
+
+  it('reverse TS', async () => {
+    api.calculatePathSpeedTs.mockResolvedValue({ distance: 0, possible_matches: [], unverified_units: [] })
+    render(<PathSpeedTsCalculatorPage />)
+    fireEvent.click(screen.getByRole('button', { name: '反推速度 + TS' }))
+    await screen.findByText(/無匹配結果/)
+    expect(api.calculatePathSpeedTs).toHaveBeenCalledWith(expect.objectContaining({ hero_bonus: 0 }))
+  })
+
+  it('save troops', async () => {
+    api.calculateSaveTroops.mockResolvedValue({ ideal_distance: 28, send_time_formatted: '4h 0m 0s', return_time_formatted: '8h 0m 0s' })
+    render(<SaveTroopsCalculatorPage />)
+    fireEvent.click(screen.getByRole('button', { name: '計算' }))
+    await screen.findByTestId('save-distance-line')
+    expect(api.calculateSaveTroops).toHaveBeenCalledWith(expect.objectContaining({ tournament_square_level: 0, hero_bonus: 0 }))
+    expect(screen.queryAllByTestId('pending-verify-chip')).toHaveLength(0)
   })
 })
