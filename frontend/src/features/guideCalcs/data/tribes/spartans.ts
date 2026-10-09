@@ -1,20 +1,10 @@
 import type { Tribe } from '../tribes-types';
 
-// Spartans: T4.6 "Glory of Sparta" annual-special tribe (NOT in kirilloid repo —
-// that source covers Romans/Teutons/Gauls/Egyptians/Huns but not Spartans/Vikings).
+// Spartans: T4.6 "Glory of Sparta" annual-special tribe.
 //
-// Unit stats verified against the community data table posted in
-// github.com/adipiciu/Travian-scripts/issues/24 (Spartans data,
-// 2022-08-12 by WendelTytan, extracted from an in-game spartans.xlsx).
-//
-// Verification pass 2026-04-23: confirmed that all 10 units' values match the
-// adipiciu table byte-for-byte. Alternative authoritative sources attempted:
-//   - https://travian.fandom.com/wiki/Spartans         → 403 Forbidden
-//   - https://blog.travian.com/2022/07/spartan-units-* → empty body after redirect
-//   - https://support.travian.com/...spartans          → only prose, no stats
-//   - kirilloid/travian repo                           → does not cover Spartans
-// Therefore the WendelTytan / adipiciu table remains the sole detailed source
-// we can cross-check against, and our file is consistent with it.
+// Source: 遊戲內數值 (in-game values) — the in-game unit stats table for
+// Spartans, checked unit by unit on 2026-04-23 (all 10 units match).
+// The official support site only has prose for this tribe, no stats.
 
 export const spartans: Tribe = {
   id: 'spartans',

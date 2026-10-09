@@ -3494,7 +3494,7 @@
     },
     "town_hall": {
       "building_id": "town_hall",
-      "name_zh": "村會堂",
+      "name_zh": "城鎮廳",
       "name_en": "Town Hall",
       "category": "infrastructure",
       "max_level": 20,

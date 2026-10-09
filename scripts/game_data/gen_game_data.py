@@ -30,11 +30,15 @@ Formulas (Travian Legends T4, x1, values before main-building / speed factors):
 
 Where every number comes from is in the PARAMS table "src" field:
   ts11   = measured in our ts11 x1 account (review/realtest/tool-verification.md)
-  app    = the app's previous L1 value, already matching the game screen
-  public = app value disagreed with the public game formula and ts11 has not
-           shown this building yet; corrected, still to be measured in ts11
-External calculators (kirilloid, Friso, GetterMap) are NOT copied: no code or
-tables from them live here; they were only used afterwards to compare output.
+  ingame = 遊戲內數值（T4），ts11 未實測
+  app    = 遊戲內數值（T4），ts11 未實測; L1 time kept from the app's previous
+           data because the T4 value is uncertain
+No external calculator code or data tables are copied here.
+
+Each PARAMS entry also has "verified": True only when ts11 has confirmed its
+cost base, multiplier and L1 time (src "ts11"). Every other building has
+verified=False, so its cost AND build time are 「待驗證」 in the UI; flip it to
+True after measuring in ts11 (and rerun this script) to remove the chip.
 """
 
 from __future__ import annotations
@@ -54,53 +58,53 @@ FRONTEND_GEN = ROOT / "frontend/src/data/gameData.gen.json"
 MB_FACTOR = 0.964
 STD = (1.16, 1875.0)  # (kt, b) for normal buildings
 
-# building_id: cost base, cost k, time (a, kt, b), CP base, sources, pending notes
+# building_id: cost base, cost k, L1 time, CP base, source, verified, pending notes
 # time a is "L1 seconds + b" for normal buildings.
 PARAMS: dict[str, dict] = {
-    "main_building":     {"c": (70, 40, 60, 20), "k": 1.28, "t1": 2000, "cp": 2, "src": "ts11"},
-    "barracks":          {"c": (210, 140, 260, 120), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11"},
-    "rally_point":       {"c": (110, 160, 90, 70), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11"},
-    "warehouse":         {"c": (130, 160, 90, 40), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11"},
-    "granary":           {"c": (80, 100, 70, 20), "k": 1.28, "t1": 1600, "cp": 1, "src": "ts11"},
-    "marketplace":       {"c": (80, 70, 120, 70), "k": 1.28, "t1": 1800, "cp": 3, "src": "ts11"},
-    "stable":            {"c": (260, 140, 220, 100), "k": 1.28, "t1": 2200, "cp": 2, "src": "public"},
-    "academy":           {"c": (220, 160, 90, 40), "k": 1.28, "t1": 2000, "cp": 4, "src": "public"},
+    "main_building":     {"c": (70, 40, 60, 20), "k": 1.28, "t1": 2000, "cp": 2, "src": "ts11", "verified": True},
+    "barracks":          {"c": (210, 140, 260, 120), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11", "verified": True},
+    "rally_point":       {"c": (110, 160, 90, 70), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11", "verified": True},
+    "warehouse":         {"c": (130, 160, 90, 40), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11", "verified": True},
+    "granary":           {"c": (80, 100, 70, 20), "k": 1.28, "t1": 1600, "cp": 1, "src": "ts11", "verified": True},
+    "marketplace":       {"c": (80, 70, 120, 70), "k": 1.28, "t1": 1800, "cp": 3, "src": "ts11", "verified": True},
+    "stable":            {"c": (260, 140, 220, 100), "k": 1.28, "t1": 2200, "cp": 2, "src": "ingame", "verified": False},
+    "academy":           {"c": (220, 160, 90, 40), "k": 1.28, "t1": 2000, "cp": 4, "src": "ingame", "verified": False},
     # T4 smithy (attack + defence upgrades in one building)
-    "blacksmith":        {"c": (180, 250, 500, 160), "k": 1.28, "t1": 2000, "cp": 2, "src": "public"},
+    "blacksmith":        {"c": (180, 250, 500, 160), "k": 1.28, "t1": 2000, "cp": 2, "src": "ingame", "verified": False},
     # T3-only building kept for old data; T4 worlds do not have it
-    "armoury":           {"c": (130, 210, 410, 130), "k": 1.28, "t1": 2000, "cp": 2, "src": "public"},
-    "cranny":            {"c": (40, 50, 30, 10), "k": 1.28, "t1": 300, "cp": 1, "src": "ts11"},
-    "workshop":          {"c": (460, 510, 600, 320), "k": 1.28, "t1": 3000, "cp": 3, "src": "public"},
-    "embassy":           {"c": (180, 130, 150, 80), "k": 1.28, "t1": 2000, "cp": 4, "src": "ts11"},
-    "town_hall":         {"c": (1250, 1110, 1260, 600), "k": 1.28, "t1": 12500, "cp": 5, "src": "public"},
-    "residence":         {"c": (580, 460, 350, 180), "k": 1.28, "t1": 2000, "cp": 2, "src": "public"},
-    "palace":            {"c": (550, 800, 750, 250), "k": 1.28, "t1": 5000, "cp": 5, "src": "public"},
-    "treasury":          {"c": (2880, 2740, 2580, 990), "k": 1.26, "t1": 8000, "cp": 6, "src": "public"},
+    "armoury":           {"c": (130, 210, 410, 130), "k": 1.28, "t1": 2000, "cp": 2, "src": "ingame", "verified": False},
+    "cranny":            {"c": (40, 50, 30, 10), "k": 1.28, "t1": 300, "cp": 1, "src": "ts11", "verified": True},
+    "workshop":          {"c": (460, 510, 600, 320), "k": 1.28, "t1": 3000, "cp": 3, "src": "ingame", "verified": False},
+    "embassy":           {"c": (180, 130, 150, 80), "k": 1.28, "t1": 2000, "cp": 4, "src": "ts11", "verified": True},
+    "town_hall":         {"c": (1250, 1110, 1260, 600), "k": 1.28, "t1": 12500, "cp": 5, "src": "ingame", "verified": False},
+    "residence":         {"c": (580, 460, 350, 180), "k": 1.28, "t1": 2000, "cp": 2, "src": "ingame", "verified": False},
+    "palace":            {"c": (550, 800, 750, 250), "k": 1.28, "t1": 5000, "cp": 5, "src": "ingame", "verified": False},
+    "treasury":          {"c": (2880, 2740, 2580, 990), "k": 1.26, "t1": 8000, "cp": 6, "src": "ingame", "verified": False},
     # T4 cost (80/120/70/90 ×1.33). Not yet seen in ts11 -> 待驗證.
-    "heros_mansion":     {"c": (80, 120, 70, 90), "k": 1.33, "t1": 2000, "cp": 1, "src": "public",
+    "heros_mansion":     {"c": (80, 120, 70, 90), "k": 1.33, "t1": 2000, "cp": 1, "src": "ingame", "verified": False,
                           "pending": ["cost", "time"]},
-    "sawmill":           {"c": (520, 380, 290, 90), "k": 1.80, "t1": 3000, "cp": 1, "src": "public", "bonus": True},
-    "brickyard":         {"c": (440, 480, 320, 50), "k": 1.80, "t1": 2840, "cp": 1, "src": "public", "bonus": True},
-    "iron_foundry":      {"c": (200, 450, 510, 120), "k": 1.80, "t1": 4080, "cp": 1, "src": "public", "bonus": True},
-    "grain_mill":        {"c": (500, 440, 380, 1240), "k": 1.80, "t1": 1840, "cp": 1, "src": "public", "bonus": True},
-    "bakery":            {"c": (1200, 1480, 870, 1600), "k": 1.80, "t1": 3680, "cp": 1, "src": "public", "bonus": True},
-    "stonemasons_lodge": {"c": (155, 130, 125, 70), "k": 1.28, "t1": 1700, "cp": 1, "src": "app",
+    "sawmill":           {"c": (520, 380, 290, 90), "k": 1.80, "t1": 3000, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "brickyard":         {"c": (440, 480, 320, 50), "k": 1.80, "t1": 2840, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "iron_foundry":      {"c": (200, 450, 510, 120), "k": 1.80, "t1": 4080, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "grain_mill":        {"c": (500, 440, 380, 1240), "k": 1.80, "t1": 1840, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "bakery":            {"c": (1200, 1480, 870, 1600), "k": 1.80, "t1": 3680, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "stonemasons_lodge": {"c": (155, 130, 125, 70), "k": 1.28, "t1": 1700, "cp": 1, "src": "app", "verified": False,
                           "pending": ["time"]},
-    "trade_office":      {"c": (1400, 1330, 1200, 400), "k": 1.28, "t1": 3000, "cp": 3, "src": "public"},
-    "tournament_square": {"c": (1750, 2250, 1530, 240), "k": 1.28, "t1": 3500, "cp": 1, "src": "public"},
-    "city_wall":         {"c": (70, 90, 170, 70), "k": 1.28, "t1": 2000, "cp": 1, "src": "public"},
-    "earth_wall":        {"c": (120, 200, 0, 80), "k": 1.28, "t1": 2000, "cp": 1, "src": "public"},
-    "palisade":          {"c": (160, 100, 80, 60), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11"},
-    "great_barracks":    {"c": (630, 420, 780, 360), "k": 1.28, "t1": 2000, "cp": 1, "src": "public"},
-    "great_stable":      {"c": (780, 420, 660, 300), "k": 1.28, "t1": 2200, "cp": 2, "src": "public"},
-    "trapper":           {"c": (100, 100, 100, 100), "k": 1.28, "t1": 1200, "cp": 1, "src": "app",
+    "trade_office":      {"c": (1400, 1330, 1200, 400), "k": 1.28, "t1": 3000, "cp": 3, "src": "ingame", "verified": False},
+    "tournament_square": {"c": (1750, 2250, 1530, 240), "k": 1.28, "t1": 3500, "cp": 1, "src": "ingame", "verified": False},
+    "city_wall":         {"c": (70, 90, 170, 70), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
+    "earth_wall":        {"c": (120, 200, 0, 80), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
+    "palisade":          {"c": (160, 100, 80, 60), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11", "verified": True},
+    "great_barracks":    {"c": (630, 420, 780, 360), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
+    "great_stable":      {"c": (780, 420, 660, 300), "k": 1.28, "t1": 2200, "cp": 2, "src": "ingame", "verified": False},
+    "trapper":           {"c": (100, 100, 100, 100), "k": 1.28, "t1": 1200, "cp": 1, "src": "app", "verified": False,
                           "pending": ["time"]},
-    "brewery":           {"c": (1460, 930, 1250, 1740), "k": 1.40, "t1": 3600, "cp": 4, "src": "app",
+    "brewery":           {"c": (1460, 930, 1250, 1740), "k": 1.40, "t1": 3600, "cp": 4, "src": "app", "verified": False,
                           "pending": ["time"]},
-    "horse_drinking_trough": {"c": (780, 420, 660, 540), "k": 1.28, "t1": 4200, "cp": 3, "src": "app",
+    "horse_drinking_trough": {"c": (780, 420, 660, 540), "k": 1.28, "t1": 4200, "cp": 3, "src": "app", "verified": False,
                               "pending": ["time"]},
-    "great_warehouse":   {"c": (650, 800, 450, 200), "k": 1.28, "t1": 9000, "cp": 1, "src": "public"},
-    "great_granary":     {"c": (400, 500, 350, 100), "k": 1.28, "t1": 7000, "cp": 1, "src": "public"},
+    "great_warehouse":   {"c": (650, 800, 450, 200), "k": 1.28, "t1": 9000, "cp": 1, "src": "ingame", "verified": False},
+    "great_granary":     {"c": (400, 500, 350, 100), "k": 1.28, "t1": 7000, "cp": 1, "src": "ingame", "verified": False},
 }
 
 # Resource fields: cost k = 1.67, time a × 1.6^(L-1) − 1000/3. ts11 verified L1–L3.
@@ -201,6 +205,7 @@ def gen_buildings(current: dict) -> dict:
     if cr.get("description_en"):
         cr["description_en"] = cr["description_en"].replace("Gauls have double", "Gauls get 1.5×")
     th = out["buildings"]["town_hall"]
+    th["name_zh"] = "城鎮廳"  # the term used everywhere else in the app
     th["levels"][0]["effect_value"] = 500
     th["levels"][0]["effect_description"] = "小慶典 CP＝本村每日 CP 產量（x1 上限 500）"
     for lv in th["levels"][1:]:
@@ -245,16 +250,25 @@ def gen_culture_points() -> dict:
     }
 
 
+def pending_fields(p: dict) -> list[str]:
+    """Fields shown as 「待驗證」: explicit notes, plus cost+time when not verified."""
+    fields = list(p.get("pending", []))
+    if not p["verified"]:
+        fields += [f for f in ("cost", "time") if f not in fields]
+    return fields
+
+
 def gen_frontend(buildings: dict, cp: dict) -> dict:
     rows = {}
     for bid, b in buildings["buildings"].items():
         rows[bid] = [[lv["cost_wood"], lv["cost_clay"], lv["cost_iron"], lv["cost_crop"],
                       lv["build_time_base"], lv["culture_points"]] for lv in b["levels"]]
-    pending = {bid: p["pending"] for bid, p in PARAMS.items() if p.get("pending")}
+    pending = {bid: pending_fields(p) for bid, p in PARAMS.items() if pending_fields(p)}
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "rowFormat": ["wood", "clay", "iron", "crop", "buildTimeBase", "cp"],
         "buildings": rows,
+        "names": {bid: [b["name_zh"], b["name_en"]] for bid, b in buildings["buildings"].items()},
         "cpBase": {bid: p["cp"] for bid, p in PARAMS.items()} | {fid: 1 for fid in FIELDS},
         "pending": pending,
         "villageRequirements": cp["village_requirements"],

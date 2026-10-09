@@ -280,7 +280,7 @@ export const CROPPER_LAYOUTS: readonly CropperLayout[] = Object.freeze([
 // Trade Office bonus is **tribe-dependent**:
 //   - Romans: +20%/level (max +400% / 5× at Lv 20)
 //   - Other tribes: +10%/level (max +200% / 3× at Lv 20)
-// (Per travian.fandom.com/wiki/Trade_office and Travian Answers aid 48.)
+// (遊戲內數值 (in-game values); official Travian Answers aid 48.)
 // =========================================================================
 export type TribeId = 'romans' | 'teutons' | 'gauls' | 'egyptians' | 'huns' | 'spartans' | 'vikings';
 

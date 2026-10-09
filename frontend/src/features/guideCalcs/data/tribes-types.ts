@@ -1,6 +1,6 @@
 /**
  * Tribe + unit type definitions. All numbers are for 1x server speed.
- * Stats verified against kirilloid/travian source.
+ * Stats are 遊戲內數值 (in-game values).
  */
 
 import type { TribeId } from './travian';

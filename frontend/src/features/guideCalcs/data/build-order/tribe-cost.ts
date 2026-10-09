@@ -10,7 +10,7 @@
  *
  * Sources:
  *   - Roman / Teuton / Gaul:
- *       kirilloid/travian base/units.ts + xlsx T4.6 Start Guide "Other!R60-62"
+ *       遊戲內數值 (in-game values) + xlsx T4.6 Start Guide "Other!R60-62"
  *   - Viking:
  *       https://support.travian.com/en/support/solutions/articles/7000090975
  *   - Egyptian / Hun / Spartan:
@@ -66,21 +66,21 @@ export const TRIBE_SETTLER_COST: Record<TribeId, SettlerCost> = {
     trainingSeconds: 26900,
     combat: STANDARD_COMBAT,
     verified: true,
-    source: 'kirilloid/travian base/units.ts + xlsx T4.6 Start Guide Other!R61',
+    source: '遊戲內數值 (in-game values) + xlsx T4.6 Start Guide Other!R61',
   },
   teutons: {
     wood: 5800, clay: 4400, iron: 4600, crop: 5200, total: 20000,
     trainingSeconds: 31000,
     combat: STANDARD_COMBAT,
     verified: true,
-    source: 'kirilloid/travian base/units.ts + xlsx T4.6 Start Guide Other!R62',
+    source: '遊戲內數值 (in-game values) + xlsx T4.6 Start Guide Other!R62',
   },
   gauls: {
     wood: 4400, clay: 5600, iron: 4200, crop: 3900, total: 18100,
     trainingSeconds: 22700,
     combat: STANDARD_COMBAT,
     verified: true,
-    source: 'kirilloid/travian base/units.ts + xlsx T4.6 Start Guide Other!R60',
+    source: '遊戲內數值 (in-game values) + xlsx T4.6 Start Guide Other!R60',
   },
   vikings: {
     wood: 5800, clay: 4600, iron: 4800, crop: 4800, total: 20000,

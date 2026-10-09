@@ -10,6 +10,7 @@ import {
   type ResourceType,
 } from './data/travian';
 import { lumiBracket } from './components/FarmingCalculator';
+import { PRESET_LUMI_CP } from './components/PassiveCpCalculator';
 
 // =========================================================================
 // FieldRoiCalculator — fieldRoi() reference cases
@@ -165,7 +166,7 @@ describe('OasisRoi — component math reproduction (prod × oasis × 24 × gold)
 // =========================================================================
 // PassiveCpCalculator — cpAtLevel() reference values
 // Validation anchor from component: Lumi "MB 20 + Market 20 + Embassy 20 +
-// Academy 20 + Town Hall 10 + baseline 2 = 529 CP/day".
+// Academy 20 + Town Hall 10 = 529 CP/day" (no empty-village base; ts11 sum = game 12/day).
 // =========================================================================
 describe('PassiveCpCalculator.cpAtLevel — Lumi 529 CP/day config', () => {
   it('mainBuilding Lv 20 = round(2 × 1.2^20)', () => {
@@ -184,16 +185,14 @@ describe('PassiveCpCalculator.cpAtLevel — Lumi 529 CP/day config', () => {
   it('townHall Lv 10 = round(5 × 1.2^10) = 31', () => {
     expect(cpAtLevel('townHall', 10)).toBe(31);
   });
-  it('Lumi preset total (MB20 + Mkt20 + Emb20 + Acad20 + TH10 + baseline 2) = 531', () => {
-    // NOTE: component claims 529 in its text, but actual arithmetic with current
-    // rounding constants yields 77+115+153+153+31+2 = 531. Pinning actual output.
-    const sum = 2
-      + cpAtLevel('mainBuilding', 20)
+  it('Lumi preset total (MB20 + Mkt20 + Emb20 + Acad20 + TH10) = 529, no +2 base', () => {
+    const sum = cpAtLevel('mainBuilding', 20)
       + cpAtLevel('marketplace', 20)
       + cpAtLevel('embassy', 20)
       + cpAtLevel('academy', 20)
       + cpAtLevel('townHall', 10);
-    expect(sum).toBe(531);
+    expect(sum).toBe(529);
+    expect(PRESET_LUMI_CP).toBe(529);
   });
   it('Lv 0 always returns 0', () => {
     expect(cpAtLevel('mainBuilding', 0)).toBe(0);

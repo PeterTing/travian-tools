@@ -28,8 +28,8 @@
     "success": "Success",
     "pendingVerify": "Unverified",
     "pendingVerifyNote": "Not yet confirmed in the game",
-    "pendingVerifyCostNote": "Cost not yet confirmed in the game",
-    "pendingVerifyTimeNote": "Build time not yet confirmed in the game"
+    "buildingVerifyLegend": "Except buildings marked ✓, these numbers have not been measured in ts11",
+    "verifiedTs11": "Measured in ts11"
   },
   "home": {
     "title": "Travian Tools",
@@ -599,7 +599,7 @@
       "cropScouter": "Capital Type Finder",
       "launchSim": "Launch Simulator",
       "buildOrder": "Build Order",
-      "passiveCp": "Culture Points",
+      "passiveCp": "CP & new villages",
       "fieldRoi": "Field ROI",
       "oasisRoi": "Oasis ROI",
       "cropSim": "Crop Simulator",

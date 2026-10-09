@@ -231,7 +231,7 @@ class TestTournamentSquareS71:
         assert a.travel_time_formatted == b.travel_time_formatted
 
 
-# ─── SHOULD: Smithy formula (S187 / KIR) ──────────────────────────
+# ─── SHOULD: Smithy formula (S187 / 遊戲內數值) ──────────────────────────
 
 
 class TestSmithyFormula:
@@ -347,7 +347,7 @@ class TestNpcCapacity:
 
 class TestCulturePointsPerBuilding:
     def test_mb_1_to_2_daily_increase_is_1(self) -> None:
-        # culture_points field = daily CP at level (KIR). MB1=2, MB2=3 → +1
+        # culture_points field = daily CP at level (遊戲內數值). MB1=2, MB2=3 → +1
         response = client.post(
             "/api/v1/calculator/building/upgrade",
             json={

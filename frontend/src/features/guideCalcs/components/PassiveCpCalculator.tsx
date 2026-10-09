@@ -2,36 +2,42 @@ import { useState, useMemo } from 'react'
 import { cpAtLevel, type CpBuilding } from '../data/travian'
 import {
   SERVER_SPEEDS, villageRequirements, startCp, celebrationCap, celebrationCp, celebration,
-  isVillageCpVerified, type ServerSpeed, type CelebrationKind,
+  isVillageCpVerified, buildingName, type ServerSpeed, type CelebrationKind,
 } from '../../../data/gameData'
 import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import { useLang } from '../i18n/LangContext'
 import s from './calc.module.css'
 import CalcResultPanel from './CalcResultPanel'
 
-interface FieldDef { id: string; key: CpBuilding; label: string }
+/** ids：buildings.json 的建築 id（中文名從同一份資料取，合併欄位用「／」） */
+interface FieldDef { id: string; key: CpBuilding; label: string; ids: string[] }
 
 const FIELDS: FieldDef[] = [
-  { id: 'mb', key: 'mainBuilding',     label: 'Main Building' },
-  { id: 'mk', key: 'marketplace',      label: 'Marketplace' },
-  { id: 'em', key: 'embassy',          label: 'Embassy' },
-  { id: 'ac', key: 'academy',          label: 'Academy' },
-  { id: 'th', key: 'townHall',         label: 'Town Hall' },
-  { id: 're', key: 'residence',        label: 'Residence' },
-  { id: 'cr', key: 'cranny',           label: 'Cranny' },
-  { id: 'wh', key: 'warehouse',        label: 'Warehouse' },
-  { id: 'gr', key: 'granary',          label: 'Granary' },
-  { id: 'sm', key: 'smithy',           label: 'Smithy / Armoury' },
-  { id: 'ba', key: 'barracks',         label: 'Barracks' },
-  { id: 'st', key: 'stable',           label: 'Stable' },
-  { id: 'ts', key: 'tournamentSquare', label: 'Tournament Sq.' },
-  { id: 'hm', key: 'heroMansion',      label: "Hero's Mansion" },
-  { id: 'to', key: 'tradeOffice',      label: 'Trade Office' },
-  { id: 'pl', key: 'palace',           label: 'Palace / Treasury' },
+  { id: 'mb', key: 'mainBuilding',     label: 'Main Building',     ids: ['main_building'] },
+  { id: 'mk', key: 'marketplace',      label: 'Marketplace',       ids: ['marketplace'] },
+  { id: 'em', key: 'embassy',          label: 'Embassy',           ids: ['embassy'] },
+  { id: 'ac', key: 'academy',          label: 'Academy',           ids: ['academy'] },
+  { id: 'th', key: 'townHall',         label: 'Town Hall',         ids: ['town_hall'] },
+  { id: 're', key: 'residence',        label: 'Residence',         ids: ['residence'] },
+  { id: 'cr', key: 'cranny',           label: 'Cranny',            ids: ['cranny'] },
+  { id: 'wh', key: 'warehouse',        label: 'Warehouse',         ids: ['warehouse'] },
+  { id: 'gr', key: 'granary',          label: 'Granary',           ids: ['granary'] },
+  { id: 'sm', key: 'smithy',           label: 'Smithy / Armoury',  ids: ['blacksmith', 'armoury'] },
+  { id: 'ba', key: 'barracks',         label: 'Barracks',          ids: ['barracks'] },
+  { id: 'st', key: 'stable',           label: 'Stable',            ids: ['stable'] },
+  { id: 'ts', key: 'tournamentSquare', label: 'Tournament Sq.',    ids: ['tournament_square'] },
+  { id: 'hm', key: 'heroMansion',      label: "Hero's Mansion",    ids: ['heros_mansion'] },
+  { id: 'to', key: 'tradeOffice',      label: 'Trade Office',      ids: ['trade_office'] },
+  { id: 'pl', key: 'palace',           label: 'Palace / Treasury', ids: ['palace', 'treasury'] },
 ]
 
+function fieldLabel(f: FieldDef, en: boolean): string {
+  return en ? f.label : f.ids.map(id => buildingName(id, 'zh')).join('／')
+}
+
 const PRESETS: Record<string, Record<string, number>> = {
-  lumi: { mb: 20, mk: 20, em: 20, ac: 20, th: 10, re: 10, cr: 1, wh: 10, gr: 10 },
+  // 攻略（small guide §2.2）的每村被動配置：MB20＋市場20＋大使館20＋研究院20＋城鎮廳10＝529 CP/天
+  lumi: { mb: 20, mk: 20, em: 20, ac: 20, th: 10 },
   min: { mb: 5, mk: 3, em: 3, ac: 10, th: 1, re: 10, cr: 1, wh: 3, gr: 3 },
   zero: {},
 }
@@ -41,8 +47,15 @@ const TH1_HOURS: Record<ServerSpeed, number> = { 1: 24, 2: 24, 3: 12, 5: 12, 10:
 
 export type CelebrationMode = 'none' | CelebrationKind
 
+/** 一個村每日 CP＝各建築目前等級的 CP 加總（沒有空村基礎值） */
+export function villageDailyCp(levels: Record<string, number>): number {
+  return FIELDS.reduce((sum, f) => sum + cpAtLevel(f.key, levels[f.id] ?? 0), 0)
+}
+
+export const PRESET_LUMI_CP = villageDailyCp(PRESETS.lumi ?? {})
+
 export interface CountdownInput {
-  /** 這個村每日 CP（含空村基礎） */
+  /** 這個村每日 CP（各建築加總） */
   villageCp: number
   /** 其他村每日 CP 加總 */
   otherVillagesCp: number
@@ -111,17 +124,14 @@ export default function PassiveCpCalculator() {
     setHours(TH1_HOURS[sp])
   }
 
-  const total = useMemo(() => {
-    let sum = 2 // baseline
-    FIELDS.forEach(f => { sum += cpAtLevel(f.key, levels[f.id] ?? 0) })
-    return sum
-  }, [levels])
+  // 只算建築：遊戲沒有空村基礎產量（ts11：各棟 CP 加總＝遊戲顯示的 12／天）
+  const total = useMemo(() => villageDailyCp(levels), [levels])
 
   const breakdown = useMemo(() => FIELDS.map(f => ({
-    label: f.label,
+    label: fieldLabel(f, en),
     level: levels[f.id] ?? 0,
     cp: cpAtLevel(f.key, levels[f.id] ?? 0),
-  })).filter(x => x.cp > 0).sort((a, b) => b.cp - a.cp), [levels])
+  })).filter(x => x.cp > 0).sort((a, b) => b.cp - a.cp), [levels, en])
 
   const cd = useMemo(() => villageCountdown({
     villageCp: total, otherVillagesCp: otherCp, currentCp, speed, mode, hoursPerCelebration: hours,
@@ -136,11 +146,11 @@ export default function PassiveCpCalculator() {
   return (
     <>
       <div className={s.intro}>
-        <h2>{en ? 'Culture Points' : '文明點'}</h2>
-        {/* Preset 「常用」= MB20+Market20+Embassy20+Academy20+TH10 → 531 CP/day; see tests */}
+        <h2>{en ? 'CP & new villages' : 'CP 與開村'}</h2>
+        {/* Preset 「常用」= MB20+Market20+Embassy20+Academy20+TH10 → 529 CP/day; see tests */}
         <p>{en
           ? 'How many culture points one village produces per day, and how long until the next village. Raise building levels below, or tap a preset to fill common setups.'
-          : '看一個村莊每天能產出多少文明點、還要幾天能開下一村。調整下面的建築等級，或點預設一鍵帶入常見配置。'}</p>
+          : '看一個村莊每天能產出多少 CP、還要幾天能開下一村。調整下面的建築等級，或點預設一鍵帶入常見配置。'}</p>
       </div>
 
       <div className={s.wrapper}>
@@ -153,14 +163,14 @@ export default function PassiveCpCalculator() {
               <div key={idx} className={s.fieldRow}>
                 {a && (
                   <div className={s.field}>
-                    <label>{a.label}</label>
+                    <label>{fieldLabel(a, en)}</label>
                     <input type="number" min={0} max={20} value={levels[a.id] ?? 0}
                            onChange={e => set(a.id, +e.target.value)} />
                   </div>
                 )}
                 {b && (
                   <div className={s.field}>
-                    <label>{b.label}</label>
+                    <label>{fieldLabel(b, en)}</label>
                     <input type="number" min={0} max={20} value={levels[b.id] ?? 0}
                            onChange={e => set(b.id, +e.target.value)} />
                   </div>
@@ -170,7 +180,7 @@ export default function PassiveCpCalculator() {
           })}
 
           <div className={s.btnRow}>
-            <button onClick={() => apply('lumi')}>{en ? 'Common (531/d)' : '常用（531／天）'}</button>
+            <button onClick={() => apply('lumi')}>{en ? `Common (${PRESET_LUMI_CP}/d)` : `常用（${PRESET_LUMI_CP}／天）`}</button>
             <button onClick={() => apply('min')}>{en ? 'Bare-min' : '最小'}</button>
             <button onClick={() => apply('zero')}>{en ? 'Clear' : '清空'}</button>
           </div>
@@ -199,6 +209,11 @@ export default function PassiveCpCalculator() {
               <label>{en ? 'Hours per celebration' : '一場慶典幾小時'}</label>
               <input data-testid="cp-hours" type="number" min={1} value={hours}
                      onChange={e => setHours(Math.max(1, +e.target.value || 1))} />
+              <p className="mt-1 text-xs text-gray-500" data-testid="cp-hours-hint">
+                {en
+                  ? 'Celebrations get shorter as the Town Hall levels up; the default is the official Town Hall level 1 duration.'
+                  : '慶典時長會隨城鎮廳等級變短，預設帶入城鎮廳 1 級的官方時長。'}
+              </p>
             </div>
           </div>
           <div className={s.field}>
@@ -221,7 +236,7 @@ export default function PassiveCpCalculator() {
           title={en ? 'Daily passive CP' : '每日被動 CP'}
           primary={<>{total} / {en ? 'day' : '天'}</>}
           secondary={mode === 'none'
-            ? (en ? 'Includes +2 empty-village baseline' : '含空村 +2 基礎產量')
+            ? (en ? 'Buildings only; there is no empty-village base' : '只算建築，遊戲沒有空村基礎產量')
             : (en
               ? `One ${mode} celebration: +${cd.perCelebration} CP (cap ${mode === 'small' ? capSmall : capGreat})`
               : `辦一場${mode === 'small' ? '小' : '大'}慶典：+${cd.perCelebration} CP（上限 ${mode === 'small' ? capSmall : capGreat}）`)}
@@ -301,7 +316,7 @@ export default function PassiveCpCalculator() {
           <div className={s.note}>
             {en
               ? 'Culture points are account-wide — enter the other villages\' CP/day so great celebrations and the countdown use the whole account.'
-              : '文明點是整帳號共用，把其他村的每日 CP 填進去，大慶典和開村倒數才會用全帳號計算。'}
+              : 'CP 是整帳號共用，把其他村的每日 CP 填進去，大慶典和開村倒數才會用全帳號計算。'}
           </div>
         </CalcResultPanel>
       </div>

@@ -297,7 +297,7 @@ class TestTechnologyCalculator:
             smithy_improved_value,
         )
 
-        # Legends smithy (KIR / S187), upkeep 1 for legionnaire
+        # Legends smithy (遊戲內數值 / S187), upkeep 1 for legionnaire
         assert leg.attack_values[1] == round_smithy_display(
             smithy_improved_value(40, 1, 10)
         )

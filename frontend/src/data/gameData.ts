@@ -38,6 +38,15 @@ export function buildingRow(buildingId: string, level: number): BuildingLevelRow
   return buildingRows(buildingId)[level - 1]
 }
 
+const NAMES: Readonly<Record<string, readonly string[]>> = gen.names
+
+/** 建築顯示名稱（跟資料庫頁同一份）；找不到就回傳 id */
+export function buildingName(buildingId: string, lang: 'zh' | 'en'): string {
+  const n = NAMES[buildingId]
+  if (!n) return buildingId
+  return (lang === 'en' ? n[1] : n[0]) ?? buildingId
+}
+
 export const CP_BASE_BY_ID: Readonly<Record<string, number>> = gen.cpBase
 
 /** 哪些建築的哪些欄位還沒在 ts11 實測（UI 顯示「待驗證」）。 */
@@ -45,6 +54,11 @@ export const PENDING: Readonly<Record<string, readonly string[]>> = gen.pending
 
 export function isPending(buildingId: string, field: 'cost' | 'time'): boolean {
   return (PENDING[buildingId] ?? []).includes(field)
+}
+
+/** ts11 實測過（花費、時間都沒有待驗證）的建築；不認得的 id 一律當成未實測 */
+export function isBuildingVerified(buildingId: string): boolean {
+  return buildingId in gen.buildings && (PENDING[buildingId] ?? []).length === 0
 }
 
 /** 累積 CP 門檻；index 0 = 第 1 村。官方表（我們的公式逐格重算一致）。 */

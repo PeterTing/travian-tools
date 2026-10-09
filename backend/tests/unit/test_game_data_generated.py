@@ -312,3 +312,35 @@ def test_only_x1_village_2_is_verified() -> None:
     assert is_verified(2, 1)
     assert not is_verified(3, 1)
     assert not is_verified(2, 3)
+
+
+# ─── 待驗證 follows the per-building verified flag ────────────────
+
+
+@pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
+def test_every_building_not_measured_in_ts11_is_pending() -> None:
+    """Cost AND time of every building whose src != "ts11" must be 待驗證."""
+    mod = _gen_module()
+    fe = json.loads(
+        (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
+    )
+    not_measured = sorted(bid for bid, p in mod.PARAMS.items() if p["src"] != "ts11")
+    assert len(not_measured) == 27  # 22 + hero mansion + 4 kept-L1-time buildings
+    for bid in not_measured:
+        assert not mod.PARAMS[bid]["verified"], bid
+        assert {"cost", "time"} <= set(fe["pending"][bid]), bid
+    for bid, p in mod.PARAMS.items():
+        if p["src"] == "ts11":
+            assert p["verified"], bid
+            assert bid not in fe["pending"], bid
+    # resource fields are ts11-measured
+    assert not set(mod.FIELDS) & set(fe["pending"])
+
+
+@pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
+def test_flipping_verified_removes_the_chip() -> None:
+    mod = _gen_module()
+    p = dict(mod.PARAMS["stable"])
+    assert mod.pending_fields(p) == ["cost", "time"]
+    p["verified"] = True
+    assert mod.pending_fields(p) == []

@@ -178,7 +178,7 @@ def calculate_actual_build_time(
 ) -> int:
     """計算實際建造時間.
 
-    Legends / T4（KIR；ts11 實測）：base × 0.964^(MB−1) ÷ speed，四捨五入到 10 秒。
+    Legends / T4（遊戲內數值；ts11 實測）：base × 0.964^(MB−1) ÷ speed，四捨五入到 10 秒。
     """
     from app.utils.travian_formulas import calculate_build_time
 

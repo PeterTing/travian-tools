@@ -28,8 +28,10 @@ Duration at Town Hall Lv 1: 24 h on x1–x2, 12 h on x3–x5, 6 h on x10; higher
   gives ~12 CP, **not** 500. Parties only pay off once a village makes a few hundred CP/day
   (small guide §4.1: hold parties from ~350 CP/day per village).
 - A village at the 529 CP/day passive baseline (Main Building 20 + Market 20 + Embassy 20 +
-  Academy 20 + Town Hall 10) hits the 500 small-celebration cap, so a back-to-back small chain
-  roughly doubles its CP.
+  Academy 20 + Town Hall 10 = 77 + 115 + 153 + 153 + 31) hits the 500 small-celebration cap, so
+  a back-to-back small chain roughly doubles its CP. A village's daily CP is just the sum of its
+  buildings' CP; there is no extra "empty village" base (ts11: the sum of the buildings equals
+  the 12 CP/day the game shows). The calculator used to add +2 and show 531; it now shows 529.
 - A Great Celebration pays the whole account's daily CP (cap 2,000 on x1), so it only reaches
   the cap once the account makes 2,000+ CP/day.
 

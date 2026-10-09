@@ -1,10 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import i18n from '@/i18n/i18n'
+import gen from '../../data/gameData.gen.json'
 import { render, screen, within } from '@testing-library/react'
 import PassiveCpCalculator, { villageCountdown } from './components/PassiveCpCalculator'
 import { cropSim } from './components/CropSimCalculator'
 import { CP_REQUIRED, CELEBRATIONS, cpAtLevel, hmCumulativeCost, FIELD_COSTS, type CpBuilding } from './data/travian'
 import {
   buildingRows, celebrationCp, celebrationCap, villageRequirements, isVillageCpVerified, isPending,
+  buildingName, isBuildingVerified,
 } from '../../data/gameData'
 
 describe('celebration CP = daily CP production, capped (support.travian.com/en/articles/82)', () => {
@@ -12,7 +15,7 @@ describe('celebration CP = daily CP production, capped (support.travian.com/en/a
     expect(celebrationCp(12, 'small', 1)).toBe(12)
   })
   it('caps at 500 / 2,000 on x1', () => {
-    expect(celebrationCp(531, 'small', 1)).toBe(500)
+    expect(celebrationCp(529, 'small', 1)).toBe(500)
     expect(celebrationCp(5000, 'great', 1)).toBe(2000)
     expect(celebrationCp(1500, 'great', 1)).toBe(1500)
   })
@@ -34,16 +37,16 @@ describe('villageCountdown', () => {
     expect(r.perCelebration).toBe(12)
     expect(r.rows[0]!.daysWithCelebration).toBeCloseTo(1500 / 24)
   })
-  it('the old "+2,000 a day" column is gone: 531 CP/day + great celebrations', () => {
-    const r = villageCountdown({ villageCp: 531, otherVillagesCp: 0, currentCp: 0, speed: 1, mode: 'great', hoursPerCelebration: 60 })
-    expect(r.perCelebration).toBe(531)
-    // village 3 = 8,000 CP: 8000 / (531 + 531 × 24/60) — old code said 8000 / 2531
-    expect(r.rows[1]!.daysWithCelebration).toBeCloseTo(8000 / (531 + 531 * 0.4))
-    expect(r.rows[1]!.daysWithCelebration).toBeGreaterThan(8000 / 2531)
+  it('the old "+2,000 a day" column is gone: 529 CP/day + great celebrations', () => {
+    const r = villageCountdown({ villageCp: 529, otherVillagesCp: 0, currentCp: 0, speed: 1, mode: 'great', hoursPerCelebration: 60 })
+    expect(r.perCelebration).toBe(529)
+    // village 3 = 8,000 CP: 8000 / (529 + 529 × 24/60) — old code said 8000 / 2529
+    expect(r.rows[1]!.daysWithCelebration).toBeCloseTo(8000 / (529 + 529 * 0.4))
+    expect(r.rows[1]!.daysWithCelebration).toBeGreaterThan(8000 / 2529)
   })
   it('great celebration uses the whole account and is capped', () => {
-    const r = villageCountdown({ villageCp: 531, otherVillagesCp: 3000, currentCp: 0, speed: 1, mode: 'great', hoursPerCelebration: 24 })
-    expect(r.accountCp).toBe(3531)
+    const r = villageCountdown({ villageCp: 529, otherVillagesCp: 3000, currentCp: 0, speed: 1, mode: 'great', hoursPerCelebration: 24 })
+    expect(r.accountCp).toBe(3529)
     expect(r.perCelebration).toBe(2000)
   })
 })
@@ -107,7 +110,8 @@ describe('CropSim reproduces small travian guide Table 1 (non-Egyptian, gold ×1
 })
 
 describe('PassiveCpCalculator UI', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await i18n.changeLanguage('zh-TW')
     // desktop width so the result details are open
     window.matchMedia = ((query: string) => ({
       matches: true, media: query, onchange: null,
@@ -129,5 +133,72 @@ describe('PassiveCpCalculator UI', () => {
     const cost = screen.getByTestId('cp-celebration-cost')
     expect(within(cost).getByText(/1,340/)).toBeInTheDocument()
     expect(within(cost).getAllByTestId('pending-verify-chip').length).toBeGreaterThan(0)
+  })
+  it('title is CP 與開村 and the body says CP, not 文明點', () => {
+    render(<PassiveCpCalculator />)
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('CP 與開村')
+    expect(screen.queryByText(/文明點/)).toBeNull()
+  })
+  it('celebration hours field has the Town Hall hint', () => {
+    render(<PassiveCpCalculator />)
+    expect(screen.getByTestId('cp-hours-hint')).toHaveTextContent('慶典時長會隨城鎮廳等級變短，預設帶入城鎮廳 1 級的官方時長。')
+  })
+  it('building labels are Chinese in zh (same names as the buildings database)', () => {
+    render(<PassiveCpCalculator />)
+    expect(screen.getAllByText('村莊大樓').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('城鎮廳').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('鐵匠鋪／防具工坊').length).toBeGreaterThan(0)
+    expect(screen.queryByText('Main Building')).toBeNull()
+  })
+  describe('in English', () => {
+    let prev = 'zh-TW'
+    beforeEach(async () => { prev = i18n.language; await i18n.changeLanguage('en') })
+    afterEach(async () => { await i18n.changeLanguage(prev) })
+    it('keeps English building names and wording', () => {
+      render(<PassiveCpCalculator />)
+      expect(screen.getAllByText('Main Building').length).toBeGreaterThan(0)
+      expect(screen.queryByText('村莊大樓')).toBeNull()
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('CP & new villages')
+      expect(screen.getByTestId('cp-hours-hint')).toHaveTextContent(/Town Hall level 1/)
+    })
+  })
+})
+
+describe('待驗證 follows the generator verified flag', () => {
+  const unverified = [
+    'stable', 'academy', 'blacksmith', 'armoury', 'workshop', 'town_hall', 'residence', 'palace',
+    'treasury', 'sawmill', 'brickyard', 'iron_foundry', 'grain_mill', 'bakery', 'trade_office',
+    'tournament_square', 'city_wall', 'earth_wall', 'great_barracks', 'great_stable',
+    'great_warehouse', 'great_granary',
+  ]
+  it.each(unverified)('%s cost and time are 待驗證', (id) => {
+    expect(isPending(id, 'cost')).toBe(true)
+    expect(isPending(id, 'time')).toBe(true)
+  })
+  it.each(['main_building', 'warehouse', 'granary', 'cranny', 'marketplace', 'embassy', 'palisade', 'barracks', 'rally_point'])(
+    '%s (ts11 measured) has no chip', (id) => {
+      expect(isPending(id, 'cost')).toBe(false)
+      expect(isPending(id, 'time')).toBe(false)
+    },
+  )
+  it('every building not measured in ts11 has cost AND time 待驗證', () => {
+    const measured = new Set(['main_building', 'barracks', 'rally_point', 'warehouse', 'granary', 'marketplace',
+      'cranny', 'embassy', 'palisade', 'woodcutter', 'clay_pit', 'iron_mine', 'cropland'])
+    for (const id of Object.keys(gen.buildings)) {
+      if (measured.has(id)) {
+        expect(isBuildingVerified(id), id).toBe(true)
+      } else {
+        expect(isPending(id, 'cost') && isPending(id, 'time'), id).toBe(true)
+        expect(isBuildingVerified(id), id).toBe(false)
+      }
+    }
+    for (const id of ['stonemasons_lodge', 'trapper', 'brewery', 'horse_drinking_trough']) {
+      expect(isPending(id, 'cost'), id).toBe(true)
+    }
+  })
+  it('names come from the same data as the database page', () => {
+    expect(buildingName('main_building', 'zh')).toBe('村莊大樓')
+    expect(buildingName('main_building', 'en')).toBe('Main Building')
+    expect(buildingName('town_hall', 'zh')).toBe('城鎮廳')
   })
 })

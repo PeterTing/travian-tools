@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { buildingsApi } from '@/services/gameApi'
 import type { BuildingListItem, BuildingDetail, BuildingCategory } from '@/types/game'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
-import { isPending } from '@/data/gameData'
+import BuildingVerifyMark, { BuildingVerifyLegend } from '@/components/common/BuildingVerifyMark'
 
 const CATEGORY_VALUES: (BuildingCategory | 'all')[] = [
   'all',
@@ -79,9 +78,10 @@ export default function BuildingsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">
+      <h1 className="text-3xl font-bold mb-2">
         {t('database.buildings.title')}
       </h1>
+      <BuildingVerifyLegend />
 
       {/* 篩選器 */}
       <div className="flex flex-wrap gap-4 mb-6">
@@ -130,6 +130,7 @@ export default function BuildingsPage() {
               >
                 <p className="font-medium">
                   {isZh ? building.name_zh : building.name_en}
+                  <BuildingVerifyMark buildingId={building.building_id} />
                 </p>
                 <p className="text-sm opacity-70">
                   {t('common.level')}1-{building.max_level} {t('common.separator')} {t(`categories.${building.category}`)}
@@ -143,8 +144,9 @@ export default function BuildingsPage() {
         <div className="md:col-span-2 border rounded-lg p-4">
           {selectedBuilding ? (
             <>
-              <h2 className="text-2xl font-bold mb-2">
+              <h2 className="text-2xl font-bold mb-2" data-testid="building-detail-name">
                 {isZh ? selectedBuilding.name_zh : selectedBuilding.name_en}
+                <BuildingVerifyMark buildingId={selectedBuilding.building_id} />
               </h2>
               <p className="text-muted-foreground mb-4">
                 {isZh
@@ -176,17 +178,6 @@ export default function BuildingsPage() {
                       )
                     })}
                   </div>
-                </div>
-              )}
-
-              {(isPending(selectedBuilding.building_id, 'cost') || isPending(selectedBuilding.building_id, 'time')) && (
-                <div className="mb-2 flex flex-col gap-1" data-testid="building-pending">
-                  {isPending(selectedBuilding.building_id, 'cost') && (
-                    <PendingVerifyChip withNote note={t('common.pendingVerifyCostNote')} />
-                  )}
-                  {isPending(selectedBuilding.building_id, 'time') && (
-                    <PendingVerifyChip withNote note={t('common.pendingVerifyTimeNote')} />
-                  )}
                 </div>
               )}
 
