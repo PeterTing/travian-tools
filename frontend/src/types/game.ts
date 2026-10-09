@@ -101,6 +101,9 @@ export type TroopCategory =
   | 'special'
   | 'settler'
 
+/** 兵種速度出處：ts11 遊戲內說明／官方文章／待驗證 */
+export type TroopSpeedSource = 'ts11' | 'official' | 'pending'
+
 export interface TroopListItem {
   troop_id: string
   name_zh: string
@@ -110,7 +113,9 @@ export interface TroopListItem {
   attack: number
   defense_infantry: number
   defense_cavalry: number
-  speed: number
+  /** 格／小時（x1）；null＝待驗證（P0-15） */
+  speed: number | null
+  speed_source: TroopSpeedSource
   crop_consumption: number
 }
 
@@ -128,7 +133,11 @@ export interface TroopDetail {
   attack: number
   defense_infantry: number
   defense_cavalry: number
-  speed: number
+  /** 格／小時（x1）；null＝待驗證（P0-15） */
+  speed: number | null
+  speed_source: TroopSpeedSource
+  /** manual/troop/N（ts11 遊戲內說明）或官方網址 */
+  speed_ref: string | null
   carry_capacity: number
   cost_wood: number
   cost_clay: number
@@ -156,7 +165,8 @@ export interface TroopCompareItem {
   attack: number
   defense_infantry: number
   defense_cavalry: number
-  speed: number
+  speed: number | null
+  speed_source: TroopSpeedSource
   total_cost: number
   crop_consumption: number
   attack_per_crop: number

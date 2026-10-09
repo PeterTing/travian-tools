@@ -35,6 +35,11 @@ _MARKDOWN_TOPICS: dict[str, str] = {
 }
 
 
+def _speed_text(speed: object, unit: str = "") -> str:
+    """兵種速度；None（沒有第一手出處）顯示「待驗證」."""
+    return "待驗證" if speed is None else f"{speed}{unit}"
+
+
 class TravianKnowledgeBase:
     """Travian 知識庫檢索服務."""
 
@@ -852,7 +857,7 @@ class TravianKnowledgeBase:
                 f"- **{troop['name_zh']}** ({troop['type']}): "
                 f"攻擊{troop['attack']}/步防{troop['defense_infantry']}/"
                 f"騎防{troop['defense_cavalry']} | "
-                f"速度{troop['speed']} | 糧{troop['upkeep']}"
+                f"速度{_speed_text(troop.get('speed'))} | 糧{troop['upkeep']}"
             )
 
         return "\n".join(lines)
@@ -865,7 +870,7 @@ class TravianKnowledgeBase:
 攻擊力: {troop["attack"]}
 步兵防禦: {troop["defense_infantry"]}
 騎兵防禦: {troop["defense_cavalry"]}
-速度: {troop["speed"]} 格/小時
+速度: {_speed_text(troop.get("speed"), " 格/小時")}
 載重: {troop["capacity"]}
 糧食消耗: {troop["upkeep"]}
 成本: 木{cost.get("wood", 0)}/磚{cost.get("clay", 0)}/鐵{cost.get("iron", 0)}/糧{cost.get("crop", 0)}

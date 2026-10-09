@@ -72,13 +72,19 @@ describe('TRIBE_SETTLER_COST (all 7 tribes verified)', () => {
     });
   });
 
-  it('all tribes share defInf=80, defCav=80, speed=5, carry=3000, upkeep=1', () => {
+  it('all tribes share defInf=80, defCav=80, carry=3000, upkeep=1', () => {
     Object.values(TRIBE_SETTLER_COST).forEach((c) => {
       expect(c.combat.defInf).toBe(80);
       expect(c.combat.defCav).toBe(80);
-      expect(c.combat.speed).toBe(5);
       expect(c.combat.carry).toBe(3000);
       expect(c.combat.upkeep).toBe(1);
     });
+  });
+
+  it('settler speed comes from the generated unit speeds (P0-15): 5, Spartans 待驗證', () => {
+    (['romans', 'teutons', 'gauls', 'vikings', 'egyptians', 'huns'] as const).forEach((id) => {
+      expect(TRIBE_SETTLER_COST[id].combat.speed, `${id} speed`).toBe(5);
+    });
+    expect(TRIBE_SETTLER_COST.spartans.combat.speed).toBeNull();
   });
 });

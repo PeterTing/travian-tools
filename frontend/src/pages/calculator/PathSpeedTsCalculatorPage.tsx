@@ -214,6 +214,13 @@ export default function PathSpeedTsCalculatorPage() {
                   在 +-30 秒容差內無匹配結果
                 </div>
               )}
+
+              {(result.unverified_units?.length ?? 0) > 0 && (
+                <p className="text-xs text-muted-foreground" data-testid="unverified-units-note">
+                  兵種速度來自 ts11 遊戲內說明與官方說明。以下兵種的速度還沒有第一手出處，沒有列入比對：
+                  {result.unverified_units?.join('、')}
+                </p>
+              )}
             </div>
           ) : (
             <div className="text-center text-muted-foreground py-8">

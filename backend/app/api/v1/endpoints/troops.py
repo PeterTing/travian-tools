@@ -21,7 +21,8 @@ class TroopListItem(BaseModel):
     attack: int
     defense_infantry: int
     defense_cavalry: int
-    speed: int
+    speed: int | None
+    speed_source: str
     crop_consumption: int
 
 
@@ -43,7 +44,9 @@ class TroopDetailResponse(BaseModel):
     attack: int
     defense_infantry: int
     defense_cavalry: int
-    speed: int
+    speed: int | None
+    speed_source: str
+    speed_ref: str | None = None
     carry_capacity: int
     cost_wood: int
     cost_clay: int
@@ -74,7 +77,8 @@ class TroopCompareItem(BaseModel):
     attack: int
     defense_infantry: int
     defense_cavalry: int
-    speed: int
+    speed: int | None
+    speed_source: str
     total_cost: int
     crop_consumption: int
     attack_per_crop: float
@@ -137,6 +141,7 @@ async def get_troops(
             defense_infantry=t.defense_infantry,
             defense_cavalry=t.defense_cavalry,
             speed=t.speed,
+            speed_source=t.speed_source,
             crop_consumption=t.crop_consumption,
         )
         for t in troops
@@ -188,6 +193,7 @@ async def compare_troops(
             defense_infantry=t.defense_infantry,
             defense_cavalry=t.defense_cavalry,
             speed=t.speed,
+            speed_source=t.speed_source,
             total_cost=t.total_cost,
             crop_consumption=t.crop_consumption,
             attack_per_crop=t.attack_per_crop,
@@ -200,13 +206,16 @@ async def compare_troops(
     # 計算比較摘要
     best_attack = max(troops, key=lambda t: t.attack)
     best_defense = max(troops, key=lambda t: t.defense_infantry + t.defense_cavalry)
-    best_speed = max(troops, key=lambda t: t.speed)
+    with_speed = [t for t in troops if t.speed is not None]
+    best_speed = max(with_speed, key=lambda t: t.speed or 0) if with_speed else None
     best_attack_efficiency = max(troops, key=lambda t: t.attack_per_crop)
 
     summary = {
         "best_attack": f"{best_attack.name_zh} ({best_attack.attack})",
         "best_defense": f"{best_defense.name_zh} ({best_defense.defense_infantry + best_defense.defense_cavalry})",
-        "best_speed": f"{best_speed.name_zh} ({best_speed.speed})",
+        "best_speed": (
+            f"{best_speed.name_zh} ({best_speed.speed})" if best_speed else "待驗證"
+        ),
         "best_attack_efficiency": f"{best_attack_efficiency.name_zh} ({best_attack_efficiency.attack_per_crop:.2f})",
     }
 
@@ -242,6 +251,7 @@ async def get_troops_by_tribe(
             defense_infantry=t.defense_infantry,
             defense_cavalry=t.defense_cavalry,
             speed=t.speed,
+            speed_source=t.speed_source,
             crop_consumption=t.crop_consumption,
         )
         for t in troops
@@ -280,6 +290,8 @@ async def get_troop_detail(tribe: TroopTribe, troop_id: str) -> TroopDetailRespo
         defense_infantry=troop.defense_infantry,
         defense_cavalry=troop.defense_cavalry,
         speed=troop.speed,
+        speed_source=troop.speed_source,
+        speed_ref=troop.speed_ref,
         carry_capacity=troop.carry_capacity,
         cost_wood=troop.cost_wood,
         cost_clay=troop.cost_clay,

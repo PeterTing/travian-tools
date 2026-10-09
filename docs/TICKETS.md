@@ -2,7 +2,7 @@
 
 | 項目 | 內容 |
 |---|---|
-| 版本 | v2.0.30（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
+| 版本 | v2.0.31（v2.0 取代 v1，v1 已封存於 `docs/archive/TICKETS-v1.md`） |
 | 更新日期 | 2026-10-09 |
 | 規格來源 | [`PRD.md`](PRD.md) |
 
@@ -174,7 +174,7 @@
 - 範圍：來襲紀錄補「對方上次上線時間」欄位 → 算出發兵時間窗 → 反推 TS 等級，結果寫回該筆來襲；附註欄（神器、錘子、feeder）
 - 依賴：P1-01 反推 TS 等級（公式已在 PathSpeedTs 計算器）
 
-### P0-15 兵種資料來源查證 ⬜（擋 IA v2.2 用到兵種資料的頁面）
+### P0-15 兵種資料來源查證 🔄（第一階段：兵種速度 PR 送審）
 - 問題：兵種數值（7 族，含斯巴達）可能是整張表從 kirilloid 或社群表搬來的，違反「同類功能照公式自己重寫，外部網站只拿來比對」
 - 兩份資料都要查：
   - 前端 `frontend/src/features/guideCalcs/data/tribes/*.ts`、`tribes-types.ts`、`build-order/tribe-cost.ts`（#18 從 travian-guide 搬入）
@@ -191,11 +191,21 @@
     - `POST /advanced-calculator/technology` → `/calculator/technology`（鐵匠鋪，兵種攻防基礎值）
     - `POST /advanced-calculator/path-speed-ts` → `/calculator/path-speed-ts`（反推 TS：速度對應兵種名稱）
   - 速度由使用者自己填、沒有讀兵種表，但屬於 IA v2.2 要先藏起來的功能：`/calculator/path`（行軍時間）、`/calculator/interception`（攔截）、`/calculator/save-troops`（躲兵）、`/calculator/attack-planner`（TS 優化器；預設速度 6）
-- **PM 決定欄**：查證後若確定是搬來的，現有頁面要
-  - [ ] 下架（路由與入口一起拿掉，等重建）
-  - [ ] 保留，整頁標「待驗證」，逐兵種重建後拿掉
-- IA v2.2：這張票關掉之前，援軍可達、躲兵、行軍時間、假攻、練兵量、OP 規劃、反推 TS 的入口**直接藏起來**（不是變灰）
+- **PM 決定（2026-10-09）**：
+  - [ ] ~~下架（路由與入口一起拿掉，等重建）~~
+  - [x] 保留，標「待驗證」，逐兵種重建後拿掉
+  - 官方來源（support.travian.com、遊戲內說明）算第一手資料，出處寫官方網址；外部玩家網站（kirilloid、Friso、GetterMap、社群表、fandom）不能當資料來源
+  - 維京：出處是官方文章，結案（網址改成現在的 `support.travian.com/en/articles/139-vikings-in-travian-legends`）
+  - 其他 6 族（前端資料）和後端 `troops.json`／`knowledge_base/tribes.py` 當成搬來的重建
+  - 戰鬥模擬路由關掉、導回首頁，等 P1-06（IA v2.2 PR 處理）
+- IA v2.2：入口**保留**，用到兵種數值的地方標「待驗證」（原本寫「入口先藏」，依 PM 決定改掉）
 - 初步查證（2026-10-09）：見 PR #24 說明
+- **第一階段：兵種速度（全 7 族）** 🔄 送審
+  - 唯一一份：`scripts/game_data/gen_game_data.py` 的 `UNIT_SPEEDS` → `backend/data/static/unit_speeds.json`、`troops.json`（只改 speed／speed_source／speed_ref）、`frontend/src/data/unitSpeeds.gen.json`；`knowledge_base/tribes.py` 與前端部族資料、開村資料、農場收益都改讀這份
+  - 出處：羅馬、條頓、高盧、埃及、匈奴 50 個兵種＝ts11 遊戲內說明（`manual/troop/N`，原文存 `scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json`）；維京＝官方 S139；斯巴達步兵騎兵＝官方 S187；斯巴達衝撞車、弩炮、Ephor、開拓者＝沒有第一手出處，速度留空（待驗證）
+  - 跟舊資料不同：後端匈奴神射手 16→15、維京 Jarl 4→5；`tribes.py` 有 9 個速度跟出處不一樣、4 個斯巴達兵種沒有出處（已全部改讀產生檔）；S187 的匈奴傭兵寫 7，ts11 遊戲內是 6（用 ts11）
+  - 反推 TS 讀新的速度；待驗證的兵種不列入比對，畫面列出名單
+- 第二階段（未開始）：高盧花費、糧耗、訓練時間（ts11 兵營／馬廄／研究院頁），其他部族排後面；重建完的那一族拿掉「待驗證」
 
 ---
 
@@ -256,6 +266,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-09 | v2.0.31 | P0-15 第一階段：兵種速度依 ts11 遊戲內說明與官方說明重建（全 7 族，前後端同一份由 `scripts/game_data/` 產生）；記錄 PM 對 P0-15 的決定（官方來源可用、維京結案、入口保留標待驗證） |
 | 2026-10-09 | v2.0.30 | 新增 P0-13（[#24](https://github.com/PeterTing/travian-tools/pull/24)）：慶典 CP 改成日產量有上限、開村倒數、建築數值由 `scripts/game_data/` 公式產生並 ts11 校正（前後端同一份）、CP 門檻只剩一份、待驗證標示、產量模擬修正、拿掉佯攻兵量。依研究前 10 缺口新增 P0-14（來襲回報＋反推 TS）、P1-15～P1-21；新增 P1-22（建造隊列解析，給建造提醒）、P1-23（英雄頁解析，給英雄屬性）。幕僚長審核：兵種資料的來源註解改回原本的真實出處，新增 P0-15「兵種資料來源查證」（擋 IA v2.2 用到兵種資料的頁面） |
 | 2026-10-09 | v2.0.29 | 工具網站自訂網域 `tr.tingcloud.tw` 送審：Cloud Run domain mapping（asia-east1 支援、免費、不開 LB）；tt-api `CORS_ORIGINS` 加新網域、保留 run.app；擴充 0.5.1 信任新網域；部署文件補指令與驗證步驟。線上變更（CORS 環境變數、domain mapping、Cloudflare CNAME）等審核與網域驗證後才做 |
 | 2026-10-09 | v2.0.28 | P0-07 已 merge（`899ebfe`）並部署（`tt-ocr-00001-sf9`、`tt-api-00004-8hv`、`tt-web-00005-4nh`），附上線實測；入口仍標「測試版」（P1-11）。冷啟動文案改「15 秒左右」、辨識中進度條改成逼近 90% 不跑滿；部署文件補匿名驗證改打 `/`（`/healthz` 被 Google 前端保留）。P1-14 補幕僚長 #21 核准時的備註：50 秒總時限要在拿 ID token 之後、每次送出前重算剩餘時間才是硬上限（httpx timeout 是分階段計算）；tt-api 逾時後 tt-ocr 仍會辨識完那張（只記錄）；估計 0.5 → 1 天 |

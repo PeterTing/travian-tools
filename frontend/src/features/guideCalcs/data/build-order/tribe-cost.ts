@@ -12,18 +12,24 @@
  *   - Roman / Teuton / Gaul:
  *       kirilloid/travian base/units.ts + xlsx T4.6 Start Guide "Other!R60-62"
  *   - Viking:
- *       https://support.travian.com/en/support/solutions/articles/7000090975
+ *       https://support.travian.com/en/articles/139-vikings-in-travian-legends
+ *       (same official article; the old .../solutions/articles/7000090975 URL now 404s)
  *   - Egyptian / Hun / Spartan:
  *       Player-provided in-game stats screen (verified 2026-04-23)
+ *
+ * Settler speed is the exception (P0-15 phase 1): it comes from
+ * src/data/unitSpeeds.gen.json (ts11 in-game help / support.travian.com);
+ * null = no first-hand source yet (Spartans, 待驗證).
  */
 import type { TribeId } from '../travian';
+import { unitSpeedValue } from '@/data/unitSpeeds';
 
 export interface SettlerCombatStats {
   attack: number;
   defInf: number;
   defCav: number;
-  /** Fields per hour (base travel speed). */
-  speed: number;
+  /** Fields per hour (base travel speed); null = 待驗證. Generated, see header. */
+  speed: number | null;
   /** Carry capacity (resources per settler). */
   carry: number;
   /** Upkeep in crop per hour. */
@@ -46,67 +52,70 @@ export interface SettlerCost {
   source: string;
 }
 
-const STANDARD_COMBAT: SettlerCombatStats = {
+const STANDARD_COMBAT: Omit<SettlerCombatStats, 'speed'> = {
   attack: 10,
   defInf: 80,
   defCav: 80,
-  speed: 5,
   carry: 3000,
   upkeep: 1,
 };
 
-const EGYPTIAN_COMBAT: SettlerCombatStats = {
+const EGYPTIAN_COMBAT: Omit<SettlerCombatStats, 'speed'> = {
   ...STANDARD_COMBAT,
   attack: 0,
 };
+
+function settlerCombat(tribe: TribeId, base: Omit<SettlerCombatStats, 'speed'>): SettlerCombatStats {
+  return { ...base, speed: unitSpeedValue(tribe, 'settler') };
+}
 
 export const TRIBE_SETTLER_COST: Record<TribeId, SettlerCost> = {
   romans: {
     wood: 4600, clay: 4200, iron: 5800, crop: 4400, total: 19000,
     trainingSeconds: 26900,
-    combat: STANDARD_COMBAT,
+    combat: settlerCombat('romans', STANDARD_COMBAT),
     verified: true,
     source: 'kirilloid/travian base/units.ts + xlsx T4.6 Start Guide Other!R61',
   },
   teutons: {
     wood: 5800, clay: 4400, iron: 4600, crop: 5200, total: 20000,
     trainingSeconds: 31000,
-    combat: STANDARD_COMBAT,
+    combat: settlerCombat('teutons', STANDARD_COMBAT),
     verified: true,
     source: 'kirilloid/travian base/units.ts + xlsx T4.6 Start Guide Other!R62',
   },
   gauls: {
     wood: 4400, clay: 5600, iron: 4200, crop: 3900, total: 18100,
     trainingSeconds: 22700,
-    combat: STANDARD_COMBAT,
+    combat: settlerCombat('gauls', STANDARD_COMBAT),
     verified: true,
     source: 'kirilloid/travian base/units.ts + xlsx T4.6 Start Guide Other!R60',
   },
   vikings: {
     wood: 5800, clay: 4600, iron: 4800, crop: 4800, total: 20000,
     trainingSeconds: 31000,
-    combat: STANDARD_COMBAT,
+    combat: settlerCombat('vikings', STANDARD_COMBAT),
     verified: true,
-    source: 'support.travian.com/en/support/solutions/articles/7000090975',
+    source: 'https://support.travian.com/en/articles/139-vikings-in-travian-legends',
   },
   egyptians: {
     wood: 5040, clay: 6510, iron: 4830, crop: 4620, total: 21000,
     trainingSeconds: 24800,
-    combat: EGYPTIAN_COMBAT,
+    combat: settlerCombat('egyptians', EGYPTIAN_COMBAT),
     verified: true,
     source: 'Player-provided in-game stats screen (verified 2026-04-23)',
   },
   huns: {
     wood: 6100, clay: 4600, iron: 4800, crop: 5400, total: 20900,
     trainingSeconds: 28950,
-    combat: STANDARD_COMBAT,
+    combat: settlerCombat('huns', STANDARD_COMBAT),
     verified: true,
     source: 'Player-provided in-game stats screen (verified 2026-04-23)',
   },
   spartans: {
     wood: 5115, clay: 5580, iron: 6045, crop: 3255, total: 19995,
     trainingSeconds: 34100,
-    combat: STANDARD_COMBAT,
+    combat: settlerCombat('spartans', STANDARD_COMBAT),
     verified: true,
     source: 'Player-provided in-game stats screen (verified 2026-04-23)',
   },

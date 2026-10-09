@@ -9,6 +9,13 @@ One parameter table (below) -> four generated files:
   backend/data/static/culture_points.json village CP thresholds, celebration caps
   frontend/src/data/gameData.gen.json     compact copy of all of the above for the UI
 
+Unit speeds (P0-15 phase 1) — one table (UNIT_SPEEDS below) -> three files:
+
+  backend/data/static/unit_speeds.json    speed + provenance per unit (all 7 tribes)
+  backend/data/static/troops.json         only the speed / speed_source / speed_ref
+                                          fields are rewritten; other stats untouched
+  frontend/src/data/unitSpeeds.gen.json   same content as unit_speeds.json
+
 Usage:
   python scripts/game_data/gen_game_data.py          # rewrite the files
   python scripts/game_data/gen_game_data.py --check  # exit 1 if any file is stale
@@ -34,6 +41,13 @@ Where every number comes from is in the PARAMS table "src" field:
   app    = 遊戲內數值（T4），ts11 未實測; L1 time kept from the app's previous
            data because the T4 value is uncertain
 No external calculator code or data tables are copied here.
+
+Unit speed provenance ("source" field in UNIT_SPEEDS):
+  ts11     = read on our ts11 x1 server from the in-game help (Travian.Game.Manual,
+             GET /api/v1/manual/troop/N); raw text kept in
+             scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json
+  official = support.travian.com article (URL in UNIT_SPEED_SOURCES)
+  pending  = no first-hand source yet -> speed is null and the UI shows 「待驗證」
 
 Each PARAMS entry also has "verified": True only when ts11 has confirmed its
 cost base, multiplier and L1 time (src "ts11"). Every other building has
@@ -128,6 +142,131 @@ SPEEDS = [1, 2, 3, 5, 10]
 CELEBRATION_CAP = {1: (500, 2000), 2: (500, 2000), 3: (250, 1000), 5: (250, 1000), 10: (125, 500)}
 START_CP = {1: 500, 2: 250, 3: 167, 5: 100, 10: 50}
 MAX_VILLAGES = 50
+
+
+# ---------------------------------------------------------------------------
+# Unit speeds (fields/hour, x1, before Tournament Square / artefacts / hero items)
+# ---------------------------------------------------------------------------
+BACKEND_UNIT_SPEEDS = ROOT / "backend/data/static/unit_speeds.json"
+BACKEND_TROOPS = ROOT / "backend/data/static/troops.json"
+FRONTEND_UNIT_SPEEDS = ROOT / "frontend/src/data/unitSpeeds.gen.json"
+TS11_MANUAL_EVIDENCE = ROOT / "scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json"
+
+UNIT_SPEED_SOURCES = {
+    "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-09 讀取",
+    "s139": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+    "s187": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+}
+TRIBE_ORDER = ["romans", "teutons", "gauls", "egyptians", "huns", "spartans", "vikings"]
+
+# One row per unit, game order t1..t10:
+#   (troops.json id, frontend id, knowledge_base/tribes.py key, speed, source, ref)
+# ref = in-game manual troop number for "ts11", UNIT_SPEED_SOURCES key for "official".
+UNIT_SPEEDS: dict[str, list[tuple]] = {
+    "romans": [
+        ("legionnaire", "legionnaire", "legionnaire", 6, "ts11", 1),
+        ("praetorian", "praetorian", "praetorian", 5, "ts11", 2),
+        ("imperian", "imperian", "imperian", 7, "ts11", 3),
+        ("equites_legati", "equitesLegati", "equites_legati", 16, "ts11", 4),
+        ("equites_imperatoris", "equitesImperatoris", "equites_imperatoris", 14, "ts11", 5),
+        ("equites_caesaris", "equitesCaesaris", "equites_caesaris", 10, "ts11", 6),
+        ("roman_ram", "ram", "battering_ram", 4, "ts11", 7),
+        ("fire_catapult", "fireCatapult", "fire_catapult", 3, "ts11", 8),
+        ("senator", "senator", "senator", 4, "ts11", 9),
+        ("roman_settler", "settler", "settler", 5, "ts11", 10),
+    ],
+    "teutons": [
+        ("clubswinger", "maceman", "clubswinger", 7, "ts11", 11),
+        ("spearman", "spearman", "spearman", 7, "ts11", 12),
+        ("axeman", "axeman", "axeman", 6, "ts11", 13),
+        ("teuton_scout", "scout", "scout", 9, "ts11", 14),
+        ("paladin", "paladin", "paladin", 10, "ts11", 15),
+        ("teutonic_knight", "tk", "teutonic_knight", 9, "ts11", 16),
+        ("teuton_ram", "ram", "ram", 4, "ts11", 17),
+        ("teuton_catapult", "catapult", "catapult", 3, "ts11", 18),
+        ("chief", "chief", "chief", 4, "ts11", 19),
+        ("teuton_settler", "settler", "settler", 5, "ts11", 20),
+    ],
+    "gauls": [
+        ("phalanx", "phalanx", "phalanx", 7, "ts11", 21),
+        ("swordsman", "swordsman", "swordsman", 6, "ts11", 22),
+        ("pathfinder", "pathfinder", "pathfinder", 17, "ts11", 23),
+        ("theutates_thunder", "theutatesThunder", "theutates_thunder", 19, "ts11", 24),
+        ("druidrider", "druidrider", "druidrider", 16, "ts11", 25),
+        ("haeduan", "haeduan", "haeduan", 13, "ts11", 26),
+        ("gaul_ram", "ram", "ram", 4, "ts11", 27),
+        ("trebuchet", "trebuchet", "trebuchet", 3, "ts11", 28),
+        ("chieftain", "chieftain", "chieftain", 5, "ts11", 29),
+        ("gaul_settler", "settler", "settler", 5, "ts11", 30),
+    ],
+    "egyptians": [
+        ("slave_militia", "slaveMilitia", "slave_militia", 7, "ts11", 51),
+        ("ash_warden", "ashWarden", "ash_warden", 6, "ts11", 52),
+        ("khopesh_warrior", "khopesh", "khopesh_warrior", 7, "ts11", 53),
+        ("sopdu_explorer", "sopdu", "sopdu_explorer", 16, "ts11", 54),
+        ("anhur_guard", "anhur", "anhur_guard", 15, "ts11", 55),
+        ("resheph_chariot", "resheph", "resheph_chariot", 10, "ts11", 56),
+        ("egyptian_ram", "ram", "ram", 4, "ts11", 57),
+        ("stone_catapult", "catapult", "stone_catapult", 3, "ts11", 58),
+        ("nomarch", "nomarch", "nomarch", 4, "ts11", 59),
+        ("egyptian_settler", "settler", "settler", 5, "ts11", 60),
+    ],
+    "huns": [
+        ("mercenary", "mercenary", "mercenary", 6, "ts11", 61),
+        ("bowman", "bowman", "bowman", 6, "ts11", 62),
+        ("spotter", "spotter", "spotter", 19, "ts11", 63),
+        ("steppe_rider", "steppeRider", "steppe_rider", 16, "ts11", 64),
+        ("marksman", "marksman", "marksman", 15, "ts11", 65),
+        ("marauder", "marauder", "marauder", 14, "ts11", 66),
+        ("hun_ram", "ram", "ram", 4, "ts11", 67),
+        ("hun_catapult", "catapult", "catapult", 3, "ts11", 68),
+        ("logades", "logades", "logades", 5, "ts11", 69),
+        ("hun_settler", "settler", "settler", 5, "ts11", 70),
+    ],
+    # ts11 has no Spartans. S187 lists infantry + cavalry only; siege, Ephor and
+    # settler have no official source yet -> null / 「待驗證」.
+    "spartans": [
+        ("hoplite", "hoplite", "hoplite", 6, "official", "s187"),
+        ("sentinel", "sentinel", "sentinel", 9, "official", "s187"),
+        ("shieldsman", "shieldsman", "shieldsman", 8, "official", "s187"),
+        ("twinsteel_therion", "twinsteel", "twirler", 6, "official", "s187"),
+        ("elpida_rider", "elpida", "elpida_rider", 16, "official", "s187"),
+        ("corinthian_crusher", "corinthian", "corinthian_crusher", 9, "official", "s187"),
+        ("spartan_ram", "ram", "ram", None, "pending", None),
+        ("ballista", "ballista", "catapult", None, "pending", None),
+        ("ephor", "ephor", "ephor", None, "pending", None),
+        ("spartan_settler", "settler", "settler", None, "pending", None),
+    ],
+    # ts11 has no Vikings: official "Viking Units Overview" table (S139).
+    "vikings": [
+        ("thrall", "thrall", "thrall", 7, "official", "s139"),
+        ("shield_maiden", "shieldMaiden", "shield_maiden", 7, "official", "s139"),
+        ("berserker", "berserker", "berserker", 5, "official", "s139"),
+        ("heimdalls_eye", "heimdallsEye", "scout", 9, "official", "s139"),
+        ("huskarl_rider", "huskarlRider", "huskarl_rider", 12, "official", "s139"),
+        ("valkyries_blessing", "valkyrie", "valkyrjas_blessing", 9, "official", "s139"),
+        ("viking_ram", "ram", "ram", 4, "official", "s139"),
+        ("viking_catapult", "catapult", "catapult", 3, "official", "s139"),
+        ("jarl", "jarl", "jarl", 5, "official", "s139"),
+        ("viking_settler", "settler", "settler", 5, "official", "s139"),
+    ],
+}
+
+# Cross-check only (not used for output): speeds in the official S187 table,
+# infantry + cavalry (t1..t6). On that page the speed row is labelled "Crop
+# upkeep" and the upkeep row "Capacity" (labels shifted by one row); the
+# numbers themselves match the in-game help except Hun Mercenary (S187: 7,
+# ts11 help: 6) -> we use ts11.
+S187_SPEED = {
+    "romans": [6, 5, 7, 16, 14, 10],
+    "teutons": [7, 7, 6, 9, 10, 9],
+    "gauls": [7, 6, 17, 19, 16, 13],
+    "egyptians": [7, 6, 7, 16, 15, 10],
+    "huns": [7, 6, 19, 16, 15, 14],
+    "spartans": [6, 9, 8, 6, 16, 9],
+    "vikings": [7, 7, 5, 9, 12, 9],
+}
+S187_KNOWN_DIFF = {("huns", 0)}
 
 
 def round5(x: float) -> int:
@@ -279,6 +418,51 @@ def gen_frontend(buildings: dict, cp: dict) -> dict:
     }
 
 
+def gen_unit_speeds() -> dict:
+    tribes = {}
+    for tribe in TRIBE_ORDER:
+        rows = []
+        for slot, (be_id, fe_id, kb_id, speed, src, ref) in enumerate(UNIT_SPEEDS[tribe], start=1):
+            if src == "ts11":
+                ref_text = f"manual/troop/{ref}"
+            elif src == "official":
+                ref_text = UNIT_SPEED_SOURCES[ref]
+            else:
+                ref_text = None
+            rows.append({"slot": slot, "troop_id": be_id, "fe_id": fe_id, "kb_id": kb_id,
+                         "speed": speed, "source": src, "ref": ref_text})
+        tribes[tribe] = rows
+    return {
+        "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
+        "unit": "fields/hour, x1, base speed (no Tournament Square / artefact / hero bonus)",
+        "sources": {"ts11": UNIT_SPEED_SOURCES["ts11"],
+                    "official": [UNIT_SPEED_SOURCES["s139"], UNIT_SPEED_SOURCES["s187"]],
+                    "pending": "沒有第一手出處，速度留空（待驗證）"},
+        "tribes": tribes,
+    }
+
+
+def gen_troops(current: dict, speeds: dict) -> dict:
+    """Rewrite only speed / speed_source / speed_ref; every other stat is untouched."""
+    out = json.loads(json.dumps(current))
+    troops = out["troops"]
+    for tribe, rows in speeds["tribes"].items():
+        for r in rows:
+            t = troops[r["troop_id"]]
+            assert t["tribe"] == tribe, r["troop_id"]
+            rebuilt: dict = {}
+            for k, v in t.items():
+                if k in ("speed_source", "speed_ref"):
+                    continue
+                rebuilt[k] = v
+                if k == "speed":
+                    rebuilt["speed"] = r["speed"]
+                    rebuilt["speed_source"] = r["source"]
+                    rebuilt["speed_ref"] = r["ref"]
+            troops[r["troop_id"]] = rebuilt
+    return out
+
+
 def render(obj: dict, compact: bool = False) -> str:
     if compact:
         return json.dumps(obj, ensure_ascii=False, separators=(",", ":")) + "\n"
@@ -289,11 +473,15 @@ def outputs() -> dict[Path, str]:
     b = gen_buildings(_load(BACKEND_BUILDINGS))
     r = gen_resources(_load(BACKEND_RESOURCES))
     cp = gen_culture_points()
+    us = gen_unit_speeds()
     return {
         BACKEND_BUILDINGS: render(b),
         BACKEND_RESOURCES: render(r),
         BACKEND_CP: render(cp),
         FRONTEND_GEN: render(gen_frontend(b, cp), compact=True),
+        BACKEND_UNIT_SPEEDS: render(us),
+        BACKEND_TROOPS: render(gen_troops(_load(BACKEND_TROOPS), us)),
+        FRONTEND_UNIT_SPEEDS: render(us),
     }
 
 

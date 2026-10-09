@@ -133,6 +133,8 @@ export interface SpeedTsMatch {
 export interface PathSpeedTsResponse {
   distance: number
   possible_matches: SpeedTsMatch[]
+  /** 速度還沒有第一手出處（待驗證）、沒有列入比對的兵種（P0-15） */
+  unverified_units?: string[]
 }
 
 // ============ Village Builder ============

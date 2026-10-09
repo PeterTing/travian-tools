@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { troopsApi } from '@/services/gameApi'
+import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
 
 const TRIBES: { value: TroopTribe | 'all'; label: string }[] = [
@@ -24,6 +25,13 @@ const CATEGORIES: { value: TroopCategory | 'all'; label: string }[] = [
   { value: 'special', label: '特殊' },
   { value: 'settler', label: '移民' },
 ]
+
+/** 速度出處說明（P0-15）：ts11 遊戲內說明／官方文章／待驗證 */
+function speedSourceLabel(t: Pick<TroopDetail, 'speed_source' | 'speed_ref'>): string {
+  if (t.speed_source === 'ts11') return 'ts11 遊戲內說明'
+  if (t.speed_source === 'official') return '官方說明'
+  return '待驗證'
+}
 
 export default function TroopsPage() {
   const { i18n } = useTranslation()
@@ -175,8 +183,18 @@ export default function TroopsPage() {
                 </div>
                 <div className="p-3 bg-yellow-50 dark:bg-yellow-950 rounded">
                   <p className="text-sm text-muted-foreground">速度</p>
-                  <p className="text-2xl font-bold text-yellow-600">
-                    {selectedTroop.speed}
+                  {selectedTroop.speed === null ? (
+                    <p className="text-2xl font-bold text-yellow-600" data-testid="troop-speed">
+                      —{' '}
+                      <PendingVerifyChip note="這個兵種的速度還沒有第一手出處" />
+                    </p>
+                  ) : (
+                    <p className="text-2xl font-bold text-yellow-600" data-testid="troop-speed">
+                      {selectedTroop.speed}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground" data-testid="troop-speed-source">
+                    {speedSourceLabel(selectedTroop)}
                   </p>
                 </div>
               </div>

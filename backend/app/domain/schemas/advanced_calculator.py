@@ -204,6 +204,8 @@ class PathSpeedTsResponse(BaseModel):
 
     distance: float
     possible_matches: list[SpeedTsMatch]
+    # 速度還沒有第一手出處（待驗證）的兵種，沒有列入比對
+    unverified_units: list[str] = []
 
 
 # ============ Village Builder (最佳建造順序) ============
