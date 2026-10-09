@@ -127,7 +127,7 @@ describe('#27 後續新種類的文字', () => {
   it.each([
     // PM 定稿（TICKETS「#27 後續」2）
     ['merchantTradeOffice', '商人容量、速度和交易所加成還沒在 ts11 遊戲內核對。', '目前用的是社群 wiki 的數字，可能有誤差。'],
-    // 工程擬稿，待 PM 定（照官方說明頁 S71 的實際內容寫）
+    // PM 定稿（照官方說明頁 S71 的實際內容寫）
     ['arenaSpeed', '競技場加速還沒在 ts11 遊戲內核對。', '目前照官方說明頁：前 20 格不加速，超過的路段每級 +20%。'],
   ])('%s', (kind, what, source) => {
     expect(notes[kind]).toEqual({ what, source })

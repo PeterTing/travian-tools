@@ -47,7 +47,7 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
   fieldHighLevel: '用到資源田 4 級以上花費或時間、3 級以上產量的地方：田地回本的結果摘要、升級成本、產量增加、比較表；建造順序的結果摘要（總時間、成本）與清單；綠洲收益的結果摘要、產量兩列、比較表；首都產量模擬的「總計 /hr」標題、「產量分解」標題與三列合計',
   launchSim: '開局衝村模擬：結果摘要第二行（第幾天）、總時數、伺服器天、里程碑表（開局花費是試算表每一步的加總）',
   merchantTradeOffice: '貿易路線交易所 > 0 級時：結果摘要第二行（容量、往返）、每商人容量（含交易所）、所需商人表的「次數」、總商人（取代這幾處的 merchantCapacity；速度、單程／往返、部族選單不受交易所影響，維持 merchantCapacity）',
-  arenaSpeed: '行軍時間競技場 > 0 級時：結果摘要第二行（距離 · 速度）、移動時間、秒數、實際速度（0 級不標）。文字待 PM 定稿',
+  arenaSpeed: '行軍時間競技場 > 0 級時：結果摘要第二行（距離 · 速度）、移動時間、秒數、實際速度（0 級不標）',
 }
 
 export function pendingNoteKeys(kind: PendingKind): { what: string; source: string } {
