@@ -42,7 +42,11 @@ export default function CpCard({
       <div className="flex items-baseline gap-2">
         <h2 className="text-base font-semibold">{t('home.cpCard.title', { n: t(`home.villageOrdinal.${Math.min(next, 10)}`) })}</h2>
         {progress && (
-          <Link to="/calculator/passive-cp" className="ml-auto text-sm text-orange-700">
+          <Link
+            to="/calculator/passive-cp"
+            className="ml-auto inline-flex min-h-[44px] min-w-[44px] items-center text-sm text-orange-700"
+            data-testid="cp-card-go"
+          >
             {t('home.cpCard.go')} ›
           </Link>
         )}

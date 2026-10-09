@@ -8,7 +8,7 @@ export function OcrBetaTag() {
   const { t } = useTranslation()
   return (
     <span
-      className="inline-flex h-fit shrink-0 items-center whitespace-nowrap rounded-full border border-sky-300 bg-sky-50 px-1.5 py-px text-[11px] font-medium leading-4 text-sky-800"
+      className="inline-flex h-fit shrink-0 items-center whitespace-nowrap rounded-full border border-sky-300 bg-sky-50 px-1.5 py-px text-xs font-medium leading-4 text-sky-800"
       title={t('ocr.beta.hint')}
       data-testid="ocr-beta-tag"
     >

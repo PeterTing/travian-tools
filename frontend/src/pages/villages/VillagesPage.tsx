@@ -264,7 +264,7 @@ function VillageRow({ village, now }: { village: Village; now: Date }) {
             <span className="truncate font-semibold">{name}</span>
             {coordinates && <span className="tabular-nums">{coordinates}</span>}
             {village.is_capital && (
-              <span className="rounded-md bg-sky-100 px-1.5 text-[11px] font-semibold leading-5 text-sky-700">
+              <span className="rounded-md bg-sky-100 px-1.5 text-xs font-semibold leading-5 text-sky-700">
                 {t('villages.capital')}
               </span>
             )}

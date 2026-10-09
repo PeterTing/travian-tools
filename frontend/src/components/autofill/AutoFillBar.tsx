@@ -29,7 +29,8 @@ interface AutoFillBarProps {
  * 計算器最上面的「已帶入」列（IA v2.2）：
  *   已帶入：PeterT · ts11（x1・高盧）· 主村 (0|0)   更改
  *   時差 +6 小時（從貼上的頁面讀到）／時差：貼一頁就會自動設好
- *   〔待驗證〕兵種花費、糧耗、訓練時間尚未在 ts11 核對；斯巴達速度待驗證   ← 只在用到兵種資料的頁面
+ *   〔待驗證〕兵種花費、糧耗、訓練時間尚未在 ts11 核對   ← 只在用到兵種資料的頁面
+ *             斯巴達速度待驗證                          （兩行對齊灰標右邊）
  */
 export default function AutoFillBar({ usesVillage = true, unitData, assumption }: AutoFillBarProps) {
   const { t } = useTranslation()
@@ -65,9 +66,10 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
             </Link>
           </span>
         )}
+        {/* 點擊範圍 44×44；負邊距讓它不把這一行撐高、也不把摘要擠到下一行 */}
         <button
           type="button"
-          className="ml-auto min-h-[32px] shrink-0 px-1 text-xs text-orange-700 underline"
+          className="-my-3 -mr-3 ml-auto inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center px-1 text-xs text-orange-700 underline"
           aria-expanded={editing}
           onClick={() => setEditing((v) => !v)}
           data-testid="autofill-edit"
@@ -83,10 +85,17 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
       </p>
 
       {showUnitLine && (
-        <p className="text-xs text-muted-foreground" data-testid="autofill-unit-pending">
-          <PendingVerifyChip className="mr-1" note={t('autofill.unitPending')} />
-          {t('autofill.unitPending')}
-        </p>
+        // 兩行都對齊灰標右邊的文字起點（懸掛縮排），不折到灰標底下
+        <div className="flex items-baseline gap-1 text-xs text-muted-foreground" data-testid="autofill-unit-pending">
+          <PendingVerifyChip
+            className="shrink-0"
+            note={`${t('autofill.unitPending')}\n${t('autofill.unitPendingSpartan')}`}
+          />
+          <div className="min-w-0" data-testid="autofill-unit-pending-text">
+            <p data-testid="autofill-unit-pending-line1">{t('autofill.unitPending')}</p>
+            <p data-testid="autofill-unit-pending-line2">{t('autofill.unitPendingSpartan')}</p>
+          </div>
+        </div>
       )}
 
       {assumption && (
@@ -100,7 +109,7 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
           <label className="flex flex-col gap-1 text-xs">
             {t('autofill.speed')}
             <select
-              className="min-h-[40px] rounded border bg-background px-2 text-sm"
+              className="min-h-[44px] rounded border bg-background px-2 text-sm"
               value={speed}
               onChange={(e) => fill.setOverride({ speed: Number(e.target.value) as AutoFillSpeed })}
             >
@@ -114,7 +123,7 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
           <label className="flex flex-col gap-1 text-xs">
             {t('autofill.tribe')}
             <select
-              className="min-h-[40px] rounded border bg-background px-2 text-sm"
+              className="min-h-[44px] rounded border bg-background px-2 text-sm"
               value={tribe ?? ''}
               onChange={(e) => e.target.value && fill.setOverride({ tribe: e.target.value as TroopTribe })}
             >
@@ -130,7 +139,7 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
             <label className="flex flex-col gap-1 text-xs">
               {t('autofill.village')}
               <select
-                className="min-h-[40px] rounded border bg-background px-2 text-sm"
+                className="min-h-[44px] rounded border bg-background px-2 text-sm"
                 value={village?.village_id ?? ''}
                 onChange={(e) => fill.selectVillage(e.target.value)}
               >

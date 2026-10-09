@@ -40,7 +40,7 @@ export default function BottomTabBar() {
               <Link
                 to={tab.to}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex h-14 flex-col items-center justify-center gap-0.5 whitespace-nowrap text-[11px] ${
+                className={`flex h-14 flex-col items-center justify-center gap-0.5 whitespace-nowrap text-xs ${
                   isActive ? 'font-semibold text-orange-600' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >

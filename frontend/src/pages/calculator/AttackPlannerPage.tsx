@@ -185,7 +185,8 @@ function TsOptimizerForm() {
             </label>
             <button
               type="button"
-              className="col-span-2 min-h-[40px] rounded border p-2 text-sm text-red-600 sm:col-span-1"
+              className="col-span-2 min-h-[44px] rounded border p-2 text-sm text-red-600 sm:col-span-1"
+              data-testid="attack-remove"
               onClick={() => removeAttacker(i)}
               disabled={attackers.length <= 1}
             >

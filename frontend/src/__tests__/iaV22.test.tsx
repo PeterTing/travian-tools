@@ -107,6 +107,18 @@ describe('IA v2.2', () => {
       expect(screen.getByTestId('sidebar-incoming-count')).toHaveTextContent('1')
     })
 
+    it('tab labels are at least 12px (text-xs, not text-[11px])', () => {
+      render(
+        <MemoryRouter>
+          <BottomTabBar />
+        </MemoryRouter>,
+      )
+      for (const tab of within(screen.getByTestId('bottom-tab-bar')).getAllByRole('link')) {
+        expect(tab).toHaveClass('text-xs')
+        expect(tab.className).not.toContain('text-[11px]')
+      }
+    })
+
     it('has no red dot without unarrived incoming', () => {
       render(
         <MemoryRouter>
@@ -157,8 +169,28 @@ describe('IA v2.2', () => {
     it('shows 兵種待驗證 on pages that use unit data, e.g. 行軍時間', () => {
       renderBar('/calculator/path')
       const line = screen.getByTestId('autofill-unit-pending')
-      expect(line).toHaveTextContent('兵種花費、糧耗、訓練時間尚未在 ts11 核對；斯巴達速度待驗證')
-      expect(within(line).getByTestId('pending-verify-chip')).toHaveTextContent('待驗證')
+      // 兩行、沒有分號；灰標在最前面，兩行都掛在灰標右邊（同一個文字欄）
+      expect(line).not.toHaveTextContent('；')
+      expect(screen.getByTestId('autofill-unit-pending-line1')).toHaveTextContent(/^兵種花費、糧耗、訓練時間尚未在 ts11 核對$/)
+      expect(screen.getByTestId('autofill-unit-pending-line2')).toHaveTextContent(/^斯巴達速度待驗證$/)
+      const chip = within(line).getByTestId('pending-verify-chip')
+      expect(chip).toHaveTextContent('待驗證')
+      expect(line.firstElementChild).toContainElement(chip)
+      const text = screen.getByTestId('autofill-unit-pending-text')
+      expect(line.lastElementChild).toBe(text)
+      expect(text).toContainElement(screen.getByTestId('autofill-unit-pending-line1'))
+      expect(text).toContainElement(screen.getByTestId('autofill-unit-pending-line2'))
+      expect(line).toHaveClass('flex')
+    })
+
+    it('「更改」 and the editor selects are at least 44px tall', () => {
+      renderBar('/calculator/path')
+      const edit = screen.getByTestId('autofill-edit')
+      expect(edit).toHaveClass('inline-flex', 'min-h-[44px]', 'min-w-[44px]', 'items-center')
+      fireEvent.click(edit)
+      const selects = within(screen.getByTestId('autofill-editor')).getAllByRole('combobox')
+      expect(selects.length).toBeGreaterThanOrEqual(2)
+      for (const sel of selects) expect(sel).toHaveClass('min-h-[44px]')
     })
   })
 
@@ -194,6 +226,17 @@ describe('IA v2.2', () => {
       expect(screen.getByTestId('incoming-rest-list')).toHaveTextContent('接下來 3 筆')
     })
 
+    it('incoming card tap targets are at least 44px (全部 ›, 反推 TS, 躲兵, 複製給盟友)', () => {
+      render(
+        <MemoryRouter>
+          <IncomingCard movements={[movement('a', 12)]} villageName={() => '二村 (12|−1)'} utcOffset={120} now={new Date()} busy={false} />
+        </MemoryRouter>,
+      )
+      expect(screen.getByTestId('incoming-all')).toHaveClass('inline-flex', 'min-h-[44px]', 'min-w-[44px]', 'items-center')
+      for (const name of ['反推 TS', '躲兵']) expect(screen.getByRole('link', { name })).toHaveClass('min-h-[44px]')
+      expect(screen.getByTestId('incoming-copy')).toHaveClass('min-h-[44px]')
+    })
+
     it('CP card shows progress from the numbers last entered in CP 與開村, with 待驗證 for village 3', () => {
       writeCpProgress('acc-1', { currentCp: 846, dailyCp: 48, speed: 1 })
       render(
@@ -205,6 +248,7 @@ describe('IA v2.2', () => {
       expect(screen.getByTestId('cp-card-progress')).toHaveTextContent('846 / 8,000 CP')
       expect(screen.getByTestId('cp-card-progress')).toHaveTextContent('待驗證')
       expect(screen.getByText(/每天 \+48 → 約 150 天/)).toBeInTheDocument()
+      expect(screen.getByTestId('cp-card-go')).toHaveClass('inline-flex', 'min-h-[44px]', 'min-w-[44px]', 'items-center')
     })
 
     it('CP card ends with 「上次輸入：M/D HH:mm · 只存在這台裝置」 in local time, no weekday, no tooltip', () => {

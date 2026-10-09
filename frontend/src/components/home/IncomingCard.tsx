@@ -71,7 +71,11 @@ export default function IncomingCard({ movements, villageName, utcOffset, now, b
         <span className="min-w-0 text-sm text-muted-foreground">
           {t('home.incomingCard.nearest', { village: villageName(first.village_id) })}
         </span>
-        <Link to={ROUTES.CALCULATOR.INCOMING} className="ml-auto shrink-0 text-sm text-orange-700">
+        <Link
+          to={ROUTES.CALCULATOR.INCOMING}
+          className="ml-auto inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center text-sm text-orange-700"
+          data-testid="incoming-all"
+        >
           {t('home.incomingCard.all')} ›
         </Link>
       </div>
@@ -98,26 +102,26 @@ export default function IncomingCard({ movements, villageName, utcOffset, now, b
       <p className="mt-1 text-sm text-amber-800" data-testid="incoming-ts-line">
         ⚠ {t('home.incomingCard.noLastSeen')}
         {/* 反推 TS 用到兵種速度：只在這裡放一個待驗證（TICKETS P0-15） */}
-        <PendingVerifyChip className="ml-1" note={t('autofill.unitPending')} />
+        <PendingVerifyChip className="ml-1" note={`${t('autofill.unitPending')}\n${t('autofill.unitPendingSpartan')}`} />
       </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
         <Link
           to="/calculator/path-speed-ts"
-          className="inline-flex min-h-[40px] items-center rounded-md bg-red-600 px-3 text-sm font-medium text-white"
+          className="inline-flex min-h-[44px] items-center rounded-md bg-red-600 px-3 text-sm font-medium text-white"
         >
           {t('nav.calcs.pathSpeedTs')}
         </Link>
         <Link
           to="/calculator/save-troops"
-          className="inline-flex min-h-[40px] items-center rounded-md border px-3 text-sm"
+          className="inline-flex min-h-[44px] items-center rounded-md border px-3 text-sm"
         >
           {t('nav.calcs.saveTroops')}
         </Link>
         <button
           type="button"
           onClick={() => void copyForAllies()}
-          className="inline-flex min-h-[40px] items-center rounded-md border px-3 text-sm"
+          className="inline-flex min-h-[44px] items-center rounded-md border px-3 text-sm"
           data-testid="incoming-copy"
         >
           {copied ? t('home.incomingCard.copied') : t('home.incomingCard.copy')}

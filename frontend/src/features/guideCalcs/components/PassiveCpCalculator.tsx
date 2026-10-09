@@ -8,7 +8,7 @@ import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import Stepper from '@/components/common/Stepper'
 import AutoFillBar, { AutoFillHint } from '@/components/autofill/AutoFillBar'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
-import { writeCpProgress } from '@/lib/cpProgress'
+import { readCpProgress, writeCpProgress } from '@/lib/cpProgress'
 import { useLang } from '../i18n/LangContext'
 import s from './calc.module.css'
 import CalcResultPanel from './CalcResultPanel'
@@ -120,14 +120,17 @@ export default function PassiveCpCalculator() {
   const [otherCp, setOtherCp] = useState<number>(0)
   const [mode, setMode] = useState<CelebrationMode>('small')
   const [hours, setHours] = useState<number>(TH1_HOURS[accountSpeed])
-  // 使用者動過輸入才記到首頁的「開村 · CP」卡（不記預設值）
-  const touched = useRef(false)
+  const accountId = fill.account?.account_id ?? null
+  // 使用者在「哪個帳號」動過輸入才記到那個帳號的首頁「開村 · CP」卡（不記預設值）。
+  // 換帳號就清掉，避免把上一個帳號打的數字寫進新帳號。
+  const touchedFor = useRef<string | null>(null)
+  const touch = () => { touchedFor.current = accountId }
   const set = (id: string, v: number) => {
-    touched.current = true
+    touch()
     setLevels(prev => ({ ...prev, [id]: Math.max(0, Math.min(20, v || 0)) }))
   }
   const apply = (preset: string) => setLevels(() => {
-    touched.current = true
+    touch()
     const next: Record<string, number> = {}
     FIELDS.forEach(f => { next[f.id] = PRESETS[preset]?.[f.id] ?? 0 })
     return next
@@ -152,6 +155,22 @@ export default function PassiveCpCalculator() {
     if (manualSpeed == null) resetForSpeed(accountSpeed)
   }, [accountSpeed, manualSpeed])
 
+  // 換帳號：不再算「動過」，表單換成那個帳號上次存的目前 CP（沒存過就用預設值）
+  const lastAccountId = useRef(accountId)
+  useEffect(() => {
+    if (lastAccountId.current === accountId) return
+    lastAccountId.current = accountId
+    touchedFor.current = null
+    const saved = readCpProgress(accountId)
+    setLevels(PRESETS.lumi)
+    setManualSpeed(null)
+    lastAccountSpeed.current = accountSpeed
+    setHours(TH1_HOURS[accountSpeed])
+    setCurrentCp(saved ? saved.currentCp : startCp(accountSpeed))
+    // 存的是全帳號每日 CP；扣掉這村（預設配置）就是其他村
+    setOtherCp(saved ? Math.max(0, saved.dailyCp - PRESET_LUMI_CP) : 0)
+  }, [accountId, accountSpeed])
+
   // 只算建築：遊戲沒有空村基礎產量（ts11：各棟 CP 加總＝遊戲顯示的 12／天）
   const total = useMemo(() => villageDailyCp(levels), [levels])
 
@@ -165,9 +184,8 @@ export default function PassiveCpCalculator() {
     villageCp: total, otherVillagesCp: otherCp, currentCp, speed, mode, hoursPerCelebration: hours,
   }), [total, otherCp, currentCp, speed, mode, hours])
 
-  const accountId = fill.account?.account_id ?? null
   useEffect(() => {
-    if (!touched.current) return
+    if (accountId == null || touchedFor.current !== accountId) return
     writeCpProgress(accountId, { currentCp, dailyCp: cd.accountCp, speed })
   }, [accountId, currentCp, cd.accountCp, speed])
 
@@ -234,14 +252,14 @@ export default function PassiveCpCalculator() {
             <div className={s.field}>
               <label>{en ? 'CP you have now' : '目前已有 CP'}</label>
               <input data-testid="cp-current" type="number" min={0} value={currentCp}
-                     onChange={e => { touched.current = true; setCurrentCp(Math.max(0, +e.target.value || 0)) }} />
+                     onChange={e => { touch(); setCurrentCp(Math.max(0, +e.target.value || 0)) }} />
             </div>
           </div>
           <div className={s.fieldRow}>
             <div className={s.field}>
               <label>{en ? 'Other villages CP/day' : '其他村每日 CP'}</label>
               <input data-testid="cp-other" type="number" min={0} value={otherCp}
-                     onChange={e => { touched.current = true; setOtherCp(Math.max(0, +e.target.value || 0)) }} />
+                     onChange={e => { touch(); setOtherCp(Math.max(0, +e.target.value || 0)) }} />
             </div>
             <div className={s.field}>
               <label>{en ? 'Hours per celebration' : '一場慶典幾小時'}</label>
