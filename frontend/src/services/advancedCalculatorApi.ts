@@ -33,6 +33,12 @@ export interface InterceptionRequest {
   catcher_speed: number
   server_speed?: number
   catcher_ts_level?: number
+  /** 攔截者英雄靴子 %（只算超過 20 格，跟競技場相加；P0-21） */
+  catcher_hero_bonus?: number
+  /** 攻擊方競技場等級（回程用；P0-21） */
+  attacker_ts_level?: number
+  /** 攻擊方英雄靴子 %（回程用；P0-21） */
+  attacker_hero_bonus?: number
 }
 
 export interface InterceptionResponse {
@@ -105,6 +111,8 @@ export interface SaveTroopsRequest {
   offline_hours: number
   server_speed?: number
   tournament_square_level?: number
+  /** 英雄靴子 %（P0-21） */
+  hero_bonus?: number
 }
 
 export interface SaveTroopsResponse {
@@ -120,6 +128,8 @@ export interface PathSpeedTsRequest {
   target_y: number
   travel_time_seconds: number
   server_speed?: number
+  /** 攻擊方英雄靴子 %（P0-21） */
+  hero_bonus?: number
 }
 
 export interface SpeedTsMatch {
@@ -204,6 +214,8 @@ export interface AttackerProfile {
   y: number
   unit_speed: number
   ts_level: number
+  /** 英雄靴子 %（P0-21） */
+  hero_bonus?: number
   allow_ts_adjustment: boolean
 }
 

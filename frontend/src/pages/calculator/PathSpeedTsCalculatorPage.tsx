@@ -5,6 +5,7 @@ import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerify
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { PathSpeedTsRequest, PathSpeedTsResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import { speedPendingKinds } from '@/lib/pendingNotes'
 
 export default function PathSpeedTsCalculatorPage() {
   const [form, setForm] = useState<PathSpeedTsRequest>({
@@ -14,6 +15,7 @@ export default function PathSpeedTsCalculatorPage() {
     target_y: 0,
     travel_time_seconds: 3600,
     server_speed: 1,
+    hero_bonus: 0,
   })
   const { currentAccount } = useCurrentAccount()
   useEffect(() => {
@@ -23,6 +25,8 @@ export default function PathSpeedTsCalculatorPage() {
   }, [currentAccount])
   const [timeInput, setTimeInput] = useState({ hours: 1, minutes: 0, seconds: 0 })
   const [result, setResult] = useState<PathSpeedTsResponse | null>(null)
+  // 結果是用哪個靴子 % 算的（灰標看這個）
+  const [usedBoots, setUsedBoots] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -45,6 +49,7 @@ export default function PathSpeedTsCalculatorPage() {
       setError(null)
       const res = await advancedCalculatorApi.calculatePathSpeedTs(form)
       setResult(res)
+      setUsedBoots(form.hero_bonus ?? 0)
     } catch {
       setError('計算失敗，請檢查輸入')
     } finally {
@@ -156,6 +161,20 @@ export default function PathSpeedTsCalculatorPage() {
             </p>
           </div>
 
+          {/* 攻擊方的英雄靴子：跟競技場相加、只算超過 20 格（P0-21） */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">英雄靴子速度加成（%）</label>
+            <input
+              type="number"
+              min={0}
+              max={75}
+              data-testid="reverse-boots"
+              value={form.hero_bonus ?? 0}
+              onChange={(e) => handleChange('hero_bonus', Number(e.target.value))}
+              className="w-full p-2 border rounded bg-background"
+            />
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">伺服器速度</label>
             <select
@@ -199,16 +218,23 @@ export default function PathSpeedTsCalculatorPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {result.possible_matches.map((match, idx) => (
-                        <tr key={idx} className="border-t">
-                          <td className="p-3 font-medium">{match.unit_speed}</td>
-                          <td className="p-3">{match.tournament_square_level}</td>
-                          <td className="p-3">{match.calculated_travel_time_formatted}</td>
-                          <td className="p-3 text-xs">
-                            {match.possible_units.join(', ')}
-                          </td>
-                        </tr>
-                      ))}
+                      {result.possible_matches.map((match, idx) => {
+                        // 待驗證：這一列有競技場或靴子時，時間用了官方說明頁的公式（一列一個，P0-21）
+                        const kinds = speedPendingKinds(match.tournament_square_level, usedBoots)
+                        return (
+                          <PendingRow as="tr" tableColSpan={4} key={idx} className="border-t">
+                            <td className="p-3 font-medium">{match.unit_speed}</td>
+                            <td className="p-3">{match.tournament_square_level}</td>
+                            <td className="p-3" data-testid="reverse-travel">
+                              {match.calculated_travel_time_formatted}
+                              {kinds.length > 0 && <> <PendingVerifyChip kinds={kinds} /></>}
+                            </td>
+                            <td className="p-3 text-xs">
+                              {match.possible_units.join(', ')}
+                            </td>
+                          </PendingRow>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>

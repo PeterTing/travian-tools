@@ -5,6 +5,8 @@ import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { InterceptionRequest, InterceptionResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import { speedPendingKinds } from '@/lib/pendingNotes'
 
 export default function InterceptionCalculatorPage() {
   const [form, setForm] = useState<InterceptionRequest>({
@@ -19,6 +21,9 @@ export default function InterceptionCalculatorPage() {
     catcher_speed: 10,
     server_speed: 1,
     catcher_ts_level: 0,
+    catcher_hero_bonus: 0,
+    attacker_ts_level: 0,
+    attacker_hero_bonus: 0,
   })
   const { currentAccount } = useCurrentAccount()
   useEffect(() => {
@@ -27,6 +32,8 @@ export default function InterceptionCalculatorPage() {
     }
   }, [currentAccount])
   const [result, setResult] = useState<InterceptionResponse | null>(null)
+  // 結果是用哪一組輸入算的（灰標看這組，不看還沒按「計算」的新輸入）
+  const [used, setUsed] = useState<InterceptionRequest | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -40,12 +47,16 @@ export default function InterceptionCalculatorPage() {
       setError(null)
       const res = await advancedCalculatorApi.calculateInterception(form)
       setResult(res)
+      setUsed(form)
     } catch {
       setError('計算失敗，請檢查輸入')
     } finally {
       setLoading(false)
     }
   }
+
+  const returnKinds = used ? speedPendingKinds(used.attacker_ts_level ?? 0, used.attacker_hero_bonus ?? 0) : []
+  const catchKinds = used ? speedPendingKinds(used.catcher_ts_level ?? 0, used.catcher_hero_bonus ?? 0) : []
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -132,6 +143,30 @@ export default function InterceptionCalculatorPage() {
             />
           </div>
 
+          {/* 攻擊方回程也照共用行軍公式：競技場、靴子只加快超過 20 格的路段（P0-21） */}
+          <div>
+            <Stepper
+              label="攻擊方競技場等級"
+              value={form.attacker_ts_level ?? 0}
+              onChange={(v) => handleChange('attacker_ts_level', v)}
+              min={0}
+              max={20}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">攻擊方英雄靴子速度加成（%）</label>
+            <input
+              type="number"
+              min={0}
+              max={75}
+              data-testid="attacker-boots"
+              value={form.attacker_hero_bonus ?? 0}
+              onChange={(e) => handleChange('attacker_hero_bonus', Number(e.target.value))}
+              className="w-full p-2 border rounded bg-background"
+            />
+          </div>
+
           <h2 className="text-xl font-semibold pt-2">攔截者村莊（你的）</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -180,6 +215,19 @@ export default function InterceptionCalculatorPage() {
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-2">攔截者英雄靴子速度加成（%）</label>
+            <input
+              type="number"
+              min={0}
+              max={75}
+              data-testid="catcher-boots"
+              value={form.catcher_hero_bonus ?? 0}
+              onChange={(e) => handleChange('catcher_hero_bonus', Number(e.target.value))}
+              className="w-full p-2 border rounded bg-background"
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-2">伺服器速度</label>
             <select
               value={form.server_speed}
@@ -206,16 +254,24 @@ export default function InterceptionCalculatorPage() {
           {result ? (
             <div className="space-y-4">
               <div className="p-4 bg-muted rounded">
-                <span className="text-sm text-muted-foreground">攻擊者回到家時間</span>
+                {/* 待驗證：攻擊方有競技場或靴子時，回程用了官方說明頁的公式（一行一個，P0-21） */}
+                <PendingRow as="p" className="text-sm text-muted-foreground" data-testid="intercept-return-label">
+                  攻擊者回到家時間
+                  {returnKinds.length > 0 && <> <PendingVerifyChip kinds={returnKinds} /></>}
+                </PendingRow>
                 <p className="text-2xl font-bold">{result.attacker_return_time}</p>
               </div>
               <div className="p-4 bg-primary/10 rounded text-center">
                 <span className="text-sm text-muted-foreground">你應該在此時發送攔截部隊</span>
                 <p className="text-3xl font-bold text-primary">{result.send_time}</p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              {/* 390 寬一欄：灰標的說明要有整張卡的寬度（窄格子撐滿的規則） */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="p-4 bg-muted rounded">
-                  <span className="text-sm text-muted-foreground">攔截行進時間</span>
+                  <PendingRow as="p" className="text-sm text-muted-foreground" data-testid="intercept-travel-label">
+                    攔截行進時間
+                    {catchKinds.length > 0 && <> <PendingVerifyChip kinds={catchKinds} /></>}
+                  </PendingRow>
                   <p className="font-semibold">{result.travel_time_formatted}</p>
                 </div>
                 <div className="p-4 bg-muted rounded">

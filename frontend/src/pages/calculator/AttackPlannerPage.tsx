@@ -7,6 +7,8 @@ import type {
   TsOptimizerResponse,
 } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import { speedPendingKinds } from '@/lib/pendingNotes'
 
 // 舊的「佯攻兵量」（目標人口 5% 的自編算法）已下架；
 // 之後照攻略規則（19 步兵＋1 投石）併進 OP 規劃重寫，見 docs/TICKETS.md。
@@ -36,10 +38,13 @@ function TsOptimizerForm() {
       y: 0,
       unit_speed: 6,
       ts_level: 0,
+      hero_bonus: 0,
       allow_ts_adjustment: true,
     },
   ])
   const [result, setResult] = useState<TsOptimizerResponse | null>(null)
+  // 結果是用哪一組攻擊者算的（灰標看這組）
+  const [usedAttackers, setUsedAttackers] = useState<AttackerProfile[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -52,6 +57,7 @@ function TsOptimizerForm() {
         y: 0,
         unit_speed: 6,
         ts_level: 0,
+        hero_bonus: 0,
         allow_ts_adjustment: true,
       },
     ])
@@ -83,6 +89,7 @@ function TsOptimizerForm() {
       }
       const res = await advancedCalculatorApi.calculateTsOptimizer(req)
       setResult(res)
+      setUsedAttackers(attackers)
     } catch {
       setError('計算失敗，請檢查輸入與時間格式')
     } finally {
@@ -130,8 +137,8 @@ function TsOptimizerForm() {
       <h3 className="font-bold mb-2">攻擊者</h3>
       <div className="space-y-2 mb-3">
         {attackers.map((a, i) => (
-          // 390 寬：每個攻擊者一張小卡、兩欄並附欄名；≥640 才排成一列六格
-          <div key={i} className="grid grid-cols-2 gap-2 rounded-md border p-2 sm:grid-cols-6 sm:border-0 sm:p-0" data-testid="attacker-row">
+          // 390 寬：每個攻擊者一張小卡、兩欄並附欄名；≥640 才排成一列七格
+          <div key={i} className="grid grid-cols-2 gap-2 rounded-md border p-2 sm:grid-cols-7 sm:border-0 sm:p-0" data-testid="attacker-row">
             <label className="col-span-2 min-w-0 text-xs text-muted-foreground sm:col-span-1">
               <span className="sm:sr-only">標籤</span>
               <input
@@ -183,9 +190,24 @@ function TsOptimizerForm() {
                 onChange={(e) => updateAttacker(i, 'ts_level', Number(e.target.value))}
               />
             </label>
+            {/* 靴子跟競技場相加、只算超過 20 格（P0-21） */}
+            <label className="min-w-0 text-xs text-muted-foreground">
+              <span className="sm:sr-only">英雄靴子速度加成（%）</span>
+              <input
+                type="number"
+                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
+                placeholder="靴子 %"
+                aria-label="英雄靴子速度加成（%）"
+                data-testid="attacker-boots"
+                min={0}
+                max={75}
+                value={a.hero_bonus ?? 0}
+                onChange={(e) => updateAttacker(i, 'hero_bonus', Number(e.target.value))}
+              />
+            </label>
             <button
               type="button"
-              className="col-span-2 min-h-[44px] rounded border p-2 text-sm text-red-600 sm:col-span-1"
+              className="min-h-[44px] self-end rounded border p-2 text-sm text-red-600"
               data-testid="attack-remove"
               onClick={() => removeAttacker(i)}
               disabled={attackers.length <= 1}
@@ -223,7 +245,8 @@ function TsOptimizerForm() {
               ))}
             </div>
           )}
-          <div className="overflow-x-auto">
+          {/* ≥640 表格；390 寬改一攻擊者一張小卡（表格要橫向捲動，灰標說明會被切掉） */}
+          <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-muted">
@@ -235,17 +258,42 @@ function TsOptimizerForm() {
               </tr>
             </thead>
             <tbody>
-              {result.results.map((r) => (
-                <tr key={r.village_label}>
-                  <td className="border p-2">{r.village_label}</td>
-                  <td className="border p-2">{r.distance}</td>
-                  <td className="border p-2">{r.recommended_ts_level}</td>
-                  <td className="border p-2 font-mono text-xs">{r.send_time}</td>
-                  <td className="border p-2">{r.travel_time_formatted}</td>
-                </tr>
-              ))}
+              {result.results.map((r) => {
+                // 待驗證：這一列的攻擊者有競技場或靴子時，行進時間用了官方說明頁的公式（一列一個，P0-21）
+                const atk = usedAttackers.find((a) => a.village_label === r.village_label)
+                const kinds = speedPendingKinds(atk?.ts_level ?? r.recommended_ts_level, atk?.hero_bonus ?? 0)
+                return (
+                  <PendingRow as="tr" tableColSpan={5} key={r.village_label}>
+                    <td className="border p-2">{r.village_label}</td>
+                    <td className="border p-2">{r.distance}</td>
+                    <td className="border p-2">{r.recommended_ts_level}</td>
+                    <td className="border p-2 font-mono text-xs">{r.send_time}</td>
+                    <td className="border p-2" data-testid="ts-travel">
+                      {r.travel_time_formatted}
+                      {kinds.length > 0 && <> <PendingVerifyChip kinds={kinds} /></>}
+                    </td>
+                  </PendingRow>
+                )
+              })}
             </tbody>
           </table>
+          </div>
+          <div className="space-y-2 sm:hidden" data-testid="ts-result-cards">
+            {result.results.map((r) => {
+              const atk = usedAttackers.find((a) => a.village_label === r.village_label)
+              const kinds = speedPendingKinds(atk?.ts_level ?? r.recommended_ts_level, atk?.hero_bonus ?? 0)
+              return (
+                <div key={r.village_label} className="min-w-0 rounded-md border p-3 text-sm">
+                  <p className="font-medium">{r.village_label}</p>
+                  <p className="text-muted-foreground">距離 {r.distance} · 建議 TS {r.recommended_ts_level}</p>
+                  <p className="mt-1 break-all font-mono text-xs">發兵 {r.send_time}</p>
+                  <PendingRow as="p" className="mt-1" data-testid="ts-travel-card">
+                    行進 {r.travel_time_formatted}
+                    {kinds.length > 0 && <> <PendingVerifyChip kinds={kinds} /></>}
+                  </PendingRow>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
