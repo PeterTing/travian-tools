@@ -103,11 +103,9 @@ export default function TraderouteCalculator() {
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Merchants needed' : '所需商人'}
-          // 所需商人用商人容量和速度算（社群 wiki 的數字）
-          titlePending="merchantCapacity"
           primary={<>{totalLabel}</>}
           secondary={
-            // 「容量」「往返」（商人速度）也是同一份社群 wiki 數字：跟標題不同一行，自己一個灰標（PM）
+            // 所需商人、容量、往返都用同一份社群 wiki 的商人容量和速度：只在第二行放一個灰標，標題不重複（PM 去重）
             <SummaryPending kind="merchantCapacity" testId="traderoute-summary">
               {lang === 'en'
                 ? `Cap ${fmtInt(cap)} · round trip ${fmtHr(roundTrip)}`

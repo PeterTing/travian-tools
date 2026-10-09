@@ -72,7 +72,7 @@ describe('結果摘要：用到待驗證資料的數字，收合時旁邊也有�
       expect(within(screen.getByTestId('calc-result-primary')).queryByTestId('pending-verify-chip')).toBeNull()
       // 同一種只放一個（標題和第二行不重複）
       const kinds = summaryChipKinds().flatMap((k) => k.split(' '))
-      if (!decl.repeatOk) expect(new Set(kinds).size, `${path} 摘要裡同一種灰標放了兩次`).toBe(kinds.length)
+      expect(new Set(kinds).size, `${path} 摘要裡同一種灰標放了兩次`).toBe(kinds.length)
       // 點開：說明撐滿面板內容寬度（data-fill）
       for (const chip of within(screen.getByTestId('calc-result-panel')).queryAllByTestId('pending-verify-chip')) {
         if (chip.closest('[data-testid="calc-result-details"]')) continue
@@ -113,7 +113,7 @@ describe('貿易路線、農場收益、田地回本：明細裡用到待驗證�
     const el = within(root).getByText(label)
     return el.querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind') ?? null
   }
-  it('trade route: capacity, speed, one-way/round trip rows, table header, total merchants -> merchantCapacity; tribe select label; summary round-trip line has its own chip', async () => {
+  it('trade route: capacity, speed, one-way/round trip rows, table header, total merchants -> merchantCapacity; tribe select label; summary: only the second line (容量 · 往返) has a chip, title has none (dedup)', async () => {
     const d = await open('features/guideCalcs/components/TraderouteCalculator.tsx')
     expect(chipNextTo(d, '每商人容量（含交易所）')).toBe('merchantCapacity')
     expect(chipNextTo(d, '速度')).toBe('merchantCapacity')
@@ -121,7 +121,7 @@ describe('貿易路線、農場收益、田地回本：明細裡用到待驗證�
     const sec = screen.getByTestId('calc-result-secondary')
     expect(sec).toHaveTextContent('往返')
     expect(within(sec).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantCapacity')
-    expect(within(screen.getByTestId('calc-result-title')).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantCapacity')
+    expect(within(screen.getByTestId('calc-result-title')).queryByTestId('pending-verify-chip')).toBeNull()
     expect(chipNextTo(d, '總商人')).toBe('merchantCapacity')
     expect(within(within(d).getByTestId('traderoute-table').querySelector('thead')!).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantCapacity')
     const tribe = screen.getByLabelText('部族')
@@ -147,6 +147,48 @@ describe('貿易路線、農場收益、田地回本：明細裡用到待驗證�
     expect(chipNextTo(d, '每小時產量增加')).toBe('fieldHighLevel plusFormula')
     expect(chipNextTo(d, '每天產量增加')).toBe('fieldHighLevel plusFormula')
     expect(within(within(d).getByTestId('field-roi-compare').querySelector('thead')!).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'fieldHighLevel plusFormula')
+    cleanup()
+  })
+})
+
+/** 不靠登記表：首都產量模擬的加成建築（預設全 5 級）會算進數字 → building */
+describe('首都產量模擬：加成建築算進去的數字都有 building', () => {
+  const kindsOf = (el: Element | null) => el?.querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind') ?? null
+  // 明細的合計列（不是表格欄位標題）
+  const rowLabel = (d: HTMLElement, label: string) => within(d).getAllByText(label).find((el) => !el.closest('table'))!
+  // 加成建築欄位：label 和 input 在同一個 div 裡
+  const setBonus = (label: string, v: number) => {
+    const input = screen.getByText(label, { selector: 'label' }).parentElement!.querySelector('input')!
+    fireEvent.change(input, { target: { value: String(v) } })
+  }
+  it('default: summary title, 產量分解 title and the three total rows list fieldHighLevel, building, cropSim in order; table header cells have no chip', async () => {
+    const { default: CropSim } = await import('./components/CropSimCalculator')
+    render(<MemoryRouter><CropSim /></MemoryRouter>)
+    expect(kindsOf(screen.getByTestId('calc-result-title'))).toBe('fieldHighLevel building cropSim')
+    fireEvent.click(screen.getByTestId('calc-result-toggle'))
+    const d = screen.getByTestId('calc-result-details')
+    expect(kindsOf(within(d).getByTestId('cropsim-breakdown-title'))).toBe('fieldHighLevel building cropSim')
+    expect(within(d).getByTestId('cropsim-breakdown').querySelector('thead [data-testid="pending-verify-chip"]')).toBeNull()
+    for (const label of ['木 + 土 + 鐵 /hr', '糧食 /hr', '總計 /hr']) {
+      expect(kindsOf(rowLabel(d, label)), label).toBe('fieldHighLevel building cropSim')
+    }
+    cleanup()
+  })
+  it('bonus buildings: only lines whose buildings are > 0 get building; all 0 -> none', async () => {
+    const { default: CropSim } = await import('./components/CropSimCalculator')
+    render(<MemoryRouter><CropSim /></MemoryRouter>)
+    const set = setBonus
+    set('Grain Mill', 0)
+    set('Bakery', 0)
+    fireEvent.click(screen.getByTestId('calc-result-toggle'))
+    const d = screen.getByTestId('calc-result-details')
+    expect(kindsOf(rowLabel(d, '糧食 /hr'))).toBe('fieldHighLevel cropSim')
+    expect(kindsOf(rowLabel(d, '木 + 土 + 鐵 /hr'))).toBe('fieldHighLevel building cropSim')
+    expect(kindsOf(screen.getByTestId('calc-result-title'))).toBe('fieldHighLevel building cropSim')
+    for (const l of ['Sawmill', 'Brickyard', 'Iron Foundry']) set(l, 0)
+    expect(kindsOf(rowLabel(d, '木 + 土 + 鐵 /hr'))).toBe('fieldHighLevel cropSim')
+    expect(kindsOf(screen.getByTestId('calc-result-title'))).toBe('fieldHighLevel cropSim')
+    expect(kindsOf(within(d).getByTestId('cropsim-breakdown-title'))).toBe('fieldHighLevel cropSim')
     cleanup()
   })
 })

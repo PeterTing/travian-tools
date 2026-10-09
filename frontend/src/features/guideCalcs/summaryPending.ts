@@ -16,8 +16,6 @@ import type { PendingKind } from '@/lib/pendingNotes'
 export interface SummaryPendingDecl {
   chips: PendingKind[][]
   note: string
-  /** 同一種出現在兩個灰標：只有 PM 明講要分開標時才可以，寫原因 */
-  repeatOk?: string
 }
 
 export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
@@ -26,17 +24,16 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
     note: '距離、移動時間：兵種速度是使用者自己打的數字（預設 7），這頁沒有兵種選單、不從網址或帳號帶入速度；已帶入列只帶伺服器速度和出發座標（幕僚長確認不用標）',
   },
   'features/guideCalcs/components/CropSimCalculator.tsx': {
-    chips: [['fieldHighLevel', 'cropSim']],
-    note: '總計 /hr 用到資源田產量（預設 18 級，3 級以上是公式推算，fieldHighLevel）、Plus ×1.25（預設開）／供水系統（cropSim）：標題旁一個，有用到才列',
+    chips: [['fieldHighLevel', 'building', 'cropSim']],
+    note: '總計 /hr＝田產量（預設 18 級，3 級以上是公式推算，fieldHighLevel）×（1＋加成建築（預設全 5 級，building）＋綠洲）× Plus 1.25（預設開）／供水系統（cropSim）：標題旁一個，依公式順序，有用到才列',
   },
   'features/guideCalcs/components/OasisRoiCalculator.tsx': {
     chips: [['fieldHighLevel', 'cropSim', 'heroMansionCost']],
     note: '第二行一個灰標，依序：「每天 +X」（田地 3 級以上產量 fieldHighLevel、有勾 Plus 的 ×1.25 cropSim）、「英雄宅成本」（heroMansionCost）；回本天數就是這兩個相除，標題不再重複放',
   },
   'features/guideCalcs/components/TraderouteCalculator.tsx': {
-    chips: [['merchantCapacity'], ['merchantCapacity']],
-    note: '所需商人用商人容量和速度算（社群 wiki 的數字）：標題「所需商人」旁一個；第二行「容量 · 往返」（往返用商人速度）另一行，自己一個',
-    repeatOk: 'PM 2026-10-10：往返時間那一行跟「所需商人」不同行，要有自己的灰標',
+    chips: [['merchantCapacity']],
+    note: '所需商人、容量、往返都用商人容量和速度算（社群 wiki 的數字）：第二行「容量 · 往返」旁一個；標題「所需商人」是同一份資料，不重複放（PM 去重）',
   },
   'features/guideCalcs/components/FarmingCalculator.tsx': {
     chips: [['unitCarry']],
