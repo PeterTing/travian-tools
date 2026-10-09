@@ -4,6 +4,7 @@ import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import type { PendingKind } from '@/lib/pendingNotes'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
 
@@ -27,6 +28,9 @@ export default function TraderouteCalculator() {
   const speed = MERCHANTS[tribe].speed;
   const oneWay = dist / speed;
   const roundTrip = oneWay * 2;
+  // 待驗證：容量受交易所影響的數字，交易所 > 0 級時改用 merchantTradeOffice（說明多寫「交易所加成」，取代 merchantCapacity）；
+  // 速度、單程／往返、部族選單不受交易所影響，一律 merchantCapacity
+  const capKind: PendingKind = office > 0 ? 'merchantTradeOffice' : 'merchantCapacity';
 
   const rows = useMemo(() => {
     const labels: Record<string, string> = lang === 'en'
@@ -106,7 +110,7 @@ export default function TraderouteCalculator() {
           primary={<>{totalLabel}</>}
           secondary={
             // 所需商人、容量、往返都用同一份社群 wiki 的商人容量和速度：只在第二行放一個灰標，標題不重複（PM 去重）
-            <SummaryPending kind="merchantCapacity" testId="traderoute-summary">
+            <SummaryPending kind={capKind} testId="traderoute-summary">
               {lang === 'en'
                 ? `Cap ${fmtInt(cap)} · round trip ${fmtHr(roundTrip)}`
                 : `容量 ${fmtInt(cap)} · 往返 ${fmtHr(roundTrip)}`}
@@ -114,7 +118,7 @@ export default function TraderouteCalculator() {
           }
         >
           <h4>{lang === 'en' ? 'Merchant specs' : '商人規格'}</h4>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Capacity per merchant (incl. Trade Office)' : '每商人容量（含交易所）'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={s.value}>{fmtInt(cap)}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Capacity per merchant (incl. Trade Office)' : '每商人容量（含交易所）'} <PendingVerifyChip kind={capKind} /></span><span className={s.value}>{fmtInt(cap)}</span></PendingRow>
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Speed' : '速度'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={s.value}>{speed} {lang === 'en' ? 'tiles/hr' : '格/小時'}</span></PendingRow>
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way / round trip' : '單程 / 往返'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={s.value}>{fmtHr(oneWay)} / {fmtHr(roundTrip)}</span></PendingRow>
 
@@ -124,7 +128,7 @@ export default function TraderouteCalculator() {
             <thead>
               <PendingRow as="tr" className="h-11" tableColSpan={4}>
                 <th>{lang === 'en' ? 'Resource' : '資源'}</th><th>/ hr</th>
-                <th>{lang === 'en' ? 'Trips/hr' : '次數'} <PendingVerifyChip kind="merchantCapacity" /></th>
+                <th>{lang === 'en' ? 'Trips/hr' : '次數'} <PendingVerifyChip kind={capKind} /></th>
                 <th>{lang === 'en' ? 'Dedicated' : '常駐'}</th>
               </PendingRow>
             </thead>
@@ -135,7 +139,7 @@ export default function TraderouteCalculator() {
             </tbody>
           </table>
 
-          <PendingRow className={s.row} style={{ marginTop: 12 }}><span className={s.label}>{lang === 'en' ? 'Total merchants' : '總商人'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={`${s.value} ${s.highlight}`}>{totalLabel}</span></PendingRow>
+          <PendingRow className={s.row} style={{ marginTop: 12 }}><span className={s.label}>{lang === 'en' ? 'Total merchants' : '總商人'} <PendingVerifyChip kind={capKind} /></span><span className={`${s.value} ${s.highlight}`}>{totalLabel}</span></PendingRow>
 
           <div className={s.note}>
             {lang === 'en'

@@ -6,7 +6,9 @@ import {
   distanceOnMap,
   formatTravelTime,
 } from '@/lib/travianFormulas'
-import CalcResultPanel, { RESULT_PANEL_SPACE_CLASS } from '@/features/guideCalcs/components/CalcResultPanel'
+import CalcResultPanel, { RESULT_PANEL_SPACE_CLASS, SummaryPending } from '@/features/guideCalcs/components/CalcResultPanel'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import type { PendingKind } from '@/lib/pendingNotes'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
 
@@ -61,6 +63,10 @@ export default function PathCalculatorPage() {
       arrivalSpeed: Math.round(arrivalSpeed * 100) / 100,
     }
   }, [startX, startY, targetX, targetY, unitSpeed, tsLevel, heroBonus, artifact, serverSpeed])
+
+  // 待驗證：競技場 > 0 級時，移動時間和速度用了競技場公式（官方說明頁 S71，還沒在 ts11 遊戲內核對）；0 級不標
+  const arenaKinds: PendingKind[] = tsLevel > 0 ? ['arenaSpeed' as const] : []
+  const arenaChip = arenaKinds.length ? <> <PendingVerifyChip kinds={arenaKinds} /></> : null
 
   const inputCls =
     'w-full min-w-0 max-w-full rounded border border-input bg-background p-2 text-sm'
@@ -187,7 +193,11 @@ export default function PathCalculatorPage() {
           lang={guideLang}
           title={t('pathCalc.results')}
           primary={<>{result.formatted}</>}
-          secondary={`${result.distance} ${t('pathCalc.fields')} · ${result.arrivalSpeed} ${t('pathCalc.fieldsPerHour')}`}
+          secondary={
+            <SummaryPending kinds={arenaKinds} testId="path-summary">
+              {`${result.distance} ${t('pathCalc.fields')} · ${result.arrivalSpeed} ${t('pathCalc.fieldsPerHour')}`}
+            </SummaryPending>
+          }
           detailsLabel={{ zh: '明細', en: 'details' }}
         >
           <dl className="space-y-3 text-sm">
@@ -197,20 +207,21 @@ export default function PathCalculatorPage() {
                 {result.distance} {t('pathCalc.fields')}
               </dd>
             </div>
-            <div className="flex justify-between gap-3 border-b pb-2">
-              <dt className="text-muted-foreground">{t('pathCalc.travelTime')}</dt>
+            {/* 有灰標的列：至少 44px、垂直置中，相鄰兩列的點擊範圍不重疊 */}
+            <PendingRow className={`flex justify-between gap-3 border-b pb-2 ${arenaChip ? 'min-h-11 items-center' : ''}`}>
+              <dt className="text-muted-foreground">{t('pathCalc.travelTime')}{arenaChip}</dt>
               <dd className="font-mono font-medium tabular-nums">{result.formatted}</dd>
-            </div>
-            <div className="flex justify-between gap-3 border-b pb-2">
-              <dt className="text-muted-foreground">{t('pathCalc.seconds')}</dt>
+            </PendingRow>
+            <PendingRow className={`flex justify-between gap-3 border-b pb-2 ${arenaChip ? 'min-h-11 items-center' : ''}`}>
+              <dt className="text-muted-foreground">{t('pathCalc.seconds')}{arenaChip}</dt>
               <dd className="font-mono font-medium tabular-nums">{result.travelSeconds}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">{t('pathCalc.effectiveSpeed')}</dt>
+            </PendingRow>
+            <PendingRow className={`flex justify-between gap-3 ${arenaChip ? 'min-h-11 items-center' : ''}`}>
+              <dt className="text-muted-foreground">{t('pathCalc.effectiveSpeed')}{arenaChip}</dt>
               <dd className="font-mono font-medium tabular-nums">
                 {result.arrivalSpeed} {t('pathCalc.fieldsPerHour')}
               </dd>
-            </div>
+            </PendingRow>
           </dl>
         </CalcResultPanel>
       </div>

@@ -18,6 +18,8 @@ function usedKinds(): Set<string> {
     }
     // kinds 用變數組出來的（例如 const prodKinds: PendingKind[] = [...(gold ? ['plusFormula' as const] : [])]）
     for (const line of text.split('\n')) {
+      // 單一個 kind 用變數選的（例如 const capKind: PendingKind = office > 0 ? 'merchantTradeOffice' : 'merchantCapacity'）
+      if (/:\s*PendingKind\s*=/.test(line)) for (const m of line.matchAll(/'([a-zA-Z]+)'/g)) used.add(m[1]!)
       if (!/PendingKind\[\]/.test(line) && !/^\s*\.\.\.\(/.test(line)) continue
       for (const m of line.matchAll(/'([a-zA-Z]+)' as const/g)) used.add(m[1]!)
     }
@@ -108,6 +110,25 @@ describe('P0-17 新種類的文字（PM 定稿，2026-10-10）', () => {
     ['plusFormula', 'Plus 加成的算法還沒在 ts11 遊戲內核對。', '這頁用加總算，產量模擬和綠洲用相乘算，結果可能不一樣。'],
     ['fieldHighLevel', '資源田 4 級以上的花費、時間，和 3 級以上的產量是公式推算。', 'ts11 只核對過花費 1–3 級、產量 0–2 級。'],
     ['launchSim', '開局花費是試算表每一步的加總，含派對（用小慶典的糧）。', '這些數字還沒在 ts11 遊戲內核對。'],
+  ])('%s', (kind, what, source) => {
+    expect(notes[kind]).toEqual({ what, source })
+    expect(enNotes[kind]?.what).toBeTruthy()
+    expect(enNotes[kind]?.source).toBeTruthy()
+    for (const t of [what, source, enNotes[kind]!.what!, enNotes[kind]!.source!]) {
+      expect(t).not.toMatch(/T4/)
+      expect(t).not.toContain('粮')
+    }
+  })
+})
+
+describe('#27 後續新種類的文字', () => {
+  const notes = (zh as unknown as { pendingNotes: Notes }).pendingNotes
+  const enNotes = (en as unknown as { pendingNotes: Notes }).pendingNotes
+  it.each([
+    // PM 定稿（TICKETS「#27 後續」2）
+    ['merchantTradeOffice', '商人容量、速度和交易所加成還沒在 ts11 遊戲內核對。', '目前用的是社群 wiki 的數字，可能有誤差。'],
+    // 工程擬稿，待 PM 定（照官方說明頁 S71 的實際內容寫）
+    ['arenaSpeed', '競技場加速還沒在 ts11 遊戲內核對。', '目前照官方說明頁：前 20 格不加速，超過的路段每級 +20%。'],
   ])('%s', (kind, what, source) => {
     expect(notes[kind]).toEqual({ what, source })
     expect(enNotes[kind]?.what).toBeTruthy()

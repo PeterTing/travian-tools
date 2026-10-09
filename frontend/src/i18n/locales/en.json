@@ -1185,6 +1185,14 @@
     "launchSim": {
       "what": "The opening cost is the sum of every step in the spreadsheet, including parties (using the small celebration's crop).",
       "source": "These numbers haven't been checked in-game on ts11 yet."
+    },
+    "merchantTradeOffice": {
+      "what": "Merchant capacity, speed and the Trade Office bonus haven't been checked in-game on ts11 yet.",
+      "source": "We currently use the community wiki's numbers; they may be off."
+    },
+    "arenaSpeed": {
+      "what": "The Tournament Square speed-up hasn't been checked in-game on ts11 yet.",
+      "source": "We follow the official help page: no bonus for the first 20 fields, then +20% per level beyond them."
     }
   }
 }

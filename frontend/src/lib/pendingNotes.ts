@@ -23,6 +23,8 @@ export const PENDING_KINDS = [
   'plusFormula',
   'fieldHighLevel',
   'launchSim',
+  'merchantTradeOffice',
+  'arenaSpeed',
 ] as const
 
 export type PendingKind = (typeof PENDING_KINDS)[number]
@@ -39,11 +41,13 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
   celebration: 'CP 與開村的慶典花費表與下方說明',
   heroMansionCost: '綠洲收益的英雄宅累積成本（明細、比較表）與結果摘要第二行「英雄宅成本」',
   cropSim: '資源田與首都規劃（首都產量模擬）的 Plus／供水系統說明，以及有用到時的「總計 /hr」摘要標題、「產量分解」標題、合計列；綠洲收益有勾 Plus 時的結果摘要與產量',
-  merchantCapacity: '貿易路線：結果摘要第二行（容量、往返；標題「所需商人」同一份資料不重複放）、每商人容量、速度、單程／往返、所需商人表、總商人、部族選單（選項裡有容量和速度）',
+  merchantCapacity: '貿易路線：速度、單程／往返、部族選單（選項裡有容量和速度）；交易所 0 級時也標結果摘要第二行（容量、往返；標題「所需商人」同一份資料不重複放）、每商人容量、所需商人表、總商人',
   unitCarry: '農場收益：結果摘要「每日收益」標題、搬運上限、每日預估收益、單位選單（選項裡有攜帶量）',
-  plusFormula: '田地回本（資源田 ROI）有勾 Plus 時：結果摘要第二行、產量增加、四種資源比較表（這頁 Plus 用加總，產量模擬和綠洲用相乘）',
+  plusFormula: '田地回本（資源田 ROI）有勾 Plus 時：結果摘要第二行、產量增加、四種資源比較表；建造順序有勾 Plus 時（排序用到）：結果摘要第二行、「接下來 20 步」清單標題（這兩頁 Plus 用加總，產量模擬和綠洲用相乘）',
   fieldHighLevel: '用到資源田 4 級以上花費或時間、3 級以上產量的地方：田地回本的結果摘要、升級成本、產量增加、比較表；建造順序的結果摘要（總時間、成本）與清單；綠洲收益的結果摘要、產量兩列、比較表；首都產量模擬的「總計 /hr」標題、「產量分解」標題與三列合計',
   launchSim: '開局衝村模擬：結果摘要第二行（第幾天）、總時數、伺服器天、里程碑表（開局花費是試算表每一步的加總）',
+  merchantTradeOffice: '貿易路線交易所 > 0 級時：結果摘要第二行（容量、往返）、每商人容量（含交易所）、所需商人表的「次數」、總商人（取代這幾處的 merchantCapacity；速度、單程／往返、部族選單不受交易所影響，維持 merchantCapacity）',
+  arenaSpeed: '行軍時間競技場 > 0 級時：結果摘要第二行（距離 · 速度）、移動時間、秒數、實際速度（0 級不標）。文字待 PM 定稿',
 }
 
 export function pendingNoteKeys(kind: PendingKind): { what: string; source: string } {
