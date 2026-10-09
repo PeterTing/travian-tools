@@ -7,6 +7,8 @@ import {
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip';
+import type { PendingKind } from '@/lib/pendingNotes';
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
 
@@ -151,6 +153,11 @@ export default function BuildOrderCalculator() {
     () => planGreedy({ cropperId, isCap, start, bonus, mb, gold }),
     [cropperId, isCap, start, bonus, mb, gold],
   );
+  // 待驗證：資源田 4 級以上（fieldHighLevel）、加成建築（building）
+  const planKinds: PendingKind[] = [
+    ...(plan.steps.some(x => x.kind === 'field' && x.to >= 4) ? ['fieldHighLevel' as const] : []),
+    ...(plan.steps.some(x => x.kind === 'bb') ? ['building' as const] : []),
+  ];
 
   return (
     <>
@@ -209,20 +216,24 @@ export default function BuildOrderCalculator() {
           title={lang === 'en' ? 'Next upgrades' : '接下來升級'}
           primary={<>{formatDuration(plan.totalTime)}</>}
           secondary={
-            // 成本裡有加成建築（鋸木廠等，數值還沒在 ts11 核對）時，成本旁跟著灰標
-            plan.steps.some(x => x.kind === 'bb') ? (
-              <>
-                {lang === 'en' ? '20 steps · ' : '20 步 · '}
-                <SummaryPending kind="building" testId="build-order-summary-cost">
-                  {lang === 'en' ? `cost ${plan.totalCost.toLocaleString()}` : `成本 ${plan.totalCost.toLocaleString()}`}
-                </SummaryPending>
-              </>
-            ) : lang === 'en'
-              ? `20 steps · cost ${plan.totalCost.toLocaleString()}`
-              : `20 步 · 成本 ${plan.totalCost.toLocaleString()}`
+            // 一行一個灰標：資源田升到 4 級以上（花費、時間是公式推算，也涵蓋上面的總時間）、
+            // 加成建築（鋸木廠等，數值還沒核對）。總時間用同一份資料，不另外在標題放灰標
+            <SummaryPending kinds={planKinds} testId="build-order-summary-cost">
+              {lang === 'en'
+                ? `20 steps · cost ${plan.totalCost.toLocaleString()}`
+                : `20 步 · 成本 ${plan.totalCost.toLocaleString()}`}
+            </SummaryPending>
           }
         >
-          <h4>{lang === 'en' ? 'Next 20 upgrades (lowest ROI first)' : '接下來 20 步（依 ROI 排序）'}</h4>
+          {planKinds.length ? (
+            // 每一步的花費、時間：灰標放在清單標題旁（一個，不放每一列）
+            <PendingRow as="h4" className="flex min-h-11 items-center gap-1">
+              <span>{lang === 'en' ? 'Next 20 upgrades (lowest ROI first)' : '接下來 20 步（依 ROI 排序）'}</span>
+              <PendingVerifyChip kinds={planKinds} />
+            </PendingRow>
+          ) : (
+            <h4>{lang === 'en' ? 'Next 20 upgrades (lowest ROI first)' : '接下來 20 步（依 ROI 排序）'}</h4>
+          )}
           <ol className={s.steps}>
             {plan.steps.map((st, i) => (
               <li key={i}>

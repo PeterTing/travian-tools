@@ -1,13 +1,19 @@
 import { Fragment, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ElementType, type HTMLAttributes, type MouseEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { pendingNoteKeys, splitClauses, type PendingKind } from '@/lib/pendingNotes'
-import { PendingRowContext, usePendingNoteGroup } from './PendingNoteGroup'
+import { PendingFillContext, PendingRowContext, usePendingNoteGroup } from './PendingNoteGroup'
 
-interface PendingVerifyChipProps {
-  /** 說明文字的種類（全站一張表：lib/pendingNotes.ts） */
-  kind: PendingKind
+type PendingVerifyChipProps = {
   className?: string
-}
+} & (
+  /** 說明文字的種類（全站一張表：lib/pendingNotes.ts） */
+  | { kind: PendingKind; kinds?: never }
+  /**
+   * 同一行有好幾個數字用到不同的待驗證資料（設計師）：一行只放一個灰標，
+   * 點開依數字在這一行出現的順序列出每一種說明，每種兩行，種類之間隔 8px
+   */
+  | { kinds: readonly PendingKind[]; kind?: never }
+)
 
 /** 開關狀態：有 Provider 用整頁共用的（一次只開一個），沒有就自己記 */
 function useOpenState(id: string) {
@@ -31,18 +37,26 @@ function useOpenState(id: string) {
  * - 一般文字行（灰標在句子裡或行首）：左邊跟灰標對齊；灰標太靠右放不下時往左移，整塊不超出這一行
  * - 窄格子、表格（兵種詳情四格、開村門檻表、慶典表）：撐滿整張卡／整列的寬度
  *   （PendingRow 加 fill；表格列 tableColSpan 自動 fill）
+ * - 結果面板（CalcResultPanel，手機固定在底部、電腦黏在右邊）裡：一律撐滿面板內容寬度，
+ *   左緣＝面板內容左緣（PendingFillContext，面板自己設）
+ * - 一行只放一個灰標：同一行有好幾種待驗證資料時傳 kinds，點開依數字在這一行出現的順序
+ *   列出每一種（每種兩行，種類之間隔 8px）
  */
-export default function PendingVerifyChip({ kind, className = '' }: PendingVerifyChipProps) {
+export default function PendingVerifyChip({ kind, kinds: kindList, className = '' }: PendingVerifyChipProps) {
+  const kinds = useMemo<readonly PendingKind[]>(() => kindList ?? (kind ? [kind] : []), [kind, kindList])
+  const kindsKey = kinds.join(' ')
   const { t } = useTranslation()
   const id = useId()
   const panelId = `pending-note-${id.replace(/:/g, '')}`
   const { open, toggle } = useOpenState(panelId)
   const row = useContext(PendingRowContext)
+  const fillDefault = useContext(PendingFillContext)
 
   useEffect(() => {
     if (!row) return
-    row.register({ id: panelId, kind, open })
-  }, [row, panelId, kind, open])
+    row.register({ id: panelId, kinds, open })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [row, panelId, kindsKey, open])
   useEffect(() => {
     if (!row) return
     return () => row.register(null)
@@ -61,7 +75,7 @@ export default function PendingVerifyChip({ kind, className = '' }: PendingVerif
         type="button"
         id={`${panelId}-chip`}
         data-testid="pending-verify-chip"
-        data-kind={kind}
+        data-kind={kindsKey}
         aria-expanded={open}
         // 收合時說明塊不在畫面上：只有展開才指向它，不指向不存在的 id
         aria-controls={open ? panelId : undefined}
@@ -74,7 +88,7 @@ export default function PendingVerifyChip({ kind, className = '' }: PendingVerif
         </span>
       </button>
       {/* 不在「一行」裡（例如表格格子、標題）：面板直接接在灰標後面，自成一塊 */}
-      {!row && open && <PendingNotePanel id={panelId} kind={kind} />}
+      {!row && open && <PendingNotePanel fill={fillDefault} id={panelId} kinds={kinds} />}
     </>
   )
 }
@@ -95,9 +109,8 @@ function clauses(text: string): ReactNode {
 }
 
 /** 展開的灰色說明：第一行哪個數字還沒核對，第二行現在的數字從哪裡來 */
-export function PendingNotePanel({ id, kind, fill = false }: { id: string; kind: PendingKind; fill?: boolean }) {
+export function PendingNotePanel({ id, kinds, fill = false }: { id: string; kinds: readonly PendingKind[]; fill?: boolean }) {
   const { t } = useTranslation()
-  const keys = pendingNoteKeys(kind)
   const ref = useRef<HTMLSpanElement>(null)
   // 文字行：左邊對齊灰標；灰標太靠右放不下時往左移，整塊不超出這一行。fill：撐滿、從容器內容左緣開始
   useLayoutEffect(() => {
@@ -128,8 +141,16 @@ export function PendingNotePanel({ id, kind, fill = false }: { id: string; kind:
       data-fill={fill ? 'true' : undefined}
       className={`mt-1 block ${fill ? 'w-full' : 'w-fit max-w-full'} rounded-md bg-gray-100 px-2 py-1.5 text-left text-xs font-normal leading-5 text-gray-700`}
     >
-      <span className="block" data-testid="pending-note-what">{clauses(t(keys.what))}</span>
-      <span className="block" data-testid="pending-note-source">{clauses(t(keys.source))}</span>
+      {kinds.map((k, i) => {
+        const keys = pendingNoteKeys(k)
+        // 好幾種：依數字在那一行出現的順序，每種兩行，種類之間隔 8px
+        return (
+          <span key={k} className={`block ${i > 0 ? 'mt-2' : ''}`} data-testid="pending-note-entry" data-kind={k}>
+            <span className="block" data-testid="pending-note-what">{clauses(t(keys.what))}</span>
+            <span className="block" data-testid="pending-note-source">{clauses(t(keys.source))}</span>
+          </span>
+        )
+      })}
     </span>
   )
 }
@@ -152,9 +173,12 @@ export function PendingRow({
   tableColSpan?: number
   children: ReactNode
 } & HTMLAttributes<HTMLElement>) {
-  const [chip, setChip] = useState<{ id: string; kind: string; open: boolean } | null>(null)
+  const [chip, setChip] = useState<{ id: string; kinds: readonly string[]; open: boolean } | null>(null)
   const slot = useMemo(() => ({ register: setChip }), [])
   const open = chip?.open ?? false
+  // 在結果面板裡：沒指定就撐滿面板內容寬度
+  const fillDefault = useContext(PendingFillContext)
+  const fillPanel = fill ?? fillDefault
   return (
     <>
       <PendingRowContext.Provider value={slot}>
@@ -163,11 +187,11 @@ export function PendingRow({
       {open && chip && (tableColSpan ? (
         <tr data-testid="pending-note-row">
           <td colSpan={tableColSpan}>
-            <PendingNotePanel fill id={chip.id} kind={chip.kind as PendingKind} />
+            <PendingNotePanel fill id={chip.id} kinds={chip.kinds as readonly PendingKind[]} />
           </td>
         </tr>
       ) : (
-        <PendingNotePanel fill={fill} id={chip.id} kind={chip.kind as PendingKind} />
+        <PendingNotePanel fill={fillPanel} id={chip.id} kinds={chip.kinds as readonly PendingKind[]} />
       ))}
     </>
   )

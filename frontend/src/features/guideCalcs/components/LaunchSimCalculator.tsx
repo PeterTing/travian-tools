@@ -7,6 +7,8 @@ import type { TribeId } from '../data/travian';
 import { TRIBES } from '../data/tribes/index';
 import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+
 import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const TRIBE_ORDER: TribeId[] = ['romans', 'teutons', 'gauls', 'egyptians', 'huns', 'vikings', 'spartans'];
@@ -138,49 +140,49 @@ export default function LaunchSimCalculator() {
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Estimated settle time' : '預估結帳時間'}
-          // 拓荒者花費是社群整理的兵種數字（P0-18 還沒核對），結帳時間跟著它算
-          titlePending="units"
           primary={<>{result.totalHours.toFixed(1)} h</>}
           secondary={
-            <>
-              {lang === 'en' ? `Day ${(result.totalHours / 24).toFixed(1)} · ` : `第 ${(result.totalHours / 24).toFixed(1)} 天 · `}
-              <SummaryPending kind="units" testId="launch-sim-summary-settlers">
-                {lang === 'en' ? `settlers ${settlerCost.toLocaleString()}` : `拓荒者 ${settlerCost.toLocaleString()}`}
-              </SummaryPending>
-            </>
+            // 一行一個灰標，依數字出現順序：「第 X 天」＝試算表每一步花費加總÷產量（launchSim）、
+            // 「拓荒者」花費（社群整理的兵種數字，units）。上面的時數用同一份資料，標題不另外放
+            <SummaryPending kinds={['launchSim', 'units']} testId="launch-sim-summary-settlers">
+              {lang === 'en'
+                ? `Day ${(result.totalHours / 24).toFixed(1)} · settlers ${settlerCost.toLocaleString()}`
+                : `第 ${(result.totalHours / 24).toFixed(1)} 天 · 拓荒者 ${settlerCost.toLocaleString()}`}
+            </SummaryPending>
           }
         >
-          <div className={s.row}>
-            <span className={s.label}>{lang === 'en' ? 'Total hours' : '總時數'}</span>
+          <PendingRow className={s.row}>
+            <span className={s.label}>{lang === 'en' ? 'Total hours' : '總時數'} <PendingVerifyChip kind="launchSim" /></span>
             <span className={s.value}>{result.totalHours.toFixed(1)} h</span>
-          </div>
-          <div className={s.row}>
-            <span className={s.label}>{lang === 'en' ? 'Server day' : '伺服器天'}</span>
+          </PendingRow>
+          <PendingRow className={s.row}>
+            <span className={s.label}>{lang === 'en' ? 'Server day' : '伺服器天'} <PendingVerifyChip kind="launchSim" /></span>
             <span className={s.value}>
               {lang === 'en' ? 'Day ' : '第 '}
               {(result.totalHours / 24).toFixed(1)}
               {lang === 'en' ? '' : ' 天'}
             </span>
-          </div>
-          <div className={s.row}>
-            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x)' : '拓荒者成本（3 名）'}</span>
+          </PendingRow>
+          <PendingRow className={s.row}>
+            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x)' : '拓荒者成本（3 名）'} <PendingVerifyChip kind="units" /></span>
             <span className={s.value}>{settlerCost.toLocaleString()}</span>
-          </div>
+          </PendingRow>
 
           <h4>{lang === 'en' ? 'Milestones' : '里程碑'}</h4>
-          <table className={s.table}>
+          {/* 累計成本、時數、天都是試算表每一步的加總：表頭一個灰標；每列 44px、垂直置中 */}
+          <table className={`${s.table} ${s.tapRows}`} data-testid="launch-sim-milestones">
             <thead>
-              <tr>
+              <PendingRow as="tr" className="h-11" tableColSpan={5}>
                 <th>#</th>
                 <th>{lang === 'en' ? 'Milestone' : '里程碑'}</th>
-                <th>{lang === 'en' ? 'Cum. cost' : '累計成本'}</th>
+                <th>{lang === 'en' ? 'Cum. cost' : '累計成本'} <PendingVerifyChip kind="launchSim" /></th>
                 <th>{lang === 'en' ? 'Cum. hours' : '累計時數'}</th>
                 <th>{lang === 'en' ? 'Day' : '天'}</th>
-              </tr>
+              </PendingRow>
             </thead>
             <tbody>
               {result.milestones.map((m) => (
-                <tr key={m.step}>
+                <tr key={m.step} className="h-11">
                   <td>{m.step}</td>
                   <td>{lang === 'en' ? m.label : m.labelZh}</td>
                   <td>{m.cumulativeCost.toLocaleString()}</td>

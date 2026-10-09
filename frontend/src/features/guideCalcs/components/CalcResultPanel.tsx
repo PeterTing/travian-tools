@@ -1,6 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import s from './calc.module.css'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import { PendingFillContext } from '@/components/common/PendingNoteGroup'
 import type { PendingKind } from '@/lib/pendingNotes'
 
 export interface CalcResultPanelProps {
@@ -10,7 +11,7 @@ export interface CalcResultPanelProps {
    * 摘要的大數字是用「待驗證」資料算出來的：灰標放在標題（大數字的標籤）旁邊，不放在大數字旁。
    * 手機收合時也看得到（P0-17 PM 規則：畫面上用待驗證資料算出的數字，旁邊都要有灰標）。
    */
-  titlePending?: PendingKind | false
+  titlePending?: PendingKind | readonly PendingKind[] | false
   /** Main result — large type on phone */
   primary: ReactNode
   /** One line of secondary info under the primary */
@@ -94,11 +95,13 @@ export default function CalcResultPanel({
 
   return (
     <div ref={rootRef} className={s.output} data-testid="calc-result-panel">
+      {/* 面板裡的灰標說明撐滿面板內容寬度（設計師規則） */}
+      <PendingFillContext.Provider value={true}>
       {title && titlePending ? (
         // 標題這一行至少 44px、垂直置中：灰標點擊範圍不碰到下面的大數字或「展開明細」
         <PendingRow as="h4" className={`${s.summaryTitle} flex min-h-11 items-center gap-1`} data-testid="calc-result-title">
           <span>{title}</span>
-          <PendingVerifyChip kind={titlePending} />
+          <PendingVerifyChip kinds={typeof titlePending === 'string' ? [titlePending] : titlePending} />
         </PendingRow>
       ) : title ? (
         <h4 className={s.summaryTitle} data-testid="calc-result-title">{title}</h4>
@@ -143,19 +146,23 @@ export default function CalcResultPanel({
           </div>
         </>
       ) : null}
+      </PendingFillContext.Provider>
     </div>
   )
 }
 
 /**
- * 摘要第二行裡、用「待驗證」資料算出的那一段（例如「英雄宅成本 17,805」）：字後面緊跟灰標。
- * 這一段至少 44px 高、垂直置中，灰標的點擊範圍不會碰到下面的「展開明細」。
+ * 摘要第二行（或其中一段）用到「待驗證」資料：字後面緊跟一個灰標。
+ * 一行只放一個灰標；這一行有好幾種待驗證資料時傳 kinds，依數字在這一行出現的順序排（設計師）。
+ * kinds 是空陣列就只顯示字（例如 Plus 沒勾）。這一行至少 44px、垂直置中，灰標點擊範圍不碰到「展開明細」。
  */
-export function SummaryPending({ kind, children, testId }: { kind: PendingKind; children: ReactNode; testId?: string }) {
+export function SummaryPending({ kind, kinds, children, testId }: { kind?: PendingKind; kinds?: readonly PendingKind[]; children: ReactNode; testId?: string }) {
+  const list = kinds ?? (kind ? [kind] : [])
+  if (list.length === 0) return <>{children}</>
   return (
     <PendingRow as="span" className="inline-flex min-h-11 flex-wrap items-center gap-x-1" data-testid={testId}>
       <span>{children}</span>
-      <PendingVerifyChip kind={kind} />
+      <PendingVerifyChip kinds={list} />
     </PendingRow>
   )
 }

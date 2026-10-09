@@ -10,9 +10,16 @@ function usedKinds(): Set<string> {
   const used = new Set<string>()
   for (const [file, text] of Object.entries(sources)) {
     if (file.includes('__tests__') || file.endsWith('.test.tsx')) continue
-    for (const m of text.matchAll(/<PendingVerifyChip[^>]*\bkind=(?:"([a-zA-Z]+)"|\{([^}]*)\})/g)) {
+    // <PendingVerifyChip kind="x" | kinds={[...]}>、<SummaryPending kind(s)=...>、titlePending=...
+    for (const m of text.matchAll(/(?:<(?:PendingVerifyChip|SummaryPending)[^>]*\bkinds?|\btitlePending)=(?:"([a-zA-Z]+)"|\{([^}]*)\})/g)) {
       if (m[1]) used.add(m[1])
-      else for (const q of m[2]!.matchAll(/'([a-zA-Z]+)'/g)) used.add(q[1]!)
+      // typeof x === 'string' 這種比較不算
+      else for (const q of m[2]!.matchAll(/(?<!=== )'([a-zA-Z]+)'/g)) used.add(q[1]!)
+    }
+    // kinds 用變數組出來的（例如 const prodKinds: PendingKind[] = [...(gold ? ['plusFormula' as const] : [])]）
+    for (const line of text.split('\n')) {
+      if (!/PendingKind\[\]/.test(line) && !/^\s*\.\.\.\(/.test(line)) continue
+      for (const m of line.matchAll(/'([a-zA-Z]+)' as const/g)) used.add(m[1]!)
     }
   }
   return used
@@ -88,6 +95,26 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
     for (const [file, text] of Object.entries(sources)) {
       if (file.includes('__tests__') || file.endsWith('.test.tsx')) continue
       expect(text, file).not.toMatch(/<PendingVerifyChip[^>]*\b(note|withNote)=/)
+    }
+  })
+})
+
+describe('P0-17 新種類的文字（PM 定稿，2026-10-10）', () => {
+  const notes = (zh as unknown as { pendingNotes: Notes }).pendingNotes
+  const enNotes = (en as unknown as { pendingNotes: Notes }).pendingNotes
+  it.each([
+    ['merchantCapacity', '商人容量還沒在 ts11 遊戲內核對。', '目前用的是社群 wiki 的數字，可能有誤差。'],
+    ['unitCarry', '兵種攜帶量還沒在 ts11 遊戲內核對。', '目前用的是社群整理的數字，可能有誤差。'],
+    ['plusFormula', 'Plus 加成的算法還沒在 ts11 遊戲內核對。', '這頁用加總算，產量模擬和綠洲用相乘算，結果可能不一樣。'],
+    ['fieldHighLevel', '資源田 4 級以上的花費和時間是公式推算。', 'ts11 只核對過 1–3 級。'],
+    ['launchSim', '開局花費是試算表每一步的加總，含派對（用小慶典的糧）。', '這些數字還沒在 ts11 遊戲內核對。'],
+  ])('%s', (kind, what, source) => {
+    expect(notes[kind]).toEqual({ what, source })
+    expect(enNotes[kind]?.what).toBeTruthy()
+    expect(enNotes[kind]?.source).toBeTruthy()
+    for (const t of [what, source, enNotes[kind]!.what!, enNotes[kind]!.source!]) {
+      expect(t).not.toMatch(/T4/)
+      expect(t).not.toContain('粮')
     }
   })
 })

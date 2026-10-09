@@ -419,6 +419,13 @@
   display: none;
 }
 
+/* 結果面板明細的每一列至少 44px、垂直置中（有沒有灰標都一樣）：
+   相鄰兩列都有「待驗證」灰標時，44px 點擊範圍只落在自己這一列（P0-17 幕僚長規則） */
+.details .row {
+  min-height: 2.75rem;
+  align-items: center;
+}
+
 @media (min-width: 1024px) {
   .detailsToggle {
     display: none;

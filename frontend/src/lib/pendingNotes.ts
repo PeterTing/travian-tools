@@ -18,22 +18,32 @@ export const PENDING_KINDS = [
   'celebration',
   'heroMansionCost',
   'cropSim',
+  'merchantCapacity',
+  'unitCarry',
+  'plusFormula',
+  'fieldHighLevel',
+  'launchSim',
 ] as const
 
 export type PendingKind = (typeof PENDING_KINDS)[number]
 
 /** 每一種出現在哪裡（給 PM 的文字表、也給完整性測試用） */
 export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
-  units: '兵種資料庫詳情：「訓練成本」標題旁（花費、糧耗、訓練時間還沒核對的部族；data/unitCostVerified.json）；開局衝村模擬的結果摘要（標題、拓荒者花費）',
+  units: '兵種資料庫詳情：「訓練成本」標題旁（花費、糧耗、訓練時間還沒核對的部族；data/unitCostVerified.json）；開局衝村模擬的「拓荒者」花費（摘要、明細）；農場收益的兵力初始成本、回本天數',
   autofillUnits: '已帶入列（用到兵種資料的計算器）：一個灰標管兩行（兵種花費、斯巴達速度）',
   spartanSpeed: '首頁來襲卡反推 TS 那一行、反推 TS 結果的「未列入反推」提示',
   unitSpeedOfficialPending: '兵種資料庫：斯巴達步兵／騎兵 6 種的速度（列表與詳情）',
   unitSpeedNoSource: '兵種資料庫：斯巴達攻城槌、弩砲、監察官、移民的速度（列表與詳情）',
-  building: '建築資料庫列表與詳情、建築升級花費結果的建築名稱旁；CP 與開村「每日被動 CP」摘要標題；資源田建造順序摘要的成本（有加成建築時）',
+  building: '建築資料庫列表與詳情、建築升級花費結果的建築名稱旁；CP 與開村「每日被動 CP」摘要標題；建造順序摘要的成本（有加成建築時）；田地回本有加成建築時的摘要與產量',
   cpThreshold: 'CP 與開村的開村門檻表與下方說明、首頁開村卡進度',
   celebration: 'CP 與開村的慶典花費表與下方說明',
-  heroMansionCost: '綠洲收益的英雄宅累積成本（明細、比較表）與結果摘要（標題、英雄宅成本）',
-  cropSim: '資源田與首都規劃（首都產量模擬）的 Plus／供水系統說明，以及有用到時的「總計 /hr」摘要標題',
+  heroMansionCost: '綠洲收益的英雄宅累積成本（明細、比較表）與結果摘要第二行「英雄宅成本」',
+  cropSim: '資源田與首都規劃（首都產量模擬）的 Plus／供水系統說明，以及有用到時的「總計 /hr」摘要標題；綠洲收益有勾 Plus 時的結果摘要與產量',
+  merchantCapacity: '貿易路線：結果摘要「所需商人」標題、每商人容量、所需商人表、總商人、部族選單（選項裡有容量）',
+  unitCarry: '農場收益：結果摘要「每日收益」標題、搬運上限、每日預估收益、單位選單（選項裡有攜帶量）',
+  plusFormula: '田地回本（資源田 ROI）有勾 Plus 時：結果摘要第二行、產量增加、四種資源比較表（這頁 Plus 用加總，產量模擬和綠洲用相乘）',
+  fieldHighLevel: '用到資源田 4 級以上花費或時間的地方：田地回本（目標等級 ≥ 4）的結果摘要、升級成本、比較表；建造順序的結果摘要（總時間、成本）',
+  launchSim: '開局衝村模擬：結果摘要第二行（第幾天）、總時數、伺服器天、里程碑表（開局花費是試算表每一步的加總）',
 }
 
 export function pendingNoteKeys(kind: PendingKind): { what: string; source: string } {

@@ -25,8 +25,15 @@ export function usePendingNoteGroup(): PendingNoteGroupValue | null {
 
 /** 灰標所在的那一行：說明面板畫在這一行的正下方（在版面裡，不浮在內容上） */
 export interface PendingRowSlot {
-  register: (chip: { id: string; kind: string; open: boolean } | null) => void
+  register: (chip: { id: string; kinds: readonly string[]; open: boolean } | null) => void
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const PendingRowContext = createContext<PendingRowSlot | null>(null)
+
+/**
+ * 結果面板（手機固定在底部、電腦黏在右邊）裡的灰標：說明一律撐滿面板內容寬度，
+ * 從面板內容左緣開始（設計師規則，跟開村門檻表一樣）。CalcResultPanel 設成 true。
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export const PendingFillContext = createContext(false)

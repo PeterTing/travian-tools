@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { render, screen, within, cleanup } from '@testing-library/react'
+import { fireEvent, render, screen, within, cleanup } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import type { ComponentType } from 'react'
 import { readFileSync } from 'node:fs'
@@ -64,12 +64,22 @@ describe('結果摘要：用到待驗證資料的數字，收合時旁邊也有�
   for (const [path, decl] of Object.entries(SUMMARY_PENDING)) {
     const Comp = calculators[`/src/${path}`]
     if (!Comp) continue // 計算器頁面（PathCalculatorPage）要 API，見上面登記；它摘要沒用到待驗證資料
-    it(`390 collapsed: ${path.split('/').pop()} summary chips = [${decl.kinds.join(', ')}]`, () => {
+    it(`390 collapsed: ${path.split('/').pop()} summary chips = ${JSON.stringify(decl.chips)}`, () => {
       render(<MemoryRouter><Comp /></MemoryRouter>)
       expect(screen.getByTestId('calc-result-details').closest('[hidden]')).not.toBeNull()
-      expect(summaryChipKinds().sort()).toEqual([...decl.kinds].sort())
+      expect(summaryChipKinds().sort()).toEqual(decl.chips.map((c) => c.join(' ')).sort())
       // 灰標放在標籤（標題或第二行的字）旁邊，不放在大數字旁
       expect(within(screen.getByTestId('calc-result-primary')).queryByTestId('pending-verify-chip')).toBeNull()
+      // 同一種只放一個（標題和第二行不重複）
+      const kinds = summaryChipKinds().flatMap((k) => k.split(' '))
+      expect(new Set(kinds).size, `${path} 摘要裡同一種灰標放了兩次`).toBe(kinds.length)
+      // 點開：說明撐滿面板內容寬度（data-fill）
+      for (const chip of within(screen.getByTestId('calc-result-panel')).queryAllByTestId('pending-verify-chip')) {
+        if (chip.closest('[data-testid="calc-result-details"]')) continue
+        fireEvent.click(chip)
+        expect(document.getElementById(chip.getAttribute('aria-controls') ?? '')).toHaveAttribute('data-fill', 'true')
+        fireEvent.click(chip)
+      }
       cleanup()
     })
   }
@@ -83,5 +93,102 @@ describe('結果面板高度上限：手機最多半個螢幕，超過就在面�
   it('.output: max-height min(50vh, 22rem) and overflow-y auto', () => {
     expect(outputRule).toMatch(/max-height:\s*min\(50vh,\s*22rem\)/)
     expect(outputRule).toMatch(/overflow-y:\s*auto/)
+  })
+
+  it('detail rows are at least 44px and vertically centered (adjacent chips never share a tap area)', () => {
+    const m = css.match(/\n\.details \.row\s*\{([^}]*)\}/)
+    expect(m?.[1]).toMatch(/min-height:\s*2\.75rem/)
+    expect(m?.[1]).toMatch(/align-items:\s*center/)
+  })
+})
+
+describe('貿易路線、農場收益、田地回本：明細裡用到待驗證資料的數字也有灰標', () => {
+  const open = async (path: string) => {
+    const Comp = calculators[`/src/${path}`]!
+    render(<MemoryRouter><Comp /></MemoryRouter>)
+    fireEvent.click(screen.getByTestId('calc-result-toggle'))
+    return screen.getByTestId('calc-result-details')
+  }
+  const chipNextTo = (root: HTMLElement, label: string) => {
+    const el = within(root).getByText(label)
+    return el.querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind') ?? null
+  }
+  it('trade route: capacity row, table header, total merchants -> merchantCapacity; tribe select label too', async () => {
+    const d = await open('features/guideCalcs/components/TraderouteCalculator.tsx')
+    expect(chipNextTo(d, '每商人容量（含交易所）')).toBe('merchantCapacity')
+    expect(chipNextTo(d, '總商人')).toBe('merchantCapacity')
+    expect(within(within(d).getByTestId('traderoute-table').querySelector('thead')!).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantCapacity')
+    const tribe = screen.getByLabelText('部族')
+    expect(tribe.tagName).toBe('SELECT')
+    expect(tribe.closest('div')!.querySelector('[data-kind="merchantCapacity"]')).not.toBeNull()
+    cleanup()
+  })
+  it('farming: carry cap and daily yield -> unitCarry; troop cost and payback -> units; unit select label -> unitCarry', async () => {
+    const d = await open('features/guideCalcs/components/FarmingCalculator.tsx')
+    expect(chipNextTo(d, '搬運上限')).toBe('unitCarry')
+    expect(chipNextTo(d, '每日預估收益')).toBe('unitCarry')
+    expect(chipNextTo(d, '兵力初始成本')).toBe('units')
+    expect(chipNextTo(d, '回本天數')).toBe('units')
+    const unit = screen.getByLabelText('單位')
+    expect(unit.tagName).toBe('SELECT')
+    expect(unit.closest('div')!.querySelector('[data-kind="unitCarry"]')).not.toBeNull()
+    cleanup()
+  })
+  it('field ROI (default L7): cost / production rows and compare table header -> building', async () => {
+    const d = await open('features/guideCalcs/components/FieldRoiCalculator.tsx')
+    // 預設 L7、Plus 有勾、沒有加成建築
+    expect(chipNextTo(d, '升級成本（合計）')).toBe('fieldHighLevel')
+    expect(chipNextTo(d, '每小時產量增加')).toBe('plusFormula')
+    expect(chipNextTo(d, '每天產量增加')).toBe('plusFormula')
+    expect(within(within(d).getByTestId('field-roi-compare').querySelector('thead')!).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'fieldHighLevel plusFormula')
+    cleanup()
+  })
+})
+
+/** 不靠登記表：直接看畫面（F） */
+describe('Plus 有勾、390 收合：摘要的灰標點開要列出 Plus 的說明', () => {
+  const openSummaryChip = () => {
+    const panel = screen.getByTestId('calc-result-panel')
+    expect(screen.getByTestId('calc-result-details').closest('[hidden]')).not.toBeNull()
+    const chips = within(panel).getAllByTestId('pending-verify-chip').filter((c) => !c.closest('[data-testid="calc-result-details"]'))
+    expect(chips).toHaveLength(1) // 摘要一行一個灰標
+    fireEvent.click(chips[0]!)
+    const note = document.getElementById(chips[0]!.getAttribute('aria-controls') ?? '')!
+    expect(chips[0]).toHaveAttribute('aria-expanded', 'true')
+    expect(note).toHaveAttribute('data-fill', 'true')
+    return within(note).getAllByTestId('pending-note-entry')
+  }
+  const plusBox = () => {
+    const box = screen.getByRole('checkbox', { name: /Plus/ }) as HTMLInputElement
+    expect(box.checked).toBe(true)
+    return box
+  }
+
+  it('oasis: cropSim (每天 +X) then heroMansionCost; unchecking Plus drops cropSim', async () => {
+    const { default: Oasis } = await import('./components/OasisRoiCalculator')
+    render(<MemoryRouter><Oasis /></MemoryRouter>)
+    plusBox()
+    const entries = openSummaryChip()
+    expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['cropSim', 'heroMansionCost'])
+    expect(entries[0]).toHaveTextContent('Plus 用乘的（×1.25）')
+    // 種類之間隔 8px（mt-2）
+    expect(entries[1]).toHaveClass('mt-2')
+    fireEvent.click(plusBox())
+    const chip = within(screen.getByTestId('calc-result-secondary')).getByTestId('pending-verify-chip')
+    expect(chip).toHaveAttribute('data-kind', 'heroMansionCost')
+    cleanup()
+  })
+
+  it('field ROI (default L7): fieldHighLevel (成本) then plusFormula (每天 +), with the PM copy', async () => {
+    const { default: FieldRoi } = await import('./components/FieldRoiCalculator')
+    render(<MemoryRouter><FieldRoi /></MemoryRouter>)
+    plusBox()
+    const entries = openSummaryChip()
+    expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['fieldHighLevel', 'plusFormula'])
+    expect(entries[0]).toHaveTextContent('資源田 4 級以上的花費和時間是公式推算。')
+    expect(entries[0]).toHaveTextContent('ts11 只核對過 1–3 級。')
+    expect(entries[1]).toHaveTextContent('Plus 加成的算法還沒在 ts11 遊戲內核對。')
+    expect(entries[1]).toHaveTextContent('這頁用加總算，產量模擬和綠洲用相乘算，結果可能不一樣。')
+    cleanup()
   })
 })
