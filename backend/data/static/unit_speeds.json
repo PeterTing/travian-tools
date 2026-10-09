@@ -1,0 +1,659 @@
+{
+  "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
+  "unit": "fields/hour, x1, base speed (no Tournament Square / artefact / hero bonus)",
+  "sources": {
+    "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-09 讀取",
+    "official": [
+      "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+      "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+    ],
+    "official_pending": "官方說明頁，數字標示取自第三方計算器（待驗證，不列入反推 TS）",
+    "pending": "沒有第一手出處，速度留空（待驗證）"
+  },
+  "tribes": {
+    "romans": [
+      {
+        "slot": 1,
+        "troop_id": "legionnaire",
+        "fe_id": "legionnaire",
+        "kb_id": "legionnaire",
+        "speed": 6,
+        "source": "ts11",
+        "ref": "manual/troop/1"
+      },
+      {
+        "slot": 2,
+        "troop_id": "praetorian",
+        "fe_id": "praetorian",
+        "kb_id": "praetorian",
+        "speed": 5,
+        "source": "ts11",
+        "ref": "manual/troop/2"
+      },
+      {
+        "slot": 3,
+        "troop_id": "imperian",
+        "fe_id": "imperian",
+        "kb_id": "imperian",
+        "speed": 7,
+        "source": "ts11",
+        "ref": "manual/troop/3"
+      },
+      {
+        "slot": 4,
+        "troop_id": "equites_legati",
+        "fe_id": "equitesLegati",
+        "kb_id": "equites_legati",
+        "speed": 16,
+        "source": "ts11",
+        "ref": "manual/troop/4"
+      },
+      {
+        "slot": 5,
+        "troop_id": "equites_imperatoris",
+        "fe_id": "equitesImperatoris",
+        "kb_id": "equites_imperatoris",
+        "speed": 14,
+        "source": "ts11",
+        "ref": "manual/troop/5"
+      },
+      {
+        "slot": 6,
+        "troop_id": "equites_caesaris",
+        "fe_id": "equitesCaesaris",
+        "kb_id": "equites_caesaris",
+        "speed": 10,
+        "source": "ts11",
+        "ref": "manual/troop/6"
+      },
+      {
+        "slot": 7,
+        "troop_id": "roman_ram",
+        "fe_id": "ram",
+        "kb_id": "battering_ram",
+        "speed": 4,
+        "source": "ts11",
+        "ref": "manual/troop/7"
+      },
+      {
+        "slot": 8,
+        "troop_id": "fire_catapult",
+        "fe_id": "fireCatapult",
+        "kb_id": "fire_catapult",
+        "speed": 3,
+        "source": "ts11",
+        "ref": "manual/troop/8"
+      },
+      {
+        "slot": 9,
+        "troop_id": "senator",
+        "fe_id": "senator",
+        "kb_id": "senator",
+        "speed": 4,
+        "source": "ts11",
+        "ref": "manual/troop/9"
+      },
+      {
+        "slot": 10,
+        "troop_id": "roman_settler",
+        "fe_id": "settler",
+        "kb_id": "settler",
+        "speed": 5,
+        "source": "ts11",
+        "ref": "manual/troop/10"
+      }
+    ],
+    "teutons": [
+      {
+        "slot": 1,
+        "troop_id": "clubswinger",
+        "fe_id": "maceman",
+        "kb_id": "clubswinger",
+        "speed": 7,
+        "source": "ts11",
+        "ref": "manual/troop/11"
+      },
+      {
+        "slot": 2,
+        "troop_id": "spearman",
+        "fe_id": "spearman",
+        "kb_id": "spearman",
+        "speed": 7,
+        "source": "ts11",
+        "ref": "manual/troop/12"
+      },
+      {
+        "slot": 3,
+        "troop_id": "axeman",
+        "fe_id": "axeman",
+        "kb_id": "axeman",
+        "speed": 6,
+        "source": "ts11",
+        "ref": "manual/troop/13"
+      },
+      {
+        "slot": 4,
+        "troop_id": "teuton_scout",
+        "fe_id": "scout",
+        "kb_id": "scout",
+        "speed": 9,
+        "source": "ts11",
+        "ref": "manual/troop/14"
+      },
+      {
+        "slot": 5,
+        "troop_id": "paladin",
+        "fe_id": "paladin",
+        "kb_id": "paladin",
+        "speed": 10,
+        "source": "ts11",
+        "ref": "manual/troop/15"
+      },
+      {
+        "slot": 6,
+        "troop_id": "teutonic_knight",
+        "fe_id": "tk",
+        "kb_id": "teutonic_knight",
+        "speed": 9,
+        "source": "ts11",
+        "ref": "manual/troop/16"
+      },
+      {
+        "slot": 7,
+        "troop_id": "teuton_ram",
+        "fe_id": "ram",
+        "kb_id": "ram",
+        "speed": 4,
+        "source": "ts11",
+        "ref": "manual/troop/17"
+      },
+      {
+        "slot": 8,
+        "troop_id": "teuton_catapult",
+        "fe_id": "catapult",
+        "kb_id": "catapult",
+        "speed": 3,
+        "source": "ts11",
+        "ref": "manual/troop/18"
+      },
+      {
+        "slot": 9,
+        "troop_id": "chief",
+        "fe_id": "chief",
+        "kb_id": "chief",
+        "speed": 4,
+        "source": "ts11",
+        "ref": "manual/troop/19"
+      },
+      {
+        "slot": 10,
+        "troop_id": "teuton_settler",
+        "fe_id": "settler",
+        "kb_id": "settler",
+        "speed": 5,
+        "source": "ts11",
+        "ref": "manual/troop/20"
+      }
+    ],
+    "gauls": [
+      {
+        "slot": 1,
+        "troop_id": "phalanx",
+        "fe_id": "phalanx",
+        "kb_id": "phalanx",
+        "speed": 7,
+        "source": "ts11",
+        "ref": "manual/troop/21"
+      },
+      {
+        "slot": 2,
+        "troop_id": "swordsman",
+        "fe_id": "swordsman",
+        "kb_id": "swordsman",
+        "speed": 6,
+        "source": "ts11",
+        "ref": "manual/troop/22"
+      },
+      {
+        "slot": 3,
+        "troop_id": "pathfinder",
+        "fe_id": "pathfinder",
+        "kb_id": "pathfinder",
+        "speed": 17,
+        "source": "ts11",
+        "ref": "manual/troop/23"
+      },
+      {
+        "slot": 4,
+        "troop_id": "theutates_thunder",
+        "fe_id": "theutatesThunder",
+        "kb_id": "theutates_thunder",
+        "speed": 19,
+        "source": "ts11",
+        "ref": "manual/troop/24"
+      },
+      {
+        "slot": 5,
+        "troop_id": "druidrider",
+        "fe_id": "druidrider",
+        "kb_id": "druidrider",
+        "speed": 16,
+        "source": "ts11",
+        "ref": "manual/troop/25"
+      },
+      {
+        "slot": 6,
+        "troop_id": "haeduan",
+        "fe_id": "haeduan",
+        "kb_id": "haeduan",
+        "speed": 13,
+        "source": "ts11",
+        "ref": "manual/troop/26"
+      },
+      {
+        "slot": 7,
+        "troop_id": "gaul_ram",
+        "fe_id": "ram",
+        "kb_id": "ram",
+        "speed": 4,
+        "source": "ts11",
+        "ref": "manual/troop/27"
+      },
+      {
+        "slot": 8,
+        "troop_id": "trebuchet",
+        "fe_id": "trebuchet",
+        "kb_id": "trebuchet",
+        "speed": 3,
+        "source": "ts11",
+        "ref": "manual/troop/28"
+      },
+      {
+        "slot": 9,
+        "troop_id": "chieftain",
+        "fe_id": "chieftain",
+        "kb_id": "chieftain",
+        "speed": 5,
+        "source": "ts11",
+        "ref": "manual/troop/29"
+      },
+      {
+        "slot": 10,
+        "troop_id": "gaul_settler",
+        "fe_id": "settler",
+        "kb_id": "settler",
+        "speed": 5,
+        "source": "ts11",
+        "ref": "manual/troop/30"
+      }
+    ],
+    "egyptians": [
+      {
+        "slot": 1,
+        "troop_id": "slave_militia",
+        "fe_id": "slaveMilitia",
+        "kb_id": "slave_militia",
+        "speed": 7,
+        "source": "ts11",
+        "ref": "manual/troop/51"
+      },
+      {
+        "slot": 2,
+        "troop_id": "ash_warden",
+        "fe_id": "ashWarden",
+        "kb_id": "ash_warden",
+        "speed": 6,
+        "source": "ts11",
+        "ref": "manual/troop/52"
+      },
+      {
+        "slot": 3,
+        "troop_id": "khopesh_warrior",
+        "fe_id": "khopesh",
+        "kb_id": "khopesh_warrior",
+        "speed": 7,
+        "source": "ts11",
+        "ref": "manual/troop/53"
+      },
+      {
+        "slot": 4,
+        "troop_id": "sopdu_explorer",
+        "fe_id": "sopdu",
+        "kb_id": "sopdu_explorer",
+        "speed": 16,
+        "source": "ts11",
+        "ref": "manual/troop/54"
+      },
+      {
+        "slot": 5,
+        "troop_id": "anhur_guard",
+        "fe_id": "anhur",
+        "kb_id": "anhur_guard",
+        "speed": 15,
+        "source": "ts11",
+        "ref": "manual/troop/55"
+      },
+      {
+        "slot": 6,
+        "troop_id": "resheph_chariot",
+        "fe_id": "resheph",
+        "kb_id": "resheph_chariot",
+        "speed": 10,
+        "source": "ts11",
+        "ref": "manual/troop/56"
+      },
+      {
+        "slot": 7,
+        "troop_id": "egyptian_ram",
+        "fe_id": "ram",
+        "kb_id": "ram",
+        "speed": 4,
+        "source": "ts11",
+        "ref": "manual/troop/57"
+      },
+      {
+        "slot": 8,
+        "troop_id": "stone_catapult",
+        "fe_id": "catapult",
+        "kb_id": "stone_catapult",
+        "speed": 3,
+        "source": "ts11",
+        "ref": "manual/troop/58"
+      },
+      {
+        "slot": 9,
+        "troop_id": "nomarch",
+        "fe_id": "nomarch",
+        "kb_id": "nomarch",
+        "speed": 4,
+        "source": "ts11",
+        "ref": "manual/troop/59"
+      },
+      {
+        "slot": 10,
+        "troop_id": "egyptian_settler",
+        "fe_id": "settler",
+        "kb_id": "settler",
+        "speed": 5,
+        "source": "ts11",
+        "ref": "manual/troop/60"
+      }
+    ],
+    "huns": [
+      {
+        "slot": 1,
+        "troop_id": "mercenary",
+        "fe_id": "mercenary",
+        "kb_id": "mercenary",
+        "speed": 6,
+        "source": "ts11",
+        "ref": "manual/troop/61"
+      },
+      {
+        "slot": 2,
+        "troop_id": "bowman",
+        "fe_id": "bowman",
+        "kb_id": "bowman",
+        "speed": 6,
+        "source": "ts11",
+        "ref": "manual/troop/62"
+      },
+      {
+        "slot": 3,
+        "troop_id": "spotter",
+        "fe_id": "spotter",
+        "kb_id": "spotter",
+        "speed": 19,
+        "source": "ts11",
+        "ref": "manual/troop/63"
+      },
+      {
+        "slot": 4,
+        "troop_id": "steppe_rider",
+        "fe_id": "steppeRider",
+        "kb_id": "steppe_rider",
+        "speed": 16,
+        "source": "ts11",
+        "ref": "manual/troop/64"
+      },
+      {
+        "slot": 5,
+        "troop_id": "marksman",
+        "fe_id": "marksman",
+        "kb_id": "marksman",
+        "speed": 15,
+        "source": "ts11",
+        "ref": "manual/troop/65"
+      },
+      {
+        "slot": 6,
+        "troop_id": "marauder",
+        "fe_id": "marauder",
+        "kb_id": "marauder",
+        "speed": 14,
+        "source": "ts11",
+        "ref": "manual/troop/66"
+      },
+      {
+        "slot": 7,
+        "troop_id": "hun_ram",
+        "fe_id": "ram",
+        "kb_id": "ram",
+        "speed": 4,
+        "source": "ts11",
+        "ref": "manual/troop/67"
+      },
+      {
+        "slot": 8,
+        "troop_id": "hun_catapult",
+        "fe_id": "catapult",
+        "kb_id": "catapult",
+        "speed": 3,
+        "source": "ts11",
+        "ref": "manual/troop/68"
+      },
+      {
+        "slot": 9,
+        "troop_id": "logades",
+        "fe_id": "logades",
+        "kb_id": "logades",
+        "speed": 5,
+        "source": "ts11",
+        "ref": "manual/troop/69"
+      },
+      {
+        "slot": 10,
+        "troop_id": "hun_settler",
+        "fe_id": "settler",
+        "kb_id": "settler",
+        "speed": 5,
+        "source": "ts11",
+        "ref": "manual/troop/70"
+      }
+    ],
+    "spartans": [
+      {
+        "slot": 1,
+        "troop_id": "hoplite",
+        "fe_id": "hoplite",
+        "kb_id": "hoplite",
+        "speed": 6,
+        "source": "official_pending",
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+      },
+      {
+        "slot": 2,
+        "troop_id": "sentinel",
+        "fe_id": "sentinel",
+        "kb_id": "sentinel",
+        "speed": 9,
+        "source": "official_pending",
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+      },
+      {
+        "slot": 3,
+        "troop_id": "shieldsman",
+        "fe_id": "shieldsman",
+        "kb_id": "shieldsman",
+        "speed": 8,
+        "source": "official_pending",
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+      },
+      {
+        "slot": 4,
+        "troop_id": "twinsteel_therion",
+        "fe_id": "twinsteel",
+        "kb_id": "twirler",
+        "speed": 6,
+        "source": "official_pending",
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+      },
+      {
+        "slot": 5,
+        "troop_id": "elpida_rider",
+        "fe_id": "elpida",
+        "kb_id": "elpida_rider",
+        "speed": 16,
+        "source": "official_pending",
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+      },
+      {
+        "slot": 6,
+        "troop_id": "corinthian_crusher",
+        "fe_id": "corinthian",
+        "kb_id": "corinthian_crusher",
+        "speed": 9,
+        "source": "official_pending",
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+      },
+      {
+        "slot": 7,
+        "troop_id": "spartan_ram",
+        "fe_id": "ram",
+        "kb_id": "ram",
+        "speed": null,
+        "source": "pending",
+        "ref": null
+      },
+      {
+        "slot": 8,
+        "troop_id": "ballista",
+        "fe_id": "ballista",
+        "kb_id": "catapult",
+        "speed": null,
+        "source": "pending",
+        "ref": null
+      },
+      {
+        "slot": 9,
+        "troop_id": "ephor",
+        "fe_id": "ephor",
+        "kb_id": "ephor",
+        "speed": null,
+        "source": "pending",
+        "ref": null
+      },
+      {
+        "slot": 10,
+        "troop_id": "spartan_settler",
+        "fe_id": "settler",
+        "kb_id": "settler",
+        "speed": null,
+        "source": "pending",
+        "ref": null
+      }
+    ],
+    "vikings": [
+      {
+        "slot": 1,
+        "troop_id": "thrall",
+        "fe_id": "thrall",
+        "kb_id": "thrall",
+        "speed": 7,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      },
+      {
+        "slot": 2,
+        "troop_id": "shield_maiden",
+        "fe_id": "shieldMaiden",
+        "kb_id": "shield_maiden",
+        "speed": 7,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      },
+      {
+        "slot": 3,
+        "troop_id": "berserker",
+        "fe_id": "berserker",
+        "kb_id": "berserker",
+        "speed": 5,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      },
+      {
+        "slot": 4,
+        "troop_id": "heimdalls_eye",
+        "fe_id": "heimdallsEye",
+        "kb_id": "scout",
+        "speed": 9,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      },
+      {
+        "slot": 5,
+        "troop_id": "huskarl_rider",
+        "fe_id": "huskarlRider",
+        "kb_id": "huskarl_rider",
+        "speed": 12,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      },
+      {
+        "slot": 6,
+        "troop_id": "valkyries_blessing",
+        "fe_id": "valkyrie",
+        "kb_id": "valkyrjas_blessing",
+        "speed": 9,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      },
+      {
+        "slot": 7,
+        "troop_id": "viking_ram",
+        "fe_id": "ram",
+        "kb_id": "ram",
+        "speed": 4,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      },
+      {
+        "slot": 8,
+        "troop_id": "viking_catapult",
+        "fe_id": "catapult",
+        "kb_id": "catapult",
+        "speed": 3,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      },
+      {
+        "slot": 9,
+        "troop_id": "jarl",
+        "fe_id": "jarl",
+        "kb_id": "jarl",
+        "speed": 5,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      },
+      {
+        "slot": 10,
+        "troop_id": "viking_settler",
+        "fe_id": "settler",
+        "kb_id": "settler",
+        "speed": 5,
+        "source": "official",
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+      }
+    ]
+  }
+}

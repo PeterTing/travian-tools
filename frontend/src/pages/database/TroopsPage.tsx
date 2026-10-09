@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { troopsApi } from '@/services/gameApi'
+import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
 
 const TRIBES: { value: TroopTribe | 'all'; label: string }[] = [
@@ -24,6 +25,22 @@ const CATEGORIES: { value: TroopCategory | 'all'; label: string }[] = [
   { value: 'special', label: '特殊' },
   { value: 'settler', label: '移民' },
 ]
+
+/** 官方頁數字取自第三方計算器的出處說明（P0-15，斯巴達步兵、騎兵） */
+const OFFICIAL_PENDING_SOURCE_TEXT = '官方說明頁，數字標示取自第三方計算器'
+
+/** 速度出處說明（P0-15）：ts11 遊戲內說明／官方文章／官方頁待驗證／待驗證 */
+function speedSourceLabel(t: Pick<TroopDetail, 'speed_source' | 'speed_ref'>): string {
+  if (t.speed_source === 'ts11') return 'ts11 遊戲內說明'
+  if (t.speed_source === 'official') return '官方說明'
+  if (t.speed_source === 'official_pending') return '官方說明頁（待驗證）'
+  return '待驗證'
+}
+
+/** 速度沒有第一手出處（null 或官方頁標示取自第三方計算器）就標「待驗證」 */
+function isSpeedPending(t: Pick<TroopListItem, 'speed' | 'speed_source'>): boolean {
+  return t.speed === null || t.speed_source === 'official_pending' || t.speed_source === 'pending'
+}
 
 export default function TroopsPage() {
   const { i18n } = useTranslation()
@@ -135,6 +152,12 @@ export default function TroopsPage() {
                   ATK: {troop.attack} | DEF: {troop.defense_infantry}/
                   {troop.defense_cavalry}
                 </p>
+                {isSpeedPending(troop) && (
+                  <p className="text-sm opacity-70" data-testid="troop-list-speed">
+                    速度 {troop.speed ?? '—'}{' '}
+                    <PendingVerifyChip note={troop.speed === null ? '這個兵種的速度還沒有第一手出處' : OFFICIAL_PENDING_SOURCE_TEXT} />
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -175,11 +198,32 @@ export default function TroopsPage() {
                 </div>
                 <div className="p-3 bg-yellow-50 dark:bg-yellow-950 rounded">
                   <p className="text-sm text-muted-foreground">速度</p>
-                  <p className="text-2xl font-bold text-yellow-600">
-                    {selectedTroop.speed}
+                  {selectedTroop.speed === null ? (
+                    <p className="text-2xl font-bold text-yellow-600" data-testid="troop-speed">
+                      —{' '}
+                      <PendingVerifyChip note="這個兵種的速度還沒有第一手出處" />
+                    </p>
+                  ) : (
+                    <p className="text-2xl font-bold text-yellow-600" data-testid="troop-speed">
+                      {selectedTroop.speed}
+                      {isSpeedPending(selectedTroop) && (
+                        <>
+                          {' '}
+                          <PendingVerifyChip note={OFFICIAL_PENDING_SOURCE_TEXT} />
+                        </>
+                      )}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground" data-testid="troop-speed-source">
+                    {speedSourceLabel(selectedTroop)}
                   </p>
                 </div>
               </div>
+              {selectedTroop.speed_source === 'official_pending' && (
+                <p className="-mt-4 mb-6 text-xs text-muted-foreground" data-testid="troop-speed-official-pending-source">
+                  {OFFICIAL_PENDING_SOURCE_TEXT}
+                </p>
+              )}
 
               {/* 詳細資訊 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
+import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { PathSpeedTsRequest, PathSpeedTsResponse } from '@/services/advancedCalculatorApi'
 
@@ -213,6 +214,17 @@ export default function PathSpeedTsCalculatorPage() {
                 <div className="text-center text-muted-foreground py-4">
                   在 +-30 秒容差內無匹配結果
                 </div>
+              )}
+
+              {(result.unverified_units?.length ?? 0) > 0 && (
+                <p
+                  className="flex items-center gap-2 text-xs text-muted-foreground"
+                  data-testid="unverified-units-note"
+                  title={result.unverified_units?.join('、')}
+                >
+                  <PendingVerifyChip />
+                  <span>斯巴達兵種速度待驗證，未列入反推</span>
+                </p>
               )}
             </div>
           ) : (

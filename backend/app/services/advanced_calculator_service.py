@@ -389,13 +389,17 @@ class AdvancedCalculatorService:
 
         troops_data = _load_troops_data()
 
-        # 建立速度 → 兵種名稱的對應
+        # 建立速度 → 兵種名稱的對應（速度由 gen_game_data.py 產生，P0-15）。
+        # 只用有第一手出處的速度（ts11 遊戲內說明／官方文章）；待驗證的兵種
+        # （目前是斯巴達 10 種）不列入比對，另外回傳名單。
         speed_to_units: dict[int, list[str]] = {}
+        unverified_units: list[str] = []
         for troop in troops_data.values():
-            spd = troop["speed"]
-            if spd not in speed_to_units:
-                speed_to_units[spd] = []
-            speed_to_units[spd].append(troop["name_en"])
+            spd = troop.get("speed")
+            if spd is None or troop.get("speed_source") not in ("ts11", "official"):
+                unverified_units.append(f"{troop['name_en']} ({troop['tribe']})")
+                continue
+            speed_to_units.setdefault(int(spd), []).append(troop["name_en"])
 
         all_speeds = sorted(speed_to_units.keys())
         possible_matches: list[SpeedTsMatch] = []
@@ -427,6 +431,7 @@ class AdvancedCalculatorService:
         return PathSpeedTsResponse(
             distance=round(distance, 2),
             possible_matches=possible_matches,
+            unverified_units=unverified_units,
         )
 
     # ─── Village Builder (Lumi-style build order) ─────────────────

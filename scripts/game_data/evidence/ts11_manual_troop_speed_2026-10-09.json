@@ -1,0 +1,307 @@
+{
+  "_what": "ts11 x1 international 遊戲內說明（Travian.Game.Manual → GET /api/v1/manual/troop/N）讀到的速度欄位原文，2026-10-09 21:43–21:46（台北）由 ts11 帳號的 bot 瀏覽器擷取（唯讀）。ts11 是 5 族伺服器，沒有斯巴達／維京。",
+  "server": "ts11.x1.international.travian.com",
+  "captured_at": "2026-10-09T21:46+08:00",
+  "troops": {
+    "1": {
+      "name_zh": "古羅馬步兵",
+      "tribe_zh": "羅馬人",
+      "speed_text": "6 格（每小時）",
+      "speed": 6
+    },
+    "2": {
+      "name_zh": "禁衛兵",
+      "tribe_zh": "羅馬人",
+      "speed_text": "5 格（每小時）",
+      "speed": 5
+    },
+    "3": {
+      "name_zh": "帝國兵",
+      "tribe_zh": "羅馬人",
+      "speed_text": "7 格（每小時）",
+      "speed": 7
+    },
+    "4": {
+      "name_zh": "使者騎士",
+      "tribe_zh": "羅馬人",
+      "speed_text": "16 格（每小時）",
+      "speed": 16
+    },
+    "5": {
+      "name_zh": "帝國騎士",
+      "tribe_zh": "羅馬人",
+      "speed_text": "14 格（每小時）",
+      "speed": 14
+    },
+    "6": {
+      "name_zh": "將軍騎士",
+      "tribe_zh": "羅馬人",
+      "speed_text": "10 格（每小時）",
+      "speed": 10
+    },
+    "7": {
+      "name_zh": "衝撞車",
+      "tribe_zh": "羅馬人",
+      "speed_text": "4 格（每小時）",
+      "speed": 4
+    },
+    "8": {
+      "name_zh": "火焰投石機",
+      "tribe_zh": "羅馬人",
+      "speed_text": "3 格（每小時）",
+      "speed": 3
+    },
+    "9": {
+      "name_zh": "參議員",
+      "tribe_zh": "羅馬人",
+      "speed_text": "4 格（每小時）",
+      "speed": 4
+    },
+    "10": {
+      "name_zh": "開拓者",
+      "tribe_zh": "羅馬人",
+      "speed_text": "5 格（每小時）",
+      "speed": 5
+    },
+    "11": {
+      "name_zh": "棍棒兵",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "7 格（每小時）",
+      "speed": 7
+    },
+    "12": {
+      "name_zh": "矛兵",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "7 格（每小時）",
+      "speed": 7
+    },
+    "13": {
+      "name_zh": "斧頭兵",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "6 格（每小時）",
+      "speed": 6
+    },
+    "14": {
+      "name_zh": "偵察兵",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "9 格（每小時）",
+      "speed": 9
+    },
+    "15": {
+      "name_zh": "遊俠",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "10 格（每小時）",
+      "speed": 10
+    },
+    "16": {
+      "name_zh": "條頓騎士",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "9 格（每小時）",
+      "speed": 9
+    },
+    "17": {
+      "name_zh": "破城槌",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "4 格（每小時）",
+      "speed": 4
+    },
+    "18": {
+      "name_zh": "弩炮",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "3 格（每小時）",
+      "speed": 3
+    },
+    "19": {
+      "name_zh": "司令官",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "4 格（每小時）",
+      "speed": 4
+    },
+    "20": {
+      "name_zh": "開拓者",
+      "tribe_zh": "日耳曼人",
+      "speed_text": "5 格（每小時）",
+      "speed": 5
+    },
+    "21": {
+      "name_zh": "方陣兵",
+      "tribe_zh": "高盧人",
+      "speed_text": "7 格（每小時）",
+      "speed": 7
+    },
+    "22": {
+      "name_zh": "劍士",
+      "tribe_zh": "高盧人",
+      "speed_text": "6 格（每小時）",
+      "speed": 6
+    },
+    "23": {
+      "name_zh": "探路者",
+      "tribe_zh": "高盧人",
+      "speed_text": "17 格（每小時）",
+      "speed": 17
+    },
+    "24": {
+      "name_zh": "雷法師",
+      "tribe_zh": "高盧人",
+      "speed_text": "19 格（每小時）",
+      "speed": 19
+    },
+    "25": {
+      "name_zh": "德魯伊騎兵",
+      "tribe_zh": "高盧人",
+      "speed_text": "16 格（每小時）",
+      "speed": 16
+    },
+    "26": {
+      "name_zh": "海頓聖騎",
+      "tribe_zh": "高盧人",
+      "speed_text": "13 格（每小時）",
+      "speed": 13
+    },
+    "27": {
+      "name_zh": "破城槌",
+      "tribe_zh": "高盧人",
+      "speed_text": "4 格（每小時）",
+      "speed": 4
+    },
+    "28": {
+      "name_zh": "投石機",
+      "tribe_zh": "高盧人",
+      "speed_text": "3 格（每小時）",
+      "speed": 3
+    },
+    "29": {
+      "name_zh": "族長",
+      "tribe_zh": "高盧人",
+      "speed_text": "5 格（每小時）",
+      "speed": 5
+    },
+    "30": {
+      "name_zh": "開拓者",
+      "tribe_zh": "高盧人",
+      "speed_text": "5 格（每小時）",
+      "speed": 5
+    },
+    "51": {
+      "name_zh": "奴隸民兵",
+      "tribe_zh": "埃及人",
+      "speed_text": "7 格（每小時）",
+      "speed": 7
+    },
+    "52": {
+      "name_zh": "看守人艾什",
+      "tribe_zh": "埃及人",
+      "speed_text": "6 格（每小時）",
+      "speed": 6
+    },
+    "53": {
+      "name_zh": "斧刀勇士",
+      "tribe_zh": "埃及人",
+      "speed_text": "7 格（每小時）",
+      "speed": 7
+    },
+    "54": {
+      "name_zh": "探險者索普杜",
+      "tribe_zh": "埃及人",
+      "speed_text": "16 格（每小時）",
+      "speed": 16
+    },
+    "55": {
+      "name_zh": "守衛安赫",
+      "tribe_zh": "埃及人",
+      "speed_text": "15 格（每小時）",
+      "speed": 15
+    },
+    "56": {
+      "name_zh": "瑞舍夫戰車",
+      "tribe_zh": "埃及人",
+      "speed_text": "10 格（每小時）",
+      "speed": 10
+    },
+    "57": {
+      "name_zh": "破城槌",
+      "tribe_zh": "埃及人",
+      "speed_text": "4 格（每小時）",
+      "speed": 4
+    },
+    "58": {
+      "name_zh": "石弩",
+      "tribe_zh": "埃及人",
+      "speed_text": "3 格（每小時）",
+      "speed": 3
+    },
+    "59": {
+      "name_zh": "州長",
+      "tribe_zh": "埃及人",
+      "speed_text": "4 格（每小時）",
+      "speed": 4
+    },
+    "60": {
+      "name_zh": "開拓者",
+      "tribe_zh": "埃及人",
+      "speed_text": "5 格（每小時）",
+      "speed": 5
+    },
+    "61": {
+      "name_zh": "僱傭兵",
+      "tribe_zh": "匈奴",
+      "speed_text": "6 格（每小時）",
+      "speed": 6
+    },
+    "62": {
+      "name_zh": "弓箭手",
+      "tribe_zh": "匈奴",
+      "speed_text": "6 格（每小時）",
+      "speed": 6
+    },
+    "63": {
+      "name_zh": "探子",
+      "tribe_zh": "匈奴",
+      "speed_text": "19 格（每小時）",
+      "speed": 19
+    },
+    "64": {
+      "name_zh": "草原騎士",
+      "tribe_zh": "匈奴",
+      "speed_text": "16 格（每小時）",
+      "speed": 16
+    },
+    "65": {
+      "name_zh": "神射手",
+      "tribe_zh": "匈奴",
+      "speed_text": "15 格（每小時）",
+      "speed": 15
+    },
+    "66": {
+      "name_zh": "掠奪者",
+      "tribe_zh": "匈奴",
+      "speed_text": "14 格（每小時）",
+      "speed": 14
+    },
+    "67": {
+      "name_zh": "破城槌",
+      "tribe_zh": "匈奴",
+      "speed_text": "4 格（每小時）",
+      "speed": 4
+    },
+    "68": {
+      "name_zh": "弩炮",
+      "tribe_zh": "匈奴",
+      "speed_text": "3 格（每小時）",
+      "speed": 3
+    },
+    "69": {
+      "name_zh": "重步兵",
+      "tribe_zh": "匈奴",
+      "speed_text": "5 格（每小時）",
+      "speed": 5
+    },
+    "70": {
+      "name_zh": "開拓者",
+      "tribe_zh": "匈奴",
+      "speed_text": "5 格（每小時）",
+      "speed": 5
+    }
+  }
+}

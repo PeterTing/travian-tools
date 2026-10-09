@@ -3,15 +3,26 @@ import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
 
-interface UnitOpt { id: string; label: { zh: string; en: string }; carry: number; speed: number; cost: number }
-const UNITS: UnitOpt[] = [
-  { id: 'tt',     label: { zh: 'TT (高盧人, 速 19)',     en: 'TT (Gaul, speed 19)' },     carry: 75, speed: 19, cost: 1090 },
-  { id: 'ei',     label: { zh: 'EI (羅馬人, 速 14)',     en: 'EI (Roman, speed 14)' },    carry: 100, speed: 14, cost: 1410 },
-  { id: 'steppe', label: { zh: 'Steppe Rider (匈, 速 16)',   en: 'Steppe Rider (Hun, speed 16)' },  carry: 115, speed: 16, cost: 895 },
-  { id: 'paladin',label: { zh: 'Paladin (日耳曼人, 速 10)',en: 'Paladin (Teuton, speed 10)' },carry: 110, speed: 10, cost: 1005 },
-  { id: 'club',   label: { zh: 'Clubswinger (日耳曼人, 速 7)', en: 'Clubswinger (Teuton, speed 7)' }, carry: 60, speed: 7, cost: 250 },
-  { id: 'ec',     label: { zh: 'EC (羅馬人, 速 10)',     en: 'EC (Roman, speed 10)' },    carry: 70, speed: 10, cost: 2170 },
+import { unitSpeedValue, type SpeedTribeId } from '@/data/unitSpeeds';
+
+// Speed comes from src/data/unitSpeeds.gen.json (P0-15 phase 1: ts11 in-game help).
+// Carry and cost are the old values and have not been rebuilt yet (P0-15 later phases).
+interface UnitOpt { id: string; name: { zh: string; en: string }; tribe: SpeedTribeId; feId: string; carry: number; speed: number; cost: number }
+const UNIT_DEFS: Omit<UnitOpt, 'speed'>[] = [
+  { id: 'tt',     name: { zh: 'TT (高盧人',             en: 'TT (Gaul' },             tribe: 'gauls',   feId: 'theutatesThunder',   carry: 75,  cost: 1090 },
+  { id: 'ei',     name: { zh: 'EI (羅馬人',             en: 'EI (Roman' },            tribe: 'romans',  feId: 'equitesImperatoris', carry: 100, cost: 1410 },
+  { id: 'steppe', name: { zh: 'Steppe Rider (匈',       en: 'Steppe Rider (Hun' },    tribe: 'huns',    feId: 'steppeRider',        carry: 115, cost: 895 },
+  { id: 'paladin',name: { zh: 'Paladin (日耳曼人',      en: 'Paladin (Teuton' },      tribe: 'teutons', feId: 'paladin',            carry: 110, cost: 1005 },
+  { id: 'club',   name: { zh: 'Clubswinger (日耳曼人',  en: 'Clubswinger (Teuton' },  tribe: 'teutons', feId: 'maceman',            carry: 60,  cost: 250 },
+  { id: 'ec',     name: { zh: 'EC (羅馬人',             en: 'EC (Roman' },            tribe: 'romans',  feId: 'equitesCaesaris',    carry: 70,  cost: 2170 },
 ];
+const UNITS: UnitOpt[] = UNIT_DEFS.map(u => {
+  const speed = unitSpeedValue(u.tribe, u.feId);
+  if (speed === null) throw new Error(`no speed for ${u.tribe}.${u.feId}`);
+  return { ...u, speed };
+});
+const unitLabel = (u: UnitOpt, lang: 'zh' | 'en') =>
+  lang === 'en' ? `${u.name.en}, speed ${u.speed})` : `${u.name.zh}, 速 ${u.speed})`;
 
 export function lumiBracket(pop: number, lang: 'zh' | 'en') {
   if (pop < 150) return { bracket: '< 150', n: 0,
@@ -80,7 +91,7 @@ export default function FarmingCalculator() {
             <label>{lang === 'en' ? 'Unit' : '單位'}</label>
             <select value={unitId} onChange={e => setUnitId(e.target.value)}>
               {UNITS.map(u => (
-                <option key={u.id} value={u.id}>{lang === 'en' ? u.label.en : u.label.zh} · carry {u.carry}</option>
+                <option key={u.id} value={u.id}>{unitLabel(u, lang)} · carry {u.carry}</option>
               ))}
             </select>
           </div>

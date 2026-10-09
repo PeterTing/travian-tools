@@ -1,6 +1,7 @@
 """Troop data schema for troops.json validation."""
 
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, Field, computed_field
 
@@ -55,7 +56,20 @@ class Troop(BaseModel):
     defense_cavalry: int = Field(..., ge=0, description="騎兵防禦")
 
     # 移動與運載
-    speed: int = Field(..., ge=0, description="速度（格/小時）")
+    # 速度由 scripts/game_data/gen_game_data.py 產生（P0-15）：ts11 遊戲內說明／官方文章；
+    # 沒有第一手出處的是 None（待驗證）
+    speed: int | None = Field(
+        ..., ge=1, description="速度（格/小時，x1）；None＝待驗證"
+    )
+    speed_source: Literal["ts11", "official", "official_pending", "pending"] = Field(
+        ...,
+        description=(
+            "速度出處：ts11 遊戲內說明／官方文章／官方頁但數字取自第三方計算器（待驗證）／待驗證"
+        ),
+    )
+    speed_ref: str | None = Field(
+        None, description="速度出處細節（manual/troop/N 或官方網址）"
+    )
     carry_capacity: int = Field(..., ge=0, description="運載量")
 
     # 成本
