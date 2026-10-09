@@ -3,6 +3,7 @@ import { fieldRoi, FIELD_COSTS, type ResourceType } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const TYPE_LABELS: Record<ResourceType, { zh: string; en: string }> = {
   wood: { zh: '🪵 木材', en: '🪵 Wood' },
@@ -41,11 +42,12 @@ export default function FieldRoiCalculator() {
     <>
       <div className={s.intro}>
         {/* Validation vs Lumi Table 2 (Wood L7 = 6.46d) lives in calculators.regression.test.ts */}
-        <h2>{lang === 'en' ? 'Field ROI' : '田地回本'}</h2>
+        <h2>{lang === 'en' ? 'Field ROI (normal village)' : '田地回本（一般村）'}</h2>
         <p>{lang === 'en'
           ? 'How many days until a field upgrade pays for itself. Fewer days = upgrade that field first. Building, oasis, and Plus bonuses all add together.'
           : '升一級資源田要幾天回本，天數越少越值得先升。加成建築、綠洲與 Plus 金幣加成會一起算進去。'}</p>
       </div>
+      <CalcBar />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>

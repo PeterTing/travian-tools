@@ -170,6 +170,16 @@ describe('village list (P0-02 slice 2)', () => {
     expect(within(main).getByRole('link', { name: '打開 主村 的詳情' })).toHaveAttribute('href', '/villages/v-main')
   })
 
+  it('shows the ＋ 貼上 button (to the home paste box) and leaves FAB height + 16px at the bottom', async () => {
+    renderPage()
+    await waitFor(() => expect(rows()).toHaveLength(4))
+    const fab = screen.getByTestId('paste-fab')
+    expect(fab).toHaveTextContent('＋ 貼上')
+    expect(fab).toHaveAttribute('href', '/#paste')
+    expect(fab.className).toContain('lg:hidden')
+    expect(screen.getByTestId('villages-root').className).toContain('pb-[calc(48px+16px)]')
+  })
+
   it('marks a negative crop change in red, and only that one', async () => {
     renderPage()
     await waitFor(() => expect(rows()).toHaveLength(4))

@@ -2,6 +2,12 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ROUTES } from '@/constants/routes'
 import { CurrentAccountProvider } from '@/contexts/CurrentAccountContext'
+import { AccountDataProvider } from '@/contexts/AccountDataContext'
+import { AutoFillProvider } from '@/components/autofill/AutoFillContext'
+import CalcFrame from '@/components/autofill/CalcFrame'
+import ExternalLinksPage from '@/pages/ExternalLinksPage'
+import IncomingListPage from '@/pages/calculator/IncomingListPage'
+import FieldsPage from '@/pages/calculator/guide/FieldsPage'
 import AppShell from '@/components/layout/AppShell'
 import { RequireAuth } from '@/components/auth'
 import HomePage from '@/pages/HomePage'
@@ -19,7 +25,6 @@ import ResourcesPage from '@/pages/database/ResourcesPage'
 // Calculator pages
 import CalculatorsIndexPage from '@/pages/calculator/CalculatorsIndexPage'
 import BuildingCalculatorPage from '@/pages/calculator/BuildingCalculatorPage'
-import BattleSimulatorPage from '@/pages/calculator/BattleSimulatorPage'
 import CropBalancePage from '@/pages/calculator/CropBalancePage'
 // Advanced calculator pages
 import PathCalculatorPage from '@/pages/calculator/PathCalculatorPage'
@@ -31,13 +36,11 @@ import PathSpeedTsCalculatorPage from '@/pages/calculator/PathSpeedTsCalculatorP
 // Phase 1 new calculators (2026-04)
 import CropScouterPage from '@/pages/calculator/CropScouterPage'
 import AttackPlannerPage from '@/pages/calculator/AttackPlannerPage'
-import FieldRoiPage from '@/pages/calculator/guide/FieldRoiPage'
 import OasisRoiPage from '@/pages/calculator/guide/OasisRoiPage'
 import PassiveCpPage from '@/pages/calculator/guide/PassiveCpPage'
 import BuildOrderPage from '@/pages/calculator/guide/BuildOrderPage'
 import TraderoutePage from '@/pages/calculator/guide/TraderoutePage'
 import FarmingPage from '@/pages/calculator/guide/FarmingPage'
-import CropSimPage from '@/pages/calculator/guide/CropSimPage'
 import LaunchSimPage from '@/pages/calculator/guide/LaunchSimPage'
 
 // Game accounts page
@@ -59,7 +62,8 @@ import {
 // Strategy pages
 import { HealthCheckPage, OpeningChecklistPage } from '@/pages/strategy'
 
-function AppContent() {
+/** 路由與外框（測試用：不含 Provider） */
+export function AppContent() {
   return (
     <AppShell>
       <Routes>
@@ -93,41 +97,37 @@ function AppContent() {
         <Route path="/register" element={<RegisterPage />} />
         {/* Database routes */}
         <Route path="/database/buildings" element={<BuildingsPage />} />
-        <Route path="/database/troops" element={<TroopsPage />} />
+        <Route path="/database/troops" element={<CalcFrame usesVillage={false}><TroopsPage /></CalcFrame>} />
         <Route path="/database/resources" element={<ResourcesPage />} />
-        {/* Calculator routes */}
+        {/* Calculator routes（IA v2.2：每個計算器最上面都有「已帶入」列） */}
         <Route path={ROUTES.CALCULATOR.INDEX} element={<CalculatorsIndexPage />} />
-        {/* 戰鬥模擬：P1-06 重寫完成前不放導覽入口（P0-11），路由先留著 */}
-        <Route path="/calculator/building" element={<BuildingCalculatorPage />} />
-        
-        <Route path="/calculator/battle" element={<BattleSimulatorPage />} />
-        <Route path="/calculator/crop" element={<CropBalancePage />} />
-        {/* Advanced calculator routes */}
-        <Route path="/calculator/path" element={<PathCalculatorPage />} />
-        <Route path="/calculator/interception" element={<InterceptionCalculatorPage />} />
-        
-        <Route path="/calculator/technology" element={<TechnologyCalculatorPage />} />
-        <Route path="/calculator/npc" element={<NpcCalculatorPage />} />
-        <Route path="/calculator/save-troops" element={<SaveTroopsCalculatorPage />} />
-        <Route path="/calculator/path-speed-ts" element={<PathSpeedTsCalculatorPage />} />
-        {/* Phase 1 new calculators */}
-        
-        <Route path="/calculator/crop-scouter" element={<CropScouterPage />} />
-        <Route path="/calculator/attack-planner" element={<AttackPlannerPage />} />
-
-        {/* P0-09 guide calculators */}
-        <Route path="/calculator/field-roi" element={<FieldRoiPage />} />
-        <Route path="/calculator/oasis-roi" element={<OasisRoiPage />} />
+        {/* 戰鬥模擬：P1-06 照公式重寫前隱藏，舊網址轉回首頁 */}
+        <Route path="/calculator/battle" element={<Navigate to="/" replace />} />
+        <Route path="/calculator/building" element={<CalcFrame usesVillage={false}><BuildingCalculatorPage /></CalcFrame>} />
+        <Route path="/calculator/crop" element={<CalcFrame><CropBalancePage /></CalcFrame>} />
+        <Route path="/calculator/path" element={<CalcFrame><PathCalculatorPage /></CalcFrame>} />
+        <Route path="/calculator/interception" element={<CalcFrame><InterceptionCalculatorPage /></CalcFrame>} />
+        <Route path="/calculator/technology" element={<CalcFrame usesVillage={false}><TechnologyCalculatorPage /></CalcFrame>} />
+        <Route path="/calculator/npc" element={<CalcFrame usesVillage={false}><NpcCalculatorPage /></CalcFrame>} />
+        <Route path="/calculator/save-troops" element={<CalcFrame><SaveTroopsCalculatorPage /></CalcFrame>} />
+        <Route path="/calculator/path-speed-ts" element={<CalcFrame><PathSpeedTsCalculatorPage /></CalcFrame>} />
+        <Route path="/calculator/crop-scouter" element={<CalcFrame usesVillage={false}><CropScouterPage /></CalcFrame>} />
+        <Route path="/calculator/attack-planner" element={<CalcFrame><AttackPlannerPage /></CalcFrame>} />
+        <Route path={ROUTES.CALCULATOR.INCOMING} element={<RequireAuth><IncomingListPage /></RequireAuth>} />
+        <Route path={ROUTES.CALCULATOR.FIELDS} element={<CalcFrame><FieldsPage /></CalcFrame>} />
+        <Route path="/calculator/oasis-roi" element={<CalcFrame><OasisRoiPage /></CalcFrame>} />
         <Route path="/calculator/passive-cp" element={<PassiveCpPage />} />
-        <Route path="/calculator/build-order" element={<BuildOrderPage />} />
-        <Route path="/calculator/trade-route" element={<TraderoutePage />} />
-        <Route path="/calculator/farming" element={<FarmingPage />} />
-        <Route path="/calculator/crop-sim" element={<CropSimPage />} />
-        <Route path="/calculator/launch-sim" element={<LaunchSimPage />} />
-        {/* Duplicates → guide versions */}
-        <Route path="/calculator/roi" element={<Navigate to="/calculator/field-roi" replace />} />
+        <Route path="/calculator/build-order" element={<CalcFrame><BuildOrderPage /></CalcFrame>} />
+        <Route path="/calculator/trade-route" element={<CalcFrame><TraderoutePage /></CalcFrame>} />
+        <Route path="/calculator/farming" element={<CalcFrame><FarmingPage /></CalcFrame>} />
+        <Route path="/calculator/launch-sim" element={<CalcFrame usesVillage={false}><LaunchSimPage /></CalcFrame>} />
+        {/* 舊網址 → 新頁面 */}
+        <Route path="/calculator/field-roi" element={<Navigate to={ROUTES.CALCULATOR.FIELDS} replace />} />
+        <Route path="/calculator/crop-sim" element={<Navigate to={`${ROUTES.CALCULATOR.FIELDS}?mode=capital`} replace />} />
+        <Route path="/calculator/roi" element={<Navigate to={ROUTES.CALCULATOR.FIELDS} replace />} />
         <Route path="/calculator/culture-points" element={<Navigate to="/calculator/passive-cp" replace />} />
         <Route path="/calculator/village-builder" element={<Navigate to="/calculator/build-order" replace />} />
+        <Route path={ROUTES.EXTERNAL_LINKS} element={<ExternalLinksPage />} />
 
         {/* Statistics routes - 公開 */}
         <Route path="/statistics/overview" element={<ServerOverviewPage />} />
@@ -158,7 +158,11 @@ function App() {
   return (
     <AuthProvider>
       <CurrentAccountProvider>
-        <AppContent />
+        <AccountDataProvider>
+          <AutoFillProvider>
+            <AppContent />
+          </AutoFillProvider>
+        </AccountDataProvider>
       </CurrentAccountProvider>
     </AuthProvider>
   )

@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import i18n from '@/i18n/i18n'
 import gen from '../../data/gameData.gen.json'
 import { render, screen, within } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import PassiveCpCalculator, { villageCountdown } from './components/PassiveCpCalculator'
 import { cropSim } from './components/CropSimCalculator'
 import { CP_REQUIRED, CELEBRATIONS, cpAtLevel, hmCumulativeCost, FIELD_COSTS, type CpBuilding } from './data/travian'
@@ -121,7 +122,7 @@ describe('PassiveCpCalculator UI', () => {
     })) as typeof window.matchMedia
   })
   it('marks village 3+ thresholds 待驗證 but not village 2', () => {
-    render(<PassiveCpCalculator />)
+    render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
     const table = screen.getByTestId('cp-countdown')
     const rows = within(table).getAllByRole('row')
     expect(within(rows[1]!).queryByTestId('pending-verify-chip')).toBeNull()
@@ -129,22 +130,22 @@ describe('PassiveCpCalculator UI', () => {
     expect(screen.queryByText('+大慶典/天')).toBeNull()
   })
   it('shows small-celebration crop cost with 待驗證', () => {
-    render(<PassiveCpCalculator />)
+    render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
     const cost = screen.getByTestId('cp-celebration-cost')
     expect(within(cost).getByText(/1,340/)).toBeInTheDocument()
     expect(within(cost).getAllByTestId('pending-verify-chip').length).toBeGreaterThan(0)
   })
   it('title is CP 與開村 and the body says CP, not 文明點', () => {
-    render(<PassiveCpCalculator />)
+    render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('CP 與開村')
     expect(screen.queryByText(/文明點/)).toBeNull()
   })
   it('celebration hours field has the Town Hall hint', () => {
-    render(<PassiveCpCalculator />)
+    render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
     expect(screen.getByTestId('cp-hours-hint')).toHaveTextContent('慶典時長會隨城鎮廳等級變短，預設帶入城鎮廳 1 級的官方時長。')
   })
   it('building labels are Chinese in zh (same names as the buildings database)', () => {
-    render(<PassiveCpCalculator />)
+    render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
     expect(screen.getAllByText('村莊大樓').length).toBeGreaterThan(0)
     expect(screen.getAllByText('城鎮廳').length).toBeGreaterThan(0)
     expect(screen.getAllByText('鐵匠鋪／防具工坊').length).toBeGreaterThan(0)
@@ -155,7 +156,7 @@ describe('PassiveCpCalculator UI', () => {
     beforeEach(async () => { prev = i18n.language; await i18n.changeLanguage('en') })
     afterEach(async () => { await i18n.changeLanguage(prev) })
     it('keeps English building names and wording', () => {
-      render(<PassiveCpCalculator />)
+      render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
       expect(screen.getAllByText('Main Building').length).toBeGreaterThan(0)
       expect(screen.queryByText('村莊大樓')).toBeNull()
       expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('CP & new villages')

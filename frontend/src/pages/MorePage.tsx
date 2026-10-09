@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import NavList from '@/components/layout/NavList'
-import { MORE_GROUPS, MORE_LINKS } from '@/components/layout/navItems'
+import ExternalLinkList from '@/components/external/ExternalLinkList'
+import { GAME_DATA_LINKS, MORE_LINKS, STATISTICS_LINKS } from '@/components/layout/navItems'
 import { ROUTES } from '@/constants/routes'
 
-/** 手機底部「更多」：地圖、帳號管理、數據庫、統計，最下面是登入的使用者和登出 */
+/** 手機底部「更多」：遊戲資料、外部工具、地圖與帳號、統計，最下面是登入的使用者和登出 */
 export default function MorePage() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
@@ -17,16 +18,24 @@ export default function MorePage() {
       <h1 className="text-xl font-bold">{t('nav.more.title')}</h1>
 
       <section className="space-y-2">
+        <h2 className="text-xs font-semibold text-muted-foreground">{t('nav.gameData')}</h2>
+        <NavList links={GAME_DATA_LINKS} pathname={pathname} />
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-xs font-semibold text-muted-foreground">{t('nav.more.external')}</h2>
+        <ExternalLinkList />
+      </section>
+
+      <section className="space-y-2">
         <h2 className="text-xs font-semibold text-muted-foreground">{t('nav.more.tools')}</h2>
         <NavList links={MORE_LINKS} pathname={pathname} />
       </section>
 
-      {MORE_GROUPS.map((group) => (
-        <section key={group.titleKey} className="space-y-2">
-          <h2 className="text-xs font-semibold text-muted-foreground">{t(group.titleKey)}</h2>
-          <NavList links={group.links} pathname={pathname} />
-        </section>
-      ))}
+      <section className="space-y-2">
+        <h2 className="text-xs font-semibold text-muted-foreground">{t('nav.statistics')}</h2>
+        <NavList links={STATISTICS_LINKS} pathname={pathname} />
+      </section>
 
       <section className="space-y-2">
         <h2 className="text-xs font-semibold text-muted-foreground">{t('nav.more.account')}</h2>

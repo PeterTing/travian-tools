@@ -7,6 +7,8 @@ import {
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
+import { CalcBar } from '@/components/autofill/CalcFrame'
+import Stepper from '@/components/common/Stepper'
 
 export type BB = 'sawmill' | 'brickyard' | 'ironFoundry' | 'grainMill' | 'bakery';
 
@@ -159,6 +161,7 @@ export default function BuildOrderCalculator() {
           ? 'Suggests the next 20 upgrades from your current village. Capitals can go to field Lv 20; other villages stop at Lv 10. Bonus buildings appear when their requirements are met.'
           : '依目前村莊狀態，建議接下來 20 個最划算的升級。首都資源田可升到 20 級，一般村最高 10 級；加成建築在條件達到後會自動出現。'}</p>
       </div>
+      <CalcBar />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>
@@ -178,26 +181,26 @@ export default function BuildOrderCalculator() {
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Current field levels' : '現況：田地等級'}</h4>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Wood</label><input type="number" min={0} max={20} value={start.wood} onChange={e => setStart(p => ({ ...p, wood: +e.target.value }))} /></div>
-            <div className={s.field}><label>Clay</label><input type="number" min={0} max={20} value={start.clay} onChange={e => setStart(p => ({ ...p, clay: +e.target.value }))} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label="Wood" value={start.wood} onChange={v => setStart(p => ({ ...p, wood: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label="Clay" value={start.clay} onChange={v => setStart(p => ({ ...p, clay: v }))} min={0} max={20} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Iron</label><input type="number" min={0} max={20} value={start.iron} onChange={e => setStart(p => ({ ...p, iron: +e.target.value }))} /></div>
-            <div className={s.field}><label>Crop</label><input type="number" min={0} max={20} value={start.crop} onChange={e => setStart(p => ({ ...p, crop: +e.target.value }))} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label="Iron" value={start.iron} onChange={v => setStart(p => ({ ...p, iron: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label="Crop" value={start.crop} onChange={v => setStart(p => ({ ...p, crop: v }))} min={0} max={20} /></div>
           </div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Bonus building levels' : '加成建築等級'}</h4>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Sawmill</label><input type="number" min={0} max={5} value={bonus.sawmill} onChange={e => setBonus(p => ({ ...p, sawmill: +e.target.value }))} /></div>
-            <div className={s.field}><label>Brickyard</label><input type="number" min={0} max={5} value={bonus.brickyard} onChange={e => setBonus(p => ({ ...p, brickyard: +e.target.value }))} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label="Sawmill" value={bonus.sawmill} onChange={v => setBonus(p => ({ ...p, sawmill: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label="Brickyard" value={bonus.brickyard} onChange={v => setBonus(p => ({ ...p, brickyard: v }))} min={0} max={5} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Iron Foundry</label><input type="number" min={0} max={5} value={bonus.ironFoundry} onChange={e => setBonus(p => ({ ...p, ironFoundry: +e.target.value }))} /></div>
-            <div className={s.field}><label>Grain Mill</label><input type="number" min={0} max={5} value={bonus.grainMill} onChange={e => setBonus(p => ({ ...p, grainMill: +e.target.value }))} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label="Iron Foundry" value={bonus.ironFoundry} onChange={v => setBonus(p => ({ ...p, ironFoundry: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label="Grain Mill" value={bonus.grainMill} onChange={v => setBonus(p => ({ ...p, grainMill: v }))} min={0} max={5} /></div>
           </div>
-          <div className={s.field}><label>Bakery</label><input type="number" min={0} max={5} value={bonus.bakery} onChange={e => setBonus(p => ({ ...p, bakery: +e.target.value }))} /></div>
+          <div className="mb-3.5 min-w-0"><Stepper label="Bakery" value={bonus.bakery} onChange={v => setBonus(p => ({ ...p, bakery: v }))} min={0} max={5} /></div>
 
-          <div className={s.field}><label>Main Building Lv</label><input type="number" min={1} max={20} value={mb} onChange={e => setMb(+e.target.value)} /></div>
+          <div className="mb-3.5 min-w-0"><Stepper label="Main Building Lv" value={mb} onChange={setMb} min={1} max={20} /></div>
           <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> Plus +25% gold</label>
         </div>
 

@@ -99,7 +99,7 @@ const branchSteps: BuildStep[] = [
   },
   {
     step: 49,
-    building: { zh: '文化點產量 100(任務)', en: 'Culture point production 100 task' },
+    building: { zh: 'CP 產量 100（任務）', en: 'Culture point production 100 task' },
     targetLevel: null,
     tier: 2,
     cost: null,
@@ -218,7 +218,7 @@ const branchSteps: BuildStep[] = [
   },
   {
     step: 62,
-    building: { zh: '文化點產量 150(任務)', en: 'Culture point production 150 task' },
+    building: { zh: 'CP 產量 150（任務）', en: 'Culture point production 150 task' },
     targetLevel: null,
     tier: 2,
     cost: null,

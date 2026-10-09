@@ -6,16 +6,18 @@ import type {
   TsOptimizerRequest,
   TsOptimizerResponse,
 } from '@/services/advancedCalculatorApi'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 // 舊的「佯攻兵量」（目標人口 5% 的自編算法）已下架；
 // 之後照攻略規則（19 步兵＋1 投石）併進 OP 規劃重寫，見 docs/TICKETS.md。
 export default function AttackPlannerPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">攻擊規劃器</h1>
+    <div className="mx-auto w-full max-w-5xl min-w-0 px-4 py-4">
+      <h1 className="mb-2 text-xl font-bold">OP 規劃</h1>
       <p className="text-muted-foreground mb-6">
         TS 優化器：同步多個攻擊者對同一目標的抵達時間。
       </p>
+      <CalcBar />
 
       <TsOptimizerForm />
     </div>
@@ -89,8 +91,9 @@ function TsOptimizerForm() {
   }
 
   return (
-    <div className="border rounded-lg p-6">
-      <div className="grid grid-cols-3 gap-4 mb-4">
+    <div className="min-w-0 rounded-lg border p-4 sm:p-6">
+      {/* 390 寬：目標 X／Y 一列兩格，抵達時間獨占一列（原本三欄太窄） */}
+      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
         <div>
           <label className="block text-sm font-medium mb-2">目標 X</label>
           <input
@@ -98,7 +101,7 @@ function TsOptimizerForm() {
             data-testid="target-x"
             value={target.x}
             onChange={(e) => setTarget({ ...target, x: Number(e.target.value) })}
-            className="w-full p-2 border rounded bg-background"
+            className="w-full min-w-0 p-2 border rounded bg-background"
           />
         </div>
         <div>
@@ -108,10 +111,10 @@ function TsOptimizerForm() {
             data-testid="target-y"
             value={target.y}
             onChange={(e) => setTarget({ ...target, y: Number(e.target.value) })}
-            className="w-full p-2 border rounded bg-background"
+            className="w-full min-w-0 p-2 border rounded bg-background"
           />
         </div>
-        <div>
+        <div className="col-span-2 min-w-0 sm:col-span-1">
           <label className="block text-sm font-medium mb-2">
             希望抵達時間 (ISO 8601)
           </label>
@@ -127,49 +130,63 @@ function TsOptimizerForm() {
       <h3 className="font-bold mb-2">攻擊者</h3>
       <div className="space-y-2 mb-3">
         {attackers.map((a, i) => (
-          <div key={i} className="grid grid-cols-6 gap-2">
-            <input
-              className="p-2 border rounded bg-background text-sm"
-              placeholder="標籤"
-              value={a.village_label}
-              onChange={(e) => updateAttacker(i, 'village_label', e.target.value)}
-            />
-            <input
-              type="number"
-              className="p-2 border rounded bg-background text-sm"
-              placeholder="X"
-              value={a.x}
-              onChange={(e) => updateAttacker(i, 'x', Number(e.target.value))}
-            />
-            <input
-              type="number"
-              className="p-2 border rounded bg-background text-sm"
-              placeholder="Y"
-              value={a.y}
-              onChange={(e) => updateAttacker(i, 'y', Number(e.target.value))}
-            />
-            <input
-              type="number"
-              className="p-2 border rounded bg-background text-sm"
-              placeholder="速度"
-              value={a.unit_speed}
-              onChange={(e) =>
-                updateAttacker(i, 'unit_speed', Number(e.target.value))
-              }
-            />
-            <input
-              type="number"
-              className="p-2 border rounded bg-background text-sm"
-              placeholder="TS lv"
-              min={0}
-              max={20}
-              value={a.ts_level}
-              onChange={(e) =>
-                updateAttacker(i, 'ts_level', Number(e.target.value))
-              }
-            />
+          // 390 寬：每個攻擊者一張小卡、兩欄並附欄名；≥640 才排成一列六格
+          <div key={i} className="grid grid-cols-2 gap-2 rounded-md border p-2 sm:grid-cols-6 sm:border-0 sm:p-0" data-testid="attacker-row">
+            <label className="col-span-2 min-w-0 text-xs text-muted-foreground sm:col-span-1">
+              <span className="sm:sr-only">標籤</span>
+              <input
+                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
+                placeholder="標籤"
+                value={a.village_label}
+                onChange={(e) => updateAttacker(i, 'village_label', e.target.value)}
+              />
+            </label>
+            <label className="min-w-0 text-xs text-muted-foreground">
+              <span className="sm:sr-only">X</span>
+              <input
+                type="number"
+                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
+                placeholder="X"
+                value={a.x}
+                onChange={(e) => updateAttacker(i, 'x', Number(e.target.value))}
+              />
+            </label>
+            <label className="min-w-0 text-xs text-muted-foreground">
+              <span className="sm:sr-only">Y</span>
+              <input
+                type="number"
+                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
+                placeholder="Y"
+                value={a.y}
+                onChange={(e) => updateAttacker(i, 'y', Number(e.target.value))}
+              />
+            </label>
+            <label className="min-w-0 text-xs text-muted-foreground">
+              <span className="sm:sr-only">速度</span>
+              <input
+                type="number"
+                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
+                placeholder="速度"
+                value={a.unit_speed}
+                onChange={(e) => updateAttacker(i, 'unit_speed', Number(e.target.value))}
+              />
+            </label>
+            <label className="min-w-0 text-xs text-muted-foreground">
+              <span className="sm:sr-only">TS lv</span>
+              <input
+                type="number"
+                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
+                placeholder="TS lv"
+                min={0}
+                max={20}
+                value={a.ts_level}
+                onChange={(e) => updateAttacker(i, 'ts_level', Number(e.target.value))}
+              />
+            </label>
             <button
-              className="p-2 border rounded text-red-600 text-sm"
+              type="button"
+              className="col-span-2 min-h-[44px] rounded border p-2 text-sm text-red-600 sm:col-span-1"
+              data-testid="attack-remove"
               onClick={() => removeAttacker(i)}
               disabled={attackers.length <= 1}
             >
@@ -206,6 +223,7 @@ function TsOptimizerForm() {
               ))}
             </div>
           )}
+          <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-muted">
@@ -228,6 +246,7 @@ function TsOptimizerForm() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

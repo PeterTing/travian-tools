@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 import { unitSpeedValue, type SpeedTribeId } from '@/data/unitSpeeds';
 
@@ -75,6 +76,7 @@ export default function FarmingCalculator() {
           ? 'Suggests how many horses to send to inactive targets and estimates daily loot. Under 150 pop: skip; 150–400: 1 horse; 400–550: 2; 550+: about 3–7 (default 5). Adjust loot per raid from your reports.'
           : '估算打不活躍村該派幾匹馬、一天大概能搶多少。人口不到 150 略過；150–400 派 1 匹；400–550 派 2 匹；550 以上大約 3–7 匹（預設 5）。每次搶到的量請依戰報調整。'}</p>
       </div>
+      <CalcBar />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>

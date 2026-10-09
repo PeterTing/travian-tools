@@ -29,7 +29,10 @@
     "pendingVerify": "待驗證",
     "pendingVerifyNote": "這個數值還沒在遊戲裡實測確認",
     "buildingVerifyLegend": "除標 ✓ 的建築外，數值皆未在 ts11 實測",
-    "verifiedTs11": "已在 ts11 實測"
+    "verifiedTs11": "已在 ts11 實測",
+    "cancel": "取消",
+    "decrease": "減少",
+    "increase": "增加"
   },
   "nav": {
     "title": "Travian Tools",
@@ -38,7 +41,7 @@
     "buildings": "建築數據",
     "troops": "兵種數據",
     "resources": "資源田數據",
-    "buildingCalc": "建築升級計算",
+    "buildingCalc": "建築升級花費",
     "roiCalc": "ROI 計算器",
     "battleSim": "戰鬥模擬器",
     "cropBalance": "糧食平衡",
@@ -58,27 +61,32 @@
     },
     "groups": {
       "combat": "打仗",
-      "development": "發展"
+      "development": "發展",
+      "defense": "防守",
+      "raid": "掠奪",
+      "data": "資料"
     },
     "calcs": {
-      "path": "移動時間",
-      "interception": "攔截計算器",
-      "saveTroops": "避兵計算器",
-      "pathSpeedTs": "TS 反推計算器",
-      "attackPlanner": "攻擊規劃器",
+      "path": "行軍時間",
+      "interception": "攔截",
+      "saveTroops": "躲兵",
+      "pathSpeedTs": "反推 TS",
+      "attackPlanner": "OP 規劃",
       "villageBuilder": "最佳建造順序",
-      "culturePoints": "文化點計算器",
-      "npc": "NPC 計算器",
-      "technology": "科技計算器",
+      "culturePoints": "CP 計算器",
+      "npc": "購物清單（NPC）",
+      "technology": "鐵匠升級",
       "cropScouter": "首都類型反推",
-      "launchSim": "出兵模擬",
+      "launchSim": "開局時間表",
       "buildOrder": "建造順序",
       "passiveCp": "CP 與開村",
       "fieldRoi": "田地 ROI",
       "oasisRoi": "綠洲 ROI",
       "cropSim": "糧食模擬",
       "farming": "農場收益",
-      "tradeRoute": "貿易路線"
+      "tradeRoute": "商路",
+      "fields": "資源田與首都規劃",
+      "incoming": "來襲列表"
     },
     "stats": {
       "overview": "伺服器總覽",
@@ -92,14 +100,39 @@
       "title": "更多",
       "tools": "地圖與帳號",
       "account": "網站帳號",
-      "signedInAs": "目前登入：{{name}}"
+      "signedInAs": "目前登入：{{name}}",
+      "external": "外部工具"
     },
     "calculatorsPage": {
       "title": "計算器",
       "search": "搜尋計算器",
       "searchPlaceholder": "搜尋計算器…",
-      "noResults": "沒有符合的計算器"
-    }
+      "noResults": "沒有符合的計算器",
+      "segments": "計算器分類"
+    },
+    "desc": {
+      "passiveCp": "被動 CP、慶典、開村倒數",
+      "fields": "一般村田地回本、首都產量模擬",
+      "buildOrder": "依村莊角色排建造步驟",
+      "launchSim": "派對與拓荒時間表（原「出兵模擬」）",
+      "npc": "NPC 怎麼換（多棟建築總價之後加）",
+      "tradeRoute": "feeder 商路、商人趟數",
+      "buildingCalc": "一棟建築升到某級的資源和時間",
+      "path": "單程行軍時間、同步抵達",
+      "attackPlanner": "多村同時抵達的出發時間",
+      "technology": "鐵匠升級的花費與時間",
+      "cropBalance": "村莊糧食收支（含兵糧）",
+      "incoming": "依抵達排序，伺服器時間為主",
+      "pathSpeedTs": "從抵達時間反推對方 TS 等級",
+      "interception": "算出能攔截的出發時間",
+      "saveTroops": "躲兵出發與回來的時間",
+      "cropScouter": "偵查資源推敵方首都類型（跟查糧不同）",
+      "oasisRoi": "佔綠洲多久回本",
+      "farming": "掠奪農場的收益"
+    },
+    "gameData": "遊戲資料",
+    "externalLinks": "外部連結",
+    "incomingDot": "有未抵達的來襲"
   },
   "home": {
     "title": "Travian Tools",
@@ -109,7 +142,7 @@
       "buildings": "查看所有建築的升級成本、建造時間和效果",
       "troops": "查看各部族兵種的攻防數值、訓練成本和效率分析",
       "resources": "查看資源田各等級產量和 ROI 分析",
-      "buildingCalc": "計算建築升級所需資源、時間和文化點",
+      "buildingCalc": "計算建築升級所需資源、時間和 CP",
       "roiCalc": "計算資源田升級的投資回報率",
       "battleSim": "模擬攻防戰鬥結果和傷亡預估",
       "cropBalance": "計算村莊糧食收支平衡"
@@ -133,11 +166,85 @@
       "minutesAgo": "{{count}} 分鐘前",
       "hoursAgo": "{{count}} 小時前",
       "yesterday": "昨天",
-      "daysAgo": "{{count}} 天前"
+      "daysAgo": "{{count}} 天前",
+      "latest": "最近："
     },
     "incoming": {
       "villageFilter": "村莊：",
-      "allVillages": "全部村莊"
+      "allVillages": "全部村莊",
+      "listNote": "依抵達時間排序，倒數每秒更新。資料來自最後一次存入的集結點。",
+      "none": "還沒有來襲。貼上集結點後會出現在這裡。",
+      "arrived": "已抵達"
+    },
+    "todayTitle": "今天要做的事",
+    "pasteFab": "貼上",
+    "pasteCard": {
+      "title": "貼上遊戲頁面",
+      "hint": "在遊戲裡全選、複製，貼到這裡（集結點、戰報、村莊總覽）；電腦也可以在首頁直接按 Ctrl＋V。",
+      "placeholder": "在遊戲裡打開「集結點」→ 全選 → 複製，貼在這裡…"
+    },
+    "incomingCard": {
+      "title": "來襲",
+      "nearest": "最近一筆抵達 {{village}}",
+      "all": "全部",
+      "from": "來自",
+      "left": "剩",
+      "needsCoords": "缺座標 · 待補",
+      "noLastSeen": "缺「對方上次上線時間」，還不能反推 TS",
+      "noLastSeenShort": "缺上線時間",
+      "copy": "複製給盟友",
+      "copied": "已複製",
+      "next": "接下來 {{count}} 筆",
+      "byArrival": "依抵達排序",
+      "unknownFrom": "來自 ？？？",
+      "unknownVillage": "未知村莊",
+      "colTarget": "目標村",
+      "colFrom": "來自",
+      "colCountdown": "倒數",
+      "colServer": "伺服器時間",
+      "colLocal": "本地時間",
+      "tableNote": "依抵達排序。時間以伺服器時間為主，旁邊附本地時間（時差從貼上的集結點或村莊頁自動算出）。"
+    },
+    "cpCard": {
+      "title": "開{{n}} · CP",
+      "go": "去算",
+      "perDay": "每天 +{{daily}}",
+      "days": "約 {{days}} 天",
+      "pendingNote": "{{n}}門檻 {{target}} 尚未在 ts11 確認，天數跟著標待驗證。",
+      "empty": "還沒填過目前 CP",
+      "enter": "去輸入",
+      "lastInput": "上次輸入：{{at}} · 只存在這台裝置"
+    },
+    "villageOrdinal": {
+      "2": "二村",
+      "3": "三村",
+      "4": "四村",
+      "5": "五村",
+      "6": "六村",
+      "7": "七村",
+      "8": "八村",
+      "9": "九村",
+      "10": "十村"
+    },
+    "pendingCard": {
+      "title": "待補資料",
+      "needsCoords": "來襲缺座標：{{village}}",
+      "noVillages": "還沒有村莊資料：貼「村莊總覽」"
+    },
+    "empty": {
+      "title": "先貼一頁遊戲畫面",
+      "subtitle": "貼一次集結點，就會開始幫你算來襲倒數。",
+      "stepsTitle": "三步開始",
+      "step1": "新增遊戲帳號",
+      "step1Done": "新增遊戲帳號",
+      "step1Detail": "部族、速度已設定 ·",
+      "step2": "貼「集結點」",
+      "step2Detail": "讀出來襲和部隊，首頁才會有來襲倒數",
+      "step3": "到『CP 與開村』填一次目前 CP",
+      "step3Detail": "首頁就會顯示開村倒數",
+      "previewTitle": "貼完後這裡會出現：",
+      "previewIncoming": "來襲倒數 · 最近一筆抵達時間",
+      "previewCp": "開村進度 · 在『CP 與開村』填過 CP 後顯示"
     }
   },
   "notFound": {
@@ -163,7 +270,7 @@
       "totalCost": "總成本",
       "buildTime": "建造時間",
       "population": "人口",
-      "culturePoints": "文化點",
+      "culturePoints": "CP",
       "effect": "效果"
     },
     "troops": {
@@ -222,7 +329,7 @@
       "baseTime": "基礎時間",
       "actualTime": "實際時間",
       "populationIncrease": "人口增加",
-      "culturePointsPerDay": "文化點增加（每日）",
+      "culturePointsPerDay": "CP 增加（每日）",
       "viewDetails": "查看各等級詳情",
       "selectPrompt": "請選擇建築和等級範圍後點擊計算",
       "levelRange": "Lv.{{from}} → Lv.{{to}}",
@@ -429,7 +536,8 @@
     "empty": "新增遊戲帳號後，這裡會出現它所在的世界。",
     "summary": "伺服器時差 {{offset}}",
     "change": "更改",
-    "collapse": "收合"
+    "collapse": "收合",
+    "derivedFromPage": "從貼上頁面上的伺服器時鐘自動算出；不對再按「更改」。"
   },
   "gameAccounts": {
     "title": "遊戲帳號管理",
@@ -930,7 +1038,7 @@
   },
   "confirm": {},
   "pathCalc": {
-    "title": "移動時間",
+    "title": "行軍時間",
     "intro": "算出部隊從一點走到另一點要多久。競技場只加快超過 20 格的那段路，每升一級快 20%。改數字時結果會立刻更新。",
     "inputs": "輸入",
     "results": "結果",
@@ -1054,5 +1162,50 @@
       "TRUNCATED_AT_EDGE": "被截圖邊緣切掉了，可以補截一張",
       "PARSE_ERROR": "這一欄讀不出來，請手動填"
     }
+  },
+  "time": {
+    "server": "伺服器",
+    "local": "本地",
+    "tomorrow": "（明天）"
+  },
+  "autofill": {
+    "label": "已帶入：",
+    "noAccount": "還沒有遊戲帳號，先用預設值（x1）。",
+    "addAccount": "新增遊戲帳號",
+    "change": "更改",
+    "done": "完成",
+    "thisPageOnly": "（這頁暫時改過）",
+    "offsetUnknown": "時差：貼一頁就會自動設好",
+    "offsetKnown": "時差 {{hours}} 小時（從貼上的頁面讀到）",
+    "unitPending": "兵種花費、糧耗、訓練時間尚未在 ts11 核對",
+    "unitPendingSpartan": "斯巴達速度待驗證",
+    "speed": "伺服器速度",
+    "tribe": "部族",
+    "village": "村莊",
+    "editNote": "只改這一頁，不會動到帳號設定；換頁就回到帳號的值。村莊會記住，下次預設用它。",
+    "manual": "已手動修改",
+    "restore": "還原",
+    "fromAccount": "帳號帶入"
+  },
+  "external": {
+    "heroRevive": "英雄復活",
+    "items": "道具清單",
+    "serverNews": "伺服器公告／版本",
+    "adventureDamage": "冒險扣血與獎勵",
+    "adventureLoot": "冒險掉寶",
+    "getterMap": "聯盟／玩家地圖",
+    "getterMapNote": "先開伺服器清單，再選你的伺服器",
+    "heroTracking": "英雄裝備變化追蹤",
+    "travcoDual": "travco 帳號與雙帳號邀請",
+    "travcoDualNote": "個人頁 → Dual membership invitations → 產生連結給隊友",
+    "opensNewTab": "開新分頁",
+    "leaveTitle": "即將離開 Travian Tools",
+    "leaveBody": "接下來會在新分頁打開 {{site}}。那不是本站，內容由對方維護。",
+    "leaveGo": "前往",
+    "intro": "只放連結，資料由對方網站維護；點了會先提示再開新分頁。"
+  },
+  "fields": {
+    "modeRoi": "一般村",
+    "modeCapital": "首都"
   }
 }

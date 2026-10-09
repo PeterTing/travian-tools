@@ -4,6 +4,8 @@ import PendingVerifyChip from '@/components/common/PendingVerifyChip';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
+import { CalcBar } from '@/components/autofill/CalcFrame'
+import Stepper from '@/components/common/Stepper'
 
 const fmtInt = (n: number) => Math.round(n).toLocaleString('en-US');
 
@@ -71,11 +73,12 @@ export default function CropSimCalculator() {
     <>
       <div className={s.intro}>
         {/* Table 1 reference numbers — see calculators.regression.test.ts */}
-        <h2>{lang === 'en' ? 'Crop Simulator' : '糧食模擬'}</h2>
+        <h2>{lang === 'en' ? 'Capital production' : '首都產量模擬'}</h2>
         <p>{lang === 'en'
           ? 'Estimates total capital production per hour (wood, clay, iron, and crop) with all bonuses. Compare 15c / 9c / 7c / 6c layouts. Plus +25% is multiplied on top of fields × (1 + bonus buildings + oasis).'
           : '估算首都每小時總產量（木、土、鐵、糧），可比較 15c／9c／7c／6c。算法：田產量 ×（1＋加成建築＋綠洲），有勾 Plus 再 ×1.25。'}</p>
       </div>
+      <CalcBar />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>
@@ -118,9 +121,14 @@ export default function CropSimCalculator() {
           </div>
 
           <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> Plus +25% gold</label>
-          <div className={s.field}>
-            <label>{lang === 'en' ? 'Egyptian Waterworks level (0 = not Egyptian)' : '埃及供水系統等級（不是埃及填 0）'}</label>
-            <input type="number" min={0} max={20} value={waterworks} onChange={e => setWaterworks(Math.max(0, Math.min(20, +e.target.value || 0)))} />
+          <div className="mb-3.5">
+            <Stepper
+              label={lang === 'en' ? 'Egyptian Waterworks level (0 = not Egyptian)' : '埃及供水系統等級（不是埃及填 0）'}
+              value={waterworks}
+              onChange={setWaterworks}
+              min={0}
+              max={20}
+            />
           </div>
           <p className="text-xs text-gray-500">
             <PendingVerifyChip />{' '}

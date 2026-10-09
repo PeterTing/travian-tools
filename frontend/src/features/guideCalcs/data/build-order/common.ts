@@ -348,7 +348,7 @@ export const common: BuildStep[] = [
   },
   {
     step: 34,
-    building: { zh: '文化點產量 50（任務）', en: 'Culture point production 50 task' },
+    building: { zh: 'CP 產量 50（任務）', en: 'Culture point production 50 task' },
     targetLevel: null,
     tier: 1,
     cost: null,

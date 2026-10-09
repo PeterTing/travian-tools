@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import {
   calculateTravelSeconds,
   distanceOnMap,
   formatTravelTime,
 } from '@/lib/travianFormulas'
-import CalcResultPanel from '@/features/guideCalcs/components/CalcResultPanel'
+import CalcResultPanel, { RESULT_PANEL_SPACE_CLASS } from '@/features/guideCalcs/components/CalcResultPanel'
+import { CalcBar } from '@/components/autofill/CalcFrame'
+import Stepper from '@/components/common/Stepper'
 
 /**
- * 移動時間（路徑）計算器 — 前端即時結果（S71 競技場公式與後端共用）。
+ * 行軍時間（路徑）計算器 — 前端即時結果（S71 競技場公式與後端共用）。
  * 版型：上方輸入、下方 sticky 結果；≥1024px 左右欄。
  */
 export default function PathCalculatorPage() {
@@ -25,12 +27,19 @@ export default function PathCalculatorPage() {
   const [artifact, setArtifact] = useState<'none' | 'unique_2x' | 'village_2x'>('none')
   const [serverSpeed, setServerSpeed] = useState(1)
 
-  const { currentAccount } = useCurrentAccount()
+  // 「已帶入」：伺服器速度跟帳號（或這頁的「更改」），出發座標用帶入的村莊
+  const fill = useAutoFill()
   useEffect(() => {
-    if (currentAccount?.server_speed) {
-      setServerSpeed(currentAccount.server_speed)
+    setServerSpeed(fill.speed)
+  }, [fill.speed])
+  const fillX = fill.village?.coordinate_x
+  const fillY = fill.village?.coordinate_y
+  useEffect(() => {
+    if (fillX != null && fillY != null) {
+      setStartX(fillX)
+      setStartY(fillY)
     }
-  }, [currentAccount?.server_speed])
+  }, [fillX, fillY])
 
   const result = useMemo(() => {
     const distance = distanceOnMap(startX, startY, targetX, targetY)
@@ -62,8 +71,9 @@ export default function PathCalculatorPage() {
         <h1 className="mb-2 text-xl font-semibold">{t('pathCalc.title')}</h1>
         <p className="text-sm text-muted-foreground">{t('pathCalc.intro')}</p>
       </div>
+      <CalcBar />
 
-      <div className="flex min-w-0 flex-col gap-4 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px)+11rem)] lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:pb-0">
+      <div className={`flex min-w-0 flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 ${RESULT_PANEL_SPACE_CLASS}`}>
         <div className="min-w-0 rounded-xl border bg-card p-4">
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-primary">
             {t('pathCalc.inputs')}
@@ -130,17 +140,9 @@ export default function PathCalculatorPage() {
             />
           </label>
 
-          <label className="mb-3 block text-xs text-muted-foreground">
-            {t('pathCalc.tsLevel')}
-            <input
-              type="number"
-              min={0}
-              max={20}
-              value={tsLevel}
-              onChange={(e) => setTsLevel(Number(e.target.value))}
-              className={`${inputCls} mt-1`}
-            />
-          </label>
+          <div className="mb-3">
+            <Stepper label={t('pathCalc.tsLevel')} value={tsLevel} onChange={setTsLevel} min={0} max={20} testId="path-ts-level" />
+          </div>
 
           <label className="mb-3 block text-xs text-muted-foreground">
             {t('pathCalc.heroBonus')}

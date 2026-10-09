@@ -5,6 +5,7 @@ import type {
   CropScouterRequest,
   CropScouterResponse,
 } from '@/services/advancedCalculatorApi'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 export default function CropScouterPage() {
   const [form, setForm] = useState<CropScouterRequest>({
@@ -43,6 +44,7 @@ export default function CropScouterPage() {
         輸入偵查到的對手每小時資源產量，估算其首都類型（15c / 9c / 7c / 6c /
         4446 / 3347）。以 crop-to-others 比例啟發式判斷。
       </p>
+      <CalcBar />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="border rounded-lg p-6">

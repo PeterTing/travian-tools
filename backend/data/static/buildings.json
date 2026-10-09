@@ -6714,7 +6714,7 @@
     },
     "palisade": {
       "building_id": "palisade",
-      "name_zh": "木柵欄",
+      "name_zh": "木牆",
       "name_en": "Palisade",
       "category": "defense",
       "max_level": 20,

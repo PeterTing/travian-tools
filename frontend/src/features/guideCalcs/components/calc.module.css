@@ -10,8 +10,22 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  /* Room for fixed result panel + bottom tabs on phone */
-  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 11rem);
+  /* Room for the fixed result panel on phone (bottom tabs are already padded by AppShell <main>) */
+  padding-bottom: calc(var(--calc-panel-h, 12rem) + 16px);
+}
+
+/*
+ * Same room for pages that lay out their own wrapper but use CalcResultPanel (e.g. 行軍時間).
+ * --calc-panel-h is the collapsed panel height, measured by CalcResultPanel on phone.
+ */
+.panelSpace {
+  padding-bottom: calc(var(--calc-panel-h, 12rem) + 16px);
+}
+
+@media (min-width: 1024px) {
+  .panelSpace {
+    padding-bottom: 0;
+  }
 }
 
 @media (min-width: 1024px) {

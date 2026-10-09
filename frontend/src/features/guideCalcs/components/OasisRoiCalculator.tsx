@@ -7,6 +7,7 @@ import PendingVerifyChip from '@/components/common/PendingVerifyChip';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const fmt = (n: number) => isFinite(n)
   ? (Math.abs(n) >= 1000 ? Math.round(n).toLocaleString('en-US') : n.toFixed(1).replace(/\.0$/, ''))
@@ -52,6 +53,7 @@ export default function OasisRoiCalculator() {
           ? "How many days until the Hero's Mansion that captured an oasis pays for itself. Mansion Lv 10 / 15 / 20 can hold 1 / 2 / 3 oases."
           : '算佔領綠洲所需的英雄宅要幾天回本。英雄宅 10／15／20 級分別可佔 1／2／3 塊綠洲。'}</p>
       </div>
+      <CalcBar />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>
@@ -101,7 +103,7 @@ export default function OasisRoiCalculator() {
           <div className={s.note}>
             {lang === 'en'
               ? 'This is for one oasis. For several, run once each, or set the combined oasis % in Field ROI.'
-              : '這裡只算一塊綠洲。若佔多塊，請分開算，或到「田地回本」把綠洲％加總。'}
+              : '這裡只算一塊綠洲。若佔多塊，請分開算，或到「資源田與首都規劃」把綠洲％加總。'}
           </div>
         </div>
 

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { NpcCalculatorRequest, NpcCalculatorResponse } from '@/services/advancedCalculatorApi'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const RESOURCE_KEYS = ['wood', 'clay', 'iron', 'crop'] as const
 type ResourceKey = (typeof RESOURCE_KEYS)[number]
@@ -57,6 +58,7 @@ export default function NpcCalculatorPage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">{t('calculator.npc.title')}</h1>
       <p className="text-muted-foreground mb-6">{t('calculator.npc.description')}</p>
+      <CalcBar />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="border rounded-lg p-6">

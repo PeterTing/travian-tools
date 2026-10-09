@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { PathSpeedTsRequest, PathSpeedTsResponse } from '@/services/advancedCalculatorApi'
+import { CalcBar } from '@/components/autofill/CalcFrame'
 
 export default function PathSpeedTsCalculatorPage() {
   const [form, setForm] = useState<PathSpeedTsRequest>({
@@ -57,6 +58,7 @@ export default function PathSpeedTsCalculatorPage() {
       <p className="text-muted-foreground mb-6">
         根據已知的攻擊者座標、目標座標和行進時間，反推可能的部隊速度和競技場等級組合。
       </p>
+      <CalcBar />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input */}

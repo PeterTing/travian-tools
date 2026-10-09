@@ -1,7 +1,7 @@
-import { formatCountdownSeconds } from '@/lib/formatCountdown'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import PasteFab, { PASTE_FAB_CLEARANCE } from '@/components/paste/PasteFab'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { OcrFailed } from '@/components/ocr/OcrFailed'
@@ -9,13 +9,18 @@ import { OcrBetaTag } from '@/components/ocr/OcrBetaTag'
 import { OcrRecognizing } from '@/components/ocr/OcrRecognizing'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
+import { isUnarrived, useAccountData } from '@/contexts/AccountDataContext'
+import CpCard from '@/components/home/CpCard'
+import IncomingCard from '@/components/home/IncomingCard'
+import TimePair from '@/components/home/TimePair'
+import { ROUTES } from '@/constants/routes'
 import {
   emptyPasteReasonKey,
   looksLikeHtml,
-  movementKindLabel,
   pageTypeLabel,
   PASTE_FORMAT_HELP,
 } from '@/lib/pasteFormat'
+import { displayOffsetHours, formatOffsetHours } from '@/lib/serverTime'
 import {
   formatRecentUploadLine,
   isSuccessfulSync,
@@ -28,19 +33,8 @@ import { syncApi, type SyncLog } from '@/services/syncApi'
 import { villageApi } from '@/services/villageApi'
 
 const RECENT_LIMIT = 5
-const ALL_VILLAGES = ''
-
-function incomingVillageStorageKey(accountId: string, worldId?: string | null): string {
-  return `tt:incomingVillage:${accountId}:${worldId || 'noworld'}`
-}
-
-function countdownLabel(arrivalAt: string | null | undefined, now: Date): string {
-  if (!arrivalAt) return '—'
-  const t = new Date(arrivalAt).getTime() - now.getTime()
-  if (Number.isNaN(t)) return '—'
-  if (t <= 0) return '已抵達'
-  return formatCountdownSeconds(Math.floor(t / 1000))
-}
+/** 來襲 3 筆以上：手機列出接下來幾筆、電腦改成全寬表格（設計稿「來襲中」） */
+const BUSY_INCOMING = 3
 
 type OcrState =
   | { phase: 'idle' }
@@ -71,6 +65,30 @@ export default function HomePage() {
   const { isAuthenticated } = useAuth()
   const { currentAccount, loading: accountLoading } = useCurrentAccount()
   const navigate = useNavigate()
+  const location = useLocation()
+  const accountData = useAccountData()
+  const pasteCardRef = useRef<HTMLDivElement | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  // 右下角「＋ 貼上」只在貼上卡已經捲到畫面上方、看不到時才出現：
+  // 貼上卡在畫面裡（或還在下面、往下捲就到）時不顯示，免得蓋住來襲／開村卡和貼上框
+  const [pasteCardScrolledPast, setPasteCardScrolledPast] = useState(false)
+  const [pasteCardEl, setPasteCardEl] = useState<HTMLDivElement | null>(null)
+  const setPasteCardNode = useCallback((el: HTMLDivElement | null) => {
+    pasteCardRef.current = el
+    setPasteCardEl(el)
+  }, [])
+  useEffect(() => {
+    if (!pasteCardEl || typeof IntersectionObserver === 'undefined') {
+      setPasteCardScrolledPast(false)
+      return
+    }
+    const io = new IntersectionObserver((entries) => {
+      const entry = entries[entries.length - 1]
+      if (entry) setPasteCardScrolledPast(!entry.isIntersecting && entry.boundingClientRect.bottom <= 0)
+    })
+    io.observe(pasteCardEl)
+    return () => io.disconnect()
+  }, [pasteCardEl])
 
   const [pasteText, setPasteText] = useState('')
   const [parsing, setParsing] = useState(false)
@@ -81,7 +99,6 @@ export default function HomePage() {
   const [villages, setVillages] = useState<
     { village_id: string; name: string; coordinate_x: number; coordinate_y: number }[]
   >([])
-  const [villageFilter, setVillageFilter] = useState<string>(ALL_VILLAGES)
   const [now, setNow] = useState(() => new Date())
   const [savedBanner, setSavedBanner] = useState('')
   const [ocr, setOcr] = useState<OcrState>({ phase: 'idle' })
@@ -90,13 +107,18 @@ export default function HomePage() {
   const fileInput = useRef<HTMLInputElement>(null)
 
   const accountId = currentAccount?.account_id ?? null
-  const worldId = currentAccount?.world_id ?? null
 
+  // 倒數每秒更新；沒有來襲時每 30 秒更新頁首的時鐘就好
   useEffect(() => {
-    if (!movements.length) return
-    const id = window.setInterval(() => setNow(new Date()), 1000)
+    const id = window.setInterval(() => setNow(new Date()), movements.length ? 1000 : 30_000)
     return () => window.clearInterval(id)
   }, [movements.length])
+
+  // 回到首頁（例如存完貼上）時，讓紅點和「已帶入」也重新讀一次
+  const reloadAccountData = accountData.reload
+  useEffect(() => {
+    void reloadAccountData()
+  }, [reloadAccountData])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -106,33 +128,6 @@ export default function HomePage() {
       window.history.replaceState({}, '', '/')
     }
   }, [])
-
-  // Restore village filter per account+world
-  useEffect(() => {
-    if (!accountId) {
-      setVillageFilter(ALL_VILLAGES)
-      return
-    }
-    try {
-      const key = incomingVillageStorageKey(accountId, worldId)
-      const stored = localStorage.getItem(key)
-      setVillageFilter(stored ?? ALL_VILLAGES)
-    } catch {
-      setVillageFilter(ALL_VILLAGES)
-    }
-  }, [accountId, worldId])
-
-  const persistVillageFilter = (value: string) => {
-    setVillageFilter(value)
-    if (!accountId) return
-    try {
-      const key = incomingVillageStorageKey(accountId, worldId)
-      if (!value) localStorage.removeItem(key)
-      else localStorage.setItem(key, value)
-    } catch {
-      /* ignore quota */
-    }
-  }
 
   const villageNameById = useMemo(() => {
     const map = new Map<string, string>()
@@ -146,14 +141,12 @@ export default function HomePage() {
       return
     }
     try {
-      const res = await pasteApi.listMovements(accountId, {
-        villageId: villageFilter || null,
-      })
-      setMovements(res.movements)
+      const res = await pasteApi.listMovements(accountId)
+      setMovements(res.movements ?? [])
     } catch {
       setMovements([])
     }
-  }, [accountId, villageFilter])
+  }, [accountId])
 
   const reloadRecent = useCallback(async () => {
     if (!accountId) {
@@ -192,14 +185,18 @@ export default function HomePage() {
     }
   }, [accountId])
 
+  // 三樣都讀完才決定要不要顯示空狀態，免得畫面跳來跳去
+  const [loaded, setLoaded] = useState(false)
   useEffect(() => {
-    void reloadMovements()
-  }, [reloadMovements])
-
-  useEffect(() => {
-    void reloadRecent()
-    void reloadVillages()
-  }, [reloadRecent, reloadVillages])
+    let cancelled = false
+    setLoaded(false)
+    void Promise.all([reloadMovements(), reloadRecent(), reloadVillages()]).then(() => {
+      if (!cancelled) setLoaded(true)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [reloadMovements, reloadRecent, reloadVillages])
 
   const runParse = async (raw: string) => {
     if (!currentAccount) {
@@ -351,6 +348,52 @@ export default function HomePage() {
     }
   }
 
+  // 桌機：首頁直接按 Ctrl＋V 也能貼（焦點不在輸入框時）
+  const runParseRef = useRef(runParse)
+  runParseRef.current = runParse
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const target = e.target as HTMLElement | null
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return
+      const text = e.clipboardData?.getData('text/html') || e.clipboardData?.getData('text/plain') || ''
+      if (!text.trim()) return
+      e.preventDefault()
+      setPasteText(text)
+      void runParseRef.current(text)
+    }
+    document.addEventListener('paste', onPaste)
+    return () => document.removeEventListener('paste', onPaste)
+  }, [])
+
+  const focusPaste = useCallback(() => {
+    pasteCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    textareaRef.current?.focus({ preventScroll: true })
+  }, [])
+
+  // 頂列「＋ 貼上」連到 /#paste
+  useEffect(() => {
+    if (location.hash === '#paste') focusPaste()
+  }, [location.hash, focusPaste])
+
+  const villageName = useCallback(
+    (id: string | null | undefined) => {
+      if (!id) return t('home.incomingCard.unknownVillage')
+      const v = villages.find((x) => x.village_id === id)
+      if (!v) return t('home.incomingCard.unknownVillage')
+      return `${v.name} (${v.coordinate_x}|${v.coordinate_y})`
+    },
+    [villages, t],
+  )
+
+  const unarrived = useMemo(() => movements.filter((m) => isUnarrived(m, now)), [movements, now])
+  const needsCoords = useMemo(() => movements.filter((m) => m.needs_coords && isUnarrived(m, now)), [movements, now])
+  const utcOffset = accountData.world?.utc_offset ?? null
+  const offsetHours = displayOffsetHours(utcOffset)
+  const busy = unarrived.length >= BUSY_INCOMING
+  const isEmpty =
+    (!currentAccount && !accountLoading) || (loaded && !recentLogs.length && !villages.length && !movements.length)
+  const latestLog = recentLogs[0]
+
   if (!isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-10 max-w-lg text-center space-y-4">
@@ -363,36 +406,15 @@ export default function HomePage() {
     )
   }
 
-  return (
-    <div className="container mx-auto px-4 py-6 max-w-lg space-y-6">
-      {savedBanner && (
-        <div
-          className="rounded-md border border-green-300 bg-green-50 text-green-900 text-sm px-3 py-2"
-          data-testid="saved-banner"
-        >
-          {savedBanner}
-          <button
-            type="button"
-            className="ml-3 underline"
-            onClick={() => setSavedBanner('')}
-          >
-            關閉
-          </button>
-        </div>
-      )}
-
+  const pasteCard = (
+    <div ref={setPasteCardNode} className="scroll-mt-20" id="paste">
       <Card data-testid="paste-home">
-        <CardHeader>
-          <CardTitle className="text-xl">貼上遊戲頁面</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            在遊戲裡全選、複製，貼到這裡就好。工具會自己判斷是哪一種頁面。
-          </p>
-          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-            <span className="rounded-full border px-2 py-0.5">集結點</span>
-            <span className="rounded-full border px-2 py-0.5">戰報</span>
-            <span className="rounded-full border px-2 py-0.5">村莊總覽</span>
-            <span className="rounded-full border px-2 py-0.5">更多之後加</span>
-          </div>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex flex-wrap items-center gap-2 text-lg">
+            {t('home.pasteCard.title')}
+            <OcrBetaTag />
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">{t('home.pasteCard.hint')}</p>
         </CardHeader>
         <CardContent className="space-y-3">
           <input
@@ -405,11 +427,7 @@ export default function HomePage() {
             onChange={(e) => void onScreenshots(e.target.files)}
           />
           {ocr.phase === 'recognizing' ? (
-            <OcrRecognizing
-              previews={ocr.previews}
-              startedAt={ocr.startedAt}
-              onCancel={cancelOcr}
-            />
+            <OcrRecognizing previews={ocr.previews} startedAt={ocr.startedAt} onCancel={cancelOcr} />
           ) : (
             <>
               {ocr.phase === 'failed' && (
@@ -424,8 +442,9 @@ export default function HomePage() {
                 />
               )}
               <textarea
-                className="w-full min-h-[140px] rounded-md border bg-background p-3 text-sm"
-                placeholder="把遊戲頁面貼在這裡…"
+                ref={textareaRef}
+                className="w-full min-h-[120px] rounded-md border bg-background p-3 text-sm"
+                placeholder={t('home.pasteCard.placeholder')}
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
                 data-testid="paste-textarea"
@@ -477,128 +496,212 @@ export default function HomePage() {
               。
             </p>
           )}
-        </CardContent>
-      </Card>
-
-      <Card data-testid="recent-uploads">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">{t('home.recentUploads.title')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {!recentLogs.length ? (
-            <p
-              className="text-sm text-muted-foreground py-3"
-              data-testid="recent-uploads-empty"
-            >
-              {t('home.recentUploads.empty')}
-            </p>
-          ) : (
-            <ul className="divide-y rounded-md border" data-testid="recent-uploads-list">
-              {recentLogs.map((log) => {
-                const when = formatRelativeLabel(
-                  relativeAgo(log.completed_at || log.started_at, now),
-                  t,
-                )
-                const line = formatRecentUploadLine(
-                  log,
-                  log.village_id ? villageNameById.get(log.village_id) : null,
-                )
-                return (
-                  <li
-                    key={log.log_id}
-                    className="px-3 py-2 text-sm flex justify-between gap-2"
-                    data-testid="recent-upload-row"
-                  >
-                    <span className="min-w-0 truncate">{line}</span>
-                    <span className="text-xs text-muted-foreground shrink-0">{when}</span>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card data-testid="incoming-list">
-        <CardHeader>
-          <div className="flex items-center gap-2 flex-wrap">
-            <CardTitle className="text-lg">來襲列表</CardTitle>
-            {villages.length > 0 && (
-              <label
-                className="ml-auto inline-flex items-center rounded-full border bg-background py-1 pl-3 pr-2 text-sm"
-                data-testid="incoming-village-filter"
-              >
-                <span className="text-muted-foreground">
-                  {t('home.incoming.villageFilter')}
+          <div data-testid="recent-uploads" className="border-t pt-2 text-xs text-muted-foreground">
+            {latestLog ? (
+              <p data-testid="recent-upload-row" className="flex flex-wrap gap-x-1">
+                <span>{t('home.recentUploads.latest')}</span>
+                <span className="min-w-0 break-words">
+                  {formatRecentUploadLine(latestLog, latestLog.village_id ? villageNameById.get(latestLog.village_id) : null)}
                 </span>
-                <select
-                  className="cursor-pointer bg-transparent pr-1 font-medium outline-none max-w-[9rem]"
-                  value={villageFilter}
-                  onChange={(e) => persistVillageFilter(e.target.value)}
-                  aria-label={t('home.incoming.villageFilter')}
-                >
-                  <option value={ALL_VILLAGES}>{t('home.incoming.allVillages')}</option>
-                  {villages.map((v) => (
-                    <option key={v.village_id} value={v.village_id}>
-                      {v.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                <span>· {formatRelativeLabel(relativeAgo(latestLog.completed_at || latestLog.started_at, now), t)}</span>
+              </p>
+            ) : (
+              <p data-testid="recent-uploads-empty">{t('home.recentUploads.empty')}</p>
             )}
           </div>
-          <p className="text-sm text-muted-foreground">
-            依抵達時間排序，倒數每秒更新。資料來自最後一次存入的集結點。
-          </p>
-        </CardHeader>
-        <CardContent>
-          {!movements.length ? (
-            <p className="text-sm text-muted-foreground py-4">還沒有來襲。貼上集結點後會出現在這裡。</p>
-          ) : (
-            <ul className="divide-y rounded-md border">
-              {movements.map((m) => (
-                <li key={m.movement_id} className="px-3 py-2 text-sm flex justify-between gap-2">
-                  <div>
-                    <div className="font-medium">
-                      {movementKindLabel(m.kind)}{' '}
-                      <span className="font-normal text-muted-foreground">
-                        {m.coordinate_x != null && m.coordinate_y != null
-                          ? `(${m.coordinate_x}|${m.coordinate_y})`
-                          : m.role || '？？？'}
-                      </span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      抵達{' '}
-                      {m.arrival_at
-                        ? new Date(m.arrival_at).toLocaleString('zh-TW', {
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit',
-                            hour12: false,
-                          })
-                        : '—'}
-                      {' · '}
-                      剩 {countdownLabel(m.arrival_at, now)}
-                    </div>
-                  </div>
-                  {m.needs_coords ? (
-                    <Link
-                      className="text-amber-700 text-xs shrink-0 underline"
-                      to={`/paste/movement/${m.movement_id}`}
-                    >
-                      待補
-                    </Link>
-                  ) : (
-                    <span className="text-xs text-muted-foreground shrink-0">完整</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
         </CardContent>
       </Card>
+    </div>
+  )
+
+  const pendingItems = [
+    ...needsCoords.map((m) => ({
+      key: m.movement_id,
+      to: `/paste/movement/${m.movement_id}`,
+      text: t('home.pendingCard.needsCoords', { village: villageName(m.village_id) }),
+    })),
+    ...(currentAccount && villages.length === 0
+      ? [{ key: 'no-villages', to: '#paste', text: t('home.pendingCard.noVillages') }]
+      : []),
+  ]
+  const pendingCard =
+    pendingItems.length > 0 ? (
+      <section className="rounded-xl border bg-background p-4 shadow-sm" data-testid="pending-card">
+        <h2 className="text-base font-semibold">
+          {t('home.pendingCard.title')}{' '}
+          <span className="rounded-full bg-amber-100 px-2 text-sm text-amber-800">{pendingItems.length}</span>
+        </h2>
+        <ul className="mt-2 divide-y rounded-md border">
+          {pendingItems.map((item) => (
+            <li key={item.key}>
+              {item.to.startsWith('#') ? (
+                <button
+                  type="button"
+                  onClick={focusPaste}
+                  className="flex min-h-[44px] w-full items-center justify-between px-3 text-left text-sm hover:bg-muted"
+                >
+                  {item.text} <span aria-hidden="true">›</span>
+                </button>
+              ) : (
+                <Link to={item.to} className="flex min-h-[44px] items-center justify-between px-3 text-sm hover:bg-muted">
+                  {item.text} <span aria-hidden="true">›</span>
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : null
+
+  const cpCard = (
+    <CpCard
+      accountId={accountId}
+      villageCount={villages.length || currentAccount?.village_count || 1}
+      speed={currentAccount?.server_speed ?? 1}
+    />
+  )
+
+  const showFab = !isEmpty && pasteCardScrolledPast
+
+  const incomingCard =
+    unarrived.length > 0 ? (
+      <IncomingCard movements={unarrived} villageName={villageName} utcOffset={utcOffset} now={now} busy={busy} />
+    ) : null
+
+  return (
+    <div
+      className={`mx-auto w-full max-w-lg space-y-4 px-4 py-4 lg:max-w-[1080px] lg:px-6 lg:py-6 ${isEmpty ? '' : PASTE_FAB_CLEARANCE}`}
+      data-testid="home-root"
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h1 className="text-xl font-bold">{isEmpty ? t('home.empty.title') : t('home.todayTitle')}</h1>
+        {!isEmpty && (
+          <span className="text-xs text-muted-foreground" data-testid="home-clock">
+            <TimePair date={now} utcOffset={utcOffset} now={now} inline />
+          </span>
+        )}
+      </div>
+
+      {savedBanner && (
+        <div
+          className="rounded-md border border-green-300 bg-green-50 text-green-900 text-sm px-3 py-2"
+          data-testid="saved-banner"
+        >
+          {savedBanner}
+          <button type="button" className="ml-3 underline" onClick={() => setSavedBanner('')}>
+            關閉
+          </button>
+        </div>
+      )}
+
+      {isEmpty && <p className="text-sm text-muted-foreground">{t('home.empty.subtitle')}</p>}
+
+      {/*
+        卡片都是同一層的兄弟，順序固定（貼上卡不會因為換版面被重新建立，打到一半的字不會不見）；
+        版面用 order／欄位決定：
+        - 空狀態：貼上全寬置頂，下面左「三步開始」、右「貼完後會出現」
+        - 來襲中（3 筆以上）：來襲全寬，下面開村和貼上並排，最後待補
+        - 方案 A：來襲 → 開村 → 貼上 → 待補；電腦左主欄（來襲、開村）＋右欄（貼上、待補）
+      */}
+      <div
+        className={`grid grid-cols-1 gap-4 lg:grid-cols-12 ${
+          isEmpty || busy ? '' : `lg:items-start ${incomingCard ? 'lg:grid-rows-[auto_1fr]' : ''}`
+        }`}
+        data-testid={isEmpty ? 'home-empty' : busy ? 'home-busy' : 'home-normal'}
+      >
+        {isEmpty && (
+        <section className="order-2 rounded-xl border bg-background p-4 lg:col-span-6" data-testid="home-steps">
+          <h2 className="text-base font-semibold">{t('home.empty.stepsTitle')}</h2>
+          <ol className="mt-2 space-y-3 text-sm">
+            <li className="flex gap-3">
+              <span
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${
+                  currentAccount ? 'bg-green-600 text-white' : 'bg-muted'
+                }`}
+              >
+                {currentAccount ? '✓' : '1'}
+              </span>
+              <span className="min-w-0">
+                {currentAccount ? (
+                  <>
+                    <span className="block font-medium">{t('home.empty.step1Done')}</span>
+                    <span className="block text-xs text-muted-foreground">
+                      {currentAccount.server_name || currentAccount.server_url} · {t('home.empty.step1Detail')}{' '}
+                      {offsetHours == null
+                        ? t('autofill.offsetUnknown')
+                        : t('autofill.offsetKnown', { hours: formatOffsetHours(offsetHours) })}
+                    </span>
+                  </>
+                ) : (
+                  <Link to={ROUTES.GAME_ACCOUNTS_NEW} className="font-medium text-orange-700 underline">
+                    {t('home.empty.step1')}
+                  </Link>
+                )}
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs">2</span>
+              <span className="min-w-0">
+                <span className="block font-medium">{t('home.empty.step2')}</span>
+                <span className="block text-xs text-muted-foreground">{t('home.empty.step2Detail')}</span>
+              </span>
+            </li>
+            <li>
+              <Link
+                to="/calculator/passive-cp"
+                className="-mx-2 flex min-h-[44px] gap-3 rounded-md px-2 py-1 hover:bg-muted"
+                data-testid="home-step3-cp"
+              >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs">3</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium">{t('home.empty.step3')}</span>
+                  <span className="block text-xs text-muted-foreground">{t('home.empty.step3Detail')}</span>
+                </span>
+                <span aria-hidden className="self-center text-orange-600">›</span>
+              </Link>
+            </li>
+          </ol>
+        </section>
+        )}
+        {!isEmpty && incomingCard && (
+          <div className={`order-1 min-w-0 lg:self-start ${busy ? 'lg:col-span-12' : 'lg:col-span-7 lg:col-start-1 lg:row-start-1'}`}>
+            {incomingCard}
+          </div>
+        )}
+        {!isEmpty && (
+          <div
+            className={`order-2 min-w-0 lg:self-start ${
+              busy ? 'lg:col-span-6' : `lg:col-span-7 lg:col-start-1 ${incomingCard ? 'lg:row-start-2' : 'lg:row-start-1'}`
+            }`}
+          >
+            {cpCard}
+          </div>
+        )}
+        <div
+          className={`min-w-0 ${
+            isEmpty ? 'order-1 lg:col-span-12' : busy ? 'order-3 lg:col-span-6' : `order-3 lg:col-span-5 lg:col-start-8 lg:row-start-1 ${incomingCard ? 'lg:row-span-2' : ''}`
+          }`}
+        >
+          {pasteCard}
+        </div>
+        {!isEmpty && pendingCard && (
+          <div className={`order-4 min-w-0 ${busy ? 'lg:col-span-12' : `lg:col-span-5 lg:col-start-8 ${incomingCard ? 'lg:row-start-3' : 'lg:row-start-2'}`}`}>
+            {pendingCard}
+          </div>
+        )}
+        {isEmpty && (
+        <section className="order-3 rounded-xl border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground lg:col-span-6" data-testid="home-preview">
+          <h2 className="text-base font-semibold text-foreground">{t('home.empty.previewTitle')}</h2>
+          <ul className="mt-2 space-y-2">
+            <li className="rounded-md border bg-background/60 px-3 py-2">{t('home.empty.previewIncoming')}</li>
+            <li className="rounded-md border bg-background/60 px-3 py-2">{t('home.empty.previewCp')}</li>
+          </ul>
+        </section>
+        )}
+      </div>
+
+      {/* 手機：右下角浮動「＋ 貼上」（電腦在頂列） */}
+      {showFab && <PasteFab onClick={focusPaste} />}
     </div>
   )
 }
