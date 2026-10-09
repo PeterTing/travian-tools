@@ -25,7 +25,11 @@
     "yes": "是",
     "no": "否",
     "error": "錯誤",
-    "success": "成功"
+    "success": "成功",
+    "pendingVerify": "待驗證",
+    "pendingVerifyNote": "這個數值還沒在遊戲裡實測確認",
+    "pendingVerifyCostNote": "花費還沒在遊戲裡實測確認",
+    "pendingVerifyTimeNote": "建造時間還沒在遊戲裡實測確認"
   },
   "nav": {
     "title": "Travian Tools",

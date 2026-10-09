@@ -4,7 +4,7 @@ Covers:
 - POST /api/v1/advanced-calculator/village-builder
 - POST /api/v1/advanced-calculator/crop-scouter
 - POST /api/v1/advanced-calculator/ts-optimizer
-- POST /api/v1/advanced-calculator/fake-troops
+- POST /api/v1/advanced-calculator/fake-troops（已下架，確認回 404/405）
 """
 
 from fastapi.testclient import TestClient
@@ -99,10 +99,10 @@ class TestTsOptimizerAPI:
         assert r.status_code == 422
 
 
-class TestFakeTroopsAPI:
-    """Fake Troops endpoint tests."""
+class TestFakeTroopsRetired:
+    """佯攻兵量（自編 5% 算法）已下架；之後照攻略規則併進 OP 規劃重寫。"""
 
-    def test_happy_path(self) -> None:
+    def test_endpoint_removed(self) -> None:
         payload = {
             "target_population": 500,
             "attacker_tribe": "romans",
@@ -110,20 +110,4 @@ class TestFakeTroopsAPI:
             "include_rams": True,
         }
         r = client.post("/api/v1/advanced-calculator/fake-troops", json=payload)
-        assert r.status_code == 200
-        body = r.json()
-        assert body["min_infantry"] > 0
-        assert body["min_catapults"] > 0
-
-    def test_no_catapults(self) -> None:
-        payload = {
-            "target_population": 500,
-            "attacker_tribe": "teutons",
-            "include_catapults": False,
-            "include_rams": False,
-        }
-        r = client.post("/api/v1/advanced-calculator/fake-troops", json=payload)
-        assert r.status_code == 200
-        body = r.json()
-        assert body["min_catapults"] == 0
-        assert body["min_rams"] == 0
+        assert r.status_code in (404, 405)

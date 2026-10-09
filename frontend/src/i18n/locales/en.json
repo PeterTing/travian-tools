@@ -25,7 +25,11 @@
     "yes": "Yes",
     "no": "No",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "pendingVerify": "Unverified",
+    "pendingVerifyNote": "Not yet confirmed in the game",
+    "pendingVerifyCostNote": "Cost not yet confirmed in the game",
+    "pendingVerifyTimeNote": "Build time not yet confirmed in the game"
   },
   "home": {
     "title": "Travian Tools",

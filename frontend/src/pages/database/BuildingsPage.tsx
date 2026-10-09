@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { buildingsApi } from '@/services/gameApi'
 import type { BuildingListItem, BuildingDetail, BuildingCategory } from '@/types/game'
+import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import { isPending } from '@/data/gameData'
 
 const CATEGORY_VALUES: (BuildingCategory | 'all')[] = [
   'all',
@@ -174,6 +176,17 @@ export default function BuildingsPage() {
                       )
                     })}
                   </div>
+                </div>
+              )}
+
+              {(isPending(selectedBuilding.building_id, 'cost') || isPending(selectedBuilding.building_id, 'time')) && (
+                <div className="mb-2 flex flex-col gap-1" data-testid="building-pending">
+                  {isPending(selectedBuilding.building_id, 'cost') && (
+                    <PendingVerifyChip withNote note={t('common.pendingVerifyCostNote')} />
+                  )}
+                  {isPending(selectedBuilding.building_id, 'time') && (
+                    <PendingVerifyChip withNote note={t('common.pendingVerifyTimeNote')} />
+                  )}
                 </div>
               )}
 

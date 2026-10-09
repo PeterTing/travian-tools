@@ -53,8 +53,8 @@ Defender with continuous Great Celebrations + Tablet of Law:
 
 ## Great Celebration (defense-grade anti-conquest)
 
-- **Small Celebration**: 6,400 wood / 6,650 clay / 4,000 iron / 9,000 crop → 24 h, +500 CP
-- **Great Celebration**: 16,000 / 17,000 / 12,000 / 28,000 → 60 h, +2,000 CP, requires Town Hall Lv 10
+- **Small Celebration**: 6,400 / 6,650 / 5,940 / 1,340 (crop 待 ts11 驗證) → 24 h at Town Hall 1, CP = that village's daily CP (cap 500 on x1)
+- **Great Celebration**: 29,700 / 33,250 / 32,000 / 6,700 (待 ts11 驗證), CP = whole account's daily CP (cap 2,000 on x1), requires Town Hall Lv 10
 - **Tablet of Law** hero item: instant +5% loyalty
 
 Costs scale with server speed.

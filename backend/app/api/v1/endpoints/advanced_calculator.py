@@ -7,8 +7,6 @@ from app.domain.schemas.advanced_calculator import (
     CropScouterResponse,
     CulturePointsRequest,
     CulturePointsResponse,
-    FakeTroopsRequest,
-    FakeTroopsResponse,
     InterceptionRequest,
     InterceptionResponse,
     NpcCalculatorRequest,
@@ -113,12 +111,3 @@ async def calculate_ts_optimizer(
     """攻擊 TS 優化器 — 多個攻擊者對同一目標同步抵達時間."""
     service = get_advanced_calculator_service()
     return service.calculate_ts_optimizer(request)
-
-
-@router.post("/fake-troops", response_model=FakeTroopsResponse)
-async def calculate_fake_troops(
-    request: FakeTroopsRequest,
-) -> FakeTroopsResponse:
-    """佯攻部隊計算器 — 計算看起來像真打的最小兵量."""
-    service = get_advanced_calculator_service()
-    return service.calculate_fake_troops(request)

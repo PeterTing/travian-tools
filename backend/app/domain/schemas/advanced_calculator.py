@@ -348,29 +348,3 @@ class TsOptimizerResponse(BaseModel):
     target_arrival: str
     results: list[TsOptimizerResult]
     warnings: list[str] = Field(default_factory=list)
-
-
-# ============ Fake Troops Calculator (佯攻部隊計算器) ============
-
-
-class FakeTroopsRequest(BaseModel):
-    """佯攻部隊計算器請求."""
-
-    target_population: int = Field(..., ge=0, description="目標村莊人口")
-    attacker_tribe: str = Field(
-        ...,
-        description="攻擊者部族：'romans','teutons','gauls','huns','egyptians','spartans','vikings'",
-    )
-    include_catapults: bool = Field(True, description="是否包含催化彈（真打標配）")
-    include_rams: bool = Field(True, description="是否包含破城槌")
-
-
-class FakeTroopsResponse(BaseModel):
-    """佯攻部隊計算器回應."""
-
-    min_infantry: int
-    min_cavalry: int
-    min_catapults: int
-    min_rams: int
-    total_population_cost: int
-    reasoning: str

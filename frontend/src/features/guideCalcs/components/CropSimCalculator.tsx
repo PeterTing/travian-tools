@@ -1,10 +1,54 @@
 import { useState, useMemo } from 'react';
 import { CROPPER_LAYOUTS, FIELD_PRODUCTION, type CropperId, type ResourceType } from '../data/travian';
+import PendingVerifyChip from '@/components/common/PendingVerifyChip';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
 
 const fmtInt = (n: number) => Math.round(n).toLocaleString('en-US');
+
+export interface CropSimInput {
+  layoutId: CropperId;
+  fieldLevel: number;
+  bonus: { saw: number; bri: number; fnd: number; mil: number; bak: number };
+  oasis: Record<ResourceType, number>; // percent
+  gold: boolean;
+  /** Egyptian Waterworks level (0 = not Egyptian). +5% oasis bonus per level — 待驗證 */
+  waterworks: number;
+}
+
+/**
+ * Capital production per hour.
+ * production = fields × base × (1 + bonus buildings + oasis) × 1.25 (Plus gold, multiplied last)
+ * This reproduces the small travian guide's Table 1 (non-Egyptian) cell by cell.
+ * Gold multiplied vs added has no official statement yet → 待 ts11 開 Plus 實測.
+ */
+export function cropSim(input: CropSimInput) {
+  const layout = CROPPER_LAYOUTS.find(l => l.id === input.layoutId)!;
+  const base = FIELD_PRODUCTION[input.fieldLevel] ?? 0;
+  const goldMult = input.gold ? 1.25 : 1;
+  const ww = 1 + Math.max(0, Math.min(20, input.waterworks)) * 0.05;
+  const bbPct: Record<ResourceType, number> = {
+    wood: input.bonus.saw * 0.05,
+    clay: input.bonus.bri * 0.05,
+    iron: input.bonus.fnd * 0.05,
+    crop: (input.bonus.mil + input.bonus.bak) * 0.05,
+  };
+  const oPct: Record<ResourceType, number> = {
+    wood: (input.oasis.wood / 100) * ww,
+    clay: (input.oasis.clay / 100) * ww,
+    iron: (input.oasis.iron / 100) * ww,
+    crop: (input.oasis.crop / 100) * ww,
+  };
+  const counts: Record<ResourceType, number> = { wood: layout.wood, clay: layout.clay, iron: layout.iron, crop: layout.crop };
+  const totals: Record<ResourceType, number> = { wood: 0, clay: 0, iron: 0, crop: 0 };
+  const rows = (['wood', 'clay', 'iron', 'crop'] as ResourceType[]).map(t => {
+    const total = counts[t] * base * (1 + bbPct[t] + oPct[t]) * goldMult;
+    totals[t] = total;
+    return { t, n: counts[t], base, bb: bbPct[t], oa: oPct[t], total };
+  });
+  return { rows, totals };
+}
 
 export default function CropSimCalculator() {
   const { lang } = useLang();
@@ -13,36 +57,12 @@ export default function CropSimCalculator() {
   const [bonus, setBonus] = useState({ saw: 5, bri: 5, fnd: 5, mil: 5, bak: 5 });
   const [oasis, setOasis] = useState({ wood: 0, clay: 0, iron: 0, crop: 150 });
   const [gold, setGold] = useState(true);
-  const [egypt, setEgypt] = useState(false);
+  const [waterworks, setWaterworks] = useState(0);
 
-  const result = useMemo(() => {
-    const layout = CROPPER_LAYOUTS.find(l => l.id === layoutId)!;
-    const base = FIELD_PRODUCTION[flv] ?? 0;
-    const goldPct = gold ? 0.25 : 0;
-
-    const bbPct: Record<ResourceType, number> = {
-      wood: bonus.saw * 0.05,
-      clay: bonus.bri * 0.05,
-      iron: bonus.fnd * 0.05,
-      crop: (bonus.mil + bonus.bak) * 0.05,
-    };
-    const oPct: Record<ResourceType, number> = {
-      wood: oasis.wood / 100,
-      clay: oasis.clay / 100,
-      iron: oasis.iron / 100,
-      crop: (oasis.crop / 100) * (egypt ? 1.35 : 1.0),
-    };
-    const counts: Record<ResourceType, number> = { wood: layout.wood, clay: layout.clay, iron: layout.iron, crop: layout.crop };
-
-    const totals: Record<ResourceType, number> = { wood: 0, clay: 0, iron: 0, crop: 0 };
-    const rows = (['wood', 'clay', 'iron', 'crop'] as ResourceType[]).map(t => {
-      const mult = 1 + bbPct[t] + oPct[t] + goldPct;
-      const total = counts[t] * base * mult;
-      totals[t] = total;
-      return { t, n: counts[t], base, bb: bbPct[t], oa: oPct[t], total };
-    });
-    return { rows, totals };
-  }, [layoutId, flv, bonus, oasis, gold, egypt]);
+  const result = useMemo(
+    () => cropSim({ layoutId, fieldLevel: flv, bonus, oasis, gold, waterworks }),
+    [layoutId, flv, bonus, oasis, gold, waterworks],
+  );
 
   const nonCrop = result.totals.wood + result.totals.clay + result.totals.iron;
   const total = nonCrop + result.totals.crop;
@@ -53,8 +73,8 @@ export default function CropSimCalculator() {
         {/* Table 1 reference numbers — see calculators.regression.test.ts */}
         <h2>{lang === 'en' ? 'Crop Simulator' : '糧食模擬'}</h2>
         <p>{lang === 'en'
-          ? 'Estimates total capital production per hour (wood, clay, iron, and crop) with all bonuses. Compare 15c / 9c / 7c / 6c layouts. Egyptian Waterworks multiplies crop-oasis bonus by 1.35. Plus gold bonus is included when checked.'
-          : '估算首都每小時總產量（木、土、鐵、糧），可比較 15c／9c／7c／6c。埃及人的供水系統會讓糧綠洲加成再乘 1.35；有勾選 Plus 時一併算進去。'}</p>
+          ? 'Estimates total capital production per hour (wood, clay, iron, and crop) with all bonuses. Compare 15c / 9c / 7c / 6c layouts. Plus +25% is multiplied on top of fields × (1 + bonus buildings + oasis).'
+          : '估算首都每小時總產量（木、土、鐵、糧），可比較 15c／9c／7c／6c。算法：田產量 ×（1＋加成建築＋綠洲），有勾 Plus 再 ×1.25。'}</p>
       </div>
 
       <div className={s.wrapper}>
@@ -98,7 +118,16 @@ export default function CropSimCalculator() {
           </div>
 
           <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> Plus +25% gold</label>
-          <label className={s.check}><input type="checkbox" checked={egypt} onChange={e => setEgypt(e.target.checked)} /> {lang === 'en' ? 'Egyptian (Waterworks ×1.35)' : '埃及人（供水系統 ×1.35）'}</label>
+          <div className={s.field}>
+            <label>{lang === 'en' ? 'Egyptian Waterworks level (0 = not Egyptian)' : '埃及供水系統等級（不是埃及填 0）'}</label>
+            <input type="number" min={0} max={20} value={waterworks} onChange={e => setWaterworks(Math.max(0, Math.min(20, +e.target.value || 0)))} />
+          </div>
+          <p className="text-xs text-gray-500">
+            <PendingVerifyChip />{' '}
+            {lang === 'en'
+              ? 'Plus ×1.25 multiplied (not added) and Waterworks +5% oasis bonus per level are not yet confirmed in-game.'
+              : 'Plus 用乘的（不是加的）、供水系統每級綠洲加成 +5%，都還沒在遊戲裡實測確認。'}
+          </p>
         </div>
 
         <CalcResultPanel
@@ -154,15 +183,15 @@ export default function CropSimCalculator() {
               <th>75%</th>
             </tr></thead>
             <tbody>
-              <tr><td>1-1-1-15</td><td>136,500</td><td>126,000</td><td>105,000</td><td>94,500</td></tr>
+              <tr><td>1-1-1-15</td><td>136,500</td><td>126,000</td><td>115,500*</td><td>105,000*</td></tr>
               <tr><td>3-3-3-9</td><td>107,100</td><td>100,800</td><td>94,500</td><td>88,200</td></tr>
               <tr><td>3-4-4-7</td><td>97,300</td><td>92,400</td><td>87,500</td><td>82,600</td></tr>
             </tbody>
           </table>
           <div className={s.note}>
             {lang === 'en'
-              ? 'All cells assume Lv 18 fields + all bonus buildings (Lv 5) + Plus +25% + Egyptian Waterworks. Columns = crop-oasis bonus tier: 150% = 3× 50% crop oases, 125% / 100% = fewer oases (or Waterworks inactive), 75% = minimal. Numbers are 1x-speed crop /hr. Toggle "Egyptian" + pick layout + set crop oasis in the calculator to reproduce any cell.'
-              : '所有儲存格：Lv 18 田 + 全加成建築（Lv 5）+ Plus +25% + 埃及人供水系統（Waterworks）。欄位 = 糧綠洲加成層級：150% = 3 塊 50% 糧綠洲、125% / 100% = 綠洲較少（或供水系統未啟動）、75% = 最少。數字為 1x 速每小時糧產。計算器打開「埃及人」+ 選配置 + 設定糧綠洲加成即可重現任一格。'}
+              ? 'From the small travian guide, Table 1 — NOT Egyptian. Total production of all four resources per hour (x1): Lv 18 fields, all bonus buildings Lv 5, Plus ×1.25 multiplied last. Columns = crop-oasis bonus (150% = three 50% crop oases). * The guide prints 105,000 / 94,500 for these two cells; recomputing every cell with the same formula gives 115,500 / 105,000, so we show the recomputed value. Set layout + crop oasis % above to reproduce any cell.'
+              : '出自 small travian guide 表 1，不是埃及。數字是四種資源合計的每小時總產量（x1）：田 18 級、加成建築全 5 級、Plus ×1.25 乘在最後。欄位＝糧綠洲加成（150%＝3 塊 50% 糧綠洲）。* 這兩格原表寫 105,000／94,500，用同一套公式逐格重算應為 115,500／105,000，這裡顯示重算值。在上面選配置、填糧綠洲％就能重現任一格。'}
           </div>
         </CalcResultPanel>
       </div>

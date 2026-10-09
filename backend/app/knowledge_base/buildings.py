@@ -337,8 +337,19 @@ BUILDINGS_DATA = {
         "description": "舉辦慶典獲得文化點",
         "requirements": ["主建築 10級", "研究院 10級"],
         "celebrations": {
-            "small": {"cp": 500, "cost": 6650, "requirement": "1級"},
-            "great": {"cp": 2000, "cost": 29700, "requirement": "10級"},
+            # CP＝每日 CP 產量（小：本村；大：全帳號），cp 欄是 x1 上限
+            "small": {
+                "cp": 500,
+                "cp_rule": "本村每日 CP 產量，x1 上限 500",
+                "cost": 20330,
+                "requirement": "1級",
+            },
+            "great": {
+                "cp": 2000,
+                "cp_rule": "全帳號每日 CP 產量，x1 上限 2000",
+                "cost": 101650,
+                "requirement": "10級",
+            },
         },
     },
     "residence": {

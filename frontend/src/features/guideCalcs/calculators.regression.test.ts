@@ -104,7 +104,7 @@ describe('fieldTotalCost — reference costs', () => {
 // HM cost regression: L20 must be 326110, NOT 249170 (the pre-fix buggy
 // value). Anything 249k-ish means the earlier off-by-level bug regressed.
 // =========================================================================
-describe('OasisRoi — Hero\'s Mansion cumulative cost (kirilloid T4)', () => {
+describe('OasisRoi — Hero\'s Mansion cumulative cost (T4 formula)', () => {
   it('hmCumulativeCost(0) = 0', () => {
     expect(hmCumulativeCost(0)).toBe(0);
   });

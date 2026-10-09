@@ -3,6 +3,7 @@ import {
   CROPPER_LAYOUTS, OASIS_TYPES, FIELD_PRODUCTION,
   hmCumulativeCost, type CropperId, type ResourceType,
 } from '../data/travian';
+import PendingVerifyChip from '@/components/common/PendingVerifyChip';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
@@ -114,7 +115,12 @@ export default function OasisRoiCalculator() {
               : `每天 +${fmt(dailyGain)} · 英雄宅成本 ${fmt(hmCumulativeCost(hm))}`
           }
         >
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'HM cumulative cost' : '英雄宅累積成本'}</span><span className={s.value}>{fmt(hmCumulativeCost(hm))}</span></div>
+          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'HM cumulative cost' : '英雄宅累積成本'} <PendingVerifyChip /></span><span className={s.value}>{fmt(hmCumulativeCost(hm))}</span></div>
+          <p className="mb-2 text-xs text-gray-500" data-testid="hm-pending-note">
+            {lang === 'en'
+              ? 'Not yet confirmed in-game (T4 cost 80/120/70/90, ×1.33 per level)'
+              : '這個數值還沒在遊戲裡實測確認（英雄宅花費用 T4 數值 80/120/70/90，每級 ×1.33）'}
+          </p>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /hr from this oasis' : '此綠洲每小時產量'}</span><span className={s.value}>+{fmt(dailyGain / 24)}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /day' : '每天'}</span><span className={s.value}>+{fmt(dailyGain)}</span></div>
 

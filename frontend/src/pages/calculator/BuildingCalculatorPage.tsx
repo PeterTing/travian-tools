@@ -3,6 +3,8 @@ import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { buildingsApi, calculatorApi } from '@/services/gameApi'
+import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import { isPending } from '@/data/gameData'
 import type {
   BuildingListItem,
   BuildingUpgradeRequest,
@@ -206,6 +208,11 @@ export default function BuildingCalculatorPage() {
               {/* Resource cost */}
               <div>
                 <h4 className="font-medium mb-2">{t('calculator.building.totalResources')}</h4>
+                {isPending(result.building_id, 'cost') && (
+                  <div className="mb-2" data-testid="calc-pending-cost">
+                    <PendingVerifyChip withNote note={t('common.pendingVerifyCostNote')} />
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="p-2 bg-amber-50 dark:bg-amber-950 rounded">
                     <span className="text-amber-700 dark:text-amber-300">
@@ -253,6 +260,11 @@ export default function BuildingCalculatorPage() {
               {/* Time */}
               <div>
                 <h4 className="font-medium mb-2">{t('calculator.building.buildTime')}</h4>
+                {isPending(result.building_id, 'time') && (
+                  <div className="mb-2" data-testid="calc-pending-time">
+                    <PendingVerifyChip withNote note={t('common.pendingVerifyTimeNote')} />
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="p-2 bg-muted rounded">
                     <span className="text-muted-foreground">

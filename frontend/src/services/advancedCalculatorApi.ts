@@ -228,24 +228,6 @@ export interface TsOptimizerResponse {
   warnings: string[]
 }
 
-// ============ Fake Troops Calculator ============
-
-export interface FakeTroopsRequest {
-  target_population: number
-  attacker_tribe: string
-  include_catapults: boolean
-  include_rams: boolean
-}
-
-export interface FakeTroopsResponse {
-  min_infantry: number
-  min_cavalry: number
-  min_catapults: number
-  min_rams: number
-  total_population_cost: number
-  reasoning: string
-}
-
 // ============ API Client ============
 
 export const advancedCalculatorApi = {
@@ -306,13 +288,6 @@ export const advancedCalculatorApi = {
     request: TsOptimizerRequest
   ): Promise<TsOptimizerResponse> => {
     const response = await api.post('/advanced-calculator/ts-optimizer', request)
-    return response.data
-  },
-
-  calculateFakeTroops: async (
-    request: FakeTroopsRequest
-  ): Promise<FakeTroopsResponse> => {
-    const response = await api.post('/advanced-calculator/fake-troops', request)
     return response.data
   },
 }
