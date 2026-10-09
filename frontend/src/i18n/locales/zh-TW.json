@@ -32,7 +32,8 @@
     "verifiedTs11": "已在 ts11 實測",
     "cancel": "取消",
     "decrease": "減少",
-    "increase": "增加"
+    "increase": "增加",
+    "pendingVerifyHint": "ⓘ"
   },
   "nav": {
     "title": "Travian Tools",
@@ -210,7 +211,7 @@
       "go": "去算",
       "perDay": "每天 +{{daily}}",
       "days": "約 {{days}} 天",
-      "pendingNote": "{{n}}門檻 {{target}} 尚未在 ts11 確認，天數跟著標待驗證。",
+      "pendingNote": "{{n}}門檻 {{target}} 還沒在 ts11 確認，天數跟著標待驗證。",
       "empty": "還沒填過目前 CP",
       "enter": "去輸入",
       "lastInput": "上次輸入：{{at}} · 只存在這台裝置"
@@ -286,7 +287,21 @@
       "consumption": "耗糧",
       "details": "詳細資料",
       "trainingCost": "訓練成本",
-      "efficiency": "效率分析"
+      "efficiency": "效率分析",
+      "category": {
+        "infantry": "步兵",
+        "cavalry": "騎兵",
+        "siege": "攻城",
+        "scout": "偵查",
+        "special": "特殊",
+        "settler": "移民"
+      },
+      "trainingBuilding": {
+        "barracks": "兵營",
+        "stable": "馬廄",
+        "workshop": "工場",
+        "residence": "行宮"
+      }
     },
     "resources": {
       "title": "資源田數據庫",
@@ -1177,7 +1192,7 @@
     "thisPageOnly": "（這頁暫時改過）",
     "offsetUnknown": "時差：貼一頁就會自動設好",
     "offsetKnown": "時差 {{hours}} 小時（從貼上的頁面讀到）",
-    "unitPending": "兵種花費、糧耗、訓練時間尚未在 ts11 核對",
+    "unitPending": "兵種花費、糧耗、訓練時間還沒在 ts11 核對",
     "unitPendingSpartan": "斯巴達速度待驗證",
     "speed": "伺服器速度",
     "tribe": "部族",
@@ -1207,5 +1222,67 @@
   "fields": {
     "modeRoi": "一般村",
     "modeCapital": "首都"
+  },
+  "pendingNotes": {
+    "units": {
+      "what": "兵種花費、糧耗、訓練時間還沒在 ts11 遊戲內核對。",
+      "source": "目前用的是社群整理的數字，可能有誤差。"
+    },
+    "autofillUnits": {
+      "what": "兵種花費、糧耗、訓練時間還沒在 ts11 遊戲內核對，目前用的是社群整理的數字。",
+      "source": "斯巴達速度取自官方說明頁（頁面標示數字來自第三方計算器），反推 TS 不會算斯巴達兵種。"
+    },
+    "spartanSpeed": {
+      "what": "斯巴達速度還沒在 ts11 遊戲內核對，反推 TS 不會算斯巴達兵種。",
+      "source": "斯巴達速度只有官方說明頁的數字，頁面標示取自第三方計算器；攻城槌、弩砲、監察官、移民目前沒有可靠來源。"
+    },
+    "unitSpeedOfficialPending": {
+      "what": "斯巴達速度只有官方說明頁的數字，頁面標示取自第三方計算器。",
+      "source": "反推 TS 不會算斯巴達兵種。"
+    },
+    "unitSpeedNoSource": {
+      "what": "這個兵種的速度目前沒有可靠來源，先留空。",
+      "source": "反推 TS 不會算斯巴達兵種。"
+    },
+    "building": {
+      "what": "建築數值還沒在 ts11 遊戲內核對。",
+      "source": "目前用的數字來源還在查，可能有誤差。"
+    },
+    "cpThreshold": {
+      "what": "開村 CP 門檻還沒在 ts11 遊戲內核對。",
+      "source": "目前用公式推算，可能有誤差。"
+    },
+    "celebration": {
+      "what": "小慶典的糧和大慶典的花費還沒在 ts11 城鎮廳頁確認。",
+      "source": "小慶典的糧目前用的是開局試算表的數字；大慶典的花費來源還在查。"
+    },
+    "heroMansionCost": {
+      "what": "英雄宅的花費還沒在 ts11 遊戲內核對。",
+      "source": "目前用的數字來源還在查，可能有誤差。"
+    },
+    "cropSim": {
+      "what": "Plus 用乘的（×1.25）、埃及供水系統每級綠洲加成 +5%，都還沒在 ts11 遊戲內核對。",
+      "source": "目前照社群攻略的公式算，沒有官方說明。"
+    },
+    "merchantCapacity": {
+      "what": "商人容量和速度還沒在 ts11 遊戲內核對。",
+      "source": "目前用的是社群 wiki 的數字，可能有誤差。"
+    },
+    "unitCarry": {
+      "what": "兵種攜帶量還沒在 ts11 遊戲內核對。",
+      "source": "目前用的是社群整理的數字，可能有誤差。"
+    },
+    "plusFormula": {
+      "what": "Plus 加成的算法還沒在 ts11 遊戲內核對。",
+      "source": "這頁用加總算，產量模擬和綠洲用相乘算，結果可能不一樣。"
+    },
+    "fieldHighLevel": {
+      "what": "資源田 4 級以上的花費、時間，和 3 級以上的產量是公式推算。",
+      "source": "ts11 只核對過花費 1–3 級、產量 0–2 級。"
+    },
+    "launchSim": {
+      "what": "開局花費是試算表每一步的加總，含派對（用小慶典的糧）。",
+      "source": "這些數字還沒在 ts11 遊戲內核對。"
+    }
   }
 }

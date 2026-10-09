@@ -2,7 +2,9 @@ import { useState, useMemo } from 'react';
 import { fieldRoi, FIELD_COSTS, type ResourceType } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
-import CalcResultPanel from './CalcResultPanel';
+import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
+import type { PendingKind } from '@/lib/pendingNotes';
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const TYPE_LABELS: Record<ResourceType, { zh: string; en: string }> = {
@@ -29,6 +31,18 @@ export default function FieldRoiCalculator() {
     return fieldRoi(type, level, opts);
   }, [type, level, bonus, oasis, gold]);
   const breakdown = FIELD_COSTS[type][level - 1];
+  // 待驗證（PM 2026-10-10）：
+  // - fieldHighLevel：ts11 只核對過資源田花費 1–3 級、產量 0–2 級；4 級以上花費、3 級以上產量是公式推算
+  // - plusFormula：這頁 Plus 用加總（1 + 加成建築 + 綠洲 + 0.25），產量模擬和綠洲用相乘；先不統一（P0-18 D05）
+  // - building：加成建築（鋸木廠等）的 % 還沒核對
+  const costKinds: PendingKind[] = level >= 4 ? ['fieldHighLevel'] : [];
+  const prodKinds: PendingKind[] = [
+    ...(level >= 3 ? ['fieldHighLevel' as const] : []),
+    ...(gold ? ['plusFormula' as const] : []),
+    ...(bonus > 0 ? ['building' as const] : []),
+  ];
+  // 一行一個灰標，依數字在這一行出現的順序：先「成本」、再「每天 +」（同一種只列一次）
+  const lineKinds: PendingKind[] = [...new Set<PendingKind>([...costKinds, ...prodKinds])];
 
   const compareRows = useMemo(() => {
     const opts = { goldBonus: gold ? 0.25 : 0, bonusBuildingPct: bonus, oasisPct: oasis };
@@ -108,14 +122,18 @@ export default function FieldRoiCalculator() {
           title={lang === 'en' ? 'Result' : '結果'}
           primary={<>{result.roiDays.toFixed(2)} {lang === 'en' ? 'days' : '天'}</>}
           secondary={
-            lang === 'en'
-              ? `Cost ${fmt(result.cost)} · +${fmt(result.productionGainPerDay)}/day`
-              : `成本 ${fmt(result.cost)} · 每天 +${fmt(result.productionGainPerDay)}`
+            // 回本天數就是這一行兩個數字相除：灰標放這一行（標題不重複放）
+            <SummaryPending kinds={lineKinds} testId="field-roi-summary">
+              {lang === 'en'
+                ? `Cost ${fmt(result.cost)} · +${fmt(result.productionGainPerDay)}/day`
+                : `成本 ${fmt(result.cost)} · 每天 +${fmt(result.productionGainPerDay)}`}
+            </SummaryPending>
           }
         >
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Upgrade cost (total)' : '升級成本（合計）'}</span><span className={s.value}>{fmt(result.cost)}</span></div>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Production gain /hr' : '每小時產量增加'}</span><span className={s.value}>+{fmt(result.productionGainPerHour)}</span></div>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Production gain /day' : '每天產量增加'}</span><span className={s.value}>+{fmt(result.productionGainPerDay)}</span></div>
+          {/* 明細有用到待驗證資料的數字都跟著灰標（PM 規則）；PendingRow 在沒灰標時跟一般列一樣 */}
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Upgrade cost (total)' : '升級成本（合計）'}{costKinds.length ? <> <PendingVerifyChip kinds={costKinds} /></> : null}</span><span className={s.value}>{fmt(result.cost)}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Production gain /hr' : '每小時產量增加'}{prodKinds.length ? <> <PendingVerifyChip kinds={prodKinds} /></> : null}</span><span className={s.value}>+{fmt(result.productionGainPerHour)}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Production gain /day' : '每天產量增加'}{prodKinds.length ? <> <PendingVerifyChip kinds={prodKinds} /></> : null}</span><span className={s.value}>+{fmt(result.productionGainPerDay)}</span></PendingRow>
 
           <div className={s.note}>
             {lang === 'en' ? 'Cost breakdown (W / C / I / Cr): ' : '成本拆解 (木 / 土 / 鐵 / 糧)：'}
@@ -123,11 +141,18 @@ export default function FieldRoiCalculator() {
           </div>
 
           <h4>{lang === 'en' ? 'Same level, all four resources' : '同等級四種資源比較'}</h4>
-          <table className={s.table}>
-            <thead><tr><th>{lang === 'en' ? 'Type' : '類型'}</th><th>{lang === 'en' ? 'Cost' : '成本'}</th><th>Δ /day</th><th>ROI ({lang === 'en' ? 'days' : '天'})</th></tr></thead>
+          <table className={`${s.table} ${s.tapRows}`} data-testid="field-roi-compare">
+            <thead>
+              <PendingRow as="tr" className="h-11" tableColSpan={4}>
+                <th>{lang === 'en' ? 'Type' : '類型'}</th>
+                {/* 一行一個灰標：成本欄、Δ/day 欄的待驗證資料依欄位順序 */}
+                <th>{lang === 'en' ? 'Cost' : '成本'}{lineKinds.length ? <> <PendingVerifyChip kinds={lineKinds} /></> : null}</th>
+                <th>Δ /day</th><th>ROI ({lang === 'en' ? 'days' : '天'})</th>
+              </PendingRow>
+            </thead>
             <tbody>
               {compareRows.map(({ t: t2, r, best }) => (
-                <tr key={t2} className={best ? s.tableRowHi : ''}>
+                <tr key={t2} className={`h-11 ${best ? s.tableRowHi : ''}`}>
                   <td>{t(TYPE_LABELS[t2])}</td>
                   <td>{fmt(r.cost)}</td>
                   <td>{fmt(r.productionGainPerDay)}</td>

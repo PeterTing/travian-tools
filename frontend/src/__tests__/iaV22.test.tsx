@@ -171,7 +171,7 @@ describe('IA v2.2', () => {
       const line = screen.getByTestId('autofill-unit-pending')
       // 兩行、沒有分號；灰標在最前面，兩行都掛在灰標右邊（同一個文字欄）
       expect(line).not.toHaveTextContent('；')
-      expect(screen.getByTestId('autofill-unit-pending-line1')).toHaveTextContent(/^兵種花費、糧耗、訓練時間尚未在 ts11 核對$/)
+      expect(screen.getByTestId('autofill-unit-pending-line1')).toHaveTextContent(/^兵種花費、糧耗、訓練時間還沒在 ts11 核對$/)
       expect(screen.getByTestId('autofill-unit-pending-line2')).toHaveTextContent(/^斯巴達速度待驗證$/)
       const chip = within(line).getByTestId('pending-verify-chip')
       expect(chip).toHaveTextContent('待驗證')
@@ -181,6 +181,18 @@ describe('IA v2.2', () => {
       expect(text).toContainElement(screen.getByTestId('autofill-unit-pending-line1'))
       expect(text).toContainElement(screen.getByTestId('autofill-unit-pending-line2'))
       expect(line).toHaveClass('flex')
+    })
+
+    it('the 已帶入 chip uses the two-line autofillUnits copy (one chip governs both lines)', () => {
+      renderBar('/calculator/path')
+      const line = screen.getByTestId('autofill-unit-pending')
+      fireEvent.click(within(line).getByTestId('pending-verify-chip'))
+      expect(screen.getByTestId('pending-note-what')).toHaveTextContent(
+        /^兵種花費、糧耗、訓練時間還沒在 ts11 遊戲內核對，目前用的是社群整理的數字。$/,
+      )
+      expect(screen.getByTestId('pending-note-source')).toHaveTextContent(
+        /^斯巴達速度取自官方說明頁（頁面標示數字來自第三方計算器），反推 TS 不會算斯巴達兵種。$/,
+      )
     })
 
     it('「更改」 and the editor selects are at least 44px tall', () => {

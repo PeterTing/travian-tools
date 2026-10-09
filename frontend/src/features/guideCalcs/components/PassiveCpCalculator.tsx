@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { cpAtLevel, type CpBuilding } from '../data/travian'
 import {
   SERVER_SPEEDS, villageRequirements, startCp, celebrationCap, celebrationCp, celebration,
-  isVillageCpVerified, buildingName, type ServerSpeed, type CelebrationKind,
+  isVillageCpVerified, isBuildingVerified, buildingName, type ServerSpeed, type CelebrationKind,
 } from '../../../data/gameData'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import Stepper from '@/components/common/Stepper'
 import AutoFillBar, { AutoFillHint } from '@/components/autofill/AutoFillBar'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
@@ -174,6 +174,11 @@ export default function PassiveCpCalculator() {
 
   // 只算建築：遊戲沒有空村基礎產量（ts11：各棟 CP 加總＝遊戲顯示的 12／天）
   const total = useMemo(() => villageDailyCp(levels), [levels])
+  // 每日 CP 用到還沒在 ts11 核對的建築數值（等級 > 0 的建築裡有沒標 ✓ 的）→ 摘要標題旁放灰標
+  const usesUnverifiedBuilding = useMemo(
+    () => FIELDS.some(f => (levels[f.id] ?? 0) > 0 && f.ids.some(id => !isBuildingVerified(id))),
+    [levels],
+  )
 
   const breakdown = useMemo(() => FIELDS.map(f => ({
     label: fieldLabel(f, en),
@@ -194,7 +199,6 @@ export default function PassiveCpCalculator() {
   const great = celebration('great')
   const capSmall = celebrationCap('small', speed)
   const capGreat = celebrationCap('great', speed)
-  const anyUnverified = cd.rows.some(r => !r.verified)
 
   return (
     <>
@@ -291,6 +295,7 @@ export default function PassiveCpCalculator() {
         <CalcResultPanel
           lang={lang}
           title={en ? 'Daily passive CP' : '每日被動 CP'}
+          titlePending={usesUnverifiedBuilding ? 'building' : false}
           primary={<>{total} / {en ? 'day' : '天'}</>}
           secondary={mode === 'none'
             ? (en ? 'Buildings only; there is no empty-village base' : '只算建築，遊戲沒有空村基礎產量')
@@ -299,7 +304,8 @@ export default function PassiveCpCalculator() {
               : `辦一場${mode === 'small' ? '小' : '大'}慶典：+${cd.perCelebration} CP（上限 ${mode === 'small' ? capSmall : capGreat}）`)}
         >
           <h4>{en ? 'Days to reach village #N' : '開村門檻所需天數'}</h4>
-          <table className={s.table} data-testid="cp-countdown">
+          {/* 每一列至少 44px、數字垂直置中：灰標的 44px 點擊範圍剛好等於這一列，不會蓋到上一列的灰標 */}
+          <table className={`${s.table} ${s.tapRows}`} data-testid="cp-countdown">
             <thead>
               <tr>
                 <th>#</th>
@@ -310,55 +316,37 @@ export default function PassiveCpCalculator() {
             </thead>
             <tbody>
               {cd.rows.map(r => (
-                <tr key={r.village}>
+                <PendingRow as="tr" className="h-11" tableColSpan={4} key={r.village}>
                   <td>#{r.village}</td>
                   <td>
                     {r.required.toLocaleString()}
-                    {!r.verified && <> <PendingVerifyChip /></>}
+                    {!r.verified && <> <PendingVerifyChip kind="cpThreshold" /></>}
                   </td>
                   <td>{fmtDays(r.daysPassive)}</td>
                   <td>{fmtDays(r.daysWithCelebration)}</td>
-                </tr>
+                </PendingRow>
               ))}
             </tbody>
           </table>
-          {anyUnverified && (
-            <p className="mb-3 mt-1" data-testid="cp-countdown-note">
-              <PendingVerifyChip
-                withNote
-                note={en
-                  ? 'Not yet confirmed in-game (only village 2 on x1, 2,000, is)'
-                  : '這個數值還沒在遊戲裡實測確認（只有 x1 第 2 村 2,000 確認過）'}
-              />
-            </p>
-          )}
 
           <h4>{en ? 'Celebration cost (x1)' : '慶典花費（x1）'}</h4>
-          <table className={s.table} data-testid="cp-celebration-cost">
+          <table className={`${s.table} ${s.tapRows}`} data-testid="cp-celebration-cost">
             <thead>
               <tr><th>{en ? 'Type' : '種類'}</th><th>{en ? 'Wood / Clay / Iron' : '木／泥／鐵'}</th><th>{en ? 'Crop' : '糧'}</th></tr>
             </thead>
             <tbody>
-              <tr>
+              <PendingRow as="tr" className="h-11" tableColSpan={3}>
                 <td>{en ? 'Small' : '小慶典'}</td>
                 <td>{small.cost.slice(0, 3).map(n => n.toLocaleString()).join(' / ')}</td>
-                <td>{small.cost[3].toLocaleString()}{small.pending.length > 0 && <> <PendingVerifyChip /></>}</td>
-              </tr>
-              <tr>
-                <td>{en ? 'Great' : '大慶典'}{great.pending.includes('cost') && <> <PendingVerifyChip /></>}</td>
+                <td>{small.cost[3].toLocaleString()}{small.pending.length > 0 && <> <PendingVerifyChip kind="celebration" /></>}</td>
+              </PendingRow>
+              <PendingRow as="tr" className="h-11" tableColSpan={3}>
+                <td>{en ? 'Great' : '大慶典'}{great.pending.includes('cost') && <> <PendingVerifyChip kind="celebration" /></>}</td>
                 <td>{great.cost.slice(0, 3).map(n => n.toLocaleString()).join(' / ')}</td>
                 <td>{great.cost[3].toLocaleString()}</td>
-              </tr>
+              </PendingRow>
             </tbody>
           </table>
-          <p className="mb-3 mt-1" data-testid="cp-celebration-note">
-            <PendingVerifyChip
-              withNote
-              note={en
-                ? 'Not yet confirmed in-game (small-celebration crop may be 500)'
-                : '這個數值還沒在遊戲裡實測確認（小慶典的糧也可能是 500）'}
-            />
-          </p>
 
           <h4>{en ? 'Top contributors' : '最大貢獻建築'}</h4>
           <table className={s.table}>

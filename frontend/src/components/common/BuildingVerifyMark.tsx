@@ -15,14 +15,13 @@ export default function BuildingVerifyMark({ buildingId, className = '' }: Build
       <span
         data-testid="verified-mark"
         className={`ml-1 align-middle text-sm text-green-600 ${className}`}
-        title={t('common.verifiedTs11')}
         aria-label={t('common.verifiedTs11')}
       >
         ✓
       </span>
     )
   }
-  return <PendingVerifyChip className={`ml-1 ${className}`} />
+  return <PendingVerifyChip className={`ml-1 ${className}`} kind="building" />
 }
 
 /** 頁首一行灰字：除標 ✓ 的建築外，數值皆未在 ts11 實測 */

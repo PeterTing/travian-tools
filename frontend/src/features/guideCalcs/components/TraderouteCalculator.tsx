@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react';
 import { MERCHANTS, merchantCapacity, type TribeId } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
-import CalcResultPanel from './CalcResultPanel';
+import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
 
@@ -60,8 +61,12 @@ export default function TraderouteCalculator() {
           <h4>{lang === 'en' ? 'Setup' : '基本'}</h4>
 
           <div className={s.field}>
-            <label>{lang === 'en' ? 'Tribe' : '部族'}</label>
-            <select value={tribe} onChange={e => setTribe(e.target.value as TribeId)}>
+            {/* 選項裡有商人容量和速度：灰標放在欄位名稱旁（不放進 label，免得點名稱變成點灰標） */}
+            <PendingRow className="flex min-h-11 items-center gap-1">
+              <label htmlFor="traderoute-tribe">{lang === 'en' ? 'Tribe' : '部族'}</label>
+              <PendingVerifyChip kind="merchantCapacity" />
+            </PendingRow>
+            <select id="traderoute-tribe" value={tribe} onChange={e => setTribe(e.target.value as TribeId)}>
               {Object.entries(MERCHANTS).map(([id, m]) => {
                 const zhNames: Record<string, string> = {
                   romans: '羅馬人', gauls: '高盧人', teutons: '日耳曼人',
@@ -100,27 +105,37 @@ export default function TraderouteCalculator() {
           title={lang === 'en' ? 'Merchants needed' : '所需商人'}
           primary={<>{totalLabel}</>}
           secondary={
-            lang === 'en'
-              ? `Cap ${fmtInt(cap)} · round trip ${fmtHr(roundTrip)}`
-              : `容量 ${fmtInt(cap)} · 往返 ${fmtHr(roundTrip)}`
+            // 所需商人、容量、往返都用同一份社群 wiki 的商人容量和速度：只在第二行放一個灰標，標題不重複（PM 去重）
+            <SummaryPending kind="merchantCapacity" testId="traderoute-summary">
+              {lang === 'en'
+                ? `Cap ${fmtInt(cap)} · round trip ${fmtHr(roundTrip)}`
+                : `容量 ${fmtInt(cap)} · 往返 ${fmtHr(roundTrip)}`}
+            </SummaryPending>
           }
         >
           <h4>{lang === 'en' ? 'Merchant specs' : '商人規格'}</h4>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Capacity per merchant (incl. Trade Office)' : '每商人容量（含交易所）'}</span><span className={s.value}>{fmtInt(cap)}</span></div>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Speed' : '速度'}</span><span className={s.value}>{speed} {lang === 'en' ? 'tiles/hr' : '格/小時'}</span></div>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way / round trip' : '單程 / 往返'}</span><span className={s.value}>{fmtHr(oneWay)} / {fmtHr(roundTrip)}</span></div>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Capacity per merchant (incl. Trade Office)' : '每商人容量（含交易所）'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={s.value}>{fmtInt(cap)}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Speed' : '速度'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={s.value}>{speed} {lang === 'en' ? 'tiles/hr' : '格/小時'}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way / round trip' : '單程 / 往返'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={s.value}>{fmtHr(oneWay)} / {fmtHr(roundTrip)}</span></PendingRow>
 
           <h4>{lang === 'en' ? 'Merchants needed (1 hour cycle)' : '所需商人（每小時送完）'}</h4>
-          <table className={s.table}>
-            <thead><tr><th>{lang === 'en' ? 'Resource' : '資源'}</th><th>/ hr</th><th>{lang === 'en' ? 'Trips/hr' : '次數'}</th><th>{lang === 'en' ? 'Dedicated' : '常駐'}</th></tr></thead>
+          {/* 次數用商人容量、常駐也用往返時間（速度）算：表頭放一個灰標；每列 44px、垂直置中 */}
+          <table className={`${s.table} ${s.tapRows}`} data-testid="traderoute-table">
+            <thead>
+              <PendingRow as="tr" className="h-11" tableColSpan={4}>
+                <th>{lang === 'en' ? 'Resource' : '資源'}</th><th>/ hr</th>
+                <th>{lang === 'en' ? 'Trips/hr' : '次數'} <PendingVerifyChip kind="merchantCapacity" /></th>
+                <th>{lang === 'en' ? 'Dedicated' : '常駐'}</th>
+              </PendingRow>
+            </thead>
             <tbody>
               {rows.map(r => (
-                <tr key={r.t}><td>{r.label}</td><td>{fmtInt(r.sur)}</td><td>{r.tripsHr.toFixed(2)}</td><td>{r.dedicated.toFixed(2)}</td></tr>
+                <tr key={r.t} className="h-11"><td>{r.label}</td><td>{fmtInt(r.sur)}</td><td>{r.tripsHr.toFixed(2)}</td><td>{r.dedicated.toFixed(2)}</td></tr>
               ))}
             </tbody>
           </table>
 
-          <div className={s.row} style={{ marginTop: 12 }}><span className={s.label}>{lang === 'en' ? 'Total merchants' : '總商人'}</span><span className={`${s.value} ${s.highlight}`}>{totalLabel}</span></div>
+          <PendingRow className={s.row} style={{ marginTop: 12 }}><span className={s.label}>{lang === 'en' ? 'Total merchants' : '總商人'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={`${s.value} ${s.highlight}`}>{totalLabel}</span></PendingRow>
 
           <div className={s.note}>
             {lang === 'en'

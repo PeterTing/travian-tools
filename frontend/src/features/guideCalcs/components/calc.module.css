@@ -16,7 +16,7 @@
 
 /*
  * Same room for pages that lay out their own wrapper but use CalcResultPanel (e.g. 行軍時間).
- * --calc-panel-h is the collapsed panel height, measured by CalcResultPanel on phone.
+ * --calc-panel-h is the panel's current height (collapsed or expanded), measured by CalcResultPanel on phone.
  */
 .panelSpace {
   padding-bottom: calc(var(--calc-panel-h, 12rem) + 16px);
@@ -201,6 +201,13 @@
 .table th {
   color: hsl(var(--muted-foreground));
   font-weight: 500;
+}
+
+/* 有「待驗證」灰標的表：每一列至少 44px（列上加 h-11），內容垂直置中；
+   灰標的 44px 點擊範圍剛好落在自己這一列，不會蓋到上一列或下一列 */
+.tapRows td,
+.tapRows th {
+  vertical-align: middle;
 }
 
 .best {
@@ -410,6 +417,13 @@
 
 .details[hidden] {
   display: none;
+}
+
+/* 結果面板明細的每一列至少 44px、垂直置中（有沒有灰標都一樣）：
+   相鄰兩列都有「待驗證」灰標時，44px 點擊範圍只落在自己這一列（P0-17 幕僚長規則） */
+.details .row {
+  min-height: 2.75rem;
+  align-items: center;
 }
 
 @media (min-width: 1024px) {

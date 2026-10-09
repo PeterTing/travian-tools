@@ -37,6 +37,19 @@ describe('BuildingsPage ts11 verification marks', () => {
     expect(within(st).queryByTestId('verified-mark')).toBeNull()
   })
 
+  it('list: every name line is at least 44px and vertically centred (chip hit area stays on its own line), with or without a chip', async () => {
+    render(<BuildingsPage />)
+    await screen.findByText('馬廄')
+    const lines = screen.getAllByTestId('building-list-name')
+    expect(lines).toHaveLength(2)
+    for (const l of lines) expect(l).toHaveClass('min-h-11', 'flex', 'items-center')
+  })
+
+  it('the ✓ mark has no hover-only title', async () => {
+    render(<BuildingsPage />)
+    expect(await screen.findByTestId('verified-mark')).not.toHaveAttribute('title')
+  })
+
   it('detail view: one chip next to the name, none inside the level table', async () => {
     render(<BuildingsPage />)
     fireEvent.click(await screen.findByText('馬廄'))

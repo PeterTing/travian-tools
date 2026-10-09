@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { usesUnitData } from '@/components/layout/navItems'
 import { ROUTES } from '@/constants/routes'
 import { formatOffsetHours } from '@/lib/serverTime'
@@ -29,7 +29,7 @@ interface AutoFillBarProps {
  * 計算器最上面的「已帶入」列（IA v2.2）：
  *   已帶入：PeterT · ts11（x1・高盧）· 主村 (0|0)   更改
  *   時差 +6 小時（從貼上的頁面讀到）／時差：貼一頁就會自動設好
- *   〔待驗證〕兵種花費、糧耗、訓練時間尚未在 ts11 核對   ← 只在用到兵種資料的頁面
+ *   〔待驗證〕兵種花費、糧耗、訓練時間還沒在 ts11 核對   ← 只在用到兵種資料的頁面
  *             斯巴達速度待驗證                          （兩行對齊灰標右邊）
  */
 export default function AutoFillBar({ usesVillage = true, unitData, assumption }: AutoFillBarProps) {
@@ -85,17 +85,14 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
       </p>
 
       {showUnitLine && (
-        // 兩行都對齊灰標右邊的文字起點（懸掛縮排），不折到灰標底下
-        <div className="flex items-baseline gap-1 text-xs text-muted-foreground" data-testid="autofill-unit-pending">
-          <PendingVerifyChip
-            className="shrink-0"
-            note={`${t('autofill.unitPending')}\n${t('autofill.unitPendingSpartan')}`}
-          />
+        // 兩行都對齊灰標右邊的文字起點（懸掛縮排），不折到灰標底下；一個灰標管這兩行（autofillUnits）
+        <PendingRow className="flex items-baseline gap-1 text-xs text-muted-foreground" data-testid="autofill-unit-pending">
+          <PendingVerifyChip className="shrink-0" kind="autofillUnits" />
           <div className="min-w-0" data-testid="autofill-unit-pending-text">
             <p data-testid="autofill-unit-pending-line1">{t('autofill.unitPending')}</p>
             <p data-testid="autofill-unit-pending-line2">{t('autofill.unitPendingSpartan')}</p>
           </div>
-        </div>
+        </PendingRow>
       )}
 
       {assumption && (

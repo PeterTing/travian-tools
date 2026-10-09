@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { troopsApi } from '@/services/gameApi'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import { isTribeCostVerified } from '@/data/unitCosts'
 
 const TRIBES: { value: TroopTribe | 'all'; label: string }[] = [
   { value: 'all', label: '全部' },
@@ -30,12 +31,11 @@ const CATEGORIES: { value: TroopCategory | 'all'; label: string }[] = [
 /** 官方頁數字取自第三方計算器的出處說明（P0-15，斯巴達步兵、騎兵） */
 const OFFICIAL_PENDING_SOURCE_TEXT = '官方說明頁，數字標示取自第三方計算器'
 
-/** 速度出處說明（P0-15）：ts11 遊戲內說明／官方文章／官方頁待驗證／待驗證 */
+/** 速度出處說明（P0-15）：只給已核對的速度用（ts11 遊戲內說明／官方說明）；待驗證的看灰標 */
 function speedSourceLabel(t: Pick<TroopDetail, 'speed_source' | 'speed_ref'>): string {
   if (t.speed_source === 'ts11') return 'ts11 遊戲內說明'
   if (t.speed_source === 'official') return '官方說明'
-  if (t.speed_source === 'official_pending') return '官方說明頁（待驗證）'
-  return '待驗證'
+  return ''
 }
 
 /** 速度沒有第一手出處（null 或官方頁標示取自第三方計算器）就標「待驗證」 */
@@ -44,7 +44,7 @@ function isSpeedPending(t: Pick<TroopListItem, 'speed' | 'speed_source'>): boole
 }
 
 export default function TroopsPage() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [troops, setTroops] = useState<TroopListItem[]>([])
   const [selectedTroop, setSelectedTroop] = useState<TroopDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -157,7 +157,7 @@ export default function TroopsPage() {
                 {isSpeedPending(troop) && (
                   <p className="text-sm opacity-70" data-testid="troop-list-speed">
                     速度 {troop.speed ?? '—'}{' '}
-                    <PendingVerifyChip note={troop.speed === null ? '這個兵種的速度還沒有第一手出處' : OFFICIAL_PENDING_SOURCE_TEXT} />
+                    <PendingVerifyChip kind={troop.speed === null ? 'unitSpeedNoSource' : 'unitSpeedOfficialPending'} />
                   </p>
                 )}
               </div>
@@ -179,7 +179,9 @@ export default function TroopsPage() {
               </p>
 
               {/* 戰鬥屬性 */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="mb-6">
+              {/* 速度的待驗證說明畫在四格下面（格子太窄，放格子裡會擠成好幾行） */}
+              <PendingRow fill className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 bg-red-50 dark:bg-red-950 rounded">
                   <p className="text-sm text-muted-foreground">攻擊力</p>
                   <p className="text-2xl font-bold text-red-600">
@@ -203,7 +205,7 @@ export default function TroopsPage() {
                   {selectedTroop.speed === null ? (
                     <p className="text-2xl font-bold text-yellow-600" data-testid="troop-speed">
                       —{' '}
-                      <PendingVerifyChip note="這個兵種的速度還沒有第一手出處" />
+                      <PendingVerifyChip kind="unitSpeedNoSource" />
                     </p>
                   ) : (
                     <p className="text-2xl font-bold text-yellow-600" data-testid="troop-speed">
@@ -211,21 +213,25 @@ export default function TroopsPage() {
                       {isSpeedPending(selectedTroop) && (
                         <>
                           {' '}
-                          <PendingVerifyChip note={OFFICIAL_PENDING_SOURCE_TEXT} />
+                          <PendingVerifyChip kind="unitSpeedOfficialPending" />
                         </>
                       )}
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground" data-testid="troop-speed-source">
-                    {speedSourceLabel(selectedTroop)}
-                  </p>
+                  {/* 待驗證的速度：出處寫在灰標說明和卡片下面那行，卡片裡不再重複「官方說明頁（待驗證）」 */}
+                  {!isSpeedPending(selectedTroop) && (
+                    <p className="text-xs text-muted-foreground" data-testid="troop-speed-source">
+                      {speedSourceLabel(selectedTroop)}
+                    </p>
+                  )}
                 </div>
-              </div>
+              </PendingRow>
               {selectedTroop.speed_source === 'official_pending' && (
-                <p className="-mt-4 mb-6 text-xs text-muted-foreground" data-testid="troop-speed-official-pending-source">
+                <p className="mt-2 text-xs text-muted-foreground" data-testid="troop-speed-official-pending-source">
                   {OFFICIAL_PENDING_SOURCE_TEXT}
                 </p>
               )}
+              </div>
 
               {/* 詳細資訊 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -235,11 +241,11 @@ export default function TroopsPage() {
                     <tbody>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">部族</td>
-                        <td className="py-2 text-right">{selectedTroop.tribe}</td>
+                        <td className="py-2 text-right">{t(`tribes.${selectedTroop.tribe}`, { defaultValue: selectedTroop.tribe })}</td>
                       </tr>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">類型</td>
-                        <td className="py-2 text-right">{selectedTroop.category}</td>
+                        <td className="py-2 text-right">{t(`database.troops.category.${selectedTroop.category}`, { defaultValue: selectedTroop.category })}</td>
                       </tr>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">運載量</td>
@@ -251,7 +257,7 @@ export default function TroopsPage() {
                       </tr>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">訓練建築</td>
-                        <td className="py-2 text-right">{selectedTroop.training_building}</td>
+                        <td className="py-2 text-right">{t(`database.troops.trainingBuilding.${selectedTroop.training_building}`, { defaultValue: selectedTroop.training_building })}</td>
                       </tr>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">研究院需求</td>
@@ -261,9 +267,17 @@ export default function TroopsPage() {
                   </table>
                 </div>
 
-                <div>
-                  <h3 className="font-semibold mb-2">訓練成本</h3>
-                  <table className="w-full text-sm">
+                <div data-testid="troop-cost-section">
+                  {/* 兵種花費／糧耗／訓練時間：整個部族一個灰標，放在「訓練成本」標題旁（P0-17；P0-18 核對完把
+                      data/unitCostVerified.json 那個部族改 true 就會拿掉）；說明撐滿這一區 */}
+                  {isTribeCostVerified(selectedTroop.tribe) ? (
+                    <h3 className="font-semibold mb-2">訓練成本</h3>
+                  ) : (
+                    <PendingRow fill as="h3" className="font-semibold" data-testid="troop-cost-heading">
+                      訓練成本 <PendingVerifyChip kind="units" />
+                    </PendingRow>
+                  )}
+                  <table className={`w-full text-sm${isTribeCostVerified(selectedTroop.tribe) ? '' : ' mt-2'}`}>
                     <tbody>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">木材</td>

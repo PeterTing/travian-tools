@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
+import { PendingNoteGroupProvider } from '@/components/common/PendingNoteGroup'
 import AppHeader from './AppHeader'
 import BottomTabBar from './BottomTabBar'
 import Sidebar from './Sidebar'
@@ -12,6 +14,7 @@ import { BOTTOM_NAV_CLEARANCE } from './bottomNav'
  */
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
+  const { pathname } = useLocation()
   return (
     <div className="min-h-screen bg-background text-foreground">
       <a
@@ -25,7 +28,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <Sidebar />
         {/* 手機：底部留「分頁列高度＋16px」（含 safe area），所有頁面捲到底都不會被擋住；min-w-0 讓內容不會把版面撐寬 */}
         <main id="main-content" className={`min-w-0 flex-1 ${BOTTOM_NAV_CLEARANCE}`} data-testid="app-main">
-          {children}
+          {/* 「待驗證」說明一頁只開一個；換頁（key 換）就全部收起 */}
+          <PendingNoteGroupProvider key={pathname}>{children}</PendingNoteGroupProvider>
         </main>
       </div>
       <BottomTabBar />
