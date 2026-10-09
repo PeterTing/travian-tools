@@ -34,6 +34,9 @@ OCR_SERVICE="tt-ocr"
 MIGRATE_JOB="travian-tools-migrate"
 API_ORIGIN="https://${API_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"
 WEB_ORIGIN="https://${WEB_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"
+# tt-web 的自訂網域（Cloud Run domain mapping，見 docs/deploy-cloud-run.md「自訂網域」）。
+# 舊的 run.app 網址繼續可用，所以 CORS 兩個都放。
+WEB_CUSTOM_ORIGIN="https://tr.tingcloud.tw"
 OCR_ORIGIN="https://${OCR_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app"
 TAG="${TAG:-$(git rev-parse --short=7 HEAD)}"
 IMAGE_BASE="${REGION}-docker.pkg.dev/${PROJECT}/${REPO}"
@@ -74,7 +77,7 @@ deploy() {
     --service-account "${RUN_SA}" \
     --add-cloudsql-instances "${SQL_INSTANCE}" \
     --set-secrets "DATABASE_URL=DATABASE_URL:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest" \
-    --set-env-vars "^@^DEBUG=false@RUN_MIGRATIONS=false@MAP_SQL_DAILY_FETCH_ENABLED=false@CORS_ORIGINS=${WEB_ORIGIN}@OCR_SERVICE_URL=${OCR_ORIGIN}" \
+    --set-env-vars "^@^DEBUG=false@RUN_MIGRATIONS=false@MAP_SQL_DAILY_FETCH_ENABLED=false@CORS_ORIGINS=${WEB_ORIGIN},${WEB_CUSTOM_ORIGIN}@OCR_SERVICE_URL=${OCR_ORIGIN}" \
     --port 8000 --cpu 1 --memory 512Mi \
     --min-instances 0 --max-instances 2 --concurrency 40 --timeout 60s \
     --cpu-throttling --allow-unauthenticated

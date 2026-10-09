@@ -192,6 +192,11 @@ describe('isTrustedSender', () => {
     assert.equal(isTrustedSender({ origin: `${site}.evil.test` }, TRUSTED_SITE_ORIGINS), false);
     assert.equal(isTrustedSender({ origin: 'http://tt-web-138672009807.asia-east1.run.app' }, TRUSTED_SITE_ORIGINS), false);
     assert.equal(isTrustedSender({ origin: 'https://ts3.x1.asia.travian.com' }, TRUSTED_SITE_ORIGINS), false);
+    assert.equal(isTrustedSender({ origin: 'https://tr.tingcloud.tw' }, TRUSTED_SITE_ORIGINS), true);
+    assert.equal(isTrustedSender({ url: 'https://tr.tingcloud.tw/dashboard' }, TRUSTED_SITE_ORIGINS), true);
+    assert.equal(isTrustedSender({ origin: 'http://tr.tingcloud.tw' }, TRUSTED_SITE_ORIGINS), false);
+    assert.equal(isTrustedSender({ origin: 'https://tingcloud.tw' }, TRUSTED_SITE_ORIGINS), false);
+    assert.equal(isTrustedSender({ origin: 'https://evil.tr.tingcloud.tw' }, TRUSTED_SITE_ORIGINS), false);
     assert.equal(isTrustedSender({ url: 'not a url' }, TRUSTED_SITE_ORIGINS), false);
     assert.equal(isTrustedSender(undefined, TRUSTED_SITE_ORIGINS), false);
   });
