@@ -263,12 +263,13 @@ function TsOptimizerForm() {
                 const atk = usedAttackers.find((a) => a.village_label === r.village_label)
                 const kinds = speedPendingKinds(atk?.ts_level ?? r.recommended_ts_level, atk?.hero_bonus ?? 0)
                 return (
+                  // 列高 ≥ 44（p-3）：上下兩列灰標的點擊範圍（44×44）才不會疊在一起
                   <PendingRow as="tr" tableColSpan={5} key={r.village_label}>
-                    <td className="border p-2">{r.village_label}</td>
-                    <td className="border p-2">{r.distance}</td>
-                    <td className="border p-2">{r.recommended_ts_level}</td>
-                    <td className="border p-2 font-mono text-xs">{r.send_time}</td>
-                    <td className="border p-2" data-testid="ts-travel">
+                    <td className="border p-3">{r.village_label}</td>
+                    <td className="border p-3">{r.distance}</td>
+                    <td className="border p-3">{r.recommended_ts_level}</td>
+                    <td className="border p-3 font-mono text-xs">{r.send_time}</td>
+                    <td className="border p-3" data-testid="ts-travel">
                       {r.travel_time_formatted}
                       {kinds.length > 0 && <> <PendingVerifyChip kinds={kinds} /></>}
                     </td>
