@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { usesUnitData } from '@/components/layout/navItems'
 import { ROUTES } from '@/constants/routes'
 import { formatOffsetHours } from '@/lib/serverTime'
@@ -86,16 +86,13 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
 
       {showUnitLine && (
         // 兩行都對齊灰標右邊的文字起點（懸掛縮排），不折到灰標底下
-        <div className="flex items-baseline gap-1 text-xs text-muted-foreground" data-testid="autofill-unit-pending">
-          <PendingVerifyChip
-            className="shrink-0"
-            note={`${t('autofill.unitPending')}\n${t('autofill.unitPendingSpartan')}`}
-          />
+        <PendingRow className="flex items-baseline gap-1 text-xs text-muted-foreground" data-testid="autofill-unit-pending">
+          <PendingVerifyChip className="shrink-0" kind="units" />
           <div className="min-w-0" data-testid="autofill-unit-pending-text">
             <p data-testid="autofill-unit-pending-line1">{t('autofill.unitPending')}</p>
             <p data-testid="autofill-unit-pending-line2">{t('autofill.unitPendingSpartan')}</p>
           </div>
-        </div>
+        </PendingRow>
       )}
 
       {assumption && (

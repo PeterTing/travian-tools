@@ -55,7 +55,7 @@ export default function CpCard({
         <>
           <p className="mt-1 text-lg font-semibold tabular-nums" data-testid="cp-card-progress">
             {progress.currentCp.toLocaleString()} / {target.toLocaleString()} CP
-            {!verified && <PendingVerifyChip className="ml-1" />}
+            {!verified && <PendingVerifyChip className="ml-1" kind="cpThreshold" />}
           </p>
           <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden="true">
             <div className="h-full bg-orange-500" style={{ width: `${pct}%` }} />

@@ -32,7 +32,8 @@
     "verifiedTs11": "Measured in ts11",
     "cancel": "Cancel",
     "decrease": "Decrease",
-    "increase": "Increase"
+    "increase": "Increase",
+    "pendingVerifyHint": "ⓘ"
   },
   "home": {
     "title": "Travian Tools",
@@ -1109,5 +1110,43 @@
   "fields": {
     "modeRoi": "Normal village",
     "modeCapital": "Capital"
+  },
+  "pendingNotes": {
+    "units": {
+      "what": "Unit costs, upkeep and training times haven't been checked in-game on ts11 yet.",
+      "source": "The current numbers are community-compiled and may be off."
+    },
+    "spartanSpeed": {
+      "what": "Spartan unit speeds haven't been checked in-game on ts11 yet; reverse TS leaves Spartan units out.",
+      "source": "Six units use the official help page's numbers (the page says they come from a third-party calculator); ram, ballista, ephor and settler have no source yet."
+    },
+    "unitSpeedOfficialPending": {
+      "what": "This unit's speed hasn't been checked in-game on ts11 yet.",
+      "source": "The number is from the official help page, which says its numbers come from a third-party calculator."
+    },
+    "unitSpeedNoSource": {
+      "what": "This unit's speed hasn't been checked in-game on ts11 yet.",
+      "source": "There is no official or in-game source yet, so no number is shown."
+    },
+    "building": {
+      "what": "This building's costs and build times haven't been confirmed on ts11 yet.",
+      "source": "Levels are calculated from Travian T4 base values and formulas; confirmed buildings get a ✓."
+    },
+    "cpThreshold": {
+      "what": "This village CP threshold hasn't been confirmed on ts11 yet (only village 2 on x1, 2,000, is).",
+      "source": "It is calculated with the T4 village CP formula."
+    },
+    "celebration": {
+      "what": "The small celebration's crop and the great celebration's cost haven't been confirmed on a ts11 Town Hall yet.",
+      "source": "Small-celebration crop 1,340 follows the opening build-order sheet (it may be 500); the great celebration's cost is the T4 value."
+    },
+    "heroMansionCost": {
+      "what": "The Hero's Mansion cost hasn't been confirmed on ts11 yet.",
+      "source": "It uses the T4 values: 80 / 120 / 70 / 90, ×1.33 per level."
+    },
+    "cropSim": {
+      "what": "Plus as ×1.25 (multiplied) and the Egyptian Waterworks +5% oasis bonus per level are not yet confirmed in-game.",
+      "source": "The formula matches the small guide's Table 1 cell by cell; neither item has an official statement."
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { CROPPER_LAYOUTS, FIELD_PRODUCTION, type CropperId, type ResourceType } from '../data/travian';
-import PendingVerifyChip from '@/components/common/PendingVerifyChip';
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
@@ -130,12 +130,12 @@ export default function CropSimCalculator() {
               max={20}
             />
           </div>
-          <p className="text-xs text-gray-500">
-            <PendingVerifyChip />{' '}
+          <PendingRow as="p" className="text-xs text-gray-500">
+            <PendingVerifyChip kind="cropSim" />{' '}
             {lang === 'en'
               ? 'Plus ×1.25 multiplied (not added) and Waterworks +5% oasis bonus per level are not yet confirmed in-game.'
               : 'Plus 用乘的（不是加的）、供水系統每級綠洲加成 +5%，都還沒在遊戲裡實測確認。'}
-          </p>
+          </PendingRow>
         </div>
 
         <CalcResultPanel

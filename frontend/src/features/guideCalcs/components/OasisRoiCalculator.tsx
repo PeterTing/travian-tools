@@ -3,7 +3,7 @@ import {
   CROPPER_LAYOUTS, OASIS_TYPES, FIELD_PRODUCTION,
   hmCumulativeCost, type CropperId, type ResourceType,
 } from '../data/travian';
-import PendingVerifyChip from '@/components/common/PendingVerifyChip';
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
@@ -117,7 +117,7 @@ export default function OasisRoiCalculator() {
               : `每天 +${fmt(dailyGain)} · 英雄宅成本 ${fmt(hmCumulativeCost(hm))}`
           }
         >
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'HM cumulative cost' : '英雄宅累積成本'} <PendingVerifyChip /></span><span className={s.value}>{fmt(hmCumulativeCost(hm))}</span></div>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'HM cumulative cost' : '英雄宅累積成本'} <PendingVerifyChip kind="heroMansionCost" /></span><span className={s.value}>{fmt(hmCumulativeCost(hm))}</span></PendingRow>
           <p className="mb-2 text-xs text-gray-500" data-testid="hm-pending-note">
             {lang === 'en'
               ? 'Not yet confirmed in-game (T4 cost 80/120/70/90, ×1.33 per level)'

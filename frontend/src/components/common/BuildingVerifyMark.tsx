@@ -22,7 +22,7 @@ export default function BuildingVerifyMark({ buildingId, className = '' }: Build
       </span>
     )
   }
-  return <PendingVerifyChip className={`ml-1 ${className}`} />
+  return <PendingVerifyChip className={`ml-1 ${className}`} kind="building" />
 }
 
 /** 頁首一行灰字：除標 ✓ 的建築外，數值皆未在 ts11 實測 */

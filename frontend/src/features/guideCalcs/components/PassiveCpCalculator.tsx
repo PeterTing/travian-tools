@@ -4,7 +4,7 @@ import {
   SERVER_SPEEDS, villageRequirements, startCp, celebrationCap, celebrationCp, celebration,
   isVillageCpVerified, buildingName, type ServerSpeed, type CelebrationKind,
 } from '../../../data/gameData'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import Stepper from '@/components/common/Stepper'
 import AutoFillBar, { AutoFillHint } from '@/components/autofill/AutoFillBar'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
@@ -310,27 +310,25 @@ export default function PassiveCpCalculator() {
             </thead>
             <tbody>
               {cd.rows.map(r => (
-                <tr key={r.village}>
+                <PendingRow as="tr" tableColSpan={4} key={r.village}>
                   <td>#{r.village}</td>
                   <td>
                     {r.required.toLocaleString()}
-                    {!r.verified && <> <PendingVerifyChip /></>}
+                    {!r.verified && <> <PendingVerifyChip kind="cpThreshold" /></>}
                   </td>
                   <td>{fmtDays(r.daysPassive)}</td>
                   <td>{fmtDays(r.daysWithCelebration)}</td>
-                </tr>
+                </PendingRow>
               ))}
             </tbody>
           </table>
           {anyUnverified && (
-            <p className="mb-3 mt-1" data-testid="cp-countdown-note">
-              <PendingVerifyChip
-                withNote
-                note={en
-                  ? 'Not yet confirmed in-game (only village 2 on x1, 2,000, is)'
-                  : '這個數值還沒在遊戲裡實測確認（只有 x1 第 2 村 2,000 確認過）'}
-              />
-            </p>
+            <PendingRow as="p" className="mb-3 mt-1" data-testid="cp-countdown-note">
+              <PendingVerifyChip kind="cpThreshold" />{' '}
+              <span className="text-xs text-gray-500">{en
+                ? 'Not yet confirmed in-game (only village 2 on x1, 2,000, is)'
+                : '這個數值還沒在遊戲裡實測確認（只有 x1 第 2 村 2,000 確認過）'}</span>
+            </PendingRow>
           )}
 
           <h4>{en ? 'Celebration cost (x1)' : '慶典花費（x1）'}</h4>
@@ -339,26 +337,24 @@ export default function PassiveCpCalculator() {
               <tr><th>{en ? 'Type' : '種類'}</th><th>{en ? 'Wood / Clay / Iron' : '木／泥／鐵'}</th><th>{en ? 'Crop' : '糧'}</th></tr>
             </thead>
             <tbody>
-              <tr>
+              <PendingRow as="tr" tableColSpan={3}>
                 <td>{en ? 'Small' : '小慶典'}</td>
                 <td>{small.cost.slice(0, 3).map(n => n.toLocaleString()).join(' / ')}</td>
-                <td>{small.cost[3].toLocaleString()}{small.pending.length > 0 && <> <PendingVerifyChip /></>}</td>
-              </tr>
-              <tr>
-                <td>{en ? 'Great' : '大慶典'}{great.pending.includes('cost') && <> <PendingVerifyChip /></>}</td>
+                <td>{small.cost[3].toLocaleString()}{small.pending.length > 0 && <> <PendingVerifyChip kind="celebration" /></>}</td>
+              </PendingRow>
+              <PendingRow as="tr" tableColSpan={3}>
+                <td>{en ? 'Great' : '大慶典'}{great.pending.includes('cost') && <> <PendingVerifyChip kind="celebration" /></>}</td>
                 <td>{great.cost.slice(0, 3).map(n => n.toLocaleString()).join(' / ')}</td>
                 <td>{great.cost[3].toLocaleString()}</td>
-              </tr>
+              </PendingRow>
             </tbody>
           </table>
-          <p className="mb-3 mt-1" data-testid="cp-celebration-note">
-            <PendingVerifyChip
-              withNote
-              note={en
-                ? 'Not yet confirmed in-game (small-celebration crop may be 500)'
-                : '這個數值還沒在遊戲裡實測確認（小慶典的糧也可能是 500）'}
-            />
-          </p>
+          <PendingRow as="p" className="mb-3 mt-1" data-testid="cp-celebration-note">
+            <PendingVerifyChip kind="celebration" />{' '}
+            <span className="text-xs text-gray-500">{en
+              ? 'Not yet confirmed in-game (small-celebration crop may be 500)'
+              : '這個數值還沒在遊戲裡實測確認（小慶典的糧也可能是 500）'}</span>
+          </PendingRow>
 
           <h4>{en ? 'Top contributors' : '最大貢獻建築'}</h4>
           <table className={s.table}>

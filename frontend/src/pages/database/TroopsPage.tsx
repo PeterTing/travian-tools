@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { troopsApi } from '@/services/gameApi'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 
@@ -157,7 +157,7 @@ export default function TroopsPage() {
                 {isSpeedPending(troop) && (
                   <p className="text-sm opacity-70" data-testid="troop-list-speed">
                     速度 {troop.speed ?? '—'}{' '}
-                    <PendingVerifyChip note={troop.speed === null ? '這個兵種的速度還沒有第一手出處' : OFFICIAL_PENDING_SOURCE_TEXT} />
+                    <PendingVerifyChip kind={troop.speed === null ? 'unitSpeedNoSource' : 'unitSpeedOfficialPending'} />
                   </p>
                 )}
               </div>
@@ -179,7 +179,9 @@ export default function TroopsPage() {
               </p>
 
               {/* 戰鬥屬性 */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="mb-6">
+              {/* 速度的待驗證說明畫在四格下面（格子太窄，放格子裡會擠成好幾行） */}
+              <PendingRow className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 bg-red-50 dark:bg-red-950 rounded">
                   <p className="text-sm text-muted-foreground">攻擊力</p>
                   <p className="text-2xl font-bold text-red-600">
@@ -203,7 +205,7 @@ export default function TroopsPage() {
                   {selectedTroop.speed === null ? (
                     <p className="text-2xl font-bold text-yellow-600" data-testid="troop-speed">
                       —{' '}
-                      <PendingVerifyChip note="這個兵種的速度還沒有第一手出處" />
+                      <PendingVerifyChip kind="unitSpeedNoSource" />
                     </p>
                   ) : (
                     <p className="text-2xl font-bold text-yellow-600" data-testid="troop-speed">
@@ -211,7 +213,7 @@ export default function TroopsPage() {
                       {isSpeedPending(selectedTroop) && (
                         <>
                           {' '}
-                          <PendingVerifyChip note={OFFICIAL_PENDING_SOURCE_TEXT} />
+                          <PendingVerifyChip kind="unitSpeedOfficialPending" />
                         </>
                       )}
                     </p>
@@ -220,12 +222,13 @@ export default function TroopsPage() {
                     {speedSourceLabel(selectedTroop)}
                   </p>
                 </div>
-              </div>
+              </PendingRow>
               {selectedTroop.speed_source === 'official_pending' && (
-                <p className="-mt-4 mb-6 text-xs text-muted-foreground" data-testid="troop-speed-official-pending-source">
+                <p className="mt-2 text-xs text-muted-foreground" data-testid="troop-speed-official-pending-source">
                   {OFFICIAL_PENDING_SOURCE_TEXT}
                 </p>
               )}
+              </div>
 
               {/* 詳細資訊 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

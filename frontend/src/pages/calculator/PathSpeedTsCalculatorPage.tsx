@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { PathSpeedTsRequest, PathSpeedTsResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
@@ -219,14 +219,14 @@ export default function PathSpeedTsCalculatorPage() {
               )}
 
               {(result.unverified_units?.length ?? 0) > 0 && (
-                <p
+                <PendingRow
+                  as="p"
                   className="flex items-center gap-2 text-xs text-muted-foreground"
                   data-testid="unverified-units-note"
-                  title={result.unverified_units?.join('、')}
                 >
-                  <PendingVerifyChip />
+                  <PendingVerifyChip kind="spartanSpeed" />
                   <span>斯巴達兵種速度待驗證，未列入反推</span>
-                </p>
+                </PendingRow>
               )}
             </div>
           ) : (
