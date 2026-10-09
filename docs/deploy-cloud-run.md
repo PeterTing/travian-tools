@@ -8,7 +8,7 @@
 | 服務 | Cloud Run 服務名 | 網址 |
 |---|---|---|
 | 後端 API | `tt-api` | https://tt-api-138672009807.asia-east1.run.app （健康檢查 `/health`，API 在 `/api/v1`） |
-| 工具網站（前端） | `tt-web` | https://tt-web-138672009807.asia-east1.run.app |
+| 工具網站（前端） | `tt-web` | https://tt-web-138672009807.asia-east1.run.app （自訂網域 https://tr.tingcloud.tw ，見下面「自訂網域」；兩個網址都可用） |
 
 > 服務名刻意不含 `travian`：合規測試把網址裡有 `travian` 的 host 視為遊戲網域，擴充不能對它要權限。
 
@@ -28,7 +28,7 @@
 | Cloud Run Job | `travian-tools-migrate`：`alembic upgrade head && alembic check` |
 | Cloud Run 服務 | `tt-api`（1 vCPU／512 MiB）、`tt-web`（nginx，1 vCPU／256 MiB）；兩個都 min-instances 0、max-instances 2、只在處理請求時計費 |
 
-後端 CORS：網頁來源只有 `CORS_ORIGINS`（正式＝工具網站網址）；擴充只允許 `CORS_EXTENSION_IDS`
+後端 CORS：網頁來源只有 `CORS_ORIGINS`（正式＝工具網站的 run.app 網址＋`https://tr.tingcloud.tw`）；擴充只允許 `CORS_EXTENSION_IDS`
 （預設是 manifest key 固定的 ID `nkgbmaokaapljaciiifbhgohlejmdcdn`），不再放行任意 `chrome-extension://`。
 `allow_credentials=False`：前端和擴充都只用 `Authorization: Bearer`，不用 cookie。
 
@@ -117,6 +117,47 @@ gcloud projects get-iam-policy artogo-travian-tools --project artogo-travian-too
 
 本機實測（`docker run --cpus 1 --memory 1g`，2026-10-06）：每張暖機 1.8–2.6 秒；冷啟動＝容器就緒約 4.1 秒＋第一張
 2.0–2.9 秒（比平常多約 4 秒，另加 Cloud Run 拉 image 的時間）；記憶體高峰 421–458 MiB；image 515 MB（未壓縮）。
+
+## 自訂網域 `tr.tingcloud.tw`（tt-web）
+
+用 Cloud Run 內建的 domain mapping（免費；**不開負載平衡器**，LB 每月約 US$18 起）。
+`asia-east1` 在官方支援 domain mapping 的 region 清單內（https://cloud.google.com/run/docs/mapping-custom-domains ，2026-10-09 查詢；
+`gcloud beta run domain-mappings list --region asia-east1` 可正常列出）。這個功能目前是 Preview，官方註明延遲較高、不建議用在重要正式服務；
+本工具流量小，先接受，之後要換成 LB 或 Firebase Hosting 再評估。
+
+- 只對應 `tt-web`。前端打 API 用 build 時寫入的 `VITE_API_URL`（tt-api 的 run.app 網址），所以 tt-web 不用重新 build；
+  只要 tt-api 的 `CORS_ORIGINS` 同時放 run.app 原網址和 `https://tr.tingcloud.tw`（`scripts/deploy_cloud_run.sh` 已改）。
+- 舊的 run.app 網址繼續可用。登入狀態存在瀏覽器的 localStorage，換網址要重新登入一次。
+- 擴充 0.5.1 起，`tr.tingcloud.tw` 也能把登入憑證交給擴充（`externally_connectable`／`TRUSTED_SITE_ORIGINS`）；
+  擴充的「在工具網站登入」連結先維持 run.app 網址，等新網域上線穩定再換。
+- 前置：gcloud 帳號（`dainy@artogo.co`）必須是 `tingcloud.tw` 在 Search Console 的擁有者（`gcloud domains list-user-verified` 要列出它）。
+- DNS 在 Cloudflare：`tr` 一筆 CNAME → `ghs.googlehosted.com`，**只用 DNS（灰雲）**；開代理（橘雲）Google 發不出憑證。
+  最終要加的記錄以 `domain-mappings describe` 的 `resourceRecords` 為準。
+
+```bash
+export CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools
+# 1) 確認網域已驗證（要列出 tingcloud.tw）
+gcloud domains list-user-verified --project artogo-travian-tools
+# 2) tt-api 的 CORS 加新網域（只改這一個變數，沿用同一個 image，會產生新 revision）
+gcloud run services update tt-api --project artogo-travian-tools --region asia-east1 \
+  --update-env-vars '^@^CORS_ORIGINS=https://tt-web-138672009807.asia-east1.run.app,https://tr.tingcloud.tw'
+# 3) 建立 domain mapping，再讀出要加的 DNS 記錄
+gcloud beta run domain-mappings create --service tt-web --domain tr.tingcloud.tw \
+  --region asia-east1 --project artogo-travian-tools
+gcloud beta run domain-mappings describe --domain tr.tingcloud.tw \
+  --region asia-east1 --project artogo-travian-tools
+```
+
+上線後驗證：
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://tr.tingcloud.tw/            # 200
+curl -sI https://tr.tingcloud.tw/ | head -1                                    # 憑證有效（curl 不報 SSL 錯）
+curl -s -o /dev/null -D - -X OPTIONS https://tt-api-138672009807.asia-east1.run.app/api/v1/auth/login \
+  -H 'Origin: https://tr.tingcloud.tw' -H 'Access-Control-Request-Method: POST' \
+  -H 'Access-Control-Request-Headers: Authorization,Content-Type' | grep -i access-control-allow-origin   # 回 https://tr.tingcloud.tw
+curl -s -o /dev/null -w '%{http_code}\n' https://tt-web-138672009807.asia-east1.run.app/   # 舊網址仍 200
+```
 
 ## 已知限制
 

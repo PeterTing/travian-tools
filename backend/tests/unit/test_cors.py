@@ -73,3 +73,39 @@ def test_site_origin_comes_only_from_cors_origins() -> None:
     assert "access-control-allow-origin" not in _preflight(
         client, "http://localhost:5174"
     )
+
+
+CUSTOM_DOMAIN = "https://tr.tingcloud.tw"
+
+
+def test_cors_origins_list_keeps_run_app_and_custom_domain() -> None:
+    settings = _settings(CORS_ORIGINS=f"{SITE}, {CUSTOM_DOMAIN} ,")
+    assert settings.cors_origins_list == [SITE, CUSTOM_DOMAIN]
+
+
+def test_both_site_origins_pass_preflight_and_lookalikes_do_not() -> None:
+    """正式環境 CORS_ORIGINS＝run.app 原網址＋tr.tingcloud.tw（scripts/deploy_cloud_run.sh）."""
+    settings = _settings(CORS_ORIGINS=f"{SITE},{CUSTOM_DOMAIN}")
+    probe = FastAPI()
+    probe.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins_list,
+        allow_origin_regex=settings.cors_origin_regex,
+        allow_methods=["GET", "POST"],
+        allow_headers=["Authorization", "Content-Type"],
+    )
+
+    @probe.get("/health")
+    def _health() -> dict[str, str]:
+        return {"status": "healthy"}
+
+    client = TestClient(probe)
+    for origin in (SITE, CUSTOM_DOMAIN):
+        assert _preflight(client, origin).get("access-control-allow-origin") == origin
+    for origin in (
+        "http://tr.tingcloud.tw",
+        "https://tingcloud.tw",
+        "https://evil.tr.tingcloud.tw",
+        "https://tr.tingcloud.tw.evil.example",
+    ):
+        assert "access-control-allow-origin" not in _preflight(client, origin)
