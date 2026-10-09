@@ -171,7 +171,7 @@ describe('IA v2.2', () => {
       const line = screen.getByTestId('autofill-unit-pending')
       // 兩行、沒有分號；灰標在最前面，兩行都掛在灰標右邊（同一個文字欄）
       expect(line).not.toHaveTextContent('；')
-      expect(screen.getByTestId('autofill-unit-pending-line1')).toHaveTextContent(/^兵種花費、糧耗、訓練時間尚未在 ts11 核對$/)
+      expect(screen.getByTestId('autofill-unit-pending-line1')).toHaveTextContent(/^兵種花費、糧耗、訓練時間還沒在 ts11 核對$/)
       expect(screen.getByTestId('autofill-unit-pending-line2')).toHaveTextContent(/^斯巴達速度待驗證$/)
       const chip = within(line).getByTestId('pending-verify-chip')
       expect(chip).toHaveTextContent('待驗證')

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import zh from '@/i18n/locales/zh-TW.json'
 import en from '@/i18n/locales/en.json'
-import { PENDING_KINDS, PENDING_KINDS_UNUSED, PENDING_KIND_USAGE } from '../pendingNotes'
+import { PENDING_KINDS, PENDING_KIND_USAGE } from '../pendingNotes'
 
 // 掃全部原始碼，找出每個 <PendingVerifyChip kind=...> 用到的 kind
 const sources = import.meta.glob('/src/**/*.tsx', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
@@ -30,8 +30,7 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
   it('every kind in the table is used somewhere and says where', () => {
     const used = usedKinds()
     for (const k of PENDING_KINDS) {
-      // 表裡保留、但目前沒有灰標用到的種類要寫明（PENDING_KINDS_UNUSED）
-      expect(used.has(k), k).toBe(!PENDING_KINDS_UNUSED.includes(k))
+      expect(used.has(k), k).toBe(true)
       expect(PENDING_KIND_USAGE[k], k).toBeTruthy()
     }
   })

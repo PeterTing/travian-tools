@@ -187,7 +187,21 @@
       "consumption": "Consumption",
       "details": "Details",
       "trainingCost": "Training Cost",
-      "efficiency": "Efficiency Analysis"
+      "efficiency": "Efficiency Analysis",
+      "category": {
+        "infantry": "Infantry",
+        "cavalry": "Cavalry",
+        "siege": "Siege",
+        "scout": "Scout",
+        "special": "Special",
+        "settler": "Settler"
+      },
+      "trainingBuilding": {
+        "barracks": "Barracks",
+        "stable": "Stable",
+        "workshop": "Workshop",
+        "residence": "Residence"
+      }
     },
     "resources": {
       "title": "Resource Field Database",

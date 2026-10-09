@@ -24,7 +24,7 @@ export type PendingKind = (typeof PENDING_KINDS)[number]
 
 /** 每一種出現在哪裡（給 PM 的文字表、也給完整性測試用） */
 export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
-  units: '目前沒有灰標用到（已帶入列改用 autofillUnits）；保留給之後兵種花費、糧耗、訓練時間的灰標',
+  units: '兵種資料庫詳情：「訓練成本」標題旁（花費、糧耗、訓練時間還沒核對的部族；data/unitCostVerified.json）',
   autofillUnits: '已帶入列（用到兵種資料的計算器）：一個灰標管兩行（兵種花費、斯巴達速度）',
   spartanSpeed: '首頁來襲卡反推 TS 那一行、反推 TS 結果的「未列入反推」提示',
   unitSpeedOfficialPending: '兵種資料庫：斯巴達步兵／騎兵 6 種的速度（列表與詳情）',
@@ -35,9 +35,6 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
   heroMansionCost: '綠洲收益的英雄宅累積成本',
   cropSim: '資源田與首都規劃（首都產量模擬）的 Plus／供水系統說明',
 }
-
-/** 表裡有、但目前沒有灰標用到的種類（PM 定稿保留文字；完整性測試放行這幾個） */
-export const PENDING_KINDS_UNUSED: readonly PendingKind[] = ['units']
 
 export function pendingNoteKeys(kind: PendingKind): { what: string; source: string } {
   return { what: `pendingNotes.${kind}.what`, source: `pendingNotes.${kind}.source` }

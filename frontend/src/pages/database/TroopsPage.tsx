@@ -5,6 +5,7 @@ import { troopsApi } from '@/services/gameApi'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import { isTribeCostVerified } from '@/data/unitCosts'
 
 const TRIBES: { value: TroopTribe | 'all'; label: string }[] = [
   { value: 'all', label: '全部' },
@@ -42,7 +43,7 @@ function isSpeedPending(t: Pick<TroopListItem, 'speed' | 'speed_source'>): boole
 }
 
 export default function TroopsPage() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [troops, setTroops] = useState<TroopListItem[]>([])
   const [selectedTroop, setSelectedTroop] = useState<TroopDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -239,11 +240,11 @@ export default function TroopsPage() {
                     <tbody>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">部族</td>
-                        <td className="py-2 text-right">{selectedTroop.tribe}</td>
+                        <td className="py-2 text-right">{t(`tribes.${selectedTroop.tribe}`, { defaultValue: selectedTroop.tribe })}</td>
                       </tr>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">類型</td>
-                        <td className="py-2 text-right">{selectedTroop.category}</td>
+                        <td className="py-2 text-right">{t(`database.troops.category.${selectedTroop.category}`, { defaultValue: selectedTroop.category })}</td>
                       </tr>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">運載量</td>
@@ -255,7 +256,7 @@ export default function TroopsPage() {
                       </tr>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">訓練建築</td>
-                        <td className="py-2 text-right">{selectedTroop.training_building}</td>
+                        <td className="py-2 text-right">{t(`database.troops.trainingBuilding.${selectedTroop.training_building}`, { defaultValue: selectedTroop.training_building })}</td>
                       </tr>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">研究院需求</td>
@@ -265,9 +266,17 @@ export default function TroopsPage() {
                   </table>
                 </div>
 
-                <div>
-                  <h3 className="font-semibold mb-2">訓練成本</h3>
-                  <table className="w-full text-sm">
+                <div data-testid="troop-cost-section">
+                  {/* 兵種花費／糧耗／訓練時間：整個部族一個灰標，放在「訓練成本」標題旁（P0-17；P0-18 核對完把
+                      data/unitCostVerified.json 那個部族改 true 就會拿掉）；說明撐滿這一區 */}
+                  {isTribeCostVerified(selectedTroop.tribe) ? (
+                    <h3 className="font-semibold mb-2">訓練成本</h3>
+                  ) : (
+                    <PendingRow fill as="h3" className="font-semibold" data-testid="troop-cost-heading">
+                      訓練成本 <PendingVerifyChip kind="units" />
+                    </PendingRow>
+                  )}
+                  <table className={`w-full text-sm${isTribeCostVerified(selectedTroop.tribe) ? '' : ' mt-2'}`}>
                     <tbody>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">木材</td>

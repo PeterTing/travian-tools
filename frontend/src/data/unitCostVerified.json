@@ -1,0 +1,12 @@
+{
+  "_note": "兵種花費、糧耗、訓練時間有沒有在 ts11 遊戲內說明頁核對過（每個部族一個）。目前全部是社群整理的數字，一律 false；P0-18 核對完一個部族就把那個部族改成 true，兵種詳情的「待驗證」灰標會自己拿掉。",
+  "tribes": {
+    "romans": false,
+    "gauls": false,
+    "teutons": false,
+    "huns": false,
+    "egyptians": false,
+    "vikings": false,
+    "spartans": false
+  }
+}
