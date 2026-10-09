@@ -113,17 +113,17 @@ describe('貿易路線、農場收益、田地回本：明細裡用到待驗證�
     const el = within(root).getByText(label)
     return el.querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind') ?? null
   }
-  it('trade route: capacity, speed, one-way/round trip rows, table header, total merchants -> merchantCapacity; tribe select label; summary: only the second line (容量 · 往返) has a chip, title has none (dedup)', async () => {
+  it('trade route (trade office 10 by default): capacity, trips header, total merchants, summary -> merchantTradeOffice; speed, one-way/round trip, tribe select -> merchantCapacity; summary: only the second line (容量 · 往返) has a chip, title has none (dedup)', async () => {
     const d = await open('features/guideCalcs/components/TraderouteCalculator.tsx')
-    expect(chipNextTo(d, '每商人容量（含交易所）')).toBe('merchantCapacity')
+    expect(chipNextTo(d, '每商人容量（含交易所）')).toBe('merchantTradeOffice')
     expect(chipNextTo(d, '速度')).toBe('merchantCapacity')
     expect(chipNextTo(d, '單程 / 往返')).toBe('merchantCapacity')
     const sec = screen.getByTestId('calc-result-secondary')
     expect(sec).toHaveTextContent('往返')
-    expect(within(sec).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantCapacity')
+    expect(within(sec).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantTradeOffice')
     expect(within(screen.getByTestId('calc-result-title')).queryByTestId('pending-verify-chip')).toBeNull()
-    expect(chipNextTo(d, '總商人')).toBe('merchantCapacity')
-    expect(within(within(d).getByTestId('traderoute-table').querySelector('thead')!).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantCapacity')
+    expect(chipNextTo(d, '總商人')).toBe('merchantTradeOffice')
+    expect(within(within(d).getByTestId('traderoute-table').querySelector('thead')!).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantTradeOffice')
     const tribe = screen.getByLabelText('部族')
     expect(tribe.tagName).toBe('SELECT')
     expect(tribe.closest('div')!.querySelector('[data-kind="merchantCapacity"]')).not.toBeNull()
@@ -292,5 +292,107 @@ describe('fieldHighLevel thresholds: production >= 3, cost/time >= 4', () => {
     const reach4 = (lv: number) => planGreedy({ ...base, start: { wood: lv, clay: lv, iron: lv, crop: lv } }).steps.some((x) => x.kind === 'field' && x.to >= 4)
     expect(reach4(1)).toBe(false)
     expect(reach4(3)).toBe(true)
+  })
+})
+
+/** #27 後續：交易所、Plus 排序、競技場（不靠登記表） */
+describe('#27 follow-up chips', () => {
+  const secondaryKind = () => within(screen.getByTestId('calc-result-secondary')).queryByTestId('pending-verify-chip')?.getAttribute('data-kind') ?? null
+  const titleChip = () => within(screen.getByTestId('calc-result-title')).queryByTestId('pending-verify-chip')
+
+  it('trade route: trade office 0 -> merchantCapacity everywhere; 1 -> merchantTradeOffice on the capacity lines', async () => {
+    const { default: Trade } = await import('./components/TraderouteCalculator')
+    render(<MemoryRouter><Trade /></MemoryRouter>)
+    const office = screen.getByRole('spinbutton', { name: '交易所等級 (0–20)' })
+    fireEvent.change(office, { target: { value: '0' } })
+    expect(secondaryKind()).toBe('merchantCapacity')
+    fireEvent.click(screen.getByTestId('calc-result-toggle'))
+    const d = screen.getByTestId('calc-result-details')
+    const kind = (label: string) => within(d).getByText(label).querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind')
+    expect(kind('每商人容量（含交易所）')).toBe('merchantCapacity')
+    expect(kind('總商人')).toBe('merchantCapacity')
+    fireEvent.change(office, { target: { value: '1' } })
+    expect(secondaryKind()).toBe('merchantTradeOffice')
+    expect(kind('每商人容量（含交易所）')).toBe('merchantTradeOffice')
+    expect(kind('總商人')).toBe('merchantTradeOffice')
+    expect(kind('速度')).toBe('merchantCapacity')
+    expect(titleChip()).toBeNull()
+    cleanup()
+  })
+
+  it('build order: Plus checked (used in ROI sorting) -> plusFormula last on the summary line and list title; unchecked -> gone', async () => {
+    const { default: BuildOrder } = await import('./components/BuildOrderCalculator')
+    render(<MemoryRouter><BuildOrder /></MemoryRouter>)
+    expect(secondaryKind()).toBe('fieldHighLevel building plusFormula')
+    expect(titleChip()).toBeNull()
+    fireEvent.click(screen.getByTestId('calc-result-toggle'))
+    const listTitle = () => within(screen.getByTestId('calc-result-details')).getByText('接下來 20 步（依 ROI 排序）').closest('h4')!.querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind')
+    expect(listTitle()).toBe('fieldHighLevel building plusFormula')
+    fireEvent.click(screen.getByRole('checkbox', { name: /Plus/ }))
+    expect(secondaryKind()).toBe('fieldHighLevel building')
+    expect(listTitle()).toBe('fieldHighLevel building')
+    cleanup()
+  })
+
+  it('march time: arena 0 -> no chip; arena 1 -> arenaSpeed on the summary line and the time / seconds / speed rows (never the title)', async () => {
+    const { default: Path } = await import('@/pages/calculator/PathCalculatorPage')
+    render(<MemoryRouter><Path /></MemoryRouter>)
+    const panel = screen.getByTestId('calc-result-panel')
+    expect(within(panel).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
+    const ts = within(screen.getByTestId('path-ts-level')).getByRole('spinbutton')
+    fireEvent.change(ts, { target: { value: '1' } })
+    expect(secondaryKind()).toBe('arenaSpeed')
+    expect(titleChip()).toBeNull()
+    expect(within(screen.getByTestId('calc-result-primary')).queryByTestId('pending-verify-chip')).toBeNull()
+    const d = screen.getByTestId('calc-result-details')
+    for (const key of ['pathCalc.travelTime', 'pathCalc.seconds', 'pathCalc.effectiveSpeed']) {
+      expect(within(d).getByText(i18n.t(key)).querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind'), key).toBe('arenaSpeed')
+    }
+    fireEvent.change(ts, { target: { value: '0' } })
+    expect(within(panel).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
+    cleanup()
+  })
+})
+
+/** 邊界測試：門檻往任一邊移 1 級都會失敗 */
+describe('fieldHighLevel boundaries (each threshold on its own)', () => {
+  const setSelect = (from: string, to: number) => fireEvent.change(screen.getByDisplayValue(from), { target: { value: String(to) } })
+  const has = (el: Element | null) => (el?.querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind') ?? '').split(' ').includes('fieldHighLevel')
+
+  it('capital production sim: field level 2 -> no fieldHighLevel; 3 -> fieldHighLevel', async () => {
+    const { default: CropSim } = await import('./components/CropSimCalculator')
+    render(<MemoryRouter><CropSim /></MemoryRouter>)
+    setSelect('Lv 18', 2)
+    expect(has(screen.getByTestId('calc-result-title'))).toBe(false)
+    setSelect('Lv 2', 3)
+    expect(has(screen.getByTestId('calc-result-title'))).toBe(true)
+    cleanup()
+  })
+
+  const fieldRoi = async () => {
+    const { default: FieldRoi } = await import('./components/FieldRoiCalculator')
+    render(<MemoryRouter><FieldRoi /></MemoryRouter>)
+    fireEvent.click(screen.getByRole('checkbox', { name: /Plus/ }))
+    return (label: string) => has(within(screen.getByTestId('calc-result-details')).getByText(label))
+  }
+
+  it('field ROI cost threshold: target lvl 3 -> cost row has no fieldHighLevel; lvl 4 -> it does', async () => {
+    const costRow = await fieldRoi()
+    setSelect('Lv 7', 3)
+    expect(costRow('升級成本（合計）')).toBe(false)
+    setSelect('Lv 3', 4)
+    expect(costRow('升級成本（合計）')).toBe(true)
+    cleanup()
+  })
+
+  it('field ROI production threshold: target lvl 2 -> production rows have no fieldHighLevel; lvl 3 -> they do', async () => {
+    const row = await fieldRoi()
+    setSelect('Lv 7', 2)
+    expect(row('每小時產量增加')).toBe(false)
+    expect(row('每天產量增加')).toBe(false)
+    setSelect('Lv 2', 3)
+    expect(row('每小時產量增加')).toBe(true)
+    expect(row('每天產量增加')).toBe(true)
+    cleanup()
   })
 })

@@ -153,10 +153,12 @@ export default function BuildOrderCalculator() {
     () => planGreedy({ cropperId, isCap, start, bonus, mb, gold }),
     [cropperId, isCap, start, bonus, mb, gold],
   );
-  // 待驗證：資源田 4 級以上（fieldHighLevel）、加成建築（building）
+  // 待驗證（一行一個灰標，依序）：資源田 4 級以上（fieldHighLevel）、加成建築（building）、
+  // 有勾 Plus 時排序（ROI）用到 Plus 加總算法（plusFormula，跟田地回本同一種算法）
   const planKinds: PendingKind[] = [
     ...(plan.steps.some(x => x.kind === 'field' && x.to >= 4) ? ['fieldHighLevel' as const] : []),
     ...(plan.steps.some(x => x.kind === 'bb') ? ['building' as const] : []),
+    ...(gold ? ['plusFormula' as const] : []),
   ];
 
   return (

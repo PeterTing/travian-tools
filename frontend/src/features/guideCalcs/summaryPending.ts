@@ -21,7 +21,7 @@ export interface SummaryPendingDecl {
 export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
   'pages/calculator/PathCalculatorPage.tsx': {
     chips: [],
-    note: '距離、移動時間：兵種速度是使用者自己打的數字（預設 7），這頁沒有兵種選單、不從網址或帳號帶入速度；已帶入列只帶伺服器速度和出發座標（幕僚長確認不用標）',
+    note: '預設（競技場 0 級）沒用到待驗證資料：兵種速度是使用者自己打的數字（預設 7），這頁沒有兵種選單、不從網址或帳號帶入速度；已帶入列只帶伺服器速度和出發座標（幕僚長確認不用標）。競技場 > 0 級時第二行（距離 · 速度）放 arenaSpeed（#27 後續；文字待 PM 定稿）',
   },
   'features/guideCalcs/components/CropSimCalculator.tsx': {
     chips: [['fieldHighLevel', 'building', 'cropSim']],
@@ -32,8 +32,8 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
     note: '第二行一個灰標，依序：「每天 +X」（田地 3 級以上產量 fieldHighLevel、有勾 Plus 的 ×1.25 cropSim）、「英雄宅成本」（heroMansionCost）；回本天數就是這兩個相除，標題不再重複放',
   },
   'features/guideCalcs/components/TraderouteCalculator.tsx': {
-    chips: [['merchantCapacity']],
-    note: '所需商人、容量、往返都用商人容量和速度算（社群 wiki 的數字）：第二行「容量 · 往返」旁一個；標題「所需商人」是同一份資料，不重複放（PM 去重）',
+    chips: [['merchantTradeOffice']],
+    note: '所需商人、容量、往返都用商人容量和速度算（社群 wiki 的數字）：第二行「容量 · 往返」旁一個；標題「所需商人」是同一份資料，不重複放（PM 去重）。預設交易所 10 級 → merchantTradeOffice（說明多寫交易所加成）；交易所 0 級 → merchantCapacity',
   },
   'features/guideCalcs/components/FarmingCalculator.tsx': {
     chips: [['unitCarry']],
@@ -48,8 +48,8 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
     note: '每日被動 CP 用建築 CP 數值算：等級 > 0 的建築裡有還沒核對的，標題旁放 building 灰標（不放大數字旁）',
   },
   'features/guideCalcs/components/BuildOrderCalculator.tsx': {
-    chips: [['fieldHighLevel', 'building']],
-    note: '第二行「成本」一個灰標：資源田升到 4 級以上（fieldHighLevel，也涵蓋上面的總時間）、加成建築（building）；有用到才列',
+    chips: [['fieldHighLevel', 'building', 'plusFormula']],
+    note: '第二行「成本」一個灰標：資源田升到 4 級以上（fieldHighLevel，也涵蓋上面的總時間）、加成建築（building）、有勾 Plus 時排序用到的 Plus 加總算法（plusFormula，預設有勾）；有用到才列',
   },
   'features/guideCalcs/components/LaunchSimCalculator.tsx': {
     chips: [['launchSim', 'units']],
