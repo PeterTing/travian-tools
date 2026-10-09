@@ -54,21 +54,23 @@ def calculate_travel_seconds(
 ) -> int:
     """Travel time in seconds, rounded to nearest second (game behaviour).
 
-    Tournament Square (S71): first 20 fields at normal speed; beyond that
-    speed × (1 + 0.20 × TS_level).
+    Official help page S71: first 20 fields at normal speed; beyond that
+    speed × (1 + 0.20 × TS_level + boots%). Tournament Square and hero boots
+    are ADDED together (not multiplied) and only apply beyond 20 fields (P0-20).
+    hero_bonus_percent = hero boots bonus (%).
     """
     if distance <= 0 or unit_speed <= 0:
         return 0
 
     speed = float(unit_speed) * float(server_speed if server_speed > 0 else 1.0)
     speed *= artifact_multiplier if artifact_multiplier > 0 else 1.0
-    if hero_bonus_percent:
-        speed *= 1 + hero_bonus_percent / 100.0
 
     ts_level = max(0, tournament_square_level)
-    if ts_level > 0 and distance > TS_THRESHOLD_FIELDS:
+    boots = max(0.0, hero_bonus_percent) / 100.0
+    if (ts_level > 0 or boots > 0) and distance > TS_THRESHOLD_FIELDS:
         near = TS_THRESHOLD_FIELDS / speed
-        bonus = 1 + ts_level * TS_BONUS_PER_LEVEL
+        # 競技場和靴子相加，只算超過 20 格的路段
+        bonus = 1 + ts_level * TS_BONUS_PER_LEVEL + boots
         far = (distance - TS_THRESHOLD_FIELDS) / (speed * bonus)
         hours = near + far
     else:

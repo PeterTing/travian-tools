@@ -956,7 +956,7 @@
   },
   "pathCalc": {
     "title": "Travel time",
-    "intro": "How long troops take to travel between two points. Tournament Square only speeds the stretch beyond 20 fields (+20% per level). Results update as you type.",
+    "intro": "How long troops take to travel between two points. Tournament Square and hero boots only speed up the stretch beyond 20 fields, and their bonuses add up; each Tournament Square level adds 20%. Results update as you type.",
     "inputs": "Inputs",
     "results": "Results",
     "startX": "Start X",
@@ -965,7 +965,7 @@
     "targetY": "Target Y",
     "unitSpeed": "Unit speed (fields/hour)",
     "tsLevel": "Tournament Square level (0–20)",
-    "heroBonus": "Hero speed bonus (%)",
+    "heroBonus": "Hero boots speed bonus (%)",
     "artifact": "Artifact",
     "artifactNone": "None",
     "artifactUnique2x": "Unique 2×",
@@ -1193,6 +1193,14 @@
     "arenaSpeed": {
       "what": "The Tournament Square speed-up hasn't been checked in-game on ts11 yet.",
       "source": "We follow the official help page: no bonus for the first 20 fields, then +20% per level beyond them."
+    },
+    "heroBootsSpeed": {
+      "what": "The hero boots speed-up hasn't been checked in-game on ts11 yet.",
+      "source": "We follow the official help page: boots only speed up the stretch beyond 20 fields."
+    },
+    "arenaBootsSpeed": {
+      "what": "The Tournament Square and hero boots speed-ups haven't been checked in-game on ts11 yet.",
+      "source": "We follow the official help page: no bonus for the first 20 fields, then +20% per Tournament Square level plus the boots bonus beyond them (added together, not multiplied)."
     }
   }
 }

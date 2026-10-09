@@ -352,6 +352,36 @@ describe('#27 follow-up chips', () => {
     expect(within(panel).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
     cleanup()
   })
+
+  it('march time (P0-20): boots only -> heroBootsSpeed; arena + boots -> arenaBootsSpeed; one chip per line on the same lines; both 0 -> none', async () => {
+    const { default: Path } = await import('@/pages/calculator/PathCalculatorPage')
+    render(<MemoryRouter><Path /></MemoryRouter>)
+    const panel = screen.getByTestId('calc-result-panel')
+    const ts = within(screen.getByTestId('path-ts-level')).getByRole('spinbutton')
+    const boots = screen.getByLabelText(i18n.t('pathCalc.heroBonus'))
+    expect(i18n.t('pathCalc.heroBonus')).toBe('英雄靴子速度加成（%）')
+    expect(screen.getByText(/競技場和英雄靴子只加快超過 20 格的那段路，兩者相加；競技場每升一級快 20%。/)).toBeInTheDocument()
+    const rowKinds = () => {
+      const d = screen.getByTestId('calc-result-details')
+      return ['pathCalc.travelTime', 'pathCalc.seconds', 'pathCalc.effectiveSpeed'].map((key) => {
+        const chips = within(d).getByText(i18n.t(key)).querySelectorAll('[data-testid="pending-verify-chip"]')
+        expect(chips.length, key).toBeLessThanOrEqual(1)
+        return chips[0]?.getAttribute('data-kind') ?? null
+      })
+    }
+    fireEvent.change(boots, { target: { value: '25' } })
+    expect(secondaryKind()).toBe('heroBootsSpeed')
+    expect(rowKinds()).toEqual(['heroBootsSpeed', 'heroBootsSpeed', 'heroBootsSpeed'])
+    fireEvent.change(ts, { target: { value: '3' } })
+    expect(secondaryKind()).toBe('arenaBootsSpeed')
+    expect(rowKinds()).toEqual(['arenaBootsSpeed', 'arenaBootsSpeed', 'arenaBootsSpeed'])
+    expect(titleChip()).toBeNull()
+    fireEvent.change(boots, { target: { value: '0' } })
+    expect(secondaryKind()).toBe('arenaSpeed')
+    fireEvent.change(ts, { target: { value: '0' } })
+    expect(within(panel).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
+    cleanup()
+  })
 })
 
 /** 邊界測試：門檻往任一邊移 1 級都會失敗 */

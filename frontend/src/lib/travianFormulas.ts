@@ -16,8 +16,10 @@ export function tournamentSquareBonusFactor(level: number): number {
 
 /**
  * Travel time in seconds, rounded to nearest second (game behaviour).
- * Tournament Square (S71): first 20 fields at normal speed; beyond that
- * speed × (1 + 0.20 × TS_level).
+ * Official help page S71: the first 20 fields at normal speed; beyond that
+ * speed × (1 + 0.20 × TS_level + boots%). Tournament Square and hero boots are
+ * ADDED together (not multiplied) and only apply beyond 20 fields (P0-20).
+ * heroBonusPercent = hero boots bonus (%).
  */
 export function calculateTravelSeconds(opts: {
   distance: number
@@ -40,13 +42,14 @@ export function calculateTravelSeconds(opts: {
 
   let speed = unitSpeed * (serverSpeed > 0 ? serverSpeed : 1)
   speed *= artifactMultiplier > 0 ? artifactMultiplier : 1
-  if (heroBonusPercent) speed *= 1 + heroBonusPercent / 100
 
   const tsLevel = Math.max(0, tournamentSquareLevel)
+  const boots = Math.max(0, heroBonusPercent) / 100
   let hours: number
-  if (tsLevel > 0 && distance > TS_THRESHOLD_FIELDS) {
+  if ((tsLevel > 0 || boots > 0) && distance > TS_THRESHOLD_FIELDS) {
     const near = TS_THRESHOLD_FIELDS / speed
-    const bonus = tournamentSquareBonusFactor(tsLevel)
+    // 競技場和靴子相加，只算超過 20 格的路段
+    const bonus = tournamentSquareBonusFactor(tsLevel) + boots
     const far = (distance - TS_THRESHOLD_FIELDS) / (speed * bonus)
     hours = near + far
   } else {
