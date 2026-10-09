@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from app.utils.culture_points import celebration_cap, village_requirements
+
 # 早期發展策略
 EARLY_GAME_STRATEGIES = {
     "first_72_hours": {
@@ -61,9 +63,9 @@ EARLY_GAME_STRATEGIES = {
         },
         "tips": [
             "持續舉辦慶典累積文化點",
-            "小型慶典：500文化點",
-            "大型慶典（城鎮廳10級）：2000文化點",
-            "慶典成本約20,330資源",
+            "小型慶典：拿到本村每日 CP 產量（x1 上限 500）——開局一天才十幾 CP，別期待一次 500",
+            "大型慶典（城鎮廳10級）：拿到全帳號每日 CP 產量（x1 上限 2000）",
+            "小慶典成本 20,330 資源（糧食 1,340 待 ts11 驗證）",
         ],
     },
 }
@@ -356,16 +358,18 @@ CULTURE_POINTS_GUIDE = {
     },
     "celebrations": {
         "small": {
-            "cp": 500,
-            "cost": "約6,650資源",
+            "cp": f"本村每日 CP 產量，x1 上限 {celebration_cap('small', 1)}",
+            "cp_cap_x1": celebration_cap("small", 1),
+            "cost": "6,400／6,650／5,940／1,340（糧食待 ts11 驗證）",
             "requirement": "城鎮廳1級",
         },
         "great": {
-            "cp": 2000,
-            "cost": "約29,700資源",
+            "cp": f"全帳號每日 CP 產量，x1 上限 {celebration_cap('great', 1)}",
+            "cp_cap_x1": celebration_cap("great", 1),
+            "cost": "29,700／33,250／32,000／6,700（待 ts11 驗證）",
             "requirement": "城鎮廳10級",
         },
-        "tip": "速度伺服器時間減半但獎勵也減半",
+        "tip": "慶典給的 CP＝每日 CP 產量（有上限）；x3／x5 上限減半、x10 剩 1/4（官方 Game Versions and Speed）",
     },
     "efficient_buildings": {
         "title": "高效文化點建築",
@@ -377,13 +381,11 @@ CULTURE_POINTS_GUIDE = {
         ],
     },
     "village_requirements": {
-        "description": "每個新村莊需要的累積文化點",
-        "formula": "隨村莊數量指數增長",
+        "description": "每個新村莊需要的累積文化點（x1；第 3 村起待 ts11 驗證）",
+        "formula": "官方表；約 1600 ÷ 速度 × (村數−1)^2.3",
         "example": [
-            {"village": 2, "cp_needed": 2000},
-            {"village": 3, "cp_needed": 6000},
-            {"village": 4, "cp_needed": 12000},
-            {"village": 5, "cp_needed": 20000},
+            {"village": v, "cp_needed": village_requirements(1)[v - 1]}
+            for v in (2, 3, 4, 5)
         ],
     },
 }

@@ -7,14 +7,16 @@ Sources:
 - S41: Trapper — https://support.travian.com/en/articles/41
 - S187: Unit comparison (smithy L20 values)
 - S20: Celebrations fixed CP
-- TS11: in-game verification on ts11 International x1 (2026-10-05)
+- TS11: in-game verification on ts11 International x1 (2026-10-05); the build-time
+  formula (0.964^(MB−1), rounded to 10 s) 公式經 ts11 實測校正, pinned by
+  tests/unit/test_travian_formulas_ts11.py
 """
 
 from __future__ import annotations
 
 import math
 
-# Main Building build-time factor (Legends / T4). Source: KIR; verified TS11.
+# Main Building build-time factor (Legends / T4). 公式經 ts11 實測校正 (test_travian_formulas_ts11.py).
 MB_TIME_FACTOR = 0.964
 
 # Tournament Square applies only beyond this distance. Source: S71 (not the old 30).
@@ -31,14 +33,14 @@ def calculate_build_time(
 ) -> int:
     """Actual build time in seconds, rounded to nearest 10 s.
 
-    Formula (KIR / TS11): base × 0.964^(MB_level − 1) ÷ server_speed
+    Formula (公式經 ts11 實測校正): base × 0.964^(MB_level − 1) ÷ server_speed
     """
     if base_time <= 0:
         return 0
     speed = server_speed if server_speed > 0 else 1.0
     mb = max(1, main_building_level)
     actual = base_time * (MB_TIME_FACTOR ** (mb - 1)) / speed
-    # Game UI rounds build times to the nearest 10 seconds (KIR / TS11).
+    # Game UI rounds build times to the nearest 10 seconds (公式經 ts11 實測校正).
     return max(0, int(round(actual / 10.0) * 10))
 
 

@@ -8,7 +8,6 @@ vi.mock('@/services/advancedCalculatorApi', () => ({
   advancedCalculatorApi: {
     calculateCropScouter: vi.fn(),
     calculateTsOptimizer: vi.fn(),
-    calculateFakeTroops: vi.fn(),
   },
 }))
 
@@ -51,44 +50,15 @@ describe('AttackPlannerPage', () => {
     vi.clearAllMocks()
   })
 
-  it('defaults to TS optimizer tab', () => {
+  it('shows the TS optimizer directly', () => {
     render(<AttackPlannerPage />)
-    // TS optimizer form present
     expect(screen.getByTestId('ts-submit')).toBeInTheDocument()
   })
 
-  it('switches to fake troops tab', async () => {
+  it('no longer offers the retired fake-troops calculator', () => {
     render(<AttackPlannerPage />)
-    fireEvent.click(screen.getByTestId('mode-fake'))
-    await waitFor(() =>
-      expect(screen.getByTestId('fake-submit')).toBeInTheDocument(),
-    )
-  })
-
-  it('fake troops calls API with tribe', async () => {
-    mockedApi.calculateFakeTroops.mockResolvedValueOnce({
-      min_infantry: 25,
-      min_cavalry: 5,
-      min_catapults: 10,
-      min_rams: 5,
-      total_population_cost: 115,
-      reasoning: 'Target 500 / romans',
-    })
-
-    render(<AttackPlannerPage />)
-    fireEvent.click(screen.getByTestId('mode-fake'))
-    await waitFor(() =>
-      expect(screen.getByTestId('fake-submit')).toBeInTheDocument(),
-    )
-    fireEvent.click(screen.getByTestId('fake-submit'))
-
-    await waitFor(() =>
-      expect(screen.getByTestId('fake-result')).toBeInTheDocument(),
-    )
-    expect(mockedApi.calculateFakeTroops).toHaveBeenCalledWith(
-      expect.objectContaining({
-        attacker_tribe: 'romans',
-      }),
-    )
+    expect(screen.queryByTestId('mode-fake')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('fake-submit')).not.toBeInTheDocument()
+    expect(screen.queryByText(/佯攻/)).not.toBeInTheDocument()
   })
 })

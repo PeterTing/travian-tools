@@ -347,7 +347,7 @@ class TestNpcCapacity:
 
 class TestCulturePointsPerBuilding:
     def test_mb_1_to_2_daily_increase_is_1(self) -> None:
-        # culture_points field = daily CP at level (KIR). MB1=2, MB2=3 → +1
+        # culture_points field = daily CP at level (round(base × 1.2^L), 公式經 ts11 實測校正). MB1=2, MB2=3 → +1
         response = client.post(
             "/api/v1/calculator/building/upgrade",
             json={

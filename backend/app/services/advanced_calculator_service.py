@@ -12,8 +12,6 @@ from app.domain.schemas.advanced_calculator import (
     CulturePointsRequest,
     CulturePointsResponse,
     CulturePointsVillage,
-    FakeTroopsRequest,
-    FakeTroopsResponse,
     InterceptionRequest,
     InterceptionResponse,
     NpcCalculatorRequest,
@@ -34,6 +32,7 @@ from app.domain.schemas.advanced_calculator import (
     VillageBuilderRequest,
     VillageBuilderResponse,
 )
+from app.utils.culture_points import village_requirements
 from app.utils.travian_formulas import (
     TS_THRESHOLD_FIELDS,
     calculate_travel_seconds,
@@ -42,29 +41,8 @@ from app.utils.travian_formulas import (
     smithy_improved_value,
 )
 
-# 文化點需求表（Travian Legends）
-CP_REQUIREMENTS = [
-    0,  # 1st village (free)
-    2000,  # 2nd
-    8000,  # 3rd
-    20000,  # 4th
-    39000,  # 5th
-    65000,  # 6th
-    99000,  # 7th
-    141000,  # 8th
-    191000,  # 9th
-    251000,  # 10th
-    319000,  # 11th
-    397000,  # 12th
-    486000,  # 13th
-    584000,  # 14th
-    692000,  # 15th
-    811000,  # 16th
-    941000,  # 17th
-    1082000,  # 18th
-    1234000,  # 19th
-    1397000,  # 20th
-]
+# 文化點需求表（x1，前 20 村）——唯一來源是 data/static/culture_points.json
+CP_REQUIREMENTS = village_requirements(1)[:20]
 
 MAP_SIZE = 401
 
@@ -785,62 +763,6 @@ class AdvancedCalculatorService:
             target_arrival=request.target_arrival,
             results=results,
             warnings=warnings,
-        )
-
-    # ─── Fake Troops Calculator (佯攻部隊) ─────────────────────────
-
-    def calculate_fake_troops(self, request: FakeTroopsRequest) -> FakeTroopsResponse:
-        """Compute minimum fake-attack composition that looks credible.
-
-        Community heuristic:
-          - infantry  = 5% of target population × tribe multiplier (min 10)
-          - cavalry   = 1% of target population × tribe multiplier (min 1)
-          - catapults = target_pop / 50  (0 if excluded)
-          - rams      = target_pop / 100 (0 if excluded)
-
-        Tribe multipliers reflect relative unit cost (Teuton cheapest,
-        Spartan priciest). Population cost follows standard Travian
-        crop-consumption: infantry × 1, cavalry × 4, cats × 6, rams × 4.
-        """
-        pop = request.target_population
-        tribe = request.attacker_tribe.lower()
-
-        tribe_multipliers = {
-            "romans": 1.0,
-            "teutons": 0.8,
-            "gauls": 0.9,
-            "huns": 0.95,
-            "egyptians": 0.9,
-            "spartans": 1.05,
-            "vikings": 0.95,
-        }
-        multiplier = tribe_multipliers.get(tribe, 1.0)
-
-        min_infantry = max(10, int(pop * 0.05 * multiplier))
-        min_cavalry = max(1, int(pop * 0.01 * multiplier))
-        min_catapults = int(pop / 50) if request.include_catapults else 0
-        min_rams = int(pop / 100) if request.include_rams else 0
-
-        total_pop_cost = (
-            min_infantry * 1 + min_cavalry * 4 + min_catapults * 6 + min_rams * 4
-        )
-
-        reasoning_parts = [
-            f"Target population {pop} ({tribe}). Fake needs ~5% infantry + ",
-            f"{min_cavalry} cavalry for speed profile.",
-        ]
-        if request.include_catapults:
-            reasoning_parts.append(" Catapults included (real-attack signal).")
-        if request.include_rams:
-            reasoning_parts.append(" Rams included.")
-
-        return FakeTroopsResponse(
-            min_infantry=min_infantry,
-            min_cavalry=min_cavalry,
-            min_catapults=min_catapults,
-            min_rams=min_rams,
-            total_population_cost=total_pop_cost,
-            reasoning="".join(reasoning_parts),
         )
 
 

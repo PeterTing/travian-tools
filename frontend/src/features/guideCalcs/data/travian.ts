@@ -1,14 +1,19 @@
 /**
  * Travian Legends T4.6 — Canonical Data Module
  *
- * Single source of truth for all calculators.
+ * Building costs / times / CP and village CP thresholds come from
+ * src/data/gameData.gen.json (scripts/game_data/gen_game_data.py) — the same
+ * generated numbers the backend serves, so every page shows one set of values.
  * All values are for 1x server speed unless noted.
  *
- * Verified against:
- *   - kirilloid/travian source (authoritative game formulas)
- *   - support.travian.com / travian.fandom.com (public documentation)
- *   - Lumi/Eggstra/Dave advanced guide (ROI Tables 2 & 3)
+ * Checked against: ts11 measurements (review/realtest/tool-verification.md),
+ * support.travian.com (official rules), Lumi/Eggstra/Dave guide (ROI tables).
+ * External calculators were only used to compare output, not copied.
  */
+
+import {
+  buildingRows, CP_BASE_BY_ID, villageRequirements, celebration, celebrationCap,
+} from '../../../data/gameData';
 
 export type ResourceType = 'wood' | 'clay' | 'iron' | 'crop';
 export type CropperId = '15c' | '9c' | '7c' | '6c';
@@ -52,30 +57,19 @@ export const FIELD_PRODUCTION: readonly number[] = Object.freeze([
 
 // =========================================================================
 // Field upgrade costs (per-level, NOT cumulative)
-// Cost(L) = round5(base × 1.67^(L-1)) per resource
+// Cost(L) = round5(base × 1.67^(L-1)) per resource — generated data
 // =========================================================================
-function _fieldCostTable(
-  baseW: number, baseC: number, baseI: number, baseCr: number,
-): FieldCostRow[] {
-  const rows: FieldCostRow[] = [];
-  for (let L = 1; L <= 20; L++) {
-    const mult = Math.pow(1.67, L - 1);
-    rows.push({
-      level: L,
-      wood: Math.round((baseW * mult) / 5) * 5,
-      clay: Math.round((baseC * mult) / 5) * 5,
-      iron: Math.round((baseI * mult) / 5) * 5,
-      crop: Math.round((baseCr * mult) / 5) * 5,
-    });
-  }
-  return rows;
+function _fieldCostTable(buildingId: string): FieldCostRow[] {
+  return buildingRows(buildingId).map(r => ({
+    level: r.level, wood: r.wood, clay: r.clay, iron: r.iron, crop: r.crop,
+  }));
 }
 
 export const FIELD_COSTS: Record<ResourceType, readonly FieldCostRow[]> = {
-  wood: Object.freeze(_fieldCostTable(40, 100, 50, 60)),
-  clay: Object.freeze(_fieldCostTable(80, 40, 80, 50)),
-  iron: Object.freeze(_fieldCostTable(100, 80, 30, 60)),
-  crop: Object.freeze(_fieldCostTable(70, 90, 70, 20)),
+  wood: Object.freeze(_fieldCostTable('woodcutter')),
+  clay: Object.freeze(_fieldCostTable('clay_pit')),
+  iron: Object.freeze(_fieldCostTable('iron_mine')),
+  crop: Object.freeze(_fieldCostTable('cropland')),
 };
 
 export function fieldTotalCost(type: ResourceType, level: number): number {
@@ -96,16 +90,21 @@ export const BONUS_BUILDINGS = {
   bakery:      { resource: 'crop' as const, perLevel: 0.05, maxLevel: 5, requires: 'Cropland L10, Grain Mill L5' },
 } as const;
 
-// Bonus-building L1 base cost (scales by 1.80^(L-1))
-export const BB_BASE_COST: Record<keyof typeof BONUS_BUILDINGS, { wood: number; clay: number; iron: number; crop: number }> = {
-  sawmill:     { wood: 520,  clay: 380,  iron: 290,  crop: 90 },
-  brickyard:   { wood: 440,  clay: 480,  iron: 320,  crop: 50 },
-  ironFoundry: { wood: 200,  clay: 450,  iron: 510,  crop: 120 },
-  grainMill:   { wood: 500,  clay: 440,  iron: 380,  crop: 1240 },
-  bakery:      { wood: 1200, clay: 1480, iron: 870,  crop: 1600 },
+const BB_ID: Record<keyof typeof BONUS_BUILDINGS, string> = {
+  sawmill: 'sawmill', brickyard: 'brickyard', ironFoundry: 'iron_foundry',
+  grainMill: 'grain_mill', bakery: 'bakery',
 };
 
+// Bonus-building L1 base cost (scales by 1.80^(L-1)) — generated data
+export const BB_BASE_COST: Record<keyof typeof BONUS_BUILDINGS, { wood: number; clay: number; iron: number; crop: number }> =
+  Object.fromEntries((Object.keys(BB_ID) as (keyof typeof BONUS_BUILDINGS)[]).map(bb => {
+    const r = buildingRows(BB_ID[bb])[0]!;
+    return [bb, { wood: r.wood, clay: r.clay, iron: r.iron, crop: r.crop }];
+  })) as Record<keyof typeof BONUS_BUILDINGS, { wood: number; clay: number; iron: number; crop: number }>;
+
 export function bbCost(bb: keyof typeof BONUS_BUILDINGS, lv: number): FieldCostRow {
+  const r = buildingRows(BB_ID[bb])[lv - 1];
+  if (r) return { level: lv, wood: r.wood, clay: r.clay, iron: r.iron, crop: r.crop };
   const b = BB_BASE_COST[bb];
   const m = Math.pow(1.80, lv - 1);
   return {
@@ -136,25 +135,37 @@ export type CpBuilding =
   | 'woodcutter' | 'clayPit' | 'ironMine' | 'cropland'
   | 'sawmill' | 'brickyard' | 'ironFoundry' | 'grainMill' | 'bakery';
 
-export const CP_BASE: Record<CpBuilding, number> = {
-  // base 1
-  warehouse: 1, granary: 1, cranny: 1, barracks: 1, tournamentSquare: 1,
-  heroMansion: 1, greatBarracks: 1, greatWarehouse: 1, greatGranary: 1,
-  stonemason: 1, rallyPoint: 1, trapper: 1,
-  cityWall: 1, earthWall: 1, palisade: 1, stoneWall: 1, makeshiftWall: 1, barricade: 1,
-  woodcutter: 1, clayPit: 1, ironMine: 1, cropland: 1,
-  sawmill: 1, brickyard: 1, ironFoundry: 1, grainMill: 1, bakery: 1,
-  // base 2
-  mainBuilding: 2, residence: 2, smithy: 2, armoury: 2, stable: 2, greatStable: 2,
-  // base 3
-  marketplace: 3, workshop: 3, tradeOffice: 3, horseDrinkingTrough: 3,
-  // base 4
-  embassy: 4, academy: 4, brewery: 4,
-  // base 5
-  townHall: 5, palace: 5,
-  // base 6
-  treasury: 6,
+// camelCase key → building_id in the generated data
+const CP_ID: Partial<Record<CpBuilding, string>> = {
+  mainBuilding: 'main_building', marketplace: 'marketplace', embassy: 'embassy',
+  academy: 'academy', townHall: 'town_hall', residence: 'residence', palace: 'palace',
+  treasury: 'treasury', tradeOffice: 'trade_office', smithy: 'blacksmith', armoury: 'armoury',
+  stable: 'stable', greatStable: 'great_stable', barracks: 'barracks',
+  greatBarracks: 'great_barracks', workshop: 'workshop', warehouse: 'warehouse',
+  granary: 'granary', greatWarehouse: 'great_warehouse', greatGranary: 'great_granary',
+  tournamentSquare: 'tournament_square', heroMansion: 'heros_mansion', cranny: 'cranny',
+  trapper: 'trapper', rallyPoint: 'rally_point', stonemason: 'stonemasons_lodge',
+  brewery: 'brewery', horseDrinkingTrough: 'horse_drinking_trough',
+  cityWall: 'city_wall', earthWall: 'earth_wall', palisade: 'palisade',
+  woodcutter: 'woodcutter', clayPit: 'clay_pit', ironMine: 'iron_mine', cropland: 'cropland',
+  sawmill: 'sawmill', brickyard: 'brickyard', ironFoundry: 'iron_foundry',
+  grainMill: 'grain_mill', bakery: 'bakery',
 };
+
+const ALL_CP_BUILDINGS: CpBuilding[] = [
+  'mainBuilding', 'marketplace', 'embassy', 'academy', 'townHall', 'residence', 'palace',
+  'treasury', 'tradeOffice', 'smithy', 'armoury', 'stable', 'greatStable', 'barracks',
+  'greatBarracks', 'workshop', 'warehouse', 'granary', 'greatWarehouse', 'greatGranary',
+  'tournamentSquare', 'heroMansion', 'cranny', 'trapper', 'rallyPoint', 'stonemason',
+  'brewery', 'horseDrinkingTrough', 'cityWall', 'earthWall', 'palisade', 'stoneWall',
+  'makeshiftWall', 'barricade', 'woodcutter', 'clayPit', 'ironMine', 'cropland',
+  'sawmill', 'brickyard', 'ironFoundry', 'grainMill', 'bakery',
+];
+
+// Walls not in the app's building list (stone / makeshift wall, barricade) are CP base 1.
+export const CP_BASE: Record<CpBuilding, number> = Object.fromEntries(
+  ALL_CP_BUILDINGS.map(b => [b, CP_ID[b] ? (CP_BASE_BY_ID[CP_ID[b]!] ?? 1) : 1]),
+) as Record<CpBuilding, number>;
 
 export function cpAtLevel(building: CpBuilding, level: number): number {
   const base = CP_BASE[building];
@@ -171,20 +182,18 @@ export function cpSum(building: CpBuilding, minLevel: number, maxLevel: number):
 // =========================================================================
 // Culture Points required to settle village N
 // =========================================================================
-// Source: support.travian.com/en/support/solutions/articles/7000065115-culture-points-cp-
-// x1 speed. Verified 2026-04-23. Delta = cumulative[N] - cumulative[N-1].
-export const CP_REQUIRED: ReadonlyArray<{ village: number; delta: number; cumulative: number }> = Object.freeze([
-  { village: 1,  delta: 0,      cumulative: 0 },
-  { village: 2,  delta: 2000,   cumulative: 2000 },
-  { village: 3,  delta: 6000,   cumulative: 8000 },
-  { village: 4,  delta: 12000,  cumulative: 20000 },
-  { village: 5,  delta: 19000,  cumulative: 39000 },
-  { village: 6,  delta: 26000,  cumulative: 65000 },
-  { village: 7,  delta: 34000,  cumulative: 99000 },
-  { village: 8,  delta: 42000,  cumulative: 141000 },
-  { village: 9,  delta: 50000,  cumulative: 191000 },
-  { village: 10, delta: 60000,  cumulative: 251000 },
-]);
+// Source: support.travian.com/en/articles/51-culture-points-cp (official table;
+// our formula round(1600 / speed × (N−1)^2.3) reproduces every cell). x1 here;
+// other speeds via villageRequirements(speed) in src/data/gameData.ts.
+// Only village 2 (2,000) has been confirmed in ts11 — UI marks the rest 待驗證.
+const _X1 = villageRequirements(1);
+export const CP_REQUIRED: ReadonlyArray<{ village: number; delta: number; cumulative: number }> = Object.freeze(
+  _X1.slice(0, 10).map((cumulative, i) => ({
+    village: i + 1,
+    delta: i === 0 ? 0 : cumulative - _X1[i - 1]!,
+    cumulative,
+  })),
+);
 
 // =========================================================================
 // Oasis types
@@ -212,11 +221,7 @@ export const OASIS_TYPES: readonly OasisType[] = Object.freeze([
 // =========================================================================
 // Hero's Mansion oasis unlocks + cumulative build cost
 //
-// T4 override per kirilloid src/model/t4/buildings.ts:
-//   [ID.HERO_MANSION]: { c: [80, 120, 70, 90] }  → L1 total = 360
-//   Inherits k = 1.33 from T3 base (src/model/t3/buildings.ts)
-//
-// Cumulative(L) = base × (k^L − 1) / (k − 1) = 360 × (1.33^L − 1) / 0.33
+// T4 cost: L1 80/120/70/90 (total 360), ×1.33 per level, round5 per level.
 //
 // Note: Lumi Table 3 ROI values (e.g. 15c HM10 50%-crop = 1.83 days) were
 // derived against an earlier HM cost table ~5× higher than modern T4.
@@ -224,18 +229,13 @@ export const OASIS_TYPES: readonly OasisType[] = Object.freeze([
 // meaning modern T4 makes capturing oases FAR more attractive than the
 // numbers in the published Lumi guide suggest.
 // =========================================================================
-// Hero's Mansion cumulative cost (T4 formula, kirilloid-verified)
-// Base L1 cost per resource: [80, 120, 70, 90] with k=1.33 geometric scaling, round5 per-level.
+// Hero's Mansion cumulative cost — generated data (T4: 80/120/70/90 × 1.33^(L-1)).
+// 待驗證: not yet seen on a ts11 building page.
 export function hmCumulativeCost(level: number): number {
   if (level <= 0) return 0;
-  const base = [80, 120, 70, 90];
-  const k = 1.33;
-  let sum = 0;
-  for (let L = 1; L <= level; L++) {
-    const m = Math.pow(k, L - 1);
-    for (const b of base) sum += Math.round((b * m) / 5) * 5;
-  }
-  return sum;
+  return buildingRows('heros_mansion')
+    .slice(0, level)
+    .reduce((sum, r) => sum + r.wood + r.clay + r.iron + r.crop, 0);
 }
 
 export const HERO_MANSION = {
@@ -313,16 +313,22 @@ export const TRADE_OFFICE_PER_LEVEL = TRADE_OFFICE_PER_LEVEL_DEFAULT;
 // =========================================================================
 // Town Hall Celebrations (1x speed)
 // =========================================================================
+// CP gained = daily CP production (small: that village, great: whole account),
+// capped by world speed (x1: 500 / 2,000). `cp` below is the x1 cap, NOT a fixed
+// reward — use celebrationCp() from src/data/gameData.ts.
+// Costs: small crop 1,340 and the great costs are 待驗證 (ts11 has no Town Hall yet).
+const _small = celebration('small');
+const _great = celebration('great');
 export const CELEBRATIONS = {
   small: {
     name: { zh: '小型慶典', en: 'Small Celebration' },
-    minTownHall: 1, cp: 500, hours: 24,
-    cost: { wood: 6400, clay: 6650, iron: 5940, crop: 500 },
+    minTownHall: _small.minTownHall, cp: celebrationCap('small', 1), hours: 24,
+    cost: { wood: _small.cost[0], clay: _small.cost[1], iron: _small.cost[2], crop: _small.cost[3] },
   },
   great: {
     name: { zh: '大型慶典', en: 'Great Celebration' },
-    minTownHall: 10, cp: 2000, hours: 60,
-    cost: { wood: 29700, clay: 33250, iron: 32000, crop: 6700 },
+    minTownHall: _great.minTownHall, cp: celebrationCap('great', 1), hours: 60,
+    cost: { wood: _great.cost[0], clay: _great.cost[1], iron: _great.cost[2], crop: _great.cost[3] },
   },
 } as const;
 
@@ -333,13 +339,21 @@ export function mbMultiplier(level: number): number {
   return Math.pow(0.964, Math.max(0, level - 1));
 }
 
+const FIELD_ID: Record<ResourceType, string> = {
+  wood: 'woodcutter', clay: 'clay_pit', iron: 'iron_mine', crop: 'cropland',
+};
+
 const FIELD_TIME_BASE: Record<ResourceType, number> = {
   wood: 1780 / 3, clay: 1660 / 3, iron: 2350 / 3, crop: 1450 / 3,
 };
 
+// Base seconds come from the generated data (a × 1.6^(L−1) − 1000/3); the
+// formula is only a fallback for levels outside the table (e.g. crop L21).
 export function fieldBuildTime(type: ResourceType, level: number, mbLevel = 1): number {
-  const a = FIELD_TIME_BASE[type];
-  const baseSec = Math.max(0, a * Math.pow(1.6, level - 1) - 1000 / 3);
+  const row = buildingRows(FIELD_ID[type])[level - 1];
+  const baseSec = row
+    ? row.buildTimeBase
+    : Math.max(0, FIELD_TIME_BASE[type] * Math.pow(1.6, level - 1) - 1000 / 3);
   return baseSec * mbMultiplier(mbLevel);
 }
 

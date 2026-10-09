@@ -128,8 +128,8 @@ export default function LaunchSimCalculator() {
 
           <div className={s.note}>
             {lang === 'en'
-              ? 'Task rewards and culture-point timing are not included, so real settle is often a bit faster. Assumes 1× server speed.'
-              : '尚未計入任務獎勵與文明點節奏，實際結帳通常會再快一些。數字以 1 倍速伺服器為準。'}
+              ? 'Task rewards and culture-point timing are not included, so real settle is often a bit faster. Assumes 1× server speed. A party (small celebration) only gives this village\'s daily CP — about a dozen CP early on, capped at 500 on x1 — so check the CP countdown in the Culture Points calculator before planning on parties.'
+              : '尚未計入任務獎勵與文明點節奏，實際結帳通常會再快一些。數字以 1 倍速伺服器為準。派對（小慶典）拿到的 CP＝本村每日 CP 產量，開局只有十幾點、x1 上限 500，不是固定 500；開村時間請到「CP 與開村」計算器看開村倒數。'}
           </div>
         </div>
 

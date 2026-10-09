@@ -5,48 +5,19 @@ import type {
   AttackerProfile,
   TsOptimizerRequest,
   TsOptimizerResponse,
-  FakeTroopsRequest,
-  FakeTroopsResponse,
 } from '@/services/advancedCalculatorApi'
 
-type Mode = 'ts' | 'fake'
-
+// 舊的「佯攻兵量」（目標人口 5% 的自編算法）已下架；
+// 之後照攻略規則（19 步兵＋1 投石）併進 OP 規劃重寫，見 docs/TICKETS.md。
 export default function AttackPlannerPage() {
-  const [mode, setMode] = useState<Mode>('ts')
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-2">攻擊規劃器</h1>
       <p className="text-muted-foreground mb-6">
-        TS 優化器同步多個攻擊者對一目標抵達時間；佯攻兵量計算器算出看起來像真打的最小兵力。
+        TS 優化器：同步多個攻擊者對同一目標的抵達時間。
       </p>
 
-      <div className="flex gap-0 mb-6">
-        <button
-          data-testid="mode-ts"
-          className={`px-4 py-2 rounded-l border ${
-            mode === 'ts'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-background'
-          }`}
-          onClick={() => setMode('ts')}
-        >
-          TS 優化器
-        </button>
-        <button
-          data-testid="mode-fake"
-          className={`px-4 py-2 rounded-r border-t border-r border-b ${
-            mode === 'fake'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-background'
-          }`}
-          onClick={() => setMode('fake')}
-        >
-          佯攻兵量
-        </button>
-      </div>
-
-      {mode === 'ts' ? <TsOptimizerForm /> : <FakeTroopsForm />}
+      <TsOptimizerForm />
     </div>
   )
 }
@@ -259,133 +230,6 @@ function TsOptimizerForm() {
           </table>
         </div>
       )}
-    </div>
-  )
-}
-
-// ─── Fake Troops Form ────────────────────────────────────────────
-
-const TRIBES = [
-  'romans',
-  'teutons',
-  'gauls',
-  'huns',
-  'egyptians',
-  'spartans',
-  'vikings',
-] as const
-
-function FakeTroopsForm() {
-  const [form, setForm] = useState<FakeTroopsRequest>({
-    target_population: 500,
-    attacker_tribe: 'romans',
-    include_catapults: true,
-    include_rams: true,
-  })
-  const [result, setResult] = useState<FakeTroopsResponse | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const handleCalculate = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const res = await advancedCalculatorApi.calculateFakeTroops(form)
-      setResult(res)
-    } catch {
-      setError('計算失敗')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="border rounded-lg p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">目標人口</label>
-            <input
-              type="number"
-              data-testid="pop"
-              min={0}
-              value={form.target_population}
-              onChange={(e) =>
-                setForm({ ...form, target_population: Number(e.target.value) || 0 })
-              }
-              className="w-full p-2 border rounded bg-background"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">攻擊方部族</label>
-            <select
-              data-testid="tribe"
-              value={form.attacker_tribe}
-              onChange={(e) =>
-                setForm({ ...form, attacker_tribe: e.target.value })
-              }
-              className="w-full p-2 border rounded bg-background"
-            >
-              {TRIBES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex gap-4 mb-4">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={form.include_catapults}
-                onChange={(e) =>
-                  setForm({ ...form, include_catapults: e.target.checked })
-                }
-              />
-              含催化彈
-            </label>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={form.include_rams}
-                onChange={(e) =>
-                  setForm({ ...form, include_rams: e.target.checked })
-                }
-              />
-              含破城槌
-            </label>
-          </div>
-          <Button
-            data-testid="fake-submit"
-            disabled={loading}
-            onClick={handleCalculate}
-          >
-            {loading ? '計算中…' : '計算佯攻兵量'}
-          </Button>
-
-          {error && (
-            <p className="text-red-600 mt-3" data-testid="error">
-              {error}
-            </p>
-          )}
-        </div>
-
-        {result && (
-          <div data-testid="fake-result" className="space-y-2">
-            <h3 className="font-bold mb-2">建議佯攻組成</h3>
-            <p>步兵 (infantry): {result.min_infantry}</p>
-            <p>騎兵 (cavalry): {result.min_cavalry}</p>
-            <p>催化彈: {result.min_catapults}</p>
-            <p>破城槌: {result.min_rams}</p>
-            <p className="font-bold mt-3 pt-2 border-t">
-              人口成本: {result.total_population_cost}
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              {result.reasoning}
-            </p>
-          </div>
-        )}
-      </div>
     </div>
   )
 }

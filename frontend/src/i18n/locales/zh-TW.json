@@ -25,7 +25,11 @@
     "yes": "是",
     "no": "否",
     "error": "錯誤",
-    "success": "成功"
+    "success": "成功",
+    "pendingVerify": "待驗證",
+    "pendingVerifyNote": "這個數值還沒在遊戲裡實測確認",
+    "buildingVerifyLegend": "除標 ✓ 的建築外，數值皆未在 ts11 實測",
+    "verifiedTs11": "已在 ts11 實測"
   },
   "nav": {
     "title": "Travian Tools",
@@ -69,7 +73,7 @@
       "cropScouter": "首都類型反推",
       "launchSim": "出兵模擬",
       "buildOrder": "建造順序",
-      "passiveCp": "文明點",
+      "passiveCp": "CP 與開村",
       "fieldRoi": "田地 ROI",
       "oasisRoi": "綠洲 ROI",
       "cropSim": "糧食模擬",

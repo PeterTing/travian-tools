@@ -4,7 +4,6 @@ Covers:
 - Optimal Village Builder (Lumi-style build order)
 - Crop Scouter (reverse-inference of enemy cropper type)
 - Attack TS Optimizer (multi-attacker sync-arrival)
-- Fake Troops Calculator (credible fake composition)
 
 Source documents:
 - docs/knowledge/template-definitions.md
@@ -17,7 +16,6 @@ from datetime import datetime
 from app.domain.schemas.advanced_calculator import (
     AttackerProfile,
     CropScouterRequest,
-    FakeTroopsRequest,
     OasisConfig,
     TsOptimizerRequest,
     VillageBuilderRequest,
@@ -346,75 +344,3 @@ def test_ts_optimizer_short_distance_skips_ts_bonus():
         )
     ).results[0]
     assert r_a.travel_time_formatted == r_b.travel_time_formatted
-
-
-# ─── Fake Troops Calculator ───────────────────────────────────────
-
-
-def test_fake_troops_scales_with_target_population():
-    """Larger target population needs more fake troops."""
-    service = get_advanced_calculator_service()
-    small = service.calculate_fake_troops(
-        FakeTroopsRequest(
-            target_population=200,
-            attacker_tribe="romans",
-            include_catapults=True,
-            include_rams=True,
-        )
-    )
-    large = service.calculate_fake_troops(
-        FakeTroopsRequest(
-            target_population=2000,
-            attacker_tribe="romans",
-            include_catapults=True,
-            include_rams=True,
-        )
-    )
-    assert large.total_population_cost > small.total_population_cost
-    assert large.min_infantry > small.min_infantry
-
-
-def test_fake_troops_without_catapults_is_cheaper():
-    """Excluding catapults should reduce population cost and zero out cats."""
-    service = get_advanced_calculator_service()
-    with_cats = service.calculate_fake_troops(
-        FakeTroopsRequest(
-            target_population=500,
-            attacker_tribe="gauls",
-            include_catapults=True,
-            include_rams=True,
-        )
-    )
-    no_cats = service.calculate_fake_troops(
-        FakeTroopsRequest(
-            target_population=500,
-            attacker_tribe="gauls",
-            include_catapults=False,
-            include_rams=True,
-        )
-    )
-    assert no_cats.min_catapults == 0
-    assert no_cats.total_population_cost < with_cats.total_population_cost
-
-
-def test_fake_troops_tribe_multiplier_applied():
-    """Teuton (cheapest) should produce fewer units than Spartan (priciest)
-    for the same target population."""
-    service = get_advanced_calculator_service()
-    teuton = service.calculate_fake_troops(
-        FakeTroopsRequest(
-            target_population=1000,
-            attacker_tribe="teutons",
-            include_catapults=False,
-            include_rams=False,
-        )
-    )
-    spartan = service.calculate_fake_troops(
-        FakeTroopsRequest(
-            target_population=1000,
-            attacker_tribe="spartans",
-            include_catapults=False,
-            include_rams=False,
-        )
-    )
-    assert teuton.min_infantry < spartan.min_infantry

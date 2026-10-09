@@ -178,7 +178,7 @@ def calculate_actual_build_time(
 ) -> int:
     """計算實際建造時間.
 
-    Legends / T4（KIR；ts11 實測）：base × 0.964^(MB−1) ÷ speed，四捨五入到 10 秒。
+    Legends / T4（公式經 ts11 實測校正）：base × 0.964^(MB−1) ÷ speed，四捨五入到 10 秒。
     """
     from app.utils.travian_formulas import calculate_build_time
 
@@ -238,8 +238,8 @@ async def calculate_building_upgrade(
         total_population += level_data.population
 
     # CP：每棟建築按「目前等級」的每日產出計算，不是把各級累加。
-    # buildings.json 的 culture_points 欄位對應 KIR 的該級每日 CP
-    # （round(base × 1.2^level)）；cp_per_day 欄位是舊的累加值，勿用。
+    # buildings.json 的 culture_points 是該級每日 CP（round(base × 1.2^level)，
+    # 見 scripts/game_data/gen_game_data.py；cp_per_day 現在與它相同）。
     from_level_data = (
         building.get_level(request.from_level) if request.from_level > 0 else None
     )

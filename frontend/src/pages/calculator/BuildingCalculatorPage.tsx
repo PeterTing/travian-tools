@@ -3,6 +3,8 @@ import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { buildingsApi, calculatorApi } from '@/services/gameApi'
+import BuildingVerifyMark, { BuildingVerifyLegend } from '@/components/common/BuildingVerifyMark'
+import { isBuildingVerified } from '@/data/gameData'
 import type {
   BuildingListItem,
   BuildingUpgradeRequest,
@@ -85,7 +87,8 @@ export default function BuildingCalculatorPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{t('calculator.building.title')}</h1>
+      <h1 className="text-3xl font-bold mb-2">{t('calculator.building.title')}</h1>
+      <BuildingVerifyLegend />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input area */}
@@ -104,7 +107,7 @@ export default function BuildingCalculatorPage() {
             >
               {buildings.map((building) => (
                 <option key={building.building_id} value={building.building_id}>
-                  {isZh ? building.name_zh : building.name_en}
+                  {isZh ? building.name_zh : building.name_en}{isBuildingVerified(building.building_id) ? ' ✓' : ''}
                 </option>
               ))}
             </select>
@@ -195,8 +198,9 @@ export default function BuildingCalculatorPage() {
             <div className="space-y-4">
               {/* Building info */}
               <div className="p-4 bg-muted rounded">
-                <h3 className="font-semibold">
+                <h3 className="font-semibold" data-testid="calc-building-name">
                   {isZh ? result.building_name_zh : result.building_name_en}
+                  <BuildingVerifyMark buildingId={result.building_id} />
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   {t('calculator.building.levelRange', { from: result.from_level, to: result.to_level })}
