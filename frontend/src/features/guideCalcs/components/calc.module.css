@@ -16,7 +16,7 @@
 
 /*
  * Same room for pages that lay out their own wrapper but use CalcResultPanel (e.g. 行軍時間).
- * --calc-panel-h is the collapsed panel height, measured by CalcResultPanel on phone.
+ * --calc-panel-h is the panel's current height (collapsed or expanded), measured by CalcResultPanel on phone.
  */
 .panelSpace {
   padding-bottom: calc(var(--calc-panel-h, 12rem) + 16px);

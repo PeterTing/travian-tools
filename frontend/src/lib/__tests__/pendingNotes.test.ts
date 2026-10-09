@@ -103,10 +103,10 @@ describe('P0-17 新種類的文字（PM 定稿，2026-10-10）', () => {
   const notes = (zh as unknown as { pendingNotes: Notes }).pendingNotes
   const enNotes = (en as unknown as { pendingNotes: Notes }).pendingNotes
   it.each([
-    ['merchantCapacity', '商人容量還沒在 ts11 遊戲內核對。', '目前用的是社群 wiki 的數字，可能有誤差。'],
+    ['merchantCapacity', '商人容量和速度還沒在 ts11 遊戲內核對。', '目前用的是社群 wiki 的數字，可能有誤差。'],
     ['unitCarry', '兵種攜帶量還沒在 ts11 遊戲內核對。', '目前用的是社群整理的數字，可能有誤差。'],
     ['plusFormula', 'Plus 加成的算法還沒在 ts11 遊戲內核對。', '這頁用加總算，產量模擬和綠洲用相乘算，結果可能不一樣。'],
-    ['fieldHighLevel', '資源田 4 級以上的花費和時間是公式推算。', 'ts11 只核對過 1–3 級。'],
+    ['fieldHighLevel', '資源田 4 級以上的花費、時間，和 3 級以上的產量是公式推算。', 'ts11 只核對過花費 1–3 級、產量 0–2 級。'],
     ['launchSim', '開局花費是試算表每一步的加總，含派對（用小慶典的糧）。', '這些數字還沒在 ts11 遊戲內核對。'],
   ])('%s', (kind, what, source) => {
     expect(notes[kind]).toEqual({ what, source })

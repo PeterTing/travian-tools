@@ -72,7 +72,7 @@ describe('結果摘要：用到待驗證資料的數字，收合時旁邊也有�
       expect(within(screen.getByTestId('calc-result-primary')).queryByTestId('pending-verify-chip')).toBeNull()
       // 同一種只放一個（標題和第二行不重複）
       const kinds = summaryChipKinds().flatMap((k) => k.split(' '))
-      expect(new Set(kinds).size, `${path} 摘要裡同一種灰標放了兩次`).toBe(kinds.length)
+      if (!decl.repeatOk) expect(new Set(kinds).size, `${path} 摘要裡同一種灰標放了兩次`).toBe(kinds.length)
       // 點開：說明撐滿面板內容寬度（data-fill）
       for (const chip of within(screen.getByTestId('calc-result-panel')).queryAllByTestId('pending-verify-chip')) {
         if (chip.closest('[data-testid="calc-result-details"]')) continue
@@ -113,9 +113,15 @@ describe('貿易路線、農場收益、田地回本：明細裡用到待驗證�
     const el = within(root).getByText(label)
     return el.querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind') ?? null
   }
-  it('trade route: capacity row, table header, total merchants -> merchantCapacity; tribe select label too', async () => {
+  it('trade route: capacity, speed, one-way/round trip rows, table header, total merchants -> merchantCapacity; tribe select label; summary round-trip line has its own chip', async () => {
     const d = await open('features/guideCalcs/components/TraderouteCalculator.tsx')
     expect(chipNextTo(d, '每商人容量（含交易所）')).toBe('merchantCapacity')
+    expect(chipNextTo(d, '速度')).toBe('merchantCapacity')
+    expect(chipNextTo(d, '單程 / 往返')).toBe('merchantCapacity')
+    const sec = screen.getByTestId('calc-result-secondary')
+    expect(sec).toHaveTextContent('往返')
+    expect(within(sec).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantCapacity')
+    expect(within(screen.getByTestId('calc-result-title')).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantCapacity')
     expect(chipNextTo(d, '總商人')).toBe('merchantCapacity')
     expect(within(within(d).getByTestId('traderoute-table').querySelector('thead')!).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'merchantCapacity')
     const tribe = screen.getByLabelText('部族')
@@ -138,8 +144,8 @@ describe('貿易路線、農場收益、田地回本：明細裡用到待驗證�
     const d = await open('features/guideCalcs/components/FieldRoiCalculator.tsx')
     // 預設 L7、Plus 有勾、沒有加成建築
     expect(chipNextTo(d, '升級成本（合計）')).toBe('fieldHighLevel')
-    expect(chipNextTo(d, '每小時產量增加')).toBe('plusFormula')
-    expect(chipNextTo(d, '每天產量增加')).toBe('plusFormula')
+    expect(chipNextTo(d, '每小時產量增加')).toBe('fieldHighLevel plusFormula')
+    expect(chipNextTo(d, '每天產量增加')).toBe('fieldHighLevel plusFormula')
     expect(within(within(d).getByTestId('field-roi-compare').querySelector('thead')!).getByTestId('pending-verify-chip')).toHaveAttribute('data-kind', 'fieldHighLevel plusFormula')
     cleanup()
   })
@@ -169,13 +175,13 @@ describe('Plus 有勾、390 收合：摘要的灰標點開要列出 Plus 的說�
     render(<MemoryRouter><Oasis /></MemoryRouter>)
     plusBox()
     const entries = openSummaryChip()
-    expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['cropSim', 'heroMansionCost'])
-    expect(entries[0]).toHaveTextContent('Plus 用乘的（×1.25）')
+    expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['fieldHighLevel', 'cropSim', 'heroMansionCost'])
+    expect(entries[1]).toHaveTextContent('Plus 用乘的（×1.25）')
     // 種類之間隔 8px（mt-2）
     expect(entries[1]).toHaveClass('mt-2')
     fireEvent.click(plusBox())
     const chip = within(screen.getByTestId('calc-result-secondary')).getByTestId('pending-verify-chip')
-    expect(chip).toHaveAttribute('data-kind', 'heroMansionCost')
+    expect(chip).toHaveAttribute('data-kind', 'fieldHighLevel heroMansionCost')
     cleanup()
   })
 
@@ -185,10 +191,64 @@ describe('Plus 有勾、390 收合：摘要的灰標點開要列出 Plus 的說�
     plusBox()
     const entries = openSummaryChip()
     expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['fieldHighLevel', 'plusFormula'])
-    expect(entries[0]).toHaveTextContent('資源田 4 級以上的花費和時間是公式推算。')
-    expect(entries[0]).toHaveTextContent('ts11 只核對過 1–3 級。')
+    expect(entries[0]).toHaveTextContent('資源田 4 級以上的花費、時間，和 3 級以上的產量是公式推算。')
+    expect(entries[0]).toHaveTextContent('ts11 只核對過花費 1–3 級、產量 0–2 級。')
     expect(entries[1]).toHaveTextContent('Plus 加成的算法還沒在 ts11 遊戲內核對。')
     expect(entries[1]).toHaveTextContent('這頁用加總算，產量模擬和綠洲用相乘算，結果可能不一樣。')
     cleanup()
+  })
+})
+
+/** fieldHighLevel 的門檻：產量 3 級以上、花費／時間 4 級以上（ts11 核對過產量 0–2、花費 1–3） */
+describe('fieldHighLevel thresholds: production >= 3, cost/time >= 4', () => {
+  const setLevel = (from: string, to: number) => fireEvent.change(screen.getByDisplayValue(from), { target: { value: String(to) } })
+  const uncheckPlus = () => fireEvent.click(screen.getByRole('checkbox', { name: /Plus/ }))
+  const summaryKinds = () => {
+    const c = within(screen.getByTestId('calc-result-secondary')).queryByTestId('pending-verify-chip')
+    return c ? c.getAttribute('data-kind') : null
+  }
+  const rowKind = (label: string) => {
+    const d = screen.getByTestId('calc-result-details')
+    return within(d).getByText(label).querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind') ?? null
+  }
+
+  it('field ROI: target lvl 2 -> no chip; lvl 3 -> production only; lvl 4 -> cost too', async () => {
+    const { default: FieldRoi } = await import('./components/FieldRoiCalculator')
+    render(<MemoryRouter><FieldRoi /></MemoryRouter>)
+    uncheckPlus()
+    setLevel('Lv 7', 2)
+    expect(summaryKinds()).toBeNull()
+    expect(rowKind('升級成本（合計）')).toBeNull()
+    expect(rowKind('每小時產量增加')).toBeNull()
+    setLevel('Lv 2', 3)
+    expect(summaryKinds()).toBe('fieldHighLevel')
+    expect(rowKind('升級成本（合計）')).toBeNull() // 花費 3 級核對過
+    expect(rowKind('每小時產量增加')).toBe('fieldHighLevel')
+    expect(rowKind('每天產量增加')).toBe('fieldHighLevel')
+    setLevel('Lv 3', 4)
+    expect(summaryKinds()).toBe('fieldHighLevel')
+    expect(rowKind('升級成本（合計）')).toBe('fieldHighLevel')
+    cleanup()
+  })
+
+  it('oasis: field level choices start at 5, so production always uses lvl >= 3 -> fieldHighLevel on the summary and both production rows', async () => {
+    const { default: Oasis } = await import('./components/OasisRoiCalculator')
+    render(<MemoryRouter><Oasis /></MemoryRouter>)
+    uncheckPlus()
+    const lv = screen.getByDisplayValue('Lv 10') as HTMLSelectElement
+    expect(Math.min(...[...lv.options].map((o) => +o.value))).toBeGreaterThanOrEqual(3)
+    expect(summaryKinds()).toBe('fieldHighLevel heroMansionCost')
+    fireEvent.click(screen.getByTestId('calc-result-toggle'))
+    expect(rowKind('此綠洲每小時產量')).toBe('fieldHighLevel')
+    expect(rowKind('每天')).toBe('fieldHighLevel')
+    cleanup()
+  })
+
+  it('build order: cost/time chip only when a field step goes to lvl >= 4 (start lvl 1 -> none reach 4; start lvl 3 -> some do)', async () => {
+    const { planGreedy } = await import('./components/BuildOrderCalculator')
+    const base = { cropperId: '15c' as const, isCap: false, bonus: { sawmill: 0, brickyard: 0, ironFoundry: 0, grainMill: 0, bakery: 0 }, mb: 10, gold: true }
+    const reach4 = (lv: number) => planGreedy({ ...base, start: { wood: lv, clay: lv, iron: lv, crop: lv } }).steps.some((x) => x.kind === 'field' && x.to >= 4)
+    expect(reach4(1)).toBe(false)
+    expect(reach4(3)).toBe(true)
   })
 })

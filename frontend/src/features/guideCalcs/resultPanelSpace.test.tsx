@@ -34,7 +34,7 @@ describe('固定在底部的結果列不蓋住輸入', () => {
     vi.restoreAllMocks()
   })
 
-  it('the panel publishes its collapsed height; opening details keeps the collapsed value; unmount clears it', () => {
+  it('the panel publishes its current height: collapsed, then expanded (follows the panel), unmount clears it', () => {
     vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ height: 183.4 } as DOMRect)
     const root = document.documentElement
     const { unmount } = render(
@@ -46,10 +46,32 @@ describe('固定在底部的結果列不蓋住輸入', () => {
 
     vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ height: 400 } as DOMRect)
     fireEvent.click(screen.getByTestId('calc-result-toggle'))
-    expect(root.style.getPropertyValue(PANEL_HEIGHT_VAR)).toBe('184px')
+    // 展開明細：留白跟著面板現在的高度（設計師擋件：捲到底時最後一個輸入不被蓋住）
+    expect(root.style.getPropertyValue(PANEL_HEIGHT_VAR)).toBe('400px')
 
     unmount()
     expect(root.style.getPropertyValue(PANEL_HEIGHT_VAR)).toBe('')
+  })
+
+  it('a ResizeObserver keeps it in sync while the panel changes height (e.g. a chip note opens)', () => {
+    let cb: ResizeObserverCallback | null = null
+    const orig = globalThis.ResizeObserver
+    globalThis.ResizeObserver = class {
+      constructor(c: ResizeObserverCallback) { cb = c }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    } as unknown as typeof ResizeObserver
+    try {
+      vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ height: 180 } as DOMRect)
+      render(<CalcResultPanel title="結果" primary="1" secondary="2"><p>明細</p></CalcResultPanel>)
+      expect(document.documentElement.style.getPropertyValue(PANEL_HEIGHT_VAR)).toBe('180px')
+      vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ height: 306 } as DOMRect)
+      cb!([], {} as ResizeObserver)
+      expect(document.documentElement.style.getPropertyValue(PANEL_HEIGHT_VAR)).toBe('306px')
+    } finally {
+      globalThis.ResizeObserver = orig
+    }
   })
 
   it('shared input-area padding = collapsed panel height + 16px (wrapper and panelSpace)', () => {

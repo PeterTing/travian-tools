@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { CROPPER_LAYOUTS, FIELD_PRODUCTION, type CropperId, type ResourceType } from '../data/travian';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip';
+import type { PendingKind } from '@/lib/pendingNotes';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
@@ -60,6 +61,11 @@ export default function CropSimCalculator() {
   const [oasis, setOasis] = useState({ wood: 0, clay: 0, iron: 0, crop: 150 });
   const [gold, setGold] = useState(true);
   const [waterworks, setWaterworks] = useState(0);
+  // 待驗證（一行一個灰標，依序）：資源田 3 級以上的產量是公式推算（fieldHighLevel）；Plus ×1.25、供水系統（cropSim）
+  const simKinds: PendingKind[] = [
+    ...(flv >= 3 ? ['fieldHighLevel' as const] : []),
+    ...(gold || waterworks > 0 ? ['cropSim' as const] : []),
+  ];
 
   const result = useMemo(
     () => cropSim({ layoutId, fieldLevel: flv, bonus, oasis, gold, waterworks }),
@@ -139,8 +145,8 @@ export default function CropSimCalculator() {
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Total /hr' : '總計 /hr'}
-          // Plus ×1.25 用乘的、供水系統 +5%／級還沒核對：有用到才標
-          titlePending={gold || waterworks > 0 ? 'cropSim' : false}
+          // 總計用到：資源田 3 級以上的產量（公式推算）、Plus ×1.25／供水系統（還沒核對）；有用到才列
+          titlePending={simKinds.length ? simKinds : false}
           primary={<>{fmtInt(total)}</>}
           secondary={
             lang === 'en'
@@ -149,22 +155,25 @@ export default function CropSimCalculator() {
           }
         >
           <h4>{lang === 'en' ? 'Production breakdown /hr' : '產量分解 /hr'}</h4>
-          <table className={s.table}>
-            <thead><tr>
-              <th>{lang === 'en' ? 'Resource' : '資源'}</th>
-              <th>{lang === 'en' ? 'Fields' : '田數'}</th>
-              <th>{lang === 'en' ? 'Base' : '基礎'}</th>
-              <th>{lang === 'en' ? 'Bonus%' : '加成%'}</th>
-              <th>{lang === 'en' ? 'Oasis%' : '綠洲%'}</th>
-              <th>{lang === 'en' ? 'Total /hr' : '總計 /hr'}</th>
-            </tr></thead>
+          {/* 基礎（3 級以上產量）、總計（再加 Plus／供水系統）：表頭一個灰標；每列 44px、垂直置中 */}
+          <table className={`${s.table} ${s.tapRows}`} data-testid="cropsim-breakdown">
+            <thead>
+              <PendingRow as="tr" className="h-11" tableColSpan={6}>
+                <th>{lang === 'en' ? 'Resource' : '資源'}</th>
+                <th>{lang === 'en' ? 'Fields' : '田數'}</th>
+                <th>{lang === 'en' ? 'Base' : '基礎'}{simKinds.length ? <> <PendingVerifyChip kinds={simKinds} /></> : null}</th>
+                <th>{lang === 'en' ? 'Bonus%' : '加成%'}</th>
+                <th>{lang === 'en' ? 'Oasis%' : '綠洲%'}</th>
+                <th>{lang === 'en' ? 'Total /hr' : '總計 /hr'}</th>
+              </PendingRow>
+            </thead>
             <tbody>
               {result.rows.map(r => {
                 const labels: Record<string, string> = lang === 'en'
                   ? { wood: '🪵 Wood', clay: '🧱 Clay', iron: '⛏️ Iron', crop: '🌾 Crop' }
                   : { wood: '🪵 木材', clay: '🧱 黏土', iron: '⛏️ 鐵礦', crop: '🌾 糧食' };
                 return (
-                  <tr key={r.t}>
+                  <tr key={r.t} className="h-11">
                     <td>{labels[r.t]}</td>
                     <td>{r.n} × {r.base}</td>
                     <td>{(r.n * r.base).toLocaleString()}</td>
@@ -177,9 +186,9 @@ export default function CropSimCalculator() {
             </tbody>
           </table>
 
-          <div className={s.row} style={{ marginTop: 12 }}><span className={s.label}>{lang === 'en' ? 'Wood + Clay + Iron /hr' : '木 + 土 + 鐵 /hr'}</span><span className={s.value}>{fmtInt(nonCrop)}</span></div>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Crop /hr' : '糧食 /hr'}</span><span className={s.value}>{fmtInt(result.totals.crop)}</span></div>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Total /hr' : '總計 /hr'}</span><span className={`${s.value} ${s.highlight}`}>{fmtInt(total)}</span></div>
+          <PendingRow className={s.row} style={{ marginTop: 12 }}><span className={s.label}>{lang === 'en' ? 'Wood + Clay + Iron /hr' : '木 + 土 + 鐵 /hr'}{simKinds.length ? <> <PendingVerifyChip kinds={simKinds} /></> : null}</span><span className={s.value}>{fmtInt(nonCrop)}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Crop /hr' : '糧食 /hr'}{simKinds.length ? <> <PendingVerifyChip kinds={simKinds} /></> : null}</span><span className={s.value}>{fmtInt(result.totals.crop)}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Total /hr' : '總計 /hr'}{simKinds.length ? <> <PendingVerifyChip kinds={simKinds} /></> : null}</span><span className={`${s.value} ${s.highlight}`}>{fmtInt(total)}</span></PendingRow>
 
           <h4>{lang === 'en' ? 'Reference (Lv 18, fully buffed)' : '參考值（18 級、加成拉滿）'}</h4>
           <table className={s.table}>

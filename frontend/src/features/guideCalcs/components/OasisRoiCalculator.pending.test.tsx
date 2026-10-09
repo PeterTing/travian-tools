@@ -65,10 +65,10 @@ describe('OasisRoiCalculator: the Hero\'s Mansion cost number always comes with 
     const table = screen.getByTestId('oasis-hm-compare')
     for (const tr of table.querySelectorAll('thead > tr, tbody > tr')) expect(tr).toHaveClass('h-11')
     fireEvent.click(within(screen.getByTestId('calc-result-secondary')).getByTestId('pending-verify-chip'))
-    // Plus 預設有勾：一個灰標兩種說明，依數字順序（每天 +X → cropSim、英雄宅成本 → heroMansionCost）
+    // Plus 預設有勾：一個灰標三種說明，依數字順序（每天 +X → fieldHighLevel、cropSim；英雄宅成本 → heroMansionCost）
     const entries = screen.getAllByTestId('pending-note-entry')
-    expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['cropSim', 'heroMansionCost'])
-    expect(within(entries[1]!).getByTestId('pending-note-what')).toHaveTextContent('英雄宅的花費還沒在 ts11 遊戲內核對。')
-    expect(within(entries[1]!).getByTestId('pending-note-source')).toHaveTextContent('目前用的數字來源還在查，可能有誤差。')
+    expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['fieldHighLevel', 'cropSim', 'heroMansionCost'])
+    expect(within(entries[2]!).getByTestId('pending-note-what')).toHaveTextContent('英雄宅的花費還沒在 ts11 遊戲內核對。')
+    expect(within(entries[2]!).getByTestId('pending-note-source')).toHaveTextContent('目前用的數字來源還在查，可能有誤差。')
   })
 })

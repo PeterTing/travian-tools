@@ -7,6 +7,7 @@ import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerify
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
+import type { PendingKind } from '@/lib/pendingNotes';
 import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const fmt = (n: number) => isFinite(n)
@@ -43,6 +44,11 @@ export default function OasisRoiCalculator() {
   }, [layout, fieldLv, oasisId, gold]);
 
   const roi = useMemo(() => hmCumulativeCost(hm) / dailyGain, [hm, dailyGain]);
+  // 產量用到的待驗證：資源田 3 級以上的產量是公式推算（fieldHighLevel）、Plus ×1.25（cropSim）
+  const prodKinds: PendingKind[] = [
+    ...(fieldLv >= 3 ? ['fieldHighLevel' as const] : []),
+    ...(gold ? ['cropSim' as const] : []),
+  ];
 
   return (
     <>
@@ -113,8 +119,8 @@ export default function OasisRoiCalculator() {
           primary={<>{roi.toFixed(2)} {lang === 'en' ? 'days' : '天'}</>}
           secondary={
             // 手機收合時只看得到這一行：一行一個灰標，依數字出現順序——
-            // 「每天 +X」（有勾 Plus 時用 ×1.25，cropSim）、「英雄宅成本」（heroMansionCost）
-            <SummaryPending kinds={gold ? ['cropSim', 'heroMansionCost'] : ['heroMansionCost']} testId="oasis-summary-hm">
+            // 「每天 +X」（3 級以上產量 fieldHighLevel、有勾 Plus 的 ×1.25 cropSim）、「英雄宅成本」（heroMansionCost）
+            <SummaryPending kinds={[...prodKinds, 'heroMansionCost']} testId="oasis-summary-hm">
               {lang === 'en'
                 ? `+${fmt(dailyGain)}/day · mansion cost ${fmt(hmCumulativeCost(hm))}`
                 : `每天 +${fmt(dailyGain)} · 英雄宅成本 ${fmt(hmCumulativeCost(hm))}`}
@@ -122,9 +128,9 @@ export default function OasisRoiCalculator() {
           }
         >
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'HM cumulative cost' : '英雄宅累積成本'} <PendingVerifyChip kind="heroMansionCost" /></span><span className={s.value}>{fmt(hmCumulativeCost(hm))}</span></PendingRow>
-          {/* 有勾 Plus：產量用 ×1.25（還沒核對）→ 產量兩列跟著 cropSim 灰標 */}
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /hr from this oasis' : '此綠洲每小時產量'}{gold ? <> <PendingVerifyChip kind="cropSim" /></> : null}</span><span className={s.value}>+{fmt(dailyGain / 24)}</span></PendingRow>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /day' : '每天'}{gold ? <> <PendingVerifyChip kind="cropSim" /></> : null}</span><span className={s.value}>+{fmt(dailyGain)}</span></PendingRow>
+          {/* 產量兩列：3 級以上產量（fieldHighLevel）、有勾 Plus 的 ×1.25（cropSim） */}
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /hr from this oasis' : '此綠洲每小時產量'}{prodKinds.length ? <> <PendingVerifyChip kinds={prodKinds} /></> : null}</span><span className={s.value}>+{fmt(dailyGain / 24)}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /day' : '每天'}{prodKinds.length ? <> <PendingVerifyChip kinds={prodKinds} /></> : null}</span><span className={s.value}>+{fmt(dailyGain)}</span></PendingRow>
 
           <h4>{lang === 'en' ? 'Compare 3 mansion levels' : '比較三種英雄宅等級'}</h4>
           {/* 「成本」欄是英雄宅花費：表頭放一個灰標；每列 44px、垂直置中，點擊範圍不重疊 */}
@@ -132,8 +138,8 @@ export default function OasisRoiCalculator() {
             <thead>
               <PendingRow as="tr" className="h-11" tableColSpan={4}>
                 <th>{lang === 'en' ? 'Mansion' : '英雄宅'}</th>
-                {/* 一行一個灰標：成本（英雄宅）、ROI（有勾 Plus 時產量用 ×1.25） */}
-                <th>{lang === 'en' ? 'Cost' : '成本'} <PendingVerifyChip kinds={gold ? ['heroMansionCost', 'cropSim'] : ['heroMansionCost']} /></th>
+                {/* 一行一個灰標：成本（英雄宅）、ROI（用到的產量） */}
+                <th>{lang === 'en' ? 'Cost' : '成本'} <PendingVerifyChip kinds={['heroMansionCost', ...prodKinds]} /></th>
                 <th>ROI</th>
                 <th>{lang === 'en' ? 'Verdict' : '判斷'}</th>
               </PendingRow>

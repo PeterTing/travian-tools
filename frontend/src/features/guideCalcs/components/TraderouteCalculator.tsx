@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { MERCHANTS, merchantCapacity, type TribeId } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
-import CalcResultPanel from './CalcResultPanel';
+import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
@@ -61,7 +61,7 @@ export default function TraderouteCalculator() {
           <h4>{lang === 'en' ? 'Setup' : '基本'}</h4>
 
           <div className={s.field}>
-            {/* 選項裡有商人容量：灰標放在欄位名稱旁（不放進 label，免得點名稱變成點灰標） */}
+            {/* 選項裡有商人容量和速度：灰標放在欄位名稱旁（不放進 label，免得點名稱變成點灰標） */}
             <PendingRow className="flex min-h-11 items-center gap-1">
               <label htmlFor="traderoute-tribe">{lang === 'en' ? 'Tribe' : '部族'}</label>
               <PendingVerifyChip kind="merchantCapacity" />
@@ -103,22 +103,25 @@ export default function TraderouteCalculator() {
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Merchants needed' : '所需商人'}
-          // 所需商人用商人容量算（社群 wiki 的數字）；第二行的「容量」同一份資料，不再重複放灰標
+          // 所需商人用商人容量和速度算（社群 wiki 的數字）
           titlePending="merchantCapacity"
           primary={<>{totalLabel}</>}
           secondary={
-            lang === 'en'
-              ? `Cap ${fmtInt(cap)} · round trip ${fmtHr(roundTrip)}`
-              : `容量 ${fmtInt(cap)} · 往返 ${fmtHr(roundTrip)}`
+            // 「容量」「往返」（商人速度）也是同一份社群 wiki 數字：跟標題不同一行，自己一個灰標（PM）
+            <SummaryPending kind="merchantCapacity" testId="traderoute-summary">
+              {lang === 'en'
+                ? `Cap ${fmtInt(cap)} · round trip ${fmtHr(roundTrip)}`
+                : `容量 ${fmtInt(cap)} · 往返 ${fmtHr(roundTrip)}`}
+            </SummaryPending>
           }
         >
           <h4>{lang === 'en' ? 'Merchant specs' : '商人規格'}</h4>
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Capacity per merchant (incl. Trade Office)' : '每商人容量（含交易所）'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={s.value}>{fmtInt(cap)}</span></PendingRow>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Speed' : '速度'}</span><span className={s.value}>{speed} {lang === 'en' ? 'tiles/hr' : '格/小時'}</span></div>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way / round trip' : '單程 / 往返'}</span><span className={s.value}>{fmtHr(oneWay)} / {fmtHr(roundTrip)}</span></div>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Speed' : '速度'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={s.value}>{speed} {lang === 'en' ? 'tiles/hr' : '格/小時'}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way / round trip' : '單程 / 往返'} <PendingVerifyChip kind="merchantCapacity" /></span><span className={s.value}>{fmtHr(oneWay)} / {fmtHr(roundTrip)}</span></PendingRow>
 
           <h4>{lang === 'en' ? 'Merchants needed (1 hour cycle)' : '所需商人（每小時送完）'}</h4>
-          {/* 次數、常駐都用商人容量算：表頭放一個灰標；每列 44px、垂直置中，點擊範圍不重疊 */}
+          {/* 次數用商人容量、常駐也用往返時間（速度）算：表頭放一個灰標；每列 44px、垂直置中 */}
           <table className={`${s.table} ${s.tapRows}`} data-testid="traderoute-table">
             <thead>
               <PendingRow as="tr" className="h-11" tableColSpan={4}>

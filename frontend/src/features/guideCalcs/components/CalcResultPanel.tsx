@@ -59,8 +59,10 @@ export default function CalcResultPanel({
     return () => mq.removeEventListener('change', apply)
   }, [])
 
-  // 手機：量收合時的高度，寫到 <html> 的 --calc-panel-h，輸入區才能留出剛好的空間。
-  // 展開明細時不更新（保持收合高度），電腦版不需要。
+  // 手機：面板現在的高度（收合、展開明細、點開灰標說明都會變）寫到 <html> 的 --calc-panel-h，
+  // 共用版面的輸入區底部留「面板高度＋16px」，捲到底時最後一個輸入（含灰標）不會被面板蓋住
+  // （設計師擋件）。面板本身最高 min(50vh, 22rem)、超過在面板內捲動，所以留白也不會超過這個高度。
+  // 電腦版面板不是固定在底部，不需要。
   useLayoutEffect(() => {
     const el = rootRef.current
     const root = document.documentElement
@@ -68,13 +70,13 @@ export default function CalcResultPanel({
       root.style.removeProperty(PANEL_HEIGHT_VAR)
       return
     }
-    if (open) return
     const measure = () => root.style.setProperty(PANEL_HEIGHT_VAR, `${Math.ceil(el.getBoundingClientRect().height)}px`)
     measure()
     if (typeof ResizeObserver === 'undefined') return
     const ro = new ResizeObserver(measure)
     ro.observe(el)
     return () => ro.disconnect()
+    // open：展開／收合明細時馬上量一次（不等 ResizeObserver）
   }, [isDesktop, open])
   useEffect(
     () => () => {
