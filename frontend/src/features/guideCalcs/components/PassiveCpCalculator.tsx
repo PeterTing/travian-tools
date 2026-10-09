@@ -155,8 +155,9 @@ export default function PassiveCpCalculator() {
     if (manualSpeed == null) resetForSpeed(accountSpeed)
   }, [accountSpeed, manualSpeed])
 
-  // 換帳號：不再算「動過」，表單換成那個帳號上次存的目前 CP（沒存過就用預設值）
-  const lastAccountId = useRef(accountId)
+  // 第一次進來和換帳號：不再算「動過」，表單換成那個帳號上次存的目前 CP（沒存過就用預設值）。
+  // 初值用 undefined：從首頁點進來時帳號已經載好，第一次 render 就有 accountId，也要讀一次。
+  const lastAccountId = useRef<string | null | undefined>(undefined)
   useEffect(() => {
     if (lastAccountId.current === accountId) return
     lastAccountId.current = accountId
