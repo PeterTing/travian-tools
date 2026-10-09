@@ -64,8 +64,9 @@ export default function PathCalculatorPage() {
     }
   }, [startX, startY, targetX, targetY, unitSpeed, tsLevel, heroBonus, artifact, serverSpeed])
 
-  // 待驗證：競技場 > 0 級時，移動時間和速度用了競技場公式（官方說明頁 S71，還沒在 ts11 遊戲內核對）；0 級不標
-  const arenaKinds: PendingKind[] = tsLevel > 0 ? ['arenaSpeed' as const] : []
+  // 待驗證：競技場 > 0 級或英雄靴子 > 0% 時，移動時間和速度用了官方說明頁 S71 的公式（還沒在 ts11 遊戲內核對）；
+  // 一行一個灰標，依用到的加成選一種說明（只有競技場／只有靴子／兩個都有）；兩個都 0 不標
+  const arenaKinds: PendingKind[] = tsLevel > 0 && heroBonus > 0 ? ['arenaBootsSpeed' as const] : tsLevel > 0 ? ['arenaSpeed' as const] : heroBonus > 0 ? ['heroBootsSpeed' as const] : []
   const arenaChip = arenaKinds.length ? <> <PendingVerifyChip kinds={arenaKinds} /></> : null
 
   const inputCls =

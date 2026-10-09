@@ -82,3 +82,32 @@ describe('Tournament Square (S71) — shared frontend formula', () => {
     expect(l20).toBe(Math.round((2 + 0.4) * 3600))
   })
 })
+
+describe('Hero boots (P0-20, official help page S71): added to Tournament Square, beyond 20 fields only', () => {
+  const t = (distance: number, ts: number, boots: number) =>
+    calculateTravelSeconds({ distance, unitSpeed: 10, tournamentSquareLevel: ts, heroBonusPercent: boots })
+
+  it('≤ 20 fields with boots: time unchanged', () => {
+    expect(t(20, 0, 75)).toBe(t(20, 0, 0))
+    expect(t(15, 0, 75)).toBe(t(15, 0, 0))
+    expect(t(20, 10, 75)).toBe(7200)
+  })
+
+  it('> 20 fields: boots + arena are added, not multiplied', () => {
+    // TS 10 (+200%) + boots 25% → far segment × 3.25 (not 3 × 1.25 = 3.75)
+    const added = Math.round((20 / 10 + 80 / (10 * 3.25)) * 3600)
+    const multiplied = Math.round((20 / 10 + 80 / (10 * 3.75)) * 3600)
+    expect(t(100, 10, 25)).toBe(added)
+    expect(t(100, 10, 25)).not.toBe(multiplied)
+  })
+
+  it('arena only', () => {
+    expect(t(60, 5, 0)).toBe(Math.round((2 + 40 / (10 * 2)) * 3600))
+  })
+
+  it('boots only: only the stretch beyond 20 fields is faster', () => {
+    expect(t(60, 0, 50)).toBe(Math.round((2 + 40 / (10 * 1.5)) * 3600))
+    expect(t(60, 0, 50)).not.toBe(Math.round((60 / 15) * 3600))
+  })
+})
+

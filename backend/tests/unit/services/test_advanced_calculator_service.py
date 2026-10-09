@@ -100,10 +100,33 @@ class TestHelperFunctions:
         assert with_artifact == pytest.approx(base / 2)
 
     def test_calculate_travel_time_with_hero_bonus(self) -> None:
-        """含英雄速度加成的行進時間."""
-        base = _calculate_travel_time(100, 10)
+        """英雄靴子只加快超過 20 格的路段（P0-20，官方說明頁 S71）."""
         with_hero = _calculate_travel_time(100, 10, hero_bonus=50)
-        assert with_hero == pytest.approx(base / 1.5)
+        assert with_hero == pytest.approx(20 / 10 + 80 / (10 * 1.5), abs=1 / 3600)
+
+    def test_boots_within_20_fields_no_effect(self) -> None:
+        """20 格以內有靴子 → 時間不變."""
+        assert _calculate_travel_time(20, 10, hero_bonus=75) == _calculate_travel_time(
+            20, 10
+        )
+        assert _calculate_travel_time(15, 10, hero_bonus=75) == _calculate_travel_time(
+            15, 10
+        )
+
+    def test_boots_and_ts_are_added_not_multiplied(self) -> None:
+        """競技場 10 級（+200%）＋靴子 25% → 超過 20 格 ×3.25，不是 ×3.75."""
+        t = _calculate_travel_time(100, 10, tournament_square_level=10, hero_bonus=25)
+        assert t == pytest.approx(2 + 80 / (10 * 3.25), abs=1 / 3600)
+        assert t != pytest.approx(2 + 80 / (10 * 3 * 1.25), abs=1 / 3600)
+
+    def test_ts_only_and_boots_only(self) -> None:
+        """只有競技場、只有靴子."""
+        assert _calculate_travel_time(
+            60, 10, tournament_square_level=5
+        ) == pytest.approx(2 + 40 / (10 * 2), abs=1 / 3600)
+        assert _calculate_travel_time(60, 10, hero_bonus=50) == pytest.approx(
+            2 + 40 / (10 * 1.5), abs=1 / 3600
+        )
 
 
 # ============ Path Calculator 測試 ============

@@ -15,7 +15,10 @@ class PathCalculatorRequest(BaseModel):
     unit_speed: int = Field(..., gt=0, description="單位速度（格/小時）")
     tournament_square_level: int = Field(0, ge=0, le=20, description="競技場等級")
     hero_bonus: int = Field(
-        0, ge=0, le=75, description="英雄速度加成百分比（0, 25, 50, 75）"
+        0,
+        ge=0,
+        le=75,
+        description="英雄靴子速度加成百分比（只算超過 20 格的路段，跟競技場相加）",
     )
     artifact_bonus: str = Field(
         "none",

@@ -21,7 +21,7 @@ export interface SummaryPendingDecl {
 export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
   'pages/calculator/PathCalculatorPage.tsx': {
     chips: [],
-    note: '預設（競技場 0 級）沒用到待驗證資料：兵種速度是使用者自己打的數字（預設 7），這頁沒有兵種選單、不從網址或帳號帶入速度；已帶入列只帶伺服器速度和出發座標（幕僚長確認不用標）。競技場 > 0 級時第二行（距離 · 速度）放 arenaSpeed（#27 後續）',
+    note: '預設（競技場 0 級）沒用到待驗證資料：兵種速度是使用者自己打的數字（預設 7），這頁沒有兵種選單、不從網址或帳號帶入速度；已帶入列只帶伺服器速度和出發座標（幕僚長確認不用標）。競技場 > 0 級或英雄靴子 > 0% 時第二行（距離 · 速度）放一個：只有競技場 arenaSpeed、只有靴子 heroBootsSpeed、兩個都有 arenaBootsSpeed（#27 後續、P0-20）',
   },
   'features/guideCalcs/components/CropSimCalculator.tsx': {
     chips: [['fieldHighLevel', 'building', 'cropSim']],
