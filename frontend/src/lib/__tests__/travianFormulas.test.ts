@@ -3,8 +3,19 @@ import {
   TS_BONUS_PER_LEVEL,
   TS_THRESHOLD_FIELDS,
   calculateTravelSeconds,
+  distanceForTravelHours,
+  farSpeedFactor,
   tournamentSquareBonusFactor,
+  travelHours,
 } from '../travianFormulas'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+// 前後端共用的一致性案例（P0-21）。用 fs 讀、不用 import：前端 Docker build 只有 frontend/，tsc 看不到 docs/
+interface TravelCase { distance: number; unitSpeed: number; serverSpeed: number; arenaLevel: number; bootsPercent: number; seconds: number }
+const travelCases = JSON.parse(
+  readFileSync(resolve(__dirname, '../../../../docs/knowledge/travel-speed-cases.json'), 'utf-8'),
+) as { cases: TravelCase[] }
 
 describe('Tournament Square (S71) — shared frontend formula', () => {
   it('constants match backend: threshold 20, +20% per level', () => {
@@ -111,3 +122,27 @@ describe('Hero boots (P0-20, official help page S71): added to Tournament Square
   })
 })
 
+
+describe('P0-21 行軍速度公式統一：前後端同一份案例（docs/knowledge/travel-speed-cases.json）', () => {
+  it.each(travelCases.cases.map((c) => [`d${c.distance} v${c.unitSpeed}×${c.serverSpeed} ts${c.arenaLevel} boots${c.bootsPercent}`, c] as const))('%s', (_name, c) => {
+    const opts = {
+      distance: c.distance,
+      unitSpeed: c.unitSpeed,
+      serverSpeed: c.serverSpeed,
+      tournamentSquareLevel: c.arenaLevel,
+      heroBonusPercent: c.bootsPercent,
+    }
+    // 行軍時間頁用的就是這個函式（後端 test_travel_speed_consistency.py 用同一份案例跑每個工具）
+    expect(calculateTravelSeconds(opts)).toBe(c.seconds)
+    expect(Math.round(travelHours(opts) * 3600)).toBe(c.seconds)
+    // 躲兵的反函數：走那麼久 → 回到同一個距離
+    const back = distanceForTravelHours({ hours: travelHours(opts), unitSpeed: c.unitSpeed, serverSpeed: c.serverSpeed, tournamentSquareLevel: c.arenaLevel, heroBonusPercent: c.bootsPercent })
+    expect(back).toBeCloseTo(c.distance, 9)
+  })
+
+  it('farSpeedFactor adds arena and boots (1 + 0.2×TS + boots%)', () => {
+    expect(farSpeedFactor(0, 0)).toBe(1)
+    expect(farSpeedFactor(5, 25)).toBeCloseTo(2.25, 12)
+    expect(farSpeedFactor(20, 75)).toBeCloseTo(5.75, 12)
+  })
+})

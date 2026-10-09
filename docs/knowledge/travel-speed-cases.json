@@ -1,0 +1,85 @@
+{
+  "_comment": "P0-21 一致性測試的共用案例（前端 travianFormulas.test.ts、後端 test_travel_speed_consistency.py 都讀這份）。seconds 是照官方說明頁 S71 手算：前 20 格原速，超過的路段 ×(1+競技場×0.2+靴子%)，四捨五入到秒。",
+  "cases": [
+    {
+      "distance": 10,
+      "unitSpeed": 7,
+      "serverSpeed": 1,
+      "arenaLevel": 0,
+      "bootsPercent": 0,
+      "seconds": 5143
+    },
+    {
+      "distance": 20,
+      "unitSpeed": 7,
+      "serverSpeed": 1,
+      "arenaLevel": 5,
+      "bootsPercent": 25,
+      "seconds": 10286
+    },
+    {
+      "distance": 21,
+      "unitSpeed": 7,
+      "serverSpeed": 1,
+      "arenaLevel": 5,
+      "bootsPercent": 25,
+      "seconds": 10514
+    },
+    {
+      "distance": 50,
+      "unitSpeed": 7,
+      "serverSpeed": 1,
+      "arenaLevel": 5,
+      "bootsPercent": 25,
+      "seconds": 17143
+    },
+    {
+      "distance": 50,
+      "unitSpeed": 6,
+      "serverSpeed": 1,
+      "arenaLevel": 5,
+      "bootsPercent": 0,
+      "seconds": 21000
+    },
+    {
+      "distance": 50,
+      "unitSpeed": 6,
+      "serverSpeed": 1,
+      "arenaLevel": 0,
+      "bootsPercent": 30,
+      "seconds": 25846
+    },
+    {
+      "distance": 100,
+      "unitSpeed": 19,
+      "serverSpeed": 1,
+      "arenaLevel": 20,
+      "bootsPercent": 75,
+      "seconds": 6426
+    },
+    {
+      "distance": 35,
+      "unitSpeed": 3,
+      "serverSpeed": 2,
+      "arenaLevel": 1,
+      "bootsPercent": 0,
+      "seconds": 19500
+    },
+    {
+      "distance": 80,
+      "unitSpeed": 10,
+      "serverSpeed": 3,
+      "arenaLevel": 10,
+      "bootsPercent": 50,
+      "seconds": 4457
+    },
+    {
+      "distance": 150,
+      "unitSpeed": 5,
+      "serverSpeed": 1,
+      "arenaLevel": 0,
+      "bootsPercent": 0,
+      "seconds": 108000
+    }
+  ]
+}

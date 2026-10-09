@@ -34,8 +34,8 @@ from app.domain.schemas.advanced_calculator import (
 )
 from app.utils.culture_points import village_requirements
 from app.utils.travian_formulas import (
-    TS_THRESHOLD_FIELDS,
     calculate_travel_seconds,
+    distance_for_travel_hours,
     distance_on_map,
     round_smithy_display,
     smithy_improved_value,
@@ -78,10 +78,7 @@ def _calculate_travel_time(
     hero_bonus: int = 0,
     artifact_bonus: str = "none",
 ) -> float:
-    """計算旅行時間（小時）.
-
-    競技場只加速超過 20 格的路段，每級 +20%（S71）。
-    """
+    """行軍時間（小時，取到秒）——共用 `calculate_travel_seconds` 的薄包裝（P0-21）."""
     seconds = calculate_travel_seconds(
         distance=distance,
         unit_speed=unit_speed,
@@ -140,9 +137,17 @@ class AdvancedCalculatorService:
             request.defender_x,
             request.defender_y,
         )
-        # 2. 攻擊者回程時間
-        t_return_hours = d1 / (request.attacker_speed * request.server_speed)
-        t_return_seconds = max(1, int(round(t_return_hours * 3600)))
+        # 2. 攻擊者回程時間（共用公式：攻擊方的競技場、靴子只加快超過 20 格的路段，P0-21）
+        t_return_seconds = max(
+            1,
+            calculate_travel_seconds(
+                distance=d1,
+                unit_speed=request.attacker_speed,
+                server_speed=request.server_speed,
+                tournament_square_level=request.attacker_ts_level,
+                hero_bonus_percent=request.attacker_hero_bonus,
+            ),
+        )
 
         # 3. 攻擊到達時間 → 回到家的時間
         attack_arrival = datetime.strptime(request.attack_arrival_time, "%H:%M:%S")
@@ -156,14 +161,17 @@ class AdvancedCalculatorService:
             request.attacker_y,
         )
 
-        # 5. 攔截者行進時間
-        t_catch_hours = _calculate_travel_time(
-            distance=d2,
-            unit_speed=request.catcher_speed,
-            server_speed=request.server_speed,
-            tournament_square_level=request.catcher_ts_level,
+        # 5. 攔截者行進時間（共用公式，P0-21）
+        t_catch_seconds = max(
+            1,
+            calculate_travel_seconds(
+                distance=d2,
+                unit_speed=request.catcher_speed,
+                server_speed=request.server_speed,
+                tournament_square_level=request.catcher_ts_level,
+                hero_bonus_percent=request.catcher_hero_bonus,
+            ),
         )
-        t_catch_seconds = max(1, int(round(t_catch_hours * 3600)))
 
         # 6. 發送時間 = 回到家時間 - 攔截者行進時間
         send_time = return_time - timedelta(seconds=t_catch_seconds)
@@ -348,24 +356,17 @@ class AdvancedCalculatorService:
 
     def calculate_save_troops(self, request: SaveTroopsRequest) -> SaveTroopsResponse:
         """避兵計算器 — 計算派兵保護的理想距離."""
-        effective_speed = float(request.unit_speed * request.server_speed)
-
         # 單程時間 = offline_hours / 2（去回各一半）
         one_way_hours = request.offline_hours / 2
 
-        # 理想距離：前 20 格無 TS，超過部分受競技場加速（S71）
-        from app.utils.travian_formulas import (
-            tournament_square_bonus_factor,
+        # 理想距離：共用行軍公式的反函數（前 20 格原速，超過的路段競技場＋靴子，S71、P0-21）
+        ideal_distance = distance_for_travel_hours(
+            one_way_hours,
+            unit_speed=request.unit_speed,
+            server_speed=request.server_speed,
+            tournament_square_level=request.tournament_square_level,
+            hero_bonus_percent=request.hero_bonus,
         )
-
-        threshold = TS_THRESHOLD_FIELDS
-        time_to_threshold = threshold / effective_speed
-        if request.tournament_square_level > 0 and one_way_hours > time_to_threshold:
-            bonus = tournament_square_bonus_factor(request.tournament_square_level)
-            far_hours = one_way_hours - time_to_threshold
-            ideal_distance = threshold + far_hours * effective_speed * bonus
-        else:
-            ideal_distance = one_way_hours * effective_speed
 
         one_way_seconds = max(1, int(round(one_way_hours * 3600)))
         round_trip_seconds = max(1, int(round(request.offline_hours * 3600)))
@@ -407,13 +408,16 @@ class AdvancedCalculatorService:
 
         for speed in all_speeds:
             for ts_level in range(21):  # 0-20
-                calc_hours = _calculate_travel_time(
-                    distance=distance,
-                    unit_speed=speed,
-                    server_speed=request.server_speed,
-                    tournament_square_level=ts_level,
+                calc_seconds = max(
+                    1,
+                    calculate_travel_seconds(
+                        distance=distance,
+                        unit_speed=speed,
+                        server_speed=request.server_speed,
+                        tournament_square_level=ts_level,
+                        hero_bonus_percent=request.hero_bonus,
+                    ),
                 )
-                calc_seconds = max(1, int(round(calc_hours * 3600)))
 
                 if abs(calc_seconds - request.travel_time_seconds) <= tolerance:
                     possible_matches.append(
@@ -696,14 +700,9 @@ class AdvancedCalculatorService:
     ) -> TsOptimizerResponse:
         """Compute send times for multiple attackers to sync arrival.
 
-        Tournament Square formula (S71; docs/knowledge/tournament-square-speed.md):
-          if distance ≤ 20: travel_time = distance / unit_speed
-          else:
-            threshold_time = 20 / unit_speed
-            beyond_time    = (distance - 20) / (unit_speed × (1 + TS × 0.20))
-            travel_time    = threshold_time + beyond_time
-
-        Server speed divides total travel seconds. Times rounded to nearest second.
+        Travel time uses the shared `calculate_travel_seconds` (S71; P0-21;
+        docs/knowledge/tournament-square-speed.md): first 20 fields at base
+        speed, beyond × (1 + TS × 0.20 + boots%).
         """
         try:
             target_dt = datetime.fromisoformat(request.target_arrival)
@@ -736,6 +735,7 @@ class AdvancedCalculatorService:
                     unit_speed=atk.unit_speed,
                     server_speed=request.server_speed,
                     tournament_square_level=ts_level,
+                    hero_bonus_percent=atk.hero_bonus,
                 )
             )
 

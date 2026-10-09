@@ -44,6 +44,50 @@ def calculate_build_time(
     return max(0, int(round(actual / 10.0) * 10))
 
 
+def _effective_speed(
+    unit_speed: float, server_speed: float = 1.0, artifact_multiplier: float = 1.0
+) -> float:
+    speed = float(unit_speed) * float(server_speed if server_speed > 0 else 1.0)
+    return speed * (artifact_multiplier if artifact_multiplier > 0 else 1.0)
+
+
+def far_speed_factor(
+    tournament_square_level: int = 0, hero_bonus_percent: float = 0.0
+) -> float:
+    """Speed multiplier beyond 20 fields: 1 + 0.20 × TS_level + boots% (S71, added)."""
+    return (
+        1
+        + max(0, tournament_square_level) * TS_BONUS_PER_LEVEL
+        + max(0.0, hero_bonus_percent) / 100.0
+    )
+
+
+def travel_hours(
+    distance: float,
+    unit_speed: float,
+    server_speed: float = 1.0,
+    tournament_square_level: int = 0,
+    hero_bonus_percent: float = 0.0,
+    artifact_multiplier: float = 1.0,
+) -> float:
+    """行軍時間（小時，不四捨五入）——全站唯一的行軍速度公式（P0-21）.
+
+    Official help page S71: first 20 fields at normal speed; beyond that
+    speed × (1 + 0.20 × TS_level + boots%). Tournament Square and hero boots
+    are ADDED together (not multiplied) and only apply beyond 20 fields.
+    Mirror: frontend/src/lib/travianFormulas.ts `travelHours`.
+    """
+    if distance <= 0 or unit_speed <= 0:
+        return 0.0
+    speed = _effective_speed(unit_speed, server_speed, artifact_multiplier)
+    factor = far_speed_factor(tournament_square_level, hero_bonus_percent)
+    if factor > 1 and distance > TS_THRESHOLD_FIELDS:
+        near = TS_THRESHOLD_FIELDS / speed
+        far = (distance - TS_THRESHOLD_FIELDS) / (speed * factor)
+        return near + far
+    return distance / speed
+
+
 def calculate_travel_seconds(
     distance: float,
     unit_speed: float,
@@ -54,30 +98,39 @@ def calculate_travel_seconds(
 ) -> int:
     """Travel time in seconds, rounded to nearest second (game behaviour).
 
-    Official help page S71: first 20 fields at normal speed; beyond that
-    speed × (1 + 0.20 × TS_level + boots%). Tournament Square and hero boots
-    are ADDED together (not multiplied) and only apply beyond 20 fields (P0-20).
-    hero_bonus_percent = hero boots bonus (%).
+    Every calculator (march time, interception, TS optimizer, reverse TS)
+    uses this; see `travel_hours` for the formula (P0-20, P0-21).
     """
     if distance <= 0 or unit_speed <= 0:
         return 0
-
-    speed = float(unit_speed) * float(server_speed if server_speed > 0 else 1.0)
-    speed *= artifact_multiplier if artifact_multiplier > 0 else 1.0
-
-    ts_level = max(0, tournament_square_level)
-    boots = max(0.0, hero_bonus_percent) / 100.0
-    if (ts_level > 0 or boots > 0) and distance > TS_THRESHOLD_FIELDS:
-        near = TS_THRESHOLD_FIELDS / speed
-        # 競技場和靴子相加，只算超過 20 格的路段
-        bonus = 1 + ts_level * TS_BONUS_PER_LEVEL + boots
-        far = (distance - TS_THRESHOLD_FIELDS) / (speed * bonus)
-        hours = near + far
-    else:
-        hours = distance / speed
-
+    hours = travel_hours(
+        distance,
+        unit_speed,
+        server_speed,
+        tournament_square_level,
+        hero_bonus_percent,
+        artifact_multiplier,
+    )
     # Game rounds travel time to the nearest second (TS11: 2998.8 → 2999).
     return max(1, int(round(hours * 3600)))
+
+
+def distance_for_travel_hours(
+    hours: float,
+    unit_speed: float,
+    server_speed: float = 1.0,
+    tournament_square_level: int = 0,
+    hero_bonus_percent: float = 0.0,
+) -> float:
+    """`travel_hours` 的反函數：走 hours 小時能走多遠（躲兵用，P0-21）."""
+    if hours <= 0 or unit_speed <= 0:
+        return 0.0
+    speed = _effective_speed(unit_speed, server_speed)
+    factor = far_speed_factor(tournament_square_level, hero_bonus_percent)
+    time_to_threshold = TS_THRESHOLD_FIELDS / speed
+    if factor > 1 and hours > time_to_threshold:
+        return TS_THRESHOLD_FIELDS + (hours - time_to_threshold) * speed * factor
+    return hours * speed
 
 
 def smithy_improved_value(base: float, upkeep: int, level: int) -> float:

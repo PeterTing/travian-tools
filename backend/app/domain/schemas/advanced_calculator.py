@@ -53,6 +53,21 @@ class InterceptionRequest(BaseModel):
     catcher_speed: int = Field(..., gt=0, description="攔截部隊速度")
     server_speed: int = Field(1, ge=1, le=10, description="伺服器速度倍率")
     catcher_ts_level: int = Field(0, ge=0, le=20, description="攔截者競技場等級")
+    catcher_hero_bonus: int = Field(
+        0,
+        ge=0,
+        le=75,
+        description="攔截者英雄靴子速度加成百分比（只算超過 20 格，跟競技場相加）",
+    )
+    attacker_ts_level: int = Field(
+        0, ge=0, le=20, description="攻擊方競技場等級（回程用，P0-21）"
+    )
+    attacker_hero_bonus: int = Field(
+        0,
+        ge=0,
+        le=75,
+        description="攻擊方英雄靴子速度加成百分比（回程用，P0-21）",
+    )
 
 
 class InterceptionResponse(BaseModel):
@@ -168,6 +183,12 @@ class SaveTroopsRequest(BaseModel):
     offline_hours: float = Field(..., gt=0, description="離線時間（小時）")
     server_speed: int = Field(1, ge=1, le=10, description="伺服器速度倍率")
     tournament_square_level: int = Field(0, ge=0, le=20, description="競技場等級")
+    hero_bonus: int = Field(
+        0,
+        ge=0,
+        le=75,
+        description="英雄靴子速度加成百分比（只算超過 20 格，跟競技場相加）",
+    )
 
 
 class SaveTroopsResponse(BaseModel):
@@ -190,6 +211,12 @@ class PathSpeedTsRequest(BaseModel):
     target_y: int = Field(..., ge=-200, le=200, description="目標 Y 座標")
     travel_time_seconds: int = Field(..., gt=0, description="已知的行進時間（秒）")
     server_speed: int = Field(1, ge=1, le=10, description="伺服器速度倍率")
+    hero_bonus: int = Field(
+        0,
+        ge=0,
+        le=75,
+        description="攻擊方英雄靴子速度加成百分比（只算超過 20 格，跟競技場相加）",
+    )
 
 
 class SpeedTsMatch(BaseModel):
@@ -314,6 +341,12 @@ class AttackerProfile(BaseModel):
     y: int = Field(..., ge=-200, le=200)
     unit_speed: int = Field(..., gt=0, description="最慢發送部隊速度 (fields/hour)")
     ts_level: int = Field(0, ge=0, le=20, description="當前 Tournament Square 等級")
+    hero_bonus: int = Field(
+        0,
+        ge=0,
+        le=75,
+        description="英雄靴子速度加成百分比（只算超過 20 格，跟競技場相加）",
+    )
     allow_ts_adjustment: bool = Field(
         True, description="是否允許發送前微調 TS 等級以命中時間窗"
     )
