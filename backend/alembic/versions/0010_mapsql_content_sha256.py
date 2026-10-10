@@ -1,7 +1,7 @@
 """map_snapshots.content_sha256 + (server_url, created_at) index.
 
-Revision ID: 0009_map_snapshot_sha256
-Revises: 0008_sync_type_rally
+Revision ID: 0010_mapsql_content_sha256
+Revises: 0009_multi_tribe
 Create Date: 2026-10-11
 
 The scheduled map.sql job (every 4 hours) compares the SHA-256 of the fetched
@@ -16,8 +16,8 @@ import sqlalchemy as sa
 
 from alembic import op
 
-revision: str = "0009_map_snapshot_sha256"
-down_revision: str | None = "0008_sync_type_rally"
+revision: str = "0010_mapsql_content_sha256"
+down_revision: str | None = "0009_multi_tribe"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

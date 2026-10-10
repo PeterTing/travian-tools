@@ -175,8 +175,8 @@ curl -s -o /dev/null -w '%{http_code}\n' https://tt-web-138672009807.asia-east1.
     和 `DATABASE_URL` 這一個 secret 的 `secretAccessor`。
   - `travian-tools-scheduler`（Scheduler 呼叫身分）：只有 `tt-mapsql-fetch` 這個 job 的 `roles/run.invoker`。
 
-前置：這個功能合併進 main 之後，先 `scripts/deploy_cloud_run.sh build`（產生新的 backend image）和
-`scripts/deploy_cloud_run.sh migrate`（`0009_map_snapshot_sha256`：`map_snapshots.content_sha256` 欄位＋索引；
+前置：這個功能依賴 P0-25（#39，migration `0009_multi_tribe`），要等 #39 先合併。合併進 main 之後，先 `scripts/deploy_cloud_run.sh build`（產生新的 backend image）和
+`scripts/deploy_cloud_run.sh migrate`（`0010_mapsql_content_sha256`：`map_snapshots.content_sha256` 欄位＋索引；
 舊版 tt-api 不讀這個欄位，不受影響）。下面的 `TAG` 是那次 build 的 short SHA。
 
 ```bash
@@ -265,7 +265,7 @@ gcloud services disable cloudscheduler.googleapis.com --project ${PROJECT}
 
 資料：job 寫進的是現有的 `map_snapshots`／`map_villages`／`map_players`／`map_alliances`（＋差異表）。
 要清掉這兩個世界的快照要另外核准，刪 `map_snapshots` 會連帶刪掉子表（FK `ON DELETE CASCADE`）。
-欄位本身可用 `alembic downgrade 0008_sync_type_rally` 拿掉（要先部署不含這個欄位的 tt-api）。
+欄位本身可用 `alembic downgrade 0009_multi_tribe` 拿掉（要先部署不含這個欄位的 tt-api）。
 
 ## 已知限制
 
