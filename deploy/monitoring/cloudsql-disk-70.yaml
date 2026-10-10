@@ -1,0 +1,33 @@
+# Cloud Monitoring alert: travian-tools-db disk utilization > 70% (5-minute mean).
+# Created with:
+#   gcloud alpha monitoring policies create --project artogo-travian-tools \
+#     --policy-from-file deploy/monitoring/cloudsql-disk-70.yaml \
+#     --notification-channels <email channel name>
+# See docs/deploy-cloud-run.md 「Cloud SQL 硬碟：auto-increase＋70% 警報」.
+displayName: "travian-tools-db disk > 70%"
+combiner: OR
+conditions:
+  - displayName: "Cloud SQL travian-tools-db disk utilization > 70%"
+    conditionThreshold:
+      filter: >-
+        resource.type = "cloudsql_database"
+        AND resource.labels.database_id = "artogo-travian-tools:travian-tools-db"
+        AND metric.type = "cloudsql.googleapis.com/database/disk/utilization"
+      comparison: COMPARISON_GT
+      # The metric is a fraction (0.0-1.0).
+      thresholdValue: 0.7
+      duration: 300s
+      aggregations:
+        - alignmentPeriod: 300s
+          perSeriesAligner: ALIGN_MEAN
+      trigger:
+        count: 1
+alertStrategy:
+  autoClose: 604800s
+documentation:
+  mimeType: text/markdown
+  content: |-
+    travian-tools-db (Cloud SQL, artogo-travian-tools) disk is over 70% full.
+    map.sql snapshots are kept in full (no automatic deletion), so they are the
+    main growth. Storage auto-increase is on with a 30 GB cap; at the cap writes
+    fail when the disk fills. See docs/deploy-cloud-run.md.
