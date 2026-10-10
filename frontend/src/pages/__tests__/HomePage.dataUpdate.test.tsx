@@ -67,7 +67,7 @@ describe('首頁 10/10 資料更新卡', () => {
     const items = within(screen.getByTestId('data-update-items')).getAllByRole('listitem')
     expect(items.map((li) => li.textContent?.replace('改成', ''))).toEqual([
       '草原騎士運載量115 → 75',
-      '1 級資源田產量增加7 → 4',
+      '羅馬人開拓者木材花費5800 → 4600',
       '建築名稱鐵匠鋪 → 盔甲廠',
     ])
     expect(DATA_UPDATE_ITEMS).toHaveLength(3)

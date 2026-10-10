@@ -1,4 +1,4 @@
-import { INGAME_BUILDINGS, ingameUnitNameByGameId } from '@/lib/ingameNames'
+import { INGAME_BUILDINGS, ingameTribeName, ingameUnitNameByGameId } from '@/lib/ingameNames'
 import { readPref } from '@/lib/localPrefs'
 
 /** 按「知道了」後記在這台裝置；換一次更新就換 key */
@@ -14,7 +14,9 @@ const smithy = INGAME_BUILDINGS.blacksmith!
  */
 export const DATA_UPDATE_ITEMS: { label: string; before: string; after: string }[] = [
   { label: `${ingameUnitNameByGameId(64)}運載量`, before: '115', after: '75' },
-  { label: '1 級資源田產量增加', before: '7', after: '4' },
+  // 0 級資源田產量在 ts11 找不到證據（P0-23 第 5 項），改放已核對的兵種數字：
+  // 舊的後端兵種資料 5800 → ts11 manual/troop/10 開拓者花費 4600 木材
+  { label: `${ingameTribeName('romans')}${ingameUnitNameByGameId(10)}木材花費`, before: '5800', after: '4600' },
   { label: '建築名稱', before: smithy.aliases[0]!, after: smithy.zh },
 ]
 

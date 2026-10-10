@@ -89,7 +89,8 @@ export default function TroopsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">兵種數據庫</h1>
-      <CalcBar />
+      {/* 選「全部」也會列出斯巴達、維京 → 顯示待驗證那一行 */}
+      <CalcBar tribe={tribe} />
 
       {/* 部族篩選 */}
       <div className="flex flex-wrap gap-2 mb-4">

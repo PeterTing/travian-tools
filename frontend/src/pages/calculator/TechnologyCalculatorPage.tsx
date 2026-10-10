@@ -52,7 +52,7 @@ export default function TechnologyCalculatorPage() {
       <p className="text-muted-foreground mb-6">
         查看盔甲廠升級後兵種的攻擊、防禦。升級後數值＝原本數值＋（原本數值＋300×糧耗÷7）×（1.007 的等級次方 − 1），四捨五入到小數 1 位。
       </p>
-      <CalcBar />
+      <CalcBar tribe={form.tribe} />
 
       <div className="flex gap-4 mb-6 items-end">
         <div>

@@ -86,7 +86,7 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
     }
   })
 
-  it('the 已帶入 chip uses autofillUnits, whose two lines cover unit costs and Spartan speed', () => {
+  it('the 已帶入 chip uses autofillUnits, whose one line covers unit costs and Spartan speed', () => {
     const bar = Object.entries(sources).find(([f]) => f.endsWith('/components/autofill/AutoFillBar.tsx'))?.[1] ?? ''
     expect(bar).toMatch(/<PendingVerifyChip[^>]*kind="autofillUnits"/)
     expect(bar).not.toMatch(/kind="units"/)

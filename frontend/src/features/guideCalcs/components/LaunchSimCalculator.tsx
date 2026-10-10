@@ -92,7 +92,7 @@ export default function LaunchSimCalculator() {
             : '依產量與開局風格，估算多久可以結帳開新村。會標出派對、訓練開拓者與最後一步等里程碑時間。'}
         </p>
       </div>
-      <CalcBar />
+      <CalcBar tribe={tribe} />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>

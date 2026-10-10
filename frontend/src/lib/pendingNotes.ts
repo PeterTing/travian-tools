@@ -35,7 +35,7 @@ export type PendingKind = (typeof PENDING_KINDS)[number]
 /** 每一種出現在哪裡（給 PM 的文字表、也給完整性測試用） */
 export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
   units: '兵種資料庫詳情：「訓練成本」標題旁（花費、糧耗、訓練時間還沒核對的部族；data/unitCostVerified.json）；開局衝村模擬的「開拓者」花費（摘要、明細）；農場收益的兵力初始成本、回本天數',
-  autofillUnits: '已帶入列（用到兵種資料的計算器）：一個灰標管兩行（兵種花費、斯巴達速度）',
+  autofillUnits: '已帶入列（用到兵種資料的計算器，部族是斯巴達、維京才出現）：一行，兵種數字＋斯巴達速度',
   spartanSpeed: '首頁來襲卡反推 TS 那一行、反推 TS 結果的「未列入反推」提示',
   unitSpeedOfficialPending: '兵種資料庫：斯巴達步兵／騎兵 6 種的速度（列表與詳情）',
   unitSpeedNoSource: '兵種資料庫：斯巴達破城槌、弩砲、監察官、開拓者的速度（列表與詳情）',

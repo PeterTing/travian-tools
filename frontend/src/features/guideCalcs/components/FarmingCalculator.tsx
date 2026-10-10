@@ -14,7 +14,7 @@ import { getTribe } from '../data/tribes';
 import type { TribeId } from '../data/tribes-types';
 
 // 速度、運載量、花費都來自產生檔（P0-18：ts11 遊戲內說明頁；scripts/game_data/gen_game_data.py），這裡不寫數字
-interface UnitOpt { id: string; nameZh: string; nameEn: string; tribeZh: string; tribeEn: string; carry: number; speed: number; cost: number; verified: boolean }
+interface UnitOpt { id: string; tribeId: TribeId; nameZh: string; nameEn: string; tribeZh: string; tribeEn: string; carry: number; speed: number; cost: number; verified: boolean }
 const UNIT_PICKS: [string, TribeId, string][] = [
   ['tt', 'gauls', 'theutatesThunder'],
   ['ei', 'romans', 'equitesImperatoris'],
@@ -28,7 +28,7 @@ export const FARM_UNITS: UnitOpt[] = UNIT_PICKS.map(([id, tribeId, unitId]) => {
   const u = tribe.units.find(x => x.id === unitId);
   if (!u || u.speed === null) throw new Error(`no unit data for ${tribeId}.${unitId}`);
   return {
-    id, nameZh: u.name.zh, nameEn: u.name.en, tribeZh: tribe.name.zh, tribeEn: tribe.name.en,
+    id, tribeId, nameZh: u.name.zh, nameEn: u.name.en, tribeZh: tribe.name.zh, tribeEn: tribe.name.en,
     carry: u.carry, speed: u.speed, cost: u.cost.wood + u.cost.clay + u.cost.iron + u.cost.crop, verified: u.statsVerified,
   };
 });
@@ -108,7 +108,8 @@ export default function FarmingCalculator() {
           ? 'Suggests how many horses to send to inactive targets and estimates daily loot. Under 150 pop: skip; 150–400: 1 horse; 400–550: 2; 550+: about 3–7 (default 5). Adjust loot per raid from your reports.'
           : '估算打不活躍村該派幾匹馬、一天大概能搶多少。人口不到 150 略過；150–400 派 1 匹；400–550 派 2 匹；550 以上大約 3–7 匹（預設 5）。每次搶到的量請依戰報調整。'}</p>
       </div>
-      <CalcBar />
+      {/* 這頁沒有部族選單：看選的兵是哪一族（P0-17 (k)） */}
+      <CalcBar tribe={unit.tribeId} />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>
