@@ -186,8 +186,8 @@ class TestPathCalculator:
             server_speed=3,
         )
         res = service.calculate_path(req)
-        # 10 / (10 * 3) = 1/3 hour ≈ 1200s
-        assert res.travel_time_seconds == 1200
+        # 官方 S20：x3 兵速 ×2（不是 ×3）→ 10 / (10 * 2) = 0.5h = 1800s
+        assert res.travel_time_seconds == 1800
 
 
 # ============ Interception Calculator 測試 ============
@@ -438,8 +438,8 @@ class TestSaveTroopsCalculator:
             server_speed=3,
         )
         res = service.calculate_save_troops(req)
-        # 單程 2h, speed 10*3=30 → 距離 60
-        assert res.ideal_distance == pytest.approx(60.0)
+        # 單程 2h；官方 S20：x3 兵速 ×2 → 10*2=20 → 距離 40
+        assert res.ideal_distance == pytest.approx(40.0)
 
     def test_save_troops_with_ts(self, service: AdvancedCalculatorService) -> None:
         """含 TS 的避兵計算，距離 > 20 時 TS 生效."""

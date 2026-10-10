@@ -1,5 +1,5 @@
 {
-  "_comment": "P0-21 一致性測試的共用案例（前端 travianFormulas.test.ts、後端 test_travel_speed_consistency.py 都讀這份）。seconds 是照官方說明頁 S71 手算：前 20 格原速，超過的路段 ×(1+競技場×0.2+靴子%)，四捨五入到秒。 有 from／to 的案例跨地圖邊緣（401×401 環繞）：每個工具都要用座標算，距離和秒數都一樣。",
+  "_comment": "P0-21 一致性測試的共用案例（前端 travianFormulas.test.ts、後端 test_travel_speed_consistency.py 都讀這份）。seconds 是照官方說明頁 S71 手算：前 20 格原速，超過的路段 ×(1+競技場×0.2+靴子%)，四捨五入到秒。 有 from／to 的案例跨地圖邊緣（401×401 環繞）：每個工具都要用座標算，距離和秒數都一樣。 伺服器倍速不是直接乘：官方 S20 兵速表 x1 ×1、x2 ×2、x3 ×2、x5 ×2、x10 ×4（scripts/game_data/evidence/official_s20_speed_2026-10-11.json）。80 格、速度 10、競技場 10、靴子 50% 這組 x1／x2／x3／x5／x10 各一個案例，derivation 寫怎麼從 S20＋S71 算出來。",
   "cases": [
     {
       "distance": 10,
@@ -71,7 +71,45 @@
       "serverSpeed": 3,
       "arenaLevel": 10,
       "bootsPercent": 50,
-      "seconds": 4457
+      "seconds": 6686,
+      "derivation": "S20：x3 兵速 ×2 → 10×2 = 20 格/時；S71：前 20 格 20/20 時，後 60 格 60/(20×(1+10×0.2+0.5)=×3.5) 時；合計 (2+60/35)/2 時 ×3600 = 6686 秒（四捨五入）",
+      "_was": "4457（舊版直接 ×3，算太短；S20 是 ×2）"
+    },
+    {
+      "distance": 80,
+      "unitSpeed": 10,
+      "serverSpeed": 1,
+      "arenaLevel": 10,
+      "bootsPercent": 50,
+      "seconds": 13371,
+      "derivation": "S20：x1 兵速 ×1 → 10×1 = 10 格/時；S71：前 20 格 20/10 時，後 60 格 60/(10×(1+10×0.2+0.5)=×3.5) 時；合計 (2+60/35)/1 時 ×3600 = 13371 秒（四捨五入）"
+    },
+    {
+      "distance": 80,
+      "unitSpeed": 10,
+      "serverSpeed": 2,
+      "arenaLevel": 10,
+      "bootsPercent": 50,
+      "seconds": 6686,
+      "derivation": "S20：x2 兵速 ×2 → 10×2 = 20 格/時；S71：前 20 格 20/20 時，後 60 格 60/(20×(1+10×0.2+0.5)=×3.5) 時；合計 (2+60/35)/2 時 ×3600 = 6686 秒（四捨五入）"
+    },
+    {
+      "distance": 80,
+      "unitSpeed": 10,
+      "serverSpeed": 5,
+      "arenaLevel": 10,
+      "bootsPercent": 50,
+      "seconds": 6686,
+      "derivation": "S20：x5 兵速 ×2 → 10×2 = 20 格/時；S71：前 20 格 20/20 時，後 60 格 60/(20×(1+10×0.2+0.5)=×3.5) 時；合計 (2+60/35)/2 時 ×3600 = 6686 秒（四捨五入）"
+    },
+    {
+      "distance": 80,
+      "unitSpeed": 10,
+      "serverSpeed": 10,
+      "arenaLevel": 10,
+      "bootsPercent": 50,
+      "seconds": 3343,
+      "derivation": "S20：x10 兵速 ×4 → 10×4 = 40 格/時；S71：前 20 格 20/40 時，後 60 格 60/(40×(1+10×0.2+0.5)=×3.5) 時；合計 (2+60/35)/4 時 ×3600 = 3343 秒（四捨五入）"
     },
     {
       "distance": 150,

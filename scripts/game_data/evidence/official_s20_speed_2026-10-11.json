@@ -1,0 +1,57 @@
+{
+ "_what": "support.travian.com 官方說明頁 S20「Game Versions and Speed」原文（2026-10-11 00:06 台北，唯讀讀取）。用來定伺服器倍速對兵速的倍率（不是直接乘倍速）與新手保護天數。",
+ "text_method": "text 欄位是頁面 HTML 拿掉 <script>/<style>/<head> 與標籤後的文字（第一行是頁面 <title>，之後每個文字區塊一行、空白壓成一格）；text_sha256 = sha256(text 的 UTF-8 位元組)，可直接重算（backend/tests/unit/test_server_speed_s20.py 有測）。原始 HTML 的 sha256 記在 html_sha256（HTML 檔在 review/audit-2026-10-10/evidence/，不進 repo）。",
+ "articles": {
+  "s20": {
+   "url": "https://support.travian.com/en/articles/20-game-versions-and-speed",
+   "fetched_at": "2026-10-11T00:06+08:00",
+   "text_sha256": "f22c10b01a68113eaf540454f734cbfc16ebdb9b26f18cc2aabe33e0deef4126",
+   "html_sha256": "65204057da33b450384f1401e5be2557a575b718863471611a1a24f4224cd8f0",
+   "troop_speed_multiplier": {
+    "1": 1,
+    "2": 2,
+    "3": 2,
+    "5": 2,
+    "10": 4
+   },
+   "beginner_protection_days": {
+    "1": [
+     5,
+     3
+    ],
+    "2": [
+     3,
+     3
+    ],
+    "3": [
+     3,
+     3
+    ],
+    "5": [
+     2,
+     2
+    ],
+    "10": [
+     1,
+     1
+    ]
+   },
+   "quotes": [
+    "Troops speed:",
+    "Normal",
+    "*2",
+    "*2",
+    "*2",
+    "*4",
+    "Beginner’s Protection duration:",
+    "5 days + optional 3 days",
+    "3 + 3",
+    "3 + 3",
+    "2 + 2",
+    "1 + 1"
+   ],
+   "note": "表格欄位順序是 X1 X2 X3 X5 X10。兵速：X1 Normal、X2 *2、X3 *2、X5 *2、X10 *4。新手保護：5+選擇性 3 天、3+3、3+3、2+2、1+1。這頁沒寫商人速度，商人速度是否隨倍速變快仍待驗證。",
+   "text": "Game Versions and Speed | Travian: Legends\nTravian: Legends Help Center\nGo to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\nAll collections\nBasic Gameplay\nGameworlds and specials\nGame Versions and Speed\nGame Versions and Speed\nGame Versions and Speed\nTravian: Legends is available in several\ngame versions\nand\nspeeds\n. While the core gameplay remains the same, each version and speed offers a unique experience that can significantly affect your strategy.\nRegions\nTravian gameworlds are divided into\nfive regions\n:\nInternational\nAmerica\nArabics\nAsia\nEurope\nYou’re free to join\nany region\nregardless of where you live. Each region offers gameworlds of different\nspeeds\nand\nversions\n, and all gameworlds support every available language.\nGame Speed\nThe\nspeed\nof a gameworld affects almost every aspect of the game — from troop movement to building time and resource production. Speeds range from the standard\nx1\nto the incredibly fast\nx10\n.\nThe higher the speed, the faster everything happens. However, not all features scale the same way. The tables below show how speed influences different parts of the game.\nGeneral\nThis table shows how construction, troop training, movement, and production scale with speed. It also lists how durations like Beginner’s Protection and Travian Plus are adjusted.\nSpeed.\nX1\nX2\nX3\nX5\nX10\nTroops training time:\nNormal\n/2\n/3\n/5\n/10\nConstruction time:\nNormal\n/2\n/3\n/5\n/10\nTroops speed:\nNormal\n*2\n*2\n*2\n*4\nResource production:\nNormal\n*2\n*3\n*5\n*10\nBeginner’s Protection duration:\n5 days + optional 3 days\n3 + 3\n3 + 3\n2 + 2\n1 + 1\nTravian Plus duration:\n7 days\n3 days\n3 days\n3 days\n3 days\nResource bonus duration:\n7 days\n3 days\n3 days\n3 days\n3 days\nDuration\nThis section covers event timings — such as when registration closes, when artefacts appear, and how long game rounds last. Note that faster servers reach artefacts and endgame phases much earlier.\nSpeed:\nX1\nX2\nX3\nX5\nX10\nRegistration closes after:\n70 days\n35 days\n28 days\n15 days\n7 days\nArtefacts introduction:\n90th day\n45th day\n30th day\n18th day\n9th day\nConstruction plans introduction:\n180th day\n90th day\n60th day\n36th day\n18th day\nNatar WW* finishes after:\n250 days\n160 days\n95 days\n71 days\n35.5 days\nAnnual Special duration:\n180 days\n120 days\n80 days\n50 days\n30 days\n*Natars always start building their Wonder of the World when the construction plans appear.\nCulture Points\nHere you’ll find how\nCulture Points\n(formerly labeled CP) scale with game speed. Faster servers require fewer Culture Points for expansion but reduce celebration times and artwork effectiveness.\nSpeed:\nX1\nX2\nX3\nX5\nX10\nStarting Culture Points:\n500\n250\n167\n100\n50\nTownhall celebration time:\nNormal\nNormal\n/2\n/2\n/4\nTownhall small celebration limit:\n500 CP\n500 CP\n250 CP\n250 CP\n125 CP\nTownhall large celebration limit:\n2000 CP\n2000 CP\n1000 CP\n1000 CP\n500 CP\nRequirement for the 2nd village:\n2000 CP\n800 CP\n500 CP\n300 CP\n200 CP\nArtwork CP production:\n*1\n*2/3\n*1/2\n*1/3\n*~1/6\nArtwork limit:\n2000 CP\n1300 CP\n1000 CP\n700 CP\n400 CP\nArtwork usage cooldown:\n24 hours\n24 hours\n12 hours\n12 hours\n6 hours\nItems\nThis table explains when higher-tier hero items become available and how auction and smelting times shorten on faster worlds.\nSpeed\nX1\nX2\nX3\nX5\nX10\nItem tier 2 appear after:\n70 days*\n35 days*\n23.3 days*\n14 days*\n7 days*\nItem tier 3 appears after:\n140 days*\n70 days*\n46.6 days*\n28 days*\n14 days*\nAuction duration:\n~24 hours\n~12 hours\n~8 hours\n~4 hours\n~2 hours\nSmelting time:\n24 hours\n24 hours\n12 hours\n12 hours\n6 hours\n* On game worlds with Item Rarities, the appearance of items of better tiers and better rarity is more gradual over the period of the game world and the first items of better quality tiers appear earlier than on regular game worlds.\nOther\nThis section lists several additional mechanics affected by game speed, such as available vacation days, city upgrade cooldowns, and the delay of Natar attacks in the gray area.\nSpeed\nX1\nX2\nX3\nX5\nX10\nAvailable vacation days:\n15 days\n8 days\n5 days\n3 days\n2 days\nUpgrading to city cooldown:\n24 hours\n24 hours\n12 hours\n12 hours\n6 hours\nDelay of Natar attacks in gray area:\n24 hours\n12 hours\n8 hours\n4:48\n2:24\nGame Versions\nTravian: Legends features several\ngame versions\n, each with different mechanics and goals.\nRegular\nThe\nclassic\nTravian: Legends experience.\nPlayed on a randomized map.\nArtefacts appear mid-round and grant special bonuses.\nThe\nendgame\nbegins when\nconstruction plans\nare released.\nThe goal: build the\nWonder of the World\nto level 100 with your alliance to win.\nAnnual Special\nA special version released each\nSeptember\nwith unique rules and features.\nUses a\nmap of ancient Europe\n.\nVictory is based on\nVictory Points\n, not a Wonder of the World.\nArtefact-like effects are gained by controlling\nregions\n.\nGame ends on a\nset date\n, and the alliance with the most points wins.\nNew features often debut in Annual Specials before appearing in regular gameworlds.\nNew Year Special\nLaunched each\nJanuary\n, these gameworlds combine elements from previous special versions into a new, themed experience.\nTravian Tournament\nA\nprestigious competition\nfor experienced players.\nConsists of\nQualification Rounds\nand a\nFinal\n.\nThe Finals determine the overall Tournament winners and Hall of Fame entries.\n>\nTournament Main Page\n>\nTournament Hall of Fame\nCommunity Week\nOccasionally, unique gameworlds are launched with\nfeatures chosen by the community\n. These often mix gameplay mechanics from different versions to create experimental setups.\nLocal Gameworlds\nSpecial servers created for\nspecific language communities\n.\nOften include\nunique medals\nand\ncommunity-decided features\n.\nOnly available in the local language(s).\nNumber of Tribes\nThe number of available tribes depends on the gameworld type:\n6 tribes:\nRomans, Teutons or Vikings, Gauls, Huns, Egyptians, Spartans (in special gameworlds)\n5 tribes:\nRomans, Teutons, Gauls, Huns, Egyptians (common in international worlds)\n3 tribes:\nRomans, Teutons, Gauls (the traditional setup)\n>\nThe Tribes and Their Advantages\nDid this answer your question?\n😞\n😐\n😁"
+  }
+ }
+}
