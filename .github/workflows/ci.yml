@@ -15,6 +15,8 @@ jobs:
       DATABASE_URL: mysql+mysqlconnector://root:test_password@127.0.0.1:3306/travian_tools_test
       # Test-only value: Settings refuse the public default when DEBUG is off.
       JWT_SECRET_KEY: ci-test-only-jwt-secret-not-for-production-0123456789
+      # 測試帳號名、村莊名清單（一行一個），去識別測試用；沒設時 tests/unit/test_game_data_generated.py 在 CI 會失敗
+      TT_ID_DENYLIST: ${{ secrets.TT_ID_DENYLIST }}
     defaults:
       run:
         working-directory: backend
