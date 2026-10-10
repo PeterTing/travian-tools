@@ -92,7 +92,8 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
     expect(bar).not.toMatch(/kind="units"/)
     const n = (zh as unknown as { pendingNotes: Notes }).pendingNotes.autofillUnits
     expect(n?.what).toContain('花費、糧耗、訓練時間')
-    expect(n?.what).toContain('斯巴達、維京')
+    expect(n?.what).toContain('維京的花費、糧耗、訓練時間、攻防已照官方說明頁核對，攜帶量還是社群整理的數字')
+    expect(n?.what).toContain('ts11 沒有斯巴達')
     expect(n?.source).toContain('斯巴達速度')
   })
 
@@ -104,14 +105,11 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
   })
 })
 
-describe('P0-17 新種類的文字（PM 定稿，2026-10-10）', () => {
+describe('P0-17 新種類的文字（PM 定稿，2026-10-10；merchantCapacity、plusFormula、fieldHighLevel 已照官方核對，P0-23 拿掉）', () => {
   const notes = (zh as unknown as { pendingNotes: Notes }).pendingNotes
   const enNotes = (en as unknown as { pendingNotes: Notes }).pendingNotes
   it.each([
-    ['merchantCapacity', '商人容量和速度還沒在 ts11 遊戲內核對。', '目前用的是社群 wiki 的數字，可能有誤差。'],
     ['unitCarry', '兵種攜帶量還沒在 ts11 遊戲內核對。', '目前用的是社群整理的數字，可能有誤差。'],
-    ['plusFormula', 'Plus 加成的算法還沒在 ts11 遊戲內核對。', '這頁用加總算，產量模擬和綠洲用相乘算，結果可能不一樣。'],
-    ['fieldHighLevel', '資源田 4 級以上的花費、時間，和 3 級以上的產量是公式推算。', 'ts11 只核對過花費 1–3 級、產量 0–2 級。'],
     ['launchSim', '開局花費是試算表每一步的加總，含派對（用小慶典的糧）。', '這些數字還沒在 ts11 遊戲內核對。'],
   ])('%s', (kind, what, source) => {
     expect(notes[kind]).toEqual({ what, source })
@@ -124,12 +122,10 @@ describe('P0-17 新種類的文字（PM 定稿，2026-10-10）', () => {
   })
 })
 
-describe('#27 後續新種類的文字', () => {
+describe('#27 後續新種類的文字（merchantTradeOffice 已照官方核對，P0-23 拿掉）', () => {
   const notes = (zh as unknown as { pendingNotes: Notes }).pendingNotes
   const enNotes = (en as unknown as { pendingNotes: Notes }).pendingNotes
   it.each([
-    // PM 定稿（TICKETS「#27 後續」2）
-    ['merchantTradeOffice', '商人容量、速度和交易所加成還沒在 ts11 遊戲內核對。', '目前用的是社群 wiki 的數字，可能有誤差。'],
     // PM 定稿（照官方說明頁 S71 的實際內容寫）
     ['arenaSpeed', '競技場加速還沒在 ts11 遊戲內核對。', '目前照官方說明頁：前 20 格不加速，超過的路段每級 +20%。'],
     // P0-20（PM 定稿）
@@ -143,5 +139,13 @@ describe('#27 後續新種類的文字', () => {
       expect(t).not.toMatch(/T4/)
       expect(t).not.toContain('粮')
     }
+  })
+})
+
+describe('P0-23：照官方資料核對過的種類拿掉了', () => {
+  it.each(['heroMansionCost', 'cropSim', 'merchantCapacity', 'plusFormula', 'fieldHighLevel', 'merchantTradeOffice'])('%s', (kind) => {
+    expect((PENDING_KINDS as readonly string[]).includes(kind)).toBe(false)
+    expect((zh as unknown as { pendingNotes: Notes }).pendingNotes[kind]).toBeUndefined()
+    expect((en as unknown as { pendingNotes: Notes }).pendingNotes[kind]).toBeUndefined()
   })
 })

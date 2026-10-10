@@ -1,0 +1,269 @@
+{
+ "_what": "support.travian.com 官方說明頁的原文摘錄（2026-10-10 18:3x 台北，唯讀讀取）。sha256 是頁面文字（去掉 HTML）的雜湊，之後重抓可以比對有沒有改。",
+ "articles": {
+  "s3": {
+   "url": "https://support.travian.com/en/articles/3-the-tribes-and-their-advantages",
+   "text_sha256": "3cbba1205cda51ecdc06f35cb82c9c73332a1973b6bca73de95db6d1fd10fc4f",
+   "merchants": {
+    "vikings": [
+     750,
+     18
+    ],
+    "romans": [
+     500,
+     16
+    ],
+    "gauls": [
+     750,
+     24
+    ],
+    "teutons": [
+     1000,
+     12
+    ],
+    "huns": [
+     500,
+     20
+    ],
+    "egyptians": [
+     750,
+     16
+    ],
+    "spartans": [
+     500,
+     14
+    ]
+   },
+   "quotes": [
+    "Merchants: Carry 750 resources, move at 18 fields/hour.",
+    "Merchants: Carry 500 resources, move at 16 fields/hour.",
+    "Merchants: Carry 750 resources, move at 24 fields/hour.",
+    "Merchants: Carry 1000 resources, move at 12 fields/hour.",
+    "Merchants: Carry 500 resources, move at 20 fields/hour.",
+    "Merchants: Carry 750 resources, move at 16 fields/hour.",
+    "Merchants: Carry 500 resources, move at 14 fields/hour."
+   ],
+   "note": "頁面依序是 Vikings、Romans、Gauls、Teutons、Huns、Egyptians、Spartans"
+  },
+  "s213": {
+   "url": "https://support.travian.com/en/articles/213-guide-the-marketplace-trading-resources",
+   "text_sha256": "a727942cbbbfebd2ef4fd37e74af885352349fa55c2f59c37a1ef0f538030213",
+   "quotes": [
+    "Additionally Romans have a bonus for their Trade Office. It is twice as effective as the same building for other tribes, increasing their merchants capacity even more."
+   ]
+  },
+  "s88": {
+   "url": "https://support.travian.com/en/articles/88-alliance-bonuses",
+   "text_sha256": "0d4c88b136883ffdec833d5d0e62b1a3a9180bc5536c2fd279c3708b5a0d9ea2",
+   "quotes": [
+    "Level 20 Trade Office (400%): 750 × 5 = 3,750"
+   ],
+   "note": "高盧人（非羅馬）交易所 20 級 +400% → 每級 +20%；知識庫交易所表兩欄 +20%／+40% 每級（羅馬人兩倍，S213）"
+  },
+  "s129": {
+   "url": "https://support.travian.com/en/articles/129-gold-feature-production-bonuses",
+   "text_sha256": "9940e5e447530fb85e8797434f1db6cec30ef7b75e0ef55ee6e22f58561e0d25",
+   "quotes": [
+    "Each production bonus costs 5 Gold and increases the selected resource’s production by 25%.",
+    "The +25% boost applies to the total production of the selected resource, not just the base rate."
+   ]
+  },
+  "s48": {
+   "url": "https://support.travian.com/en/articles/48-oasis",
+   "text_sha256": "49456c24f4d219adb74e4ee4d7ab63108bd456df688a41cf1270fb754297b206",
+   "quotes": [
+    "This bonus applies only to that village's base production."
+   ]
+  },
+  "s139": {
+   "url": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+   "text_sha256": "6b18b1ddd28a98aa37ebb5d77b87512ab4e1db0eccb0200fbcd551fcf7f901fc",
+   "units": [
+    {
+     "name": "Thrall",
+     "atk": 45,
+     "di": 22,
+     "dc": 5,
+     "speed": 7,
+     "upkeep": 1,
+     "cost": [
+      95,
+      80,
+      50,
+      40
+     ],
+     "time": "0:13:20",
+     "req": "Barracks 1",
+     "time_s": 800
+    },
+    {
+     "name": "Shield Maiden",
+     "atk": 20,
+     "di": 50,
+     "dc": 30,
+     "speed": 7,
+     "upkeep": 1,
+     "cost": [
+      125,
+      70,
+      85,
+      40
+     ],
+     "time": "0:18:00",
+     "req": "Smithy 1, Academy 5",
+     "time_s": 1080
+    },
+    {
+     "name": "Berserker",
+     "atk": 70,
+     "di": 30,
+     "dc": 25,
+     "speed": 5,
+     "upkeep": 2,
+     "cost": [
+      235,
+      220,
+      200,
+      70
+     ],
+     "time": "0:25:50",
+     "req": "Smithy 5, Academy 10",
+     "time_s": 1550
+    },
+    {
+     "name": "Heimdall’s Eye (Scout)",
+     "atk": 0,
+     "di": 10,
+     "dc": 5,
+     "speed": 9,
+     "upkeep": 1,
+     "cost": [
+      155,
+      95,
+      50,
+      50
+     ],
+     "time": "0:18:40",
+     "req": "Smithy 1, Academy 1",
+     "time_s": 1120
+    },
+    {
+     "name": "Huskarl Rider",
+     "atk": 45,
+     "di": 95,
+     "dc": 100,
+     "speed": 12,
+     "upkeep": 2,
+     "cost": [
+      385,
+      295,
+      290,
+      85
+     ],
+     "time": "0:44:10",
+     "req": "Stable 1, Academy 5",
+     "time_s": 2650
+    },
+    {
+     "name": "Valkyrie’s Blessing",
+     "atk": 160,
+     "di": 50,
+     "dc": 75,
+     "speed": 9,
+     "upkeep": 2,
+     "cost": [
+      475,
+      535,
+      515,
+      100
+     ],
+     "time": "0:51:00",
+     "req": "Stable 10, Academy 5",
+     "time_s": 3060
+    },
+    {
+     "name": "Ram",
+     "atk": 65,
+     "di": 30,
+     "dc": 80,
+     "speed": 4,
+     "upkeep": 3,
+     "cost": [
+      950,
+      325,
+      375,
+      70
+     ],
+     "time": "1:10:00",
+     "req": "Workshop 1, Academy 10",
+     "time_s": 4200
+    },
+    {
+     "name": "Catapult",
+     "atk": 50,
+     "di": 60,
+     "dc": 10,
+     "speed": 3,
+     "upkeep": 6,
+     "cost": [
+      850,
+      1225,
+      625,
+      60
+     ],
+     "time": "2:30:00",
+     "req": "Workshop 10, Academy 15",
+     "time_s": 9000
+    },
+    {
+     "name": "Jarl (Administrator)",
+     "atk": 40,
+     "di": 40,
+     "dc": 60,
+     "speed": 5,
+     "upkeep": 4,
+     "cost": [
+      35500,
+      26600,
+      25000,
+      27200
+     ],
+     "time": "19:35:00",
+     "req": "Rally Point 10, Academy 20",
+     "time_s": 70500
+    },
+    {
+     "name": "Settler",
+     "atk": 10,
+     "di": 80,
+     "dc": 80,
+     "speed": 5,
+     "upkeep": 1,
+     "cost": [
+      5800,
+      4600,
+      4800,
+      4800
+     ],
+     "time": "8:36:40",
+     "req": "Residence or Palace 10",
+     "time_s": 31000
+    }
+   ],
+   "note": "「Viking Units Overview」表：攻擊、步兵防、騎兵防、速度、糧耗、花費、訓練時間（x1）。表上沒有運載量；頁面沒有標示數字取自第三方計算器"
+  },
+  "s187": {
+   "url": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+   "text_sha256": "d9a7541eab86a561551e49af07abe9c3c03a8e6d3e9e339beafb147bc89cef09",
+   "quotes": [
+    "Disclaimer: Calculations are based on a third-party calculator and may slightly differ from the in-game values / simulation."
+   ],
+   "note": "斯巴達只有這一頁有數字，頁面自己說取自第三方計算器 → 斯巴達維持待驗證"
+  },
+  "s10": {
+   "url": "https://support.travian.com/en/articles/10-the-spartans-and-their-advantages",
+   "text_sha256": "313c46298225265802a506b27d83938a04ac1a9a969c03ae909e0f98355b931e",
+   "note": "斯巴達介紹頁：只有商人 500／14，沒有兵種數字表"
+  }
+ }
+}

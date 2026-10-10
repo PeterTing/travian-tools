@@ -1460,8 +1460,8 @@
       "description_zh": "維京的基礎攻擊步兵",
       "description_en": "Viking basic attack infantry",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "shield_maiden": {
       "troop_id": "shield_maiden",
@@ -1487,8 +1487,8 @@
       "description_zh": "維京的防禦步兵",
       "description_en": "Viking defensive infantry",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "berserker": {
       "troop_id": "berserker",
@@ -1514,8 +1514,8 @@
       "description_zh": "維京的強力攻擊步兵，死亡時必殺一敵",
       "description_en": "Viking powerful attack infantry, kills one enemy on death",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "heimdalls_eye": {
       "troop_id": "heimdalls_eye",
@@ -1541,8 +1541,8 @@
       "description_zh": "維京的偵查步兵",
       "description_en": "Viking scout infantry",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "huskarl_rider": {
       "troop_id": "huskarl_rider",
@@ -1568,8 +1568,8 @@
       "description_zh": "維京的防禦騎兵，均衡防禦",
       "description_en": "Viking defensive cavalry with balanced defense",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "valkyries_blessing": {
       "troop_id": "valkyries_blessing",
@@ -1595,8 +1595,8 @@
       "description_zh": "維京的重騎兵，糧耗效率高",
       "description_en": "Viking heavy cavalry with efficient crop consumption",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "viking_ram": {
       "troop_id": "viking_ram",
@@ -1624,8 +1624,8 @@
       "aliases_zh": [
         "攻城槌"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "viking_catapult": {
       "troop_id": "viking_catapult",
@@ -1653,8 +1653,8 @@
       "aliases_zh": [
         "投石車"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "jarl": {
       "troop_id": "jarl",
@@ -1663,8 +1663,8 @@
       "tribe": "vikings",
       "category": "special",
       "attack": 40,
-      "defense_infantry": 60,
-      "defense_cavalry": 40,
+      "defense_infantry": 40,
+      "defense_cavalry": 60,
       "speed": 5,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
@@ -1674,14 +1674,14 @@
       "cost_iron": 25000,
       "cost_crop": 27200,
       "crop_consumption": 4,
-      "training_time_base": 77500,
+      "training_time_base": 70500,
       "training_building": "residence",
       "academy_level_required": 20,
       "description_zh": "維京的征服者，降低敵方忠誠度 15-30%",
       "description_en": "Viking chief unit for conquering villages, reduces loyalty by 15-30%",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "viking_settler": {
       "troop_id": "viking_settler",
@@ -1689,19 +1689,19 @@
       "name_en": "Settler",
       "tribe": "vikings",
       "category": "settler",
-      "attack": 0,
+      "attack": 10,
       "defense_infantry": 80,
       "defense_cavalry": 80,
       "speed": 5,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
       "carry_capacity": 3000,
-      "cost_wood": 5500,
-      "cost_clay": 7000,
-      "cost_iron": 5300,
-      "cost_crop": 4900,
+      "cost_wood": 5800,
+      "cost_clay": 4600,
+      "cost_iron": 4800,
+      "cost_crop": 4800,
       "crop_consumption": 1,
-      "training_time_base": 28900,
+      "training_time_base": 31000,
       "training_building": "residence",
       "academy_level_required": 0,
       "description_zh": "維京的開拓者，用於建立新村莊",
@@ -1711,8 +1711,8 @@
         "移民",
         "定居者"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "hoplite": {
       "troop_id": "hoplite",

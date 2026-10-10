@@ -7,7 +7,7 @@ interface BuildingVerifyMarkProps {
   className?: string
 }
 
-/** 建築名稱旁的標記：ts11 實測過的打 ✓，其他給一個「待驗證」小灰標（不逐格標）。 */
+/** 建築名稱旁的標記：核對過的（ts11 遊戲內說明＋官方知識庫，P0-23）打 ✓，其他給一個「待驗證」小灰標（不逐格標）。 */
 export default function BuildingVerifyMark({ buildingId, className = '' }: BuildingVerifyMarkProps) {
   const { t } = useTranslation()
   if (isBuildingVerified(buildingId)) {
@@ -24,7 +24,7 @@ export default function BuildingVerifyMark({ buildingId, className = '' }: Build
   return <PendingVerifyChip className={`ml-1 ${className}`} kind="building" />
 }
 
-/** 頁首一行灰字：除標 ✓ 的建築外，數值皆未在 ts11 實測 */
+/** 頁首一行灰字：除標 ✓ 的建築外，數值皆未核對 */
 export function BuildingVerifyLegend() {
   const { t } = useTranslation()
   return (

@@ -342,31 +342,77 @@ def test_every_village_threshold_is_verified_against_official_s51() -> None:
 
 
 @pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
-def test_every_building_not_measured_in_ts11_is_pending() -> None:
-    """Cost AND time of every building whose src != "ts11" must be 待驗證."""
+def test_every_building_is_verified_against_the_official_knowledge_base() -> None:
+    """P0-23: every level of every building comes from the official knowledge base
+    table (the page the ts11 in-game help links to), so nothing is 待驗證."""
     mod = _gen_module()
     fe = json.loads(
         (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
     )
-    not_measured = sorted(bid for bid, p in mod.PARAMS.items() if p["src"] != "ts11")
-    assert (
-        len(not_measured) == 26
-    )  # 21 + hero mansion + 4 kept-L1-time buildings (T3 armoury removed, #33)
-    for bid in not_measured:
-        assert not mod.PARAMS[bid]["verified"], bid
-        assert {"cost", "time"} <= set(fe["pending"][bid]), bid
-    for bid, p in mod.PARAMS.items():
-        if p["src"] == "ts11":
-            assert p["verified"], bid
-            assert bid not in fe["pending"], bid
-    # resource fields are ts11-measured
-    assert not set(mod.FIELDS) & set(fe["pending"])
+    assert fe["pending"] == {}
+    backend = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    for bid, b in backend.items():
+        rows = mod._kb_levels(bid)
+        assert rows, bid
+        pop = 0
+        for lv in b["levels"]:
+            k = rows[lv["level"]]
+            pop += lv["population"]
+            cost = [lv["cost_wood"], lv["cost_clay"], lv["cost_iron"], lv["cost_crop"]]
+            assert cost == k["cost"], (bid, lv["level"])
+            assert pop == k["pop_total"], (bid, lv["level"])
+            assert lv["culture_points"] == k["cp"], (bid, lv["level"])
+            if bid != "main_building":
+                assert lv["build_time_base"] == k["time_s"], (bid, lv["level"])
+            elif lv["level"] > 1:  # KB times the MB with the previous MB level
+                t = lv["build_time_base"] * mod.MB_FACTOR ** (lv["level"] - 2)
+                assert abs(t - k["time_s"]) <= 10, lv["level"]
 
 
 @pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
-def test_flipping_verified_removes_the_chip() -> None:
+def test_values_corrected_by_the_official_table() -> None:
+    """P0-23 corrections: brewery cost, hero mansion / trapper build times."""
+    b = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    lv2 = b["brewery"]["levels"][1]
+    cost = [lv2["cost_wood"], lv2["cost_clay"], lv2["cost_iron"], lv2["cost_crop"]]
+    assert cost == [3980, 2540, 3410, 4750]
+    assert b["heros_mansion"]["levels"][1]["build_time_base"] == 2670
+    assert b["trapper"]["levels"][1]["build_time_base"] == 2320
+
+
+@pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
+def test_building_without_official_table_is_still_pending() -> None:
     mod = _gen_module()
     p = dict(mod.PARAMS["stable"])
-    assert mod.pending_fields(p) == ["cost", "time"]
+    assert mod.pending_fields("not_in_knowledge_base", p) == ["cost", "time"]
+    mod.KB_VERIFIED.add("stable")
+    assert mod.pending_fields("stable", p) == []
     p["verified"] = True
-    assert mod.pending_fields(p) == []
+    assert mod.pending_fields("not_in_knowledge_base", p) == []
+
+
+@pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
+def test_viking_units_follow_official_s139() -> None:
+    """Vikings: cost / upkeep / training time / attack / defence from S139."""
+    t = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    vik = [r for r in t.values() if r.get("tribe") == "vikings"]
+    assert len(vik) == 10
+    assert all(r["stats_source"] == "official" for r in vik)
+    jarl = next(r for r in vik if r["troop_id"].endswith("jarl"))
+    assert (jarl["attack"], jarl["defense_infantry"], jarl["defense_cavalry"]) == (
+        40,
+        40,
+        60,
+    )
+    assert jarl["training_time_base"] == 70500
+    settler = next(r for r in vik if r["troop_id"].endswith("settler"))
+    assert settler["attack"] == 10
+    cost = [settler[f"cost_{k}"] for k in ("wood", "clay", "iron", "crop")]
+    assert cost == [5800, 4600, 4800, 4800]
+    assert settler["training_time_base"] == 31000

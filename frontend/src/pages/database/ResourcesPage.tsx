@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import { resourcesApi } from '@/services/gameApi'
 import type { ResourceFieldListItem, ResourceFieldDetail, ResourceType } from '@/types/game'
 import { ingameBuildingName } from '@/lib/ingameNames'
@@ -203,7 +202,7 @@ export default function ResourcesPage() {
                         <td className="py-2 px-2 font-medium whitespace-nowrap">
                           {level.level}
                           {/* 3 級以上產量、4 級以上花費／時間還沒對過 ts11（P0-18） */}
-                          {level.level >= 3 && <PendingVerifyChip kind="fieldHighLevel" className="ml-1" />}
+                          
                         </td>
                         <td className="py-2 px-2 text-right font-semibold text-green-600">
                           {level.production_per_hour}
@@ -255,7 +254,6 @@ export default function ResourcesPage() {
                       >
                         <td className="py-2 px-2 font-medium">
                           {roi.from_level} → {roi.to_level} 級
-                          {roi.to_level >= 3 && <PendingVerifyChip kind="fieldHighLevel" className="ml-1" />}
                         </td>
                         <td className="py-2 px-2 text-right">
                           {roi.upgrade_cost.toLocaleString()}

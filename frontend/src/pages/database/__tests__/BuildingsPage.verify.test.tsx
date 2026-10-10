@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, within, fireEvent } from '@testing-library/react'
 import i18n from '@/i18n/i18n'
 import BuildingsPage from '../BuildingsPage'
+import * as gameData from '@/data/gameData'
 
 const list = [
   { building_id: 'main_building', name_zh: '村莊大樓', name_en: 'Main Building', category: 'infrastructure', max_level: 20 },
@@ -20,11 +21,21 @@ vi.mock('@/services/gameApi', () => ({
 }))
 
 describe('BuildingsPage ts11 verification marks', () => {
-  beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
+  // P0-23：全部建築都核對過了；這裡模擬「馬廄還沒核對」，確認灰標機制還在
+  beforeEach(async () => {
+    await i18n.changeLanguage('zh-TW')
+    vi.spyOn(gameData, 'isBuildingVerified').mockImplementation((id: string) => id !== 'stable')
+  })
+  afterEach(() => { vi.restoreAllMocks() })
+
+  it('real data: every building is verified (official knowledge base, P0-23)', () => {
+    vi.restoreAllMocks()
+    for (const b of list) expect(gameData.isBuildingVerified(b.building_id), b.building_id).toBe(true)
+  })
 
   it('shows one grey legend line at the top', async () => {
     render(<BuildingsPage />)
-    expect(screen.getByTestId('building-verify-legend')).toHaveTextContent('除標 ✓ 的建築外，數值皆未在 ts11 實測')
+    expect(screen.getByTestId('building-verify-legend')).toHaveTextContent('除標 ✓ 的建築外，數值皆未核對')
   })
 
   it('ts11-measured buildings get ✓, others get ONE 待驗證 chip by the name', async () => {

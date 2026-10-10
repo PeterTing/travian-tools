@@ -57,6 +57,16 @@ Each PARAMS entry also has "verified": True only when ts11 has confirmed its
 cost base, multiplier and L1 time (src "ts11"). Every other building has
 verified=False, so its cost AND build time are 「待驗證」 in the UI; flip it to
 True after measuring in ts11 (and rerun this script) to remove the chip.
+
+P0-23 (2026-10-10): every level of every building and resource field is now
+taken from the official knowledge base tables
+(scripts/game_data/evidence/official_kb_buildings_2026-10-10.json — the page the
+ts11 in-game help links to as 「知識庫」, also embedded in support.travian.com
+article 33). Level 1 of 43 of the 44 buildings there equals the ts11 in-game
+help exactly (check_kb_against_manual). Cost, population, CP and build time per
+level come from that table; a building whose levels are all in the table counts
+as verified. The formulas above stay as a cross-check (and for levels the table
+does not list).
 """
 
 from __future__ import annotations
@@ -98,9 +108,8 @@ PARAMS: dict[str, dict] = {
     "palace":            {"c": (550, 800, 750, 250), "k": 1.28, "t1": 5000, "cp": 5, "src": "ingame", "verified": False},
     "treasury":          {"c": (2880, 2740, 2580, 990), "k": 1.26, "t1": 8000, "cp": 6, "src": "ingame", "verified": False},
     # L1 700/670/700/240, 2300 s read from ts11 manual/building/37 (P0-19); the old
-    # 80/120/70/90 was the trapper's L1. Multiplier not measured -> still 待驗證.
-    "heros_mansion":     {"c": (700, 670, 700, 240), "k": 1.33, "t1": 2300, "cp": 1, "src": "ingame", "verified": False,
-                          "pending": ["cost", "time"]},
+    # 80/120/70/90 was the trapper's L1. Every level: official knowledge base (P0-23).
+    "heros_mansion":     {"c": (700, 670, 700, 240), "k": 1.33, "t1": 2300, "cp": 1, "src": "ingame", "verified": False},
     "sawmill":           {"c": (520, 380, 290, 90), "k": 1.80, "t1": 3000, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
     "brickyard":         {"c": (440, 480, 320, 50), "k": 1.80, "t1": 2240, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
     "iron_foundry":      {"c": (200, 450, 510, 120), "k": 1.80, "t1": 4080, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
@@ -364,9 +373,64 @@ def check_l1_against_manual() -> dict[str, int]:
     return pops
 
 
+# P0-23：官方知識庫建築表（每一級的花費、累計人口、CP、x1 村莊大樓 1 級的建造秒數）
+OFFICIAL_KB = ROOT / "scripts/game_data/evidence/official_kb_buildings_2026-10-10.json"
+
+
+def _kb_levels(bid: str) -> dict[int, dict]:
+    """building_id → {level: 知識庫那一列}；沒有這棟就是空的."""
+    gid = INGAME_BUILDING_GID.get(bid)
+    if gid is None or not OFFICIAL_KB.exists():
+        return {}
+    b = json.loads(OFFICIAL_KB.read_text(encoding="utf-8"))["buildings"].get(str(gid))
+    return {r["level"]: r for r in b["rows"]} if b else {}
+
+
+def check_kb_against_manual() -> None:
+    """知識庫的 1 級要跟 ts11 遊戲內說明頁一樣（花費、人口、時間），才能拿它當 2 級以上的出處.
+    村莊大樓例外：知識庫用「村莊大樓等級」算村莊大樓自己的時間，所以只比花費和人口."""
+    manual = _ts11_buildings()
+    for bid, gid in INGAME_BUILDING_GID.items():
+        m = manual.get(str(gid))
+        k = _kb_levels(bid).get(1)
+        if not m or not k:
+            continue
+        assert k["cost"] == m["cost_l1"], (bid, k["cost"], m["cost_l1"])
+        assert k["pop_total"] == m["pop_l1"], (bid, k["pop_total"], m["pop_l1"])
+        if bid != "main_building":
+            assert k["time_s"] == m["time_l1_s"], (bid, k["time_s"], m["time_l1_s"])
+
+
+def apply_kb_levels(bid: str, levels: list[dict]) -> bool:
+    """把知識庫每一級的花費、人口（累計相減）、CP、建造秒數寫進 levels；全部等級都有才回 True.
+    村莊大樓的時間留公式（知識庫用前一級的村莊大樓算自己），但要跟知識庫差不到 10 秒."""
+    kb = _kb_levels(bid)
+    if not kb or any(lv["level"] not in kb for lv in levels if lv["level"] > 0):
+        return False
+    for lv in levels:
+        L = lv["level"]
+        if L == 0:
+            continue
+        k = kb[L]
+        assert k["cp"] == lv["culture_points"], (bid, L, k["cp"], lv["culture_points"])
+        prev = kb[L - 1]["pop_total"] if L > 1 else 0
+        lv.update(cost_wood=k["cost"][0], cost_clay=k["cost"][1], cost_iron=k["cost"][2],
+                  cost_crop=k["cost"][3], population=k["pop_total"] - prev)
+        if bid == "main_building":
+            if L >= 2:
+                assert abs(lv["build_time_base"] * MB_FACTOR ** (L - 2) - k["time_s"]) <= 10, (bid, L)
+        else:
+            lv["build_time_base"] = k["time_s"]
+    return True
+
+
+KB_VERIFIED: set[str] = set()
+
+
 def gen_buildings(current: dict) -> dict:
     out = json.loads(json.dumps(current))
     l1_pop = check_l1_against_manual()
+    check_kb_against_manual()
     for bid, b in out["buildings"].items():
         if bid in FIELDS:
             f = FIELDS[bid]
@@ -376,6 +440,8 @@ def gen_buildings(current: dict) -> dict:
                 lv.update(cost_wood=w, cost_clay=c, cost_iron=i, cost_crop=cr,
                           build_time_base=field_time(f["a"], L), culture_points=cp_at(1, L))
                 lv["cp_per_day"] = lv["culture_points"]
+            if apply_kb_levels(bid, b["levels"]):
+                KB_VERIFIED.add(bid)
             continue
         if bid not in PARAMS:  # 遊戲裡沒有的建築（apply_ingame_names 會拿掉）
             continue
@@ -393,6 +459,8 @@ def gen_buildings(current: dict) -> dict:
                 eff = mb_effect(L)
                 lv["effect_value"] = eff
                 lv["effect_description"] = f"建造時間 {round(eff * 100)}%"
+        if apply_kb_levels(bid, b["levels"]):
+            KB_VERIFIED.add(bid)
     mb = out["buildings"]["main_building"]
     mb["description_zh"] = (
         "村莊的行政中心。建造時間 × 0.964^(等級−1)：2 級 96%、3 級 93%、4 級 90%，20 級約 50%。"
@@ -427,6 +495,12 @@ def gen_resources(current: dict) -> dict:
             w, c, i, cr = build_cost(f["c"], FIELD_K, L)
             lv.update(cost_wood=w, cost_clay=c, cost_iron=i, cost_crop=cr,
                       build_time_base=field_time(f["a"], L), culture_points=cp_at(1, L))
+        fid = next(k for k, v in FIELDS.items() if v["res"] == rtype)
+        assert apply_kb_levels(fid, r["levels"]), fid
+        kb = _kb_levels(fid)
+        for lv in r["levels"]:
+            if lv["level"] > 0:  # 知識庫效果欄＝每小時產量（x1）；0 級知識庫沒有（P0-23 第 5 項）
+                assert int(kb[lv["level"]]["effects"][0].replace(",", "")) == lv["production_per_hour"], (fid, lv["level"])
     return out
 
 
@@ -462,10 +536,10 @@ def gen_culture_points() -> dict:
     }
 
 
-def pending_fields(p: dict) -> list[str]:
+def pending_fields(bid: str, p: dict) -> list[str]:
     """Fields shown as 「待驗證」: explicit notes, plus cost+time when not verified."""
     fields = list(p.get("pending", []))
-    if not p["verified"]:
+    if not p["verified"] and bid not in KB_VERIFIED:
         fields += [f for f in ("cost", "time") if f not in fields]
     return fields
 
@@ -475,7 +549,7 @@ def gen_frontend(buildings: dict, cp: dict) -> dict:
     for bid, b in buildings["buildings"].items():
         rows[bid] = [[lv["cost_wood"], lv["cost_clay"], lv["cost_iron"], lv["cost_crop"],
                       lv["build_time_base"], lv["culture_points"]] for lv in b["levels"]]
-    pending = {bid: pending_fields(p) for bid, p in PARAMS.items() if pending_fields(p)}
+    pending = {bid: pending_fields(bid, p) for bid, p in PARAMS.items() if pending_fields(bid, p)}
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "rowFormat": ["wood", "clay", "iron", "crop", "buildTimeBase", "cp"],
@@ -578,11 +652,36 @@ def gen_troops(current: dict, speeds: dict) -> dict:
     return out
 
 
+# P0-23：維京沒有 ts11 來源，花費、糧耗、訓練時間、攻防照官方 S139「Viking Units Overview」表
+# （evidence/official_support_2026-10-10.json）；S139 沒有運載量 → 運載量維持舊值、待驗證
+OFFICIAL_SUPPORT = ROOT / "scripts/game_data/evidence/official_support_2026-10-10.json"
+
+
+def _s139_units() -> list[dict]:
+    ev = json.loads(OFFICIAL_SUPPORT.read_text(encoding="utf-8"))
+    return ev["articles"]["s139"]["units"]
+
+
+def apply_s139_vikings(troops: dict, speeds: dict) -> None:
+    units = _s139_units()
+    rows = speeds["tribes"]["vikings"]
+    assert len(units) == len(rows) == 10
+    for r, u in zip(rows, units):
+        t = troops["troops"][r["troop_id"]]
+        assert r["speed"] == u["speed"], (r["troop_id"], r["speed"], u["speed"])
+        t.update(attack=u["atk"], defense_infantry=u["di"], defense_cavalry=u["dc"],
+                 cost_wood=u["cost"][0], cost_clay=u["cost"][1], cost_iron=u["cost"][2],
+                 cost_crop=u["cost"][3], crop_consumption=u["upkeep"], training_time_base=u["time_s"])
+        t["stats_source"] = "official"
+        t["stats_ref"] = UNIT_SPEED_SOURCES["s139"]
+
+
 def gen_cost_verified(speeds: dict) -> dict:
     """部族的 10 種兵都讀到 ts11 說明頁才算核對過（P0-18）；ts11 沒有斯巴達／維京 → false."""
     return {
-        "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在 ts11 遊戲內說明頁讀到（evidence/ts11_manual_2026-10-10.json）才是 true；ts11 是 5 族伺服器，斯巴達、維京沒有第一手來源，維持 false（兵種詳情顯示「待驗證」）。",
-        "tribes": {t: all(r["stats"] for r in speeds["tribes"][t]) for t in ["romans", "gauls", "teutons", "huns", "egyptians", "vikings", "spartans"]},
+        "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在 ts11 遊戲內說明頁讀到（evidence/ts11_manual_2026-10-10.json）才是 true；ts11 是 5 族伺服器：維京照官方說明頁 S139 的兵種表（evidence/official_support_2026-10-10.json）是 true，斯巴達只有標示第三方計算器的 S187，維持 false（兵種詳情顯示「待驗證」）。",
+        "tribes": {t: all(r["stats"] for r in speeds["tribes"][t]) for t in ["romans", "gauls", "teutons", "huns", "egyptians", "spartans"]}
+        | {"vikings": len(_s139_units()) == 10},
     }
 
 
@@ -731,6 +830,7 @@ def outputs() -> dict[Path, str]:
     cp = gen_culture_points()
     us = gen_unit_speeds()
     tr = gen_troops(_load(BACKEND_TROOPS), us)
+    apply_s139_vikings(tr, us)
     names = gen_ingame_names(us)
     apply_ingame_names(b, r, tr, names)
     return {

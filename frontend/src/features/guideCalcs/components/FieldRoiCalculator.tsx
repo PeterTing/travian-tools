@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { fieldRoi, FIELD_COSTS, type ResourceType } from '../data/travian';
+import { fieldRoi, FIELD_COSTS, BONUS_BUILDINGS_VERIFIED, type ResourceType } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
@@ -31,15 +31,11 @@ export default function FieldRoiCalculator() {
     return fieldRoi(type, level, opts);
   }, [type, level, bonus, oasis, gold]);
   const breakdown = FIELD_COSTS[type][level - 1];
-  // 待驗證（PM 2026-10-10）：
-  // - fieldHighLevel：ts11 只核對過資源田花費 1–3 級、產量 0–2 級；4 級以上花費、3 級以上產量是公式推算
-  // - plusFormula：這頁 Plus 用加總（1 + 加成建築 + 綠洲 + 0.25），產量模擬和綠洲用相乘；先不統一（P0-18 D05）
-  // - building：加成建築（鋸木廠等）的 % 還沒核對
-  const costKinds: PendingKind[] = level >= 4 ? ['fieldHighLevel'] : [];
+  // 資源田 1–20 級花費、時間、產量：官方知識庫；Plus 乘在總產量上：官方 S129（P0-23）。
+  // 加成建築（鋸木廠等）的資料哪天又標待驗證，這裡會自動帶回灰標
+  const costKinds: PendingKind[] = [];
   const prodKinds: PendingKind[] = [
-    ...(level >= 3 ? ['fieldHighLevel' as const] : []),
-    ...(gold ? ['plusFormula' as const] : []),
-    ...(bonus > 0 ? ['building' as const] : []),
+    ...(bonus > 0 && !BONUS_BUILDINGS_VERIFIED ? ['building' as const] : []),
   ];
   // 一行一個灰標，依數字在這一行出現的順序：先「成本」、再「每天 +」（同一種只列一次）
   const lineKinds: PendingKind[] = [...new Set<PendingKind>([...costKinds, ...prodKinds])];
