@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import i18n from '@/i18n/i18n'
 import DataUpdateCard from '@/components/home/DataUpdateCard'
-import { DATA_UPDATE_HIDE_AT, DATA_UPDATE_ITEMS, DATA_UPDATE_PREF_KEY, DATA_UPDATE_RELEASE_DATE, DATA_UPDATE_TITLE, shouldShowDataUpdate } from '@/lib/dataUpdate'
+import { DATA_UPDATE_HIDE_AT, DATA_UPDATE_ITEMS, DATA_UPDATE_PREF_KEY, dataUpdateItemsFor, DATA_UPDATE_RELEASE_DATE, DATA_UPDATE_TITLE, shouldShowDataUpdate } from '@/lib/dataUpdate'
 
 const pasteApi = vi.hoisted(() => ({
   preview: vi.fn(),
@@ -23,11 +23,12 @@ const villageApi = vi.hoisted(() => ({
 }))
 vi.mock('@/services/villageApi', () => ({ villageApi }))
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: true }) }))
+const world = vi.hoisted(() => ({ speed: 1 }))
 vi.mock('@/contexts/CurrentAccountContext', () => ({
   useCurrentAccount: () => ({
     currentAccount: {
       account_id: 'acc-1', world_id: 'w-1', player_name: 'Tester', server_name: 'ts11',
-      server_url: 'https://ts11.x1.international.travian.com',
+      server_url: 'https://ts11.x1.international.travian.com', server_speed: world.speed,
     },
     loading: false,
   }),
@@ -53,6 +54,7 @@ describe('首頁資料更新卡', () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'], now: NOW })
     localStorage.clear()
+    world.speed = 1
     pasteApi.listMovements.mockReset().mockResolvedValue({ movements: [] })
   })
   afterEach(() => {
@@ -79,7 +81,8 @@ describe('首頁資料更新卡', () => {
     const change = within(items[2]!).getByTestId('data-update-change')
     expect(change.querySelector('.line-through')).toHaveTextContent('750')
     expect(change.querySelector('.font-semibold')).toHaveTextContent('500')
-    expect(DATA_UPDATE_ITEMS).toHaveLength(6)
+    expect(DATA_UPDATE_ITEMS).toHaveLength(7)
+    expect(dataUpdateItemsFor(1)).toHaveLength(6)
     const btn = within(card).getByRole('button', { name: '知道了' })
     expect(btn.className).toContain('min-h-[44px]')
     // 字級：卡片裡沒有 text-xs 以下
@@ -150,6 +153,31 @@ describe('首頁資料更新卡', () => {
     const card = await screen.findByTestId('data-update-card')
     expect(inc.nextElementSibling).toBe(card)
     expect(screen.getAllByTestId('data-update-card')).toHaveLength(1)
+  })
+
+  describe('x3 以上世界的行軍時間修正（官方 S20：兵速 x3/x5 ×2、x10 ×4；PM：只給 x3 以上看）', () => {
+    const TEXT = 'x3 以上世界的行軍時間已修正（之前算得太短，請重新確認排好的攻擊）'
+    it.each([3, 5, 10])('x%i: first item, visible without expanding, plain sentence (no 舊 → 新)', (speed) => {
+      render(<DataUpdateCard serverSpeed={speed} />)
+      const items = within(screen.getByTestId('data-update-items')).getAllByRole('listitem')
+      expect(items[0]!.textContent).toBe(TEXT)
+      expect(within(items[0]!).queryByTestId('data-update-change')).toBeNull()
+      expect(screen.getByRole('button', { name: '再看 4 項' })).toBeInTheDocument()
+    })
+    it.each([1, 2, undefined, null])('x%s: not shown', (speed) => {
+      render(<DataUpdateCard serverSpeed={speed} />)
+      expect(screen.getByTestId('data-update-card')).not.toHaveTextContent('行軍時間')
+      expect(screen.getByRole('button', { name: '再看 3 項' })).toBeInTheDocument()
+    })
+    it('home page passes the current world speed', async () => {
+      world.speed = 5
+      render(<MemoryRouter><HomePage /></MemoryRouter>)
+      expect(await screen.findByTestId('data-update-card')).toHaveTextContent(TEXT)
+    })
+    it('home page on x1 does not show it', async () => {
+      render(<MemoryRouter><HomePage /></MemoryRouter>)
+      expect(await screen.findByTestId('data-update-card')).not.toHaveTextContent('行軍時間')
+    })
   })
 
   it('old name only comes from the in-game name table aliases (not hard-coded)', () => {

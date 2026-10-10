@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import {
-  DATA_UPDATE_ITEMS,
   DATA_UPDATE_PREF_KEY,
   DATA_UPDATE_TITLE,
   DATA_UPDATE_VISIBLE,
+  dataUpdateItemsFor,
   shouldShowDataUpdate,
   type DataUpdateItem,
 } from '@/lib/dataUpdate'
@@ -26,7 +26,7 @@ function Item({ it }: { it: DataUpdateItem }) {
     <li data-testid="data-update-item">
       <span className="flex flex-wrap gap-x-2">
         <span>{it.label}</span>
-        <BeforeAfter before={it.before} after={it.after} />
+        {it.before !== undefined && it.after !== undefined && <BeforeAfter before={it.before} after={it.after} />}
       </span>
       {it.sub && (
         <span className="flex flex-wrap gap-x-2 pl-4" data-testid="data-update-sub">
@@ -47,12 +47,14 @@ function Item({ it }: { it: DataUpdateItem }) {
  * 首頁資料更新卡（#33 + #34 一張）：淺灰資訊卡，前 3 項直接看到，「再看 3 項」展開其餘。
  * 卡片最高半個螢幕（內容多就卡片裡捲動），有來襲時來襲卡在上面。
  */
-export default function DataUpdateCard({ now }: { now?: Date }) {
+/** serverSpeed：目前世界的倍速，決定 x3 以上才有的項目要不要顯示 */
+export default function DataUpdateCard({ now, serverSpeed }: { now?: Date; serverSpeed?: number | null }) {
   const [show, setShow] = useState(() => shouldShowDataUpdate(now))
   const [expanded, setExpanded] = useState(false)
   if (!show) return null
-  const first = DATA_UPDATE_ITEMS.slice(0, DATA_UPDATE_VISIBLE)
-  const rest = DATA_UPDATE_ITEMS.slice(DATA_UPDATE_VISIBLE)
+  const items = dataUpdateItemsFor(serverSpeed)
+  const first = items.slice(0, DATA_UPDATE_VISIBLE)
+  const rest = items.slice(DATA_UPDATE_VISIBLE)
   return (
     <section
       className="max-h-[50vh] overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-800"

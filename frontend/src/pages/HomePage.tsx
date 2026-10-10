@@ -598,7 +598,7 @@ export default function HomePage() {
       {isEmpty && <p className="text-sm text-muted-foreground">{t('home.empty.subtitle')}</p>}
 
       {/* 資料更新卡：任務卡最上面（有來襲時改放在來襲卡下面，見下方） */}
-      {(isEmpty || !incomingCard) && <DataUpdateCard />}
+      {(isEmpty || !incomingCard) && <DataUpdateCard serverSpeed={currentAccount?.server_speed} />}
 
       {/*
         卡片都是同一層的兄弟，順序固定（貼上卡不會因為換版面被重新建立，打到一半的字不會不見）；
@@ -671,7 +671,7 @@ export default function HomePage() {
           <div className={`order-1 min-w-0 space-y-4 lg:self-start ${busy ? 'lg:col-span-12' : 'lg:col-span-7 lg:col-start-1 lg:row-start-1'}`}>
             {incomingCard}
             {/* 資料更新卡：有來襲時放在來襲卡下面 */}
-            <DataUpdateCard />
+            <DataUpdateCard serverSpeed={currentAccount?.server_speed} />
           </div>
         )}
         {!isEmpty && (
