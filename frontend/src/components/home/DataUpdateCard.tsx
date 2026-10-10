@@ -62,7 +62,7 @@ export default function DataUpdateCard({ now, serverSpeed }: { now?: Date; serve
       aria-labelledby="data-update-title"
     >
       <h2 id="data-update-title" className="text-base font-semibold">{DATA_UPDATE_TITLE}</h2>
-      <p className="mt-1 text-sm">數值已對照官方說明頁和社群資料更正</p>
+      <p className="mt-1 text-sm">依官方說明頁和社群資料核對</p>
       <ul className="mt-2 space-y-1 text-sm" data-testid="data-update-items">
         {first.map((it) => <Item key={it.label} it={it} />)}
         {expanded && rest.map((it) => <Item key={it.label} it={it} />)}

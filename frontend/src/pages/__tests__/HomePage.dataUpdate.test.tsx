@@ -70,7 +70,7 @@ describe('首頁資料更新卡', () => {
     const [, m, d] = DATA_UPDATE_RELEASE_DATE.split('-').map(Number)
     expect(DATA_UPDATE_TITLE).toBe(`${m}/${d} 資料更新`)
     expect(within(card).getByRole('heading', { name: DATA_UPDATE_TITLE })).toBeInTheDocument()
-    expect(card).toHaveTextContent('數值已對照官方說明頁和社群資料更正')
+    expect(card).toHaveTextContent('依官方說明頁和社群資料核對')
     const items = within(screen.getByTestId('data-update-items')).getAllByRole('listitem')
     expect(items.map((li) => li.textContent?.replace(/改成/g, ''))).toEqual([
       '小慶典的糧、大慶典的花費待驗證 → 已核對',
