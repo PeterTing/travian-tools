@@ -452,6 +452,20 @@ def test_evidence_has_no_denylisted_names() -> None:
             assert name not in folded, (path.name, f"denylist entry #{k}")
 
 
+def test_boots_beyond_20_fields_two_official_sources() -> None:
+    """#45 T6：靴子只加 20 格外＝S93＋S71（寫法不同）；競技場＋靴子相加仍待驗證."""
+    ev = json.loads(PENDING_EV.read_text(encoding="utf-8"))
+    s93 = ev["official_articles"]["s93"]["text"]
+    s71 = ev["official_articles"]["s71"]["text"]
+    for tier in ("Mercenary \u2013 +25%", "Warrior \u2013 +50%", "Archon \u2013 +75%"):
+        assert f"Boots of the {tier} troop speed after the first 20 fields" in s93
+    assert "The first 20 fields are always traveled without this bonus." in s71
+    assert "add together" not in s93
+    c = ev["conclusions"]
+    assert c["heroBootsSpeed"]["result"].startswith("verified")
+    assert c["arenaBootsSpeed"]["result"] == "pending"
+
+
 def test_identifier_scan_normalization() -> None:
     raw = "\u202d\u2212154\u202c|\u202d42\u202c"
     assert _normalize_for_id_scan(raw) == "-154|42"

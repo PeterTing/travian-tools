@@ -616,6 +616,26 @@ EFFECT_OFFICIAL: dict[str, dict] = {
 }
 
 
+# 行軍速度：「英雄靴子只加快 20 格以外」＝官方 S93＋S71（兩篇寫法不同、互不引用；PM 2026-10-11，#45 T6）。
+# 「競技場＋靴子相加」只有 S71，仍待驗證（前端 arenaBootsSpeed 灰標）。生成時檢查原文都還在 evidence 裡。
+SPEED_OFFICIAL_QUOTES: list[tuple[str, str]] = [
+    ("s93", "Boots of the Mercenary \u2013 +25% troop speed after the first 20 fields (hero must travel with the army)"),
+    ("s93", "Boots of the Warrior \u2013 +50% troop speed after the first 20 fields"),
+    ("s93", "Boots of the Archon \u2013 +75% troop speed after the first 20 fields"),
+    ("s71", "Increase troop movement speed after the first 20 fields of travel."),
+    ("s71", "The first 20 fields are always traveled without this bonus."),
+    ("s71", "Boots and Tournament Square bonuses add together, but only apply after 20 fields."),
+]
+
+
+def check_speed_quotes() -> None:
+    arts = json.loads(PENDING_CROSSCHECK.read_text(encoding="utf-8"))["official_articles"]
+    for art, quote in SPEED_OFFICIAL_QUOTES:
+        a = arts[art]
+        assert hashlib.sha256(a["text"].encode("utf-8")).hexdigest() == a["text_sha256"], art
+        assert quote in a["text"], (art, quote)
+
+
 def apply_official_effects(buildings: dict) -> dict[str, str]:
     """EFFECT_OFFICIAL 寫進效果欄；出處原文每一句都要在 evidence 裡（遊戲內說明＋官方說明頁）。回傳 {bid: 出處 key}."""
     ev = json.loads(PENDING_CROSSCHECK.read_text(encoding="utf-8"))
@@ -792,6 +812,7 @@ def gen_buildings(current: dict) -> dict:
     assert all(abs(lv["effect_value"] - mb_effect(lv["level"])) < 1e-9 for lv in mbl), "MB factor != KB"
     check_effects_against_kb(out)
     EFFECT_SOURCES.update(apply_official_effects(out))
+    check_speed_quotes()
     mk = out["buildings"]["marketplace"]
     if not any(pr["building_id"] == "granary" for pr in mk["prerequisites"]):
         mk["prerequisites"].append({"building_id": "granary", "level": 1})

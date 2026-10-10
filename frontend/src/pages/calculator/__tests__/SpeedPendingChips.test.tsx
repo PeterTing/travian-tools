@@ -9,7 +9,7 @@ import SaveTroopsCalculatorPage from '../SaveTroopsCalculatorPage'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import { speedPendingKinds } from '@/lib/pendingNotes'
 
-// 競技場 2026-10-11 核對過（ARENA_SPEED_VERIFIED；靴子仍待驗證）：這裡測「全部待驗證時」灰標放的位置，
+// 競技場、靴子各自 2026-10-11 核對過（相加仍待驗證）：這裡測「全部待驗證時」灰標放的位置，
 // 所以把 speedPendingKinds 換成只選種類的 speedKindsFor（真實資料不放灰標，見 verifiedChips2026-10-11.test.tsx）
 vi.mock('@/lib/pendingNotes', async (importOriginal) => {
   const m = await importOriginal<typeof import('@/lib/pendingNotes')>()
@@ -46,14 +46,16 @@ const setStepper = (label: string, v: number) => {
 }
 
 describe('speedPendingKinds（P0-21：全站共用，同行軍時間頁）', () => {
-  it('real module: arena alone is verified (2026-10-11); boots still pending (S71 only, #45 幕僚長)', async () => {
+  it('real module: arena alone and boots alone are verified (2026-10-11); arena + boots still pending (additivity, #45)', async () => {
     const real = await vi.importActual<typeof import('@/lib/pendingNotes')>('@/lib/pendingNotes')
     expect(real.ARENA_SPEED_VERIFIED).toBe(true)
-    expect(real.BOOTS_SPEED_VERIFIED).toBe(false)
+    expect(real.BOOTS_SPEED_VERIFIED).toBe(true)
+    expect(real.ARENA_BOOTS_ADDITIVE_VERIFIED).toBe(false)
     expect(real.speedPendingKinds(3, 0)).toEqual([])
     expect(real.speedPendingKinds(20, 0)).toEqual([])
     expect(real.speedPendingKinds(0, 0)).toEqual([])
-    expect(real.speedPendingKinds(0, 25)).toEqual(['heroBootsSpeed'])
+    expect(real.speedPendingKinds(0, 25)).toEqual([])
+    expect(real.speedPendingKinds(0, 75)).toEqual([])
     expect(real.speedPendingKinds(3, 25)).toEqual(['arenaBootsSpeed'])
     expect(real.speedPendingKinds(20, 75)).toEqual(['arenaBootsSpeed'])
     // 改回待驗證時選的種類

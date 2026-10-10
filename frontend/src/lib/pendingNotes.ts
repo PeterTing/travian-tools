@@ -44,8 +44,8 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
   vikingCarry: '維京運載量留空（null，官方說明頁 S139 沒有運載量；P0-23 PM 決定；2026-10-11 幕僚長：社群兩份出處不明，退回待驗證）：兵種資料庫詳情的運載量「—」旁；農場收益選到維京兵種時（目前清單沒有，函式和元件測試涵蓋）結果「無法計算」第二行原因旁、單位欄位旁',
   launchSim: '（PM 2026-10-11：是估算、LAUNCH_SIM_ESTIMATE_ONLY，目前不出現，改放估算說明灰字；改回 false 才會出現）開局衝村模擬：結果摘要第二行（第幾天）、總時數、伺服器天、里程碑表（開局花費是試算表每一步的加總）',
   arenaSpeed: '（2026-10-11 起核對過、ARENA_SPEED_VERIFIED，目前不出現；改回 false 才會出現）只有競技場（> 0 級、英雄靴子 0）時（兩個都 0 不標；speedPendingKinds 選）：行軍時間的結果摘要第二行（距離 · 速度）、行進時間、秒數、有效速度；攔截三張卡的標籤：「攻擊者回到家時間」（看攻方）、「你應該在此時發送攔截部隊」（攻方＋攔截方，依序列出）、「攔截行進時間」（看攔截方）；OP 規劃（TS 優化器）每張結果卡／每列的標題（村莊名，涵蓋建議 TS、發兵、行進時間；看那一列的攻擊者）；反推 TS 結果表每列的計算行進時間（看那一列的競技場等級和靴子欄位）；躲兵「計算結果」標題旁一個（整區同一份說明）（P0-21）；農場收益：「單程」、「每小時最多次數」，以及「每日收益」摘要標題、「每日預估收益」、「回本天數」的灰標裡接在原本種類後面（同一個灰標、依序列出；P0-22）',
-  heroBootsSpeed: '只有英雄靴子（> 0%、競技場 0 級）時：位置同 arenaSpeed（P0-20、P0-21）',
-  arenaBootsSpeed: '競技場 > 0 級且英雄靴子 > 0% 時：位置同 arenaSpeed（P0-20、P0-21）',
+  heroBootsSpeed: '（2026-10-11 起核對過、BOOTS_SPEED_VERIFIED：S93＋S71，目前不出現；改回 false 才會出現）只有英雄靴子（> 0%、競技場 0 級）時：位置同 arenaSpeed（P0-20、P0-21）',
+  arenaBootsSpeed: '競技場 > 0 級且英雄靴子 > 0% 時（相加只有 S71、沒實測，ARENA_BOOTS_ADDITIVE_VERIFIED false）：位置同 arenaSpeed（P0-20、P0-21）',
   smithyFormula: '盔甲廠升級：結果三張表的標題旁（攻擊力、步兵防禦、騎兵防禦；整張表同一份說明）（P0-18）',
   unitNameZhPending: '兵種資料庫詳情：維京 10 種兵的標題旁（列表整列可點，放不能點的「待驗證」字樣；名稱顯示「中文暫譯（官方英文名）」；ingameNames.gen.json zh_pending）（P0-23 後續；斯巴達 2026-10-11 起是 ASIA x1 遊戲內名稱）',
 }
@@ -58,10 +58,15 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
 export const ARENA_SPEED_VERIFIED = true
 
 /**
- * 英雄靴子「只加快 20 格以外」「跟競技場相加」只有官方 S71 一個出處，而且 S71 自己前後矛盾
- * （#45 幕僚長擋件）→ 仍待驗證：靴子 > 0 時照舊放 heroBootsSpeed／arenaBootsSpeed 灰標。
+ * 英雄靴子「只加快 20 格以外」：官方 S93（道具列表）＋S71（速度規則），兩篇寫法不同、互不引用（PM 2026-10-11，#45 T6）
+ * → 只有靴子時不放 heroBootsSpeed 灰標。改回 false 灰標就回來。
  */
-export const BOOTS_SPEED_VERIFIED = false
+export const BOOTS_SPEED_VERIFIED = true
+
+/**
+ * 「競技場＋靴子相加」只有 S71 一個出處、沒有實測（#45 幕僚長）→ 兩個都有時照舊放 arenaBootsSpeed 灰標。
+ */
+export const ARENA_BOOTS_ADDITIVE_VERIFIED = false
 
 /**
  * 行軍速度的灰標種類（P0-20、P0-21）：一行一個，三種擇一——只有競技場 arenaSpeed、只有靴子 heroBootsSpeed、
@@ -74,12 +79,16 @@ export function speedKindsFor(arenaLevel: number, bootsPercent: number): Pending
 
 /**
  * 行軍速度要放的灰標：行軍時間、攔截、OP 規劃、反推 TS、躲兵、農場收益共用。
- * 有靴子（> 0%）且靴子還沒核對（BOOTS_SPEED_VERIFIED false）→ heroBootsSpeed 或 arenaBootsSpeed；
- * 只有競技場 → 競技場核對過（ARENA_SPEED_VERIFIED）就不放，否則 arenaSpeed。
+ * 競技場＋靴子 → 相加還沒核對（ARENA_BOOTS_ADDITIVE_VERIFIED false）就放 arenaBootsSpeed；
+ * 只有競技場 → ARENA_SPEED_VERIFIED；只有靴子 → BOOTS_SPEED_VERIFIED；核對過的不放。
  */
 export function speedPendingKinds(arenaLevel: number, bootsPercent: number): PendingKind[] {
-  if (bootsPercent > 0) return BOOTS_SPEED_VERIFIED ? (arenaLevel > 0 && !ARENA_SPEED_VERIFIED ? ['arenaSpeed'] : []) : speedKindsFor(arenaLevel, bootsPercent)
-  return arenaLevel > 0 && !ARENA_SPEED_VERIFIED ? speedKindsFor(arenaLevel, 0) : []
+  const arena = arenaLevel > 0
+  const boots = bootsPercent > 0
+  if (arena && boots) return ARENA_BOOTS_ADDITIVE_VERIFIED && ARENA_SPEED_VERIFIED && BOOTS_SPEED_VERIFIED ? [] : speedKindsFor(arenaLevel, bootsPercent)
+  if (arena) return ARENA_SPEED_VERIFIED ? [] : speedKindsFor(arenaLevel, 0)
+  if (boots) return BOOTS_SPEED_VERIFIED ? [] : speedKindsFor(0, bootsPercent)
+  return []
 }
 
 /**

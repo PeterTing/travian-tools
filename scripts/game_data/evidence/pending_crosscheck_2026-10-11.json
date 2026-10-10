@@ -9,6 +9,13 @@
       "html_sha256": "af21cfaa0482eddbffbd08e79cba1c3149b96bd263a91e1f6d65a09125f25ca0",
       "text": "Go to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nAll collectionsAdvanced GameplayAdvanced featuresTroops Speed Increase & Tournament Square\nTroops Speed Increase & Tournament Square\nTroops Speed Increase & Tournament Square\n\nTroop movement speed can be increased in several ways. These bonuses can come from hero items, artefacts, and the Tournament Square building. All speed bonuses are stackable, but some work differently depending on distance.\n\nHero Items That Increase Speed\nPennants\n\nIncrease troop movement speed between your own villages.\n\nBonus applies only when the hero travels with the troops.\n\nBonus range: 30%–50% faster.\n\nStandards\n\nIncrease troop movement speed between alliance or confederacy members.\n\nBonus applies only when the hero travels with the troops.\n\nBonus range: 15%–25% faster.\n\nHero Item Overview and Mounts\n\nBoots\n\nIncrease troop movement speed after the first 20 fields of travel.\n\nBonus applies only when the hero travels with the troops.\n\nBonus range: 25%–75% faster.\n\nThe first 20 fields are always traveled without this bonus.\n\nHero Armour\n\nArtefact Bonus\nTitan’s Boots\n\nLarge artefact: 1.5× speed\n\nSmall or unique artefact: 2× speed\n\nThese bonuses apply regardless of distance.\n\nArtefacts\n\nArtefact Effects\n\nTournament Square\n\nThe Tournament Square increases movement speed after the first 20 fields.\n\nEach level adds +20% speed (multiplicative after 20 fields).\n\nAt level 20, the total bonus is +500%, meaning troops move 5× their base speed after the first 20 fields.\n\nTournament Square requires Rally Point level 15.\n\nHow Multiple Bonuses Stack\n\nSpeed bonuses follow specific stacking rules:\n\nBoots and Tournament Square bonuses add together, but only apply after 20 fields.\n\nAll other bonuses (Pennants, Standards, Artefacts) multiply with each other.\n\nFinal speed is calculated by multiplying all applicable bonuses.\n\nExample\n\nBoots of the Mercenary: +25%\n\nTournament Square level 10: +200%\n\nArtefact bonus: ×2\n\nStandard: +20%\n\nFirst 20 fields:\nBase speed × 2 (artefact) × 1.2 (standard) = 2.4× base speed\n\nAfter 20 fields:\nBase speed × 2 (artefact) × 1.2 (standard) × (1 + 0.25 + 2) = 5.65× base speed\n\nIn the table below you can find the construction costs and time, as well as the bonus for each level of Tournament Square.\n\nDid this answer your question?\n😞\n😐\n😁\nHero Items That Increase Speed\nPennants\nStandards\nBoots\nArtefact Bonus\nTitan’s Boots\nTournament Square\nHow Multiple Bonuses Stack\nExample\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\n               \nAsk a question!"
     },
+    "s93": {
+      "url": "https://support.travian.com/en/articles/93-hero-armour-items",
+      "fetched_at_utc": "2026-10-10T19:55:10.650Z",
+      "text_sha256": "d54c2ebf38514902b3c001defa8dbab845ec99547ed18237a6666047532e2433",
+      "html_sha256": "cc8e54a86c32388f39e0f9f90ef9b0fdd305770a666d92aa19468195fc1235a3",
+      "text": "Go to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nAll collectionsAdvanced GameplayHero itemsHero Armour Items\nHero Armour Items\nHero Armour Items\n\nHero armour items provide bonuses to experience gain, health regeneration, damage reduction, fighting strength, and troop training speed. Each equipment category—Helmets, Armour, and Boots—is divided into Tier 1, Tier 2, and Tier 3, with higher tiers offering stronger effects.\n\n\nThis guide explains what each item does so you can choose the right equipment for your hero.\n\nHelmets\nTier 1\n\nHelmet of Awareness – +15% experience\n\nHelmet of Regeneration – +10 HP regeneration/day\n\nHelmet of the Gladiator\n\n+100 CP/day on 1x servers\n\n+50 CP/day on 3x servers\n\nHelmet of the Horseman – +10% cavalry training\n\nHelmet of the Mercenary – +10% infantry training\n\nTier 2\n\nHelmet of Enlightenment – +20% experience\n\nHelmet of Health – +15 HP regeneration/day\n\nHelmet of the Tribune\n\n+400 CP/day on 1x\n\n+200 CP/day on 3x\n\nHelmet of the Cavalry – +15% cavalry training\n\nHelmet of the Warrior – +15% infantry training\n\nTier 3\n\nHelmet of Wisdom – +25% experience\n\nHelmet of Healing – +20 HP regeneration/day\n\nHelmet of the Consul\n\n+1600 CP/day on 1x\n\n+800 CP/day on 3x\n\nHelmet of the Heavy Cavalry – +20% cavalry training\n\nHelmet of the Archon – +20% infantry training\n\nArmour\nTier 1\n\nArmour of Regeneration – +20 HP/day\n\nLight Scale Armour – Damage −4 HP; +10 HP/day\n\nLight Breastplate – +250 fighting strength\n\nLight Segmented Armour – Damage −3; +125 fighting strength\n\nTier 2\n\nArmour of Health – +30 HP/day\n\nScale Armour – Damage −6 HP; +15 HP/day\n\nBreastplate – +1000 fighting strength\n\nSegmented Armour – Damage −4; +500 fighting strength\n\nTier 3\n\nArmour of Healing – +40 HP/day\n\nHeavy Scale Armour – Damage −8 HP; +20 HP/day\n\nHeavy Breastplate – +4000 fighting strength\n\nHeavy Segmented Armour – Damage −5; +2000 fighting strength\n\nBoots\nTier 1\n\nBoots of Regeneration – +10 HP/day\n\nBoots of the Mercenary – +25% troop speed after the first 20 fields (hero must travel with the army)\n\nSmall Spurs\n\n+3 fields/hour on 1x\n\n+6 fields/hour on 3x\n\nTier 2\n\nBoots of Health – +15 HP/day\n\nBoots of the Warrior – +50% troop speed after the first 20 fields\n\nSpurs\n\n+4 fields/hour on 1x\n\n+8 fields/hour on 3x\n\nTier 3\n\nBoots of Healing – +20 HP/day\n\nBoots of the Archon – +75% troop speed after the first 20 fields\n\nGreat Spurs\n\n+5 fields/hour on 1x\n\n+10 fields/hour on 3x\n\nDid this answer your question?\n😞\n😐\n😁\nHelmets\nTier 1\nTier 2\nTier 3\nArmour\nTier 1\nTier 2\nTier 3\nBoots\nTier 1\nTier 2\nTier 3\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\n               \nAsk a question!"
+    },
     "s84": {
       "url": "https://support.travian.com/en/articles/84-alliance-confed-and-nap",
       "fetched_at_utc": "2026-10-10T19:22:35.011Z",
@@ -113,16 +120,18 @@
       "note": "遊戲內說明（EU12、ts11 算同一個出處）＋官方知識庫表；S71 只當參考（它寫 20 級 +500%，跟表的 +400% 不合）"
     },
     "heroBootsSpeed": {
-      "result": "pending",
-      "reason": "「靴子只在 20 格以外生效」只有官方 S71 一個出處（官方知識庫只有 +25/50/75%，沒寫 20 格），而且 S71 自己前後矛盾（#45 幕僚長擋件）",
-      "sources_seen": [
-        "official_articles.s71（靴子只在 20 格以外生效，寫了兩次）",
-        "官方知識庫 items（+25/50/75%，troopSpeed）"
-      ]
+      "result": "verified (PM 2026-10-11，#45 T6)",
+      "claim": "靴子只加快 20 格以外的路程",
+      "sources": [
+        "official_articles.s93（Hero Armour Items）：'Boots of the Mercenary – +25% troop speed after the first 20 fields (hero must travel with the army)'（Warrior +50%、Archon +75% 同樣寫法）",
+        "official_articles.s71（Troops Speed Increase & Tournament Square）：'Increase troop movement speed after the first 20 fields of travel.'／'The first 20 fields are always traveled without this bonus.'"
+      ],
+      "independence": "兩篇是不同的說明頁、寫法不同（S93 是逐件道具列表，S71 是速度規則說明），沒有互相引用或抄寫；採用 PM 判斷算兩份獨立出處",
+      "still_pending": "競技場＋靴子相加：見 arenaBootsSpeed（沒實測，維持待驗證）"
     },
     "arenaBootsSpeed": {
       "result": "pending",
-      "reason": "「競技場＋靴子相加」只有官方 S71 一個出處，S71 範例算術有錯、每級寫成 multiplicative 又跟表不合（#45 幕僚長擋件）。程式照相加算",
+      "reason": "「競技場＋靴子相加」只有官方 S71 一個出處（S93 沒寫怎麼疊加），S71 範例算術有錯、每級寫成 multiplicative 又跟表不合；沒有實測。程式照相加算",
       "sources_seen": [
         "official_articles.s71：'Boots and Tournament Square bonuses add together'，範例公式 (1+0.25+2) 是相加"
       ],

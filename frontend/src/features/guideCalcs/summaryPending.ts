@@ -21,7 +21,7 @@ export interface SummaryPendingDecl {
 export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
   'pages/calculator/PathCalculatorPage.tsx': {
     chips: [],
-    note: '預設（競技場 0 級）沒用到待驗證資料：兵種速度是使用者自己打的數字（預設 7），這頁沒有兵種選單、不從網址或帳號帶入速度；已帶入列只帶伺服器速度和出發座標（幕僚長確認不用標）。競技場單獨的加速 2026-10-11 核對過（ARENA_SPEED_VERIFIED：遊戲內說明＋官方知識庫），不放灰標；英雄靴子只有 S71 一個出處（BOOTS_SPEED_VERIFIED false），靴子 > 0 時第二行（距離 · 速度）放一個：只有靴子 heroBootsSpeed、兩個都有 arenaBootsSpeed（競技場改回 false 時只有競技場放 arenaSpeed）（#27 後續、P0-20）',
+    note: '預設（競技場 0 級）沒用到待驗證資料：兵種速度是使用者自己打的數字（預設 7），這頁沒有兵種選單、不從網址或帳號帶入速度；已帶入列只帶伺服器速度和出發座標（幕僚長確認不用標）。競技場單獨的加速 2026-10-11 核對過（ARENA_SPEED_VERIFIED：遊戲內說明＋官方知識庫），不放灰標；英雄靴子只加 20 格外＝S93＋S71（BOOTS_SPEED_VERIFIED），只有靴子不放；兩個都有時相加只有 S71、沒實測（ARENA_BOOTS_ADDITIVE_VERIFIED false），第二行（距離 · 速度）放 arenaBootsSpeed（#27 後續、P0-20）',
   },
   'features/guideCalcs/components/CropSimCalculator.tsx': {
     chips: [],
@@ -37,7 +37,7 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
   },
   'features/guideCalcs/components/FarmingCalculator.tsx': {
     chips: [],
-    note: '每日收益用兵種運載量、花費算：6 種兵都是 ts11 遊戲內說明頁讀到的數字（P0-18），不放 unitCarry；之後加的兵種沒讀到時（statsVerified false）標題旁放 unitCarry。行軍速度：只有競技場 2026-10-11 核對過、不放（ARENA_SPEED_VERIFIED）；有靴子時（BOOTS_SPEED_VERIFIED false）標題旁一個灰標依序列出 unitCarry（有的話）→ 行軍速度（P0-22）。第二行是建議馬數，沒用到待驗證資料',
+    note: '每日收益用兵種運載量、花費算：6 種兵都是 ts11 遊戲內說明頁讀到的數字（P0-18），不放 unitCarry；之後加的兵種沒讀到時（statsVerified false）標題旁放 unitCarry。行軍速度：只有競技場 2026-10-11 核對過、不放（ARENA_SPEED_VERIFIED）；只有靴子也不放（BOOTS_SPEED_VERIFIED）；競技場＋靴子時（ARENA_BOOTS_ADDITIVE_VERIFIED false）標題旁一個灰標依序列出 unitCarry（有的話）→ 行軍速度（P0-22）。第二行是建議馬數，沒用到待驗證資料',
   },
   'features/guideCalcs/components/FieldRoiCalculator.tsx': {
     chips: [],

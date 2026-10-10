@@ -5,7 +5,7 @@ import i18n from '@/i18n/i18n'
 import type { AutoFillValue } from '@/components/autofill/AutoFillContext'
 import FarmingCalculator from '../FarmingCalculator'
 
-// 競技場 2026-10-11 核對過（ARENA_SPEED_VERIFIED；靴子仍待驗證）：這裡測「全部待驗證時」灰標放的位置，
+// 競技場、靴子各自 2026-10-11 核對過（相加仍待驗證）：這裡測「全部待驗證時」灰標放的位置，
 // 所以把 speedPendingKinds 換成只選種類的 speedKindsFor（真實資料不放灰標，見 verifiedChips2026-10-11.test.tsx）
 vi.mock('@/lib/pendingNotes', async (importOriginal) => {
   const m = await importOriginal<typeof import('@/lib/pendingNotes')>()

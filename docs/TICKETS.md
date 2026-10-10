@@ -438,8 +438,8 @@
 - ⬜ T1 `docs/knowledge/tournament-square-speed.md` 競技場「+400%（20 級）」不能拿 S71 當出處（S71 寫 +500%，跟表不合）：只引官方知識庫表。#45 已改寫這一段，上線前再對一次
 - ⬜ T2 大使館文字拿掉「跟大使館等級無關」這個推論，只寫「聯盟最多 60 人」（S84 原文只有 "up to 60 players"）：`gen_game_data.py` EFFECT_OFFICIAL embassy 的 description_zh／en，加上對應測試
 - ⬜ T3 證據檔裡同一份遊戲內說明（EU12、ts11 的同一頁）算一個出處，不能當兩個獨立來源：`pending_crosscheck_2026-10-11.json` conclusions 的 sources 要合併標示
-- ⬜ T4 證據檔補 S40、S187 的全文＋sha256（現在 S40 已補全文；S187 只有引句）
-- ⬜ T6 S93（Hero Armour Items）和 S71 寫法不同、沒有互相抄：把 S93 全文＋sha256 放進證據檔後，「靴子只在 20 格以外生效」可以改 ✓、拿掉只有靴子時的 heroBootsSpeed 灰標；「競技場＋靴子相加」仍待驗證，要實測才改
+- ⬜ T4 證據檔補 S40、S187 的全文＋sha256（現在 S40、S93 已補全文；S187 只有引句）
+- ✅ T6（#45 一起做）S93 全文＋sha256 放進證據檔、產生器檢查引句；「靴子只在 20 格以外生效」改 ✓（S93＋S71，寫法不同、互不引用），只有靴子時不再放 heroBootsSpeed 灰標；「競技場＋靴子相加」仍待驗證（arenaBootsSpeed），要實測才改
 - ⬜ T7 研究院之後補一篇官方 S 系列說明頁當出處（現在是遊戲內說明＋各族兵種的研究院需求）
 - ⬜ T8 下一輪檢查匈奴／維京城牆「每級 +1.5%」有沒有標待驗證（`frontend/src/features/guideCalcs/data/tribes/huns.ts` 等）
 

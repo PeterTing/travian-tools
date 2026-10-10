@@ -3,12 +3,13 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom'
 import i18n from '@/i18n/i18n'
 import type { AutoFillValue } from '@/components/autofill/AutoFillContext'
-import { ARENA_SPEED_VERIFIED, BOOTS_SPEED_VERIFIED, FIELD_LEVEL_ZERO_VERIFIED } from '@/lib/pendingNotes'
+import { ARENA_BOOTS_ADDITIVE_VERIFIED, ARENA_SPEED_VERIFIED, BOOTS_SPEED_VERIFIED, FIELD_LEVEL_ZERO_VERIFIED } from '@/lib/pendingNotes'
 
 /**
  * 2026-10-11 待驗證清單（evidence/pending_crosscheck_2026-10-11.json）：真實資料、不 mock pendingNotes。
  * - 競技場單獨：遊戲內說明（20 格）＋官方知識庫（每級 +20%）→ 不放灰標
- * - 英雄靴子（只加 20 格外、跟競技場相加）：只有 S71 一個出處、而且 S71 自己矛盾（#45 幕僚長）→ 靴子 > 0 時照舊放灰標
+ * - 英雄靴子只加 20 格外：官方 S93＋S71（寫法不同、互不引用；#45 T6）→ 只有靴子時不放灰標
+ * - 競技場＋靴子相加：只有 S71、沒實測（#45 幕僚長）→ 兩個都有時照舊放 arenaBootsSpeed
  * - 資源田 0 級 3／小時：EU12 遊戲內資源田頁 → 不放灰標
  */
 vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
@@ -21,7 +22,7 @@ vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
   return { ...mod, useAutoFill: () => value }
 })
 
-describe('2026-10-11: arena alone and level-0 fields carry no 待驗證 chip; boots still do', () => {
+describe('2026-10-11: arena alone, boots alone and level-0 fields carry no 待驗證 chip; arena + boots still does', () => {
   beforeAll(async () => {
     await i18n.changeLanguage('zh-TW')
     window.matchMedia = ((query: string) => ({
@@ -33,7 +34,8 @@ describe('2026-10-11: arena alone and level-0 fields carry no 待驗證 chip; bo
 
   it('flags are on', () => {
     expect(ARENA_SPEED_VERIFIED).toBe(true)
-    expect(BOOTS_SPEED_VERIFIED).toBe(false)
+    expect(BOOTS_SPEED_VERIFIED).toBe(true)
+    expect(ARENA_BOOTS_ADDITIVE_VERIFIED).toBe(false)
     expect(FIELD_LEVEL_ZERO_VERIFIED).toBe(true)
   })
 
@@ -55,7 +57,7 @@ describe('2026-10-11: arena alone and level-0 fields carry no 待驗證 chip; bo
     cleanup()
   })
 
-  it('march time: arena 20 + boots 25 -> arenaBootsSpeed chip (boots rest on S71 alone)', async () => {
+  it('march time: arena 20 + boots 25 -> arenaBootsSpeed chip (additivity rests on S71 alone, unmeasured)', async () => {
     const panel = await renderPath('20', '25')
     const kinds = within(panel).queryAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind'))
     expect(kinds.length).toBeGreaterThan(0)
@@ -63,11 +65,9 @@ describe('2026-10-11: arena alone and level-0 fields carry no 待驗證 chip; bo
     cleanup()
   })
 
-  it('march time: boots 25 alone -> heroBootsSpeed chip', async () => {
+  it('march time: boots 25 alone -> no chip (S93 + S71, #45 T6)', async () => {
     const panel = await renderPath('0', '25')
-    const kinds = within(panel).queryAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind'))
-    expect(kinds.length).toBeGreaterThan(0)
-    expect(new Set(kinds)).toEqual(new Set(['heroBootsSpeed']))
+    expect(within(panel).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
     cleanup()
   })
 

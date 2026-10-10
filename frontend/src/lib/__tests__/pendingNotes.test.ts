@@ -135,7 +135,7 @@ describe('#27 後續新種類的文字（merchantTradeOffice 已照官方核對�
     ['arenaSpeed', '競技場加速還沒在 ts11 遊戲內核對。', '目前照官方說明頁：前 20 格不加速，超過的路段每級 +20%。'],
     // P0-20（PM 定稿）
     ['heroBootsSpeed', '英雄靴子加速還沒在 ts11 遊戲內核對。', '目前照官方說明頁：只加快超過 20 格的路段。'],
-    ['arenaBootsSpeed', '競技場和英雄靴子加速還沒在 ts11 遊戲內核對。', '目前照官方說明頁：前 20 格不加速，超過的路段每級 +20%，再加上靴子的加成（兩者相加，不是相乘）。'],
+    ['arenaBootsSpeed', '競技場加英雄靴子「兩者相加」還沒核對：只有一篇官方說明頁這樣寫，也還沒實測。', '目前照官方說明頁：前 20 格不加速，超過的路段每級 +20%，再加上靴子的加成（兩者相加，不是相乘）。'],
   ])('%s', (kind, what, source) => {
     expect(notes[kind]).toEqual({ what, source })
     expect(enNotes[kind]?.what).toBeTruthy()

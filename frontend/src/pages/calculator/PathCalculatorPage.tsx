@@ -79,7 +79,7 @@ export default function PathCalculatorPage() {
     }
   }, [sx, sy, tx, ty, unitSpeed, tsLevel, heroBonus, artifact, serverSpeed])
 
-  // 競技場 > 0 級或英雄靴子 > 0% 時用官方 S71 的公式（競技場 2026-10-11 核對過、ARENA_SPEED_VERIFIED 不放灰標；靴子只有 S71 一個出處，BOOTS_SPEED_VERIFIED false → 有靴子時放灰標）；
+  // 競技場 > 0 級或英雄靴子 > 0% 時用官方 S71 的公式（競技場 2026-10-11 核對過、ARENA_SPEED_VERIFIED 不放灰標；靴子只加 20 格外＝S93＋S71、只有靴子不放；競技場＋靴子相加只有 S71 → 兩個都有時放灰標）；
   // 一行一個灰標，依用到的加成選一種說明（只有競技場／只有靴子／兩個都有）；兩個都 0 不標（全站共用 speedPendingKinds，P0-21）
   const arenaKinds = speedPendingKinds(tsLevel, Number.isFinite(heroBonus) ? Math.max(0, Math.min(75, heroBonus)) : 0)
   const arenaChip = arenaKinds.length ? <> <PendingVerifyChip kinds={arenaKinds} /></> : null
