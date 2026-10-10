@@ -15,7 +15,7 @@
 | 分期 | 票數 | 完成 | 估計 |
 |---|---|---|---|
 | P0 | 21 | 10（P0-01～04、P0-05、P0-06、P0-07、P0-08、P0-10、P0-11）＋P0-09 | 14 到 17 人天，截圖辨識另計；P0-13～P0-21 另計 |
-| P1 | 24 | 0 | 18.5 到 24.5 人天；P1-15～P1-24 另估 |
+| P1 | 25 | 0 | 18.5 到 24.5 人天；P1-15～P1-25 另估 |
 | P2 | 5 | 0 | P1 完成後再估 |
 
 ---
@@ -428,6 +428,12 @@
 - ⬜ map.sql Job 手動跑一次之後，兩個世界（asia-x1、eu12）的狀態都要是「寫入」（`stored`）或「沒變」，不能是 `failed`；有 `failed` 就不建／暫停 Scheduler 再查
 - ⬜（#36 rebase 時發現）糧食平衡的 `levelError`（「等級要在 1–20 之間」）現在是死碼：等級改成下拉選單後選不到範圍外的值，要拿掉或改成只處理舊的 localStorage 值；主村產量模擬的加成建築欄位名稱少了「（0–5 級）」，要補回來
 
+### #43（斯巴達 ASIA x1 核對）後續 ⬜
+- ⬜ `frontend/src/features/guideCalcs/data/tribes/spartans.ts` 手寫的兵種數值沒有被用到（`withUnitSpeeds()` 從 `unitSpeeds.gen.json` 取）：刪掉，或補測試確認跟產生檔一致。審查時把投石機改成 9900 秒，這裡沒有任何測試抓到
+- ⬜ `frontend/src/components/autofill/AutoFillBar.tsx` 開頭註解的 (k) 那一行要更新：維京運載量 2026-10-11 已退回待驗證，選維京時是「維京的運載量待驗證，兵種中文名為暫譯」，「全部」或不知道部族是「維京的兵種運載量待驗證」
+- ⬜ #43 的 PR 說明要跟最後的狀態一致：第 3、4 輪「維京運載量 ✓」相關的句子只能當歷史紀錄，不能寫成現況（第 6 輪已先更新一次，上線前再對一次）
+- ⬜ 舊名掃描（找「弩炮」這類舊名稱）要分得出是哪一族：ts11 的弩炮（game_id 18）不變，只有斯巴達的 Ballista 改成「賴達投石機」；掃描結果要標部族，不能只比字串
+
 ## P1：聯盟防守
 
 | 票 | 內容 | 估計 | 備註 |
@@ -456,6 +462,7 @@
 | P1-22 | 建造隊列解析（dorf1／dorf2）：讀出正在蓋的建築、等級與完工時間 | 1 天 | 給首頁「建造提醒」卡片用；沿用 P0-03 解析器，要真實頁面樣本 |
 | P1-23 | 英雄頁解析：屬性點、生命、經驗、可分配點數 | 1 天 | 給「英雄屬性」卡片與 P1-15 用；沿用 P0-03 解析器，要真實頁面樣本 |
 | P1-24 | 整趟倍率：旗幟和神器 | 0.5 到 1 天 | 新功能。官方說明頁 S71：旗幟（pennant／standard）的加成乘在**整段路程**上（不像競技場、靴子只算超過 20 格）；神器速度也是整趟倍率。兩個都進 P0-21 的共用公式，每個工具都有欄位（現在只有行軍時間頁有神器欄位），加上之後要有待驗證灰標（還沒在 ts11 遊戲內核對），文字給 PM 定稿 |
+| P1-25 | 測試資料、證據檔、PR 說明去識別：遊戲內帳號名稱、村莊名稱、座標 | 0.5 到 1 天 | #43 第 6 輪掃描發現（公開 repo）。範圍：`backend/tests/fixtures/parser/real_ts11/*`（含 README）、`backend/tests/fixtures/ocr/*`、用到它們的測試（`test_real_ts11_fixtures`、`test_rally_ocr`、`test_ocr_api`、`test_paste_empty_confirm`、`test_travian_formulas_ts11`、`frontend/src/test/ocrFixtures.ts`、`OcrConfirm`、`ParseConfirmPanel`、`HomePage.ocr` 等）、`scripts/game_data/evidence/ts11_manual_2026-10-10.json` 的 `read_conditions.village`、座標範例（用的是 ts11 測試村的真實座標；`AutoFillBar.tsx`、`multiTribe.test`、`coords*`、`CoordPair*`、本檔），以及 PR #34、#37 的說明。帳號名稱、村莊名稱、座標本來就在公開的 map.sql 裡；PM 決定這一批不在 #43 範圍內 |
 
 ## P2：進階（P1 完成後再估）
 
