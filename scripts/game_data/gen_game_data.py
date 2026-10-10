@@ -964,7 +964,8 @@ TRIBE_MANUAL_REF = {"romans": 1, "teutons": 11, "gauls": 21, "egyptians": 51, "h
 TRIBE_ALIASES = {"romans": ["羅馬"], "teutons": ["條頓", "條頓人", "日耳曼"], "gauls": ["高盧"],
                  "egyptians": ["埃及"], "huns": ["匈奴人"]}
 # ts11 是 5 族伺服器，沒有斯巴達、維京的遊戲內名稱
-TRIBE_NO_INGAME = {"spartans": "斯巴達人", "vikings": "維京人"}
+# 斯巴達人：ASIA x1 繁中說明頁讀到（evidence raw_zh.tribe_zh，2026-10-11）；維京沒有遊戲內名稱
+TRIBE_NO_INGAME = {"vikings": "維京人"}
 
 UNIT_ALIASES = {
     # 斯巴達（ASIA x1 遊戲內名稱，2026-10-11）：以前的暫譯只留給搜尋
@@ -1047,6 +1048,9 @@ def gen_ingame_names(speeds: dict) -> dict:
     for t, ref in TRIBE_MANUAL_REF.items():
         tribes[t] = {"zh": mt[str(ref)]["tribe_zh"], "ref": f"manual/troop/{ref}",
                      "aliases": TRIBE_ALIASES.get(t, [])}
+    raw = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))["raw_zh"]
+    tribes["spartans"] = {"zh": raw["tribe_zh"], "ref": "asia_x1/help/spartans",
+                          "aliases": [raw["tribe_zh"].removesuffix("人")]}
     for t, zh in TRIBE_NO_INGAME.items():
         tribes[t] = {"zh": zh, "ref": None, "aliases": [zh.removesuffix("人")]}
     units = {}
@@ -1126,6 +1130,47 @@ def apply_ingame_names(buildings: dict, resources: dict, troops: dict, names: di
             t["description_zh"] = ingame_text(t["description_zh"], names)
 
 
+def parse_asia_x1_raw_zh(text: str) -> dict:
+    """繁中說明頁原文（raw_zh.units[N].text）→ 名稱、部族、花費、攻防、速度、運載量、糧耗、訓練時間."""
+    import re
+
+    lines = text.split("\n")
+    assert lines[0] == "概況", lines[0]
+    m = re.fullmatch(r"(\S+) \1 \((\S+)\)", lines[1])
+    assert m and lines[2] == m.group(1), lines[1:3]
+    atk = re.fullmatch(r"攻擊力(\d+)\t步兵防禦力(\d+)\t騎兵防禦力(\d+)\t?", lines[7])
+    speed = re.fullmatch(r"速度：\t(\d+) 格（每小時）", lines[8])
+    carry = re.fullmatch(r"運載量：\t(\d+) 資源", lines[9])
+    assert atk and speed and carry and lines[10].startswith("維持：") and lines[12].startswith("訓練時間："), lines[7:13]
+    h, mi, se = (int(x) for x in lines[13].split(":"))
+    return {"name_zh": m.group(1), "tribe_zh": m.group(2), "cost": [int(x) for x in lines[3:7]],
+            "attack": int(atk.group(1)), "def_inf": int(atk.group(2)), "def_cav": int(atk.group(3)),
+            "speed": int(speed.group(1)), "carry": int(carry.group(1)), "upkeep": int(lines[11]),
+            "train_time_text": lines[13], "train_time_s": h * 3600 + mi * 60 + se}
+
+
+def check_asia_x1_raw_zh() -> None:
+    """繁中原文：SHA-256 對得上，解析出來的每個數字、中文名、部族名都跟抄錄的 troops 一樣."""
+    import hashlib
+
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
+    raw = ev["raw_zh"]
+    blocks = [raw["overview"], *raw["units"].values()]
+    for b in blocks:
+        assert hashlib.sha256(b["text"].encode("utf-8")).hexdigest() == b["text_sha256"], b["file"]
+    shot = ASIA_X1_SPARTANS.parent / raw["overview_screenshot"]
+    assert hashlib.sha256(shot.read_bytes()).hexdigest() == raw["overview_screenshot_sha256"] == shot.stem
+    ov = raw["overview"]["text"].split("\n")
+    assert raw["tribe_zh"] in ov
+    names = [ev["troops"][str(i)]["name_zh"] for i in range(1, 11)]
+    assert " " + " ".join(names) in ov, "總覽的 10 個中文名要跟 troops 一樣、同順序"
+    for i in range(1, 11):
+        got = parse_asia_x1_raw_zh(raw["units"][str(i)]["text"])
+        assert got.pop("tribe_zh") == raw["tribe_zh"], i
+        want = ev["troops"][str(i)]
+        assert got == {k: want[k] for k in got}, (i, got)
+
+
 def check_spartan_names(troops: dict, speeds: dict) -> None:
     """斯巴達 10 種兵：ASIA x1 說明頁的英文名要跟 troops.json 的 name_en 一樣（總覽截圖上的 10 個名字）."""
     ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
@@ -1150,6 +1195,7 @@ def outputs() -> dict[Path, str]:
     tr = gen_troops(_load(BACKEND_TROOPS), us)
     apply_s139_vikings(tr, us)
     check_spartan_names(tr, us)
+    check_asia_x1_raw_zh()
     names = gen_ingame_names(us)
     apply_ingame_names(b, r, tr, names)
     return {

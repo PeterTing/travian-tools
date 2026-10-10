@@ -687,6 +687,50 @@ def test_asia_x1_spartan_evidence_records_source_and_screenshots() -> None:
     ]
 
 
+def test_asia_x1_raw_zh_text_is_stored_and_matches_every_value() -> None:
+    """繁中原文 10 頁＋總覽：只存說明內容（沒有帳號、村莊等頁面內容），SHA-256 對得上，解析出來跟 troops 一樣."""
+    gen = _gen_module()
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
+    raw = ev["raw_zh"]
+    assert raw["read_at"].startswith("2026-10-11 01:")
+    assert raw["tribe_zh"] == "斯巴達人"
+    assert sorted(int(n) for n in raw["units"]) == list(range(1, 11))
+    for b in [raw["overview"], *raw["units"].values()]:
+        assert hashlib.sha256(b["text"].encode("utf-8")).hexdigest() == b["text_sha256"]
+        assert b["saved_at"].startswith("2026-10-11T01:") and b["saved_at"].endswith(
+            "+08:00"
+        )
+        for chrome in (
+            "NckuTest",
+            "伺服器標準時間",
+            "幫助選單",
+            "Privacy settings",
+            "ROG Survey",
+        ):
+            assert chrome not in b["text"], (b["file"], chrome)
+    shot = ASIA_X1_SPARTANS.parent / raw["overview_screenshot"]
+    assert (
+        hashlib.sha256(shot.read_bytes()).hexdigest()
+        == raw["overview_screenshot_sha256"]
+    )
+    for n, b in raw["units"].items():
+        got = gen.parse_asia_x1_raw_zh(b["text"])
+        assert got.pop("tribe_zh") == "斯巴達人"
+        assert got == {k: ev["troops"][n][k] for k in got}, n
+    # 賴達投石機：U+8CF4 U+9054 U+6295 U+77F3 U+6A5F
+    assert ev["troops"]["8"]["name_zh"] == "\u8cf4\u9054\u6295\u77f3\u6a5f"
+    gen.check_asia_x1_raw_zh()
+    names = json.loads(
+        (ROOT / "backend/data/static/ingame_names.json").read_text(encoding="utf-8")
+    )
+    assert names["tribes"]["spartans"] == {
+        "zh": "斯巴達人",
+        "ref": "asia_x1/help/spartans",
+        "aliases": ["斯巴達"],
+    }
+    assert names["tribes"]["vikings"]["ref"] is None
+
+
 def test_spartans_follow_asia_x1_in_game_help_everywhere() -> None:
     """troops.json、unit_speeds.json、遊戲內名稱表、knowledge_base 的斯巴達 10 種兵都跟 ASIA x1 說明頁一樣."""
     from app.knowledge_base.tribes import TRIBES_DATA
