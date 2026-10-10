@@ -26,8 +26,8 @@ describe('TroopsPage: Spartan / Viking carry capacity is 待驗證', () => {
   beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
 
   it.each([
-    ['奴僕', 'vikingCarry', '維京運載量還沒核對，先不顯示', '官方說明頁 S139 沒有運載量'],
-    ['重裝步兵', 'spartanCarry', '斯巴達運載量還沒核對，先不顯示', '官方說明頁 S10、S187 沒有運載量'],
+    ['奴僕（Thrall）', 'vikingCarry', '維京運載量還沒核對，先不顯示', '官方說明頁 S139 沒有運載量'],
+    ['重裝步兵（Hoplite）', 'spartanCarry', '斯巴達運載量還沒核對，先不顯示', '官方說明頁 S10、S187 沒有運載量'],
   ])('%s: carry shows 「—」 (aria-label 未提供, right-aligned), one %s chip right after; tap shows two lines under the row', async (name, kind, what, source) => {
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText(name))

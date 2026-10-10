@@ -1,0 +1,161 @@
+{
+ "_what": "ts11 x1 international 遊戲內說明 GET /api/v1/manual/troop/N（N＝71～90，斯巴達、維京在別的伺服器的編號範圍），2026-10-10 21:19–21:30（台北）由 ts11 帳號的 bot 瀏覽器唯讀呼叫（Travian.api GET，跟 1～70 號同一種方式，見 ts11_manual_2026-10-10.json），每次間隔 25–45 秒，只讀說明頁、沒有任何遊戲動作。20 個全部回「異常錯誤」（api.unexpectedError），跟建築 12 號（遊戲裡沒有這一號）一樣 → ts11 是 5 族伺服器，說明手冊裡沒有斯巴達、維京。最後讀一次 21 號（方陣兵）當對照，正常回說明頁，表示不是登入或連線問題。",
+ "server": "ts11.x1.international.travian.com",
+ "method": "bot 瀏覽器頁面裡 Travian.api('manual/troop/N', …, 'GET')；腳本 review/sv-2026-10-10/capture_manual_71_90.py",
+ "sha256_of": "raw 欄位（bot debug-eval 回傳的 JSON 文字，UTF-8）",
+ "raw_files": "review/sv-2026-10-10/evidence/raw/troop_71.json～troop_90.json、control_troop_21.json（不進 repo；raw 欄位就是檔案全文）",
+ "summary": {
+  "requested": 20,
+  "ok": 0,
+  "unexpected_error": 20
+ },
+ "troops": {
+  "71": {
+   "captured_at": "2026-10-10T21:19:32+08:00",
+   "bytes": 166,
+   "sha256": "fcbfc72916872a2dee9f14c89dbf0645f9e1a6b8b9fc708d7bcfd0886a62ebfa",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"aOuWf47V52wlHWMD\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "72": {
+   "captured_at": "2026-10-10T21:19:58+08:00",
+   "bytes": 166,
+   "sha256": "5056f4d34fed2af80a1321ce36a782e3d2c0398a022e12f81aa043fb530955aa",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"GaVpaPUQvAIzwtR2\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "73": {
+   "captured_at": "2026-10-10T21:20:37+08:00",
+   "bytes": 166,
+   "sha256": "67a118f32518ddd6697006743f81833e11b3bf37d02375a5ab75da55d032dd6f",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"3DS01tZufZNblWCc\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "74": {
+   "captured_at": "2026-10-10T21:21:04+08:00",
+   "bytes": 166,
+   "sha256": "0b663aa78e45a85dac974cc7e0b2e0f0600944a3090217c94ef025f028f26f9a",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"KZ0ogR9PZaily17I\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "75": {
+   "captured_at": "2026-10-10T21:21:39+08:00",
+   "bytes": 166,
+   "sha256": "a7e7e3617a7b70ba35b53b5af66bf48ab2c03a40a5452cab089e991343eda3f4",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"U0X9RTFfDJxlaYbC\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "76": {
+   "captured_at": "2026-10-10T21:22:08+08:00",
+   "bytes": 166,
+   "sha256": "4dc3b646bce69b3afd32be72392404dc1d0809c25538645ae5a44f85403c0808",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"6YNs3utGc82qa3uK\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "77": {
+   "captured_at": "2026-10-10T21:22:40+08:00",
+   "bytes": 166,
+   "sha256": "47131a69c254c2469eb68d9e875c62833c816f96d7c78033d445db7d59cf30ea",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"2BhrzOu5mYEH5YmT\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "78": {
+   "captured_at": "2026-10-10T21:23:17+08:00",
+   "bytes": 166,
+   "sha256": "df3df00eb41cfc976573e9545b610f263c159a90cecfdec1d63b156cca7eb0c4",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"0EHJ6t7iMWJALH67\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "79": {
+   "captured_at": "2026-10-10T21:23:52+08:00",
+   "bytes": 166,
+   "sha256": "8cb87cba267e949906af9b7444bbd2b596a9b191bd54cf4e5a33f0d8bf072c7e",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"HR2E9k2pgXyQmmMd\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "80": {
+   "captured_at": "2026-10-10T21:24:18+08:00",
+   "bytes": 166,
+   "sha256": "1efcb6842b10a61f5c7201e86a996bda2e4089dc0279c55620bd142ac7f9bfde",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"zDxlkRAe4nlOc5Um\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "81": {
+   "captured_at": "2026-10-10T21:24:52+08:00",
+   "bytes": 166,
+   "sha256": "aebbb19cda1c5c8212d8a4de322ce02ed512b04d2f7d3e98c2bdd50c3d9c61f8",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"aTuU4wBe9Jy8hJoB\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "82": {
+   "captured_at": "2026-10-10T21:25:29+08:00",
+   "bytes": 166,
+   "sha256": "bd09f3d3bd5b3956c94a8374cd14345174978dae11b2e269eafdfaf51b56c0a7",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"yuFDCcNr47Bl5YVr\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "83": {
+   "captured_at": "2026-10-10T21:26:04+08:00",
+   "bytes": 166,
+   "sha256": "47195b2fd31c0bf4b556bac5e654f8cbb5c43adbdfbe45761bda27a95a80feca",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"6l2MpNkWfN1ZpvDt\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "84": {
+   "captured_at": "2026-10-10T21:26:30+08:00",
+   "bytes": 166,
+   "sha256": "0799b8a5a6de72645b2148ac583f84fa62a0b0c578d008254666ae3b02f67e48",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"nwoHVhAXdc2Maaci\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "85": {
+   "captured_at": "2026-10-10T21:27:03+08:00",
+   "bytes": 166,
+   "sha256": "da0d8acb473d1b98c396c661a2e17b63a72ce64956f2f1664b3962d8acf9bb05",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"dXrq2aJLtqtSG1G1\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "86": {
+   "captured_at": "2026-10-10T21:27:46+08:00",
+   "bytes": 166,
+   "sha256": "6438374e82d1be755be93d63a40abf885195f0746b026613edc1105cc1f70da1",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"LTZ4f0ZnnZ8ctVUE\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "87": {
+   "captured_at": "2026-10-10T21:28:13+08:00",
+   "bytes": 166,
+   "sha256": "62509cadf0689f192bf9308669cb796479445ac860bdaa8c89d590144ffe39d6",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"WgWF6E1HoahVzy2Z\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "88": {
+   "captured_at": "2026-10-10T21:28:47+08:00",
+   "bytes": 166,
+   "sha256": "63e65e348b02464a30e541921177a14d12ed14f10e08d537d430dcd97717d71f",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"9ktX400MtffDX85L\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "89": {
+   "captured_at": "2026-10-10T21:29:31+08:00",
+   "bytes": 166,
+   "sha256": "8755d588d39c2ad18cf1b385968b81dad2431f8fce0fde37f4e49e077e1d496b",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"RrsB1T74HxGY30vf\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  },
+  "90": {
+   "captured_at": "2026-10-10T21:30:13+08:00",
+   "bytes": 166,
+   "sha256": "cd5dd9e923b7cc56b03fdba42f62a5c41d3790448c53436c2e311f330a6a3428",
+   "result": "異常錯誤（api.unexpectedError）",
+   "raw": "{\"result\":{\"err\":\"異常錯誤\",\"errRaw\":\"{\\\"error\\\":\\\"api.unexpectedError\\\",\\\"requestId\\\":\\\"Q3aQWvlWIVLtge6e\\\",\\\"message\\\":\\\"異常錯誤\\\"}\"},\"screenshotPath\":null}"
+  }
+ },
+ "control": {
+  "troop_id": 21,
+  "captured_at": "2026-10-10T21:30:55+08:00",
+  "bytes": 3788,
+  "sha256": "46d8ea317e292a1cf0b478703af679d696c24ef750fd83caa6f196f000bcf10c",
+  "result": "正常（方陣兵（高盧人）說明頁 HTML）"
+ }
+}

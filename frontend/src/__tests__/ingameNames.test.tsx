@@ -113,6 +113,40 @@ describe('遊戲內名稱表', () => {
     }
   })
 
+  it('Spartan / Viking: 中文暫譯（官方英文名）, Chinese part pending; ts11 units are not pending (P0-23 follow-up)', () => {
+    const pending = Object.entries(INGAME_UNITS).filter(([, u]) => u.zh_pending)
+    expect(pending).toHaveLength(20)
+    for (const [id, u] of Object.entries(INGAME_UNITS)) {
+      expect(u.zh_pending, id).toBe(u.tribe === 'spartans' || u.tribe === 'vikings')
+      expect(u.display_zh, id).toBe(u.en ? `${u.zh}（${u.en}）` : u.zh)
+      if (u.en) expect(u.en_ref, id).toMatch(/^https:\/\/support\.travian\.com\/en\/articles\/(139|187|10)-/)
+      if (!u.zh_pending) expect([u.en, u.en_ref], id).toEqual([null, null])
+    }
+    expect(INGAME_UNITS.thrall?.display_zh).toBe('奴僕（Thrall）')
+    expect(INGAME_UNITS.heimdalls_eye?.display_zh).toBe('海姆達爾之眼（Heimdall’s Eye）')
+    expect(INGAME_UNITS.hoplite?.display_zh).toBe('重裝步兵（Hoplite）')
+    expect(INGAME_UNITS.ephor?.display_zh).toBe('監察官（Ephor）')
+    // 官方說明頁沒寫英文名：只有中文
+    for (const id of ['spartan_ram', 'ballista', 'spartan_settler']) expect(INGAME_UNITS[id]?.en, id).toBeNull()
+  })
+
+  it('弩炮 is spelled like ts11 (manual/troop/18, 68); 弩砲 only survives as a search alias', () => {
+    expect(ingameUnitNameByGameId(18)).toBe('弩炮')
+    expect(INGAME_UNITS.ballista?.zh).toBe('弩炮')
+    expect(INGAME_UNITS.ballista?.aliases).toContain('弩砲')
+    expect(Object.values(INGAME_UNITS).map(u => u.zh)).not.toContain('弩砲')
+  })
+
+  it('no Chinese characters in any English name (name.en of tribes / guide units, table en, building names)', () => {
+    const CJK = /[\u3000-\u303f\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff00-\uffef]/
+    for (const t of Object.values(TRIBES)) {
+      expect(t.name.en, t.id).not.toMatch(CJK)
+      for (const u of t.units) expect(u.name.en, `${t.id}.${u.id}`).not.toMatch(CJK)
+    }
+    for (const [id, u] of Object.entries(INGAME_UNITS)) if (u.en) expect(u.en, id).not.toMatch(CJK)
+    for (const [id, [, nameEn]] of Object.entries(gen.names as Record<string, string[]>)) expect(nameEn, id).not.toMatch(CJK)
+  })
+
   it('no English unit name inside Chinese text of the tribe guides and build-order data (one name per unit on screen)', () => {
     const en = new Set<string>()
     for (const t of Object.values(TRIBES)) for (const u of t.units) if (!/^(Ram|Catapult|Settler)$/.test(u.name.en)) en.add(u.name.en)

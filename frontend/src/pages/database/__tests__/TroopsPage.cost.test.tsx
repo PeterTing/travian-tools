@@ -31,7 +31,7 @@ vi.mock('@/services/gameApi', () => ({
 describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / training time (P0-17)', () => {
   beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
 
-  it.each([['重裝步兵']])('%s: exactly one units chip, next to the 「訓練成本」 heading (Spartans: no first-hand source)', async (name) => {
+  it.each([['重裝步兵（Hoplite）']])('%s: exactly one units chip, next to the 「訓練成本」 heading (Spartans: no first-hand source)', async (name) => {
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText(name))
     const heading = await screen.findByTestId('troop-cost-heading')
@@ -46,7 +46,7 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
 
   it.each([
     ['古羅馬步兵', 'Roman costs read from the ts11 in-game help, P0-18'],
-    ['狂戰士', 'Viking costs / upkeep / training time from official S139, P0-23'],
+    ['狂戰士（Berserker）', 'Viking costs / upkeep / training time from official S139, P0-23'],
   ])('%s: no units chip (%s)', async (name) => {
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText(name))
@@ -58,7 +58,7 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
 
   it('tap: the units copy opens below the heading and fills the whole section', async () => {
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('重裝步兵'))
+    fireEvent.click(await screen.findByText('重裝步兵（Hoplite）'))
     const heading = await screen.findByTestId('troop-cost-heading')
     fireEvent.click(within(heading).getByTestId('pending-verify-chip'))
     const panel = screen.getByTestId('pending-note-panel')
@@ -70,7 +70,7 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
 
   it('基本資訊 shows tribe / type / training building in 繁體中文', async () => {
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('狂戰士'))
+    fireEvent.click(await screen.findByText('狂戰士（Berserker）'))
     await screen.findByTestId('troop-cost-section')
     for (const zh of ['維京人', '步兵', '兵營']) expect(screen.getByText(zh, { selector: 'td' })).toBeInTheDocument()
     for (const en of ['vikings', 'infantry', 'barracks']) expect(screen.queryByText(en, { selector: 'td' })).toBeNull()

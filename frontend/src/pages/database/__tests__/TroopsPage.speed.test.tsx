@@ -35,19 +35,21 @@ describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
 
   it('list: pending/null speeds get one chip, verified speeds get none', async () => {
     render(<TroopsPage />)
-    const hop = (await screen.findByText('重裝步兵')).closest('div')!
-    const ram = screen.getByText('衝撞車').closest('div')!
+    const hop = (await screen.findByText('重裝步兵（Hoplite）')).closest('div')!
+    const ram = screen.getByText('破城槌').closest('div')!
     const leg = screen.getByText('古羅馬步兵').closest('div')!
-    expect(within(hop).getAllByTestId('pending-verify-chip')).toHaveLength(1)
+    // 速度那一行一個；名稱那一行另有一個中文暫譯的灰標（unitNameZhPending，P0-23 後續）
+    expect(within(within(hop).getByTestId('troop-list-speed')).getAllByTestId('pending-verify-chip')).toHaveLength(1)
     expect(within(hop).getByTestId('troop-list-speed')).toHaveTextContent('速度 6')
-    expect(within(ram).getAllByTestId('pending-verify-chip')).toHaveLength(1)
+    expect(within(within(ram).getByTestId('troop-list-speed')).getAllByTestId('pending-verify-chip')).toHaveLength(1)
     expect(within(ram).getByTestId('troop-list-speed')).toHaveTextContent('速度 —')
+    expect(within(hop).getAllByTestId('pending-verify-chip').map(c => c.dataset.kind)).toEqual(['unitNameZhPending', 'unitSpeedOfficialPending'])
     expect(within(leg).queryByTestId('pending-verify-chip')).toBeNull()
   })
 
   it('detail, official_pending: keeps the number, shows chip and the source line below the stats', async () => {
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('重裝步兵'))
+    fireEvent.click(await screen.findByText('重裝步兵（Hoplite）'))
     const speed = await screen.findByTestId('troop-speed')
     expect(speed).toHaveTextContent('6')
     expect(within(speed).getAllByTestId('pending-verify-chip')).toHaveLength(1)
@@ -60,7 +62,7 @@ describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
 
   it('detail, speed null: shows — with chip and no official source line', async () => {
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('衝撞車'))
+    fireEvent.click(await screen.findByText('破城槌'))
     const speed = await screen.findByTestId('troop-speed')
     expect(speed).toHaveTextContent('—')
     expect(within(speed).getAllByTestId('pending-verify-chip')).toHaveLength(1)

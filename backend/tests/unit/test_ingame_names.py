@@ -264,3 +264,83 @@ def test_spartan_viking_names_follow_pm_rule():
         assert alias in units[tid]["aliases"]
     for tribe in ("spartans", "vikings"):
         assert sum(1 for u in units.values() if u["tribe"] == tribe) == 10
+
+
+# P0-23 後續：斯巴達、維京顯示「中文暫譯（官方英文名）」，英文名照官方說明頁；name.en 不能有中文
+CJK = re.compile(r"[\u3000-\u303f\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff00-\uffef]")
+SUPPORT = json.loads(
+    (ROOT / "scripts/game_data/evidence/official_support_2026-10-10.json").read_text(
+        encoding="utf-8"
+    )
+)["articles"]
+
+
+def test_spartan_viking_names_are_provisional_with_official_english():
+    troops = _load("troops.json")["troops"]
+    pending = {tid: u for tid, u in NAMES["units"].items() if u["zh_pending"]}
+    assert {u["tribe"] for u in pending.values()} == {"spartans", "vikings"}
+    assert len(pending) == 20
+    by_url = {a["url"]: a for a in SUPPORT.values()}
+    for tid, u in NAMES["units"].items():
+        assert u["display_zh"] == (f"{u['zh']}（{u['en']}）" if u["en"] else u["zh"]), (
+            tid
+        )
+        if not u["zh_pending"]:
+            assert u["en"] is None and u["en_ref"] is None, tid
+            continue
+        if u["en"]:
+            # 英文名逐字出現在官方說明頁全文（存證），troops.json 的 name_en 跟著它
+            assert u["en"] in by_url[u["en_ref"]]["text"], tid
+            assert troops[tid]["name_en"] == u["en"], tid
+    assert NAMES["units"]["thrall"]["display_zh"] == "奴僕（Thrall）"
+    assert NAMES["units"]["ballista"]["en"] is None  # 官方說明頁沒寫
+
+
+def test_catapult_spelling_follows_ts11():
+    # ts11 manual/troop/18、68 都寫「弩炮」（#34 PM 決定統一）；「弩砲」只當搜尋用的舊名
+    assert MANUAL["troops"]["18"]["name_zh"] == "弩炮"
+    zh = [u["zh"] for u in NAMES["units"].values()]
+    assert "弩砲" not in zh
+    assert NAMES["units"]["ballista"]["zh"] == "弩炮"
+    assert "弩砲" in NAMES["units"]["ballista"]["aliases"]
+
+
+def test_no_chinese_in_english_names():
+    for tid, t in _load("troops.json")["troops"].items():
+        assert not CJK.search(t["name_en"]), tid
+    for bid, b in _load("buildings.json")["buildings"].items():
+        assert not CJK.search(b.get("name_en") or ""), bid
+    for tid, u in NAMES["units"].items():
+        assert not CJK.search(u["en"] or ""), tid
+
+
+def test_ts11_manual_71_90_and_knowledge_base_evidence():
+    # ts11 說明頁 71～90 號（斯巴達、維京）全部「異常錯誤」；原文 sha256 可以重算。知識庫沒有兵種頁
+    import hashlib
+
+    ev_dir = ROOT / "scripts/game_data/evidence"
+    ev = json.loads(
+        (ev_dir / "ts11_manual_troops_71_90_2026-10-10.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert sorted(int(n) for n in ev["troops"]) == list(range(71, 91))
+    for n, row in ev["troops"].items():
+        assert (
+            hashlib.sha256(row["raw"].encode("utf-8")).hexdigest() == row["sha256"]
+        ), n
+        assert "api.unexpectedError" in row["raw"], n
+    kb = json.loads(
+        (ev_dir / "official_kb_units_2026-10-10.json").read_text(encoding="utf-8")
+    )
+    assert kb["bundle"]["routes"] == [
+        ":language",
+        "buildings",
+        "buildings/:gid",
+        "items",
+    ]
+    # 所以斯巴達、維京運載量維持留空
+    troops = _load("troops.json")["troops"]
+    for tid, u in NAMES["units"].items():
+        if u["tribe"] in ("spartans", "vikings"):
+            assert troops[tid]["carry_capacity"] is None, tid

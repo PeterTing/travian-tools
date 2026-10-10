@@ -8,7 +8,7 @@ import { CalcBar } from '@/components/autofill/CalcFrame'
 import { isTribeCostVerified } from '@/data/unitCosts'
 import { carryPendingTribe } from '@/data/unitSpeeds'
 import type { PendingKind } from '@/lib/pendingNotes'
-import { ingameTribeName } from '@/lib/ingameNames'
+import { ingameTribeName, ingameUnitDisplay } from '@/lib/ingameNames'
 
 const TRIBES: { value: TroopTribe | 'all'; label: string }[] = [
   { value: 'all', label: '全部' },
@@ -39,6 +39,26 @@ function speedSourceLabel(t: Pick<TroopDetail, 'speed_source' | 'speed_ref'>): s
   if (t.speed_source === 'ts11') return 'ts11 遊戲內說明'
   if (t.speed_source === 'official') return '官方說明'
   return ''
+}
+
+/**
+ * 兵種名稱（中文）：斯巴達、維京顯示「中文暫譯（官方英文名）」＋待驗證灰標（中文是暫譯）；
+ * 其他族是 ts11 遊戲內名稱。英文畫面只顯示英文名，不標
+ */
+function TroopName({ troop, isZh }: { troop: Pick<TroopListItem, 'troop_id' | 'name_zh' | 'name_en'>; isZh: boolean }) {
+  if (!isZh) return <>{troop.name_en}</>
+  const d = ingameUnitDisplay(troop.troop_id)
+  return (
+    <>
+      <span data-testid="troop-name">{d?.text ?? troop.name_zh}</span>
+      {d?.zhPending && (
+        <>
+          {' '}
+          <PendingVerifyChip kind="unitNameZhPending" />
+        </>
+      )}
+    </>
+  )
 }
 
 /** 速度沒有第一手出處（null 或官方頁標示取自第三方計算器）就標「待驗證」 */
@@ -155,7 +175,7 @@ export default function TroopsPage() {
                 onClick={() => handleSelectTroop(troop)}
               >
                 <p className="font-medium">
-                  {isZh ? troop.name_zh : troop.name_en}
+                  <TroopName troop={troop} isZh={isZh} />
                 </p>
                 <p className="text-sm opacity-70">
                   ATK: {troop.attack} | DEF: {troop.defense_infantry}/
@@ -177,7 +197,7 @@ export default function TroopsPage() {
           {selectedTroop ? (
             <>
               <h2 className="text-2xl font-bold mb-2">
-                {isZh ? selectedTroop.name_zh : selectedTroop.name_en}
+                <TroopName troop={selectedTroop} isZh={isZh} />
               </h2>
               <p className="text-muted-foreground mb-4">
                 {isZh

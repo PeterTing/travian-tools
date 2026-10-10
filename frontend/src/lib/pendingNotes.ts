@@ -26,6 +26,7 @@ export const PENDING_KINDS = [
   'heroBootsSpeed',
   'arenaBootsSpeed',
   'smithyFormula',
+  'unitNameZhPending',
 ] as const
 
 export type PendingKind = (typeof PENDING_KINDS)[number]
@@ -36,7 +37,7 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
   autofillUnits: '已帶入列（用到兵種資料的計算器，部族是斯巴達、維京或還不知道部族才出現）：一行，兵種數字（維京只剩攜帶量）＋斯巴達速度',
   spartanSpeed: '首頁來襲卡反推 TS 那一行、反推 TS 結果的「未列入反推」提示',
   unitSpeedOfficialPending: '兵種資料庫：斯巴達步兵／騎兵 6 種的速度（列表與詳情）',
-  unitSpeedNoSource: '兵種資料庫：斯巴達破城槌、弩砲、監察官、開拓者的速度（列表與詳情）',
+  unitSpeedNoSource: '兵種資料庫：斯巴達破城槌、弩炮、監察官、開拓者的速度（列表與詳情）',
   building: '建築資料庫列表與詳情、建築升級花費結果的建築名稱旁；CP 與開村「每日被動 CP」摘要標題；建造順序摘要的成本（有加成建築時）；田地回本有加成建築時的摘要與產量；首都產量模擬有加成建築時的「總計 /hr」摘要標題、「產量分解」標題、合計列（只標用到的那幾種資源）',
   cpThreshold: 'CP 與開村的開村門檻表與下方說明、首頁開村卡進度',
   celebration: 'CP 與開村的慶典花費表與下方說明',
@@ -50,6 +51,7 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
   heroBootsSpeed: '只有英雄靴子（> 0%、競技場 0 級）時：位置同 arenaSpeed（P0-20、P0-21）',
   arenaBootsSpeed: '競技場 > 0 級且英雄靴子 > 0% 時：位置同 arenaSpeed（P0-20、P0-21）',
   smithyFormula: '盔甲廠升級：結果三張表的標題旁（攻擊力、步兵防禦、騎兵防禦；整張表同一份說明）（P0-18）',
+  unitNameZhPending: '兵種資料庫：斯巴達、維京 20 種兵的名稱旁（列表與詳情標題；名稱顯示「中文暫譯（官方英文名）」，官方說明頁沒寫英文名的只顯示中文；ingameNames.gen.json zh_pending）（P0-23 後續）',
 }
 
 /**

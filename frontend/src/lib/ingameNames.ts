@@ -4,7 +4,18 @@ import table from '../data/ingameNames.gen.json'
 
 interface NameRow { zh: string; ref: string | null; aliases: string[] }
 interface BuildingRow extends NameRow { gid: number }
-interface UnitRow extends NameRow { tribe: string; fe_id: string; game_id: number | null }
+interface UnitRow extends NameRow {
+  tribe: string
+  fe_id: string
+  game_id: number | null
+  /** 中文是暫譯（斯巴達、維京；官方說明頁沒有中文版） */
+  zh_pending: boolean
+  /** 官方說明頁的英文名（S139／S187／S10）；ts11 的兵種、官方沒寫的是 null */
+  en: string | null
+  en_ref: string | null
+  /** 畫面上的中文顯示名：暫譯的是「中文（官方英文名）」 */
+  display_zh: string
+}
 
 export const INGAME_TRIBES = table.tribes as Record<string, NameRow>
 export const INGAME_BUILDINGS = table.buildings as Record<string, BuildingRow>
@@ -43,7 +54,22 @@ export function ingameUnitName(tribe: string, feId: string): string | undefined 
   return undefined
 }
 
+/** 某族某兵種的官方英文名（斯巴達、維京：官方說明頁 S139／S187／S10）；ts11 的兵種、官方沒寫的是 undefined */
+export function ingameUnitEn(tribe: string, feId: string): string | undefined {
+  for (const u of Object.values(INGAME_UNITS)) if (u.tribe === tribe && u.fe_id === feId) return u.en ?? undefined
+  return undefined
+}
+
 /** 搜尋用：遊戲內名稱 + 舊名都算 */
 export function matchesIngameName(row: { zh: string; aliases: string[] }, q: string): boolean {
   return [row.zh, ...row.aliases].some(n => n.includes(q))
+}
+
+/**
+ * 兵種在畫面上的中文顯示名（P0-23 後續）：ts11 有的就是遊戲內名稱；斯巴達、維京是「中文暫譯（官方英文名）」
+ * （官方說明頁沒寫英文名的只有中文），zhPending＝中文是暫譯，名稱旁要標待驗證（unitNameZhPending）
+ */
+export function ingameUnitDisplay(troopId: string): { text: string; zhPending: boolean } | undefined {
+  const u = INGAME_UNITS[troopId]
+  return u ? { text: u.display_zh, zhPending: u.zh_pending } : undefined
 }

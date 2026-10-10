@@ -1198,6 +1198,10 @@
     "spartanCarry": {
       "what": "Spartan carry capacity is unverified, so it is not shown yet",
       "source": "The official help pages S10 and S187 have no carry capacity"
+    },
+    "unitNameZhPending": {
+      "what": "The Chinese name is a provisional translation, not yet verified",
+      "source": "The official help pages are English only; the name in brackets is the official English name (left out where they give none). ts11 has no such tribe, so there is no in-game Chinese name"
     }
   },
   "verifiedNotes": {
