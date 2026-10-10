@@ -263,6 +263,10 @@ gcloud iam service-accounts delete ${SCHED_SA} --project ${PROJECT} --quiet
 gcloud services disable cloudscheduler.googleapis.com --project ${PROJECT}
 ```
 
+**快照全部保留，不自動刪除（Peter 決定，2026-10-11）。** 估算每月約 0.4 GB（兩個世界每天各換一次內容），
+最壞每月約 2.4 GB（每 4 小時都換）；Cloud SQL 只有 10 GB 且沒開 storage auto-increase。
+待幕僚長決定：開 auto-increase（可設上限），或在硬碟用量 70% 時發警報。
+
 資料：job 寫進的是現有的 `map_snapshots`／`map_villages`／`map_players`／`map_alliances`（＋差異表）。
 要清掉這兩個世界的快照要另外核准，刪 `map_snapshots` 會連帶刪掉子表（FK `ON DELETE CASCADE`）。
 欄位本身可用 `alembic downgrade 0009_multi_tribe` 拿掉（要先部署不含這個欄位的 tt-api）。
