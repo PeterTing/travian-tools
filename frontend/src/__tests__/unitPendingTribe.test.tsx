@@ -43,13 +43,14 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     fill.tribe = null
   })
 
-  it('only Spartans, Vikings, or 「全部」 need the line; the 5 ts11-verified tribes and unknown tribe do not', () => {
+  it('only Spartans, Vikings, or 「全部」 need the line; unknown tribe shows it too; the 5 ts11-verified tribes do not', () => {
     for (const tr of VERIFIED) expect(showUnitPendingLine(tr), tr).toBe(false)
     expect(showUnitPendingLine('spartans')).toBe(true)
     expect(showUnitPendingLine('vikings')).toBe(true)
     expect(showUnitPendingLine('all')).toBe(true)
-    expect(showUnitPendingLine(null)).toBe(false)
-    expect(showUnitPendingLine(undefined)).toBe(false)
+    // 不知道部族：可能是斯巴達、維京，所以顯示
+    expect(showUnitPendingLine(null)).toBe(true)
+    expect(showUnitPendingLine(undefined)).toBe(true)
   })
 
   it('pages without a tribe selector follow the account tribe', () => {
