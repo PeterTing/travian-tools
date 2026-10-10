@@ -4,8 +4,7 @@ import { INGAME_UNITS, ingameTribeName } from '@/lib/ingameNames'
 const ballista = INGAME_UNITS.ballista!
 
 /**
- * #43（斯巴達）上線那天的資料更新卡項目：先備好，不放進目前這一批（PM：#43 之後另外上線，有自己的一張卡）。
- * 上線那天：DATA_UPDATE_ITEMS 換成這兩項（有 x3 那項就排在它後面）、DATA_UPDATE_RELEASE_DATE 改成上線日。
+ * #43（斯巴達）的資料更新卡項目：DATA_UPDATE_ITEMS 排在 x3 那項後面（2026-10-11 上線，幕僚長核准）。
  * 名稱一律讀遊戲內名稱表；舊名從表的 aliases 取。
  */
 export function spartanDataUpdateItems(): DataUpdateItem[] {
