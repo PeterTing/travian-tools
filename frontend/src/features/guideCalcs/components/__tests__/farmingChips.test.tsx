@@ -48,23 +48,24 @@ describe('農場收益：行軍速度灰標（P0-22）', () => {
     expect(within(panel).getAllByTestId('pending-note-entry').map((e) => e.getAttribute('data-kind'))).toEqual(['arenaSpeed'])
   })
 
-  it('arena 5: daily yield, raids per hour and payback each have exactly one chip that includes the speed', () => {
+  it('arena 5: groups, total troops and payback each have exactly one chip that includes the speed; daily yield does not use travel time → no chip', () => {
     setArena(5)
-    expect(kindsOf(row('每小時最多次數'))).toEqual(['arenaSpeed'])
-    expect(kindsOf(row('每日預估收益'))).toEqual(['arenaSpeed'])
+    expect(kindsOf(row('需要幾組'))).toEqual(['arenaSpeed'])
+    expect(kindsOf(row('總兵數'))).toEqual(['arenaSpeed'])
     expect(kindsOf(row('回本天數'))).toEqual(['arenaSpeed'])
+    expect(kindsOf(row('每日預估收益'))).toEqual([])
   })
 
   it('arena 5 + boots 25: the combined arenaBootsSpeed kind is used', () => {
     setArena(5)
     fireEvent.change(screen.getByLabelText('英雄靴子速度加成（%）'), { target: { value: '25' } })
     expect(titleChips()[0]).toHaveAttribute('data-kind', 'arenaBootsSpeed')
-    expect(kindsOf(row('每小時最多次數'))).toEqual(['arenaBootsSpeed'])
+    expect(kindsOf(row('需要幾組'))).toEqual(['arenaBootsSpeed'])
   })
 
   it('arena 0 and boots 0: no speed chip anywhere (and no unit chip: ts11-verified)', () => {
     expect(titleChips()).toHaveLength(0)
-    expect(kindsOf(row('每小時最多次數'))).toEqual([])
+    expect(kindsOf(row('需要幾組'))).toEqual([])
     expect(kindsOf(row('每日預估收益'))).toEqual([])
     expect(kindsOf(row('回本天數'))).toEqual([])
     const all = within(screen.getByTestId('calc-result-panel')).queryAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind') ?? '')

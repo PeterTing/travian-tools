@@ -19,6 +19,9 @@ import {
 } from '@/components/ui/select'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { villageApi } from '@/services/villageApi'
+import CoordPair from '@/components/common/CoordPair'
+import { coordPairValue, coordText, type CoordText } from '@/lib/coords'
+import { useMapRadius } from '@/lib/mapRadius'
 import type { Village, VillageCreate, VillageRole, VillageType, VillageUpdate } from '@/types/game'
 
 interface VillageFormProps {
@@ -42,27 +45,35 @@ export default function VillageForm({
 
   const [formData, setFormData] = useState({
     name: village?.name || '',
-    coordinate_x: village?.coordinate_x?.toString() || '',
-    coordinate_y: village?.coordinate_y?.toString() || '',
     population: village?.population?.toString() || '0',
     village_type: village?.village_type || '',
     is_capital: village?.is_capital || false,
     role: village?.role || '',
   })
+  // 座標可以不填（兩格都空白）；有填就要兩格都是範圍內的整數
+  const mapRadius = useMapRadius()
+  const [coord, setCoord] = useState<CoordText>(() => coordText(village?.coordinate_x, village?.coordinate_y))
+  const [showCoordErrors, setShowCoordErrors] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    const coordEmpty = coord.x.trim() === '' && coord.y.trim() === ''
+    const xy = coordPairValue(coord, mapRadius)
+    if (!coordEmpty && !xy) {
+      setShowCoordErrors(true)
+      return
+    }
     setLoading(true)
 
     try {
       if (isEditing) {
         const updateData: VillageUpdate = {
           name: formData.name || undefined,
-          coordinate_x: formData.coordinate_x ? parseInt(formData.coordinate_x) : undefined,
-          coordinate_y: formData.coordinate_y ? parseInt(formData.coordinate_y) : undefined,
+          coordinate_x: xy?.x,
+          coordinate_y: xy?.y,
           population: formData.population ? parseInt(formData.population) : undefined,
           village_type: formData.village_type as VillageType || undefined,
           is_capital: formData.is_capital,
@@ -73,8 +84,8 @@ export default function VillageForm({
         const createData: VillageCreate = {
           account_id: accountId,
           name: formData.name || undefined,
-          coordinate_x: formData.coordinate_x ? parseInt(formData.coordinate_x) : undefined,
-          coordinate_y: formData.coordinate_y ? parseInt(formData.coordinate_y) : undefined,
+          coordinate_x: xy?.x,
+          coordinate_y: xy?.y,
           population: formData.population ? parseInt(formData.population) : undefined,
           village_type: formData.village_type as VillageType || undefined,
           is_capital: formData.is_capital,
@@ -118,32 +129,19 @@ export default function VillageForm({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="coordinate_x">{t('villages.coordinateX')}</Label>
-              <Input
-                id="coordinate_x"
-                type="number"
-                min="-400"
-                max="400"
-                value={formData.coordinate_x}
-                onChange={(e) => setFormData({ ...formData, coordinate_x: e.target.value })}
-                placeholder="-400 ~ 400"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="coordinate_y">{t('villages.coordinateY')}</Label>
-              <Input
-                id="coordinate_y"
-                type="number"
-                min="-400"
-                max="400"
-                value={formData.coordinate_y}
-                onChange={(e) => setFormData({ ...formData, coordinate_y: e.target.value })}
-                placeholder="-400 ~ 400"
-              />
-            </div>
-          </div>
+          <CoordPair
+            className="grid grid-cols-2 gap-4"
+            fieldClassName="min-w-0 space-y-2"
+            labelClassName="block text-sm font-medium leading-none"
+            labelX={t('villages.coordinateX')}
+            labelY={t('villages.coordinateY')}
+            required={false}
+            testId="village-coord"
+            radius={mapRadius}
+            showErrors={showCoordErrors}
+            value={coord}
+            onChange={setCoord}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="population">{t('villages.population')}</Label>

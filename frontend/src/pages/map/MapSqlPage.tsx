@@ -31,6 +31,9 @@ import { gameAccountApi } from '@/services/gameAccountApi'
 import { mapSqlApi, type MapParseResponse, type MapVillage, type MapPlayer, type MapAlliance } from '@/services/mapSqlApi'
 import type { GameAccount } from '@/types/game'
 import { distanceOnMap } from '@/lib/travianFormulas'
+import CoordPair from '@/components/common/CoordPair'
+import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
+import { useMapRadius } from '@/lib/mapRadius'
 
 type ViewMode = 'villages' | 'players' | 'alliances'
 type SearchMode = 'range' | 'player' | 'alliance'
@@ -55,8 +58,11 @@ export default function MapSqlPage() {
   const [searchMode, setSearchMode] = useState<SearchMode>('range')
   const [searchPlayerName, setSearchPlayerName] = useState('')
   const [searchAllianceName, setSearchAllianceName] = useState('')
-  const [centerX, setCenterX] = useState<number>(0)
-  const [centerY, setCenterY] = useState<number>(0)
+  // 中心座標：預設空白、可打負號；搜尋時才換成數字（距離欄用搜尋當下的中心）
+  const mapRadius = useMapRadius()
+  const [center, setCenter] = useState<CoordText>(EMPTY_COORD)
+  const [searchCenter, setSearchCenter] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
+  const [showCoordErrors, setShowCoordErrors] = useState(false)
   const [radius, setRadius] = useState<number>(20)
   const [searchResults, setSearchResults] = useState<MapVillage[] | MapPlayer[] | MapAlliance[] | null>(null)
 
@@ -160,15 +166,23 @@ export default function MapSqlPage() {
     if (parseResult) {
       let results: MapVillage[] | MapPlayer[] | MapAlliance[]
       switch (searchMode) {
-        case 'range':
+        case 'range': {
+          const c = coordPairValue(center, mapRadius)
+          if (!c) {
+            // 中心座標空白或超出範圍：欄位下方標紅字，不搜尋
+            setShowCoordErrors(true)
+            return
+          }
+          setSearchCenter(c)
           // 篩選範圍內的村莊並按距離排序
           // 距離 ≤ 半徑（跟距離欄同一個公式；跨地圖邊緣的村莊也找得到）
           results = parseResult.villages
-            .filter(v => calcDistance(centerX, centerY, v.x, v.y) <= radius)
+            .filter(v => calcDistance(c.x, c.y, v.x, v.y) <= radius)
             .sort((a, b) =>
-              calcDistance(centerX, centerY, a.x, a.y) - calcDistance(centerX, centerY, b.x, b.y)
+              calcDistance(c.x, c.y, a.x, a.y) - calcDistance(c.x, c.y, b.x, b.y)
             )
           break
+        }
         case 'player':
           results = parseResult.players.filter(p =>
             p.player_name.toLowerCase().includes(searchPlayerName.toLowerCase())
@@ -210,7 +224,7 @@ export default function MapSqlPage() {
       <TableBody>
         {villages.slice(0, 100).map((v, i) => {
           const serverUrl = getServerUrl()
-          const distance = showDistance ? calcDistance(centerX, centerY, v.x, v.y) : 0
+          const distance = showDistance ? calcDistance(searchCenter.x, searchCenter.y, v.x, v.y) : 0
           return (
           <TableRow key={i}>
             <TableCell>({v.x}, {v.y})</TableCell>
@@ -414,24 +428,15 @@ export default function MapSqlPage() {
 
             {searchMode === 'range' && (
               <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <Label>X</Label>
-                  <Input
-                    type="number"
-                    value={centerX}
-                    onChange={(e) => setCenterX(parseInt(e.target.value) || 0)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label>Y</Label>
-                  <Input
-                    type="number"
-                    value={centerY}
-                    onChange={(e) => setCenterY(parseInt(e.target.value) || 0)}
-                    className="mt-1"
-                  />
-                </div>
+                <CoordPair
+                  className="contents"
+                  labelClassName="mb-1 block text-sm font-medium leading-none"
+                  testId="map-center"
+                  radius={mapRadius}
+                  showErrors={showCoordErrors}
+                  value={center}
+                  onChange={setCenter}
+                />
                 <div>
                   <Label>{t('mapSql.radius')}</Label>
                   <Input

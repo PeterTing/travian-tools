@@ -22,6 +22,12 @@ vi.mock('@/contexts/CurrentAccountContext', () => ({
 }))
 
 const api = vi.mocked(advancedCalculatorApi)
+// 座標預設空白、空白不送出（2026-10-10 座標框修正）：按計算前把每一格座標填上（以前預設 0，這裡填 0 送出的值跟以前一樣）
+const fillCoords = () => {
+  for (const el of document.querySelectorAll<HTMLInputElement>('input[data-testid$="-x"], input[data-testid$="-y"]')) {
+    if (el.value === '') fireEvent.change(el, { target: { value: '0' } })
+  }
+}
 const chipKinds = (el: HTMLElement) => within(el).queryAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind'))
 const setStepper = (label: string, v: number) => {
   const input = within(screen.getByRole('group', { name: label })).getByRole('spinbutton')
@@ -51,6 +57,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     setStepper('攻方競技場等級', 5)
     fireEvent.change(screen.getByTestId('attacker-boots'), { target: { value: '25' } })
     fireEvent.change(screen.getByTestId('catcher-boots'), { target: { value: '20' } })
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '計算攔截時間' }))
     const ret = await screen.findByTestId('intercept-return-label')
     expect(api.calculateInterception).toHaveBeenCalledWith(expect.objectContaining({ attacker_ts_level: 5, attacker_hero_bonus: 25, catcher_hero_bonus: 20, catcher_ts_level: 0 }))
@@ -69,6 +76,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
       attacker_return_time: '19:08:34', send_time: '16:38:34', travel_time_formatted: '3h 0m 0s', distance_to_attacker: 30,
     })
     render(<InterceptionCalculatorPage />)
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '計算攔截時間' }))
     await screen.findByTestId('intercept-return-label')
     expect(screen.queryAllByTestId('pending-verify-chip')).toHaveLength(0)
@@ -83,6 +91,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     render(<AttackPlannerPage />)
     expect(screen.getAllByText('英雄靴子速度加成（%）').length).toBeGreaterThan(0)
     fireEvent.change(screen.getByTestId('attacker-boots'), { target: { value: '25' } })
+    fillCoords()
     fireEvent.click(screen.getByTestId('ts-submit'))
     const title = await screen.findByTestId('ts-card-title')
     expect(api.calculateTsOptimizer).toHaveBeenCalledWith(expect.objectContaining({ attackers: [expect.objectContaining({ hero_bonus: 25, ts_level: 0 })] }))
@@ -113,6 +122,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     for (const r of rows) fireEvent.change(within(r).getAllByRole('textbox')[0]!, { target: { value: '01' } })
     // 只有第二個攻擊者有靴子
     fireEvent.change(within(rows[1]!).getByTestId('attacker-boots'), { target: { value: '25' } })
+    fillCoords()
     fireEvent.click(screen.getByTestId('ts-submit'))
     const titles = await screen.findAllByTestId('ts-card-title')
     const sent = api.calculateTsOptimizer.mock.calls[0]![0].attackers
@@ -136,11 +146,13 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
       unverified_units: [],
     })
     render(<PathSpeedTsCalculatorPage />)
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '反推速度 + TS' }))
     const cells = await screen.findAllByTestId('reverse-travel')
     expect(cells.map(chipKinds)).toEqual([['arenaSpeed'], []])
 
     fireEvent.change(screen.getByTestId('reverse-boots'), { target: { value: '25' } })
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '反推速度 + TS' }))
     expect(api.calculatePathSpeedTs).toHaveBeenLastCalledWith(expect.objectContaining({ hero_bonus: 25 }))
     await vi.waitFor(() => expect(screen.getAllByTestId('reverse-travel').map(chipKinds)).toEqual([['arenaBootsSpeed'], ['heroBootsSpeed']]))
@@ -152,6 +164,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     render(<SaveTroopsCalculatorPage />)
     setStepper('競技場等級', 5)
     fireEvent.change(screen.getByTestId('save-boots'), { target: { value: '25' } })
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '計算' }))
     const line = await screen.findByTestId('save-distance-line')
     expect(api.calculateSaveTroops).toHaveBeenCalledWith(expect.objectContaining({ tournament_square_level: 5, hero_bonus: 25 }))
@@ -171,6 +184,7 @@ describe('新欄位不填：送出的值跟以前一樣（新欄位都是 0，�
   it('interception', async () => {
     api.calculateInterception.mockResolvedValue({ attacker_return_time: '0', send_time: '0', travel_time_formatted: '0', distance_to_attacker: 0 })
     render(<InterceptionCalculatorPage />)
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '計算攔截時間' }))
     await screen.findByTestId('intercept-return-label')
     expect(api.calculateInterception).toHaveBeenCalledWith(expect.objectContaining({ attacker_ts_level: 0, attacker_hero_bonus: 0, catcher_hero_bonus: 0, catcher_ts_level: 0 }))
@@ -180,6 +194,7 @@ describe('新欄位不填：送出的值跟以前一樣（新欄位都是 0，�
   it('TS optimizer', async () => {
     api.calculateTsOptimizer.mockResolvedValue({ target_arrival: '', results: [], warnings: [] })
     render(<AttackPlannerPage />)
+    fillCoords()
     fireEvent.click(screen.getByTestId('ts-submit'))
     await screen.findByTestId('ts-result')
     expect(api.calculateTsOptimizer).toHaveBeenCalledWith(expect.objectContaining({ attackers: [expect.objectContaining({ hero_bonus: 0, ts_level: 0 })] }))
@@ -188,6 +203,7 @@ describe('新欄位不填：送出的值跟以前一樣（新欄位都是 0，�
   it('reverse TS', async () => {
     api.calculatePathSpeedTs.mockResolvedValue({ distance: 0, possible_matches: [], unverified_units: [] })
     render(<PathSpeedTsCalculatorPage />)
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '反推速度 + TS' }))
     await screen.findByText(/無匹配結果/)
     expect(api.calculatePathSpeedTs).toHaveBeenCalledWith(expect.objectContaining({ hero_bonus: 0 }))
@@ -196,6 +212,7 @@ describe('新欄位不填：送出的值跟以前一樣（新欄位都是 0，�
   it('save troops', async () => {
     api.calculateSaveTroops.mockResolvedValue({ ideal_distance: 28, send_time_formatted: '4h 0m 0s', return_time_formatted: '8h 0m 0s' })
     render(<SaveTroopsCalculatorPage />)
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '計算' }))
     await screen.findByTestId('save-distance-line')
     expect(api.calculateSaveTroops).toHaveBeenCalledWith(expect.objectContaining({ tournament_square_level: 0, hero_bonus: 0 }))

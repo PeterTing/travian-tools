@@ -1,3 +1,4 @@
+import { sanitizeCoordText } from '@/lib/coords'
 import type { OcrField, OcrFieldName, OcrMovementMeta } from '@/services/ocrApi'
 import { formatCountdownSeconds } from './formatCountdown'
 
@@ -58,7 +59,8 @@ export function countLow(movements: Row[]): number {
 
 /** 解析 "x|y"、"(−45|12)"、"-45 12" 之類的手動輸入 */
 export function parseCoordsInput(text: string): { x: number; y: number } | null {
-  const t = text.replace(/[\u2212\u2010-\u2015\uff0d]/g, '-').trim()
+  // 先清掉遊戲複製來的方向字元、各種負號換成「-」（跟座標框共用 sanitizeCoordText）
+  const t = sanitizeCoordText(text).trim()
   const m = t.match(/^\(?\s*(-?\d{1,3})\s*[|,\s]\s*(-?\d{1,3})\s*\)?$/)
   if (!m) return null
   const x = Number(m[1])

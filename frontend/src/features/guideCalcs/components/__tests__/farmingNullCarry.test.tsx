@@ -19,7 +19,7 @@ vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
 
 const elpida = farmUnit(['elpida', 'spartans', 'elpida'])
 const huskarl = farmUnit(['huskarl', 'vikings', 'huskarlRider'])
-const base = { dist: 10, unitSpeed: 16, cost: 1000, n: 5, freq: 15, loot: 400, serverSpeed: 1, arena: 0, boots: 0 }
+const base = { dist: 10, unitSpeed: 16, cost: 1000, freq: 15, loot: 400, serverSpeed: 1, arena: 0, boots: 0 }
 
 describe('farming: unit with empty (null) carry', () => {
   beforeAll(async () => {
@@ -47,9 +47,12 @@ describe('farming: unit with empty (null) carry', () => {
     expect(r.carryCap).toBeNull()
     expect(r.daily).toBeNull()
     expect(r.payback).toBeNull()
-    expect(farmingCalc({ ...base, carry: null, n: 0 }).daily).toBeNull()
+    expect(r.perGroup).toBeNull()
+    expect(r.totalTroops).toBeNull()
+    expect(farmingCalc({ ...base, carry: null, loot: 0 }).daily).toBeNull()
     const ok = farmingCalc({ ...base, carry: 75 })
-    expect(ok.carryCap).toBe(375)
+    // ⌈400 ÷ 75⌉ = 6 匹 → 搬運上限 450
+    expect(ok.carryCap).toBe(450)
     expect(typeof ok.daily).toBe('number')
   })
 
@@ -77,7 +80,7 @@ describe('farming: unit with empty (null) carry', () => {
 
     fireEvent.change(screen.getByLabelText('單位'), { target: { value: 'tt' } })
     expect(screen.queryByTestId('calc-unavailable')).toBeNull()
-    expect(screen.getByTestId('calc-result-primary').textContent).toMatch(/^\d[\d,]*$/)
+    expect(screen.getByTestId('calc-result-primary').textContent).toMatch(/^\d+ 組 × [\d,]+ 匹 = [\d,]+ 匹$/)
     expect(screen.getByTestId('calc-result-toggle')).toBeInTheDocument()
 
     fireEvent.change(screen.getByLabelText('單位'), { target: { value: u.id } })

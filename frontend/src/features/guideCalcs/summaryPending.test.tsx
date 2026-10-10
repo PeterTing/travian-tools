@@ -127,7 +127,7 @@ describe('貿易路線、農場收益、田地回本：明細的數字都照官�
   })
   it('farming: every listed unit is read from the ts11 in-game help (P0-18), so carry, cost and payback carry no 待驗證', async () => {
     const d = await open('features/guideCalcs/components/FarmingCalculator.tsx')
-    for (const label of ['搬運上限', '每日預估收益', '兵力初始成本', '回本天數']) expect(chipNextTo(d, label), label).toBeNull()
+    for (const label of ['每組兵數', '每次實際帶回', '每日預估收益', '兵力初始成本', '回本天數']) expect(chipNextTo(d, label), label).toBeNull()
     const unit = screen.getByLabelText('單位')
     expect(unit.tagName).toBe('SELECT')
     expect(unit.closest('div')!.querySelector('[data-kind="unitCarry"]')).toBeNull()
@@ -221,6 +221,8 @@ describe('#27 follow-up chips', () => {
   it('march time: arena 0 -> no chip; arena 1 -> arenaSpeed on the summary line and the time / seconds / speed rows (never the title)', async () => {
     const { default: Path } = await import('@/pages/calculator/PathCalculatorPage')
     render(<MemoryRouter><Path /></MemoryRouter>)
+    // 座標預設空白、空白不算：先填起始和目標（2026-10-10 座標框修正）
+    for (const id of ['path-start-x', 'path-start-y', 'path-target-x', 'path-target-y']) fireEvent.change(screen.getByTestId(id), { target: { value: '0' } })
     const panel = screen.getByTestId('calc-result-panel')
     expect(within(panel).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
     const ts = within(screen.getByTestId('path-ts-level')).getByRole('spinbutton')
@@ -240,6 +242,8 @@ describe('#27 follow-up chips', () => {
   it('march time (P0-20): boots only -> heroBootsSpeed; arena + boots -> arenaBootsSpeed; one chip per line on the same lines; both 0 -> none', async () => {
     const { default: Path } = await import('@/pages/calculator/PathCalculatorPage')
     render(<MemoryRouter><Path /></MemoryRouter>)
+    // 座標預設空白、空白不算：先填起始和目標（2026-10-10 座標框修正）
+    for (const id of ['path-start-x', 'path-start-y', 'path-target-x', 'path-target-y']) fireEvent.change(screen.getByTestId(id), { target: { value: '0' } })
     const panel = screen.getByTestId('calc-result-panel')
     const ts = within(screen.getByTestId('path-ts-level')).getByRole('spinbutton')
     const boots = screen.getByLabelText(i18n.t('pathCalc.heroBonus'))
