@@ -1184,6 +1184,14 @@
     "fieldLevelZero": {
       "what": "Level-0 resource field production is unverified.",
       "source": "The official knowledge base starts at level 1; we use 3/hr, so level 1 adds only 4."
+    },
+    "buildingEffect": {
+      "what": "This building's effect is unverified.",
+      "source": "The official knowledge base has no effect numbers to compare; we are still checking where the current text comes from."
+    },
+    "vikingCarry": {
+      "what": "Viking carry capacity is unverified.",
+      "source": "The official help page S139 has no carry capacity; the current numbers are community-compiled."
     }
   },
   "verifiedNotes": {
@@ -1193,11 +1201,12 @@
     },
     "mainTs11": {
       "what": "Cost, time, population and culture points are checked.",
-      "source": "Cost and population: level 1 from the ts11 in-game help, level 2 and up from the official knowledge base; build time from the ts11 in-game help (the official knowledge base level-1 time differs from the game), within 10 seconds of the official knowledge base from level 2."
+      "source": "Level 1 from the ts11 in-game help, level 2+ from the official knowledge base. Knowledge base times include the Main Building speed-up (Main Building level 1 shows 10000 s = 2000 × 5); this table lists the base time."
     },
     "kb": {
       "what": "Cost, time, population and culture points are checked.",
       "source": "From the official knowledge base."
-    }
+    },
+    "whatWithEffect": "Cost, time, population, culture points and effect are checked."
   }
 }

@@ -64,6 +64,11 @@ export function buildingSource(buildingId: string): BuildingSource | null {
   return ((gen as { buildingSources?: Record<string, string> }).buildingSources?.[buildingId] as BuildingSource | undefined) ?? null
 }
 
+/** 效果欄照官方知識庫核對過（P0-23）；effectsPending 裡的建築效果欄標「待驗證」 */
+export function isBuildingEffectVerified(buildingId: string): boolean {
+  return !((gen as { effectsPending?: string[] }).effectsPending ?? []).includes(buildingId)
+}
+
 export function isBuildingVerified(buildingId: string): boolean {
   return buildingId in gen.buildings && (PENDING[buildingId] ?? []).length === 0
 }

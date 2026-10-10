@@ -1,6 +1,14 @@
 {
  "_what": "ts11 x1 international 遊戲內說明（Travian.Game.Manual → GET /api/v1/manual/{troop|building}/N）原文解析，2026-10-10 由 ts11 帳號的 bot 瀏覽器唯讀擷取，每次間隔 25–45 秒。原文 HTML 在 review/full-verify-2026-10-10/evidence/raw/。",
  "server": "ts11.x1.international.travian.com",
+ "read_conditions": {
+  "server_speed": "x1（ts11.x1.international.travian.com）",
+  "building_pages_read_at": "2026-10-10 08:42–09:31（台北）",
+  "village": "HandsomeTing的村莊（帳號唯一的村莊）",
+  "main_building_level_at_read_time": 4,
+  "main_building_level_how_known": "讀的當下沒有記；事後從機器人的建造紀錄（travian-bot logs/db-backup.sql 的 build_started）推回：村莊大樓 4 級 2026-10-09 11:00（台北）開始蓋、當天完成；5 級 2026-10-10 09:42（台北）才開始蓋，比最後一頁說明晚 11 分鐘。所以讀說明頁時是 4 級。",
+  "help_times_are_base_times": "說明頁的時間不看村莊大樓等級：兵營 1 級說明頁寫 2000 秒，村莊大樓 4 級實際要 2000 × 0.964³ ≈ 1792 秒；2000 是村莊大樓 1 級、x1 的基本時間，跟官方知識庫（輸入框預設村莊大樓 1 級）44 棟裡 43 棟一樣。村莊大樓自己的說明頁 2000 秒、知識庫 10000 秒＝2000 × 5，見 official_kb_mb_level_experiment_2026-10-10.json。"
+ },
  "troops": {
   "1": {
    "name_zh": "古羅馬步兵",

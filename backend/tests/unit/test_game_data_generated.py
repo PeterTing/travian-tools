@@ -273,7 +273,104 @@ def test_marketplace_needs_granary_1() -> None:
 def test_main_building_effect_is_0964_power() -> None:
     assert _lv("main_building", 3).effect_value == 0.929
     assert _lv("main_building", 4).effect_value == 0.896
-    assert "93%" in (_lv("main_building", 3).effect_description or "")
+    # 效果文字照官方知識庫效果欄（92.9%），P0-23
+    assert "92.9%" in (_lv("main_building", 3).effect_description or "")
+
+
+# ─── 效果欄照官方知識庫（P0-23 幕僚長審查）─────────────────────────
+
+
+def _kb_effects(gid: int) -> dict[int, list[str]]:
+    kb = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/official_kb_buildings_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )
+    return {r["level"]: r["effects"] for r in kb["buildings"][str(gid)]["rows"]}
+
+
+@pytest.mark.parametrize(
+    ("bid", "level", "text"),
+    [
+        ("warehouse", 1, "1,200"),
+        ("warehouse", 20, "80,000"),
+        ("great_warehouse", 1, "3,600"),
+        ("great_warehouse", 20, "240,000"),
+        ("great_granary", 1, "3,600"),
+        ("great_granary", 20, "240,000"),
+        ("woodcutter", 1, "7"),
+        ("cropland", 20, "3,430"),
+        ("stonemasons_lodge", 1, "+10%"),
+        ("stonemasons_lodge", 20, "+200%"),
+        ("earth_wall", 20, "48.6%"),
+        ("city_wall", 19, "75.4%"),
+        ("city_wall", 11, "38.4%"),
+        ("workshop", 1, "100%"),
+        ("workshop", 20, "13.5%"),
+        ("horse_drinking_trough", 1, "騎兵訓練時間 99%"),
+        ("horse_drinking_trough", 20, "騎兵訓練時間 80%"),
+        ("trade_office", 1, "+20%（羅馬人 +40%）"),
+    ],
+)
+def test_effect_matches_official_kb(bid: str, level: int, text: str) -> None:
+    assert text in (_lv(bid, level).effect_description or "")
+
+
+def test_every_verified_effect_level_matches_kb() -> None:
+    gen = json.loads(
+        (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
+    )
+    pending = set(gen["effectsPending"])
+    assert pending == {"academy", "blacksmith", "embassy", "rally_point", "treasury"}
+    data = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    gid = {
+        "woodcutter": 1,
+        "clay_pit": 2,
+        "iron_mine": 3,
+        "cropland": 4,
+        "sawmill": 5,
+        "brickyard": 6,
+        "iron_foundry": 7,
+        "grain_mill": 8,
+        "bakery": 9,
+        "warehouse": 10,
+        "granary": 11,
+        "tournament_square": 14,
+        "main_building": 15,
+        "marketplace": 17,
+        "barracks": 19,
+        "stable": 20,
+        "workshop": 21,
+        "cranny": 23,
+        "town_hall": 24,
+        "residence": 25,
+        "palace": 26,
+        "trade_office": 28,
+        "great_barracks": 29,
+        "great_stable": 30,
+        "city_wall": 31,
+        "earth_wall": 32,
+        "palisade": 33,
+        "stonemasons_lodge": 34,
+        "brewery": 35,
+        "trapper": 36,
+        "heros_mansion": 37,
+        "great_warehouse": 38,
+        "great_granary": 39,
+        "horse_drinking_trough": 41,
+    }
+    assert set(gid) == set(data) - pending
+    for bid, g in gid.items():
+        kb = _kb_effects(g)
+        for lv in data[bid]["levels"]:
+            for cell in kb[lv["level"]]:
+                if not cell or (bid == "brewery" and ":" in cell):
+                    continue
+                assert (
+                    cell.replace(".0%", "%").lstrip("+") in lv["effect_description"]
+                ), (bid, lv["level"], cell)
 
 
 # ─── culture points: one source ───────────────────────────────────
@@ -416,3 +513,71 @@ def test_viking_units_follow_official_s139() -> None:
     cost = [settler[f"cost_{k}"] for k in ("wood", "clay", "iron", "crop")]
     assert cost == [5800, 4600, 4800, 4800]
     assert settler["training_time_base"] == 31000
+
+
+# ─── 出處檔（P0-23 幕僚長審查）─────────────────────────────────────
+
+
+def test_support_pages_full_text_sha256_recomputable() -> None:
+    import hashlib
+
+    ev = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/official_support_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert "text_method" in ev
+    assert set(ev["articles"]) == {
+        "s3",
+        "s213",
+        "s88",
+        "s129",
+        "s48",
+        "s139",
+        "s187",
+        "s10",
+    }
+    for key, a in ev["articles"].items():
+        assert len(a["text"]) > 1000, key
+        assert (
+            hashlib.sha256(a["text"].encode("utf-8")).hexdigest() == a["text_sha256"]
+        ), key
+        assert len(a["html_sha256"]) == 64, key
+
+
+def test_merchant_numbers_are_in_s3_full_text() -> None:
+    a = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/official_support_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )["articles"]["s3"]
+    for cap, speed in a["merchants"].values():
+        assert f"Carry {cap} resources, move at {speed} fields/hour" in a["text"]
+
+
+def test_ts11_reads_record_conditions() -> None:
+    m = json.loads(
+        (ROOT / "scripts/game_data/evidence/ts11_manual_2026-10-10.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    rc = m["read_conditions"]
+    assert rc["main_building_level_at_read_time"] == 4
+    assert "x1" in rc["server_speed"]
+    mk = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/ts11_marketplace_read_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert mk["request"]["method"] == "GET"
+    kb = json.loads(
+        (
+            ROOT
+            / "scripts/game_data/evidence/official_kb_mb_level_experiment_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )
+    mb = [r for r in kb["runs"] if r["gid"] == 15]
+    # 村莊大樓頁不看輸入框：1 級永遠是 2000 × 5
+    assert {r["L1_s"] for r in mb} == {10000}
+    barracks0 = next(r for r in kb["runs"] if r["gid"] == 19 and r["mb_input"] == 0)
+    assert barracks0["L1_s"] == 5 * 2000

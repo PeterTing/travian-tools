@@ -299,6 +299,16 @@ describe('fieldLevelZero: level-0 field production is unverified', () => {
     expect(from0(0)).toBe(true)
     expect(from0(1)).toBe(false)
     const src = Object.entries(sources).find(([f]) => f.endsWith('/BuildOrderCalculator.tsx'))![1]
-    expect(src).toMatch(/x\.kind === 'field' && x\.from === 0\) \? \['fieldLevelZero' as const\]/)
+    expect(src).toMatch(/planUsesFieldLevelZero\(start, plan\.steps\) \? \['fieldLevelZero' as const\]/)
+  })
+
+  it('build order: a field that starts at level 0 adds fieldLevelZero even if no step upgrades it (PM)', async () => {
+    const { planUsesFieldLevelZero } = await import('./components/BuildOrderCalculator')
+    const fieldStep = (from: number) => ({ kind: 'field' as const, type: 'crop' as const, from, to: from + 1, cost: 1, roi: 1, time: 1, label: '', labelZh: '' })
+    // 起始有 0 級的木材田，20 步裡一步都沒升到它：總產量還是用 0 級 3／小時算
+    expect(planUsesFieldLevelZero({ wood: 0, clay: 5, iron: 5, crop: 5 }, [fieldStep(5)])).toBe(true)
+    expect(planUsesFieldLevelZero({ wood: 5, clay: 5, iron: 5, crop: 5 }, [])).toBe(false)
+    expect(planUsesFieldLevelZero({ wood: 5, clay: 5, iron: 5, crop: 5 }, [fieldStep(0)])).toBe(true)
+    expect(planUsesFieldLevelZero({ wood: 1, clay: 1, iron: 1, crop: 1 }, [fieldStep(1)])).toBe(false)
   })
 })

@@ -1,7 +1,7 @@
 import { useId, useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import PendingVerifyChip, { PendingNotePanel } from './PendingVerifyChip'
-import { buildingSource, isBuildingVerified } from '@/data/gameData'
+import { buildingSource, isBuildingEffectVerified, isBuildingVerified } from '@/data/gameData'
 
 interface BuildingVerifyMarkProps {
   buildingId: string
@@ -41,7 +41,8 @@ export default function BuildingVerifyMark({ buildingId, className = '' }: Build
         >
           ✓
         </button>
-        {open && <PendingNotePanel fill id={panelId} kinds={[source]} ns="verifiedNotes" />}
+        {/* 效果也照官方知識庫核對過：第一行加「效果」（P0-23）；沒核對的效果在詳情的效果欄另標待驗證 */}
+        {open && <PendingNotePanel fill id={panelId} kinds={[source]} ns="verifiedNotes" whatKeys={[isBuildingEffectVerified(buildingId) ? 'verifiedNotes.whatWithEffect' : undefined]} />}
       </>
     )
   }

@@ -33,7 +33,7 @@
           "population": 1,
           "culture_points": 3,
           "effect_value": 0.964,
-          "effect_description": "建造時間 96%",
+          "effect_description": "建造時間 96.4%",
           "cp_per_day": 3
         },
         {
@@ -46,7 +46,7 @@
           "population": 1,
           "culture_points": 3,
           "effect_value": 0.929,
-          "effect_description": "建造時間 93%",
+          "effect_description": "建造時間 92.9%",
           "cp_per_day": 3
         },
         {
@@ -59,7 +59,7 @@
           "population": 1,
           "culture_points": 4,
           "effect_value": 0.896,
-          "effect_description": "建造時間 90%",
+          "effect_description": "建造時間 89.6%",
           "cp_per_day": 4
         },
         {
@@ -72,7 +72,7 @@
           "population": 1,
           "culture_points": 5,
           "effect_value": 0.864,
-          "effect_description": "建造時間 86%",
+          "effect_description": "建造時間 86.4%",
           "cp_per_day": 5
         },
         {
@@ -85,7 +85,7 @@
           "population": 2,
           "culture_points": 6,
           "effect_value": 0.833,
-          "effect_description": "建造時間 83%",
+          "effect_description": "建造時間 83.3%",
           "cp_per_day": 6
         },
         {
@@ -98,7 +98,7 @@
           "population": 2,
           "culture_points": 7,
           "effect_value": 0.803,
-          "effect_description": "建造時間 80%",
+          "effect_description": "建造時間 80.3%",
           "cp_per_day": 7
         },
         {
@@ -111,7 +111,7 @@
           "population": 2,
           "culture_points": 9,
           "effect_value": 0.774,
-          "effect_description": "建造時間 77%",
+          "effect_description": "建造時間 77.4%",
           "cp_per_day": 9
         },
         {
@@ -124,7 +124,7 @@
           "population": 2,
           "culture_points": 10,
           "effect_value": 0.746,
-          "effect_description": "建造時間 75%",
+          "effect_description": "建造時間 74.6%",
           "cp_per_day": 10
         },
         {
@@ -137,7 +137,7 @@
           "population": 2,
           "culture_points": 12,
           "effect_value": 0.719,
-          "effect_description": "建造時間 72%",
+          "effect_description": "建造時間 71.9%",
           "cp_per_day": 12
         },
         {
@@ -150,7 +150,7 @@
           "population": 2,
           "culture_points": 15,
           "effect_value": 0.693,
-          "effect_description": "建造時間 69%",
+          "effect_description": "建造時間 69.3%",
           "cp_per_day": 15
         },
         {
@@ -163,7 +163,7 @@
           "population": 2,
           "culture_points": 18,
           "effect_value": 0.668,
-          "effect_description": "建造時間 67%",
+          "effect_description": "建造時間 66.8%",
           "cp_per_day": 18
         },
         {
@@ -176,7 +176,7 @@
           "population": 2,
           "culture_points": 21,
           "effect_value": 0.644,
-          "effect_description": "建造時間 64%",
+          "effect_description": "建造時間 64.4%",
           "cp_per_day": 21
         },
         {
@@ -189,7 +189,7 @@
           "population": 2,
           "culture_points": 26,
           "effect_value": 0.621,
-          "effect_description": "建造時間 62%",
+          "effect_description": "建造時間 62.1%",
           "cp_per_day": 26
         },
         {
@@ -202,7 +202,7 @@
           "population": 2,
           "culture_points": 31,
           "effect_value": 0.599,
-          "effect_description": "建造時間 60%",
+          "effect_description": "建造時間 59.9%",
           "cp_per_day": 31
         },
         {
@@ -215,7 +215,7 @@
           "population": 3,
           "culture_points": 37,
           "effect_value": 0.577,
-          "effect_description": "建造時間 58%",
+          "effect_description": "建造時間 57.7%",
           "cp_per_day": 37
         },
         {
@@ -228,7 +228,7 @@
           "population": 3,
           "culture_points": 44,
           "effect_value": 0.556,
-          "effect_description": "建造時間 56%",
+          "effect_description": "建造時間 55.6%",
           "cp_per_day": 44
         },
         {
@@ -241,7 +241,7 @@
           "population": 3,
           "culture_points": 53,
           "effect_value": 0.536,
-          "effect_description": "建造時間 54%",
+          "effect_description": "建造時間 53.6%",
           "cp_per_day": 53
         },
         {
@@ -254,7 +254,7 @@
           "population": 3,
           "culture_points": 64,
           "effect_value": 0.517,
-          "effect_description": "建造時間 52%",
+          "effect_description": "建造時間 51.7%",
           "cp_per_day": 64
         },
         {
@@ -267,7 +267,7 @@
           "population": 3,
           "culture_points": 77,
           "effect_value": 0.498,
-          "effect_description": "建造時間 50%",
+          "effect_description": "建造時間 49.8%",
           "cp_per_day": 77
         }
       ],
@@ -343,7 +343,7 @@
           "population": 2,
           "culture_points": 2,
           "effect_value": 0.729,
-          "effect_description": "訓練時間 73%",
+          "effect_description": "訓練時間 72.9%",
           "cp_per_day": 2
         },
         {
@@ -355,8 +355,8 @@
           "build_time_base": 5140,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 0.6561,
-          "effect_description": "訓練時間 66%",
+          "effect_value": 0.656,
+          "effect_description": "訓練時間 65.6%",
           "cp_per_day": 2
         },
         {
@@ -368,7 +368,7 @@
           "build_time_base": 6260,
           "population": 3,
           "culture_points": 3,
-          "effect_value": 0.5905,
+          "effect_value": 0.59,
           "effect_description": "訓練時間 59%",
           "cp_per_day": 3
         },
@@ -381,8 +381,8 @@
           "build_time_base": 7570,
           "population": 3,
           "culture_points": 4,
-          "effect_value": 0.5314,
-          "effect_description": "訓練時間 53%",
+          "effect_value": 0.531,
+          "effect_description": "訓練時間 53.1%",
           "cp_per_day": 4
         },
         {
@@ -394,8 +394,8 @@
           "build_time_base": 9080,
           "population": 3,
           "culture_points": 4,
-          "effect_value": 0.4783,
-          "effect_description": "訓練時間 48%",
+          "effect_value": 0.478,
+          "effect_description": "訓練時間 47.8%",
           "cp_per_day": 4
         },
         {
@@ -407,7 +407,7 @@
           "build_time_base": 10830,
           "population": 3,
           "culture_points": 5,
-          "effect_value": 0.4305,
+          "effect_value": 0.43,
           "effect_description": "訓練時間 43%",
           "cp_per_day": 5
         },
@@ -420,8 +420,8 @@
           "build_time_base": 12860,
           "population": 3,
           "culture_points": 6,
-          "effect_value": 0.3874,
-          "effect_description": "訓練時間 39%",
+          "effect_value": 0.387,
+          "effect_description": "訓練時間 38.7%",
           "cp_per_day": 6
         },
         {
@@ -433,8 +433,8 @@
           "build_time_base": 15220,
           "population": 3,
           "culture_points": 7,
-          "effect_value": 0.3487,
-          "effect_description": "訓練時間 35%",
+          "effect_value": 0.349,
+          "effect_description": "訓練時間 34.9%",
           "cp_per_day": 7
         },
         {
@@ -446,8 +446,8 @@
           "build_time_base": 17950,
           "population": 3,
           "culture_points": 9,
-          "effect_value": 0.3138,
-          "effect_description": "訓練時間 31%",
+          "effect_value": 0.314,
+          "effect_description": "訓練時間 31.4%",
           "cp_per_day": 9
         },
         {
@@ -459,8 +459,8 @@
           "build_time_base": 21130,
           "population": 3,
           "culture_points": 11,
-          "effect_value": 0.2824,
-          "effect_description": "訓練時間 28%",
+          "effect_value": 0.282,
+          "effect_description": "訓練時間 28.2%",
           "cp_per_day": 11
         },
         {
@@ -472,8 +472,8 @@
           "build_time_base": 24810,
           "population": 3,
           "culture_points": 13,
-          "effect_value": 0.2542,
-          "effect_description": "訓練時間 25%",
+          "effect_value": 0.254,
+          "effect_description": "訓練時間 25.4%",
           "cp_per_day": 13
         },
         {
@@ -485,8 +485,8 @@
           "build_time_base": 29080,
           "population": 3,
           "culture_points": 15,
-          "effect_value": 0.2288,
-          "effect_description": "訓練時間 23%",
+          "effect_value": 0.229,
+          "effect_description": "訓練時間 22.9%",
           "cp_per_day": 15
         },
         {
@@ -498,8 +498,8 @@
           "build_time_base": 34030,
           "population": 4,
           "culture_points": 18,
-          "effect_value": 0.2059,
-          "effect_description": "訓練時間 21%",
+          "effect_value": 0.206,
+          "effect_description": "訓練時間 20.6%",
           "cp_per_day": 18
         },
         {
@@ -511,8 +511,8 @@
           "build_time_base": 39770,
           "population": 4,
           "culture_points": 22,
-          "effect_value": 0.1853,
-          "effect_description": "訓練時間 19%",
+          "effect_value": 0.185,
+          "effect_description": "訓練時間 18.5%",
           "cp_per_day": 22
         },
         {
@@ -524,8 +524,8 @@
           "build_time_base": 46440,
           "population": 4,
           "culture_points": 27,
-          "effect_value": 0.1668,
-          "effect_description": "訓練時間 17%",
+          "effect_value": 0.167,
+          "effect_description": "訓練時間 16.7%",
           "cp_per_day": 27
         },
         {
@@ -537,7 +537,7 @@
           "build_time_base": 54170,
           "population": 4,
           "culture_points": 32,
-          "effect_value": 0.1501,
+          "effect_value": 0.15,
           "effect_description": "訓練時間 15%",
           "cp_per_day": 32
         },
@@ -550,8 +550,8 @@
           "build_time_base": 63130,
           "population": 4,
           "culture_points": 38,
-          "effect_value": 0.1351,
-          "effect_description": "訓練時間 14%",
+          "effect_value": 0.135,
+          "effect_description": "訓練時間 13.5%",
           "cp_per_day": 38
         }
       ],
@@ -856,7 +856,7 @@
           "build_time_base": 2000,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 1200,
+          "effect_value": 1200.0,
           "effect_description": "儲存容量 1,200",
           "cp_per_day": 1
         },
@@ -869,7 +869,7 @@
           "build_time_base": 2620,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 1700,
+          "effect_value": 1700.0,
           "effect_description": "儲存容量 1,700",
           "cp_per_day": 1
         },
@@ -882,7 +882,7 @@
           "build_time_base": 3340,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 2300,
+          "effect_value": 2300.0,
           "effect_description": "儲存容量 2,300",
           "cp_per_day": 2
         },
@@ -895,7 +895,7 @@
           "build_time_base": 4170,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 3100,
+          "effect_value": 3100.0,
           "effect_description": "儲存容量 3,100",
           "cp_per_day": 2
         },
@@ -908,7 +908,7 @@
           "build_time_base": 5140,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 4000,
+          "effect_value": 4000.0,
           "effect_description": "儲存容量 4,000",
           "cp_per_day": 2
         },
@@ -921,7 +921,7 @@
           "build_time_base": 6260,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 5000,
+          "effect_value": 5000.0,
           "effect_description": "儲存容量 5,000",
           "cp_per_day": 3
         },
@@ -934,7 +934,7 @@
           "build_time_base": 7570,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 6300,
+          "effect_value": 6300.0,
           "effect_description": "儲存容量 6,300",
           "cp_per_day": 4
         },
@@ -947,7 +947,7 @@
           "build_time_base": 9080,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 7800,
+          "effect_value": 7800.0,
           "effect_description": "儲存容量 7,800",
           "cp_per_day": 4
         },
@@ -960,7 +960,7 @@
           "build_time_base": 10830,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 9600,
+          "effect_value": 9600.0,
           "effect_description": "儲存容量 9,600",
           "cp_per_day": 5
         },
@@ -973,7 +973,7 @@
           "build_time_base": 12860,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 11800,
+          "effect_value": 11800.0,
           "effect_description": "儲存容量 11,800",
           "cp_per_day": 6
         },
@@ -986,7 +986,7 @@
           "build_time_base": 15220,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 14400,
+          "effect_value": 14400.0,
           "effect_description": "儲存容量 14,400",
           "cp_per_day": 7
         },
@@ -999,7 +999,7 @@
           "build_time_base": 17950,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 17600,
+          "effect_value": 17600.0,
           "effect_description": "儲存容量 17,600",
           "cp_per_day": 9
         },
@@ -1012,7 +1012,7 @@
           "build_time_base": 21130,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 21400,
+          "effect_value": 21400.0,
           "effect_description": "儲存容量 21,400",
           "cp_per_day": 11
         },
@@ -1025,7 +1025,7 @@
           "build_time_base": 24810,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 25900,
+          "effect_value": 25900.0,
           "effect_description": "儲存容量 25,900",
           "cp_per_day": 13
         },
@@ -1038,7 +1038,7 @@
           "build_time_base": 29080,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 31300,
+          "effect_value": 31300.0,
           "effect_description": "儲存容量 31,300",
           "cp_per_day": 15
         },
@@ -1051,7 +1051,7 @@
           "build_time_base": 34030,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 37900,
+          "effect_value": 37900.0,
           "effect_description": "儲存容量 37,900",
           "cp_per_day": 18
         },
@@ -1064,7 +1064,7 @@
           "build_time_base": 39770,
           "population": 2,
           "culture_points": 22,
-          "effect_value": 45700,
+          "effect_value": 45700.0,
           "effect_description": "儲存容量 45,700",
           "cp_per_day": 22
         },
@@ -1077,7 +1077,7 @@
           "build_time_base": 46440,
           "population": 2,
           "culture_points": 27,
-          "effect_value": 55100,
+          "effect_value": 55100.0,
           "effect_description": "儲存容量 55,100",
           "cp_per_day": 27
         },
@@ -1090,7 +1090,7 @@
           "build_time_base": 54170,
           "population": 2,
           "culture_points": 32,
-          "effect_value": 66400,
+          "effect_value": 66400.0,
           "effect_description": "儲存容量 66,400",
           "cp_per_day": 32
         },
@@ -1103,7 +1103,7 @@
           "build_time_base": 63130,
           "population": 2,
           "culture_points": 38,
-          "effect_value": 80000,
+          "effect_value": 80000.0,
           "effect_description": "儲存容量 80,000",
           "cp_per_day": 38
         }
@@ -1134,7 +1134,7 @@
           "build_time_base": 1600,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 1200,
+          "effect_value": 1200.0,
           "effect_description": "儲存容量 1,200",
           "cp_per_day": 1
         },
@@ -1147,7 +1147,7 @@
           "build_time_base": 2160,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 1700,
+          "effect_value": 1700.0,
           "effect_description": "儲存容量 1,700",
           "cp_per_day": 1
         },
@@ -1160,7 +1160,7 @@
           "build_time_base": 2800,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 2300,
+          "effect_value": 2300.0,
           "effect_description": "儲存容量 2,300",
           "cp_per_day": 2
         },
@@ -1173,7 +1173,7 @@
           "build_time_base": 3550,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 3100,
+          "effect_value": 3100.0,
           "effect_description": "儲存容量 3,100",
           "cp_per_day": 2
         },
@@ -1186,7 +1186,7 @@
           "build_time_base": 4420,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 4000,
+          "effect_value": 4000.0,
           "effect_description": "儲存容量 4,000",
           "cp_per_day": 2
         },
@@ -1199,7 +1199,7 @@
           "build_time_base": 5420,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 5000,
+          "effect_value": 5000.0,
           "effect_description": "儲存容量 5,000",
           "cp_per_day": 3
         },
@@ -1212,7 +1212,7 @@
           "build_time_base": 6590,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 6300,
+          "effect_value": 6300.0,
           "effect_description": "儲存容量 6,300",
           "cp_per_day": 4
         },
@@ -1225,7 +1225,7 @@
           "build_time_base": 7950,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 7800,
+          "effect_value": 7800.0,
           "effect_description": "儲存容量 7,800",
           "cp_per_day": 4
         },
@@ -1238,7 +1238,7 @@
           "build_time_base": 9520,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 9600,
+          "effect_value": 9600.0,
           "effect_description": "儲存容量 9,600",
           "cp_per_day": 5
         },
@@ -1251,7 +1251,7 @@
           "build_time_base": 11340,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 11800,
+          "effect_value": 11800.0,
           "effect_description": "儲存容量 11,800",
           "cp_per_day": 6
         },
@@ -1264,7 +1264,7 @@
           "build_time_base": 13450,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 14400,
+          "effect_value": 14400.0,
           "effect_description": "儲存容量 14,400",
           "cp_per_day": 7
         },
@@ -1277,7 +1277,7 @@
           "build_time_base": 15910,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 17600,
+          "effect_value": 17600.0,
           "effect_description": "儲存容量 17,600",
           "cp_per_day": 9
         },
@@ -1290,7 +1290,7 @@
           "build_time_base": 18750,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 21400,
+          "effect_value": 21400.0,
           "effect_description": "儲存容量 21,400",
           "cp_per_day": 11
         },
@@ -1303,7 +1303,7 @@
           "build_time_base": 22050,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 25900,
+          "effect_value": 25900.0,
           "effect_description": "儲存容量 25,900",
           "cp_per_day": 13
         },
@@ -1316,7 +1316,7 @@
           "build_time_base": 25880,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 31300,
+          "effect_value": 31300.0,
           "effect_description": "儲存容量 31,300",
           "cp_per_day": 15
         },
@@ -1329,7 +1329,7 @@
           "build_time_base": 30320,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 37900,
+          "effect_value": 37900.0,
           "effect_description": "儲存容量 37,900",
           "cp_per_day": 18
         },
@@ -1342,7 +1342,7 @@
           "build_time_base": 35470,
           "population": 2,
           "culture_points": 22,
-          "effect_value": 45700,
+          "effect_value": 45700.0,
           "effect_description": "儲存容量 45,700",
           "cp_per_day": 22
         },
@@ -1355,7 +1355,7 @@
           "build_time_base": 41450,
           "population": 2,
           "culture_points": 27,
-          "effect_value": 55100,
+          "effect_value": 55100.0,
           "effect_description": "儲存容量 55,100",
           "cp_per_day": 27
         },
@@ -1368,7 +1368,7 @@
           "build_time_base": 48380,
           "population": 2,
           "culture_points": 32,
-          "effect_value": 66400,
+          "effect_value": 66400.0,
           "effect_description": "儲存容量 66,400",
           "cp_per_day": 32
         },
@@ -1381,7 +1381,7 @@
           "build_time_base": 56420,
           "population": 2,
           "culture_points": 38,
-          "effect_value": 80000,
+          "effect_value": 80000.0,
           "effect_description": "儲存容量 80,000",
           "cp_per_day": 38
         }
@@ -1422,7 +1422,7 @@
           "build_time_base": 1800,
           "population": 4,
           "culture_points": 4,
-          "effect_value": 1,
+          "effect_value": 1.0,
           "effect_description": "商人數量 1",
           "cp_per_day": 4
         },
@@ -1435,7 +1435,7 @@
           "build_time_base": 2390,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 2,
+          "effect_value": 2.0,
           "effect_description": "商人數量 2",
           "cp_per_day": 4
         },
@@ -1448,7 +1448,7 @@
           "build_time_base": 3070,
           "population": 2,
           "culture_points": 5,
-          "effect_value": 3,
+          "effect_value": 3.0,
           "effect_description": "商人數量 3",
           "cp_per_day": 5
         },
@@ -1461,7 +1461,7 @@
           "build_time_base": 3860,
           "population": 2,
           "culture_points": 6,
-          "effect_value": 4,
+          "effect_value": 4.0,
           "effect_description": "商人數量 4",
           "cp_per_day": 6
         },
@@ -1474,7 +1474,7 @@
           "build_time_base": 4780,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 5,
+          "effect_value": 5.0,
           "effect_description": "商人數量 5",
           "cp_per_day": 7
         },
@@ -1487,7 +1487,7 @@
           "build_time_base": 5840,
           "population": 3,
           "culture_points": 9,
-          "effect_value": 6,
+          "effect_value": 6.0,
           "effect_description": "商人數量 6",
           "cp_per_day": 9
         },
@@ -1500,7 +1500,7 @@
           "build_time_base": 7080,
           "population": 3,
           "culture_points": 11,
-          "effect_value": 7,
+          "effect_value": 7.0,
           "effect_description": "商人數量 7",
           "cp_per_day": 11
         },
@@ -1513,7 +1513,7 @@
           "build_time_base": 8510,
           "population": 3,
           "culture_points": 13,
-          "effect_value": 8,
+          "effect_value": 8.0,
           "effect_description": "商人數量 8",
           "cp_per_day": 13
         },
@@ -1526,7 +1526,7 @@
           "build_time_base": 10170,
           "population": 3,
           "culture_points": 15,
-          "effect_value": 9,
+          "effect_value": 9.0,
           "effect_description": "商人數量 9",
           "cp_per_day": 15
         },
@@ -1539,7 +1539,7 @@
           "build_time_base": 12100,
           "population": 3,
           "culture_points": 19,
-          "effect_value": 10,
+          "effect_value": 10.0,
           "effect_description": "商人數量 10",
           "cp_per_day": 19
         },
@@ -1552,7 +1552,7 @@
           "build_time_base": 14340,
           "population": 3,
           "culture_points": 22,
-          "effect_value": 11,
+          "effect_value": 11.0,
           "effect_description": "商人數量 11",
           "cp_per_day": 22
         },
@@ -1565,7 +1565,7 @@
           "build_time_base": 16930,
           "population": 3,
           "culture_points": 27,
-          "effect_value": 12,
+          "effect_value": 12.0,
           "effect_description": "商人數量 12",
           "cp_per_day": 27
         },
@@ -1578,7 +1578,7 @@
           "build_time_base": 19940,
           "population": 3,
           "culture_points": 32,
-          "effect_value": 13,
+          "effect_value": 13.0,
           "effect_description": "商人數量 13",
           "cp_per_day": 32
         },
@@ -1591,7 +1591,7 @@
           "build_time_base": 23430,
           "population": 3,
           "culture_points": 39,
-          "effect_value": 14,
+          "effect_value": 14.0,
           "effect_description": "商人數量 14",
           "cp_per_day": 39
         },
@@ -1604,7 +1604,7 @@
           "build_time_base": 27480,
           "population": 3,
           "culture_points": 46,
-          "effect_value": 15,
+          "effect_value": 15.0,
           "effect_description": "商人數量 15",
           "cp_per_day": 46
         },
@@ -1617,7 +1617,7 @@
           "build_time_base": 32180,
           "population": 4,
           "culture_points": 55,
-          "effect_value": 16,
+          "effect_value": 16.0,
           "effect_description": "商人數量 16",
           "cp_per_day": 55
         },
@@ -1630,7 +1630,7 @@
           "build_time_base": 37620,
           "population": 4,
           "culture_points": 67,
-          "effect_value": 17,
+          "effect_value": 17.0,
           "effect_description": "商人數量 17",
           "cp_per_day": 67
         },
@@ -1643,7 +1643,7 @@
           "build_time_base": 43940,
           "population": 4,
           "culture_points": 80,
-          "effect_value": 18,
+          "effect_value": 18.0,
           "effect_description": "商人數量 18",
           "cp_per_day": 80
         },
@@ -1656,7 +1656,7 @@
           "build_time_base": 51270,
           "population": 4,
           "culture_points": 96,
-          "effect_value": 19,
+          "effect_value": 19.0,
           "effect_description": "商人數量 19",
           "cp_per_day": 96
         },
@@ -1669,7 +1669,7 @@
           "build_time_base": 59780,
           "population": 4,
           "culture_points": 115,
-          "effect_value": 20,
+          "effect_value": 20.0,
           "effect_description": "商人數量 20",
           "cp_per_day": 115
         }
@@ -1748,7 +1748,7 @@
           "population": 3,
           "culture_points": 4,
           "effect_value": 0.729,
-          "effect_description": "訓練時間 73%",
+          "effect_description": "訓練時間 72.9%",
           "cp_per_day": 4
         },
         {
@@ -1760,8 +1760,8 @@
           "build_time_base": 5500,
           "population": 3,
           "culture_points": 5,
-          "effect_value": 0.6561,
-          "effect_description": "訓練時間 66%",
+          "effect_value": 0.656,
+          "effect_description": "訓練時間 65.6%",
           "cp_per_day": 5
         },
         {
@@ -1773,7 +1773,7 @@
           "build_time_base": 6680,
           "population": 3,
           "culture_points": 6,
-          "effect_value": 0.5905,
+          "effect_value": 0.59,
           "effect_description": "訓練時間 59%",
           "cp_per_day": 6
         },
@@ -1786,8 +1786,8 @@
           "build_time_base": 8050,
           "population": 3,
           "culture_points": 7,
-          "effect_value": 0.5314,
-          "effect_description": "訓練時間 53%",
+          "effect_value": 0.531,
+          "effect_description": "訓練時間 53.1%",
           "cp_per_day": 7
         },
         {
@@ -1799,8 +1799,8 @@
           "build_time_base": 9640,
           "population": 3,
           "culture_points": 9,
-          "effect_value": 0.4783,
-          "effect_description": "訓練時間 48%",
+          "effect_value": 0.478,
+          "effect_description": "訓練時間 47.8%",
           "cp_per_day": 9
         },
         {
@@ -1812,7 +1812,7 @@
           "build_time_base": 11480,
           "population": 3,
           "culture_points": 10,
-          "effect_value": 0.4305,
+          "effect_value": 0.43,
           "effect_description": "訓練時間 43%",
           "cp_per_day": 10
         },
@@ -1825,8 +1825,8 @@
           "build_time_base": 13620,
           "population": 3,
           "culture_points": 12,
-          "effect_value": 0.3874,
-          "effect_description": "訓練時間 39%",
+          "effect_value": 0.387,
+          "effect_description": "訓練時間 38.7%",
           "cp_per_day": 12
         },
         {
@@ -1838,8 +1838,8 @@
           "build_time_base": 16100,
           "population": 4,
           "culture_points": 15,
-          "effect_value": 0.3487,
-          "effect_description": "訓練時間 35%",
+          "effect_value": 0.349,
+          "effect_description": "訓練時間 34.9%",
           "cp_per_day": 15
         },
         {
@@ -1851,8 +1851,8 @@
           "build_time_base": 18980,
           "population": 4,
           "culture_points": 18,
-          "effect_value": 0.3138,
-          "effect_description": "訓練時間 31%",
+          "effect_value": 0.314,
+          "effect_description": "訓練時間 31.4%",
           "cp_per_day": 18
         },
         {
@@ -1864,8 +1864,8 @@
           "build_time_base": 22310,
           "population": 4,
           "culture_points": 21,
-          "effect_value": 0.2824,
-          "effect_description": "訓練時間 28%",
+          "effect_value": 0.282,
+          "effect_description": "訓練時間 28.2%",
           "cp_per_day": 21
         },
         {
@@ -1877,8 +1877,8 @@
           "build_time_base": 26180,
           "population": 4,
           "culture_points": 26,
-          "effect_value": 0.2542,
-          "effect_description": "訓練時間 25%",
+          "effect_value": 0.254,
+          "effect_description": "訓練時間 25.4%",
           "cp_per_day": 26
         },
         {
@@ -1890,8 +1890,8 @@
           "build_time_base": 30670,
           "population": 4,
           "culture_points": 31,
-          "effect_value": 0.2288,
-          "effect_description": "訓練時間 23%",
+          "effect_value": 0.229,
+          "effect_description": "訓練時間 22.9%",
           "cp_per_day": 31
         },
         {
@@ -1903,8 +1903,8 @@
           "build_time_base": 35880,
           "population": 4,
           "culture_points": 37,
-          "effect_value": 0.2059,
-          "effect_description": "訓練時間 21%",
+          "effect_value": 0.206,
+          "effect_description": "訓練時間 20.6%",
           "cp_per_day": 37
         },
         {
@@ -1916,8 +1916,8 @@
           "build_time_base": 41920,
           "population": 4,
           "culture_points": 44,
-          "effect_value": 0.1853,
-          "effect_description": "訓練時間 19%",
+          "effect_value": 0.185,
+          "effect_description": "訓練時間 18.5%",
           "cp_per_day": 44
         },
         {
@@ -1929,8 +1929,8 @@
           "build_time_base": 48930,
           "population": 4,
           "culture_points": 53,
-          "effect_value": 0.1668,
-          "effect_description": "訓練時間 17%",
+          "effect_value": 0.167,
+          "effect_description": "訓練時間 16.7%",
           "cp_per_day": 53
         },
         {
@@ -1942,7 +1942,7 @@
           "build_time_base": 57060,
           "population": 4,
           "culture_points": 64,
-          "effect_value": 0.1501,
+          "effect_value": 0.15,
           "effect_description": "訓練時間 15%",
           "cp_per_day": 64
         },
@@ -1955,8 +1955,8 @@
           "build_time_base": 66490,
           "population": 4,
           "culture_points": 77,
-          "effect_value": 0.1351,
-          "effect_description": "訓練時間 14%",
+          "effect_value": 0.135,
+          "effect_description": "訓練時間 13.5%",
           "cp_per_day": 77
         }
       ],
@@ -2548,8 +2548,8 @@
           "build_time_base": 300,
           "population": 0,
           "culture_points": 1,
-          "effect_value": 200,
-          "effect_description": "隱藏容量 200（高盧 ×1.5 → 300）",
+          "effect_value": 200.0,
+          "effect_description": "隱藏容量 200（高盧 300）",
           "cp_per_day": 1
         },
         {
@@ -2561,8 +2561,8 @@
           "build_time_base": 650,
           "population": 0,
           "culture_points": 1,
-          "effect_value": 260,
-          "effect_description": "隱藏容量 260（高盧 ×1.5 → 390）",
+          "effect_value": 260.0,
+          "effect_description": "隱藏容量 260（高盧 390）",
           "cp_per_day": 1
         },
         {
@@ -2574,8 +2574,8 @@
           "build_time_base": 1050,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 340,
-          "effect_description": "隱藏容量 340（高盧 ×1.5 → 510）",
+          "effect_value": 340.0,
+          "effect_description": "隱藏容量 340（高盧 510）",
           "cp_per_day": 2
         },
         {
@@ -2587,8 +2587,8 @@
           "build_time_base": 1520,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 440,
-          "effect_description": "隱藏容量 440（高盧 ×1.5 → 660）",
+          "effect_value": 440.0,
+          "effect_description": "隱藏容量 440（高盧 660）",
           "cp_per_day": 2
         },
         {
@@ -2600,8 +2600,8 @@
           "build_time_base": 2060,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 560,
-          "effect_description": "隱藏容量 560（高盧 ×1.5 → 840）",
+          "effect_value": 560.0,
+          "effect_description": "隱藏容量 560（高盧 840）",
           "cp_per_day": 2
         },
         {
@@ -2613,8 +2613,8 @@
           "build_time_base": 2690,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 720,
-          "effect_description": "隱藏容量 720（高盧 ×1.5 → 1080）",
+          "effect_value": 720.0,
+          "effect_description": "隱藏容量 720（高盧 1,080）",
           "cp_per_day": 3
         },
         {
@@ -2626,8 +2626,8 @@
           "build_time_base": 3420,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 920,
-          "effect_description": "隱藏容量 920（高盧 ×1.5 → 1380）",
+          "effect_value": 920.0,
+          "effect_description": "隱藏容量 920（高盧 1,380）",
           "cp_per_day": 4
         },
         {
@@ -2639,8 +2639,8 @@
           "build_time_base": 4270,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 1200,
-          "effect_description": "隱藏容量 1200（高盧 ×1.5 → 1800）",
+          "effect_value": 1200.0,
+          "effect_description": "隱藏容量 1,200（高盧 1,800）",
           "cp_per_day": 4
         },
         {
@@ -2652,8 +2652,8 @@
           "build_time_base": 5260,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 1520,
-          "effect_description": "隱藏容量 1520（高盧 ×1.5 → 2280）",
+          "effect_value": 1540.0,
+          "effect_description": "隱藏容量 1,540（高盧 2,310）",
           "cp_per_day": 5
         },
         {
@@ -2665,8 +2665,8 @@
           "build_time_base": 6400,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 2000,
-          "effect_description": "隱藏容量 2000（高盧 ×1.5 → 3000）",
+          "effect_value": 2000.0,
+          "effect_description": "隱藏容量 2,000（高盧 3,000）",
           "cp_per_day": 6
         }
       ],
@@ -2702,8 +2702,8 @@
           "build_time_base": 3000,
           "population": 3,
           "culture_points": 4,
-          "effect_value": 0.9,
-          "effect_description": "訓練時間 90%",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 100%",
           "cp_per_day": 4
         },
         {
@@ -2715,8 +2715,8 @@
           "build_time_base": 3780,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 0.81,
-          "effect_description": "訓練時間 81%",
+          "effect_value": 0.9,
+          "effect_description": "訓練時間 90%",
           "cp_per_day": 4
         },
         {
@@ -2728,8 +2728,8 @@
           "build_time_base": 4680,
           "population": 2,
           "culture_points": 5,
-          "effect_value": 0.729,
-          "effect_description": "訓練時間 73%",
+          "effect_value": 0.81,
+          "effect_description": "訓練時間 81%",
           "cp_per_day": 5
         },
         {
@@ -2741,8 +2741,8 @@
           "build_time_base": 5730,
           "population": 2,
           "culture_points": 6,
-          "effect_value": 0.656,
-          "effect_description": "訓練時間 66%",
+          "effect_value": 0.729,
+          "effect_description": "訓練時間 72.9%",
           "cp_per_day": 6
         },
         {
@@ -2754,8 +2754,8 @@
           "build_time_base": 6950,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 0.59,
-          "effect_description": "訓練時間 59%",
+          "effect_value": 0.656,
+          "effect_description": "訓練時間 65.6%",
           "cp_per_day": 7
         },
         {
@@ -2767,8 +2767,8 @@
           "build_time_base": 8360,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 0.531,
-          "effect_description": "訓練時間 53%",
+          "effect_value": 0.59,
+          "effect_description": "訓練時間 59%",
           "cp_per_day": 9
         },
         {
@@ -2780,8 +2780,8 @@
           "build_time_base": 10000,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 0.478,
-          "effect_description": "訓練時間 48%",
+          "effect_value": 0.531,
+          "effect_description": "訓練時間 53.1%",
           "cp_per_day": 11
         },
         {
@@ -2793,8 +2793,8 @@
           "build_time_base": 11900,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 0.43,
-          "effect_description": "訓練時間 43%",
+          "effect_value": 0.478,
+          "effect_description": "訓練時間 47.8%",
           "cp_per_day": 13
         },
         {
@@ -2806,8 +2806,8 @@
           "build_time_base": 14110,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 0.387,
-          "effect_description": "訓練時間 39%",
+          "effect_value": 0.43,
+          "effect_description": "訓練時間 43%",
           "cp_per_day": 15
         },
         {
@@ -2819,8 +2819,8 @@
           "build_time_base": 16660,
           "population": 2,
           "culture_points": 19,
-          "effect_value": 0.349,
-          "effect_description": "訓練時間 35%",
+          "effect_value": 0.387,
+          "effect_description": "訓練時間 38.7%",
           "cp_per_day": 19
         },
         {
@@ -2832,8 +2832,8 @@
           "build_time_base": 19630,
           "population": 3,
           "culture_points": 22,
-          "effect_value": 0.314,
-          "effect_description": "訓練時間 31%",
+          "effect_value": 0.349,
+          "effect_description": "訓練時間 34.9%",
           "cp_per_day": 22
         },
         {
@@ -2845,8 +2845,8 @@
           "build_time_base": 23070,
           "population": 3,
           "culture_points": 27,
-          "effect_value": 0.282,
-          "effect_description": "訓練時間 28%",
+          "effect_value": 0.314,
+          "effect_description": "訓練時間 31.4%",
           "cp_per_day": 27
         },
         {
@@ -2858,8 +2858,8 @@
           "build_time_base": 27060,
           "population": 3,
           "culture_points": 32,
-          "effect_value": 0.254,
-          "effect_description": "訓練時間 25%",
+          "effect_value": 0.282,
+          "effect_description": "訓練時間 28.2%",
           "cp_per_day": 32
         },
         {
@@ -2871,8 +2871,8 @@
           "build_time_base": 31690,
           "population": 3,
           "culture_points": 39,
-          "effect_value": 0.229,
-          "effect_description": "訓練時間 23%",
+          "effect_value": 0.254,
+          "effect_description": "訓練時間 25.4%",
           "cp_per_day": 39
         },
         {
@@ -2884,8 +2884,8 @@
           "build_time_base": 37060,
           "population": 3,
           "culture_points": 46,
-          "effect_value": 0.206,
-          "effect_description": "訓練時間 21%",
+          "effect_value": 0.229,
+          "effect_description": "訓練時間 22.9%",
           "cp_per_day": 46
         },
         {
@@ -2897,8 +2897,8 @@
           "build_time_base": 43290,
           "population": 3,
           "culture_points": 55,
-          "effect_value": 0.185,
-          "effect_description": "訓練時間 19%",
+          "effect_value": 0.206,
+          "effect_description": "訓練時間 20.6%",
           "cp_per_day": 55
         },
         {
@@ -2910,8 +2910,8 @@
           "build_time_base": 50520,
           "population": 3,
           "culture_points": 67,
-          "effect_value": 0.167,
-          "effect_description": "訓練時間 17%",
+          "effect_value": 0.185,
+          "effect_description": "訓練時間 18.5%",
           "cp_per_day": 67
         },
         {
@@ -2923,8 +2923,8 @@
           "build_time_base": 58900,
           "population": 3,
           "culture_points": 80,
-          "effect_value": 0.15,
-          "effect_description": "訓練時間 15%",
+          "effect_value": 0.167,
+          "effect_description": "訓練時間 16.7%",
           "cp_per_day": 80
         },
         {
@@ -2936,8 +2936,8 @@
           "build_time_base": 68630,
           "population": 3,
           "culture_points": 96,
-          "effect_value": 0.135,
-          "effect_description": "訓練時間 14%",
+          "effect_value": 0.15,
+          "effect_description": "訓練時間 15%",
           "cp_per_day": 96
         },
         {
@@ -2949,8 +2949,8 @@
           "build_time_base": 79910,
           "population": 3,
           "culture_points": 115,
-          "effect_value": 0.122,
-          "effect_description": "訓練時間 12%",
+          "effect_value": 0.135,
+          "effect_description": "訓練時間 13.5%",
           "cp_per_day": 115
         }
       ],
@@ -3264,8 +3264,8 @@
           "build_time_base": 12500,
           "population": 4,
           "culture_points": 6,
-          "effect_value": 500,
-          "effect_description": "小慶典 CP＝本村每日 CP 產量（x1 上限 500）",
+          "effect_value": 86400.0,
+          "effect_description": "小慶典 24:00:00",
           "cp_per_day": 6
         },
         {
@@ -3277,8 +3277,8 @@
           "build_time_base": 14800,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 500,
-          "effect_description": "小型慶典 500 CP（固定，不隨等級增加）",
+          "effect_value": 83290.0,
+          "effect_description": "小慶典 23:08:10",
           "cp_per_day": 7
         },
         {
@@ -3290,8 +3290,8 @@
           "build_time_base": 17470,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 500,
-          "effect_description": "小型慶典 500 CP（固定，不隨等級增加）",
+          "effect_value": 80291.0,
+          "effect_description": "小慶典 22:18:11",
           "cp_per_day": 9
         },
         {
@@ -3303,8 +3303,8 @@
           "build_time_base": 20560,
           "population": 2,
           "culture_points": 10,
-          "effect_value": 500,
-          "effect_description": "小型慶典 500 CP（固定，不隨等級增加）",
+          "effect_value": 77401.0,
+          "effect_description": "小慶典 21:30:01",
           "cp_per_day": 10
         },
         {
@@ -3316,8 +3316,8 @@
           "build_time_base": 24150,
           "population": 2,
           "culture_points": 12,
-          "effect_value": 500,
-          "effect_description": "小型慶典 500 CP（固定，不隨等級增加）",
+          "effect_value": 74614.0,
+          "effect_description": "小慶典 20:43:34",
           "cp_per_day": 12
         },
         {
@@ -3329,8 +3329,8 @@
           "build_time_base": 28320,
           "population": 3,
           "culture_points": 15,
-          "effect_value": 500,
-          "effect_description": "小型慶典 500 CP（固定，不隨等級增加）",
+          "effect_value": 71928.0,
+          "effect_description": "小慶典 19:58:48",
           "cp_per_day": 15
         },
         {
@@ -3342,8 +3342,8 @@
           "build_time_base": 33150,
           "population": 3,
           "culture_points": 18,
-          "effect_value": 500,
-          "effect_description": "小型慶典 500 CP（固定，不隨等級增加）",
+          "effect_value": 69339.0,
+          "effect_description": "小慶典 19:15:39",
           "cp_per_day": 18
         },
         {
@@ -3355,8 +3355,8 @@
           "build_time_base": 38750,
           "population": 3,
           "culture_points": 21,
-          "effect_value": 500,
-          "effect_description": "小型慶典 500 CP（固定，不隨等級增加）",
+          "effect_value": 66843.0,
+          "effect_description": "小慶典 18:34:03",
           "cp_per_day": 21
         },
         {
@@ -3368,8 +3368,8 @@
           "build_time_base": 45250,
           "population": 3,
           "culture_points": 26,
-          "effect_value": 500,
-          "effect_description": "小型慶典 500 CP（固定，不隨等級增加）",
+          "effect_value": 64436.0,
+          "effect_description": "小慶典 17:53:56",
           "cp_per_day": 26
         },
         {
@@ -3381,8 +3381,8 @@
           "build_time_base": 52790,
           "population": 3,
           "culture_points": 31,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 62117.0,
+          "effect_description": "小慶典 17:15:17／大慶典 43:08:11",
           "cp_per_day": 31
         },
         {
@@ -3394,8 +3394,8 @@
           "build_time_base": 61540,
           "population": 3,
           "culture_points": 37,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 59880.0,
+          "effect_description": "小慶典 16:38:00／大慶典 41:35:01",
           "cp_per_day": 37
         },
         {
@@ -3407,8 +3407,8 @@
           "build_time_base": 71690,
           "population": 3,
           "culture_points": 45,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 57725.0,
+          "effect_description": "小慶典 16:02:05／大慶典 40:05:12",
           "cp_per_day": 45
         },
         {
@@ -3420,8 +3420,8 @@
           "build_time_base": 83460,
           "population": 3,
           "culture_points": 53,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 55647.0,
+          "effect_description": "小慶典 15:27:27／大慶典 38:38:36",
           "cp_per_day": 53
         },
         {
@@ -3433,8 +3433,8 @@
           "build_time_base": 97110,
           "population": 3,
           "culture_points": 64,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 53643.0,
+          "effect_description": "小慶典 14:54:03／大慶典 37:15:08",
           "cp_per_day": 64
         },
         {
@@ -3446,8 +3446,8 @@
           "build_time_base": 112950,
           "population": 3,
           "culture_points": 77,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 51712.0,
+          "effect_description": "小慶典 14:21:52／大慶典 35:54:40",
           "cp_per_day": 77
         },
         {
@@ -3459,8 +3459,8 @@
           "build_time_base": 131320,
           "population": 4,
           "culture_points": 92,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 49850.0,
+          "effect_description": "小慶典 13:50:50／大慶典 34:37:06",
           "cp_per_day": 92
         },
         {
@@ -3472,8 +3472,8 @@
           "build_time_base": 152630,
           "population": 4,
           "culture_points": 111,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 48056.0,
+          "effect_description": "小慶典 13:20:56／大慶典 33:22:20",
           "cp_per_day": 111
         },
         {
@@ -3485,8 +3485,8 @@
           "build_time_base": 177350,
           "population": 4,
           "culture_points": 133,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 46326.0,
+          "effect_description": "小慶典 12:52:06／大慶典 32:10:15",
           "cp_per_day": 133
         },
         {
@@ -3498,8 +3498,8 @@
           "build_time_base": 206020,
           "population": 4,
           "culture_points": 160,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 44658.0,
+          "effect_description": "小慶典 12:24:18／大慶典 31:00:45",
           "cp_per_day": 160
         },
         {
@@ -3511,8 +3511,8 @@
           "build_time_base": 239290,
           "population": 4,
           "culture_points": 192,
-          "effect_value": 2000,
-          "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
+          "effect_value": 43050.0,
+          "effect_description": "小慶典 11:57:30／大慶典 29:53:46",
           "cp_per_day": 192
         }
       ],
@@ -3544,8 +3544,8 @@
           "build_time_base": 2000,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 1,
-          "effect_description": "可訓練開拓者",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 100%；擴張槽 0",
           "cp_per_day": 2
         },
         {
@@ -3557,8 +3557,8 @@
           "build_time_base": 2620,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 2,
-          "effect_description": "2 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 90%；擴張槽 0",
           "cp_per_day": 3
         },
         {
@@ -3570,8 +3570,8 @@
           "build_time_base": 3340,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 3,
-          "effect_description": "3 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 81%；擴張槽 0",
           "cp_per_day": 3
         },
         {
@@ -3583,8 +3583,8 @@
           "build_time_base": 4170,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 4,
-          "effect_description": "4 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 72.9%；擴張槽 0",
           "cp_per_day": 4
         },
         {
@@ -3596,8 +3596,8 @@
           "build_time_base": 5140,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 5,
-          "effect_description": "5 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 65.6%；擴張槽 0",
           "cp_per_day": 5
         },
         {
@@ -3609,8 +3609,8 @@
           "build_time_base": 6260,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 6,
-          "effect_description": "6 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 59%；擴張槽 0",
           "cp_per_day": 6
         },
         {
@@ -3622,8 +3622,8 @@
           "build_time_base": 7570,
           "population": 1,
           "culture_points": 7,
-          "effect_value": 7,
-          "effect_description": "7 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 53.1%；擴張槽 0",
           "cp_per_day": 7
         },
         {
@@ -3635,8 +3635,8 @@
           "build_time_base": 9080,
           "population": 1,
           "culture_points": 9,
-          "effect_value": 8,
-          "effect_description": "8 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 47.8%；擴張槽 0",
           "cp_per_day": 9
         },
         {
@@ -3648,8 +3648,8 @@
           "build_time_base": 10830,
           "population": 1,
           "culture_points": 10,
-          "effect_value": 9,
-          "effect_description": "9 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 43%；擴張槽 0",
           "cp_per_day": 10
         },
         {
@@ -3661,8 +3661,8 @@
           "build_time_base": 12860,
           "population": 1,
           "culture_points": 12,
-          "effect_value": 10,
-          "effect_description": "可訓練管理者",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 38.7%；擴張槽 1",
           "cp_per_day": 12
         },
         {
@@ -3674,8 +3674,8 @@
           "build_time_base": 15220,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 11,
-          "effect_description": "11 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 34.9%；擴張槽 1",
           "cp_per_day": 15
         },
         {
@@ -3687,8 +3687,8 @@
           "build_time_base": 17950,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 12,
-          "effect_description": "12 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 31.4%；擴張槽 1",
           "cp_per_day": 18
         },
         {
@@ -3700,8 +3700,8 @@
           "build_time_base": 21130,
           "population": 2,
           "culture_points": 21,
-          "effect_value": 13,
-          "effect_description": "13 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 28.2%；擴張槽 1",
           "cp_per_day": 21
         },
         {
@@ -3713,8 +3713,8 @@
           "build_time_base": 24810,
           "population": 2,
           "culture_points": 26,
-          "effect_value": 14,
-          "effect_description": "14 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 25.4%；擴張槽 1",
           "cp_per_day": 26
         },
         {
@@ -3726,8 +3726,8 @@
           "build_time_base": 29080,
           "population": 2,
           "culture_points": 31,
-          "effect_value": 15,
-          "effect_description": "15 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 22.9%；擴張槽 1",
           "cp_per_day": 31
         },
         {
@@ -3739,8 +3739,8 @@
           "build_time_base": 34030,
           "population": 2,
           "culture_points": 37,
-          "effect_value": 16,
-          "effect_description": "16 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 20.6%；擴張槽 1",
           "cp_per_day": 37
         },
         {
@@ -3752,8 +3752,8 @@
           "build_time_base": 39770,
           "population": 2,
           "culture_points": 44,
-          "effect_value": 17,
-          "effect_description": "17 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 18.5%；擴張槽 1",
           "cp_per_day": 44
         },
         {
@@ -3765,8 +3765,8 @@
           "build_time_base": 46440,
           "population": 2,
           "culture_points": 53,
-          "effect_value": 18,
-          "effect_description": "18 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 16.7%；擴張槽 1",
           "cp_per_day": 53
         },
         {
@@ -3778,8 +3778,8 @@
           "build_time_base": 54170,
           "population": 2,
           "culture_points": 64,
-          "effect_value": 19,
-          "effect_description": "19 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 15%；擴張槽 1",
           "cp_per_day": 64
         },
         {
@@ -3791,8 +3791,8 @@
           "build_time_base": 63130,
           "population": 2,
           "culture_points": 77,
-          "effect_value": 20,
-          "effect_description": "可訓練第3名開拓者",
+          "effect_value": 2.0,
+          "effect_description": "訓練時間 13.5%；擴張槽 2",
           "cp_per_day": 77
         }
       ],
@@ -3826,8 +3826,8 @@
           "build_time_base": 5000,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 1,
-          "effect_description": "可訓練開拓者",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 100%；擴張槽 0",
           "cp_per_day": 6
         },
         {
@@ -3839,8 +3839,8 @@
           "build_time_base": 6100,
           "population": 1,
           "culture_points": 7,
-          "effect_value": 2,
-          "effect_description": "2 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 90%；擴張槽 0",
           "cp_per_day": 7
         },
         {
@@ -3852,8 +3852,8 @@
           "build_time_base": 7380,
           "population": 1,
           "culture_points": 9,
-          "effect_value": 3,
-          "effect_description": "3 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 81%；擴張槽 0",
           "cp_per_day": 9
         },
         {
@@ -3865,8 +3865,8 @@
           "build_time_base": 8860,
           "population": 1,
           "culture_points": 10,
-          "effect_value": 4,
-          "effect_description": "4 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 72.9%；擴張槽 0",
           "cp_per_day": 10
         },
         {
@@ -3878,8 +3878,8 @@
           "build_time_base": 10570,
           "population": 1,
           "culture_points": 12,
-          "effect_value": 5,
-          "effect_description": "5 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 65.6%；擴張槽 0",
           "cp_per_day": 12
         },
         {
@@ -3891,8 +3891,8 @@
           "build_time_base": 12560,
           "population": 1,
           "culture_points": 15,
-          "effect_value": 6,
-          "effect_description": "6 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 59%；擴張槽 0",
           "cp_per_day": 15
         },
         {
@@ -3904,8 +3904,8 @@
           "build_time_base": 14880,
           "population": 1,
           "culture_points": 18,
-          "effect_value": 7,
-          "effect_description": "7 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 53.1%；擴張槽 0",
           "cp_per_day": 18
         },
         {
@@ -3917,8 +3917,8 @@
           "build_time_base": 17560,
           "population": 1,
           "culture_points": 21,
-          "effect_value": 8,
-          "effect_description": "8 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 47.8%；擴張槽 0",
           "cp_per_day": 21
         },
         {
@@ -3930,8 +3930,8 @@
           "build_time_base": 20660,
           "population": 1,
           "culture_points": 26,
-          "effect_value": 9,
-          "effect_description": "9 格擴張槽",
+          "effect_value": 0.0,
+          "effect_description": "訓練時間 43%；擴張槽 0",
           "cp_per_day": 26
         },
         {
@@ -3943,8 +3943,8 @@
           "build_time_base": 24270,
           "population": 1,
           "culture_points": 31,
-          "effect_value": 10,
-          "effect_description": "可訓練管理者",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 38.7%；擴張槽 1",
           "cp_per_day": 31
         },
         {
@@ -3956,8 +3956,8 @@
           "build_time_base": 28450,
           "population": 2,
           "culture_points": 37,
-          "effect_value": 11,
-          "effect_description": "11 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 34.9%；擴張槽 1",
           "cp_per_day": 37
         },
         {
@@ -3969,8 +3969,8 @@
           "build_time_base": 33310,
           "population": 2,
           "culture_points": 45,
-          "effect_value": 12,
-          "effect_description": "12 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 31.4%；擴張槽 1",
           "cp_per_day": 45
         },
         {
@@ -3982,8 +3982,8 @@
           "build_time_base": 38940,
           "population": 2,
           "culture_points": 53,
-          "effect_value": 13,
-          "effect_description": "13 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 28.2%；擴張槽 1",
           "cp_per_day": 53
         },
         {
@@ -3995,8 +3995,8 @@
           "build_time_base": 45460,
           "population": 2,
           "culture_points": 64,
-          "effect_value": 14,
-          "effect_description": "14 格擴張槽",
+          "effect_value": 1.0,
+          "effect_description": "訓練時間 25.4%；擴張槽 1",
           "cp_per_day": 64
         },
         {
@@ -4008,8 +4008,8 @@
           "build_time_base": 53040,
           "population": 2,
           "culture_points": 77,
-          "effect_value": 15,
-          "effect_description": "可移動首都",
+          "effect_value": 2.0,
+          "effect_description": "訓練時間 22.9%；擴張槽 2",
           "cp_per_day": 77
         },
         {
@@ -4021,8 +4021,8 @@
           "build_time_base": 61830,
           "population": 2,
           "culture_points": 92,
-          "effect_value": 16,
-          "effect_description": "16 格擴張槽",
+          "effect_value": 2.0,
+          "effect_description": "訓練時間 20.6%；擴張槽 2",
           "cp_per_day": 92
         },
         {
@@ -4034,8 +4034,8 @@
           "build_time_base": 72020,
           "population": 2,
           "culture_points": 111,
-          "effect_value": 17,
-          "effect_description": "17 格擴張槽",
+          "effect_value": 2.0,
+          "effect_description": "訓練時間 18.5%；擴張槽 2",
           "cp_per_day": 111
         },
         {
@@ -4047,8 +4047,8 @@
           "build_time_base": 83840,
           "population": 2,
           "culture_points": 133,
-          "effect_value": 18,
-          "effect_description": "18 格擴張槽",
+          "effect_value": 2.0,
+          "effect_description": "訓練時間 16.7%；擴張槽 2",
           "cp_per_day": 133
         },
         {
@@ -4060,8 +4060,8 @@
           "build_time_base": 97550,
           "population": 2,
           "culture_points": 160,
-          "effect_value": 19,
-          "effect_description": "19 格擴張槽",
+          "effect_value": 2.0,
+          "effect_description": "訓練時間 15%；擴張槽 2",
           "cp_per_day": 160
         },
         {
@@ -4073,8 +4073,8 @@
           "build_time_base": 113460,
           "population": 2,
           "culture_points": 192,
-          "effect_value": 20,
-          "effect_description": "可訓練第3名開拓者",
+          "effect_value": 3.0,
+          "effect_description": "訓練時間 13.5%；擴張槽 3",
           "cp_per_day": 192
         }
       ],
@@ -4388,8 +4388,8 @@
           "build_time_base": 2300,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 0,
-          "effect_description": "英雄可在此居住",
+          "effect_value": 0.0,
+          "effect_description": "可佔綠洲 0",
           "cp_per_day": 1
         },
         {
@@ -4401,8 +4401,8 @@
           "build_time_base": 2670,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 0,
-          "effect_description": "2 級英雄宅",
+          "effect_value": 0.0,
+          "effect_description": "可佔綠洲 0",
           "cp_per_day": 1
         },
         {
@@ -4414,8 +4414,8 @@
           "build_time_base": 3090,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 0,
-          "effect_description": "3 級英雄宅",
+          "effect_value": 0.0,
+          "effect_description": "可佔綠洲 0",
           "cp_per_day": 2
         },
         {
@@ -4427,8 +4427,8 @@
           "build_time_base": 3590,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 0,
-          "effect_description": "4 級英雄宅",
+          "effect_value": 0.0,
+          "effect_description": "可佔綠洲 0",
           "cp_per_day": 2
         },
         {
@@ -4440,8 +4440,8 @@
           "build_time_base": 4160,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 0,
-          "effect_description": "5 級英雄宅",
+          "effect_value": 0.0,
+          "effect_description": "可佔綠洲 0",
           "cp_per_day": 2
         },
         {
@@ -4453,8 +4453,8 @@
           "build_time_base": 4830,
           "population": 2,
           "culture_points": 3,
-          "effect_value": 0,
-          "effect_description": "6 級英雄宅",
+          "effect_value": 0.0,
+          "effect_description": "可佔綠洲 0",
           "cp_per_day": 3
         },
         {
@@ -4466,8 +4466,8 @@
           "build_time_base": 5600,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 0,
-          "effect_description": "7 級英雄宅",
+          "effect_value": 0.0,
+          "effect_description": "可佔綠洲 0",
           "cp_per_day": 4
         },
         {
@@ -4479,8 +4479,8 @@
           "build_time_base": 6500,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 0,
-          "effect_description": "8 級英雄宅",
+          "effect_value": 0.0,
+          "effect_description": "可佔綠洲 0",
           "cp_per_day": 4
         },
         {
@@ -4492,8 +4492,8 @@
           "build_time_base": 7540,
           "population": 2,
           "culture_points": 5,
-          "effect_value": 0,
-          "effect_description": "9 級英雄宅",
+          "effect_value": 0.0,
+          "effect_description": "可佔綠洲 0",
           "cp_per_day": 5
         },
         {
@@ -4505,8 +4505,8 @@
           "build_time_base": 8750,
           "population": 2,
           "culture_points": 6,
-          "effect_value": 1,
-          "effect_description": "可佔領 1 個綠洲",
+          "effect_value": 1.0,
+          "effect_description": "可佔綠洲 1",
           "cp_per_day": 6
         },
         {
@@ -4518,8 +4518,8 @@
           "build_time_base": 10150,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 1,
-          "effect_description": "1 個綠洲",
+          "effect_value": 1.0,
+          "effect_description": "可佔綠洲 1",
           "cp_per_day": 7
         },
         {
@@ -4531,8 +4531,8 @@
           "build_time_base": 11770,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 1,
-          "effect_description": "1 個綠洲",
+          "effect_value": 1.0,
+          "effect_description": "可佔綠洲 1",
           "cp_per_day": 9
         },
         {
@@ -4544,8 +4544,8 @@
           "build_time_base": 13650,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 1,
-          "effect_description": "1 個綠洲",
+          "effect_value": 1.0,
+          "effect_description": "可佔綠洲 1",
           "cp_per_day": 11
         },
         {
@@ -4557,8 +4557,8 @@
           "build_time_base": 15840,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 1,
-          "effect_description": "1 個綠洲",
+          "effect_value": 1.0,
+          "effect_description": "可佔綠洲 1",
           "cp_per_day": 13
         },
         {
@@ -4570,8 +4570,8 @@
           "build_time_base": 18370,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 2,
-          "effect_description": "可佔領 2 個綠洲",
+          "effect_value": 2.0,
+          "effect_description": "可佔綠洲 2",
           "cp_per_day": 15
         },
         {
@@ -4583,8 +4583,8 @@
           "build_time_base": 21310,
           "population": 3,
           "culture_points": 18,
-          "effect_value": 2,
-          "effect_description": "2 個綠洲",
+          "effect_value": 2.0,
+          "effect_description": "可佔綠洲 2",
           "cp_per_day": 18
         },
         {
@@ -4596,8 +4596,8 @@
           "build_time_base": 24720,
           "population": 3,
           "culture_points": 22,
-          "effect_value": 2,
-          "effect_description": "2 個綠洲",
+          "effect_value": 2.0,
+          "effect_description": "可佔綠洲 2",
           "cp_per_day": 22
         },
         {
@@ -4609,8 +4609,8 @@
           "build_time_base": 28680,
           "population": 3,
           "culture_points": 27,
-          "effect_value": 2,
-          "effect_description": "2 個綠洲",
+          "effect_value": 2.0,
+          "effect_description": "可佔綠洲 2",
           "cp_per_day": 27
         },
         {
@@ -4622,8 +4622,8 @@
           "build_time_base": 33260,
           "population": 3,
           "culture_points": 32,
-          "effect_value": 2,
-          "effect_description": "2 個綠洲",
+          "effect_value": 2.0,
+          "effect_description": "可佔綠洲 2",
           "cp_per_day": 32
         },
         {
@@ -4635,8 +4635,8 @@
           "build_time_base": 38590,
           "population": 3,
           "culture_points": 38,
-          "effect_value": 3,
-          "effect_description": "可佔領 3 個綠洲",
+          "effect_value": 3.0,
+          "effect_description": "可佔綠洲 3",
           "cp_per_day": 38
         }
       ],
@@ -4672,7 +4672,7 @@
           "build_time_base": 3000,
           "population": 4,
           "culture_points": 1,
-          "effect_value": 5,
+          "effect_value": 5.0,
           "effect_description": "木材 +5%",
           "cp_per_day": 1
         },
@@ -4685,7 +4685,7 @@
           "build_time_base": 5700,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 10,
+          "effect_value": 10.0,
           "effect_description": "木材 +10%",
           "cp_per_day": 1
         },
@@ -4698,7 +4698,7 @@
           "build_time_base": 9750,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 15,
+          "effect_value": 15.0,
           "effect_description": "木材 +15%",
           "cp_per_day": 2
         },
@@ -4711,7 +4711,7 @@
           "build_time_base": 15830,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 20,
+          "effect_value": 20.0,
           "effect_description": "木材 +20%",
           "cp_per_day": 2
         },
@@ -4724,7 +4724,7 @@
           "build_time_base": 24940,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 25,
+          "effect_value": 25.0,
           "effect_description": "木材 +25%",
           "cp_per_day": 2
         }
@@ -4759,7 +4759,7 @@
           "build_time_base": 2240,
           "population": 3,
           "culture_points": 1,
-          "effect_value": 5,
+          "effect_value": 5.0,
           "effect_description": "磚塊 +5%",
           "cp_per_day": 1
         },
@@ -4772,7 +4772,7 @@
           "build_time_base": 4560,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 10,
+          "effect_value": 10.0,
           "effect_description": "磚塊 +10%",
           "cp_per_day": 1
         },
@@ -4785,7 +4785,7 @@
           "build_time_base": 8040,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 15,
+          "effect_value": 15.0,
           "effect_description": "磚塊 +15%",
           "cp_per_day": 2
         },
@@ -4798,7 +4798,7 @@
           "build_time_base": 13260,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 20,
+          "effect_value": 20.0,
           "effect_description": "磚塊 +20%",
           "cp_per_day": 2
         },
@@ -4811,7 +4811,7 @@
           "build_time_base": 21090,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 25,
+          "effect_value": 25.0,
           "effect_description": "磚塊 +25%",
           "cp_per_day": 2
         }
@@ -4846,7 +4846,7 @@
           "build_time_base": 4080,
           "population": 6,
           "culture_points": 1,
-          "effect_value": 5,
+          "effect_value": 5.0,
           "effect_description": "鐵礦 +5%",
           "cp_per_day": 1
         },
@@ -4859,7 +4859,7 @@
           "build_time_base": 7320,
           "population": 3,
           "culture_points": 1,
-          "effect_value": 10,
+          "effect_value": 10.0,
           "effect_description": "鐵礦 +10%",
           "cp_per_day": 1
         },
@@ -4872,7 +4872,7 @@
           "build_time_base": 12180,
           "population": 3,
           "culture_points": 2,
-          "effect_value": 15,
+          "effect_value": 15.0,
           "effect_description": "鐵礦 +15%",
           "cp_per_day": 2
         },
@@ -4885,7 +4885,7 @@
           "build_time_base": 19470,
           "population": 3,
           "culture_points": 2,
-          "effect_value": 20,
+          "effect_value": 20.0,
           "effect_description": "鐵礦 +20%",
           "cp_per_day": 2
         },
@@ -4898,7 +4898,7 @@
           "build_time_base": 30410,
           "population": 3,
           "culture_points": 2,
-          "effect_value": 25,
+          "effect_value": 25.0,
           "effect_description": "鐵礦 +25%",
           "cp_per_day": 2
         }
@@ -4936,7 +4936,7 @@
           "build_time_base": 1840,
           "population": 3,
           "culture_points": 1,
-          "effect_value": 5,
+          "effect_value": 5.0,
           "effect_description": "糧食 +5%",
           "cp_per_day": 1
         },
@@ -4949,7 +4949,7 @@
           "build_time_base": 3960,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 10,
+          "effect_value": 10.0,
           "effect_description": "糧食 +10%",
           "cp_per_day": 1
         },
@@ -4962,7 +4962,7 @@
           "build_time_base": 7140,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 15,
+          "effect_value": 15.0,
           "effect_description": "糧食 +15%",
           "cp_per_day": 2
         },
@@ -4975,7 +4975,7 @@
           "build_time_base": 11910,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 20,
+          "effect_value": 20.0,
           "effect_description": "糧食 +20%",
           "cp_per_day": 2
         },
@@ -4988,7 +4988,7 @@
           "build_time_base": 19070,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 25,
+          "effect_value": 25.0,
           "effect_description": "糧食 +25%",
           "cp_per_day": 2
         }
@@ -5029,8 +5029,8 @@
           "build_time_base": 3680,
           "population": 4,
           "culture_points": 1,
-          "effect_value": 5,
-          "effect_description": "糧食額外 +5%",
+          "effect_value": 5.0,
+          "effect_description": "糧食 +5%",
           "cp_per_day": 1
         },
         {
@@ -5042,8 +5042,8 @@
           "build_time_base": 6720,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 10,
-          "effect_description": "糧食額外 +10%",
+          "effect_value": 10.0,
+          "effect_description": "糧食 +10%",
           "cp_per_day": 1
         },
         {
@@ -5055,8 +5055,8 @@
           "build_time_base": 11280,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 15,
-          "effect_description": "糧食額外 +15%",
+          "effect_value": 15.0,
+          "effect_description": "糧食 +15%",
           "cp_per_day": 2
         },
         {
@@ -5068,8 +5068,8 @@
           "build_time_base": 18120,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 20,
-          "effect_description": "糧食額外 +20%",
+          "effect_value": 20.0,
+          "effect_description": "糧食 +20%",
           "cp_per_day": 2
         },
         {
@@ -5081,8 +5081,8 @@
           "build_time_base": 28380,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 25,
-          "effect_description": "糧食額外 +25%",
+          "effect_value": 25.0,
+          "effect_description": "糧食 +25%",
           "cp_per_day": 2
         }
       ],
@@ -5118,8 +5118,8 @@
           "build_time_base": 2200,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 2,
-          "effect_description": "建築耐久 +2%",
+          "effect_value": 10.0,
+          "effect_description": "建築耐久 +10%",
           "cp_per_day": 1
         },
         {
@@ -5131,8 +5131,8 @@
           "build_time_base": 3150,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 4,
-          "effect_description": "建築耐久 +4%",
+          "effect_value": 20.0,
+          "effect_description": "建築耐久 +20%",
           "cp_per_day": 1
         },
         {
@@ -5144,8 +5144,8 @@
           "build_time_base": 4260,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 6,
-          "effect_description": "建築耐久 +6%",
+          "effect_value": 30.0,
+          "effect_description": "建築耐久 +30%",
           "cp_per_day": 2
         },
         {
@@ -5157,8 +5157,8 @@
           "build_time_base": 5540,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 8,
-          "effect_description": "建築耐久 +8%",
+          "effect_value": 40.0,
+          "effect_description": "建築耐久 +40%",
           "cp_per_day": 2
         },
         {
@@ -5170,8 +5170,8 @@
           "build_time_base": 7020,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 10,
-          "effect_description": "建築耐久 +10%",
+          "effect_value": 50.0,
+          "effect_description": "建築耐久 +50%",
           "cp_per_day": 2
         },
         {
@@ -5183,8 +5183,8 @@
           "build_time_base": 8750,
           "population": 2,
           "culture_points": 3,
-          "effect_value": 12,
-          "effect_description": "建築耐久 +12%",
+          "effect_value": 60.0,
+          "effect_description": "建築耐久 +60%",
           "cp_per_day": 3
         },
         {
@@ -5196,8 +5196,8 @@
           "build_time_base": 10750,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 14,
-          "effect_description": "建築耐久 +14%",
+          "effect_value": 70.0,
+          "effect_description": "建築耐久 +70%",
           "cp_per_day": 4
         },
         {
@@ -5209,8 +5209,8 @@
           "build_time_base": 13070,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 16,
-          "effect_description": "建築耐久 +16%",
+          "effect_value": 80.0,
+          "effect_description": "建築耐久 +80%",
           "cp_per_day": 4
         },
         {
@@ -5222,8 +5222,8 @@
           "build_time_base": 15760,
           "population": 2,
           "culture_points": 5,
-          "effect_value": 18,
-          "effect_description": "建築耐久 +18%",
+          "effect_value": 90.0,
+          "effect_description": "建築耐久 +90%",
           "cp_per_day": 5
         },
         {
@@ -5235,8 +5235,8 @@
           "build_time_base": 18880,
           "population": 2,
           "culture_points": 6,
-          "effect_value": 20,
-          "effect_description": "建築耐久 +20%",
+          "effect_value": 100.0,
+          "effect_description": "建築耐久 +100%",
           "cp_per_day": 6
         },
         {
@@ -5248,8 +5248,8 @@
           "build_time_base": 22500,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 22,
-          "effect_description": "建築耐久 +22%",
+          "effect_value": 110.0,
+          "effect_description": "建築耐久 +110%",
           "cp_per_day": 7
         },
         {
@@ -5261,8 +5261,8 @@
           "build_time_base": 26700,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 24,
-          "effect_description": "建築耐久 +24%",
+          "effect_value": 120.0,
+          "effect_description": "建築耐久 +120%",
           "cp_per_day": 9
         },
         {
@@ -5274,8 +5274,8 @@
           "build_time_base": 31570,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 26,
-          "effect_description": "建築耐久 +26%",
+          "effect_value": 130.0,
+          "effect_description": "建築耐久 +130%",
           "cp_per_day": 11
         },
         {
@@ -5287,8 +5287,8 @@
           "build_time_base": 37220,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 28,
-          "effect_description": "建築耐久 +28%",
+          "effect_value": 140.0,
+          "effect_description": "建築耐久 +140%",
           "cp_per_day": 13
         },
         {
@@ -5300,8 +5300,8 @@
           "build_time_base": 43780,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 30,
-          "effect_description": "建築耐久 +30%",
+          "effect_value": 150.0,
+          "effect_description": "建築耐久 +150%",
           "cp_per_day": 15
         },
         {
@@ -5313,8 +5313,8 @@
           "build_time_base": 51380,
           "population": 3,
           "culture_points": 18,
-          "effect_value": 32,
-          "effect_description": "建築耐久 +32%",
+          "effect_value": 160.0,
+          "effect_description": "建築耐久 +160%",
           "cp_per_day": 18
         },
         {
@@ -5326,8 +5326,8 @@
           "build_time_base": 60200,
           "population": 3,
           "culture_points": 22,
-          "effect_value": 34,
-          "effect_description": "建築耐久 +34%",
+          "effect_value": 170.0,
+          "effect_description": "建築耐久 +170%",
           "cp_per_day": 22
         },
         {
@@ -5339,8 +5339,8 @@
           "build_time_base": 70430,
           "population": 3,
           "culture_points": 27,
-          "effect_value": 36,
-          "effect_description": "建築耐久 +36%",
+          "effect_value": 180.0,
+          "effect_description": "建築耐久 +180%",
           "cp_per_day": 27
         },
         {
@@ -5352,8 +5352,8 @@
           "build_time_base": 82300,
           "population": 3,
           "culture_points": 32,
-          "effect_value": 38,
-          "effect_description": "建築耐久 +38%",
+          "effect_value": 190.0,
+          "effect_description": "建築耐久 +190%",
           "cp_per_day": 32
         },
         {
@@ -5365,8 +5365,8 @@
           "build_time_base": 96070,
           "population": 3,
           "culture_points": 38,
-          "effect_value": 40,
-          "effect_description": "建築耐久 +40%",
+          "effect_value": 200.0,
+          "effect_description": "建築耐久 +200%",
           "cp_per_day": 38
         }
       ],
@@ -5406,8 +5406,8 @@
           "build_time_base": 3000,
           "population": 3,
           "culture_points": 4,
-          "effect_value": 20,
-          "effect_description": "商人攜帶量 +20%",
+          "effect_value": 20.0,
+          "effect_description": "商人運載量 +20%（羅馬人 +40%）",
           "cp_per_day": 4
         },
         {
@@ -5419,8 +5419,8 @@
           "build_time_base": 3780,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 40,
-          "effect_description": "商人攜帶量 +40%",
+          "effect_value": 40.0,
+          "effect_description": "商人運載量 +40%（羅馬人 +80%）",
           "cp_per_day": 4
         },
         {
@@ -5432,8 +5432,8 @@
           "build_time_base": 4680,
           "population": 2,
           "culture_points": 5,
-          "effect_value": 60,
-          "effect_description": "商人攜帶量 +60%",
+          "effect_value": 60.0,
+          "effect_description": "商人運載量 +60%（羅馬人 +120%）",
           "cp_per_day": 5
         },
         {
@@ -5445,8 +5445,8 @@
           "build_time_base": 5730,
           "population": 2,
           "culture_points": 6,
-          "effect_value": 80,
-          "effect_description": "商人攜帶量 +80%",
+          "effect_value": 80.0,
+          "effect_description": "商人運載量 +80%（羅馬人 +160%）",
           "cp_per_day": 6
         },
         {
@@ -5458,8 +5458,8 @@
           "build_time_base": 6950,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 100,
-          "effect_description": "商人攜帶量 +100%",
+          "effect_value": 100.0,
+          "effect_description": "商人運載量 +100%（羅馬人 +200%）",
           "cp_per_day": 7
         },
         {
@@ -5471,8 +5471,8 @@
           "build_time_base": 8360,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 120,
-          "effect_description": "商人攜帶量 +120%",
+          "effect_value": 120.0,
+          "effect_description": "商人運載量 +120%（羅馬人 +240%）",
           "cp_per_day": 9
         },
         {
@@ -5484,8 +5484,8 @@
           "build_time_base": 10000,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 140,
-          "effect_description": "商人攜帶量 +140%",
+          "effect_value": 140.0,
+          "effect_description": "商人運載量 +140%（羅馬人 +280%）",
           "cp_per_day": 11
         },
         {
@@ -5497,8 +5497,8 @@
           "build_time_base": 11900,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 160,
-          "effect_description": "商人攜帶量 +160%",
+          "effect_value": 160.0,
+          "effect_description": "商人運載量 +160%（羅馬人 +320%）",
           "cp_per_day": 13
         },
         {
@@ -5510,8 +5510,8 @@
           "build_time_base": 14110,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 180,
-          "effect_description": "商人攜帶量 +180%",
+          "effect_value": 180.0,
+          "effect_description": "商人運載量 +180%（羅馬人 +360%）",
           "cp_per_day": 15
         },
         {
@@ -5523,8 +5523,8 @@
           "build_time_base": 16660,
           "population": 2,
           "culture_points": 19,
-          "effect_value": 200,
-          "effect_description": "商人攜帶量 +200%",
+          "effect_value": 200.0,
+          "effect_description": "商人運載量 +200%（羅馬人 +400%）",
           "cp_per_day": 19
         },
         {
@@ -5536,8 +5536,8 @@
           "build_time_base": 19630,
           "population": 3,
           "culture_points": 22,
-          "effect_value": 220,
-          "effect_description": "商人攜帶量 +220%",
+          "effect_value": 220.0,
+          "effect_description": "商人運載量 +220%（羅馬人 +440%）",
           "cp_per_day": 22
         },
         {
@@ -5549,8 +5549,8 @@
           "build_time_base": 23070,
           "population": 3,
           "culture_points": 27,
-          "effect_value": 240,
-          "effect_description": "商人攜帶量 +240%",
+          "effect_value": 240.0,
+          "effect_description": "商人運載量 +240%（羅馬人 +480%）",
           "cp_per_day": 27
         },
         {
@@ -5562,8 +5562,8 @@
           "build_time_base": 27060,
           "population": 3,
           "culture_points": 32,
-          "effect_value": 260,
-          "effect_description": "商人攜帶量 +260%",
+          "effect_value": 260.0,
+          "effect_description": "商人運載量 +260%（羅馬人 +520%）",
           "cp_per_day": 32
         },
         {
@@ -5575,8 +5575,8 @@
           "build_time_base": 31690,
           "population": 3,
           "culture_points": 39,
-          "effect_value": 280,
-          "effect_description": "商人攜帶量 +280%",
+          "effect_value": 280.0,
+          "effect_description": "商人運載量 +280%（羅馬人 +560%）",
           "cp_per_day": 39
         },
         {
@@ -5588,8 +5588,8 @@
           "build_time_base": 37060,
           "population": 3,
           "culture_points": 46,
-          "effect_value": 300,
-          "effect_description": "商人攜帶量 +300%",
+          "effect_value": 300.0,
+          "effect_description": "商人運載量 +300%（羅馬人 +600%）",
           "cp_per_day": 46
         },
         {
@@ -5601,8 +5601,8 @@
           "build_time_base": 43290,
           "population": 3,
           "culture_points": 55,
-          "effect_value": 320,
-          "effect_description": "商人攜帶量 +320%",
+          "effect_value": 320.0,
+          "effect_description": "商人運載量 +320%（羅馬人 +640%）",
           "cp_per_day": 55
         },
         {
@@ -5614,8 +5614,8 @@
           "build_time_base": 50520,
           "population": 3,
           "culture_points": 67,
-          "effect_value": 340,
-          "effect_description": "商人攜帶量 +340%",
+          "effect_value": 340.0,
+          "effect_description": "商人運載量 +340%（羅馬人 +680%）",
           "cp_per_day": 67
         },
         {
@@ -5627,8 +5627,8 @@
           "build_time_base": 58900,
           "population": 3,
           "culture_points": 80,
-          "effect_value": 360,
-          "effect_description": "商人攜帶量 +360%",
+          "effect_value": 360.0,
+          "effect_description": "商人運載量 +360%（羅馬人 +720%）",
           "cp_per_day": 80
         },
         {
@@ -5640,8 +5640,8 @@
           "build_time_base": 68630,
           "population": 3,
           "culture_points": 96,
-          "effect_value": 380,
-          "effect_description": "商人攜帶量 +380%",
+          "effect_value": 380.0,
+          "effect_description": "商人運載量 +380%（羅馬人 +760%）",
           "cp_per_day": 96
         },
         {
@@ -5653,8 +5653,8 @@
           "build_time_base": 79910,
           "population": 3,
           "culture_points": 115,
-          "effect_value": 400,
-          "effect_description": "商人攜帶量 +400%",
+          "effect_value": 400.0,
+          "effect_description": "商人運載量 +400%（羅馬人 +800%）",
           "cp_per_day": 115
         }
       ],
@@ -5687,8 +5687,8 @@
           "build_time_base": 3500,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 20,
-          "effect_description": "超過20格速度 +20%",
+          "effect_value": 20.0,
+          "effect_description": "超過 20 格速度 +20%",
           "cp_per_day": 1
         },
         {
@@ -5700,8 +5700,8 @@
           "build_time_base": 4360,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 40,
-          "effect_description": "超過20格速度 +40%",
+          "effect_value": 40.0,
+          "effect_description": "超過 20 格速度 +40%",
           "cp_per_day": 1
         },
         {
@@ -5713,8 +5713,8 @@
           "build_time_base": 5360,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 60,
-          "effect_description": "超過20格速度 +60%",
+          "effect_value": 60.0,
+          "effect_description": "超過 20 格速度 +60%",
           "cp_per_day": 2
         },
         {
@@ -5726,8 +5726,8 @@
           "build_time_base": 6510,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 80,
-          "effect_description": "超過20格速度 +80%",
+          "effect_value": 80.0,
+          "effect_description": "超過 20 格速度 +80%",
           "cp_per_day": 2
         },
         {
@@ -5739,8 +5739,8 @@
           "build_time_base": 7860,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 100,
-          "effect_description": "超過20格速度 +100%",
+          "effect_value": 100.0,
+          "effect_description": "超過 20 格速度 +100%",
           "cp_per_day": 2
         },
         {
@@ -5752,8 +5752,8 @@
           "build_time_base": 9410,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 120,
-          "effect_description": "超過20格速度 +120%",
+          "effect_value": 120.0,
+          "effect_description": "超過 20 格速度 +120%",
           "cp_per_day": 3
         },
         {
@@ -5765,8 +5765,8 @@
           "build_time_base": 11220,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 140,
-          "effect_description": "超過20格速度 +140%",
+          "effect_value": 140.0,
+          "effect_description": "超過 20 格速度 +140%",
           "cp_per_day": 4
         },
         {
@@ -5778,8 +5778,8 @@
           "build_time_base": 13320,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 160,
-          "effect_description": "超過20格速度 +160%",
+          "effect_value": 160.0,
+          "effect_description": "超過 20 格速度 +160%",
           "cp_per_day": 4
         },
         {
@@ -5791,8 +5791,8 @@
           "build_time_base": 15750,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 180,
-          "effect_description": "超過20格速度 +180%",
+          "effect_value": 180.0,
+          "effect_description": "超過 20 格速度 +180%",
           "cp_per_day": 5
         },
         {
@@ -5804,8 +5804,8 @@
           "build_time_base": 18570,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 200,
-          "effect_description": "超過20格速度 +200%",
+          "effect_value": 200.0,
+          "effect_description": "超過 20 格速度 +200%",
           "cp_per_day": 6
         },
         {
@@ -5817,8 +5817,8 @@
           "build_time_base": 21840,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 220,
-          "effect_description": "超過20格速度 +220%",
+          "effect_value": 220.0,
+          "effect_description": "超過 20 格速度 +220%",
           "cp_per_day": 7
         },
         {
@@ -5830,8 +5830,8 @@
           "build_time_base": 25630,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 240,
-          "effect_description": "超過20格速度 +240%",
+          "effect_value": 240.0,
+          "effect_description": "超過 20 格速度 +240%",
           "cp_per_day": 9
         },
         {
@@ -5843,8 +5843,8 @@
           "build_time_base": 30030,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 260,
-          "effect_description": "超過20格速度 +260%",
+          "effect_value": 260.0,
+          "effect_description": "超過 20 格速度 +260%",
           "cp_per_day": 11
         },
         {
@@ -5856,8 +5856,8 @@
           "build_time_base": 35140,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 280,
-          "effect_description": "超過20格速度 +280%",
+          "effect_value": 280.0,
+          "effect_description": "超過 20 格速度 +280%",
           "cp_per_day": 13
         },
         {
@@ -5869,8 +5869,8 @@
           "build_time_base": 41060,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 300,
-          "effect_description": "超過20格速度 +300%",
+          "effect_value": 300.0,
+          "effect_description": "超過 20 格速度 +300%",
           "cp_per_day": 15
         },
         {
@@ -5882,8 +5882,8 @@
           "build_time_base": 47930,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 320,
-          "effect_description": "超過20格速度 +320%",
+          "effect_value": 320.0,
+          "effect_description": "超過 20 格速度 +320%",
           "cp_per_day": 18
         },
         {
@@ -5895,8 +5895,8 @@
           "build_time_base": 55900,
           "population": 2,
           "culture_points": 22,
-          "effect_value": 340,
-          "effect_description": "超過20格速度 +340%",
+          "effect_value": 340.0,
+          "effect_description": "超過 20 格速度 +340%",
           "cp_per_day": 22
         },
         {
@@ -5908,8 +5908,8 @@
           "build_time_base": 65140,
           "population": 2,
           "culture_points": 27,
-          "effect_value": 360,
-          "effect_description": "超過20格速度 +360%",
+          "effect_value": 360.0,
+          "effect_description": "超過 20 格速度 +360%",
           "cp_per_day": 27
         },
         {
@@ -5921,8 +5921,8 @@
           "build_time_base": 75860,
           "population": 2,
           "culture_points": 32,
-          "effect_value": 380,
-          "effect_description": "超過20格速度 +380%",
+          "effect_value": 380.0,
+          "effect_description": "超過 20 格速度 +380%",
           "cp_per_day": 32
         },
         {
@@ -5934,8 +5934,8 @@
           "build_time_base": 88300,
           "population": 2,
           "culture_points": 38,
-          "effect_value": 400,
-          "effect_description": "超過20格速度 +400%",
+          "effect_value": 400.0,
+          "effect_description": "超過 20 格速度 +400%",
           "cp_per_day": 38
         }
       ],
@@ -5963,8 +5963,8 @@
           "build_time_base": 2000,
           "population": 0,
           "culture_points": 1,
-          "effect_value": 3,
-          "effect_description": "防禦 +3%",
+          "effect_value": 3.0,
+          "effect_description": "防禦 +3%、基礎防禦 +10",
           "cp_per_day": 1
         },
         {
@@ -5976,8 +5976,8 @@
           "build_time_base": 2620,
           "population": 0,
           "culture_points": 1,
-          "effect_value": 6,
-          "effect_description": "防禦 +6%",
+          "effect_value": 6.1,
+          "effect_description": "防禦 +6.1%、基礎防禦 +20",
           "cp_per_day": 1
         },
         {
@@ -5989,8 +5989,8 @@
           "build_time_base": 3340,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 9,
-          "effect_description": "防禦 +9%",
+          "effect_value": 9.3,
+          "effect_description": "防禦 +9.3%、基礎防禦 +30",
           "cp_per_day": 2
         },
         {
@@ -6002,8 +6002,8 @@
           "build_time_base": 4170,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 13,
-          "effect_description": "防禦 +13%",
+          "effect_value": 12.6,
+          "effect_description": "防禦 +12.6%、基礎防禦 +40",
           "cp_per_day": 2
         },
         {
@@ -6015,8 +6015,8 @@
           "build_time_base": 5140,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 16,
-          "effect_description": "防禦 +16%",
+          "effect_value": 15.9,
+          "effect_description": "防禦 +15.9%、基礎防禦 +50",
           "cp_per_day": 2
         },
         {
@@ -6028,8 +6028,8 @@
           "build_time_base": 6260,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 19,
-          "effect_description": "防禦 +19%",
+          "effect_value": 19.4,
+          "effect_description": "防禦 +19.4%、基礎防禦 +60",
           "cp_per_day": 3
         },
         {
@@ -6041,8 +6041,8 @@
           "build_time_base": 7570,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 23,
-          "effect_description": "防禦 +23%",
+          "effect_value": 23.0,
+          "effect_description": "防禦 +23%、基礎防禦 +70",
           "cp_per_day": 4
         },
         {
@@ -6054,8 +6054,8 @@
           "build_time_base": 9080,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 26,
-          "effect_description": "防禦 +26%",
+          "effect_value": 26.7,
+          "effect_description": "防禦 +26.7%、基礎防禦 +80",
           "cp_per_day": 4
         },
         {
@@ -6067,8 +6067,8 @@
           "build_time_base": 10830,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 30,
-          "effect_description": "防禦 +30%",
+          "effect_value": 30.5,
+          "effect_description": "防禦 +30.5%、基礎防禦 +90",
           "cp_per_day": 5
         },
         {
@@ -6080,8 +6080,8 @@
           "build_time_base": 12860,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 34,
-          "effect_description": "防禦 +34%",
+          "effect_value": 34.4,
+          "effect_description": "防禦 +34.4%、基礎防禦 +100",
           "cp_per_day": 6
         },
         {
@@ -6093,8 +6093,8 @@
           "build_time_base": 15220,
           "population": 1,
           "culture_points": 7,
-          "effect_value": 37,
-          "effect_description": "防禦 +37%",
+          "effect_value": 38.4,
+          "effect_description": "防禦 +38.4%、基礎防禦 +110",
           "cp_per_day": 7
         },
         {
@@ -6106,8 +6106,8 @@
           "build_time_base": 17950,
           "population": 1,
           "culture_points": 9,
-          "effect_value": 41,
-          "effect_description": "防禦 +41%",
+          "effect_value": 42.6,
+          "effect_description": "防禦 +42.6%、基礎防禦 +120",
           "cp_per_day": 9
         },
         {
@@ -6119,8 +6119,8 @@
           "build_time_base": 21130,
           "population": 1,
           "culture_points": 11,
-          "effect_value": 45,
-          "effect_description": "防禦 +45%",
+          "effect_value": 46.9,
+          "effect_description": "防禦 +46.9%、基礎防禦 +130",
           "cp_per_day": 11
         },
         {
@@ -6132,8 +6132,8 @@
           "build_time_base": 24810,
           "population": 1,
           "culture_points": 13,
-          "effect_value": 49,
-          "effect_description": "防禦 +49%",
+          "effect_value": 51.3,
+          "effect_description": "防禦 +51.3%、基礎防禦 +140",
           "cp_per_day": 13
         },
         {
@@ -6145,8 +6145,8 @@
           "build_time_base": 29080,
           "population": 1,
           "culture_points": 15,
-          "effect_value": 53,
-          "effect_description": "防禦 +53%",
+          "effect_value": 55.8,
+          "effect_description": "防禦 +55.8%、基礎防禦 +150",
           "cp_per_day": 15
         },
         {
@@ -6158,8 +6158,8 @@
           "build_time_base": 34030,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 57,
-          "effect_description": "防禦 +57%",
+          "effect_value": 60.5,
+          "effect_description": "防禦 +60.5%、基礎防禦 +160",
           "cp_per_day": 18
         },
         {
@@ -6171,8 +6171,8 @@
           "build_time_base": 39770,
           "population": 2,
           "culture_points": 22,
-          "effect_value": 61,
-          "effect_description": "防禦 +61%",
+          "effect_value": 65.3,
+          "effect_description": "防禦 +65.3%、基礎防禦 +170",
           "cp_per_day": 22
         },
         {
@@ -6184,8 +6184,8 @@
           "build_time_base": 46440,
           "population": 2,
           "culture_points": 27,
-          "effect_value": 66,
-          "effect_description": "防禦 +66%",
+          "effect_value": 70.2,
+          "effect_description": "防禦 +70.2%、基礎防禦 +180",
           "cp_per_day": 27
         },
         {
@@ -6197,8 +6197,8 @@
           "build_time_base": 54170,
           "population": 2,
           "culture_points": 32,
-          "effect_value": 70,
-          "effect_description": "防禦 +70%",
+          "effect_value": 75.4,
+          "effect_description": "防禦 +75.4%、基礎防禦 +190",
           "cp_per_day": 32
         },
         {
@@ -6210,8 +6210,8 @@
           "build_time_base": 63130,
           "population": 2,
           "culture_points": 38,
-          "effect_value": 81,
-          "effect_description": "防禦 +81%",
+          "effect_value": 80.6,
+          "effect_description": "防禦 +80.6%、基礎防禦 +200",
           "cp_per_day": 38
         }
       ],
@@ -6237,8 +6237,8 @@
           "build_time_base": 2000,
           "population": 0,
           "culture_points": 1,
-          "effect_value": 2,
-          "effect_description": "防禦 +2%",
+          "effect_value": 2.0,
+          "effect_description": "防禦 +2%、基礎防禦 +6",
           "cp_per_day": 1
         },
         {
@@ -6250,8 +6250,8 @@
           "build_time_base": 2620,
           "population": 0,
           "culture_points": 1,
-          "effect_value": 4,
-          "effect_description": "防禦 +4%",
+          "effect_value": 4.0,
+          "effect_description": "防禦 +4%、基礎防禦 +12",
           "cp_per_day": 1
         },
         {
@@ -6263,8 +6263,8 @@
           "build_time_base": 3340,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 6,
-          "effect_description": "防禦 +6%",
+          "effect_value": 6.1,
+          "effect_description": "防禦 +6.1%、基礎防禦 +18",
           "cp_per_day": 2
         },
         {
@@ -6276,8 +6276,8 @@
           "build_time_base": 4170,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 9,
-          "effect_description": "防禦 +9%",
+          "effect_value": 8.2,
+          "effect_description": "防禦 +8.2%、基礎防禦 +24",
           "cp_per_day": 2
         },
         {
@@ -6289,8 +6289,8 @@
           "build_time_base": 5140,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 11,
-          "effect_description": "防禦 +11%",
+          "effect_value": 10.4,
+          "effect_description": "防禦 +10.4%、基礎防禦 +30",
           "cp_per_day": 2
         },
         {
@@ -6302,8 +6302,8 @@
           "build_time_base": 6260,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 13,
-          "effect_description": "防禦 +13%",
+          "effect_value": 12.6,
+          "effect_description": "防禦 +12.6%、基礎防禦 +36",
           "cp_per_day": 3
         },
         {
@@ -6315,8 +6315,8 @@
           "build_time_base": 7570,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 16,
-          "effect_description": "防禦 +16%",
+          "effect_value": 14.9,
+          "effect_description": "防禦 +14.9%、基礎防禦 +42",
           "cp_per_day": 4
         },
         {
@@ -6328,8 +6328,8 @@
           "build_time_base": 9080,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 18,
-          "effect_description": "防禦 +18%",
+          "effect_value": 17.2,
+          "effect_description": "防禦 +17.2%、基礎防禦 +48",
           "cp_per_day": 4
         },
         {
@@ -6341,8 +6341,8 @@
           "build_time_base": 10830,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 21,
-          "effect_description": "防禦 +21%",
+          "effect_value": 19.5,
+          "effect_description": "防禦 +19.5%、基礎防禦 +54",
           "cp_per_day": 5
         },
         {
@@ -6354,8 +6354,8 @@
           "build_time_base": 12860,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 23,
-          "effect_description": "防禦 +23%",
+          "effect_value": 21.9,
+          "effect_description": "防禦 +21.9%、基礎防禦 +60",
           "cp_per_day": 6
         },
         {
@@ -6367,8 +6367,8 @@
           "build_time_base": 15220,
           "population": 1,
           "culture_points": 7,
-          "effect_value": 26,
-          "effect_description": "防禦 +26%",
+          "effect_value": 24.3,
+          "effect_description": "防禦 +24.3%、基礎防禦 +66",
           "cp_per_day": 7
         },
         {
@@ -6380,8 +6380,8 @@
           "build_time_base": 17950,
           "population": 1,
           "culture_points": 9,
-          "effect_value": 29,
-          "effect_description": "防禦 +29%",
+          "effect_value": 26.8,
+          "effect_description": "防禦 +26.8%、基礎防禦 +72",
           "cp_per_day": 9
         },
         {
@@ -6393,8 +6393,8 @@
           "build_time_base": 21130,
           "population": 1,
           "culture_points": 11,
-          "effect_value": 32,
-          "effect_description": "防禦 +32%",
+          "effect_value": 29.4,
+          "effect_description": "防禦 +29.4%、基礎防禦 +78",
           "cp_per_day": 11
         },
         {
@@ -6406,8 +6406,8 @@
           "build_time_base": 24810,
           "population": 1,
           "culture_points": 13,
-          "effect_value": 35,
-          "effect_description": "防禦 +35%",
+          "effect_value": 31.9,
+          "effect_description": "防禦 +31.9%、基礎防禦 +84",
           "cp_per_day": 13
         },
         {
@@ -6419,8 +6419,8 @@
           "build_time_base": 29080,
           "population": 1,
           "culture_points": 15,
-          "effect_value": 38,
-          "effect_description": "防禦 +38%",
+          "effect_value": 34.6,
+          "effect_description": "防禦 +34.6%、基礎防禦 +90",
           "cp_per_day": 15
         },
         {
@@ -6432,8 +6432,8 @@
           "build_time_base": 34030,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 41,
-          "effect_description": "防禦 +41%",
+          "effect_value": 37.3,
+          "effect_description": "防禦 +37.3%、基礎防禦 +96",
           "cp_per_day": 18
         },
         {
@@ -6445,8 +6445,8 @@
           "build_time_base": 39770,
           "population": 2,
           "culture_points": 22,
-          "effect_value": 44,
-          "effect_description": "防禦 +44%",
+          "effect_value": 40.0,
+          "effect_description": "防禦 +40%、基礎防禦 +102",
           "cp_per_day": 22
         },
         {
@@ -6458,8 +6458,8 @@
           "build_time_base": 46440,
           "population": 2,
           "culture_points": 27,
-          "effect_value": 47,
-          "effect_description": "防禦 +47%",
+          "effect_value": 42.8,
+          "effect_description": "防禦 +42.8%、基礎防禦 +108",
           "cp_per_day": 27
         },
         {
@@ -6471,8 +6471,8 @@
           "build_time_base": 54170,
           "population": 2,
           "culture_points": 32,
-          "effect_value": 50,
-          "effect_description": "防禦 +50%",
+          "effect_value": 45.7,
+          "effect_description": "防禦 +45.7%、基礎防禦 +114",
           "cp_per_day": 32
         },
         {
@@ -6484,8 +6484,8 @@
           "build_time_base": 63130,
           "population": 2,
           "culture_points": 38,
-          "effect_value": 63,
-          "effect_description": "防禦 +63%",
+          "effect_value": 48.6,
+          "effect_description": "防禦 +48.6%、基礎防禦 +120",
           "cp_per_day": 38
         }
       ],
@@ -6514,7 +6514,7 @@
           "population": 0,
           "culture_points": 1,
           "effect_value": 2.5,
-          "effect_description": "防禦 +2.5%（另每級 +8 基礎防禦）",
+          "effect_description": "防禦 +2.5%、基礎防禦 +8",
           "cp_per_day": 1
         },
         {
@@ -6526,8 +6526,8 @@
           "build_time_base": 2620,
           "population": 0,
           "culture_points": 1,
-          "effect_value": 5.06,
-          "effect_description": "防禦 +5.06%（另每級 +8 基礎防禦）",
+          "effect_value": 5.1,
+          "effect_description": "防禦 +5.1%、基礎防禦 +16",
           "cp_per_day": 1
         },
         {
@@ -6539,8 +6539,8 @@
           "build_time_base": 3340,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 7.69,
-          "effect_description": "防禦 +7.69%（另每級 +8 基礎防禦）",
+          "effect_value": 7.7,
+          "effect_description": "防禦 +7.7%、基礎防禦 +24",
           "cp_per_day": 2
         },
         {
@@ -6552,8 +6552,8 @@
           "build_time_base": 4170,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 10.38,
-          "effect_description": "防禦 +10.38%（另每級 +8 基礎防禦）",
+          "effect_value": 10.4,
+          "effect_description": "防禦 +10.4%、基礎防禦 +32",
           "cp_per_day": 2
         },
         {
@@ -6565,8 +6565,8 @@
           "build_time_base": 5140,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 13.14,
-          "effect_description": "防禦 +13.14%（另每級 +8 基礎防禦）",
+          "effect_value": 13.1,
+          "effect_description": "防禦 +13.1%、基礎防禦 +40",
           "cp_per_day": 2
         },
         {
@@ -6578,8 +6578,8 @@
           "build_time_base": 6260,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 15.97,
-          "effect_description": "防禦 +15.97%（另每級 +8 基礎防禦）",
+          "effect_value": 16.0,
+          "effect_description": "防禦 +16%、基礎防禦 +48",
           "cp_per_day": 3
         },
         {
@@ -6591,8 +6591,8 @@
           "build_time_base": 7570,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 18.87,
-          "effect_description": "防禦 +18.87%（另每級 +8 基礎防禦）",
+          "effect_value": 18.9,
+          "effect_description": "防禦 +18.9%、基礎防禦 +56",
           "cp_per_day": 4
         },
         {
@@ -6604,8 +6604,8 @@
           "build_time_base": 9080,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 21.84,
-          "effect_description": "防禦 +21.84%（另每級 +8 基礎防禦）",
+          "effect_value": 21.8,
+          "effect_description": "防禦 +21.8%、基礎防禦 +64",
           "cp_per_day": 4
         },
         {
@@ -6617,8 +6617,8 @@
           "build_time_base": 10830,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 24.89,
-          "effect_description": "防禦 +24.89%（另每級 +8 基礎防禦）",
+          "effect_value": 24.9,
+          "effect_description": "防禦 +24.9%、基礎防禦 +72",
           "cp_per_day": 5
         },
         {
@@ -6630,8 +6630,8 @@
           "build_time_base": 12860,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 28.01,
-          "effect_description": "防禦 +28.01%（另每級 +8 基礎防禦）",
+          "effect_value": 28.0,
+          "effect_description": "防禦 +28%、基礎防禦 +80",
           "cp_per_day": 6
         },
         {
@@ -6643,8 +6643,8 @@
           "build_time_base": 15220,
           "population": 1,
           "culture_points": 7,
-          "effect_value": 31.21,
-          "effect_description": "防禦 +31.21%（另每級 +8 基礎防禦）",
+          "effect_value": 31.2,
+          "effect_description": "防禦 +31.2%、基礎防禦 +88",
           "cp_per_day": 7
         },
         {
@@ -6656,8 +6656,8 @@
           "build_time_base": 17950,
           "population": 1,
           "culture_points": 9,
-          "effect_value": 34.49,
-          "effect_description": "防禦 +34.49%（另每級 +8 基礎防禦）",
+          "effect_value": 34.5,
+          "effect_description": "防禦 +34.5%、基礎防禦 +96",
           "cp_per_day": 9
         },
         {
@@ -6669,8 +6669,8 @@
           "build_time_base": 21130,
           "population": 1,
           "culture_points": 11,
-          "effect_value": 37.85,
-          "effect_description": "防禦 +37.85%（另每級 +8 基礎防禦）",
+          "effect_value": 37.9,
+          "effect_description": "防禦 +37.9%、基礎防禦 +104",
           "cp_per_day": 11
         },
         {
@@ -6683,7 +6683,7 @@
           "population": 1,
           "culture_points": 13,
           "effect_value": 41.3,
-          "effect_description": "防禦 +41.3%（另每級 +8 基礎防禦）",
+          "effect_description": "防禦 +41.3%、基礎防禦 +112",
           "cp_per_day": 13
         },
         {
@@ -6695,8 +6695,8 @@
           "build_time_base": 29080,
           "population": 1,
           "culture_points": 15,
-          "effect_value": 44.83,
-          "effect_description": "防禦 +44.83%（另每級 +8 基礎防禦）",
+          "effect_value": 44.8,
+          "effect_description": "防禦 +44.8%、基礎防禦 +120",
           "cp_per_day": 15
         },
         {
@@ -6708,8 +6708,8 @@
           "build_time_base": 34030,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 48.45,
-          "effect_description": "防禦 +48.45%（另每級 +8 基礎防禦）",
+          "effect_value": 48.5,
+          "effect_description": "防禦 +48.5%、基礎防禦 +128",
           "cp_per_day": 18
         },
         {
@@ -6721,8 +6721,8 @@
           "build_time_base": 39770,
           "population": 2,
           "culture_points": 22,
-          "effect_value": 52.16,
-          "effect_description": "防禦 +52.16%（另每級 +8 基礎防禦）",
+          "effect_value": 52.2,
+          "effect_description": "防禦 +52.2%、基礎防禦 +136",
           "cp_per_day": 22
         },
         {
@@ -6734,8 +6734,8 @@
           "build_time_base": 46440,
           "population": 2,
           "culture_points": 27,
-          "effect_value": 55.97,
-          "effect_description": "防禦 +55.97%（另每級 +8 基礎防禦）",
+          "effect_value": 56.0,
+          "effect_description": "防禦 +56%、基礎防禦 +144",
           "cp_per_day": 27
         },
         {
@@ -6747,8 +6747,8 @@
           "build_time_base": 54170,
           "population": 2,
           "culture_points": 32,
-          "effect_value": 59.87,
-          "effect_description": "防禦 +59.87%（另每級 +8 基礎防禦）",
+          "effect_value": 59.9,
+          "effect_description": "防禦 +59.9%、基礎防禦 +152",
           "cp_per_day": 32
         },
         {
@@ -6760,8 +6760,8 @@
           "build_time_base": 63130,
           "population": 2,
           "culture_points": 38,
-          "effect_value": 63.86,
-          "effect_description": "防禦 +63.86%（另每級 +8 基礎防禦）",
+          "effect_value": 63.9,
+          "effect_description": "防禦 +63.9%、基礎防禦 +160",
           "cp_per_day": 38
         }
       ],
@@ -6838,7 +6838,7 @@
           "population": 2,
           "culture_points": 2,
           "effect_value": 0.729,
-          "effect_description": "訓練時間 73%",
+          "effect_description": "訓練時間 72.9%",
           "cp_per_day": 2
         },
         {
@@ -6850,8 +6850,8 @@
           "build_time_base": 5140,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 0.6561,
-          "effect_description": "訓練時間 66%",
+          "effect_value": 0.656,
+          "effect_description": "訓練時間 65.6%",
           "cp_per_day": 2
         },
         {
@@ -6863,7 +6863,7 @@
           "build_time_base": 6260,
           "population": 3,
           "culture_points": 3,
-          "effect_value": 0.5905,
+          "effect_value": 0.59,
           "effect_description": "訓練時間 59%",
           "cp_per_day": 3
         },
@@ -6876,8 +6876,8 @@
           "build_time_base": 7570,
           "population": 3,
           "culture_points": 4,
-          "effect_value": 0.5314,
-          "effect_description": "訓練時間 53%",
+          "effect_value": 0.531,
+          "effect_description": "訓練時間 53.1%",
           "cp_per_day": 4
         },
         {
@@ -6889,8 +6889,8 @@
           "build_time_base": 9080,
           "population": 3,
           "culture_points": 4,
-          "effect_value": 0.4783,
-          "effect_description": "訓練時間 48%",
+          "effect_value": 0.478,
+          "effect_description": "訓練時間 47.8%",
           "cp_per_day": 4
         },
         {
@@ -6902,7 +6902,7 @@
           "build_time_base": 10830,
           "population": 3,
           "culture_points": 5,
-          "effect_value": 0.4305,
+          "effect_value": 0.43,
           "effect_description": "訓練時間 43%",
           "cp_per_day": 5
         },
@@ -6915,8 +6915,8 @@
           "build_time_base": 12860,
           "population": 3,
           "culture_points": 6,
-          "effect_value": 0.3874,
-          "effect_description": "訓練時間 39%",
+          "effect_value": 0.387,
+          "effect_description": "訓練時間 38.7%",
           "cp_per_day": 6
         },
         {
@@ -6928,8 +6928,8 @@
           "build_time_base": 15220,
           "population": 3,
           "culture_points": 7,
-          "effect_value": 0.3487,
-          "effect_description": "訓練時間 35%",
+          "effect_value": 0.349,
+          "effect_description": "訓練時間 34.9%",
           "cp_per_day": 7
         },
         {
@@ -6941,8 +6941,8 @@
           "build_time_base": 17950,
           "population": 3,
           "culture_points": 9,
-          "effect_value": 0.3138,
-          "effect_description": "訓練時間 31%",
+          "effect_value": 0.314,
+          "effect_description": "訓練時間 31.4%",
           "cp_per_day": 9
         },
         {
@@ -6954,8 +6954,8 @@
           "build_time_base": 21130,
           "population": 3,
           "culture_points": 11,
-          "effect_value": 0.2824,
-          "effect_description": "訓練時間 28%",
+          "effect_value": 0.282,
+          "effect_description": "訓練時間 28.2%",
           "cp_per_day": 11
         },
         {
@@ -6967,8 +6967,8 @@
           "build_time_base": 24810,
           "population": 3,
           "culture_points": 13,
-          "effect_value": 0.2542,
-          "effect_description": "訓練時間 25%",
+          "effect_value": 0.254,
+          "effect_description": "訓練時間 25.4%",
           "cp_per_day": 13
         },
         {
@@ -6980,8 +6980,8 @@
           "build_time_base": 29080,
           "population": 3,
           "culture_points": 15,
-          "effect_value": 0.2288,
-          "effect_description": "訓練時間 23%",
+          "effect_value": 0.229,
+          "effect_description": "訓練時間 22.9%",
           "cp_per_day": 15
         },
         {
@@ -6993,8 +6993,8 @@
           "build_time_base": 34030,
           "population": 4,
           "culture_points": 18,
-          "effect_value": 0.2059,
-          "effect_description": "訓練時間 21%",
+          "effect_value": 0.206,
+          "effect_description": "訓練時間 20.6%",
           "cp_per_day": 18
         },
         {
@@ -7006,8 +7006,8 @@
           "build_time_base": 39770,
           "population": 4,
           "culture_points": 22,
-          "effect_value": 0.1853,
-          "effect_description": "訓練時間 19%",
+          "effect_value": 0.185,
+          "effect_description": "訓練時間 18.5%",
           "cp_per_day": 22
         },
         {
@@ -7019,8 +7019,8 @@
           "build_time_base": 46440,
           "population": 4,
           "culture_points": 27,
-          "effect_value": 0.1668,
-          "effect_description": "訓練時間 17%",
+          "effect_value": 0.167,
+          "effect_description": "訓練時間 16.7%",
           "cp_per_day": 27
         },
         {
@@ -7032,7 +7032,7 @@
           "build_time_base": 54170,
           "population": 4,
           "culture_points": 32,
-          "effect_value": 0.1501,
+          "effect_value": 0.15,
           "effect_description": "訓練時間 15%",
           "cp_per_day": 32
         },
@@ -7045,8 +7045,8 @@
           "build_time_base": 63130,
           "population": 4,
           "culture_points": 38,
-          "effect_value": 0.1351,
-          "effect_description": "訓練時間 14%",
+          "effect_value": 0.135,
+          "effect_description": "訓練時間 13.5%",
           "cp_per_day": 38
         }
       ],
@@ -7122,7 +7122,7 @@
           "population": 3,
           "culture_points": 4,
           "effect_value": 0.729,
-          "effect_description": "訓練時間 73%",
+          "effect_description": "訓練時間 72.9%",
           "cp_per_day": 4
         },
         {
@@ -7134,8 +7134,8 @@
           "build_time_base": 5500,
           "population": 3,
           "culture_points": 5,
-          "effect_value": 0.6561,
-          "effect_description": "訓練時間 66%",
+          "effect_value": 0.656,
+          "effect_description": "訓練時間 65.6%",
           "cp_per_day": 5
         },
         {
@@ -7147,7 +7147,7 @@
           "build_time_base": 6680,
           "population": 3,
           "culture_points": 6,
-          "effect_value": 0.5905,
+          "effect_value": 0.59,
           "effect_description": "訓練時間 59%",
           "cp_per_day": 6
         },
@@ -7160,8 +7160,8 @@
           "build_time_base": 8050,
           "population": 3,
           "culture_points": 7,
-          "effect_value": 0.5314,
-          "effect_description": "訓練時間 53%",
+          "effect_value": 0.531,
+          "effect_description": "訓練時間 53.1%",
           "cp_per_day": 7
         },
         {
@@ -7173,8 +7173,8 @@
           "build_time_base": 9640,
           "population": 3,
           "culture_points": 9,
-          "effect_value": 0.4783,
-          "effect_description": "訓練時間 48%",
+          "effect_value": 0.478,
+          "effect_description": "訓練時間 47.8%",
           "cp_per_day": 9
         },
         {
@@ -7186,7 +7186,7 @@
           "build_time_base": 11480,
           "population": 3,
           "culture_points": 10,
-          "effect_value": 0.4305,
+          "effect_value": 0.43,
           "effect_description": "訓練時間 43%",
           "cp_per_day": 10
         },
@@ -7199,8 +7199,8 @@
           "build_time_base": 13620,
           "population": 3,
           "culture_points": 12,
-          "effect_value": 0.3874,
-          "effect_description": "訓練時間 39%",
+          "effect_value": 0.387,
+          "effect_description": "訓練時間 38.7%",
           "cp_per_day": 12
         },
         {
@@ -7212,8 +7212,8 @@
           "build_time_base": 16100,
           "population": 4,
           "culture_points": 15,
-          "effect_value": 0.3487,
-          "effect_description": "訓練時間 35%",
+          "effect_value": 0.349,
+          "effect_description": "訓練時間 34.9%",
           "cp_per_day": 15
         },
         {
@@ -7225,8 +7225,8 @@
           "build_time_base": 18980,
           "population": 4,
           "culture_points": 18,
-          "effect_value": 0.3138,
-          "effect_description": "訓練時間 31%",
+          "effect_value": 0.314,
+          "effect_description": "訓練時間 31.4%",
           "cp_per_day": 18
         },
         {
@@ -7238,8 +7238,8 @@
           "build_time_base": 22310,
           "population": 4,
           "culture_points": 21,
-          "effect_value": 0.2824,
-          "effect_description": "訓練時間 28%",
+          "effect_value": 0.282,
+          "effect_description": "訓練時間 28.2%",
           "cp_per_day": 21
         },
         {
@@ -7251,8 +7251,8 @@
           "build_time_base": 26180,
           "population": 4,
           "culture_points": 26,
-          "effect_value": 0.2542,
-          "effect_description": "訓練時間 25%",
+          "effect_value": 0.254,
+          "effect_description": "訓練時間 25.4%",
           "cp_per_day": 26
         },
         {
@@ -7264,8 +7264,8 @@
           "build_time_base": 30670,
           "population": 4,
           "culture_points": 31,
-          "effect_value": 0.2288,
-          "effect_description": "訓練時間 23%",
+          "effect_value": 0.229,
+          "effect_description": "訓練時間 22.9%",
           "cp_per_day": 31
         },
         {
@@ -7277,8 +7277,8 @@
           "build_time_base": 35880,
           "population": 4,
           "culture_points": 37,
-          "effect_value": 0.2059,
-          "effect_description": "訓練時間 21%",
+          "effect_value": 0.206,
+          "effect_description": "訓練時間 20.6%",
           "cp_per_day": 37
         },
         {
@@ -7290,8 +7290,8 @@
           "build_time_base": 41920,
           "population": 4,
           "culture_points": 44,
-          "effect_value": 0.1853,
-          "effect_description": "訓練時間 19%",
+          "effect_value": 0.185,
+          "effect_description": "訓練時間 18.5%",
           "cp_per_day": 44
         },
         {
@@ -7303,8 +7303,8 @@
           "build_time_base": 48930,
           "population": 4,
           "culture_points": 53,
-          "effect_value": 0.1668,
-          "effect_description": "訓練時間 17%",
+          "effect_value": 0.167,
+          "effect_description": "訓練時間 16.7%",
           "cp_per_day": 53
         },
         {
@@ -7316,7 +7316,7 @@
           "build_time_base": 57060,
           "population": 4,
           "culture_points": 64,
-          "effect_value": 0.1501,
+          "effect_value": 0.15,
           "effect_description": "訓練時間 15%",
           "cp_per_day": 64
         },
@@ -7329,8 +7329,8 @@
           "build_time_base": 66490,
           "population": 4,
           "culture_points": 77,
-          "effect_value": 0.1351,
-          "effect_description": "訓練時間 14%",
+          "effect_value": 0.135,
+          "effect_description": "訓練時間 13.5%",
           "cp_per_day": 77
         }
       ],
@@ -7361,7 +7361,7 @@
           "build_time_base": 2000,
           "population": 4,
           "culture_points": 1,
-          "effect_value": 10,
+          "effect_value": 10.0,
           "effect_description": "陷阱數量 10",
           "cp_per_day": 1
         },
@@ -7374,7 +7374,7 @@
           "build_time_base": 2320,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 22,
+          "effect_value": 22.0,
           "effect_description": "陷阱數量 22",
           "cp_per_day": 1
         },
@@ -7387,7 +7387,7 @@
           "build_time_base": 2690,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 35,
+          "effect_value": 35.0,
           "effect_description": "陷阱數量 35",
           "cp_per_day": 2
         },
@@ -7400,7 +7400,7 @@
           "build_time_base": 3120,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 49,
+          "effect_value": 49.0,
           "effect_description": "陷阱數量 49",
           "cp_per_day": 2
         },
@@ -7413,7 +7413,7 @@
           "build_time_base": 3620,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 64,
+          "effect_value": 64.0,
           "effect_description": "陷阱數量 64",
           "cp_per_day": 2
         },
@@ -7426,7 +7426,7 @@
           "build_time_base": 4200,
           "population": 3,
           "culture_points": 3,
-          "effect_value": 80,
+          "effect_value": 80.0,
           "effect_description": "陷阱數量 80",
           "cp_per_day": 3
         },
@@ -7439,7 +7439,7 @@
           "build_time_base": 4870,
           "population": 3,
           "culture_points": 4,
-          "effect_value": 97,
+          "effect_value": 97.0,
           "effect_description": "陷阱數量 97",
           "cp_per_day": 4
         },
@@ -7452,7 +7452,7 @@
           "build_time_base": 5650,
           "population": 3,
           "culture_points": 4,
-          "effect_value": 115,
+          "effect_value": 115.0,
           "effect_description": "陷阱數量 115",
           "cp_per_day": 4
         },
@@ -7465,7 +7465,7 @@
           "build_time_base": 6560,
           "population": 3,
           "culture_points": 5,
-          "effect_value": 134,
+          "effect_value": 134.0,
           "effect_description": "陷阱數量 134",
           "cp_per_day": 5
         },
@@ -7478,7 +7478,7 @@
           "build_time_base": 7610,
           "population": 3,
           "culture_points": 6,
-          "effect_value": 154,
+          "effect_value": 154.0,
           "effect_description": "陷阱數量 154",
           "cp_per_day": 6
         },
@@ -7491,7 +7491,7 @@
           "build_time_base": 8820,
           "population": 3,
           "culture_points": 7,
-          "effect_value": 175,
+          "effect_value": 175.0,
           "effect_description": "陷阱數量 175",
           "cp_per_day": 7
         },
@@ -7504,7 +7504,7 @@
           "build_time_base": 10230,
           "population": 3,
           "culture_points": 9,
-          "effect_value": 196,
+          "effect_value": 196.0,
           "effect_description": "陷阱數量 196",
           "cp_per_day": 9
         },
@@ -7517,7 +7517,7 @@
           "build_time_base": 11870,
           "population": 3,
           "culture_points": 11,
-          "effect_value": 218,
+          "effect_value": 218.0,
           "effect_description": "陷阱數量 218",
           "cp_per_day": 11
         },
@@ -7530,7 +7530,7 @@
           "build_time_base": 13770,
           "population": 3,
           "culture_points": 13,
-          "effect_value": 241,
+          "effect_value": 241.0,
           "effect_description": "陷阱數量 241",
           "cp_per_day": 13
         },
@@ -7543,7 +7543,7 @@
           "build_time_base": 15980,
           "population": 3,
           "culture_points": 15,
-          "effect_value": 265,
+          "effect_value": 265.0,
           "effect_description": "陷阱數量 265",
           "cp_per_day": 15
         },
@@ -7556,7 +7556,7 @@
           "build_time_base": 18530,
           "population": 4,
           "culture_points": 18,
-          "effect_value": 290,
+          "effect_value": 290.0,
           "effect_description": "陷阱數量 290",
           "cp_per_day": 18
         },
@@ -7569,7 +7569,7 @@
           "build_time_base": 21500,
           "population": 4,
           "culture_points": 22,
-          "effect_value": 316,
+          "effect_value": 316.0,
           "effect_description": "陷阱數量 316",
           "cp_per_day": 22
         },
@@ -7582,7 +7582,7 @@
           "build_time_base": 24940,
           "population": 4,
           "culture_points": 27,
-          "effect_value": 343,
+          "effect_value": 343.0,
           "effect_description": "陷阱數量 343",
           "cp_per_day": 27
         },
@@ -7595,7 +7595,7 @@
           "build_time_base": 28930,
           "population": 4,
           "culture_points": 32,
-          "effect_value": 371,
+          "effect_value": 371.0,
           "effect_description": "陷阱數量 371",
           "cp_per_day": 32
         },
@@ -7608,7 +7608,7 @@
           "build_time_base": 33550,
           "population": 4,
           "culture_points": 38,
-          "effect_value": 400,
+          "effect_value": 400.0,
           "effect_description": "陷阱數量 400",
           "cp_per_day": 38
         }
@@ -7644,7 +7644,7 @@
           "build_time_base": 8000,
           "population": 6,
           "culture_points": 5,
-          "effect_value": 1,
+          "effect_value": 1.0,
           "effect_description": "攻擊力 +1%",
           "cp_per_day": 5
         },
@@ -7657,7 +7657,7 @@
           "build_time_base": 9940,
           "population": 3,
           "culture_points": 6,
-          "effect_value": 2,
+          "effect_value": 2.0,
           "effect_description": "攻擊力 +2%",
           "cp_per_day": 6
         },
@@ -7670,7 +7670,7 @@
           "build_time_base": 12130,
           "population": 3,
           "culture_points": 7,
-          "effect_value": 3,
+          "effect_value": 3.0,
           "effect_description": "攻擊力 +3%",
           "cp_per_day": 7
         },
@@ -7683,7 +7683,7 @@
           "build_time_base": 14610,
           "population": 3,
           "culture_points": 8,
-          "effect_value": 4,
+          "effect_value": 4.0,
           "effect_description": "攻擊力 +4%",
           "cp_per_day": 8
         },
@@ -7696,7 +7696,7 @@
           "build_time_base": 17410,
           "population": 3,
           "culture_points": 10,
-          "effect_value": 5,
+          "effect_value": 5.0,
           "effect_description": "攻擊力 +5%",
           "cp_per_day": 10
         },
@@ -7709,7 +7709,7 @@
           "build_time_base": 20570,
           "population": 4,
           "culture_points": 12,
-          "effect_value": 6,
+          "effect_value": 6.0,
           "effect_description": "攻擊力 +6%",
           "cp_per_day": 12
         },
@@ -7722,7 +7722,7 @@
           "build_time_base": 24150,
           "population": 4,
           "culture_points": 14,
-          "effect_value": 7,
+          "effect_value": 7.0,
           "effect_description": "攻擊力 +7%",
           "cp_per_day": 14
         },
@@ -7735,7 +7735,7 @@
           "build_time_base": 28190,
           "population": 4,
           "culture_points": 17,
-          "effect_value": 8,
+          "effect_value": 8.0,
           "effect_description": "攻擊力 +8%",
           "cp_per_day": 17
         },
@@ -7748,7 +7748,7 @@
           "build_time_base": 32750,
           "population": 4,
           "culture_points": 21,
-          "effect_value": 9,
+          "effect_value": 9.0,
           "effect_description": "攻擊力 +9%",
           "cp_per_day": 21
         },
@@ -7761,7 +7761,7 @@
           "build_time_base": 37910,
           "population": 4,
           "culture_points": 25,
-          "effect_value": 10,
+          "effect_value": 10.0,
           "effect_description": "攻擊力 +10%",
           "cp_per_day": 25
         },
@@ -7774,7 +7774,7 @@
           "build_time_base": 43730,
           "population": 4,
           "culture_points": 30,
-          "effect_value": 11,
+          "effect_value": 11.0,
           "effect_description": "攻擊力 +11%",
           "cp_per_day": 30
         },
@@ -7787,7 +7787,7 @@
           "build_time_base": 50320,
           "population": 4,
           "culture_points": 36,
-          "effect_value": 12,
+          "effect_value": 12.0,
           "effect_description": "攻擊力 +12%",
           "cp_per_day": 36
         },
@@ -7800,7 +7800,7 @@
           "build_time_base": 57760,
           "population": 4,
           "culture_points": 43,
-          "effect_value": 13,
+          "effect_value": 13.0,
           "effect_description": "攻擊力 +13%",
           "cp_per_day": 43
         },
@@ -7813,7 +7813,7 @@
           "build_time_base": 66170,
           "population": 4,
           "culture_points": 51,
-          "effect_value": 14,
+          "effect_value": 14.0,
           "effect_description": "攻擊力 +14%",
           "cp_per_day": 51
         },
@@ -7826,7 +7826,7 @@
           "build_time_base": 75670,
           "population": 4,
           "culture_points": 62,
-          "effect_value": 15,
+          "effect_value": 15.0,
           "effect_description": "攻擊力 +15%",
           "cp_per_day": 62
         },
@@ -7839,7 +7839,7 @@
           "build_time_base": 86410,
           "population": 5,
           "culture_points": 74,
-          "effect_value": 16,
+          "effect_value": 16.0,
           "effect_description": "攻擊力 +16%",
           "cp_per_day": 74
         },
@@ -7852,7 +7852,7 @@
           "build_time_base": 98540,
           "population": 5,
           "culture_points": 89,
-          "effect_value": 17,
+          "effect_value": 17.0,
           "effect_description": "攻擊力 +17%",
           "cp_per_day": 89
         },
@@ -7865,7 +7865,7 @@
           "build_time_base": 112250,
           "population": 5,
           "culture_points": 106,
-          "effect_value": 18,
+          "effect_value": 18.0,
           "effect_description": "攻擊力 +18%",
           "cp_per_day": 106
         },
@@ -7878,7 +7878,7 @@
           "build_time_base": 127750,
           "population": 5,
           "culture_points": 128,
-          "effect_value": 19,
+          "effect_value": 19.0,
           "effect_description": "攻擊力 +19%",
           "cp_per_day": 128
         },
@@ -7891,7 +7891,7 @@
           "build_time_base": 145250,
           "population": 5,
           "culture_points": 153,
-          "effect_value": 20,
+          "effect_value": 20.0,
           "effect_description": "攻擊力 +20%",
           "cp_per_day": 153
         }
@@ -7933,8 +7933,8 @@
           "build_time_base": 2200,
           "population": 5,
           "culture_points": 4,
-          "effect_value": 1,
-          "effect_description": "騎兵糧耗 -1%",
+          "effect_value": 0.99,
+          "effect_description": "騎兵訓練時間 99%",
           "cp_per_day": 4
         },
         {
@@ -7946,8 +7946,8 @@
           "build_time_base": 3150,
           "population": 3,
           "culture_points": 4,
-          "effect_value": 2,
-          "effect_description": "騎兵糧耗 -2%",
+          "effect_value": 0.98,
+          "effect_description": "騎兵訓練時間 98%",
           "cp_per_day": 4
         },
         {
@@ -7959,8 +7959,8 @@
           "build_time_base": 4260,
           "population": 3,
           "culture_points": 5,
-          "effect_value": 3,
-          "effect_description": "騎兵糧耗 -3%",
+          "effect_value": 0.97,
+          "effect_description": "騎兵訓練時間 97%",
           "cp_per_day": 5
         },
         {
@@ -7972,8 +7972,8 @@
           "build_time_base": 5540,
           "population": 3,
           "culture_points": 6,
-          "effect_value": 4,
-          "effect_description": "騎兵糧耗 -4%",
+          "effect_value": 0.96,
+          "effect_description": "騎兵訓練時間 96%",
           "cp_per_day": 6
         },
         {
@@ -7985,8 +7985,8 @@
           "build_time_base": 7020,
           "population": 3,
           "culture_points": 7,
-          "effect_value": 5,
-          "effect_description": "騎兵糧耗 -5%",
+          "effect_value": 0.95,
+          "effect_description": "騎兵訓練時間 95%",
           "cp_per_day": 7
         },
         {
@@ -7998,8 +7998,8 @@
           "build_time_base": 8750,
           "population": 3,
           "culture_points": 9,
-          "effect_value": 6,
-          "effect_description": "騎兵糧耗 -6%",
+          "effect_value": 0.94,
+          "effect_description": "騎兵訓練時間 94%",
           "cp_per_day": 9
         },
         {
@@ -8011,8 +8011,8 @@
           "build_time_base": 10750,
           "population": 3,
           "culture_points": 11,
-          "effect_value": 7,
-          "effect_description": "騎兵糧耗 -7%",
+          "effect_value": 0.93,
+          "effect_description": "騎兵訓練時間 93%",
           "cp_per_day": 11
         },
         {
@@ -8024,8 +8024,8 @@
           "build_time_base": 13070,
           "population": 3,
           "culture_points": 13,
-          "effect_value": 8,
-          "effect_description": "騎兵糧耗 -8%",
+          "effect_value": 0.92,
+          "effect_description": "騎兵訓練時間 92%",
           "cp_per_day": 13
         },
         {
@@ -8037,8 +8037,8 @@
           "build_time_base": 15760,
           "population": 3,
           "culture_points": 15,
-          "effect_value": 9,
-          "effect_description": "騎兵糧耗 -9%",
+          "effect_value": 0.91,
+          "effect_description": "騎兵訓練時間 91%",
           "cp_per_day": 15
         },
         {
@@ -8050,8 +8050,8 @@
           "build_time_base": 18880,
           "population": 3,
           "culture_points": 19,
-          "effect_value": 10,
-          "effect_description": "騎兵糧耗 -10%",
+          "effect_value": 0.9,
+          "effect_description": "騎兵訓練時間 90%",
           "cp_per_day": 19
         },
         {
@@ -8063,8 +8063,8 @@
           "build_time_base": 22500,
           "population": 4,
           "culture_points": 22,
-          "effect_value": 11,
-          "effect_description": "騎兵糧耗 -11%",
+          "effect_value": 0.89,
+          "effect_description": "騎兵訓練時間 89%",
           "cp_per_day": 22
         },
         {
@@ -8076,8 +8076,8 @@
           "build_time_base": 26700,
           "population": 4,
           "culture_points": 27,
-          "effect_value": 12,
-          "effect_description": "騎兵糧耗 -12%",
+          "effect_value": 0.88,
+          "effect_description": "騎兵訓練時間 88%",
           "cp_per_day": 27
         },
         {
@@ -8089,8 +8089,8 @@
           "build_time_base": 31570,
           "population": 4,
           "culture_points": 32,
-          "effect_value": 13,
-          "effect_description": "騎兵糧耗 -13%",
+          "effect_value": 0.87,
+          "effect_description": "騎兵訓練時間 87%",
           "cp_per_day": 32
         },
         {
@@ -8102,8 +8102,8 @@
           "build_time_base": 37220,
           "population": 4,
           "culture_points": 39,
-          "effect_value": 14,
-          "effect_description": "騎兵糧耗 -14%",
+          "effect_value": 0.86,
+          "effect_description": "騎兵訓練時間 86%",
           "cp_per_day": 39
         },
         {
@@ -8115,8 +8115,8 @@
           "build_time_base": 43780,
           "population": 4,
           "culture_points": 46,
-          "effect_value": 15,
-          "effect_description": "騎兵糧耗 -15%",
+          "effect_value": 0.85,
+          "effect_description": "騎兵訓練時間 85%",
           "cp_per_day": 46
         },
         {
@@ -8128,8 +8128,8 @@
           "build_time_base": 51380,
           "population": 4,
           "culture_points": 55,
-          "effect_value": 16,
-          "effect_description": "騎兵糧耗 -16%",
+          "effect_value": 0.84,
+          "effect_description": "騎兵訓練時間 84%",
           "cp_per_day": 55
         },
         {
@@ -8141,8 +8141,8 @@
           "build_time_base": 60200,
           "population": 4,
           "culture_points": 67,
-          "effect_value": 17,
-          "effect_description": "騎兵糧耗 -17%",
+          "effect_value": 0.83,
+          "effect_description": "騎兵訓練時間 83%",
           "cp_per_day": 67
         },
         {
@@ -8154,8 +8154,8 @@
           "build_time_base": 70430,
           "population": 4,
           "culture_points": 80,
-          "effect_value": 18,
-          "effect_description": "騎兵糧耗 -18%",
+          "effect_value": 0.82,
+          "effect_description": "騎兵訓練時間 82%",
           "cp_per_day": 80
         },
         {
@@ -8167,8 +8167,8 @@
           "build_time_base": 82300,
           "population": 4,
           "culture_points": 96,
-          "effect_value": 19,
-          "effect_description": "騎兵糧耗 -19%",
+          "effect_value": 0.81,
+          "effect_description": "騎兵訓練時間 81%",
           "cp_per_day": 96
         },
         {
@@ -8180,8 +8180,8 @@
           "build_time_base": 96070,
           "population": 4,
           "culture_points": 115,
-          "effect_value": 20,
-          "effect_description": "騎兵糧耗 -20%",
+          "effect_value": 0.8,
+          "effect_description": "騎兵訓練時間 80%",
           "cp_per_day": 115
         }
       ],
@@ -8213,8 +8213,8 @@
           "build_time_base": 9000,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 12000,
-          "effect_description": "儲存容量 12,000",
+          "effect_value": 3600.0,
+          "effect_description": "儲存容量 3,600",
           "cp_per_day": 1
         },
         {
@@ -8226,8 +8226,8 @@
           "build_time_base": 10740,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 17000,
-          "effect_description": "儲存容量 17,000",
+          "effect_value": 5100.0,
+          "effect_description": "儲存容量 5,100",
           "cp_per_day": 1
         },
         {
@@ -8239,8 +8239,8 @@
           "build_time_base": 12760,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 23000,
-          "effect_description": "儲存容量 23,000",
+          "effect_value": 6900.0,
+          "effect_description": "儲存容量 6,900",
           "cp_per_day": 2
         },
         {
@@ -8252,8 +8252,8 @@
           "build_time_base": 15100,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 31000,
-          "effect_description": "儲存容量 31,000",
+          "effect_value": 9300.0,
+          "effect_description": "儲存容量 9,300",
           "cp_per_day": 2
         },
         {
@@ -8265,8 +8265,8 @@
           "build_time_base": 17820,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 40000,
-          "effect_description": "儲存容量 40,000",
+          "effect_value": 12000.0,
+          "effect_description": "儲存容量 12,000",
           "cp_per_day": 2
         },
         {
@@ -8278,8 +8278,8 @@
           "build_time_base": 20970,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 50000,
-          "effect_description": "儲存容量 50,000",
+          "effect_value": 15000.0,
+          "effect_description": "儲存容量 15,000",
           "cp_per_day": 3
         },
         {
@@ -8291,8 +8291,8 @@
           "build_time_base": 24620,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 63000,
-          "effect_description": "儲存容量 63,000",
+          "effect_value": 18900.0,
+          "effect_description": "儲存容量 18,900",
           "cp_per_day": 4
         },
         {
@@ -8304,8 +8304,8 @@
           "build_time_base": 28860,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 78000,
-          "effect_description": "儲存容量 78,000",
+          "effect_value": 23400.0,
+          "effect_description": "儲存容量 23,400",
           "cp_per_day": 4
         },
         {
@@ -8317,8 +8317,8 @@
           "build_time_base": 33780,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 96000,
-          "effect_description": "儲存容量 96,000",
+          "effect_value": 28800.0,
+          "effect_description": "儲存容量 28,800",
           "cp_per_day": 5
         },
         {
@@ -8330,8 +8330,8 @@
           "build_time_base": 39480,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 118000,
-          "effect_description": "儲存容量 118,000",
+          "effect_value": 35400.0,
+          "effect_description": "儲存容量 35,400",
           "cp_per_day": 6
         },
         {
@@ -8343,8 +8343,8 @@
           "build_time_base": 46100,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 144000,
-          "effect_description": "儲存容量 144,000",
+          "effect_value": 43200.0,
+          "effect_description": "儲存容量 43,200",
           "cp_per_day": 7
         },
         {
@@ -8356,8 +8356,8 @@
           "build_time_base": 53780,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 176000,
-          "effect_description": "儲存容量 176,000",
+          "effect_value": 52800.0,
+          "effect_description": "儲存容量 52,800",
           "cp_per_day": 9
         },
         {
@@ -8369,8 +8369,8 @@
           "build_time_base": 62680,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 214000,
-          "effect_description": "儲存容量 214,000",
+          "effect_value": 64200.0,
+          "effect_description": "儲存容量 64,200",
           "cp_per_day": 11
         },
         {
@@ -8382,8 +8382,8 @@
           "build_time_base": 73010,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 259000,
-          "effect_description": "儲存容量 259,000",
+          "effect_value": 77700.0,
+          "effect_description": "儲存容量 77,700",
           "cp_per_day": 13
         },
         {
@@ -8395,8 +8395,8 @@
           "build_time_base": 84990,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 313000,
-          "effect_description": "儲存容量 313,000",
+          "effect_value": 93900.0,
+          "effect_description": "儲存容量 93,900",
           "cp_per_day": 15
         },
         {
@@ -8408,8 +8408,8 @@
           "build_time_base": 98890,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 379000,
-          "effect_description": "儲存容量 379,000",
+          "effect_value": 113700.0,
+          "effect_description": "儲存容量 113,700",
           "cp_per_day": 18
         },
         {
@@ -8421,8 +8421,8 @@
           "build_time_base": 115010,
           "population": 2,
           "culture_points": 22,
-          "effect_value": 457000,
-          "effect_description": "儲存容量 457,000",
+          "effect_value": 137100.0,
+          "effect_description": "儲存容量 137,100",
           "cp_per_day": 22
         },
         {
@@ -8434,8 +8434,8 @@
           "build_time_base": 133710,
           "population": 2,
           "culture_points": 27,
-          "effect_value": 551000,
-          "effect_description": "儲存容量 551,000",
+          "effect_value": 165300.0,
+          "effect_description": "儲存容量 165,300",
           "cp_per_day": 27
         },
         {
@@ -8447,8 +8447,8 @@
           "build_time_base": 155400,
           "population": 2,
           "culture_points": 32,
-          "effect_value": 664000,
-          "effect_description": "儲存容量 664,000",
+          "effect_value": 199200.0,
+          "effect_description": "儲存容量 199,200",
           "cp_per_day": 32
         },
         {
@@ -8460,8 +8460,8 @@
           "build_time_base": 180570,
           "population": 2,
           "culture_points": 38,
-          "effect_value": 800000,
-          "effect_description": "儲存容量 800,000",
+          "effect_value": 240000.0,
+          "effect_description": "儲存容量 240,000",
           "cp_per_day": 38
         }
       ],
@@ -8491,8 +8491,8 @@
           "build_time_base": 7000,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 12000,
-          "effect_description": "穀倉容量 12,000",
+          "effect_value": 3600.0,
+          "effect_description": "儲存容量 3,600",
           "cp_per_day": 1
         },
         {
@@ -8504,8 +8504,8 @@
           "build_time_base": 8420,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 17000,
-          "effect_description": "穀倉容量 17,000",
+          "effect_value": 5100.0,
+          "effect_description": "儲存容量 5,100",
           "cp_per_day": 1
         },
         {
@@ -8517,8 +8517,8 @@
           "build_time_base": 10070,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 23000,
-          "effect_description": "穀倉容量 23,000",
+          "effect_value": 6900.0,
+          "effect_description": "儲存容量 6,900",
           "cp_per_day": 2
         },
         {
@@ -8530,8 +8530,8 @@
           "build_time_base": 11980,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 31000,
-          "effect_description": "穀倉容量 31,000",
+          "effect_value": 9300.0,
+          "effect_description": "儲存容量 9,300",
           "cp_per_day": 2
         },
         {
@@ -8543,8 +8543,8 @@
           "build_time_base": 14190,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 40000,
-          "effect_description": "穀倉容量 40,000",
+          "effect_value": 12000.0,
+          "effect_description": "儲存容量 12,000",
           "cp_per_day": 2
         },
         {
@@ -8556,8 +8556,8 @@
           "build_time_base": 16770,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 50000,
-          "effect_description": "穀倉容量 50,000",
+          "effect_value": 15000.0,
+          "effect_description": "儲存容量 15,000",
           "cp_per_day": 3
         },
         {
@@ -8569,8 +8569,8 @@
           "build_time_base": 19750,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 63000,
-          "effect_description": "穀倉容量 63,000",
+          "effect_value": 18900.0,
+          "effect_description": "儲存容量 18,900",
           "cp_per_day": 4
         },
         {
@@ -8582,8 +8582,8 @@
           "build_time_base": 23210,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 78000,
-          "effect_description": "穀倉容量 78,000",
+          "effect_value": 23400.0,
+          "effect_description": "儲存容量 23,400",
           "cp_per_day": 4
         },
         {
@@ -8595,8 +8595,8 @@
           "build_time_base": 27220,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 96000,
-          "effect_description": "穀倉容量 96,000",
+          "effect_value": 28800.0,
+          "effect_description": "儲存容量 28,800",
           "cp_per_day": 5
         },
         {
@@ -8608,8 +8608,8 @@
           "build_time_base": 31880,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 118000,
-          "effect_description": "穀倉容量 118,000",
+          "effect_value": 35400.0,
+          "effect_description": "儲存容量 35,400",
           "cp_per_day": 6
         },
         {
@@ -8621,8 +8621,8 @@
           "build_time_base": 37280,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 144000,
-          "effect_description": "穀倉容量 144,000",
+          "effect_value": 43200.0,
+          "effect_description": "儲存容量 43,200",
           "cp_per_day": 7
         },
         {
@@ -8634,8 +8634,8 @@
           "build_time_base": 43540,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 176000,
-          "effect_description": "穀倉容量 176,000",
+          "effect_value": 52800.0,
+          "effect_description": "儲存容量 52,800",
           "cp_per_day": 9
         },
         {
@@ -8647,8 +8647,8 @@
           "build_time_base": 50810,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 214000,
-          "effect_description": "穀倉容量 214,000",
+          "effect_value": 64200.0,
+          "effect_description": "儲存容量 64,200",
           "cp_per_day": 11
         },
         {
@@ -8660,8 +8660,8 @@
           "build_time_base": 59240,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 259000,
-          "effect_description": "穀倉容量 259,000",
+          "effect_value": 77700.0,
+          "effect_description": "儲存容量 77,700",
           "cp_per_day": 13
         },
         {
@@ -8673,8 +8673,8 @@
           "build_time_base": 69010,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 313000,
-          "effect_description": "穀倉容量 313,000",
+          "effect_value": 93900.0,
+          "effect_description": "儲存容量 93,900",
           "cp_per_day": 15
         },
         {
@@ -8686,8 +8686,8 @@
           "build_time_base": 80360,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 379000,
-          "effect_description": "穀倉容量 379,000",
+          "effect_value": 113700.0,
+          "effect_description": "儲存容量 113,700",
           "cp_per_day": 18
         },
         {
@@ -8699,8 +8699,8 @@
           "build_time_base": 93510,
           "population": 2,
           "culture_points": 22,
-          "effect_value": 457000,
-          "effect_description": "穀倉容量 457,000",
+          "effect_value": 137100.0,
+          "effect_description": "儲存容量 137,100",
           "cp_per_day": 22
         },
         {
@@ -8712,8 +8712,8 @@
           "build_time_base": 108780,
           "population": 2,
           "culture_points": 27,
-          "effect_value": 551000,
-          "effect_description": "穀倉容量 551,000",
+          "effect_value": 165300.0,
+          "effect_description": "儲存容量 165,300",
           "cp_per_day": 27
         },
         {
@@ -8725,8 +8725,8 @@
           "build_time_base": 126480,
           "population": 2,
           "culture_points": 32,
-          "effect_value": 664000,
-          "effect_description": "穀倉容量 664,000",
+          "effect_value": 199200.0,
+          "effect_description": "儲存容量 199,200",
           "cp_per_day": 32
         },
         {
@@ -8738,8 +8738,8 @@
           "build_time_base": 147020,
           "population": 2,
           "culture_points": 38,
-          "effect_value": 800000,
-          "effect_description": "穀倉容量 800,000",
+          "effect_value": 240000.0,
+          "effect_description": "儲存容量 240,000",
           "cp_per_day": 38
         }
       ],
@@ -8766,8 +8766,8 @@
           "build_time_base": 260,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 5,
-          "effect_description": "每小時 +5 木材",
+          "effect_value": 7.0,
+          "effect_description": "每小時 7 木材",
           "cp_per_day": 1
         },
         {
@@ -8779,8 +8779,8 @@
           "build_time_base": 620,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 9,
-          "effect_description": "每小時 +9 木材",
+          "effect_value": 13.0,
+          "effect_description": "每小時 13 木材",
           "cp_per_day": 1
         },
         {
@@ -8792,8 +8792,8 @@
           "build_time_base": 1190,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 15,
-          "effect_description": "每小時 +15 木材",
+          "effect_value": 21.0,
+          "effect_description": "每小時 21 木材",
           "cp_per_day": 2
         },
         {
@@ -8805,8 +8805,8 @@
           "build_time_base": 2100,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 22,
-          "effect_description": "每小時 +22 木材",
+          "effect_value": 31.0,
+          "effect_description": "每小時 31 木材",
           "cp_per_day": 2
         },
         {
@@ -8818,8 +8818,8 @@
           "build_time_base": 3560,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 33,
-          "effect_description": "每小時 +33 木材",
+          "effect_value": 46.0,
+          "effect_description": "每小時 46 木材",
           "cp_per_day": 2
         },
         {
@@ -8831,8 +8831,8 @@
           "build_time_base": 5890,
           "population": 2,
           "culture_points": 3,
-          "effect_value": 50,
-          "effect_description": "每小時 +50 木材",
+          "effect_value": 70.0,
+          "effect_description": "每小時 70 木材",
           "cp_per_day": 3
         },
         {
@@ -8844,8 +8844,8 @@
           "build_time_base": 9620,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 70,
-          "effect_description": "每小時 +70 木材",
+          "effect_value": 98.0,
+          "effect_description": "每小時 98 木材",
           "cp_per_day": 4
         },
         {
@@ -8857,8 +8857,8 @@
           "build_time_base": 15590,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 100,
-          "effect_description": "每小時 +100 木材",
+          "effect_value": 140.0,
+          "effect_description": "每小時 140 木材",
           "cp_per_day": 4
         },
         {
@@ -8870,8 +8870,8 @@
           "build_time_base": 25150,
           "population": 2,
           "culture_points": 5,
-          "effect_value": 145,
-          "effect_description": "每小時 +145 木材",
+          "effect_value": 203.0,
+          "effect_description": "每小時 203 木材",
           "cp_per_day": 5
         },
         {
@@ -8883,8 +8883,8 @@
           "build_time_base": 40440,
           "population": 2,
           "culture_points": 6,
-          "effect_value": 200,
-          "effect_description": "每小時 +200 木材",
+          "effect_value": 280.0,
+          "effect_description": "每小時 280 木材",
           "cp_per_day": 6
         },
         {
@@ -8896,8 +8896,8 @@
           "build_time_base": 64900,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 280,
-          "effect_description": "每小時 +280 木材",
+          "effect_value": 392.0,
+          "effect_description": "每小時 392 木材",
           "cp_per_day": 7
         },
         {
@@ -8909,8 +8909,8 @@
           "build_time_base": 104050,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 375,
-          "effect_description": "每小時 +375 木材",
+          "effect_value": 525.0,
+          "effect_description": "每小時 525 木材",
           "cp_per_day": 9
         },
         {
@@ -8922,8 +8922,8 @@
           "build_time_base": 166680,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 495,
-          "effect_description": "每小時 +495 木材",
+          "effect_value": 693.0,
+          "effect_description": "每小時 693 木材",
           "cp_per_day": 11
         },
         {
@@ -8935,8 +8935,8 @@
           "build_time_base": 266880,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 635,
-          "effect_description": "每小時 +635 木材",
+          "effect_value": 889.0,
+          "effect_description": "每小時 889 木材",
           "cp_per_day": 13
         },
         {
@@ -8948,8 +8948,8 @@
           "build_time_base": 427210,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 800,
-          "effect_description": "每小時 +800 木材",
+          "effect_value": 1120.0,
+          "effect_description": "每小時 1,120 木材",
           "cp_per_day": 15
         },
         {
@@ -8961,8 +8961,8 @@
           "build_time_base": 683730,
           "population": 3,
           "culture_points": 18,
-          "effect_value": 1000,
-          "effect_description": "每小時 +1000 木材",
+          "effect_value": 1400.0,
+          "effect_description": "每小時 1,400 木材",
           "cp_per_day": 18
         },
         {
@@ -8974,8 +8974,8 @@
           "build_time_base": 1094170,
           "population": 3,
           "culture_points": 22,
-          "effect_value": 1300,
-          "effect_description": "每小時 +1300 木材",
+          "effect_value": 1820.0,
+          "effect_description": "每小時 1,820 木材",
           "cp_per_day": 22
         },
         {
@@ -8987,8 +8987,8 @@
           "build_time_base": 1750880,
           "population": 3,
           "culture_points": 27,
-          "effect_value": 1600,
-          "effect_description": "每小時 +1600 木材",
+          "effect_value": 2240.0,
+          "effect_description": "每小時 2,240 木材",
           "cp_per_day": 27
         },
         {
@@ -9000,8 +9000,8 @@
           "build_time_base": 2801600,
           "population": 3,
           "culture_points": 32,
-          "effect_value": 2000,
-          "effect_description": "每小時 +2000 木材",
+          "effect_value": 2800.0,
+          "effect_description": "每小時 2,800 木材",
           "cp_per_day": 32
         },
         {
@@ -9013,8 +9013,8 @@
           "build_time_base": 4482770,
           "population": 3,
           "culture_points": 38,
-          "effect_value": 2450,
-          "effect_description": "每小時 +2450 木材",
+          "effect_value": 3430.0,
+          "effect_description": "每小時 3,430 木材",
           "cp_per_day": 38
         }
       ],
@@ -9039,8 +9039,8 @@
           "build_time_base": 220,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 5,
-          "effect_description": "每小時 +5 磚塊",
+          "effect_value": 7.0,
+          "effect_description": "每小時 7 磚塊",
           "cp_per_day": 1
         },
         {
@@ -9052,8 +9052,8 @@
           "build_time_base": 550,
           "population": 1,
           "culture_points": 1,
-          "effect_value": 9,
-          "effect_description": "每小時 +9 磚塊",
+          "effect_value": 13.0,
+          "effect_description": "每小時 13 磚塊",
           "cp_per_day": 1
         },
         {
@@ -9065,8 +9065,8 @@
           "build_time_base": 1080,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 15,
-          "effect_description": "每小時 +15 磚塊",
+          "effect_value": 21.0,
+          "effect_description": "每小時 21 磚塊",
           "cp_per_day": 2
         },
         {
@@ -9078,8 +9078,8 @@
           "build_time_base": 1930,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 22,
-          "effect_description": "每小時 +22 磚塊",
+          "effect_value": 31.0,
+          "effect_description": "每小時 31 磚塊",
           "cp_per_day": 2
         },
         {
@@ -9091,8 +9091,8 @@
           "build_time_base": 3290,
           "population": 1,
           "culture_points": 2,
-          "effect_value": 33,
-          "effect_description": "每小時 +33 磚塊",
+          "effect_value": 46.0,
+          "effect_description": "每小時 46 磚塊",
           "cp_per_day": 2
         },
         {
@@ -9104,8 +9104,8 @@
           "build_time_base": 5470,
           "population": 2,
           "culture_points": 3,
-          "effect_value": 50,
-          "effect_description": "每小時 +50 磚塊",
+          "effect_value": 70.0,
+          "effect_description": "每小時 70 磚塊",
           "cp_per_day": 3
         },
         {
@@ -9117,8 +9117,8 @@
           "build_time_base": 8950,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 70,
-          "effect_description": "每小時 +70 磚塊",
+          "effect_value": 98.0,
+          "effect_description": "每小時 98 磚塊",
           "cp_per_day": 4
         },
         {
@@ -9130,8 +9130,8 @@
           "build_time_base": 14520,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 100,
-          "effect_description": "每小時 +100 磚塊",
+          "effect_value": 140.0,
+          "effect_description": "每小時 140 磚塊",
           "cp_per_day": 4
         },
         {
@@ -9143,8 +9143,8 @@
           "build_time_base": 23430,
           "population": 2,
           "culture_points": 5,
-          "effect_value": 145,
-          "effect_description": "每小時 +145 磚塊",
+          "effect_value": 203.0,
+          "effect_description": "每小時 203 磚塊",
           "cp_per_day": 5
         },
         {
@@ -9156,8 +9156,8 @@
           "build_time_base": 37690,
           "population": 2,
           "culture_points": 6,
-          "effect_value": 200,
-          "effect_description": "每小時 +200 磚塊",
+          "effect_value": 280.0,
+          "effect_description": "每小時 280 磚塊",
           "cp_per_day": 6
         },
         {
@@ -9169,8 +9169,8 @@
           "build_time_base": 60510,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 280,
-          "effect_description": "每小時 +280 磚塊",
+          "effect_value": 392.0,
+          "effect_description": "每小時 392 磚塊",
           "cp_per_day": 7
         },
         {
@@ -9182,8 +9182,8 @@
           "build_time_base": 97010,
           "population": 2,
           "culture_points": 9,
-          "effect_value": 375,
-          "effect_description": "每小時 +375 磚塊",
+          "effect_value": 525.0,
+          "effect_description": "每小時 525 磚塊",
           "cp_per_day": 9
         },
         {
@@ -9195,8 +9195,8 @@
           "build_time_base": 155420,
           "population": 2,
           "culture_points": 11,
-          "effect_value": 495,
-          "effect_description": "每小時 +495 磚塊",
+          "effect_value": 693.0,
+          "effect_description": "每小時 693 磚塊",
           "cp_per_day": 11
         },
         {
@@ -9208,8 +9208,8 @@
           "build_time_base": 248870,
           "population": 2,
           "culture_points": 13,
-          "effect_value": 635,
-          "effect_description": "每小時 +635 磚塊",
+          "effect_value": 889.0,
+          "effect_description": "每小時 889 磚塊",
           "cp_per_day": 13
         },
         {
@@ -9221,8 +9221,8 @@
           "build_time_base": 398390,
           "population": 2,
           "culture_points": 15,
-          "effect_value": 800,
-          "effect_description": "每小時 +800 磚塊",
+          "effect_value": 1120.0,
+          "effect_description": "每小時 1,120 磚塊",
           "cp_per_day": 15
         },
         {
@@ -9234,8 +9234,8 @@
           "build_time_base": 637620,
           "population": 3,
           "culture_points": 18,
-          "effect_value": 1000,
-          "effect_description": "每小時 +1000 磚塊",
+          "effect_value": 1400.0,
+          "effect_description": "每小時 1,400 磚塊",
           "cp_per_day": 18
         },
         {
@@ -9247,8 +9247,8 @@
           "build_time_base": 1020390,
           "population": 3,
           "culture_points": 22,
-          "effect_value": 1300,
-          "effect_description": "每小時 +1300 磚塊",
+          "effect_value": 1820.0,
+          "effect_description": "每小時 1,820 磚塊",
           "cp_per_day": 22
         },
         {
@@ -9260,8 +9260,8 @@
           "build_time_base": 1632820,
           "population": 3,
           "culture_points": 27,
-          "effect_value": 1600,
-          "effect_description": "每小時 +1600 磚塊",
+          "effect_value": 2240.0,
+          "effect_description": "每小時 2,240 磚塊",
           "cp_per_day": 27
         },
         {
@@ -9273,8 +9273,8 @@
           "build_time_base": 2612710,
           "population": 3,
           "culture_points": 32,
-          "effect_value": 2000,
-          "effect_description": "每小時 +2000 磚塊",
+          "effect_value": 2800.0,
+          "effect_description": "每小時 2,800 磚塊",
           "cp_per_day": 32
         },
         {
@@ -9286,8 +9286,8 @@
           "build_time_base": 4180540,
           "population": 3,
           "culture_points": 38,
-          "effect_value": 2450,
-          "effect_description": "每小時 +2450 磚塊",
+          "effect_value": 3430.0,
+          "effect_description": "每小時 3,430 磚塊",
           "cp_per_day": 38
         }
       ],
@@ -9315,8 +9315,8 @@
           "build_time_base": 450,
           "population": 3,
           "culture_points": 1,
-          "effect_value": 5,
-          "effect_description": "每小時 +5 鐵礦",
+          "effect_value": 7.0,
+          "effect_description": "每小時 7 鐵礦",
           "cp_per_day": 1
         },
         {
@@ -9328,8 +9328,8 @@
           "build_time_base": 920,
           "population": 2,
           "culture_points": 1,
-          "effect_value": 9,
-          "effect_description": "每小時 +9 鐵礦",
+          "effect_value": 13.0,
+          "effect_description": "每小時 13 鐵礦",
           "cp_per_day": 1
         },
         {
@@ -9341,8 +9341,8 @@
           "build_time_base": 1670,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 15,
-          "effect_description": "每小時 +15 鐵礦",
+          "effect_value": 21.0,
+          "effect_description": "每小時 21 鐵礦",
           "cp_per_day": 2
         },
         {
@@ -9354,8 +9354,8 @@
           "build_time_base": 2880,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 22,
-          "effect_description": "每小時 +22 鐵礦",
+          "effect_value": 31.0,
+          "effect_description": "每小時 31 鐵礦",
           "cp_per_day": 2
         },
         {
@@ -9367,8 +9367,8 @@
           "build_time_base": 4800,
           "population": 2,
           "culture_points": 2,
-          "effect_value": 33,
-          "effect_description": "每小時 +33 鐵礦",
+          "effect_value": 46.0,
+          "effect_description": "每小時 46 鐵礦",
           "cp_per_day": 2
         },
         {
@@ -9380,8 +9380,8 @@
           "build_time_base": 7880,
           "population": 2,
           "culture_points": 3,
-          "effect_value": 50,
-          "effect_description": "每小時 +50 鐵礦",
+          "effect_value": 70.0,
+          "effect_description": "每小時 70 鐵礦",
           "cp_per_day": 3
         },
         {
@@ -9393,8 +9393,8 @@
           "build_time_base": 12810,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 70,
-          "effect_description": "每小時 +70 鐵礦",
+          "effect_value": 98.0,
+          "effect_description": "每小時 98 鐵礦",
           "cp_per_day": 4
         },
         {
@@ -9406,8 +9406,8 @@
           "build_time_base": 20690,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 100,
-          "effect_description": "每小時 +100 鐵礦",
+          "effect_value": 140.0,
+          "effect_description": "每小時 140 鐵礦",
           "cp_per_day": 4
         },
         {
@@ -9419,8 +9419,8 @@
           "build_time_base": 33310,
           "population": 2,
           "culture_points": 5,
-          "effect_value": 145,
-          "effect_description": "每小時 +145 鐵礦",
+          "effect_value": 203.0,
+          "effect_description": "每小時 203 鐵礦",
           "cp_per_day": 5
         },
         {
@@ -9432,8 +9432,8 @@
           "build_time_base": 53500,
           "population": 2,
           "culture_points": 6,
-          "effect_value": 200,
-          "effect_description": "每小時 +200 鐵礦",
+          "effect_value": 280.0,
+          "effect_description": "每小時 280 鐵礦",
           "cp_per_day": 6
         },
         {
@@ -9445,8 +9445,8 @@
           "build_time_base": 85800,
           "population": 3,
           "culture_points": 7,
-          "effect_value": 280,
-          "effect_description": "每小時 +280 鐵礦",
+          "effect_value": 392.0,
+          "effect_description": "每小時 392 鐵礦",
           "cp_per_day": 7
         },
         {
@@ -9458,8 +9458,8 @@
           "build_time_base": 137470,
           "population": 3,
           "culture_points": 9,
-          "effect_value": 375,
-          "effect_description": "每小時 +375 鐵礦",
+          "effect_value": 525.0,
+          "effect_description": "每小時 525 鐵礦",
           "cp_per_day": 9
         },
         {
@@ -9471,8 +9471,8 @@
           "build_time_base": 220160,
           "population": 3,
           "culture_points": 11,
-          "effect_value": 495,
-          "effect_description": "每小時 +495 鐵礦",
+          "effect_value": 693.0,
+          "effect_description": "每小時 693 鐵礦",
           "cp_per_day": 11
         },
         {
@@ -9484,8 +9484,8 @@
           "build_time_base": 352450,
           "population": 3,
           "culture_points": 13,
-          "effect_value": 635,
-          "effect_description": "每小時 +635 鐵礦",
+          "effect_value": 889.0,
+          "effect_description": "每小時 889 鐵礦",
           "cp_per_day": 13
         },
         {
@@ -9497,8 +9497,8 @@
           "build_time_base": 564120,
           "population": 3,
           "culture_points": 15,
-          "effect_value": 800,
-          "effect_description": "每小時 +800 鐵礦",
+          "effect_value": 1120.0,
+          "effect_description": "每小時 1,120 鐵礦",
           "cp_per_day": 15
         },
         {
@@ -9510,8 +9510,8 @@
           "build_time_base": 902790,
           "population": 3,
           "culture_points": 18,
-          "effect_value": 1000,
-          "effect_description": "每小時 +1000 鐵礦",
+          "effect_value": 1400.0,
+          "effect_description": "每小時 1,400 鐵礦",
           "cp_per_day": 18
         },
         {
@@ -9523,8 +9523,8 @@
           "build_time_base": 1444660,
           "population": 3,
           "culture_points": 22,
-          "effect_value": 1300,
-          "effect_description": "每小時 +1300 鐵礦",
+          "effect_value": 1820.0,
+          "effect_description": "每小時 1,820 鐵礦",
           "cp_per_day": 22
         },
         {
@@ -9536,8 +9536,8 @@
           "build_time_base": 2311660,
           "population": 3,
           "culture_points": 27,
-          "effect_value": 1600,
-          "effect_description": "每小時 +1600 鐵礦",
+          "effect_value": 2240.0,
+          "effect_description": "每小時 2,240 鐵礦",
           "cp_per_day": 27
         },
         {
@@ -9549,8 +9549,8 @@
           "build_time_base": 3698850,
           "population": 3,
           "culture_points": 32,
-          "effect_value": 2000,
-          "effect_description": "每小時 +2000 鐵礦",
+          "effect_value": 2800.0,
+          "effect_description": "每小時 2,800 鐵礦",
           "cp_per_day": 32
         },
         {
@@ -9562,8 +9562,8 @@
           "build_time_base": 5918370,
           "population": 3,
           "culture_points": 38,
-          "effect_value": 2450,
-          "effect_description": "每小時 +2450 鐵礦",
+          "effect_value": 3430.0,
+          "effect_description": "每小時 3,430 鐵礦",
           "cp_per_day": 38
         }
       ],
@@ -9588,8 +9588,8 @@
           "build_time_base": 150,
           "population": 0,
           "culture_points": 1,
-          "effect_value": 5,
-          "effect_description": "每小時 +5 糧食",
+          "effect_value": 7.0,
+          "effect_description": "每小時 7 糧食",
           "cp_per_day": 1
         },
         {
@@ -9601,8 +9601,8 @@
           "build_time_base": 440,
           "population": 0,
           "culture_points": 1,
-          "effect_value": 9,
-          "effect_description": "每小時 +9 糧食",
+          "effect_value": 13.0,
+          "effect_description": "每小時 13 糧食",
           "cp_per_day": 1
         },
         {
@@ -9614,8 +9614,8 @@
           "build_time_base": 900,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 15,
-          "effect_description": "每小時 +15 糧食",
+          "effect_value": 21.0,
+          "effect_description": "每小時 21 糧食",
           "cp_per_day": 2
         },
         {
@@ -9627,8 +9627,8 @@
           "build_time_base": 1650,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 22,
-          "effect_description": "每小時 +22 糧食",
+          "effect_value": 31.0,
+          "effect_description": "每小時 31 糧食",
           "cp_per_day": 2
         },
         {
@@ -9640,8 +9640,8 @@
           "build_time_base": 2830,
           "population": 0,
           "culture_points": 2,
-          "effect_value": 33,
-          "effect_description": "每小時 +33 糧食",
+          "effect_value": 46.0,
+          "effect_description": "每小時 46 糧食",
           "cp_per_day": 2
         },
         {
@@ -9653,8 +9653,8 @@
           "build_time_base": 4730,
           "population": 1,
           "culture_points": 3,
-          "effect_value": 50,
-          "effect_description": "每小時 +50 糧食",
+          "effect_value": 70.0,
+          "effect_description": "每小時 70 糧食",
           "cp_per_day": 3
         },
         {
@@ -9666,8 +9666,8 @@
           "build_time_base": 7780,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 70,
-          "effect_description": "每小時 +70 糧食",
+          "effect_value": 98.0,
+          "effect_description": "每小時 98 糧食",
           "cp_per_day": 4
         },
         {
@@ -9679,8 +9679,8 @@
           "build_time_base": 12640,
           "population": 1,
           "culture_points": 4,
-          "effect_value": 100,
-          "effect_description": "每小時 +100 糧食",
+          "effect_value": 140.0,
+          "effect_description": "每小時 140 糧食",
           "cp_per_day": 4
         },
         {
@@ -9692,8 +9692,8 @@
           "build_time_base": 20430,
           "population": 1,
           "culture_points": 5,
-          "effect_value": 145,
-          "effect_description": "每小時 +145 糧食",
+          "effect_value": 203.0,
+          "effect_description": "每小時 203 糧食",
           "cp_per_day": 5
         },
         {
@@ -9705,8 +9705,8 @@
           "build_time_base": 32880,
           "population": 1,
           "culture_points": 6,
-          "effect_value": 200,
-          "effect_description": "每小時 +200 糧食",
+          "effect_value": 280.0,
+          "effect_description": "每小時 280 糧食",
           "cp_per_day": 6
         },
         {
@@ -9718,8 +9718,8 @@
           "build_time_base": 52810,
           "population": 1,
           "culture_points": 7,
-          "effect_value": 280,
-          "effect_description": "每小時 +280 糧食",
+          "effect_value": 392.0,
+          "effect_description": "每小時 392 糧食",
           "cp_per_day": 7
         },
         {
@@ -9731,8 +9731,8 @@
           "build_time_base": 84700,
           "population": 1,
           "culture_points": 9,
-          "effect_value": 375,
-          "effect_description": "每小時 +375 糧食",
+          "effect_value": 525.0,
+          "effect_description": "每小時 525 糧食",
           "cp_per_day": 9
         },
         {
@@ -9744,8 +9744,8 @@
           "build_time_base": 135710,
           "population": 1,
           "culture_points": 11,
-          "effect_value": 495,
-          "effect_description": "每小時 +495 糧食",
+          "effect_value": 693.0,
+          "effect_description": "每小時 693 糧食",
           "cp_per_day": 11
         },
         {
@@ -9757,8 +9757,8 @@
           "build_time_base": 217340,
           "population": 1,
           "culture_points": 13,
-          "effect_value": 635,
-          "effect_description": "每小時 +635 糧食",
+          "effect_value": 889.0,
+          "effect_description": "每小時 889 糧食",
           "cp_per_day": 13
         },
         {
@@ -9770,8 +9770,8 @@
           "build_time_base": 347950,
           "population": 1,
           "culture_points": 15,
-          "effect_value": 800,
-          "effect_description": "每小時 +800 糧食",
+          "effect_value": 1120.0,
+          "effect_description": "每小時 1,120 糧食",
           "cp_per_day": 15
         },
         {
@@ -9783,8 +9783,8 @@
           "build_time_base": 556910,
           "population": 2,
           "culture_points": 18,
-          "effect_value": 1000,
-          "effect_description": "每小時 +1000 糧食",
+          "effect_value": 1400.0,
+          "effect_description": "每小時 1,400 糧食",
           "cp_per_day": 18
         },
         {
@@ -9796,8 +9796,8 @@
           "build_time_base": 891260,
           "population": 2,
           "culture_points": 22,
-          "effect_value": 1300,
-          "effect_description": "每小時 +1300 糧食",
+          "effect_value": 1820.0,
+          "effect_description": "每小時 1,820 糧食",
           "cp_per_day": 22
         },
         {
@@ -9809,8 +9809,8 @@
           "build_time_base": 1426210,
           "population": 2,
           "culture_points": 27,
-          "effect_value": 1600,
-          "effect_description": "每小時 +1600 糧食",
+          "effect_value": 2240.0,
+          "effect_description": "每小時 2,240 糧食",
           "cp_per_day": 27
         },
         {
@@ -9822,8 +9822,8 @@
           "build_time_base": 2282140,
           "population": 2,
           "culture_points": 32,
-          "effect_value": 2000,
-          "effect_description": "每小時 +2000 糧食",
+          "effect_value": 2800.0,
+          "effect_description": "每小時 2,800 糧食",
           "cp_per_day": 32
         },
         {
@@ -9835,8 +9835,8 @@
           "build_time_base": 3651630,
           "population": 2,
           "culture_points": 38,
-          "effect_value": 2450,
-          "effect_description": "每小時 +2450 糧食",
+          "effect_value": 3430.0,
+          "effect_description": "每小時 3,430 糧食",
           "cp_per_day": 38
         }
       ],

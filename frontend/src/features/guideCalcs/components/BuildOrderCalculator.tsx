@@ -158,6 +158,11 @@ export function planGreedy(input: PlanInput): PlanResult {
   return { steps, totalCost, totalTime };
 }
 
+/** 這次的建議有沒有用到 0 級資源田的產量：起始有 0 級的田，或有一步是 0 → 1 級 */
+export function planUsesFieldLevelZero(start: Record<ResourceType, number>, steps: Step[]): boolean {
+  return Object.values(start).some(lv => lv === 0) || steps.some(x => x.kind === 'field' && x.from === 0);
+}
+
 export default function BuildOrderCalculator() {
   const { lang } = useLang();
   const [cropperId, setCropperId] = useState<CropperId>('15c');
@@ -174,8 +179,9 @@ export default function BuildOrderCalculator() {
   // 待驗證：資源田、加成建築的花費和時間、Plus 算法都已照官方核對（P0-23）；
   // 加成建築的資料哪天又標待驗證，這裡會自動帶回灰標
   const planKinds: PendingKind[] = [
-    // 有田從 0 級升 1 級：排序用到 0 級產量（官方資料從 1 級開始）
-    ...(plan.steps.some(x => x.kind === 'field' && x.from === 0) ? ['fieldLevelZero' as const] : []),
+    // 用到 0 級產量（官方資料從 1 級開始）就標：有田從 0 級升 1 級，或起始有 0 級的田
+    // （就算 20 步裡都沒升，總產量、加成建築的划算程度也照 0 級 3／小時算；PM，P0-23）
+    ...(planUsesFieldLevelZero(start, plan.steps) ? ['fieldLevelZero' as const] : []),
     ...(!BONUS_BUILDINGS_VERIFIED && plan.steps.some(x => x.kind === 'bb') ? ['building' as const] : []),
   ];
 

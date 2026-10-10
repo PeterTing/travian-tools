@@ -78,8 +78,13 @@ describe('BuildingsPage ts11 verification marks', () => {
     expect(mark).toHaveAttribute('data-source', 'mainTs11')
     fireEvent.click(mark)
     expect(mark).toHaveAttribute('aria-expanded', 'true')
-    expect(screen.getByTestId('pending-note-what')).toHaveTextContent('花費、時間、人口、文化點已核對。')
-    expect(screen.getByTestId('pending-note-source')).toHaveTextContent(/建造時間取自 ts11 遊戲內說明（官方知識庫 1 級的時間跟遊戲內不同）/)
+    // 效果也照官方知識庫核對過：第一行加「效果」
+    expect(screen.getByTestId('pending-note-what')).toHaveTextContent('花費、時間、人口、文化點、效果已核對。')
+    // 第二行：知識庫沒錯，時間有乘村莊大樓加速（1 級 10000 = 2000 × 5），這裡列基本時間
+    const src = screen.getByTestId('pending-note-source')
+    expect(src).toHaveTextContent('1 級取自 ts11 遊戲內說明，2 級以上取自官方知識庫。')
+    expect(src).toHaveTextContent('知識庫的時間有乘上村莊大樓加速（村莊大樓 1 級寫 10000 秒＝2000 × 5），這裡列的是沒加速的基本時間。')
+    expect(src).not.toHaveTextContent('不同')
     fireEvent.click(mark)
     expect(screen.queryByTestId('pending-note-panel')).toBeNull()
   })
@@ -101,3 +106,43 @@ describe('BuildingsPage ✓ source notes (real data, P0-23)', () => {
   })
 })
 
+
+describe('BuildingsPage effect column (official knowledge base, P0-23)', () => {
+  beforeEach(async () => {
+    await i18n.changeLanguage('zh-TW')
+    list.push({ building_id: 'rally_point', name_zh: '集結點', name_en: 'Rally Point', category: 'military', max_level: 20 })
+  })
+  afterEach(() => {
+    list.splice(2)
+    vi.restoreAllMocks()
+  })
+
+  it('real data: only buildings without a comparable knowledge base effect column are pending', () => {
+    for (const id of ['academy', 'blacksmith', 'embassy', 'rally_point', 'treasury']) expect(gameData.isBuildingEffectVerified(id), id).toBe(false)
+    for (const id of ['main_building', 'warehouse', 'great_warehouse', 'stonemasons_lodge', 'horse_drinking_trough', 'trade_office', 'woodcutter']) expect(gameData.isBuildingEffectVerified(id), id).toBe(true)
+  })
+
+  it('effect not verified: ONE chip by the 效果 heading, note under the header row; verified building: no chip', async () => {
+    render(<BuildingsPage />)
+    fireEvent.click(await screen.findByText('集結點'))
+    const heading = await screen.findByTestId('building-effect-heading')
+    const chip = within(heading).getByTestId('pending-verify-chip')
+    expect(chip).toHaveAttribute('data-kind', 'buildingEffect')
+    expect(screen.getAllByTestId('pending-verify-chip').filter((c) => c.getAttribute('data-kind') === 'buildingEffect')).toHaveLength(1)
+    fireEvent.click(chip)
+    const row = screen.getByTestId('pending-note-row')
+    expect(row.querySelector('td')).toHaveAttribute('colspan', '9')
+    expect(within(row).getByTestId('pending-note-what')).toHaveTextContent('這棟建築的效果還沒核對。')
+    expect(within(row).getByTestId('pending-note-source')).toHaveTextContent('官方知識庫沒有可以對照的效果數字；目前的文字來源還在查。')
+    // ✓ 第一行不寫「效果」
+    fireEvent.click(within((screen.getAllByText('集結點')[0]!).closest('p')!).getByTestId('verified-mark'))
+    expect(screen.getAllByTestId('pending-note-what').some((w) => w.textContent === '花費、時間、人口、文化點已核對。')).toBe(true)
+  })
+
+  it('verified effect (main building): no chip by the 效果 heading', async () => {
+    render(<BuildingsPage />)
+    fireEvent.click(await screen.findByText('村莊大樓'))
+    const heading = await screen.findByTestId('building-effect-heading')
+    expect(within(heading).queryByTestId('pending-verify-chip')).toBeNull()
+  })
+})

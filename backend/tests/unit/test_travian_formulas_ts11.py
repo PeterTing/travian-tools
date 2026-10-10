@@ -298,11 +298,13 @@ class TestBuildingDataFixes:
         palisade = get_game_data_service().buildings.get_building("palisade")
         assert palisade.get_level(1).effect_value == 2.5
 
-    def test_celebration_cp_fixed(self) -> None:
+    def test_town_hall_effect_is_kb_celebration_length(self) -> None:
+        # 效果欄照官方知識庫：慶典要辦多久（小慶典 1 級 24 小時；10 級起有大慶典）。CP 上限在 culture_points.json
         th = get_game_data_service().buildings.get_building("town_hall")
-        assert th.get_level(1).effect_value == 500
-        assert th.get_level(5).effect_value == 500
-        assert th.get_level(10).effect_value == 2000
+        assert th.get_level(1).effect_value == 24 * 3600
+        assert th.get_level(1).effect_description == "小慶典 24:00:00"
+        assert "大慶典" not in th.get_level(9).effect_description
+        assert th.get_level(10).effect_description == "小慶典 17:15:17／大慶典 43:08:11"
 
     def test_tournament_square_prereq_rally_only(self) -> None:
         ts = get_game_data_service().buildings.get_building("tournament_square")

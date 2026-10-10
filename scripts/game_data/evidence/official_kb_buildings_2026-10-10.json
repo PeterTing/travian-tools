@@ -1,5 +1,5 @@
 {
- "_what": "官方知識庫建築表（knowledgebase.legends.travian.com/en-US/buildings/<gid>，x1、村莊大樓 1 級的預設設定）。ts11 遊戲內說明頁 manual/building/N 的「知識庫」連結和 support.travian.com 第 33 篇（Buildings and Resource Fields Statistics）都連到這裡。2026-10-10 用瀏覽器唯讀讀取、每頁間隔 1.5 秒。1 級的花費、人口、時間跟 ts11 說明頁 44 棟裡 43 棟一樣；村莊大樓 1 級時間不同是因為這頁用「村莊大樓等級」算村莊大樓自己（說明頁 2000 秒）。12 號沒有這棟建築（頁面空白）。",
+ "_what": "官方知識庫建築表（knowledgebase.legends.travian.com/en-US/buildings/<gid>，x1、村莊大樓 1 級的預設設定）。ts11 遊戲內說明頁 manual/building/N 的「知識庫」連結和 support.travian.com 第 33 篇（Buildings and Resource Fields Statistics）都連到這裡。2026-10-10 用瀏覽器唯讀讀取、每頁間隔 1.5 秒。1 級的花費、人口、時間跟 ts11 說明頁 44 棟裡 43 棟一樣；村莊大樓 1 級時間看起來不同：這頁的時間都乘上了村莊大樓加速，村莊大樓自己用前一級算，1 級＝0 級倍率 5 → 2000 × 5 ＝ 10000 秒（說明頁寫基本時間 2000 秒）；知識庫沒錯，見 official_kb_mb_level_experiment_2026-10-10.json。12 號沒有這棟建築（頁面空白）。",
  "source": "https://knowledgebase.legends.travian.com/en-US/buildings",
  "linked_from": [
   "https://support.travian.com/en/articles/33-buildings-and-resource-fields-statistics",

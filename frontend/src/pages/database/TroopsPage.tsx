@@ -249,10 +249,14 @@ export default function TroopsPage() {
                         <td className="py-2 text-muted-foreground">類型</td>
                         <td className="py-2 text-right">{t(`database.troops.category.${selectedTroop.category}`, { defaultValue: selectedTroop.category })}</td>
                       </tr>
-                      <tr className="border-b">
+                      {/* 維京運載量：官方說明頁 S139 沒有，數字是舊資料表的（P0-23）；說明畫在這一列下面 */}
+                      <PendingRow as="tr" className="border-b" tableColSpan={2} data-testid="troop-carry-row">
                         <td className="py-2 text-muted-foreground">運載量</td>
-                        <td className="py-2 text-right">{selectedTroop.carry_capacity}</td>
-                      </tr>
+                        <td className="py-2 text-right" data-testid="troop-carry">
+                          {selectedTroop.carry_capacity}
+                          {selectedTroop.tribe === 'vikings' && <PendingVerifyChip kind="vikingCarry" className="ml-1" />}
+                        </td>
+                      </PendingRow>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">糧耗</td>
                         <td className="py-2 text-right">{selectedTroop.crop_consumption}/h</td>

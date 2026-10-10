@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { buildingsApi } from '@/services/gameApi'
 import type { BuildingListItem, BuildingDetail, BuildingCategory } from '@/types/game'
 import BuildingVerifyMark, { BuildingVerifyLegend } from '@/components/common/BuildingVerifyMark'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import { isBuildingEffectVerified } from '@/data/gameData'
 
 const CATEGORY_VALUES: (BuildingCategory | 'all')[] = [
   'all',
@@ -186,7 +188,8 @@ export default function BuildingsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b">
+                    {/* 效果欄沒辦法照官方知識庫核對的建築：「效果」標題旁一個灰標，說明畫在標題列下面（P0-23） */}
+                    <PendingRow as="tr" className="border-b" tableColSpan={9}>
                       <th className="py-2 px-2 text-left">{t('common.levelShort')}</th>
                       <th className="py-2 px-2 text-right">{t('database.buildings.wood')}</th>
                       <th className="py-2 px-2 text-right">{t('database.buildings.clay')}</th>
@@ -195,8 +198,11 @@ export default function BuildingsPage() {
                       <th className="py-2 px-2 text-right">{t('database.buildings.buildTime')}</th>
                       <th className="py-2 px-2 text-right">{t('database.buildings.population')}</th>
                       <th className="py-2 px-2 text-right">{t('database.buildings.culturePoints')}</th>
-                      <th className="py-2 px-2 text-left">{t('database.buildings.effect')}</th>
-                    </tr>
+                      <th className="py-2 px-2 text-left whitespace-nowrap" data-testid="building-effect-heading">
+                        {t('database.buildings.effect')}
+                        {!isBuildingEffectVerified(selectedBuilding.building_id) && <PendingVerifyChip kind="buildingEffect" className="ml-1" />}
+                      </th>
+                    </PendingRow>
                   </thead>
                   <tbody>
                     {selectedBuilding.levels.map((level) => (

@@ -1,0 +1,191 @@
+{
+  "_what": "官方知識庫建築頁的「村莊大樓等級」輸入框實驗（knowledgebase.legends.travian.com/en-US/buildings/<gid>，x1）。2026-10-10 用無頭瀏覽器唯讀打開頁面、改輸入框、讀前三級的建造時間，每次間隔 1.5 秒。腳本：review/verify-all-2026-10-10/tools/kb_mb_experiment.mjs（不在 repo）。",
+  "captured_at": "2026-10-10T11:25:08.999Z",
+  "conclusion": [
+    "知識庫的建造時間＝基本時間 × 村莊大樓加速：輸入框預設 1（倍率 1），2 級 ×0.964、10 級 ×0.719；輸入 0 時每一棟都 ×5（伐木場 1 級 260 → 1300 秒、兵營 1 級 2000 → 10000 秒）。",
+    "村莊大樓自己的頁面不看輸入框：n 級的時間用 n−1 級的村莊大樓算。1 級＝0 級倍率 5 → 2000 × 5 = 10000 秒（02:46:40）；2 級＝1 級倍率 1 → 2620 秒；3 級＝2 級倍率 0.964 → 3340 × 0.964 ≈ 3220 秒。",
+    "所以知識庫村莊大樓 1 級的 10000 秒沒有錯，只是已經乘上倍率；工具存的是基本時間（村莊大樓 1 級、x1），跟 ts11 遊戲內說明頁的 2000 秒一樣，其他 43 棟的 1 級時間（知識庫輸入框預設 1）也都跟說明頁一樣。"
+  ],
+  "runs": [
+    {
+      "gid": 1,
+      "title": "Travian Buildings",
+      "mb_input": 1,
+      "mb_input_shown": "1",
+      "L1_time": "00:04:20",
+      "L1_s": 260,
+      "L2_time": "00:10:20",
+      "L2_s": 620,
+      "L3_time": "00:19:50",
+      "L3_s": 1190
+    },
+    {
+      "gid": 1,
+      "title": "Travian Buildings",
+      "mb_input": 0,
+      "mb_input_shown": "0",
+      "L1_time": "00:21:40",
+      "L1_s": 1300,
+      "L2_time": "00:51:20",
+      "L2_s": 3080,
+      "L3_time": "01:38:50",
+      "L3_s": 5930
+    },
+    {
+      "gid": 1,
+      "title": "Travian Buildings",
+      "mb_input": 2,
+      "mb_input_shown": "2",
+      "L1_time": "00:04:10",
+      "L1_s": 250,
+      "L2_time": "00:09:50",
+      "L2_s": 590,
+      "L3_time": "00:19:00",
+      "L3_s": 1140
+    },
+    {
+      "gid": 1,
+      "title": "Travian Buildings",
+      "mb_input": 10,
+      "mb_input_shown": "10",
+      "L1_time": "00:03:10",
+      "L1_s": 190,
+      "L2_time": "00:07:20",
+      "L2_s": 440,
+      "L3_time": "00:14:10",
+      "L3_s": 850
+    },
+    {
+      "gid": 1,
+      "title": "Travian Buildings",
+      "mb_input": 1,
+      "mb_input_shown": "1",
+      "L1_time": "00:04:20",
+      "L1_s": 260,
+      "L2_time": "00:10:20",
+      "L2_s": 620,
+      "L3_time": "00:19:50",
+      "L3_s": 1190
+    },
+    {
+      "gid": 19,
+      "title": "Travian Buildings",
+      "mb_input": 1,
+      "mb_input_shown": "1",
+      "L1_time": "00:33:20",
+      "L1_s": 2000,
+      "L2_time": "00:43:40",
+      "L2_s": 2620,
+      "L3_time": "00:55:40",
+      "L3_s": 3340
+    },
+    {
+      "gid": 19,
+      "title": "Travian Buildings",
+      "mb_input": 0,
+      "mb_input_shown": "0",
+      "L1_time": "02:46:40",
+      "L1_s": 10000,
+      "L2_time": "03:38:20",
+      "L2_s": 13100,
+      "L3_time": "04:38:20",
+      "L3_s": 16700
+    },
+    {
+      "gid": 19,
+      "title": "Travian Buildings",
+      "mb_input": 2,
+      "mb_input_shown": "2",
+      "L1_time": "00:32:10",
+      "L1_s": 1930,
+      "L2_time": "00:42:10",
+      "L2_s": 2530,
+      "L3_time": "00:53:40",
+      "L3_s": 3220
+    },
+    {
+      "gid": 19,
+      "title": "Travian Buildings",
+      "mb_input": 10,
+      "mb_input_shown": "10",
+      "L1_time": "00:24:00",
+      "L1_s": 1440,
+      "L2_time": "00:31:20",
+      "L2_s": 1880,
+      "L3_time": "00:40:00",
+      "L3_s": 2400
+    },
+    {
+      "gid": 19,
+      "title": "Travian Buildings",
+      "mb_input": 1,
+      "mb_input_shown": "1",
+      "L1_time": "00:33:20",
+      "L1_s": 2000,
+      "L2_time": "00:43:40",
+      "L2_s": 2620,
+      "L3_time": "00:55:40",
+      "L3_s": 3340
+    },
+    {
+      "gid": 15,
+      "title": "Travian Buildings",
+      "mb_input": 1,
+      "mb_input_shown": "1",
+      "L1_time": "02:46:40",
+      "L1_s": 10000,
+      "L2_time": "00:43:40",
+      "L2_s": 2620,
+      "L3_time": "00:53:40",
+      "L3_s": 3220
+    },
+    {
+      "gid": 15,
+      "title": "Travian Buildings",
+      "mb_input": 0,
+      "mb_input_shown": "0",
+      "L1_time": "02:46:40",
+      "L1_s": 10000,
+      "L2_time": "00:43:40",
+      "L2_s": 2620,
+      "L3_time": "00:53:40",
+      "L3_s": 3220
+    },
+    {
+      "gid": 15,
+      "title": "Travian Buildings",
+      "mb_input": 2,
+      "mb_input_shown": "2",
+      "L1_time": "02:46:40",
+      "L1_s": 10000,
+      "L2_time": "00:43:40",
+      "L2_s": 2620,
+      "L3_time": "00:53:40",
+      "L3_s": 3220
+    },
+    {
+      "gid": 15,
+      "title": "Travian Buildings",
+      "mb_input": 10,
+      "mb_input_shown": "10",
+      "L1_time": "02:46:40",
+      "L1_s": 10000,
+      "L2_time": "00:43:40",
+      "L2_s": 2620,
+      "L3_time": "00:53:40",
+      "L3_s": 3220
+    },
+    {
+      "gid": 15,
+      "title": "Travian Buildings",
+      "mb_input": 1,
+      "mb_input_shown": "1",
+      "L1_time": "02:46:40",
+      "L1_s": 10000,
+      "L2_time": "00:43:40",
+      "L2_s": 2620,
+      "L3_time": "00:53:40",
+      "L3_s": 3220
+    }
+  ]
+}

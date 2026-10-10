@@ -115,7 +115,7 @@ function clauses(text: string): ReactNode {
 }
 
 /** 展開的灰色說明：第一行哪個數字還沒核對，第二行現在的數字從哪裡來 */
-export function PendingNotePanel({ id, kinds, labels, fill = false, ns = 'pendingNotes' }: { id: string; kinds: readonly string[]; labels?: readonly string[]; fill?: boolean; ns?: 'pendingNotes' | 'verifiedNotes' }) {
+export function PendingNotePanel({ id, kinds, labels, fill = false, ns = 'pendingNotes', whatKeys }: { id: string; kinds: readonly string[]; labels?: readonly string[]; fill?: boolean; ns?: 'pendingNotes' | 'verifiedNotes'; /** 第一行換成別的 i18n key（跟 kinds 一一對應；✓ 依效果有沒有核對換第一行） */ whatKeys?: readonly (string | undefined)[] }) {
   const { t } = useTranslation()
   const ref = useRef<HTMLSpanElement>(null)
   // 文字行：左邊對齊灰標；灰標太靠右放不下時往左移，整塊不超出這一行。fill：撐滿、從容器內容左緣開始
@@ -148,7 +148,8 @@ export function PendingNotePanel({ id, kinds, labels, fill = false, ns = 'pendin
       className={`mt-1 block ${fill ? 'w-full' : 'w-fit max-w-full'} rounded-md bg-gray-100 px-2 py-1.5 text-left text-xs font-normal leading-5 text-gray-700`}
     >
       {kinds.map((k, i) => {
-        const keys = ns === 'pendingNotes' ? pendingNoteKeys(k as PendingKind) : { what: `${ns}.${k}.what`, source: `${ns}.${k}.source` }
+        const base = ns === 'pendingNotes' ? pendingNoteKeys(k as PendingKind) : { what: `${ns}.${k}.what`, source: `${ns}.${k}.source` }
+        const keys = whatKeys?.[i] ? { ...base, what: whatKeys[i]! } : base
         // 好幾種：依數字在那一行出現的順序，每種兩行，種類之間隔 8px
         return (
           <span key={`${i}-${k}`} className={`block ${i > 0 ? 'mt-2' : ''}`} data-testid="pending-note-entry" data-kind={k}>
@@ -196,12 +197,61 @@ export function PendingRow({
       {open && chip && (tableColSpan ? (
         <tr data-testid="pending-note-row">
           <td colSpan={tableColSpan}>
-            <PendingNotePanel fill id={chip.id} kinds={chip.kinds as readonly PendingKind[]} labels={chip.labels} />
+            <StickyTableNote>
+              <PendingNotePanel fill id={chip.id} kinds={chip.kinds as readonly PendingKind[]} labels={chip.labels} />
+            </StickyTableNote>
           </td>
         </tr>
       ) : (
         <PendingNotePanel fill={fillPanel} id={chip.id} kinds={chip.kinds as readonly PendingKind[]} labels={chip.labels} />
       ))}
     </>
+  )
+}
+
+/** 往上找會橫向捲動的容器（overflow-x auto／scroll）；沒有就回 null */
+function scrollParent(el: HTMLElement | null): HTMLElement | null {
+  for (let p = el?.parentElement ?? null; p; p = p.parentElement) {
+    if (/(auto|scroll)/.test(getComputedStyle(p).overflowX)) return p
+  }
+  return null
+}
+
+/**
+ * 可以橫向捲動的表格（設計師，P0-23）：說明畫在那一列下面，但不跟著整張表撐寬——
+ * position: sticky; left: 0，寬度＝捲動容器看得到的寬度（扣掉左右內距），表格捲到哪裡說明都整塊看得到。
+ * 不在捲動容器裡就照舊撐滿那一格。
+ */
+export function StickyTableNote({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState<number | null>(null)
+  useLayoutEffect(() => {
+    const el = ref.current
+    const sc = scrollParent(el)
+    if (!el || !sc) return
+    const measure = () => {
+      const cs = getComputedStyle(sc)
+      const td = el.parentElement
+      const tdPad = td ? parseFloat(getComputedStyle(td).paddingLeft || '0') + parseFloat(getComputedStyle(td).paddingRight || '0') : 0
+      setWidth(Math.max(0, sc.clientWidth - parseFloat(cs.paddingLeft || '0') - parseFloat(cs.paddingRight || '0') - tdPad))
+    }
+    measure()
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
+    ro?.observe(sc)
+    window.addEventListener('resize', measure)
+    return () => {
+      ro?.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [])
+  return (
+    <div
+      ref={ref}
+      data-testid="pending-note-sticky"
+      className="sticky left-0"
+      style={width === null ? undefined : { width: `${width}px`, maxWidth: `${width}px` }}
+    >
+      {children}
+    </div>
   )
 }

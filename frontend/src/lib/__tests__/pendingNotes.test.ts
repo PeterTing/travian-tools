@@ -111,6 +111,10 @@ describe('P0-17 新種類的文字（PM 定稿，2026-10-10；merchantCapacity�
   it.each([
     ['unitCarry', '兵種攜帶量還沒在 ts11 遊戲內核對。', '目前用的是社群整理的數字，可能有誤差。'],
     ['launchSim', '開局花費是試算表每一步的加總，含派對（用小慶典的糧）。', '這些數字還沒在 ts11 遊戲內核對。'],
+    // P0-23：維京運載量（設計師兩行格式；出處照實寫，跟已帶入列「攜帶量還是社群整理的數字」一致）
+    ['vikingCarry', '維京運載量還沒核對。', '官方說明頁 S139 沒有運載量；目前用的是社群整理的數字。'],
+    // P0-23：建築效果欄（官方知識庫沒有可對照數字的建築）
+    ['buildingEffect', '這棟建築的效果還沒核對。', '官方知識庫沒有可以對照的效果數字；目前的文字來源還在查。'],
   ])('%s', (kind, what, source) => {
     expect(notes[kind]).toEqual({ what, source })
     expect(enNotes[kind]?.what).toBeTruthy()

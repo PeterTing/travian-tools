@@ -1,0 +1,15 @@
+{
+ "_what": "2026-10-10 ts11 市場「運送資源」分頁的唯讀讀取紀錄（P0-23）：想讀商人容量，結果伺服器回的 HTML 裡沒有送資源表單（表單是頁面載入後才畫出來的），所以商人容量改用官方說明頁 S3（official_support_2026-10-10.json）。",
+ "server": "ts11.x1.international.travian.com",
+ "request": {
+  "method": "GET",
+  "path": "/build.php?id=22&gid=17&t=5"
+ },
+ "read_only": "只發了這一個 GET（透過 ts11 機器人已登入的頁面），沒有送出任何表單、沒有 POST、沒有任何遊戲動作、沒有花金幣；之後沒有再讀。",
+ "response": {
+  "status": 200,
+  "length": 111572,
+  "html_sha256": "d3320a84f7e082b6c2538a9005d0dd4f432742a9945c1b5ca82db86e217e7094"
+ },
+ "result": "頁面有「市場 等級 1」和分頁按鈕，沒有商人容量數字；HTML 原檔放在 review 資料夾，不進 repo。"
+}
