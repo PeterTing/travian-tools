@@ -87,7 +87,7 @@ export function UtcOffsetField({
           id={selectId}
           value={draft}
           onChange={(e) => onDraftChange(e.target.value)}
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base"
           data-testid={`${testIdPrefix}-select`}
         >
           <option value="">{t('worldSettings.unset')}</option>

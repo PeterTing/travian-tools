@@ -72,7 +72,7 @@ export default function PathCalculatorPage() {
   const arenaChip = arenaKinds.length ? <> <PendingVerifyChip kinds={arenaKinds} /></> : null
 
   const inputCls =
-    'w-full min-w-0 max-w-full rounded border border-input bg-background p-2 text-sm'
+    'w-full min-w-0 max-w-full rounded border border-input bg-background p-2 text-base'
 
   return (
     <div className="mx-auto w-full max-w-5xl min-w-0 overflow-x-clip px-3 py-4 sm:px-4">

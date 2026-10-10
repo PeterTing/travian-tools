@@ -106,7 +106,7 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
           <label className="flex flex-col gap-1 text-xs">
             {t('autofill.speed')}
             <select
-              className="min-h-[44px] rounded border bg-background px-2 text-sm"
+              className="min-h-[44px] rounded border bg-background px-2 text-base"
               value={speed}
               onChange={(e) => fill.setOverride({ speed: Number(e.target.value) as AutoFillSpeed })}
             >
@@ -120,7 +120,7 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
           <label className="flex flex-col gap-1 text-xs">
             {t('autofill.tribe')}
             <select
-              className="min-h-[44px] rounded border bg-background px-2 text-sm"
+              className="min-h-[44px] rounded border bg-background px-2 text-base"
               value={tribe ?? ''}
               onChange={(e) => e.target.value && fill.setOverride({ tribe: e.target.value as TroopTribe })}
             >
@@ -136,7 +136,7 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
             <label className="flex flex-col gap-1 text-xs">
               {t('autofill.village')}
               <select
-                className="min-h-[44px] rounded border bg-background px-2 text-sm"
+                className="min-h-[44px] rounded border bg-background px-2 text-base"
                 value={village?.village_id ?? ''}
                 onChange={(e) => fill.selectVillage(e.target.value)}
               >

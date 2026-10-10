@@ -443,7 +443,7 @@ export default function HomePage() {
               )}
               <textarea
                 ref={textareaRef}
-                className="w-full min-h-[120px] rounded-md border bg-background p-3 text-sm"
+                className="w-full min-h-[120px] rounded-md border bg-background p-3 text-base"
                 placeholder={t('home.pasteCard.placeholder')}
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}

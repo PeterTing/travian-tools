@@ -86,7 +86,9 @@
   select,
   textarea {
     min-height: 2.75rem;
-    font-size: 16px;
+    /* !important：頁面上的 text-sm 等 utility 或 CSS module（.field select）比這條 base 規則晚、權重高，
+       會把字改回 14px，iOS 點進去就會放大畫面。表單控制項一律 16px，不管頁面怎麼寫 */
+    font-size: 16px !important;
   }
   input[type='file'] {
     min-height: 2.75rem;
