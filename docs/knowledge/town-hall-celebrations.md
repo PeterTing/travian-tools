@@ -17,10 +17,21 @@ a celebration gives CP **equal to daily CP production**, up to a limit that depe
 
 | Type | CP gained | x1 / x2 limit | x3 / x5 limit | x10 limit | Cost (x1) | Min. Town Hall |
 |------|-----------|---------------|---------------|-----------|-----------|----------------|
-| Small Celebration | daily CP of **that village** | 500 | 250 | 125 | 6,400 / 6,650 / 5,940 / 1,340 (crop 待 ts11 驗證) | Lv 1 |
-| Great Celebration | daily CP of **all your villages** | 2,000 | 1,000 | 500 | 29,700 / 33,250 / 32,000 / 6,700 (待 ts11 驗證) | **Lv 10** |
+| Small Celebration | daily CP of **that village** | 500 | 250 | 125 | 6,400 / 6,650 / 5,940 / 1,340 ✓ | Lv 1 |
+| Great Celebration | daily CP of **all your villages** | 2,000 | 1,000 | 500 | 29,700 / 33,250 / 32,000 / 6,700 ✓ | **Lv 10** |
 
-Duration at Town Hall Lv 1: 24 h on x1–x2, 12 h on x3–x5, 6 h on x10; higher Town Hall levels shorten it.
+Costs ✓ 已核對 (2026-10-11) — 出處：Travian Answers（官方，2021 年快照）、Travian Wiki 兩份來源一致
+(evidence: `scripts/game_data/evidence/celebration_sources_2026-10-11.json`).
+
+### Duration (x1)
+
+Each Town Hall level makes a celebration 3.6% shorter (official knowledge base, Town Hall effects; Travian Answers):
+
+- **Small:** 24 h × 0.964^(Town Hall level − 1) → Lv 1 = 24:00:00, Lv 10 = 17:15:17, Lv 20 = 11:57:30.
+- **Great:** 60 h × 0.964^(Town Hall level − 1), available from Lv 10 → Lv 10 = **43:08:11**, Lv 20 = 29:53:46.
+
+Faster worlds divide by RoundDown(speed / 3) + 1: x1–x2 ÷ 1, x3–x5 ÷ 2, x10 ÷ 4
+(small at Lv 1: 24 h on x1–x2, 12 h on x3–x5, 6 h on x10).
 
 ## CP Math: celebrations scale with what you already produce
 

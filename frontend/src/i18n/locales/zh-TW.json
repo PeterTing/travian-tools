@@ -1261,10 +1261,6 @@
       "what": "開村 CP 門檻還沒在 ts11 遊戲內核對。",
       "source": "目前用公式推算，可能有誤差。"
     },
-    "celebration": {
-      "what": "小慶典的糧和大慶典的花費還沒在 ts11 城鎮廳頁確認。",
-      "source": "小慶典的糧目前用的是開局試算表的數字；大慶典的花費來源還在查。"
-    },
     "unitCarry": {
       "what": "兵種攜帶量還沒在 ts11 遊戲內核對。",
       "source": "目前用的是社群整理的數字，可能有誤差。"
@@ -1323,7 +1319,11 @@
       "what": "花費、時間、人口、CP已核對。",
       "source": "取自官方知識庫。"
     },
-    "whatWithEffect": "花費、時間、人口、CP、效果已核對。"
+    "whatWithEffect": "花費、時間、人口、CP、效果已核對。",
+    "celebration": {
+      "what": "小慶典、大慶典的花費（木、泥、鐵、糧）已核對。",
+      "source": "出處：Travian Answers（官方，2021 年快照）、Travian Wiki 兩份來源一致"
+    }
   },
   "cropFieldsCalc": {
     "title": "糧田判斷",

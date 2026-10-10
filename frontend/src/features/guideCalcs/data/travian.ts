@@ -323,7 +323,8 @@ export const TRADE_OFFICE_PER_LEVEL = TRADE_OFFICE_PER_LEVEL_DEFAULT;
 // CP gained = daily CP production (small: that village, great: whole account),
 // capped by world speed (x1: 500 / 2,000). `cp` below is the x1 cap, NOT a fixed
 // reward — use celebrationCp() from src/data/gameData.ts.
-// Costs: small crop 1,340 and the great costs are 待驗證 (ts11 has no Town Hall yet).
+// Costs ✓ 已核對 (2026-10-11): official Travian Answers (2021 snapshot) and Travian Wiki agree
+// (scripts/game_data/evidence/celebration_sources_2026-10-11.json).
 const _small = celebration('small');
 const _great = celebration('great');
 export const CELEBRATIONS = {
