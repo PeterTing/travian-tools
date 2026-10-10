@@ -2,6 +2,9 @@ import api from './api'
 
 // ============ Types ============
 
+/** 神器（官方 S102）：大型（帳號）1.5×、獨特 2×、小型（村莊）2× */
+export type ArtifactBonus = 'none' | 'account_1_5x' | 'unique_2x' | 'village_2x'
+
 export interface PathCalculatorRequest {
   start_x: number
   start_y: number
@@ -10,7 +13,7 @@ export interface PathCalculatorRequest {
   unit_speed: number
   tournament_square_level?: number
   hero_bonus?: number
-  artifact_bonus?: string
+  artifact_bonus?: ArtifactBonus
   server_speed?: number
 }
 
@@ -44,6 +47,9 @@ export interface InterceptionRequest {
 export interface InterceptionResponse {
   attacker_return_time: string
   send_time: string
+  /** 跟攻擊到達那天比差幾天：1 = 明天、-1 = 前一天 */
+  return_day_offset?: number
+  send_day_offset?: number
   travel_time_formatted: string
   distance_to_attacker: number
 }
@@ -107,8 +113,9 @@ export interface NpcCalculatorResponse {
 }
 
 export interface SaveTroopsRequest {
-  village_x: number
-  village_y: number
+  /** 躲兵用不到村莊座標，可省略 */
+  village_x?: number
+  village_y?: number
   unit_speed: number
   offline_hours: number
   server_speed?: number
@@ -121,6 +128,9 @@ export interface SaveTroopsResponse {
   ideal_distance: number
   send_time_formatted: string
   return_time_formatted: string
+  /** 地圖上最遠能走多遠（約 282.84 格） */
+  max_map_distance?: number
+  exceeds_map?: boolean
 }
 
 export interface PathSpeedTsRequest {
@@ -132,6 +142,9 @@ export interface PathSpeedTsRequest {
   server_speed?: number
   /** 攻擊方英雄靴子 %（P0-21） */
   hero_bonus?: number
+  artifact_bonus?: ArtifactBonus
+  /** 容許誤差（秒），預設 30 */
+  tolerance_seconds?: number
 }
 
 export interface SpeedTsMatch {
@@ -149,6 +162,8 @@ export interface PathSpeedTsResponse {
   possible_matches: SpeedTsMatch[]
   /** 速度還沒有第一手出處（待驗證）、沒有列入比對的兵種（P0-15） */
   unverified_units?: string[]
+  /** 距離 ≤ 20 格：競技場不影響（S71），每個速度只回一筆 */
+  ts_irrelevant?: boolean
 }
 
 // ============ Village Builder ============
@@ -189,29 +204,6 @@ export interface VillageBuilderResponse {
 
 // ============ Crop Scouter ============
 
-export interface CropScouterRequest {
-  wood_production: number
-  clay_production: number
-  iron_production: number
-  crop_production: number
-  population: number
-  server_speed?: number
-}
-
-export interface CropperMatch {
-  cropper_type: string
-  likelihood: number
-  reasoning: string
-}
-
-export interface CropScouterResponse {
-  matches: CropperMatch[]
-  dominant_resource: string
-  wood_to_crop_ratio: number
-}
-
-// ============ Attack TS Optimizer ============
-
 export interface AttackerProfile {
   /** 前端給每個攻擊者的穩定 id，後端原樣回傳（兩個攻擊者同名也對得回去，P0-17 (i)） */
   attacker_id?: string
@@ -238,7 +230,14 @@ export interface TsOptimizerResult {
   attacker_id?: string | null
   village_label: string
   recommended_ts_level: number
+  /** 目前競技場來不及，要升到 recommended_ts_level */
+  ts_level_changed?: boolean
+  /** 升到 20 級也來不及 */
+  unreachable?: boolean
   send_time: string
+  /** 這一波實際抵達時間（目標 + 波次 × 間距） */
+  arrival_time?: string
+  wave?: number
   travel_time_formatted: string
   distance: number
 }
@@ -295,13 +294,6 @@ export const advancedCalculatorApi = {
     request: VillageBuilderRequest
   ): Promise<VillageBuilderResponse> => {
     const response = await api.post('/advanced-calculator/village-builder', request)
-    return response.data
-  },
-
-  calculateCropScouter: async (
-    request: CropScouterRequest
-  ): Promise<CropScouterResponse> => {
-    const response = await api.post('/advanced-calculator/crop-scouter', request)
     return response.data
   },
 

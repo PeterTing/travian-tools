@@ -2,7 +2,7 @@
 
 Covers:
 - Optimal Village Builder (Lumi-style build order)
-- Crop Scouter (reverse-inference of enemy cropper type)
+- （Crop Scouter 已移除：糧田判斷改在前端，輸入田地種類就標出幾糧田）
 - Attack TS Optimizer (multi-attacker sync-arrival)
 
 Source documents:
@@ -15,7 +15,6 @@ from datetime import datetime
 
 from app.domain.schemas.advanced_calculator import (
     AttackerProfile,
-    CropScouterRequest,
     OasisConfig,
     TsOptimizerRequest,
     VillageBuilderRequest,
@@ -123,74 +122,6 @@ def test_village_builder_preserves_oasis_input():
     res = service.calculate_village_builder(req)
     assert res.cropper_type == "15c"
     assert res.total_steps > 0
-
-
-# ─── Crop Scouter ─────────────────────────────────────────────────
-
-
-def test_crop_scouter_detects_15c_from_dominance():
-    """9× crop / avg-other ratio → 15c with high confidence."""
-    service = get_advanced_calculator_service()
-    req = CropScouterRequest(
-        wood_production=1000,
-        clay_production=1000,
-        iron_production=1000,
-        crop_production=9000,
-        population=600,
-        server_speed=1,
-    )
-    res = service.calculate_crop_scouter(req)
-    assert res.dominant_resource == "crop"
-    assert res.matches[0].cropper_type == "15c"
-    assert res.matches[0].likelihood >= 0.7
-
-
-def test_crop_scouter_balanced_not_15c():
-    """Balanced production (crop ≈ 1.3× others, typical of 6c / 4-4-4-6)
-    must not flag as 15c."""
-    service = get_advanced_calculator_service()
-    req = CropScouterRequest(
-        wood_production=3000,
-        clay_production=3000,
-        iron_production=3000,
-        crop_production=3900,
-        population=500,
-        server_speed=1,
-    )
-    res = service.calculate_crop_scouter(req)
-    assert res.matches[0].cropper_type != "15c"
-    # Balanced 1.3× ratio suggests 6c (most common standard layout)
-    assert res.matches[0].cropper_type in {"6c", "4446", "3347"}
-
-
-def test_crop_scouter_fully_balanced_is_4446_or_3347():
-    """True 1:1:1:1 resource balance → non-cropper capital detection."""
-    service = get_advanced_calculator_service()
-    req = CropScouterRequest(
-        wood_production=3000,
-        clay_production=3000,
-        iron_production=3000,
-        crop_production=3300,
-        population=500,
-        server_speed=1,
-    )
-    res = service.calculate_crop_scouter(req)
-    assert res.matches[0].cropper_type in {"4446", "3347"}
-
-
-def test_crop_scouter_9c_detected_in_mid_ratio():
-    """Ratio ≈ 2.2 → 9c primary, 15c secondary."""
-    service = get_advanced_calculator_service()
-    req = CropScouterRequest(
-        wood_production=2000,
-        clay_production=2000,
-        iron_production=2000,
-        crop_production=4500,
-        population=500,
-        server_speed=1,
-    )
-    res = service.calculate_crop_scouter(req)
-    assert res.matches[0].cropper_type == "9c"
 
 
 # ─── Attack TS Optimizer ──────────────────────────────────────────

@@ -37,7 +37,7 @@
     "cost": 250
    },
    "egyptians": {
-    "en": "Slave Malitia",
+    "en": "Slave Militia",
     "zh": "奴隸民兵",
     "cost": 150
    },
@@ -1076,7 +1076,7 @@
         },
         "egyptians": {
          "building": "研究奴隸民兵",
-         "building_en": "Research Slave Malitia",
+         "building_en": "Research Slave Militia",
          "cost": null,
          "target": "基本兵種，不用研究",
          "skip": true
@@ -1130,7 +1130,7 @@
         },
         "egyptians": {
          "building": "打野兵（奴隸民兵）",
-         "building_en": "Farm units (Slave Malitia)",
+         "building_en": "Farm units (Slave Militia)",
          "cost": 1200
         },
         "huns": {
@@ -1379,7 +1379,7 @@
         },
         "egyptians": {
          "building": "打野兵（奴隸民兵）",
-         "building_en": "Farm units (Slave Malitia)",
+         "building_en": "Farm units (Slave Militia)",
          "cost": 0
         },
         "huns": {

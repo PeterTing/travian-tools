@@ -27,12 +27,21 @@ export default function TraderouteCalculator() {
   const { tribe: accountTribe } = useAutoFill();
   const [tribe, setTribe] = useState<TribeId>(() => (accountTribe && accountTribe in MERCHANTS ? accountTribe as TribeId : 'gauls'));
   const [office, setOffice] = useState(10);
-  const [dist, setDist] = useState(30);
+  // 距離用文字存：空白、0、負數在欄位下方寫原因（以前負距離會算出負時間）
+  const [distText, setDistText] = useState('30');
+  const dist = Number(distText);
+  const distError = distText.trim() === '' || !Number.isFinite(dist) || dist <= 0
+    ? (lang === 'en' ? 'Enter a distance above 0' : '請填大於 0 的距離')
+    : null;
+  // 你現有的商人（市場頁看得到）；空白＝不比對
+  const [haveText, setHaveText] = useState('');
+  const have = haveText.trim() === '' ? null : Number(haveText);
   const [surplus, setSurplus] = useState({ wood: 5000, clay: 5000, iron: 5000, crop: 2000 });
 
   const cap = merchantCapacity(tribe, office);
   const speed = MERCHANTS[tribe].speed;
-  const oneWay = dist / speed;
+  // 商人速度會不會隨伺服器倍速變快：官方 S20 沒寫，先用 x1 速度（待驗證）
+  const oneWay = distError ? NaN : dist / speed;
   const roundTrip = oneWay * 2;
 
   const rows = useMemo(() => {
@@ -48,10 +57,10 @@ export default function TraderouteCalculator() {
   }, [surplus, cap, roundTrip, lang]);
 
   const totalDed = rows.reduce((s, r) => s + r.dedicated, 0);
-  const totalLabel =
-    totalDed <= 1.5 ? `${totalDed.toFixed(1)} 🟢` :
-    totalDed <= 3 ? `${totalDed.toFixed(1)} 🟡` :
-    `${totalDed.toFixed(1)} 🔴`;
+  // 商人一個一個派，不能派 0.9 個：無條件進位（稽核 2026-10-10：以前顯示 18.9）
+  const needed = isFinite(totalDed) ? Math.ceil(totalDed - 1e-9) : NaN;
+  const enough = have == null || !isFinite(needed) ? null : have >= needed;
+  const totalLabel = !isFinite(needed) ? '—' : `${needed}${enough == null ? '' : enough ? ' 🟢' : ' 🔴'}`;
 
   return (
     <>
@@ -85,7 +94,16 @@ export default function TraderouteCalculator() {
 
           <div className={s.field}>
             <label>{lang === 'en' ? 'Distance (tiles)' : '距離（格）'}</label>
-            <input type="number" min={1} max={500} value={dist} onChange={e => setDist(+e.target.value)} />
+            <input type="number" min={1} max={500} value={distText} data-testid="traderoute-dist"
+                   aria-invalid={distError ? true : undefined} onChange={e => setDistText(e.target.value)} />
+            {distError && <p role="alert" className="mt-1 text-xs text-red-600" data-testid="traderoute-dist-error">{distError}</p>}
+          </div>
+
+          <div className={s.field}>
+            <label>{lang === 'en' ? 'Merchants you have (optional)' : '你現有的商人（選填）'}</label>
+            <input type="number" min={0} value={haveText} data-testid="traderoute-have"
+                   placeholder={lang === 'en' ? 'see the Marketplace page' : '市場頁看得到'}
+                   onChange={e => setHaveText(e.target.value.replace(/[^0-9]/g, ''))} />
           </div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Hourly surplus to ship' : '每小時送出量'}</h4>
@@ -127,12 +145,24 @@ export default function TraderouteCalculator() {
             </thead>
             <tbody>
               {rows.map(r => (
-                <tr key={r.t} className="h-11"><td>{r.label}</td><td>{fmtInt(r.sur)}</td><td>{r.tripsHr.toFixed(2)}</td><td>{r.dedicated.toFixed(2)}</td></tr>
+                <tr key={r.t} className="h-11"><td>{r.label}</td><td>{fmtInt(r.sur)}</td><td>{r.tripsHr.toFixed(2)}</td><td>{isFinite(r.dedicated) ? r.dedicated.toFixed(2) : '—'}</td></tr>
               ))}
             </tbody>
           </table>
 
-          <div className={s.row} style={{ marginTop: 12 }}><span className={s.label}>{lang === 'en' ? 'Total merchants' : '總商人'}</span><span className={`${s.value} ${s.highlight}`}>{totalLabel}</span></div>
+          <div className={s.row} style={{ marginTop: 12 }}><span className={s.label}>{lang === 'en' ? 'Total merchants' : '總商人'}</span><span className={`${s.value} ${s.highlight}`} data-testid="traderoute-needed">{totalLabel}</span></div>
+          {enough === false && (
+            <p role="alert" className="text-sm text-red-600" data-testid="traderoute-short">
+              {lang === 'en'
+                ? `You need ${needed} merchants but have ${have}: ${needed - (have ?? 0)} short.`
+                : `要 ${needed} 個商人，你只有 ${have} 個，還差 ${needed - (have ?? 0)} 個。`}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground" data-testid="traderoute-speed-note">
+            {lang === 'en'
+              ? 'Merchant speed is the x1 value; whether faster servers speed merchants up is not in the official speed page (unverified).'
+              : '商人速度用 x1 的數字；伺服器倍速會不會讓商人變快，官方說明頁沒寫（待驗證）。'}
+          </p>
 
           <div className={s.note}>
             {lang === 'en'

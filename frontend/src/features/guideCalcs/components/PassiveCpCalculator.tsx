@@ -32,8 +32,38 @@ const FIELDS: FieldDef[] = [
   { id: 'ts', key: 'tournamentSquare', label: 'Tournament Sq.',    ids: ['tournament_square'] },
   { id: 'hm', key: 'heroMansion',      label: "Hero's Mansion",    ids: ['heros_mansion'] },
   { id: 'to', key: 'tradeOffice',      label: 'Trade Office',      ids: ['trade_office'] },
-  { id: 'pl', key: 'palace',           label: 'Palace / Treasury', ids: ['palace', 'treasury'] },
+  { id: 'pl', key: 'palace',           label: 'Palace',            ids: ['palace'] },
+  // 稽核 2026-10-10：以前只列上面 16 種，集結點、城牆、寶物庫和其他有 CP 的建築都沒算（ts11 實測對照見測試）
+  { id: 'tr', key: 'treasury',         label: 'Treasury',          ids: ['treasury'] },
+  { id: 'rp', key: 'rallyPoint',       label: 'Rally Point',       ids: ['rally_point'] },
+  { id: 'wa', key: 'cityWall',         label: 'Wall',              ids: ['city_wall', 'earth_wall', 'palisade'] },
+  { id: 'ws', key: 'workshop',         label: 'Workshop',          ids: ['workshop'] },
+  { id: 'gb', key: 'greatBarracks',    label: 'Great Barracks',    ids: ['great_barracks'] },
+  { id: 'gs', key: 'greatStable',      label: 'Great Stable',      ids: ['great_stable'] },
+  { id: 'gw', key: 'greatWarehouse',   label: 'Great Warehouse',   ids: ['great_warehouse'] },
+  { id: 'gg', key: 'greatGranary',     label: 'Great Granary',     ids: ['great_granary'] },
+  { id: 'tp', key: 'trapper',          label: 'Trapper',           ids: ['trapper'] },
+  { id: 'sl', key: 'stonemason',       label: "Stonemason's Lodge", ids: ['stonemasons_lodge'] },
+  { id: 'bw', key: 'brewery',          label: 'Brewery',           ids: ['brewery'] },
+  { id: 'hd', key: 'horseDrinkingTrough', label: 'Horse Drinking Trough', ids: ['horse_drinking_trough'] },
+  { id: 'sa', key: 'sawmill',          label: 'Sawmill',           ids: ['sawmill'] },
+  { id: 'bk', key: 'brickyard',        label: 'Brickyard',         ids: ['brickyard'] },
+  { id: 'if', key: 'ironFoundry',      label: 'Iron Foundry',      ids: ['iron_foundry'] },
+  { id: 'gm', key: 'grainMill',        label: 'Grain Mill',        ids: ['grain_mill'] },
+  { id: 'bc', key: 'bakery',           label: 'Bakery',            ids: ['bakery'] },
 ]
+
+/** 資源田（18 塊）：四種田的 CP 基數一樣（測試核對），用同一個算法；每塊依自己的等級算 */
+export const RESOURCE_FIELD_COUNT = 18
+const FIELD_CP_KEY: CpBuilding = 'cropland'
+
+/** 「2 2 2 2 1」「2,2,2」→ 等級陣列（0–20 整數，最多 18 塊）；格式不對回 null */
+export function parseFieldLevels(text: string): number[] | null {
+  const parts = text.split(/[\s,，、]+/).filter(Boolean)
+  if (parts.length > RESOURCE_FIELD_COUNT) return null
+  const out = parts.map(Number)
+  return out.every(n => Number.isInteger(n) && n >= 0 && n <= 20) ? out : null
+}
 
 function fieldLabel(f: FieldDef, en: boolean): string {
   return en ? f.label : f.ids.map(id => buildingName(id, 'zh')).join('／')
@@ -51,9 +81,10 @@ const TH1_HOURS: Record<ServerSpeed, number> = { 1: 24, 2: 24, 3: 12, 5: 12, 10:
 
 export type CelebrationMode = 'none' | CelebrationKind
 
-/** 一個村每日 CP＝各建築目前等級的 CP 加總（沒有空村基礎值） */
-export function villageDailyCp(levels: Record<string, number>): number {
+/** 一個村每日 CP＝各建築＋資源田目前等級的 CP 加總（沒有空村基礎值） */
+export function villageDailyCp(levels: Record<string, number>, fieldLevels: number[] = []): number {
   return FIELDS.reduce((sum, f) => sum + cpAtLevel(f.key, levels[f.id] ?? 0), 0)
+    + fieldLevels.reduce((sum, l) => sum + cpAtLevel(FIELD_CP_KEY, l), 0)
 }
 
 export const PRESET_LUMI_CP = villageDailyCp(PRESETS.lumi ?? {})
@@ -88,18 +119,20 @@ export function villageCountdown(input: CountdownInput, maxVillage = 10) {
   const perCelebration = input.mode === 'none'
     ? 0
     : celebrationCp(input.mode === 'small' ? input.villageCp : accountCp, input.mode, input.speed)
-  const hours = Math.max(1, input.hoursPerCelebration)
-  const extraPerDay = perCelebration * (24 / hours)
+  // 慶典時數 0 或空白：不能拿 1 小時去算（以前會變成一天 24 場），加慶典那欄留空
+  const hoursOk = Number.isFinite(input.hoursPerCelebration) && input.hoursPerCelebration > 0
+  const extraPerDay = hoursOk ? perCelebration * (24 / input.hoursPerCelebration) : 0
+  const currentCp = Math.max(0, input.currentCp)
   const req = villageRequirements(input.speed)
   const rows: CountdownRow[] = []
   for (let v = 2; v <= Math.min(maxVillage, req.length); v++) {
-    const remaining = Math.max(0, req[v - 1]! - input.currentCp)
+    const remaining = Math.max(0, req[v - 1]! - currentCp)
     rows.push({
       village: v,
       required: req[v - 1]!,
       verified: isVillageCpVerified(v, input.speed),
       daysPassive: accountCp > 0 ? remaining / accountCp : Infinity,
-      daysWithCelebration: input.mode === 'none' ? null : remaining / (accountCp + extraPerDay),
+      daysWithCelebration: input.mode === 'none' || !hoursOk ? null : remaining / (accountCp + extraPerDay),
     })
   }
   return { accountCp, perCelebration, extraPerDay, rows }
@@ -120,6 +153,13 @@ export default function PassiveCpCalculator() {
   const [otherCp, setOtherCp] = useState<number>(0)
   const [mode, setMode] = useState<CelebrationMode>('small')
   const [hours, setHours] = useState<number>(TH1_HOURS[accountSpeed])
+  // 資源田 18 塊的等級（用空格或逗號分開）；預設空白＝全部 0 級
+  const [fieldText, setFieldText] = useState<string>('')
+  const fieldLevels = useMemo(() => parseFieldLevels(fieldText), [fieldText])
+  const fieldError = fieldLevels == null
+    ? (en ? `Up to ${RESOURCE_FIELD_COUNT} levels, each 0–20, separated by spaces` : `最多 ${RESOURCE_FIELD_COUNT} 個等級（0–20），用空格分開`)
+    : null
+  const hoursError = !(hours > 0) ? (en ? 'Enter the hours of one celebration (above 0)' : '請填一場慶典的小時數（大於 0）') : null
   const accountId = fill.account?.account_id ?? null
   // 使用者在「哪個帳號」動過輸入才記到那個帳號的首頁「開村 · CP」卡（不記預設值）。
   // 換帳號就清掉，避免把上一個帳號打的數字寫進新帳號。
@@ -131,6 +171,7 @@ export default function PassiveCpCalculator() {
   }
   const apply = (preset: string) => setLevels(() => {
     touch()
+    if (preset === 'zero') setFieldText('')
     const next: Record<string, number> = {}
     FIELDS.forEach(f => { next[f.id] = PRESETS[preset]?.[f.id] ?? 0 })
     return next
@@ -173,22 +214,30 @@ export default function PassiveCpCalculator() {
   }, [accountId, accountSpeed])
 
   // 只算建築：遊戲沒有空村基礎產量（ts11：各棟 CP 加總＝遊戲顯示的 12／天）
-  const total = useMemo(() => villageDailyCp(levels), [levels])
+  const total = useMemo(() => villageDailyCp(levels, fieldLevels ?? []), [levels, fieldLevels])
   // 每日 CP 用到還沒在 ts11 核對的建築數值（等級 > 0 的建築裡有沒標 ✓ 的）→ 摘要標題旁放灰標
   const usesUnverifiedBuilding = useMemo(
     () => FIELDS.some(f => (levels[f.id] ?? 0) > 0 && f.ids.some(id => !isBuildingVerified(id))),
     [levels],
   )
 
-  const breakdown = useMemo(() => FIELDS.map(f => ({
-    label: fieldLabel(f, en),
-    level: levels[f.id] ?? 0,
-    cp: cpAtLevel(f.key, levels[f.id] ?? 0),
-  })).filter(x => x.cp > 0).sort((a, b) => b.cp - a.cp), [levels, en])
+  const breakdown = useMemo(() => [
+    ...FIELDS.map(f => ({
+      label: fieldLabel(f, en),
+      level: String(levels[f.id] ?? 0),
+      cp: cpAtLevel(f.key, levels[f.id] ?? 0),
+    })),
+    {
+      label: en ? `Resource fields (${(fieldLevels ?? []).filter(l => l > 0).length})` : `資源田（${(fieldLevels ?? []).filter(l => l > 0).length} 塊）`,
+      level: '—',
+      cp: villageDailyCp({}, fieldLevels ?? []),
+    },
+  ].filter(x => x.cp > 0).sort((a, b) => b.cp - a.cp), [levels, en, fieldLevels])
 
   const cd = useMemo(() => villageCountdown({
     villageCp: total, otherVillagesCp: otherCp, currentCp, speed, mode, hoursPerCelebration: hours,
   }), [total, otherCp, currentCp, speed, mode, hours])
+  // 慶典時數空白／0：加慶典那欄留空、欄位下方寫原因
 
   useEffect(() => {
     if (accountId == null || touchedFor.current !== accountId) return
@@ -231,6 +280,32 @@ export default function PassiveCpCalculator() {
             ))}
           </div>
 
+          {/* 資源田也有 CP（ts11：18 塊裡 4 塊 L2＋1 塊 L1，共 5 點） */}
+          <div className={s.field}>
+            <label htmlFor="cp-fields">{en ? 'Resource field levels (18 fields)' : '資源田等級（18 塊）'}</label>
+            <input
+              id="cp-fields"
+              data-testid="cp-fields"
+              type="text"
+              inputMode="numeric"
+              placeholder={en ? 'e.g. 2 2 2 2 1 (blank = all 0)' : '例：2 2 2 2 1（空白＝全部 0 級）'}
+              value={fieldText}
+              aria-invalid={fieldError ? true : undefined}
+              onChange={e => { touch(); setFieldText(e.target.value) }}
+            />
+            {fieldError && <p role="alert" className="mt-1 text-xs text-red-600" data-testid="cp-fields-error">{fieldError}</p>}
+            <select
+              aria-label={en ? 'Set all 18 fields to one level' : '18 塊設成同一級'}
+              data-testid="cp-fields-all"
+              className="mt-2"
+              value=""
+              onChange={e => { if (e.target.value !== '') { touch(); setFieldText(Array(RESOURCE_FIELD_COUNT).fill(e.target.value).join(' ')) } }}
+            >
+              <option value="">{en ? 'All 18 at level…' : '18 塊全部設成…'}</option>
+              {Array.from({ length: 21 }, (_, n) => <option key={n} value={n}>{en ? `Level ${n}` : `${n} 級`}</option>)}
+            </select>
+          </div>
+
           <div className={s.btnRow}>
             <button onClick={() => apply('lumi')}>{en ? `Common (${PRESET_LUMI_CP}/d)` : `常用（${PRESET_LUMI_CP}／天）`}</button>
             <button onClick={() => apply('min')}>{en ? 'Bare-min' : '最小'}</button>
@@ -268,8 +343,10 @@ export default function PassiveCpCalculator() {
             </div>
             <div className={s.field}>
               <label>{en ? 'Hours per celebration' : '一場慶典幾小時'}</label>
-              <input data-testid="cp-hours" type="number" min={1} value={hours}
-                     onChange={e => setHours(Math.max(1, +e.target.value || 1))} />
+              <input data-testid="cp-hours" type="number" min={1} value={Number.isNaN(hours) ? '' : hours}
+                     aria-invalid={hoursError ? true : undefined}
+                     onChange={e => setHours(e.target.value === '' ? NaN : +e.target.value)} />
+              {hoursError && <p role="alert" className="mt-1 text-xs text-red-600" data-testid="cp-hours-error">{hoursError}</p>}
               <p className="mt-1 text-xs text-gray-500" data-testid="cp-hours-hint">
                 {en
                   ? 'Celebrations get shorter as the Town Hall levels up; the default is the official Town Hall level 1 duration.'
@@ -298,7 +375,7 @@ export default function PassiveCpCalculator() {
           titlePending={usesUnverifiedBuilding ? 'building' : false}
           primary={<>{total} / {en ? 'day' : '天'}</>}
           secondary={mode === 'none'
-            ? (en ? 'Buildings only; there is no empty-village base' : '只算建築，遊戲沒有空村基礎產量')
+            ? (en ? 'Buildings and resource fields; there is no empty-village base' : '建築＋資源田，遊戲沒有空村基礎產量')
             : (en
               ? `One ${mode} celebration: +${cd.perCelebration} CP (cap ${mode === 'small' ? capSmall : capGreat})`
               : `辦一場${mode === 'small' ? '小' : '大'}慶典：+${cd.perCelebration} CP（上限 ${mode === 'small' ? capSmall : capGreat}）`)}

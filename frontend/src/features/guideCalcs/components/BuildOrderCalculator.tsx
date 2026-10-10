@@ -27,12 +27,14 @@ const BB_ZH: Record<BB, string> = {
   bakery: ingameBuildingName('bakery')!,
 };
 
-export const BB_REQ: Record<BB, { res: ResourceType; field: number; alsoMill?: number }> = {
-  sawmill:     { res: 'wood', field: 10 },
-  brickyard:   { res: 'clay', field: 10 },
-  ironFoundry: { res: 'iron', field: 10 },
-  grainMill:   { res: 'crop', field: 5 },
-  bakery:      { res: 'crop', field: 10, alsoMill: 5 },
+// 前置條件＝backend/data/static/buildings.json 的 prerequisites（測試逐項核對）：
+// 五種加成建築都要村莊大樓 5 級（稽核 2026-10-10：以前沒檢查，村莊大樓 1 級也會建議蓋鋸木廠）
+export const BB_REQ: Record<BB, { res: ResourceType; field: number; alsoMill?: number; mb: number }> = {
+  sawmill:     { res: 'wood', field: 10, mb: 5 },
+  brickyard:   { res: 'clay', field: 10, mb: 5 },
+  ironFoundry: { res: 'iron', field: 10, mb: 5 },
+  grainMill:   { res: 'crop', field: 5, mb: 5 },
+  bakery:      { res: 'crop', field: 10, alsoMill: 5, mb: 5 },
 };
 
 export interface Step {
@@ -64,6 +66,8 @@ export interface PlanResult {
   steps: Step[];
   totalCost: number;
   totalTime: number;
+  /** 有加成建築只差村莊大樓等級就能蓋（畫面提示先升村莊大樓） */
+  blockedByMb: BB[];
 }
 
 /**
@@ -99,6 +103,7 @@ export function planGreedy(input: PlanInput): PlanResult {
     : (bb.grainMill + bb.bakery) * 0.05;
 
   const steps: Step[] = [];
+  const blockedByMb = new Set<BB>();
 
   for (let i = 0; i < MAX; i++) {
     const cands: Step[] = [];
@@ -129,6 +134,7 @@ export function planGreedy(input: PlanInput): PlanResult {
       const minField = Math.min(...fields[req.res]);
       if (minField < req.field) return;
       if (b === 'bakery' && bb.grainMill < (req.alsoMill ?? 0)) return;
+      if (mb < req.mb) { blockedByMb.add(b); return; }
       const to = cur + 1;
       const cost = bbTotalCost(b, to);
       const totalProdHr = fields[req.res].reduce((sum, lv) => sum + (FIELD_PRODUCTION[lv] ?? 0), 0);
@@ -155,7 +161,7 @@ export function planGreedy(input: PlanInput): PlanResult {
 
   const totalCost = steps.reduce((acc, x) => acc + x.cost, 0);
   const totalTime = steps.reduce((acc, x) => acc + x.time, 0);
-  return { steps, totalCost, totalTime };
+  return { steps, totalCost, totalTime, blockedByMb: [...blockedByMb] };
 }
 
 /** 這次的建議有沒有用到 0 級資源田的產量：起始有 0 級的田，或有一步是 0 → 1 級 */
@@ -270,6 +276,13 @@ export default function BuildOrderCalculator() {
           </ol>
           <div className={s.row} style={{ marginTop: 12 }}><span className={s.label}>{lang === 'en' ? '20 steps total cost' : '20 步累積成本'}</span><span className={s.value}>{plan.totalCost.toLocaleString()}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? '20 steps total time' : '20 步累積時間'}</span><span className={s.value}>{formatDuration(plan.totalTime)}</span></div>
+          {plan.blockedByMb.length > 0 && (
+            <p role="note" className="text-sm text-amber-700 dark:text-amber-400" data-testid="build-order-mb-note">
+              {lang === 'en'
+                ? `Main Building must be Lv 5 before ${plan.blockedByMb.map(b => b).join(', ')}; upgrade it first.`
+                : `${plan.blockedByMb.map(b => BB_ZH[b]).join('、')}要村莊大樓 5 級才能蓋，先把村莊大樓升到 5 級。`}
+            </p>
+          )}
 
           <div className={s.note}>
             {lang === 'en'

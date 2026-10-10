@@ -27,7 +27,7 @@ export interface FieldCostRow {
 }
 
 // =========================================================================
-// Resource field production per hour, L0–L21 (1x speed)
+// Resource field production per hour, L0–L20 (1x speed)
 // Formula: prod(L) = round(base_T35(L) * 1.4), same for all 4 field types
 // =========================================================================
 export const FIELD_PRODUCTION: readonly number[] = Object.freeze([
@@ -51,8 +51,8 @@ export const FIELD_PRODUCTION: readonly number[] = Object.freeze([
   1820, // L17
   2240, // L18
   2800, // L19
-  3430, // L20  (capital cap for wood/clay/iron)
-  4270, // L21  (crop-only bonus level)
+  3430, // L20
+  // L21 以前寫 4270、四種資源同一個數字，找不到出處，拿掉（稽核 2026-10-10；不自己編數字）
 ]);
 
 // =========================================================================

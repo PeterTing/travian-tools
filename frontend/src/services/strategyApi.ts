@@ -42,22 +42,23 @@ export interface HealthCheckResponse {
 
 export const detectPhase = async (
   accountId: string,
-  beginnerProtectionDays = 5,
+  beginnerProtectionDays?: number,
 ): Promise<PhaseDetectionResponse> => {
   const response = await api.post<PhaseDetectionResponse>('/strategy/phase', {
     account_id: accountId,
-    beginner_protection_days: beginnerProtectionDays,
+    ...(beginnerProtectionDays != null ? { beginner_protection_days: beginnerProtectionDays } : {}),
   })
   return response.data
 }
 
 export const healthCheck = async (
   accountId: string,
-  beginnerProtectionDays = 5,
+  /** 不填就讓後端依伺服器速度用官方 S20 天數（x1 5／x2 3／x3 3／x5 2／x10 1） */
+  beginnerProtectionDays?: number,
 ): Promise<HealthCheckResponse> => {
   const response = await api.post<HealthCheckResponse>('/strategy/health-check', {
     account_id: accountId,
-    beginner_protection_days: beginnerProtectionDays,
+    ...(beginnerProtectionDays != null ? { beginner_protection_days: beginnerProtectionDays } : {}),
   })
   return response.data
 }
