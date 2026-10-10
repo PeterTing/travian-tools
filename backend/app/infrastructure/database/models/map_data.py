@@ -31,9 +31,15 @@ class MapSnapshot(Base):
     total_villages: Mapped[int] = mapped_column(Integer, default=0)
     total_players: Mapped[int] = mapped_column(Integer, default=0)
     total_alliances: Mapped[int] = mapped_column(Integer, default=0)
+    # map.sql 內容的 SHA-256（hex）。排程抓到的內容跟最新一筆相同就不再寫入。
+    content_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=func.now(),
+    )
+
+    __table_args__ = (
+        Index("ix_map_snapshots_server_created", "server_url", "created_at"),
     )
 
     # Relationships
