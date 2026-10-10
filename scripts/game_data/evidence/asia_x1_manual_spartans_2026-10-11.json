@@ -1,18 +1,18 @@
 {
- "_what": "ASIA x1 遊戲內說明（說明 → 建築與兵種 → 斯巴達分頁 → 點兵種）逐項抄錄斯巴達 10 種兵的花費、攻防、速度、運載量、糧耗、訓練時間，2026-10-11 由測試帳號 NckuTest（h34036047 大廳帳號）的瀏覽器唯讀讀取。ts11 是 5 族伺服器、說明頁 71～80 號是異常錯誤（ts11_manual_troops_71_90_2026-10-10.json），所以斯巴達改在可以選斯巴達的 ASIA x1 讀。",
+ "_what": "ASIA x1 遊戲內說明（說明 → 建築與兵種 → 斯巴達分頁 → 點兵種）逐項抄錄斯巴達 10 種兵的花費、攻防、速度、運載量、糧耗、訓練時間，2026-10-11 由測試帳號（已去識別）的瀏覽器唯讀讀取。ts11 是 5 族伺服器、說明頁 71～80 號是異常錯誤（ts11_manual_troops_71_90_2026-10-10.json），所以斯巴達改在可以選斯巴達的 ASIA x1 讀。",
  "server": "rog.x1.asia.travian.com",
  "url": "https://rog.x1.asia.travian.com",
  "path": "遊戲畫面 → 說明（Help menu）→ Instructions：Troops → Spartans 分頁 → 點兵種名稱（每個兵種一頁：花費、攻防、Velocity、Can carry、Upkeep、Duration of training）",
  "read_conditions": {
   "server_speed": "x1（rog.x1.asia.travian.com，Travian: Rise of Governors 2026 年度特別伺服器，可選斯巴達）",
   "read_at": "2026-10-11 00:36–00:45（台北）",
-  "account": "NckuTest（大廳帳號 h34036047），帳號唯一的村莊 NckuTest`s village，人口 8",
+  "account": "測試帳號（已去識別）",
   "help_times_are_base_times": "說明頁的訓練時間是 x1、建築 1 級的基本時間，不看村莊裡兵營／馬廄／工場的等級（ts11 說明頁同一套規則：ts11_manual_2026-10-10.json read_conditions.help_times_are_base_times）。存法跟 ts11 一樣：train_time_s＝說明頁的時間換成秒，不另外換算。",
   "names": "name_en＝說明頁英文介面的兵種名（截圖）；name_zh、部族名「斯巴達人」＝繁體中文介面說明頁的名稱，原文存在 raw_zh（10 頁都有，另有繁中總覽截圖）",
-  "screenshots": "英文介面截圖 5 張：總覽（Spartans 分頁 10 個兵種英文名）＋裝甲步兵、哨兵、爾必達騎士、開拓者 4 個兵種頁；繁中介面總覽截圖 1 張（raw_zh.overview_screenshot）。10 個兵種頁的繁中原文都在 raw_zh.units。檔名就是檔案的 SHA-256。"
+  "screenshots": "英文介面截圖 5 張：總覽（Spartans 分頁 10 個兵種英文名）＋裝甲步兵、哨兵、爾必達騎士、開拓者 4 個兵種頁；繁中介面總覽截圖 1 張（raw_zh.overview_screenshot）。10 個兵種頁的繁中原文都在 raw_zh.units。檔名就是檔案的 SHA-256。截圖已裁成中間的說明視窗（去識別：拿掉右上角帳號、村莊、座標和其他遊戲畫面，2026-10-11），SHA-256 是裁切後的檔案。"
  },
- "overview_screenshot": "asia_x1_spartans_2026-10-11/7bf8025b62c595a24c7c7bce3b3f520f550debbc9272ff91048972396c16a57e.png",
- "overview_screenshot_sha256": "7bf8025b62c595a24c7c7bce3b3f520f550debbc9272ff91048972396c16a57e",
+ "overview_screenshot": "asia_x1_spartans_2026-10-11/5339fcf59145ad8ff1d70e2859e721fa065f2425df0c66128953850d68d3bd64.png",
+ "overview_screenshot_sha256": "5339fcf59145ad8ff1d70e2859e721fa065f2425df0c66128953850d68d3bd64",
  "overview_captured_at": "2026-10-11T00:36:15+08:00",
  "overview_names_en": [
   "Hoplite",
@@ -46,8 +46,8 @@
    "upkeep": 1,
    "train_time_text": "0:28:20",
    "train_time_s": 1700,
-   "screenshot": "asia_x1_spartans_2026-10-11/c16f5eb97c412493ed3df832bdd5c624b00edf413fbf36d1e0857c3acf682356.png",
-   "screenshot_sha256": "c16f5eb97c412493ed3df832bdd5c624b00edf413fbf36d1e0857c3acf682356",
+   "screenshot": "asia_x1_spartans_2026-10-11/e8d3fb64c64883d3b4c27557625a8ecc72d49545c2680108c82f5529fa6a3d09.png",
+   "screenshot_sha256": "e8d3fb64c64883d3b4c27557625a8ecc72d49545c2680108c82f5529fa6a3d09",
    "captured_at": "2026-10-11T00:36:23+08:00"
   },
   "2": {
@@ -69,8 +69,8 @@
    "upkeep": 1,
    "train_time_text": "0:20:32",
    "train_time_s": 1232,
-   "screenshot": "asia_x1_spartans_2026-10-11/ff0f7d79f056b1bce554958b0ef8394ad669ceb9a75815d89b1d6442bd4d06ef.png",
-   "screenshot_sha256": "ff0f7d79f056b1bce554958b0ef8394ad669ceb9a75815d89b1d6442bd4d06ef",
+   "screenshot": "asia_x1_spartans_2026-10-11/824e66a8d0741a2f740628ff544f4765c72f537e5be403e803aa502af8605b6f.png",
+   "screenshot_sha256": "824e66a8d0741a2f740628ff544f4765c72f537e5be403e803aa502af8605b6f",
    "captured_at": "2026-10-11T00:39:32+08:00"
   },
   "3": {
@@ -138,8 +138,8 @@
    "upkeep": 2,
    "train_time_text": "0:46:56",
    "train_time_s": 2816,
-   "screenshot": "asia_x1_spartans_2026-10-11/a2195db91b4f2c43fae003badf46c3da855c38d8fc62c3b270d67de94afbab7d.png",
-   "screenshot_sha256": "a2195db91b4f2c43fae003badf46c3da855c38d8fc62c3b270d67de94afbab7d",
+   "screenshot": "asia_x1_spartans_2026-10-11/6928ec8170fb6d7e17b731a7ab755595983bbabe38c51c283ca26d39b872fac4.png",
+   "screenshot_sha256": "6928ec8170fb6d7e17b731a7ab755595983bbabe38c51c283ca26d39b872fac4",
    "captured_at": "2026-10-11T00:38:56+08:00"
   },
   "6": {
@@ -253,8 +253,8 @@
    "upkeep": 1,
    "train_time_text": "9:28:20",
    "train_time_s": 34100,
-   "screenshot": "asia_x1_spartans_2026-10-11/91a601aea005b551a7e294921ebc1de509cba9db8d5185aa72077c36785cb86a.png",
-   "screenshot_sha256": "91a601aea005b551a7e294921ebc1de509cba9db8d5185aa72077c36785cb86a",
+   "screenshot": "asia_x1_spartans_2026-10-11/77122d9da98624e0ffdcddf8639abf4b6f58b9150ee1dbf9ee5ac39cc5b310b6.png",
+   "screenshot_sha256": "77122d9da98624e0ffdcddf8639abf4b6f58b9150ee1dbf9ee5ac39cc5b310b6",
    "captured_at": "2026-10-11T00:40:53+08:00"
   }
  },
@@ -269,8 +269,8 @@
    "text": " 士兵\n羅馬人\n日耳曼人\n高盧人\n埃及人\n匈奴\n斯巴達人\n自然界\n賴達族\n 裝甲步兵 哨兵 盾牌手 雙鋼泰瑞恩 爾必達騎士 科林斯破壞者 破城槌 賴達投石機 五長官 開拓者\n建築物\n基礎\n軍事\n資源\n 倉庫 穀倉 村莊大樓 市場 大使館 山洞 城鎮廳 行宮 皇宮 寶物庫 交易所 石匠鋪 釀酒廠 大倉庫 大穀倉 放牧水槽 指揮中心 供水系統",
    "text_sha256": "5637417b9ea514a8d00ad6e854567b63263084cf01a70e754940752aa52d64c5"
   },
-  "overview_screenshot": "asia_x1_spartans_2026-10-11/331210efd662010c4b2c5d83f2a92380fa991f2e37520e057da94f94848ce74f.png",
-  "overview_screenshot_sha256": "331210efd662010c4b2c5d83f2a92380fa991f2e37520e057da94f94848ce74f",
+  "overview_screenshot": "asia_x1_spartans_2026-10-11/c752766ca1cfee5c69597d0c85a94ac7db0fde085f185d8114b737daf103c87a.png",
+  "overview_screenshot_sha256": "c752766ca1cfee5c69597d0c85a94ac7db0fde085f185d8114b737daf103c87a",
   "overview_screenshot_saved_at": "2026-10-11T01:19:46+08:00",
   "units": {
    "1": {

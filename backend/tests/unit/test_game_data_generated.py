@@ -691,6 +691,23 @@ def test_asia_x1_spartan_evidence_records_source_and_screenshots() -> None:
     ]
 
 
+def test_asia_x1_evidence_is_de_identified() -> None:
+    """公開 repo（第 6 輪）：帳號、大廳帳號、村莊寫「測試帳號（已去識別）」；截圖只留中間的說明視窗."""
+    import struct
+
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
+    assert ev["read_conditions"]["account"] == "測試帳號（已去識別）"
+    assert "測試帳號（已去識別）" in ev["_what"]
+    shots = [ev["overview_screenshot"], ev["raw_zh"]["overview_screenshot"]]
+    shots += [t["screenshot"] for t in ev["troops"].values() if t["screenshot"]]
+    assert len(set(shots)) == 6
+    for rel in set(shots):
+        head = (ASIA_X1_SPARTANS.parent / rel).read_bytes()[:24]
+        assert head[:8] == b"\x89PNG\r\n\x1a\n", rel
+        # 原圖 1024×594 整個遊戲畫面；裁切後只剩說明視窗（右上角的帳號、村莊、座標都在 x ≥ 730）
+        assert struct.unpack(">II", head[16:24]) == (269, 362), rel
+
+
 def test_asia_x1_raw_zh_text_is_stored_and_matches_every_value() -> None:
     """繁中原文 10 頁＋總覽：只存說明內容（沒有帳號、村莊等頁面內容），SHA-256 對得上，解析出來跟 troops 一樣."""
     gen = _gen_module()
@@ -705,7 +722,7 @@ def test_asia_x1_raw_zh_text_is_stored_and_matches_every_value() -> None:
             "+08:00"
         )
         for chrome in (
-            "NckuTest",
+            "`s village",
             "伺服器標準時間",
             "幫助選單",
             "Privacy settings",
