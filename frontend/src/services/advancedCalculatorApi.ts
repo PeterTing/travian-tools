@@ -73,6 +73,8 @@ export interface TechnologyRequest {
 
 export interface TroopTechRow {
   troop_name: string
+  /** 遊戲內中文名稱（P0-18） */
+  troop_name_zh?: string
   troop_id: string
   attack_values: number[]
   defense_infantry_values: number[]

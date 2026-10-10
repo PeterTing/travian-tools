@@ -19,7 +19,23 @@
         "kb_id": "legionnaire",
         "speed": 6,
         "source": "ts11",
-        "ref": "manual/troop/1"
+        "ref": "manual/troop/1",
+        "stats": {
+          "name_zh": "古羅馬步兵",
+          "cost": [
+            120,
+            100,
+            150,
+            30
+          ],
+          "attack": 40,
+          "def_inf": 35,
+          "def_cav": 50,
+          "carry": 50,
+          "upkeep": 1,
+          "train_time": 1600,
+          "ref": "manual/troop/1"
+        }
       },
       {
         "slot": 2,
@@ -28,7 +44,23 @@
         "kb_id": "praetorian",
         "speed": 5,
         "source": "ts11",
-        "ref": "manual/troop/2"
+        "ref": "manual/troop/2",
+        "stats": {
+          "name_zh": "禁衛兵",
+          "cost": [
+            100,
+            130,
+            160,
+            70
+          ],
+          "attack": 30,
+          "def_inf": 65,
+          "def_cav": 35,
+          "carry": 20,
+          "upkeep": 1,
+          "train_time": 1760,
+          "ref": "manual/troop/2"
+        }
       },
       {
         "slot": 3,
@@ -37,7 +69,23 @@
         "kb_id": "imperian",
         "speed": 7,
         "source": "ts11",
-        "ref": "manual/troop/3"
+        "ref": "manual/troop/3",
+        "stats": {
+          "name_zh": "帝國兵",
+          "cost": [
+            150,
+            160,
+            210,
+            80
+          ],
+          "attack": 70,
+          "def_inf": 40,
+          "def_cav": 25,
+          "carry": 50,
+          "upkeep": 1,
+          "train_time": 1920,
+          "ref": "manual/troop/3"
+        }
       },
       {
         "slot": 4,
@@ -46,7 +94,23 @@
         "kb_id": "equites_legati",
         "speed": 16,
         "source": "ts11",
-        "ref": "manual/troop/4"
+        "ref": "manual/troop/4",
+        "stats": {
+          "name_zh": "使者騎士",
+          "cost": [
+            140,
+            160,
+            20,
+            40
+          ],
+          "attack": 0,
+          "def_inf": 20,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 2,
+          "train_time": 1360,
+          "ref": "manual/troop/4"
+        }
       },
       {
         "slot": 5,
@@ -55,7 +119,23 @@
         "kb_id": "equites_imperatoris",
         "speed": 14,
         "source": "ts11",
-        "ref": "manual/troop/5"
+        "ref": "manual/troop/5",
+        "stats": {
+          "name_zh": "帝國騎士",
+          "cost": [
+            550,
+            440,
+            320,
+            100
+          ],
+          "attack": 120,
+          "def_inf": 65,
+          "def_cav": 50,
+          "carry": 100,
+          "upkeep": 3,
+          "train_time": 2640,
+          "ref": "manual/troop/5"
+        }
       },
       {
         "slot": 6,
@@ -64,7 +144,23 @@
         "kb_id": "equites_caesaris",
         "speed": 10,
         "source": "ts11",
-        "ref": "manual/troop/6"
+        "ref": "manual/troop/6",
+        "stats": {
+          "name_zh": "將軍騎士",
+          "cost": [
+            550,
+            640,
+            800,
+            180
+          ],
+          "attack": 180,
+          "def_inf": 80,
+          "def_cav": 105,
+          "carry": 70,
+          "upkeep": 4,
+          "train_time": 3520,
+          "ref": "manual/troop/6"
+        }
       },
       {
         "slot": 7,
@@ -73,7 +169,23 @@
         "kb_id": "battering_ram",
         "speed": 4,
         "source": "ts11",
-        "ref": "manual/troop/7"
+        "ref": "manual/troop/7",
+        "stats": {
+          "name_zh": "衝撞車",
+          "cost": [
+            900,
+            360,
+            500,
+            70
+          ],
+          "attack": 60,
+          "def_inf": 30,
+          "def_cav": 75,
+          "carry": 0,
+          "upkeep": 3,
+          "train_time": 4600,
+          "ref": "manual/troop/7"
+        }
       },
       {
         "slot": 8,
@@ -82,7 +194,23 @@
         "kb_id": "fire_catapult",
         "speed": 3,
         "source": "ts11",
-        "ref": "manual/troop/8"
+        "ref": "manual/troop/8",
+        "stats": {
+          "name_zh": "火焰投石機",
+          "cost": [
+            950,
+            1350,
+            600,
+            90
+          ],
+          "attack": 75,
+          "def_inf": 60,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 6,
+          "train_time": 9000,
+          "ref": "manual/troop/8"
+        }
       },
       {
         "slot": 9,
@@ -91,7 +219,23 @@
         "kb_id": "senator",
         "speed": 4,
         "source": "ts11",
-        "ref": "manual/troop/9"
+        "ref": "manual/troop/9",
+        "stats": {
+          "name_zh": "參議員",
+          "cost": [
+            30750,
+            27200,
+            45000,
+            37500
+          ],
+          "attack": 50,
+          "def_inf": 40,
+          "def_cav": 30,
+          "carry": 0,
+          "upkeep": 5,
+          "train_time": 90700,
+          "ref": "manual/troop/9"
+        }
       },
       {
         "slot": 10,
@@ -100,7 +244,23 @@
         "kb_id": "settler",
         "speed": 5,
         "source": "ts11",
-        "ref": "manual/troop/10"
+        "ref": "manual/troop/10",
+        "stats": {
+          "name_zh": "開拓者",
+          "cost": [
+            4600,
+            4200,
+            5800,
+            4400
+          ],
+          "attack": 0,
+          "def_inf": 80,
+          "def_cav": 80,
+          "carry": 3000,
+          "upkeep": 1,
+          "train_time": 26900,
+          "ref": "manual/troop/10"
+        }
       }
     ],
     "teutons": [
@@ -111,7 +271,23 @@
         "kb_id": "clubswinger",
         "speed": 7,
         "source": "ts11",
-        "ref": "manual/troop/11"
+        "ref": "manual/troop/11",
+        "stats": {
+          "name_zh": "棍棒兵",
+          "cost": [
+            95,
+            75,
+            40,
+            40
+          ],
+          "attack": 40,
+          "def_inf": 20,
+          "def_cav": 5,
+          "carry": 60,
+          "upkeep": 1,
+          "train_time": 720,
+          "ref": "manual/troop/11"
+        }
       },
       {
         "slot": 2,
@@ -120,7 +296,23 @@
         "kb_id": "spearman",
         "speed": 7,
         "source": "ts11",
-        "ref": "manual/troop/12"
+        "ref": "manual/troop/12",
+        "stats": {
+          "name_zh": "矛兵",
+          "cost": [
+            145,
+            70,
+            85,
+            40
+          ],
+          "attack": 10,
+          "def_inf": 35,
+          "def_cav": 60,
+          "carry": 40,
+          "upkeep": 1,
+          "train_time": 1120,
+          "ref": "manual/troop/12"
+        }
       },
       {
         "slot": 3,
@@ -129,7 +321,23 @@
         "kb_id": "axeman",
         "speed": 6,
         "source": "ts11",
-        "ref": "manual/troop/13"
+        "ref": "manual/troop/13",
+        "stats": {
+          "name_zh": "斧頭兵",
+          "cost": [
+            130,
+            120,
+            170,
+            70
+          ],
+          "attack": 60,
+          "def_inf": 30,
+          "def_cav": 30,
+          "carry": 50,
+          "upkeep": 1,
+          "train_time": 1200,
+          "ref": "manual/troop/13"
+        }
       },
       {
         "slot": 4,
@@ -138,7 +346,23 @@
         "kb_id": "scout",
         "speed": 9,
         "source": "ts11",
-        "ref": "manual/troop/14"
+        "ref": "manual/troop/14",
+        "stats": {
+          "name_zh": "偵察兵",
+          "cost": [
+            160,
+            100,
+            50,
+            50
+          ],
+          "attack": 0,
+          "def_inf": 10,
+          "def_cav": 5,
+          "carry": 0,
+          "upkeep": 1,
+          "train_time": 1120,
+          "ref": "manual/troop/14"
+        }
       },
       {
         "slot": 5,
@@ -147,7 +371,23 @@
         "kb_id": "paladin",
         "speed": 10,
         "source": "ts11",
-        "ref": "manual/troop/15"
+        "ref": "manual/troop/15",
+        "stats": {
+          "name_zh": "遊俠",
+          "cost": [
+            370,
+            270,
+            290,
+            75
+          ],
+          "attack": 55,
+          "def_inf": 100,
+          "def_cav": 40,
+          "carry": 110,
+          "upkeep": 2,
+          "train_time": 2400,
+          "ref": "manual/troop/15"
+        }
       },
       {
         "slot": 6,
@@ -156,7 +396,23 @@
         "kb_id": "teutonic_knight",
         "speed": 9,
         "source": "ts11",
-        "ref": "manual/troop/16"
+        "ref": "manual/troop/16",
+        "stats": {
+          "name_zh": "條頓騎士",
+          "cost": [
+            450,
+            515,
+            480,
+            80
+          ],
+          "attack": 150,
+          "def_inf": 50,
+          "def_cav": 75,
+          "carry": 80,
+          "upkeep": 3,
+          "train_time": 2960,
+          "ref": "manual/troop/16"
+        }
       },
       {
         "slot": 7,
@@ -165,7 +421,23 @@
         "kb_id": "ram",
         "speed": 4,
         "source": "ts11",
-        "ref": "manual/troop/17"
+        "ref": "manual/troop/17",
+        "stats": {
+          "name_zh": "破城槌",
+          "cost": [
+            1000,
+            300,
+            350,
+            70
+          ],
+          "attack": 65,
+          "def_inf": 30,
+          "def_cav": 80,
+          "carry": 0,
+          "upkeep": 3,
+          "train_time": 4200,
+          "ref": "manual/troop/17"
+        }
       },
       {
         "slot": 8,
@@ -174,7 +446,23 @@
         "kb_id": "catapult",
         "speed": 3,
         "source": "ts11",
-        "ref": "manual/troop/18"
+        "ref": "manual/troop/18",
+        "stats": {
+          "name_zh": "弩炮",
+          "cost": [
+            900,
+            1200,
+            600,
+            60
+          ],
+          "attack": 50,
+          "def_inf": 60,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 6,
+          "train_time": 9000,
+          "ref": "manual/troop/18"
+        }
       },
       {
         "slot": 9,
@@ -183,7 +471,23 @@
         "kb_id": "chief",
         "speed": 4,
         "source": "ts11",
-        "ref": "manual/troop/19"
+        "ref": "manual/troop/19",
+        "stats": {
+          "name_zh": "司令官",
+          "cost": [
+            35500,
+            26600,
+            25000,
+            27200
+          ],
+          "attack": 40,
+          "def_inf": 60,
+          "def_cav": 40,
+          "carry": 0,
+          "upkeep": 4,
+          "train_time": 70500,
+          "ref": "manual/troop/19"
+        }
       },
       {
         "slot": 10,
@@ -192,7 +496,23 @@
         "kb_id": "settler",
         "speed": 5,
         "source": "ts11",
-        "ref": "manual/troop/20"
+        "ref": "manual/troop/20",
+        "stats": {
+          "name_zh": "開拓者",
+          "cost": [
+            5800,
+            4400,
+            4600,
+            5200
+          ],
+          "attack": 10,
+          "def_inf": 80,
+          "def_cav": 80,
+          "carry": 3000,
+          "upkeep": 1,
+          "train_time": 31000,
+          "ref": "manual/troop/20"
+        }
       }
     ],
     "gauls": [
@@ -203,7 +523,23 @@
         "kb_id": "phalanx",
         "speed": 7,
         "source": "ts11",
-        "ref": "manual/troop/21"
+        "ref": "manual/troop/21",
+        "stats": {
+          "name_zh": "方陣兵",
+          "cost": [
+            100,
+            130,
+            55,
+            30
+          ],
+          "attack": 15,
+          "def_inf": 40,
+          "def_cav": 50,
+          "carry": 35,
+          "upkeep": 1,
+          "train_time": 1040,
+          "ref": "manual/troop/21"
+        }
       },
       {
         "slot": 2,
@@ -212,7 +548,23 @@
         "kb_id": "swordsman",
         "speed": 6,
         "source": "ts11",
-        "ref": "manual/troop/22"
+        "ref": "manual/troop/22",
+        "stats": {
+          "name_zh": "劍士",
+          "cost": [
+            140,
+            150,
+            185,
+            60
+          ],
+          "attack": 65,
+          "def_inf": 35,
+          "def_cav": 20,
+          "carry": 45,
+          "upkeep": 1,
+          "train_time": 1440,
+          "ref": "manual/troop/22"
+        }
       },
       {
         "slot": 3,
@@ -221,7 +573,23 @@
         "kb_id": "pathfinder",
         "speed": 17,
         "source": "ts11",
-        "ref": "manual/troop/23"
+        "ref": "manual/troop/23",
+        "stats": {
+          "name_zh": "探路者",
+          "cost": [
+            170,
+            150,
+            20,
+            40
+          ],
+          "attack": 0,
+          "def_inf": 20,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 2,
+          "train_time": 1360,
+          "ref": "manual/troop/23"
+        }
       },
       {
         "slot": 4,
@@ -230,7 +598,23 @@
         "kb_id": "theutates_thunder",
         "speed": 19,
         "source": "ts11",
-        "ref": "manual/troop/24"
+        "ref": "manual/troop/24",
+        "stats": {
+          "name_zh": "雷法師",
+          "cost": [
+            350,
+            450,
+            230,
+            60
+          ],
+          "attack": 100,
+          "def_inf": 25,
+          "def_cav": 40,
+          "carry": 75,
+          "upkeep": 2,
+          "train_time": 2480,
+          "ref": "manual/troop/24"
+        }
       },
       {
         "slot": 5,
@@ -239,7 +623,23 @@
         "kb_id": "druidrider",
         "speed": 16,
         "source": "ts11",
-        "ref": "manual/troop/25"
+        "ref": "manual/troop/25",
+        "stats": {
+          "name_zh": "德魯伊騎兵",
+          "cost": [
+            360,
+            330,
+            280,
+            120
+          ],
+          "attack": 45,
+          "def_inf": 115,
+          "def_cav": 55,
+          "carry": 35,
+          "upkeep": 2,
+          "train_time": 2560,
+          "ref": "manual/troop/25"
+        }
       },
       {
         "slot": 6,
@@ -248,7 +648,23 @@
         "kb_id": "haeduan",
         "speed": 13,
         "source": "ts11",
-        "ref": "manual/troop/26"
+        "ref": "manual/troop/26",
+        "stats": {
+          "name_zh": "海頓聖騎",
+          "cost": [
+            500,
+            620,
+            675,
+            170
+          ],
+          "attack": 140,
+          "def_inf": 60,
+          "def_cav": 165,
+          "carry": 65,
+          "upkeep": 3,
+          "train_time": 3120,
+          "ref": "manual/troop/26"
+        }
       },
       {
         "slot": 7,
@@ -257,7 +673,23 @@
         "kb_id": "ram",
         "speed": 4,
         "source": "ts11",
-        "ref": "manual/troop/27"
+        "ref": "manual/troop/27",
+        "stats": {
+          "name_zh": "破城槌",
+          "cost": [
+            950,
+            555,
+            330,
+            75
+          ],
+          "attack": 50,
+          "def_inf": 30,
+          "def_cav": 105,
+          "carry": 0,
+          "upkeep": 3,
+          "train_time": 5000,
+          "ref": "manual/troop/27"
+        }
       },
       {
         "slot": 8,
@@ -266,7 +698,23 @@
         "kb_id": "trebuchet",
         "speed": 3,
         "source": "ts11",
-        "ref": "manual/troop/28"
+        "ref": "manual/troop/28",
+        "stats": {
+          "name_zh": "投石機",
+          "cost": [
+            960,
+            1450,
+            630,
+            90
+          ],
+          "attack": 70,
+          "def_inf": 45,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 6,
+          "train_time": 9000,
+          "ref": "manual/troop/28"
+        }
       },
       {
         "slot": 9,
@@ -275,7 +723,23 @@
         "kb_id": "chieftain",
         "speed": 5,
         "source": "ts11",
-        "ref": "manual/troop/29"
+        "ref": "manual/troop/29",
+        "stats": {
+          "name_zh": "族長",
+          "cost": [
+            30750,
+            45400,
+            31000,
+            37500
+          ],
+          "attack": 40,
+          "def_inf": 50,
+          "def_cav": 50,
+          "carry": 0,
+          "upkeep": 4,
+          "train_time": 90700,
+          "ref": "manual/troop/29"
+        }
       },
       {
         "slot": 10,
@@ -284,7 +748,23 @@
         "kb_id": "settler",
         "speed": 5,
         "source": "ts11",
-        "ref": "manual/troop/30"
+        "ref": "manual/troop/30",
+        "stats": {
+          "name_zh": "開拓者",
+          "cost": [
+            4400,
+            5600,
+            4200,
+            3900
+          ],
+          "attack": 0,
+          "def_inf": 80,
+          "def_cav": 80,
+          "carry": 3000,
+          "upkeep": 1,
+          "train_time": 22700,
+          "ref": "manual/troop/30"
+        }
       }
     ],
     "egyptians": [
@@ -295,7 +775,23 @@
         "kb_id": "slave_militia",
         "speed": 7,
         "source": "ts11",
-        "ref": "manual/troop/51"
+        "ref": "manual/troop/51",
+        "stats": {
+          "name_zh": "奴隸民兵",
+          "cost": [
+            45,
+            60,
+            30,
+            15
+          ],
+          "attack": 10,
+          "def_inf": 30,
+          "def_cav": 20,
+          "carry": 15,
+          "upkeep": 1,
+          "train_time": 530,
+          "ref": "manual/troop/51"
+        }
       },
       {
         "slot": 2,
@@ -304,7 +800,23 @@
         "kb_id": "ash_warden",
         "speed": 6,
         "source": "ts11",
-        "ref": "manual/troop/52"
+        "ref": "manual/troop/52",
+        "stats": {
+          "name_zh": "看守人艾什",
+          "cost": [
+            115,
+            100,
+            145,
+            60
+          ],
+          "attack": 30,
+          "def_inf": 55,
+          "def_cav": 40,
+          "carry": 50,
+          "upkeep": 1,
+          "train_time": 1380,
+          "ref": "manual/troop/52"
+        }
       },
       {
         "slot": 3,
@@ -313,7 +825,23 @@
         "kb_id": "khopesh_warrior",
         "speed": 7,
         "source": "ts11",
-        "ref": "manual/troop/53"
+        "ref": "manual/troop/53",
+        "stats": {
+          "name_zh": "斧刀勇士",
+          "cost": [
+            170,
+            180,
+            220,
+            80
+          ],
+          "attack": 65,
+          "def_inf": 50,
+          "def_cav": 20,
+          "carry": 45,
+          "upkeep": 1,
+          "train_time": 1440,
+          "ref": "manual/troop/53"
+        }
       },
       {
         "slot": 4,
@@ -322,7 +850,23 @@
         "kb_id": "sopdu_explorer",
         "speed": 16,
         "source": "ts11",
-        "ref": "manual/troop/54"
+        "ref": "manual/troop/54",
+        "stats": {
+          "name_zh": "探險者索普杜",
+          "cost": [
+            170,
+            150,
+            20,
+            40
+          ],
+          "attack": 0,
+          "def_inf": 20,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 2,
+          "train_time": 1360,
+          "ref": "manual/troop/54"
+        }
       },
       {
         "slot": 5,
@@ -331,7 +875,23 @@
         "kb_id": "anhur_guard",
         "speed": 15,
         "source": "ts11",
-        "ref": "manual/troop/55"
+        "ref": "manual/troop/55",
+        "stats": {
+          "name_zh": "守衛安赫",
+          "cost": [
+            360,
+            330,
+            280,
+            120
+          ],
+          "attack": 50,
+          "def_inf": 110,
+          "def_cav": 50,
+          "carry": 50,
+          "upkeep": 2,
+          "train_time": 2560,
+          "ref": "manual/troop/55"
+        }
       },
       {
         "slot": 6,
@@ -340,7 +900,23 @@
         "kb_id": "resheph_chariot",
         "speed": 10,
         "source": "ts11",
-        "ref": "manual/troop/56"
+        "ref": "manual/troop/56",
+        "stats": {
+          "name_zh": "瑞舍夫戰車",
+          "cost": [
+            450,
+            560,
+            610,
+            180
+          ],
+          "attack": 110,
+          "def_inf": 120,
+          "def_cav": 150,
+          "carry": 70,
+          "upkeep": 3,
+          "train_time": 3240,
+          "ref": "manual/troop/56"
+        }
       },
       {
         "slot": 7,
@@ -349,7 +925,23 @@
         "kb_id": "ram",
         "speed": 4,
         "source": "ts11",
-        "ref": "manual/troop/57"
+        "ref": "manual/troop/57",
+        "stats": {
+          "name_zh": "破城槌",
+          "cost": [
+            995,
+            575,
+            340,
+            80
+          ],
+          "attack": 55,
+          "def_inf": 30,
+          "def_cav": 95,
+          "carry": 0,
+          "upkeep": 3,
+          "train_time": 4800,
+          "ref": "manual/troop/57"
+        }
       },
       {
         "slot": 8,
@@ -358,7 +950,23 @@
         "kb_id": "stone_catapult",
         "speed": 3,
         "source": "ts11",
-        "ref": "manual/troop/58"
+        "ref": "manual/troop/58",
+        "stats": {
+          "name_zh": "石弩",
+          "cost": [
+            980,
+            1510,
+            660,
+            100
+          ],
+          "attack": 65,
+          "def_inf": 55,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 6,
+          "train_time": 9000,
+          "ref": "manual/troop/58"
+        }
       },
       {
         "slot": 9,
@@ -367,7 +975,23 @@
         "kb_id": "nomarch",
         "speed": 4,
         "source": "ts11",
-        "ref": "manual/troop/59"
+        "ref": "manual/troop/59",
+        "stats": {
+          "name_zh": "州長",
+          "cost": [
+            34000,
+            50000,
+            34000,
+            42000
+          ],
+          "attack": 40,
+          "def_inf": 50,
+          "def_cav": 50,
+          "carry": 0,
+          "upkeep": 4,
+          "train_time": 90700,
+          "ref": "manual/troop/59"
+        }
       },
       {
         "slot": 10,
@@ -376,7 +1000,23 @@
         "kb_id": "settler",
         "speed": 5,
         "source": "ts11",
-        "ref": "manual/troop/60"
+        "ref": "manual/troop/60",
+        "stats": {
+          "name_zh": "開拓者",
+          "cost": [
+            5040,
+            6510,
+            4830,
+            4620
+          ],
+          "attack": 0,
+          "def_inf": 80,
+          "def_cav": 80,
+          "carry": 3000,
+          "upkeep": 1,
+          "train_time": 24800,
+          "ref": "manual/troop/60"
+        }
       }
     ],
     "huns": [
@@ -387,7 +1027,23 @@
         "kb_id": "mercenary",
         "speed": 6,
         "source": "ts11",
-        "ref": "manual/troop/61"
+        "ref": "manual/troop/61",
+        "stats": {
+          "name_zh": "僱傭兵",
+          "cost": [
+            130,
+            80,
+            40,
+            40
+          ],
+          "attack": 35,
+          "def_inf": 40,
+          "def_cav": 30,
+          "carry": 50,
+          "upkeep": 1,
+          "train_time": 810,
+          "ref": "manual/troop/61"
+        }
       },
       {
         "slot": 2,
@@ -396,7 +1052,23 @@
         "kb_id": "bowman",
         "speed": 6,
         "source": "ts11",
-        "ref": "manual/troop/62"
+        "ref": "manual/troop/62",
+        "stats": {
+          "name_zh": "弓箭手",
+          "cost": [
+            140,
+            110,
+            60,
+            60
+          ],
+          "attack": 50,
+          "def_inf": 30,
+          "def_cav": 10,
+          "carry": 30,
+          "upkeep": 1,
+          "train_time": 1120,
+          "ref": "manual/troop/62"
+        }
       },
       {
         "slot": 3,
@@ -405,7 +1077,23 @@
         "kb_id": "spotter",
         "speed": 19,
         "source": "ts11",
-        "ref": "manual/troop/63"
+        "ref": "manual/troop/63",
+        "stats": {
+          "name_zh": "探子",
+          "cost": [
+            170,
+            150,
+            20,
+            40
+          ],
+          "attack": 0,
+          "def_inf": 20,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 2,
+          "train_time": 1360,
+          "ref": "manual/troop/63"
+        }
       },
       {
         "slot": 4,
@@ -414,7 +1102,23 @@
         "kb_id": "steppe_rider",
         "speed": 16,
         "source": "ts11",
-        "ref": "manual/troop/64"
+        "ref": "manual/troop/64",
+        "stats": {
+          "name_zh": "草原騎士",
+          "cost": [
+            290,
+            370,
+            190,
+            45
+          ],
+          "attack": 120,
+          "def_inf": 30,
+          "def_cav": 15,
+          "carry": 75,
+          "upkeep": 2,
+          "train_time": 2400,
+          "ref": "manual/troop/64"
+        }
       },
       {
         "slot": 5,
@@ -423,7 +1127,23 @@
         "kb_id": "marksman",
         "speed": 15,
         "source": "ts11",
-        "ref": "manual/troop/65"
+        "ref": "manual/troop/65",
+        "stats": {
+          "name_zh": "神射手",
+          "cost": [
+            320,
+            350,
+            330,
+            50
+          ],
+          "attack": 110,
+          "def_inf": 80,
+          "def_cav": 70,
+          "carry": 105,
+          "upkeep": 2,
+          "train_time": 2480,
+          "ref": "manual/troop/65"
+        }
       },
       {
         "slot": 6,
@@ -432,7 +1152,23 @@
         "kb_id": "marauder",
         "speed": 14,
         "source": "ts11",
-        "ref": "manual/troop/66"
+        "ref": "manual/troop/66",
+        "stats": {
+          "name_zh": "掠奪者",
+          "cost": [
+            450,
+            560,
+            610,
+            140
+          ],
+          "attack": 180,
+          "def_inf": 60,
+          "def_cav": 40,
+          "carry": 80,
+          "upkeep": 3,
+          "train_time": 2990,
+          "ref": "manual/troop/66"
+        }
       },
       {
         "slot": 7,
@@ -441,7 +1177,23 @@
         "kb_id": "ram",
         "speed": 4,
         "source": "ts11",
-        "ref": "manual/troop/67"
+        "ref": "manual/troop/67",
+        "stats": {
+          "name_zh": "破城槌",
+          "cost": [
+            1060,
+            330,
+            360,
+            70
+          ],
+          "attack": 65,
+          "def_inf": 30,
+          "def_cav": 90,
+          "carry": 0,
+          "upkeep": 3,
+          "train_time": 4400,
+          "ref": "manual/troop/67"
+        }
       },
       {
         "slot": 8,
@@ -450,7 +1202,23 @@
         "kb_id": "catapult",
         "speed": 3,
         "source": "ts11",
-        "ref": "manual/troop/68"
+        "ref": "manual/troop/68",
+        "stats": {
+          "name_zh": "弩炮",
+          "cost": [
+            950,
+            1280,
+            620,
+            60
+          ],
+          "attack": 45,
+          "def_inf": 55,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 6,
+          "train_time": 9000,
+          "ref": "manual/troop/68"
+        }
       },
       {
         "slot": 9,
@@ -459,7 +1227,23 @@
         "kb_id": "logades",
         "speed": 5,
         "source": "ts11",
-        "ref": "manual/troop/69"
+        "ref": "manual/troop/69",
+        "stats": {
+          "name_zh": "重步兵",
+          "cost": [
+            37200,
+            27600,
+            25200,
+            27600
+          ],
+          "attack": 50,
+          "def_inf": 40,
+          "def_cav": 30,
+          "carry": 0,
+          "upkeep": 4,
+          "train_time": 90700,
+          "ref": "manual/troop/69"
+        }
       },
       {
         "slot": 10,
@@ -468,7 +1252,23 @@
         "kb_id": "settler",
         "speed": 5,
         "source": "ts11",
-        "ref": "manual/troop/70"
+        "ref": "manual/troop/70",
+        "stats": {
+          "name_zh": "開拓者",
+          "cost": [
+            6100,
+            4600,
+            4800,
+            5400
+          ],
+          "attack": 10,
+          "def_inf": 80,
+          "def_cav": 80,
+          "carry": 3000,
+          "upkeep": 1,
+          "train_time": 28950,
+          "ref": "manual/troop/70"
+        }
       }
     ],
     "spartans": [
@@ -479,7 +1279,8 @@
         "kb_id": "hoplite",
         "speed": 6,
         "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+        "stats": null
       },
       {
         "slot": 2,
@@ -488,7 +1289,8 @@
         "kb_id": "sentinel",
         "speed": 9,
         "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+        "stats": null
       },
       {
         "slot": 3,
@@ -497,7 +1299,8 @@
         "kb_id": "shieldsman",
         "speed": 8,
         "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+        "stats": null
       },
       {
         "slot": 4,
@@ -506,7 +1309,8 @@
         "kb_id": "twirler",
         "speed": 6,
         "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+        "stats": null
       },
       {
         "slot": 5,
@@ -515,7 +1319,8 @@
         "kb_id": "elpida_rider",
         "speed": 16,
         "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+        "stats": null
       },
       {
         "slot": 6,
@@ -524,7 +1329,8 @@
         "kb_id": "corinthian_crusher",
         "speed": 9,
         "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
+        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+        "stats": null
       },
       {
         "slot": 7,
@@ -533,7 +1339,8 @@
         "kb_id": "ram",
         "speed": null,
         "source": "pending",
-        "ref": null
+        "ref": null,
+        "stats": null
       },
       {
         "slot": 8,
@@ -542,7 +1349,8 @@
         "kb_id": "catapult",
         "speed": null,
         "source": "pending",
-        "ref": null
+        "ref": null,
+        "stats": null
       },
       {
         "slot": 9,
@@ -551,7 +1359,8 @@
         "kb_id": "ephor",
         "speed": null,
         "source": "pending",
-        "ref": null
+        "ref": null,
+        "stats": null
       },
       {
         "slot": 10,
@@ -560,7 +1369,8 @@
         "kb_id": "settler",
         "speed": null,
         "source": "pending",
-        "ref": null
+        "ref": null,
+        "stats": null
       }
     ],
     "vikings": [
@@ -571,7 +1381,8 @@
         "kb_id": "thrall",
         "speed": 7,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       },
       {
         "slot": 2,
@@ -580,7 +1391,8 @@
         "kb_id": "shield_maiden",
         "speed": 7,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       },
       {
         "slot": 3,
@@ -589,7 +1401,8 @@
         "kb_id": "berserker",
         "speed": 5,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       },
       {
         "slot": 4,
@@ -598,7 +1411,8 @@
         "kb_id": "scout",
         "speed": 9,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       },
       {
         "slot": 5,
@@ -607,7 +1421,8 @@
         "kb_id": "huskarl_rider",
         "speed": 12,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       },
       {
         "slot": 6,
@@ -616,7 +1431,8 @@
         "kb_id": "valkyrjas_blessing",
         "speed": 9,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       },
       {
         "slot": 7,
@@ -625,7 +1441,8 @@
         "kb_id": "ram",
         "speed": 4,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       },
       {
         "slot": 8,
@@ -634,7 +1451,8 @@
         "kb_id": "catapult",
         "speed": 3,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       },
       {
         "slot": 9,
@@ -643,7 +1461,8 @@
         "kb_id": "jarl",
         "speed": 5,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       },
       {
         "slot": 10,
@@ -652,7 +1471,8 @@
         "kb_id": "settler",
         "speed": 5,
         "source": "official",
-        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
+        "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+        "stats": null
       }
     ]
   }

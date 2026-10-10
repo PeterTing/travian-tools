@@ -27,6 +27,7 @@ export const PENDING_KINDS = [
   'arenaSpeed',
   'heroBootsSpeed',
   'arenaBootsSpeed',
+  'smithyFormula',
 ] as const
 
 export type PendingKind = (typeof PENDING_KINDS)[number]
@@ -52,6 +53,7 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
   arenaSpeed: '只有競技場（> 0 級、英雄靴子 0）時（兩個都 0 不標；speedPendingKinds 選）：行軍時間的結果摘要第二行（距離 · 速度）、行進時間、秒數、有效速度；攔截三張卡的標籤：「攻擊者回到家時間」（看攻方）、「你應該在此時發送攔截部隊」（攻方＋攔截方，依序列出）、「攔截行進時間」（看攔截方）；OP 規劃（TS 優化器）每張結果卡／每列的標題（村莊名，涵蓋建議 TS、發兵、行進時間；看那一列的攻擊者）；反推 TS 結果表每列的計算行進時間（看那一列的競技場等級和靴子欄位）；躲兵「計算結果」標題旁一個（整區同一份說明）（P0-21）；農場收益：「單程」、「每小時最多次數」，以及「每日收益」摘要標題、「每日預估收益」、「回本天數」的灰標裡接在原本種類後面（同一個灰標、依序列出；P0-22）',
   heroBootsSpeed: '只有英雄靴子（> 0%、競技場 0 級）時：位置同 arenaSpeed（P0-20、P0-21）',
   arenaBootsSpeed: '競技場 > 0 級且英雄靴子 > 0% 時：位置同 arenaSpeed（P0-20、P0-21）',
+  smithyFormula: '鐵匠升級：結果三張表的標題旁（攻擊力、步兵防禦、騎兵防禦；整張表同一份說明）（P0-18）',
 }
 
 /**

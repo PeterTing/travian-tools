@@ -1,11 +1,11 @@
 {
-  "_note": "兵種花費、糧耗、訓練時間有沒有在 ts11 遊戲內說明頁核對過（每個部族一個）。目前全部是社群整理的數字，一律 false；P0-18 核對完一個部族就把那個部族改成 true，兵種詳情的「待驗證」灰標會自己拿掉。",
+  "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在 ts11 遊戲內說明頁讀到（evidence/ts11_manual_2026-10-10.json）才是 true；ts11 是 5 族伺服器，斯巴達、維京沒有第一手來源，維持 false（兵種詳情顯示「待驗證」）。",
   "tribes": {
-    "romans": false,
-    "gauls": false,
-    "teutons": false,
-    "huns": false,
-    "egyptians": false,
+    "romans": true,
+    "gauls": true,
+    "teutons": true,
+    "huns": true,
+    "egyptians": true,
     "vikings": false,
     "spartans": false
   }

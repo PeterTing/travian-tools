@@ -3,15 +3,16 @@ import data from './unitCostVerified.json'
 import { isTribeCostVerified, UNIT_COST_VERIFIED } from './unitCosts'
 
 describe('unit cost verification flags (data/unitCostVerified.json)', () => {
-  it('real data: all 7 tribes are community-sourced, so every one is false (Vikings only had speed verified)', () => {
+  it('real data: the 5 ts11 tribes are read from the in-game help (P0-18); Spartans and Vikings have no first-hand source', () => {
     expect(Object.keys(data.tribes).sort()).toEqual(['egyptians', 'gauls', 'huns', 'romans', 'spartans', 'teutons', 'vikings'])
-    for (const [tribe, v] of Object.entries(data.tribes)) expect(v, tribe).toBe(false)
-    for (const tribe of Object.keys(data.tribes)) expect(isTribeCostVerified(tribe), tribe).toBe(false)
+    const expected: Record<string, boolean> = { romans: true, teutons: true, gauls: true, egyptians: true, huns: true, spartans: false, vikings: false }
+    for (const [tribe, v] of Object.entries(data.tribes)) expect(v, tribe).toBe(expected[tribe])
+    for (const tribe of Object.keys(data.tribes)) expect(isTribeCostVerified(tribe), tribe).toBe(expected[tribe])
     expect(UNIT_COST_VERIFIED).toBe(data.tribes)
   })
 
   it('flipping a tribe to true in the data is all it takes (mock table)', () => {
-    const mock = { ...data.tribes, gauls: true }
+    const mock = { ...data.tribes, gauls: true, romans: false }
     expect(isTribeCostVerified('gauls', mock)).toBe(true)
     expect(isTribeCostVerified('romans', mock)).toBe(false)
     expect(isTribeCostVerified('unknown', mock)).toBe(false)

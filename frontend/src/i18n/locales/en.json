@@ -1201,6 +1201,10 @@
     "arenaBootsSpeed": {
       "what": "The Tournament Square and hero boots speed-ups haven't been checked in-game on ts11 yet.",
       "source": "We follow the official help page: no bonus for the first 20 fields, then +20% per Tournament Square level plus the boots bonus beyond them (added together, not multiplied)."
+    },
+    "smithyFormula": {
+      "what": "Smithy-upgraded attack/defence values have not been checked in-game on ts11.",
+      "source": "The formula was checked against the level-20 values in the official unit comparison table; it differs from that table by at most 0.2."
     }
   }
 }

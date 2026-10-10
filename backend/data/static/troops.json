@@ -2,7 +2,7 @@
   "troops": {
     "legionnaire": {
       "troop_id": "legionnaire",
-      "name_zh": "軍團兵",
+      "name_zh": "古羅馬步兵",
       "name_en": "Legionnaire",
       "tribe": "romans",
       "category": "infantry",
@@ -22,7 +22,9 @@
       "training_building": "barracks",
       "academy_level_required": 0,
       "description_zh": "羅馬的基礎步兵，攻守均衡",
-      "description_en": "Roman basic infantry with balanced offense and defense"
+      "description_en": "Roman basic infantry with balanced offense and defense",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/1"
     },
     "praetorian": {
       "troop_id": "praetorian",
@@ -46,7 +48,9 @@
       "training_building": "barracks",
       "academy_level_required": 1,
       "description_zh": "羅馬的防禦步兵，對步兵防禦極強",
-      "description_en": "Roman defensive infantry with strong infantry defense"
+      "description_en": "Roman defensive infantry with strong infantry defense",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/2"
     },
     "imperian": {
       "troop_id": "imperian",
@@ -70,11 +74,13 @@
       "training_building": "barracks",
       "academy_level_required": 5,
       "description_zh": "羅馬的強力攻擊步兵",
-      "description_en": "Roman powerful attack infantry"
+      "description_en": "Roman powerful attack infantry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/3"
     },
     "equites_legati": {
       "troop_id": "equites_legati",
-      "name_zh": "使節騎兵",
+      "name_zh": "使者騎士",
       "name_en": "Equites Legati",
       "tribe": "romans",
       "category": "scout",
@@ -94,11 +100,13 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "羅馬的偵查騎兵",
-      "description_en": "Roman scout cavalry"
+      "description_en": "Roman scout cavalry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/4"
     },
     "equites_imperatoris": {
       "troop_id": "equites_imperatoris",
-      "name_zh": "帝國騎兵",
+      "name_zh": "帝國騎士",
       "name_en": "Equites Imperatoris",
       "tribe": "romans",
       "category": "cavalry",
@@ -118,11 +126,13 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "羅馬的攻擊騎兵，速度快",
-      "description_en": "Roman attack cavalry with good speed"
+      "description_en": "Roman attack cavalry with good speed",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/5"
     },
     "equites_caesaris": {
       "troop_id": "equites_caesaris",
-      "name_zh": "凱撒騎兵",
+      "name_zh": "將軍騎士",
       "name_en": "Equites Caesaris",
       "tribe": "romans",
       "category": "cavalry",
@@ -142,11 +152,13 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "羅馬最強的重騎兵",
-      "description_en": "Roman most powerful heavy cavalry"
+      "description_en": "Roman most powerful heavy cavalry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/6"
     },
     "roman_ram": {
       "troop_id": "roman_ram",
-      "name_zh": "攻城槌",
+      "name_zh": "衝撞車",
       "name_en": "Battering Ram",
       "tribe": "romans",
       "category": "siege",
@@ -162,15 +174,17 @@
       "cost_iron": 500,
       "cost_crop": 70,
       "crop_consumption": 3,
-      "training_time_base": 4400,
+      "training_time_base": 4600,
       "training_building": "workshop",
       "academy_level_required": 10,
       "description_zh": "羅馬的攻城武器，用於破壞城牆",
-      "description_en": "Roman siege weapon for destroying walls"
+      "description_en": "Roman siege weapon for destroying walls",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/7"
     },
     "fire_catapult": {
       "troop_id": "fire_catapult",
-      "name_zh": "火焰投石車",
+      "name_zh": "火焰投石機",
       "name_en": "Fire Catapult",
       "tribe": "romans",
       "category": "siege",
@@ -190,11 +204,13 @@
       "training_building": "workshop",
       "academy_level_required": 15,
       "description_zh": "羅馬的攻城武器，用於破壞建築",
-      "description_en": "Roman siege weapon for destroying buildings"
+      "description_en": "Roman siege weapon for destroying buildings",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/8"
     },
     "senator": {
       "troop_id": "senator",
-      "name_zh": "元老",
+      "name_zh": "參議員",
       "name_en": "Senator",
       "tribe": "romans",
       "category": "special",
@@ -214,11 +230,13 @@
       "training_building": "residence",
       "academy_level_required": 20,
       "description_zh": "羅馬的征服者，降低敵方忠誠度",
-      "description_en": "Roman chief unit for conquering villages"
+      "description_en": "Roman chief unit for conquering villages",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/9"
     },
     "roman_settler": {
       "troop_id": "roman_settler",
-      "name_zh": "移民",
+      "name_zh": "開拓者",
       "name_en": "Settler",
       "tribe": "romans",
       "category": "settler",
@@ -229,16 +247,18 @@
       "speed_source": "ts11",
       "speed_ref": "manual/troop/10",
       "carry_capacity": 3000,
-      "cost_wood": 5800,
-      "cost_clay": 5300,
-      "cost_iron": 7200,
-      "cost_crop": 5500,
+      "cost_wood": 4600,
+      "cost_clay": 4200,
+      "cost_iron": 5800,
+      "cost_crop": 4400,
       "crop_consumption": 1,
-      "training_time_base": 28900,
+      "training_time_base": 26900,
       "training_building": "residence",
       "academy_level_required": 0,
       "description_zh": "羅馬的移民，用於建立新村莊",
-      "description_en": "Roman settler for founding new villages"
+      "description_en": "Roman settler for founding new villages",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/10"
     },
     "phalanx": {
       "troop_id": "phalanx",
@@ -262,7 +282,9 @@
       "training_building": "barracks",
       "academy_level_required": 0,
       "description_zh": "高盧的基礎防禦步兵",
-      "description_en": "Gaul basic defensive infantry"
+      "description_en": "Gaul basic defensive infantry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/21"
     },
     "swordsman": {
       "troop_id": "swordsman",
@@ -286,7 +308,9 @@
       "training_building": "barracks",
       "academy_level_required": 3,
       "description_zh": "高盧的攻擊步兵",
-      "description_en": "Gaul attack infantry"
+      "description_en": "Gaul attack infantry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/22"
     },
     "pathfinder": {
       "troop_id": "pathfinder",
@@ -310,7 +334,9 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "高盧的偵查騎兵",
-      "description_en": "Gaul scout cavalry"
+      "description_en": "Gaul scout cavalry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/23"
     },
     "theutates_thunder": {
       "troop_id": "theutates_thunder",
@@ -318,7 +344,7 @@
       "name_en": "Theutates Thunder",
       "tribe": "gauls",
       "category": "cavalry",
-      "attack": 90,
+      "attack": 100,
       "defense_infantry": 25,
       "defense_cavalry": 40,
       "speed": 19,
@@ -334,7 +360,9 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "高盧最快的攻擊騎兵",
-      "description_en": "Gaul fastest attack cavalry"
+      "description_en": "Gaul fastest attack cavalry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/24"
     },
     "druidrider": {
       "troop_id": "druidrider",
@@ -358,7 +386,9 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "高盧的防禦騎兵，對步兵防禦強",
-      "description_en": "Gaul defensive cavalry with strong infantry defense"
+      "description_en": "Gaul defensive cavalry with strong infantry defense",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/25"
     },
     "haeduan": {
       "troop_id": "haeduan",
@@ -382,7 +412,9 @@
       "training_building": "stable",
       "academy_level_required": 15,
       "description_zh": "高盧的重騎兵，對騎兵防禦強",
-      "description_en": "Gaul heavy cavalry with strong cavalry defense"
+      "description_en": "Gaul heavy cavalry with strong cavalry defense",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/26"
     },
     "gaul_ram": {
       "troop_id": "gaul_ram",
@@ -406,7 +438,9 @@
       "training_building": "workshop",
       "academy_level_required": 10,
       "description_zh": "高盧的攻城武器，用於破壞城牆",
-      "description_en": "Gaul siege weapon for destroying walls"
+      "description_en": "Gaul siege weapon for destroying walls",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/27"
     },
     "trebuchet": {
       "troop_id": "trebuchet",
@@ -430,7 +464,9 @@
       "training_building": "workshop",
       "academy_level_required": 15,
       "description_zh": "高盧的攻城武器，用於破壞建築",
-      "description_en": "Gaul siege weapon for destroying buildings"
+      "description_en": "Gaul siege weapon for destroying buildings",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/28"
     },
     "chieftain": {
       "troop_id": "chieftain",
@@ -454,7 +490,9 @@
       "training_building": "residence",
       "academy_level_required": 20,
       "description_zh": "高盧的征服者，降低敵方忠誠度",
-      "description_en": "Gaul chief unit for conquering villages"
+      "description_en": "Gaul chief unit for conquering villages",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/29"
     },
     "gaul_settler": {
       "troop_id": "gaul_settler",
@@ -478,7 +516,9 @@
       "training_building": "residence",
       "academy_level_required": 0,
       "description_zh": "高盧的移民，用於建立新村莊",
-      "description_en": "Gaul settler for founding new villages"
+      "description_en": "Gaul settler for founding new villages",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/30"
     },
     "clubswinger": {
       "troop_id": "clubswinger",
@@ -502,11 +542,13 @@
       "training_building": "barracks",
       "academy_level_required": 0,
       "description_zh": "日耳曼的基礎攻擊步兵，訓練快速且便宜",
-      "description_en": "Teuton basic attack infantry with fast and cheap training"
+      "description_en": "Teuton basic attack infantry with fast and cheap training",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/11"
     },
     "spearman": {
       "troop_id": "spearman",
-      "name_zh": "長矛兵",
+      "name_zh": "矛兵",
       "name_en": "Spearman",
       "tribe": "teutons",
       "category": "infantry",
@@ -522,11 +564,13 @@
       "cost_iron": 85,
       "cost_crop": 40,
       "crop_consumption": 1,
-      "training_time_base": 1040,
+      "training_time_base": 1120,
       "training_building": "barracks",
       "academy_level_required": 1,
       "description_zh": "日耳曼的防禦步兵，對騎兵防禦強",
-      "description_en": "Teuton defensive infantry with strong cavalry defense"
+      "description_en": "Teuton defensive infantry with strong cavalry defense",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/12"
     },
     "axeman": {
       "troop_id": "axeman",
@@ -546,15 +590,17 @@
       "cost_iron": 170,
       "cost_crop": 70,
       "crop_consumption": 1,
-      "training_time_base": 1440,
+      "training_time_base": 1200,
       "training_building": "barracks",
       "academy_level_required": 3,
       "description_zh": "日耳曼的強力攻擊步兵",
-      "description_en": "Teuton powerful attack infantry"
+      "description_en": "Teuton powerful attack infantry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/13"
     },
     "teuton_scout": {
       "troop_id": "teuton_scout",
-      "name_zh": "偵查兵",
+      "name_zh": "偵察兵",
       "name_en": "Scout",
       "tribe": "teutons",
       "category": "scout",
@@ -574,11 +620,13 @@
       "training_building": "barracks",
       "academy_level_required": 1,
       "description_zh": "日耳曼的偵查步兵",
-      "description_en": "Teuton scout infantry"
+      "description_en": "Teuton scout infantry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/14"
     },
     "paladin": {
       "troop_id": "paladin",
-      "name_zh": "聖騎士",
+      "name_zh": "遊俠",
       "name_en": "Paladin",
       "tribe": "teutons",
       "category": "cavalry",
@@ -594,11 +642,13 @@
       "cost_iron": 290,
       "cost_crop": 75,
       "crop_consumption": 2,
-      "training_time_base": 2560,
+      "training_time_base": 2400,
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "日耳曼的防禦騎兵，對步兵防禦強",
-      "description_en": "Teuton defensive cavalry with strong infantry defense"
+      "description_en": "Teuton defensive cavalry with strong infantry defense",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/15"
     },
     "teutonic_knight": {
       "troop_id": "teutonic_knight",
@@ -618,15 +668,17 @@
       "cost_iron": 480,
       "cost_crop": 80,
       "crop_consumption": 3,
-      "training_time_base": 3040,
+      "training_time_base": 2960,
       "training_building": "stable",
       "academy_level_required": 15,
       "description_zh": "日耳曼的重騎兵，攻擊力強",
-      "description_en": "Teuton heavy cavalry with strong attack"
+      "description_en": "Teuton heavy cavalry with strong attack",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/16"
     },
     "teuton_ram": {
       "troop_id": "teuton_ram",
-      "name_zh": "攻城槌",
+      "name_zh": "破城槌",
       "name_en": "Ram",
       "tribe": "teutons",
       "category": "siege",
@@ -642,15 +694,17 @@
       "cost_iron": 350,
       "cost_crop": 70,
       "crop_consumption": 3,
-      "training_time_base": 4400,
+      "training_time_base": 4200,
       "training_building": "workshop",
       "academy_level_required": 10,
       "description_zh": "日耳曼的攻城武器，用於破壞城牆，最便宜",
-      "description_en": "Teuton siege weapon for destroying walls, cheapest"
+      "description_en": "Teuton siege weapon for destroying walls, cheapest",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/17"
     },
     "teuton_catapult": {
       "troop_id": "teuton_catapult",
-      "name_zh": "投石車",
+      "name_zh": "弩炮",
       "name_en": "Catapult",
       "tribe": "teutons",
       "category": "siege",
@@ -670,11 +724,13 @@
       "training_building": "workshop",
       "academy_level_required": 15,
       "description_zh": "日耳曼的攻城武器，用於破壞建築",
-      "description_en": "Teuton siege weapon for destroying buildings"
+      "description_en": "Teuton siege weapon for destroying buildings",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/18"
     },
     "chief": {
       "troop_id": "chief",
-      "name_zh": "族長",
+      "name_zh": "司令官",
       "name_en": "Chief",
       "tribe": "teutons",
       "category": "special",
@@ -690,39 +746,43 @@
       "cost_iron": 25000,
       "cost_crop": 27200,
       "crop_consumption": 4,
-      "training_time_base": 77500,
+      "training_time_base": 70500,
       "training_building": "residence",
       "academy_level_required": 20,
       "description_zh": "日耳曼的征服者，降低敵方忠誠度",
-      "description_en": "Teuton chief unit for conquering villages"
+      "description_en": "Teuton chief unit for conquering villages",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/19"
     },
     "teuton_settler": {
       "troop_id": "teuton_settler",
-      "name_zh": "移民",
+      "name_zh": "開拓者",
       "name_en": "Settler",
       "tribe": "teutons",
       "category": "settler",
-      "attack": 0,
+      "attack": 10,
       "defense_infantry": 80,
       "defense_cavalry": 80,
       "speed": 5,
       "speed_source": "ts11",
       "speed_ref": "manual/troop/20",
       "carry_capacity": 3000,
-      "cost_wood": 5500,
-      "cost_clay": 7000,
-      "cost_iron": 5300,
-      "cost_crop": 4900,
+      "cost_wood": 5800,
+      "cost_clay": 4400,
+      "cost_iron": 4600,
+      "cost_crop": 5200,
       "crop_consumption": 1,
-      "training_time_base": 28900,
+      "training_time_base": 31000,
       "training_building": "residence",
       "academy_level_required": 0,
       "description_zh": "日耳曼的移民，用於建立新村莊",
-      "description_en": "Teuton settler for founding new villages"
+      "description_en": "Teuton settler for founding new villages",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/20"
     },
     "mercenary": {
       "troop_id": "mercenary",
-      "name_zh": "傭兵",
+      "name_zh": "僱傭兵",
       "name_en": "Mercenary",
       "tribe": "huns",
       "category": "infantry",
@@ -742,7 +802,9 @@
       "training_building": "barracks",
       "academy_level_required": 0,
       "description_zh": "匈奴的基礎步兵，攻守均衡",
-      "description_en": "Hun basic infantry with balanced offense and defense"
+      "description_en": "Hun basic infantry with balanced offense and defense",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/61"
     },
     "bowman": {
       "troop_id": "bowman",
@@ -757,20 +819,22 @@
       "speed_source": "ts11",
       "speed_ref": "manual/troop/62",
       "carry_capacity": 30,
-      "cost_wood": 80,
-      "cost_clay": 120,
-      "cost_iron": 70,
-      "cost_crop": 70,
+      "cost_wood": 140,
+      "cost_clay": 110,
+      "cost_iron": 60,
+      "cost_crop": 60,
       "crop_consumption": 1,
       "training_time_base": 1120,
       "training_building": "barracks",
       "academy_level_required": 3,
       "description_zh": "匈奴的攻擊步兵",
-      "description_en": "Hun attack infantry"
+      "description_en": "Hun attack infantry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/62"
     },
     "spotter": {
       "troop_id": "spotter",
-      "name_zh": "斥候",
+      "name_zh": "探子",
       "name_en": "Spotter",
       "tribe": "huns",
       "category": "scout",
@@ -784,17 +848,19 @@
       "cost_wood": 170,
       "cost_clay": 150,
       "cost_iron": 20,
-      "cost_crop": 20,
+      "cost_crop": 40,
       "crop_consumption": 2,
       "training_time_base": 1360,
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "匈奴的偵查騎兵，遊戲中最快的偵查單位",
-      "description_en": "Hun scout cavalry, fastest scout in the game"
+      "description_en": "Hun scout cavalry, fastest scout in the game",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/63"
     },
     "steppe_rider": {
       "troop_id": "steppe_rider",
-      "name_zh": "草原騎兵",
+      "name_zh": "草原騎士",
       "name_en": "Steppe Rider",
       "tribe": "huns",
       "category": "cavalry",
@@ -805,16 +871,18 @@
       "speed_source": "ts11",
       "speed_ref": "manual/troop/64",
       "carry_capacity": 75,
-      "cost_wood": 310,
-      "cost_clay": 250,
-      "cost_iron": 130,
-      "cost_crop": 80,
+      "cost_wood": 290,
+      "cost_clay": 370,
+      "cost_iron": 190,
+      "cost_crop": 45,
       "crop_consumption": 2,
       "training_time_base": 2400,
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "匈奴的攻擊騎兵",
-      "description_en": "Hun attack cavalry"
+      "description_en": "Hun attack cavalry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/64"
     },
     "marksman": {
       "troop_id": "marksman",
@@ -829,16 +897,18 @@
       "speed_source": "ts11",
       "speed_ref": "manual/troop/65",
       "carry_capacity": 105,
-      "cost_wood": 440,
-      "cost_clay": 330,
-      "cost_iron": 240,
-      "cost_crop": 110,
+      "cost_wood": 320,
+      "cost_clay": 350,
+      "cost_iron": 330,
+      "cost_crop": 50,
       "crop_consumption": 2,
       "training_time_base": 2480,
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "匈奴的防禦騎兵，攻守均衡",
-      "description_en": "Hun defensive cavalry with balanced stats"
+      "description_en": "Hun defensive cavalry with balanced stats",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/65"
     },
     "marauder": {
       "troop_id": "marauder",
@@ -853,20 +923,22 @@
       "speed_source": "ts11",
       "speed_ref": "manual/troop/66",
       "carry_capacity": 80,
-      "cost_wood": 560,
-      "cost_clay": 510,
-      "cost_iron": 600,
-      "cost_crop": 180,
+      "cost_wood": 450,
+      "cost_clay": 560,
+      "cost_iron": 610,
+      "cost_crop": 140,
       "crop_consumption": 3,
       "training_time_base": 2990,
       "training_building": "stable",
       "academy_level_required": 15,
       "description_zh": "匈奴最強的重騎兵",
-      "description_en": "Hun most powerful heavy cavalry"
+      "description_en": "Hun most powerful heavy cavalry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/66"
     },
     "hun_ram": {
       "troop_id": "hun_ram",
-      "name_zh": "攻城槌",
+      "name_zh": "破城槌",
       "name_en": "Ram",
       "tribe": "huns",
       "category": "siege",
@@ -877,20 +949,22 @@
       "speed_source": "ts11",
       "speed_ref": "manual/troop/67",
       "carry_capacity": 0,
-      "cost_wood": 880,
-      "cost_clay": 440,
-      "cost_iron": 330,
+      "cost_wood": 1060,
+      "cost_clay": 330,
+      "cost_iron": 360,
       "cost_crop": 70,
       "crop_consumption": 3,
       "training_time_base": 4400,
       "training_building": "workshop",
       "academy_level_required": 10,
       "description_zh": "匈奴的攻城武器，用於破壞城牆",
-      "description_en": "Hun siege weapon for destroying walls"
+      "description_en": "Hun siege weapon for destroying walls",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/67"
     },
     "hun_catapult": {
       "troop_id": "hun_catapult",
-      "name_zh": "投石車",
+      "name_zh": "弩炮",
       "name_en": "Catapult",
       "tribe": "huns",
       "category": "siege",
@@ -901,20 +975,22 @@
       "speed_source": "ts11",
       "speed_ref": "manual/troop/68",
       "carry_capacity": 0,
-      "cost_wood": 880,
-      "cost_clay": 1320,
-      "cost_iron": 660,
-      "cost_crop": 65,
+      "cost_wood": 950,
+      "cost_clay": 1280,
+      "cost_iron": 620,
+      "cost_crop": 60,
       "crop_consumption": 6,
       "training_time_base": 9000,
       "training_building": "workshop",
       "academy_level_required": 15,
       "description_zh": "匈奴的攻城武器，用於破壞建築",
-      "description_en": "Hun siege weapon for destroying buildings"
+      "description_en": "Hun siege weapon for destroying buildings",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/68"
     },
     "logades": {
       "troop_id": "logades",
-      "name_zh": "領袖",
+      "name_zh": "重步兵",
       "name_en": "Logades",
       "tribe": "huns",
       "category": "special",
@@ -934,11 +1010,13 @@
       "training_building": "residence",
       "academy_level_required": 20,
       "description_zh": "匈奴的征服者，降低敵方忠誠度 15-30%",
-      "description_en": "Hun chief unit for conquering villages, reduces loyalty by 15-30%"
+      "description_en": "Hun chief unit for conquering villages, reduces loyalty by 15-30%",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/69"
     },
     "hun_settler": {
       "troop_id": "hun_settler",
-      "name_zh": "移民",
+      "name_zh": "開拓者",
       "name_en": "Settler",
       "tribe": "huns",
       "category": "settler",
@@ -949,16 +1027,18 @@
       "speed_source": "ts11",
       "speed_ref": "manual/troop/70",
       "carry_capacity": 3000,
-      "cost_wood": 5205,
-      "cost_clay": 5285,
-      "cost_iron": 6120,
-      "cost_crop": 4900,
+      "cost_wood": 6100,
+      "cost_clay": 4600,
+      "cost_iron": 4800,
+      "cost_crop": 5400,
       "crop_consumption": 1,
       "training_time_base": 28950,
       "training_building": "residence",
       "academy_level_required": 0,
       "description_zh": "匈奴的移民，用於建立新村莊",
-      "description_en": "Hun settler for founding new villages"
+      "description_en": "Hun settler for founding new villages",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/70"
     },
     "slave_militia": {
       "troop_id": "slave_militia",
@@ -978,15 +1058,17 @@
       "cost_iron": 30,
       "cost_crop": 15,
       "crop_consumption": 1,
-      "training_time_base": 560,
+      "training_time_base": 530,
       "training_building": "barracks",
       "academy_level_required": 0,
       "description_zh": "埃及的基礎步兵，訓練最快最便宜",
-      "description_en": "Egyptian basic infantry, fastest and cheapest to train"
+      "description_en": "Egyptian basic infantry, fastest and cheapest to train",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/51"
     },
     "ash_warden": {
       "troop_id": "ash_warden",
-      "name_zh": "灰燼守衛",
+      "name_zh": "看守人艾什",
       "name_en": "Ash Warden",
       "tribe": "egyptians",
       "category": "infantry",
@@ -1002,15 +1084,17 @@
       "cost_iron": 145,
       "cost_crop": 60,
       "crop_consumption": 1,
-      "training_time_base": 1360,
+      "training_time_base": 1380,
       "training_building": "barracks",
       "academy_level_required": 1,
       "description_zh": "埃及的防禦步兵",
-      "description_en": "Egyptian defensive infantry"
+      "description_en": "Egyptian defensive infantry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/52"
     },
     "khopesh_warrior": {
       "troop_id": "khopesh_warrior",
-      "name_zh": "鐮刀劍戰士",
+      "name_zh": "斧刀勇士",
       "name_en": "Khopesh Warrior",
       "tribe": "egyptians",
       "category": "infantry",
@@ -1026,15 +1110,17 @@
       "cost_iron": 220,
       "cost_crop": 80,
       "crop_consumption": 1,
-      "training_time_base": 1600,
+      "training_time_base": 1440,
       "training_building": "barracks",
       "academy_level_required": 5,
       "description_zh": "埃及的攻擊步兵",
-      "description_en": "Egyptian attack infantry"
+      "description_en": "Egyptian attack infantry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/53"
     },
     "sopdu_explorer": {
       "troop_id": "sopdu_explorer",
-      "name_zh": "索普度探險者",
+      "name_zh": "探險者索普杜",
       "name_en": "Sopdu Explorer",
       "tribe": "egyptians",
       "category": "scout",
@@ -1054,11 +1140,13 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "埃及的偵查騎兵",
-      "description_en": "Egyptian scout cavalry"
+      "description_en": "Egyptian scout cavalry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/54"
     },
     "anhur_guard": {
       "troop_id": "anhur_guard",
-      "name_zh": "安胡爾守衛",
+      "name_zh": "守衛安赫",
       "name_en": "Anhur Guard",
       "tribe": "egyptians",
       "category": "cavalry",
@@ -1078,11 +1166,13 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "埃及的防禦騎兵",
-      "description_en": "Egyptian defensive cavalry"
+      "description_en": "Egyptian defensive cavalry",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/55"
     },
     "resheph_chariot": {
       "troop_id": "resheph_chariot",
-      "name_zh": "瑞謝夫戰車",
+      "name_zh": "瑞舍夫戰車",
       "name_en": "Resheph Chariot",
       "tribe": "egyptians",
       "category": "cavalry",
@@ -1098,15 +1188,17 @@
       "cost_iron": 610,
       "cost_crop": 180,
       "crop_consumption": 3,
-      "training_time_base": 3200,
+      "training_time_base": 3240,
       "training_building": "stable",
       "academy_level_required": 15,
       "description_zh": "埃及的重騎兵，防禦極強",
-      "description_en": "Egyptian heavy cavalry with very strong defense"
+      "description_en": "Egyptian heavy cavalry with very strong defense",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/56"
     },
     "egyptian_ram": {
       "troop_id": "egyptian_ram",
-      "name_zh": "攻城槌",
+      "name_zh": "破城槌",
       "name_en": "Ram",
       "tribe": "egyptians",
       "category": "siege",
@@ -1122,15 +1214,17 @@
       "cost_iron": 340,
       "cost_crop": 80,
       "crop_consumption": 3,
-      "training_time_base": 4400,
+      "training_time_base": 4800,
       "training_building": "workshop",
       "academy_level_required": 10,
       "description_zh": "埃及的攻城武器，用於破壞城牆",
-      "description_en": "Egyptian siege weapon for destroying walls"
+      "description_en": "Egyptian siege weapon for destroying walls",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/57"
     },
     "stone_catapult": {
       "troop_id": "stone_catapult",
-      "name_zh": "石頭投石車",
+      "name_zh": "石弩",
       "name_en": "Stone Catapult",
       "tribe": "egyptians",
       "category": "siege",
@@ -1150,11 +1244,13 @@
       "training_building": "workshop",
       "academy_level_required": 15,
       "description_zh": "埃及的攻城武器，用於破壞建築",
-      "description_en": "Egyptian siege weapon for destroying buildings"
+      "description_en": "Egyptian siege weapon for destroying buildings",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/58"
     },
     "nomarch": {
       "troop_id": "nomarch",
-      "name_zh": "諾馬克",
+      "name_zh": "州長",
       "name_en": "Nomarch",
       "tribe": "egyptians",
       "category": "special",
@@ -1174,11 +1270,13 @@
       "training_building": "residence",
       "academy_level_required": 20,
       "description_zh": "埃及的征服者，降低敵方忠誠度 20-25%",
-      "description_en": "Egyptian chief unit for conquering villages, reduces loyalty by 20-25%"
+      "description_en": "Egyptian chief unit for conquering villages, reduces loyalty by 20-25%",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/59"
     },
     "egyptian_settler": {
       "troop_id": "egyptian_settler",
-      "name_zh": "移民",
+      "name_zh": "開拓者",
       "name_en": "Settler",
       "tribe": "egyptians",
       "category": "settler",
@@ -1189,16 +1287,18 @@
       "speed_source": "ts11",
       "speed_ref": "manual/troop/60",
       "carry_capacity": 3000,
-      "cost_wood": 4830,
+      "cost_wood": 5040,
       "cost_clay": 6510,
-      "cost_iron": 4620,
-      "cost_crop": 5040,
+      "cost_iron": 4830,
+      "cost_crop": 4620,
       "crop_consumption": 1,
-      "training_time_base": 28900,
+      "training_time_base": 24800,
       "training_building": "residence",
       "academy_level_required": 0,
       "description_zh": "埃及的移民，用於建立新村莊",
-      "description_en": "Egyptian settler for founding new villages"
+      "description_en": "Egyptian settler for founding new villages",
+      "stats_source": "ts11",
+      "stats_ref": "manual/troop/60"
     },
     "thrall": {
       "troop_id": "thrall",
@@ -1222,7 +1322,9 @@
       "training_building": "barracks",
       "academy_level_required": 0,
       "description_zh": "維京的基礎攻擊步兵",
-      "description_en": "Viking basic attack infantry"
+      "description_en": "Viking basic attack infantry",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "shield_maiden": {
       "troop_id": "shield_maiden",
@@ -1246,7 +1348,9 @@
       "training_building": "barracks",
       "academy_level_required": 1,
       "description_zh": "維京的防禦步兵",
-      "description_en": "Viking defensive infantry"
+      "description_en": "Viking defensive infantry",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "berserker": {
       "troop_id": "berserker",
@@ -1270,7 +1374,9 @@
       "training_building": "barracks",
       "academy_level_required": 5,
       "description_zh": "維京的強力攻擊步兵，死亡時必殺一敵",
-      "description_en": "Viking powerful attack infantry, kills one enemy on death"
+      "description_en": "Viking powerful attack infantry, kills one enemy on death",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "heimdalls_eye": {
       "troop_id": "heimdalls_eye",
@@ -1294,7 +1400,9 @@
       "training_building": "barracks",
       "academy_level_required": 1,
       "description_zh": "維京的偵查步兵",
-      "description_en": "Viking scout infantry"
+      "description_en": "Viking scout infantry",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "huskarl_rider": {
       "troop_id": "huskarl_rider",
@@ -1318,7 +1426,9 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "維京的防禦騎兵，均衡防禦",
-      "description_en": "Viking defensive cavalry with balanced defense"
+      "description_en": "Viking defensive cavalry with balanced defense",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "valkyries_blessing": {
       "troop_id": "valkyries_blessing",
@@ -1342,7 +1452,9 @@
       "training_building": "stable",
       "academy_level_required": 15,
       "description_zh": "維京的重騎兵，糧耗效率高",
-      "description_en": "Viking heavy cavalry with efficient crop consumption"
+      "description_en": "Viking heavy cavalry with efficient crop consumption",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "viking_ram": {
       "troop_id": "viking_ram",
@@ -1366,7 +1478,9 @@
       "training_building": "workshop",
       "academy_level_required": 10,
       "description_zh": "維京的攻城武器，用於破壞城牆",
-      "description_en": "Viking siege weapon for destroying walls"
+      "description_en": "Viking siege weapon for destroying walls",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "viking_catapult": {
       "troop_id": "viking_catapult",
@@ -1390,7 +1504,9 @@
       "training_building": "workshop",
       "academy_level_required": 15,
       "description_zh": "維京的攻城武器，用於破壞建築",
-      "description_en": "Viking siege weapon for destroying buildings"
+      "description_en": "Viking siege weapon for destroying buildings",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "jarl": {
       "troop_id": "jarl",
@@ -1414,7 +1530,9 @@
       "training_building": "residence",
       "academy_level_required": 20,
       "description_zh": "維京的征服者，降低敵方忠誠度 15-30%",
-      "description_en": "Viking chief unit for conquering villages, reduces loyalty by 15-30%"
+      "description_en": "Viking chief unit for conquering villages, reduces loyalty by 15-30%",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "viking_settler": {
       "troop_id": "viking_settler",
@@ -1438,7 +1556,9 @@
       "training_building": "residence",
       "academy_level_required": 0,
       "description_zh": "維京的移民，用於建立新村莊",
-      "description_en": "Viking settler for founding new villages"
+      "description_en": "Viking settler for founding new villages",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "hoplite": {
       "troop_id": "hoplite",
@@ -1462,7 +1582,9 @@
       "training_building": "barracks",
       "academy_level_required": 0,
       "description_zh": "斯巴達的基礎步兵，攻擊力強",
-      "description_en": "Spartan basic infantry with strong attack"
+      "description_en": "Spartan basic infantry with strong attack",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "sentinel": {
       "troop_id": "sentinel",
@@ -1486,7 +1608,9 @@
       "training_building": "barracks",
       "academy_level_required": 1,
       "description_zh": "斯巴達的偵查步兵，防禦值高",
-      "description_en": "Spartan scout infantry with high defense"
+      "description_en": "Spartan scout infantry with high defense",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "shieldsman": {
       "troop_id": "shieldsman",
@@ -1510,7 +1634,9 @@
       "training_building": "barracks",
       "academy_level_required": 3,
       "description_zh": "斯巴達的防禦步兵，最快的防禦步兵",
-      "description_en": "Spartan defensive infantry, fastest defensive infantry"
+      "description_en": "Spartan defensive infantry, fastest defensive infantry",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "twinsteel_therion": {
       "troop_id": "twinsteel_therion",
@@ -1534,7 +1660,9 @@
       "training_building": "barracks",
       "academy_level_required": 5,
       "description_zh": "斯巴達的強力攻擊步兵",
-      "description_en": "Spartan powerful attack infantry"
+      "description_en": "Spartan powerful attack infantry",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "elpida_rider": {
       "troop_id": "elpida_rider",
@@ -1558,7 +1686,9 @@
       "training_building": "stable",
       "academy_level_required": 5,
       "description_zh": "斯巴達的防禦騎兵",
-      "description_en": "Spartan defensive cavalry"
+      "description_en": "Spartan defensive cavalry",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "corinthian_crusher": {
       "troop_id": "corinthian_crusher",
@@ -1582,7 +1712,9 @@
       "training_building": "stable",
       "academy_level_required": 15,
       "description_zh": "斯巴達最強的重騎兵",
-      "description_en": "Spartan most powerful heavy cavalry"
+      "description_en": "Spartan most powerful heavy cavalry",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "spartan_ram": {
       "troop_id": "spartan_ram",
@@ -1606,7 +1738,9 @@
       "training_building": "workshop",
       "academy_level_required": 10,
       "description_zh": "斯巴達的攻城武器，用於破壞城牆",
-      "description_en": "Spartan siege weapon for destroying walls"
+      "description_en": "Spartan siege weapon for destroying walls",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "ballista": {
       "troop_id": "ballista",
@@ -1630,7 +1764,9 @@
       "training_building": "workshop",
       "academy_level_required": 15,
       "description_zh": "斯巴達的攻城武器，用於破壞建築",
-      "description_en": "Spartan siege weapon for destroying buildings"
+      "description_en": "Spartan siege weapon for destroying buildings",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "ephor": {
       "troop_id": "ephor",
@@ -1654,7 +1790,9 @@
       "training_building": "residence",
       "academy_level_required": 20,
       "description_zh": "斯巴達的征服者，降低敵方忠誠度",
-      "description_en": "Spartan chief unit for conquering villages"
+      "description_en": "Spartan chief unit for conquering villages",
+      "stats_source": "pending",
+      "stats_ref": null
     },
     "spartan_settler": {
       "troop_id": "spartan_settler",
@@ -1678,7 +1816,9 @@
       "training_building": "residence",
       "academy_level_required": 0,
       "description_zh": "斯巴達的移民，用於建立新村莊",
-      "description_en": "Spartan settler for founding new villages"
+      "description_en": "Spartan settler for founding new villages",
+      "stats_source": "pending",
+      "stats_ref": null
     }
   }
 }

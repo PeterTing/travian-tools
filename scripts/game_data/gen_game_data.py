@@ -98,16 +98,16 @@ PARAMS: dict[str, dict] = {
     "residence":         {"c": (580, 460, 350, 180), "k": 1.28, "t1": 2000, "cp": 2, "src": "ingame", "verified": False},
     "palace":            {"c": (550, 800, 750, 250), "k": 1.28, "t1": 5000, "cp": 5, "src": "ingame", "verified": False},
     "treasury":          {"c": (2880, 2740, 2580, 990), "k": 1.26, "t1": 8000, "cp": 6, "src": "ingame", "verified": False},
-    # T4 cost (80/120/70/90 ×1.33). Not yet seen in ts11 -> 待驗證.
-    "heros_mansion":     {"c": (80, 120, 70, 90), "k": 1.33, "t1": 2000, "cp": 1, "src": "ingame", "verified": False,
+    # L1 700/670/700/240, 2300 s read from ts11 manual/building/37 (P0-19); the old
+    # 80/120/70/90 was the trapper's L1. Multiplier not measured -> still 待驗證.
+    "heros_mansion":     {"c": (700, 670, 700, 240), "k": 1.33, "t1": 2300, "cp": 1, "src": "ingame", "verified": False,
                           "pending": ["cost", "time"]},
     "sawmill":           {"c": (520, 380, 290, 90), "k": 1.80, "t1": 3000, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
-    "brickyard":         {"c": (440, 480, 320, 50), "k": 1.80, "t1": 2840, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "brickyard":         {"c": (440, 480, 320, 50), "k": 1.80, "t1": 2240, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
     "iron_foundry":      {"c": (200, 450, 510, 120), "k": 1.80, "t1": 4080, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
     "grain_mill":        {"c": (500, 440, 380, 1240), "k": 1.80, "t1": 1840, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
     "bakery":            {"c": (1200, 1480, 870, 1600), "k": 1.80, "t1": 3680, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
-    "stonemasons_lodge": {"c": (155, 130, 125, 70), "k": 1.28, "t1": 1700, "cp": 1, "src": "app", "verified": False,
-                          "pending": ["time"]},
+    "stonemasons_lodge": {"c": (155, 130, 125, 70), "k": 1.28, "t1": 2200, "cp": 1, "src": "ingame", "verified": False},
     "trade_office":      {"c": (1400, 1330, 1200, 400), "k": 1.28, "t1": 3000, "cp": 3, "src": "ingame", "verified": False},
     "tournament_square": {"c": (1750, 2250, 1530, 240), "k": 1.28, "t1": 3500, "cp": 1, "src": "ingame", "verified": False},
     "city_wall":         {"c": (70, 90, 170, 70), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
@@ -115,12 +115,9 @@ PARAMS: dict[str, dict] = {
     "palisade":          {"c": (160, 100, 80, 60), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11", "verified": True},
     "great_barracks":    {"c": (630, 420, 780, 360), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
     "great_stable":      {"c": (780, 420, 660, 300), "k": 1.28, "t1": 2200, "cp": 2, "src": "ingame", "verified": False},
-    "trapper":           {"c": (100, 100, 100, 100), "k": 1.28, "t1": 1200, "cp": 1, "src": "app", "verified": False,
-                          "pending": ["time"]},
-    "brewery":           {"c": (1460, 930, 1250, 1740), "k": 1.40, "t1": 3600, "cp": 4, "src": "app", "verified": False,
-                          "pending": ["time"]},
-    "horse_drinking_trough": {"c": (780, 420, 660, 540), "k": 1.28, "t1": 4200, "cp": 3, "src": "app", "verified": False,
-                              "pending": ["time"]},
+    "trapper":           {"c": (80, 120, 70, 90), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
+    "brewery":           {"c": (3210, 2050, 2750, 3830), "k": 1.40, "t1": 8000, "cp": 4, "src": "ingame", "verified": False},
+    "horse_drinking_trough": {"c": (780, 420, 660, 540), "k": 1.28, "t1": 2200, "cp": 3, "src": "ingame", "verified": False},
     "great_warehouse":   {"c": (650, 800, 450, 200), "k": 1.28, "t1": 9000, "cp": 1, "src": "ingame", "verified": False},
     "great_granary":     {"c": (400, 500, 350, 100), "k": 1.28, "t1": 7000, "cp": 1, "src": "ingame", "verified": False},
 }
@@ -155,6 +152,16 @@ BACKEND_UNIT_SPEEDS = ROOT / "backend/data/static/unit_speeds.json"
 BACKEND_TROOPS = ROOT / "backend/data/static/troops.json"
 FRONTEND_UNIT_SPEEDS = ROOT / "frontend/src/data/unitSpeeds.gen.json"
 TS11_MANUAL_EVIDENCE = ROOT / "scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json"
+# P0-18: 兵種花費／攻防／運載量／糧耗／訓練時間，ts11 遊戲內說明頁原文解析（2026-10-10 唯讀擷取）
+TS11_MANUAL_STATS = ROOT / "scripts/game_data/evidence/ts11_manual_2026-10-10.json"
+FRONTEND_COST_VERIFIED = ROOT / "frontend/src/data/unitCostVerified.json"
+
+
+def _ts11_stats() -> dict[str, dict]:
+    """manual/troop/N → 解析過的數字（沒擷取到的兵種不在裡面）."""
+    if not TS11_MANUAL_STATS.exists():
+        return {}
+    return json.loads(TS11_MANUAL_STATS.read_text(encoding="utf-8"))["troops"]
 
 UNIT_SPEED_SOURCES = {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-09 讀取",
@@ -315,8 +322,52 @@ def _load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+# P0-19: L1 cost / time / population read from the ts11 in-game help
+# (manual/building/<gid>, 2026-10-10). Only level 1 is shown there, so the
+# multipliers (k) stay unmeasured and "verified" keeps its old meaning.
+TS11_MANUAL_BUILDING_GID = {
+    "sawmill": 5, "brickyard": 6, "iron_foundry": 7, "grain_mill": 8, "bakery": 9,
+    "warehouse": 10, "granary": 11, "blacksmith": 13, "tournament_square": 14,
+    "main_building": 15, "rally_point": 16, "marketplace": 17, "embassy": 18,
+    "barracks": 19, "stable": 20, "workshop": 21, "academy": 22, "cranny": 23,
+    "town_hall": 24, "residence": 25, "palace": 26, "treasury": 27, "trade_office": 28,
+    "great_barracks": 29, "great_stable": 30, "city_wall": 31, "earth_wall": 32,
+    "palisade": 33, "stonemasons_lodge": 34, "brewery": 35, "trapper": 36,
+    "heros_mansion": 37, "great_warehouse": 38, "great_granary": 39,
+    "horse_drinking_trough": 41,
+}
+
+
+def _ts11_buildings() -> dict[str, dict]:
+    if not TS11_MANUAL_STATS.exists():
+        return {}
+    return json.loads(TS11_MANUAL_STATS.read_text(encoding="utf-8")).get("buildings", {})
+
+
+def check_l1_against_manual() -> dict[str, int]:
+    """Every building read in ts11 must have the same L1 cost and time as PARAMS.
+    Returns building_id -> ts11 L1 population."""
+    manual = _ts11_buildings()
+    pops: dict[str, int] = {}
+    for bid, gid in TS11_MANUAL_BUILDING_GID.items():
+        m = manual.get(str(gid))
+        if not m:
+            continue
+        p = PARAMS[bid]
+        assert list(p["c"]) == m["cost_l1"], (bid, p["c"], m["cost_l1"])
+        assert p["t1"] == m["time_l1_s"], (bid, p["t1"], m["time_l1_s"])
+        pops[bid] = m["pop_l1"]
+    for fid, gid in (("woodcutter", 1), ("clay_pit", 2), ("iron_mine", 3), ("cropland", 4)):
+        m = manual.get(str(gid))
+        if m:
+            assert list(FIELDS[fid]["c"]) == m["cost_l1"], fid
+            assert round(field_time(FIELDS[fid]["a"], 1)) == m["time_l1_s"], fid
+    return pops
+
+
 def gen_buildings(current: dict) -> dict:
     out = json.loads(json.dumps(current))
+    l1_pop = check_l1_against_manual()
     for bid, b in out["buildings"].items():
         if bid in FIELDS:
             f = FIELDS[bid]
@@ -335,6 +386,8 @@ def gen_buildings(current: dict) -> dict:
                       build_time_base=build_time(p["t1"], L, p.get("bonus", False)),
                       culture_points=cp_at(p["cp"], L))
             lv["cp_per_day"] = lv["culture_points"]
+            if L == 1 and bid in l1_pop:
+                lv["population"] = l1_pop[bid]
             if bid == "main_building":
                 eff = mb_effect(L)
                 lv["effect_value"] = eff
@@ -378,10 +431,24 @@ def gen_resources(current: dict) -> dict:
     return out
 
 
+OFFICIAL_S51 = ROOT / "scripts/game_data/evidence/official_s51_cp_table_2026-10-10.json"
+
+
+def check_cp_against_official() -> None:
+    """開村 CP 門檻公式要跟官方 S51 表（1–50 村 × 5 種速度）每一格都一樣（P0-19）."""
+    table = json.loads(OFFICIAL_S51.read_text(encoding="utf-8"))["villages"]
+    for v in range(1, MAX_VILLAGES + 1):
+        for s in SPEEDS:
+            want = table[str(v)][str(s)]
+            got = village_cp(v, s)
+            assert got == want, f"CP village {v} x{s}: formula {got} != official {want}"
+
+
 def gen_culture_points() -> dict:
+    check_cp_against_official()
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
-        "source": "https://support.travian.com/en/articles/51-culture-points-cp ; "
+        "source": "https://support.travian.com/en/articles/51-culture-points-cp (table checked 2026-10-10) ; "
                   "https://support.travian.com/en/articles/20-game-versions-and-speed ; "
                   "https://support.travian.com/en/articles/82-celebrations-and-town-hall",
         "village_requirements": {str(s): [village_cp(v, s) for v in range(1, MAX_VILLAGES + 1)]
@@ -390,9 +457,9 @@ def gen_culture_points() -> dict:
         "celebration_cap": {str(s): {"small": CELEBRATION_CAP[s][0], "great": CELEBRATION_CAP[s][1]}
                             for s in SPEEDS},
         "celebrations": CELEBRATIONS,
-        # Only village 2 on x1 (2,000) has been seen in ts11; everything else
-        # is the official table / formula and is labelled 待驗證 in the UI.
-        "verified": {"speed": 1, "villages": [1, 2]},
+        # P0-19: the formula matches the official S51 table for every village 1–50
+        # on every speed (checked in check_cp_against_official), so nothing is 待驗證.
+        "verified": {"speeds": SPEEDS, "villages": list(range(1, MAX_VILLAGES + 1))},
     }
 
 
@@ -426,6 +493,7 @@ def gen_frontend(buildings: dict, cp: dict) -> dict:
 
 
 def gen_unit_speeds() -> dict:
+    stats = _ts11_stats()
     tribes = {}
     for tribe in TRIBE_ORDER:
         rows = []
@@ -436,8 +504,24 @@ def gen_unit_speeds() -> dict:
                 ref_text = UNIT_SPEED_SOURCES[ref]
             else:
                 ref_text = None
-            rows.append({"slot": slot, "troop_id": be_id, "fe_id": fe_id, "kb_id": kb_id,
-                         "speed": speed, "source": src, "ref": ref_text})
+            row = {"slot": slot, "troop_id": be_id, "fe_id": fe_id, "kb_id": kb_id,
+                   "speed": speed, "source": src, "ref": ref_text, "stats": None}
+            st = stats.get(str(ref)) if src == "ts11" else None
+            if st:
+                # 說明頁的速度要跟速度表一樣（速度表 2026-10-09 讀的，這次 10-10 再讀一次）
+                assert st["speed"] == speed, (tribe, be_id, st["speed"], speed)
+                row["stats"] = {
+                    "name_zh": st["name_zh"],
+                    "cost": st["cost"],
+                    "attack": st["attack"],
+                    "def_inf": st["def_inf"],
+                    "def_cav": st["def_cav"],
+                    "carry": st["carry"],
+                    "upkeep": st["upkeep"],
+                    "train_time": st["train_time_s"],
+                    "ref": f"manual/troop/{ref}",
+                }
+            rows.append(row)
         tribes[tribe] = rows
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
@@ -451,7 +535,9 @@ def gen_unit_speeds() -> dict:
 
 
 def gen_troops(current: dict, speeds: dict) -> dict:
-    """Rewrite only speed / speed_source / speed_ref; every other stat is untouched."""
+    """Rewrite speed / speed_source / speed_ref, and — for units read from the ts11
+    in-game help (P0-18) — name_zh, cost, attack/defence, carry, upkeep, training
+    time + stats_source / stats_ref. Units without ts11 stats keep their old numbers."""
     out = json.loads(json.dumps(current))
     troops = out["troops"]
     for tribe, rows in speeds["tribes"].items():
@@ -467,8 +553,38 @@ def gen_troops(current: dict, speeds: dict) -> dict:
                     rebuilt["speed"] = r["speed"]
                     rebuilt["speed_source"] = r["source"]
                     rebuilt["speed_ref"] = r["ref"]
+            rebuilt.pop("stats_source", None)
+            rebuilt.pop("stats_ref", None)
+            st = r.get("stats")
+            if st:
+                rebuilt.update(
+                    name_zh=st["name_zh"],
+                    attack=st["attack"],
+                    defense_infantry=st["def_inf"],
+                    defense_cavalry=st["def_cav"],
+                    carry_capacity=st["carry"],
+                    cost_wood=st["cost"][0],
+                    cost_clay=st["cost"][1],
+                    cost_iron=st["cost"][2],
+                    cost_crop=st["cost"][3],
+                    crop_consumption=st["upkeep"],
+                    training_time_base=st["train_time"],
+                )
+                rebuilt["stats_source"] = "ts11"
+                rebuilt["stats_ref"] = st["ref"]
+            else:
+                rebuilt["stats_source"] = "pending"
+                rebuilt["stats_ref"] = None
             troops[r["troop_id"]] = rebuilt
     return out
+
+
+def gen_cost_verified(speeds: dict) -> dict:
+    """部族的 10 種兵都讀到 ts11 說明頁才算核對過（P0-18）；ts11 沒有斯巴達／維京 → false."""
+    return {
+        "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在 ts11 遊戲內說明頁讀到（evidence/ts11_manual_2026-10-10.json）才是 true；ts11 是 5 族伺服器，斯巴達、維京沒有第一手來源，維持 false（兵種詳情顯示「待驗證」）。",
+        "tribes": {t: all(r["stats"] for r in speeds["tribes"][t]) for t in ["romans", "gauls", "teutons", "huns", "egyptians", "vikings", "spartans"]},
+    }
 
 
 def render(obj: dict, compact: bool = False) -> str:
@@ -490,6 +606,7 @@ def outputs() -> dict[Path, str]:
         BACKEND_UNIT_SPEEDS: render(us),
         BACKEND_TROOPS: render(gen_troops(_load(BACKEND_TROOPS), us)),
         FRONTEND_UNIT_SPEEDS: render(us),
+        FRONTEND_COST_VERIFIED: render(gen_cost_verified(us)),
     }
 
 

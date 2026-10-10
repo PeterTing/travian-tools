@@ -258,10 +258,11 @@ class TestSmithyFormula:
 
 
 class TestGaulTroopData:
-    def test_thunder_attack_90(self) -> None:
+    def test_thunder_attack_100(self) -> None:
+        """ts11 遊戲內說明 manual/troop/24：攻擊 100（P0-18，原本 90）."""
         troop = get_game_data_service().troops.get_troop("theutates_thunder")
         assert troop is not None
-        assert troop.attack == 90
+        assert troop.attack == 100
         assert troop.name_zh == "雷法師"
 
     def test_training_times(self) -> None:

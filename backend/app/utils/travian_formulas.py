@@ -134,7 +134,9 @@ def distance_for_travel_hours(
 
 
 def smithy_improved_value(base: float, upkeep: int, level: int) -> float:
-    """Smithy upgrade (Legends). Source: KIR; verified S187 phalanx L20.
+    """Smithy upgrade (Legends). Checked against the official S187 level-20 table
+    (base / upkeep from the ts11 in-game help): within 0.2 for every unit, 32 of 84
+    values identical after rounding -> the UI keeps the 「待驗證」 chip (P0-18).
 
     improved = base + (base + 300·upkeep/7)·(1.007^level − 1)
     """

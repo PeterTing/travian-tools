@@ -99,7 +99,7 @@ export function celebration(kind: CelebrationKind): CelebrationData {
   }
 }
 
-/** 只有 x1 第 1、2 村（0／2,000）在 ts11 實測過，其他門檻標「待驗證」。 */
+/** 開村 CP 門檻跟官方說明頁（S51）的表每一格都一樣（P0-19）：1–50 村、5 種速度都不標「待驗證」 */
 export function isVillageCpVerified(village: number, speed: ServerSpeed = 1): boolean {
-  return speed === gen.verified.speed && gen.verified.villages.includes(village)
+  return (gen.verified.speeds as number[]).includes(speed) && gen.verified.villages.includes(village)
 }

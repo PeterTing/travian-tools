@@ -257,7 +257,7 @@ describe('IA v2.2', () => {
       expect(screen.getByTestId('incoming-copy')).toHaveClass('min-h-[44px]')
     })
 
-    it('CP card shows progress from the numbers last entered in CP 與開村, with 待驗證 for village 3', () => {
+    it('CP card shows progress from the numbers last entered in CP 與開村; village 3 threshold is official (S51), no 待驗證', () => {
       writeCpProgress('acc-1', { currentCp: 846, dailyCp: 48, speed: 1 })
       render(
         <MemoryRouter>
@@ -266,7 +266,7 @@ describe('IA v2.2', () => {
       )
       expect(screen.getByText('開三村 · CP')).toBeInTheDocument()
       expect(screen.getByTestId('cp-card-progress')).toHaveTextContent('846 / 8,000 CP')
-      expect(screen.getByTestId('cp-card-progress')).toHaveTextContent('待驗證')
+      expect(screen.getByTestId('cp-card-progress')).not.toHaveTextContent('待驗證')
       expect(screen.getByText(/每天 \+48 → 約 150 天/)).toBeInTheDocument()
       expect(screen.getByTestId('cp-card-go')).toHaveClass('inline-flex', 'min-h-[44px]', 'min-w-[44px]', 'items-center')
     })
@@ -309,7 +309,7 @@ describe('IA v2.2', () => {
       expect(screen.queryByText(/去算/)).not.toBeInTheDocument()
     })
 
-    it('CP card for village 2 (ts11-verified) has no 待驗證', () => {
+    it('CP card for village 2 has no 待驗證', () => {
       writeCpProgress('acc-1', { currentCp: 500, dailyCp: 12, speed: 1 })
       render(
         <MemoryRouter>

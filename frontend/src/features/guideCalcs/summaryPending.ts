@@ -36,8 +36,8 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
     note: '所需商人、容量、往返都用商人容量和速度算（社群 wiki 的數字）：第二行「容量 · 往返」旁一個；標題「所需商人」是同一份資料，不重複放（PM 去重）。預設交易所 10 級 → merchantTradeOffice（說明多寫交易所加成）；交易所 0 級 → merchantCapacity',
   },
   'features/guideCalcs/components/FarmingCalculator.tsx': {
-    chips: [['unitCarry']],
-    note: '每日收益受兵種攜帶量限制（社群整理的數字）：標題「每日收益」旁一個；有競技場或靴子時同一個灰標接著列出行軍速度（unitCarry → arenaSpeed 等，P0-22），預設兩個都 0 只有 unitCarry；第二行是建議馬數，沒用到待驗證資料',
+    chips: [],
+    note: '每日收益用兵種運載量、花費算：6 種兵都是 ts11 遊戲內說明頁讀到的數字（P0-18），不放 unitCarry；之後加的兵種沒讀到時（statsVerified false）標題旁放 unitCarry。有競技場或靴子時標題旁一個灰標依序列出 unitCarry（有的話）→ 行軍速度（P0-22），預設兩個都 0 不放。第二行是建議馬數，沒用到待驗證資料',
   },
   'features/guideCalcs/components/FieldRoiCalculator.tsx': {
     chips: [['fieldHighLevel', 'plusFormula']],

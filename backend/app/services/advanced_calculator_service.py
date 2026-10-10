@@ -256,7 +256,7 @@ class AdvancedCalculatorService:
             def_inf_values = []
             def_cav_values = []
 
-            # Legends smithy (KIR; S187): base+(base+300·upkeep/7)·(1.007^L−1)
+            # 鐵匠鋪：base+(base+300·upkeep/7)·(1.007^L−1)，對官方 S187 20 級表最多差 0.2（P0-18）
             upkeep = int(troop.get("crop_consumption", 1))
             for level in request.research_levels:
                 attack_values.append(
@@ -278,6 +278,7 @@ class AdvancedCalculatorService:
             troop_rows.append(
                 TroopTechRow(
                     troop_name=troop["name_en"],
+                    troop_name_zh=troop.get("name_zh"),
                     troop_id=troop_id,
                     attack_values=attack_values,
                     defense_infantry_values=def_inf_values,

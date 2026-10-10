@@ -125,6 +125,7 @@ class TroopTechRow(BaseModel):
     """單一兵種的科技研究數值."""
 
     troop_name: str
+    troop_name_zh: str | None = None  # 遊戲內中文名稱（P0-18）
     troop_id: str
     attack_values: list[float]  # Legends smithy 可有小數（S187）
     defense_infantry_values: list[float]

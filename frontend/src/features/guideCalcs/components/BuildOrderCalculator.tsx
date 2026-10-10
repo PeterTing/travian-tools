@@ -101,7 +101,7 @@ export function planGreedy(input: PlanInput): PlanResult {
       if (lowestIdx < 0) return;
       const to = lowest + 1;
       const cost = fieldTotalCost(t, to);
-      const baseDelta = (FIELD_PRODUCTION[to] ?? 0) - (to === 1 ? 0 : (FIELD_PRODUCTION[lowest] ?? 0));
+      const baseDelta = (FIELD_PRODUCTION[to] ?? 0) - (FIELD_PRODUCTION[lowest] ?? 0); // 0 級也有 3/小時（P0-18）
       const delta = baseDelta * (1 + bonusFor(t) + goldPct + (oasisPct[t] ?? 0));
       const perDay = delta * 24;
       const roi = perDay > 0 ? cost / perDay : Infinity;

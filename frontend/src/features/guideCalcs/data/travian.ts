@@ -405,7 +405,8 @@ export function fieldRoi(
 
   const cost = fieldTotalCost(type, targetLevel);
   const prodAtL = FIELD_PRODUCTION[targetLevel] ?? 0;
-  const prodAtPrev = targetLevel === 1 ? 0 : (FIELD_PRODUCTION[targetLevel - 1] ?? 0);
+  // 0 級田也有產量（3/小時，ts11 實測），1 級的增加量是 7 − 3 = 4，不是 7（P0-18）
+  const prodAtPrev = FIELD_PRODUCTION[targetLevel - 1] ?? 0;
   const delta = prodAtL - prodAtPrev;
   const multiplier = 1 + bonusBuildingPct + oasisPct + goldBonus;
   const perHour = delta * multiplier;

@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { TechnologyRequest, TechnologyResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 
 const TRIBES = [
   { value: 'romans', label: '羅馬' },
@@ -15,8 +17,10 @@ const TRIBES = [
 ]
 
 export default function TechnologyCalculatorPage() {
+  // 部族預設跟著已帶入的帳號（沒有才用羅馬）
+  const { tribe: accountTribe } = useAutoFill()
   const [form, setForm] = useState<TechnologyRequest>({
-    tribe: 'romans',
+    tribe: accountTribe ?? 'romans',
     research_levels: [0, 5, 10, 15, 20],
   })
   const [result, setResult] = useState<TechnologyResponse | null>(null)
@@ -40,7 +44,7 @@ export default function TechnologyCalculatorPage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">鐵匠升級</h1>
       <p className="text-muted-foreground mb-6">
-        查看各研究等級下兵種的攻防數值變化。公式：base * 1.015^level
+        查看鐵匠鋪升級後兵種的攻擊、防禦。升級後數值＝原本數值＋（原本數值＋300×糧耗÷7）×（1.007 的等級次方 − 1），四捨五入到小數 1 位。
       </p>
       <CalcBar />
 
@@ -70,7 +74,7 @@ export default function TechnologyCalculatorPage() {
         <div className="space-y-6">
           {/* Attack Table */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">攻擊力</h3>
+            <PendingRow as="h3" className="text-lg font-semibold mb-2">攻擊力 <PendingVerifyChip kind="smithyFormula" /></PendingRow>
             <div className="border rounded-lg overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -78,7 +82,7 @@ export default function TechnologyCalculatorPage() {
                     <th className="p-3 text-left">兵種</th>
                     {result.levels.map((lv) => (
                       <th key={lv} className="p-3 text-right">
-                        Lv {lv}
+                        {lv} 級
                       </th>
                     ))}
                   </tr>
@@ -86,7 +90,7 @@ export default function TechnologyCalculatorPage() {
                 <tbody>
                   {result.troops.map((troop) => (
                     <tr key={troop.troop_id} className="border-t">
-                      <td className="p-3 font-medium">{troop.troop_name}</td>
+                      <td className="p-3 font-medium">{troop.troop_name_zh ?? troop.troop_name}</td>
                       {troop.attack_values.map((val, i) => (
                         <td key={i} className="p-3 text-right">
                           {val}
@@ -101,7 +105,7 @@ export default function TechnologyCalculatorPage() {
 
           {/* Defense Infantry Table */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">步兵防禦</h3>
+            <PendingRow as="h3" className="text-lg font-semibold mb-2">步兵防禦 <PendingVerifyChip kind="smithyFormula" /></PendingRow>
             <div className="border rounded-lg overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -109,7 +113,7 @@ export default function TechnologyCalculatorPage() {
                     <th className="p-3 text-left">兵種</th>
                     {result.levels.map((lv) => (
                       <th key={lv} className="p-3 text-right">
-                        Lv {lv}
+                        {lv} 級
                       </th>
                     ))}
                   </tr>
@@ -117,7 +121,7 @@ export default function TechnologyCalculatorPage() {
                 <tbody>
                   {result.troops.map((troop) => (
                     <tr key={troop.troop_id} className="border-t">
-                      <td className="p-3 font-medium">{troop.troop_name}</td>
+                      <td className="p-3 font-medium">{troop.troop_name_zh ?? troop.troop_name}</td>
                       {troop.defense_infantry_values.map((val, i) => (
                         <td key={i} className="p-3 text-right">
                           {val}
@@ -132,7 +136,7 @@ export default function TechnologyCalculatorPage() {
 
           {/* Defense Cavalry Table */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">騎兵防禦</h3>
+            <PendingRow as="h3" className="text-lg font-semibold mb-2">騎兵防禦 <PendingVerifyChip kind="smithyFormula" /></PendingRow>
             <div className="border rounded-lg overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -140,7 +144,7 @@ export default function TechnologyCalculatorPage() {
                     <th className="p-3 text-left">兵種</th>
                     {result.levels.map((lv) => (
                       <th key={lv} className="p-3 text-right">
-                        Lv {lv}
+                        {lv} 級
                       </th>
                     ))}
                   </tr>
@@ -148,7 +152,7 @@ export default function TechnologyCalculatorPage() {
                 <tbody>
                   {result.troops.map((troop) => (
                     <tr key={troop.troop_id} className="border-t">
-                      <td className="p-3 font-medium">{troop.troop_name}</td>
+                      <td className="p-3 font-medium">{troop.troop_name_zh ?? troop.troop_name}</td>
                       {troop.defense_cavalry_values.map((val, i) => (
                         <td key={i} className="p-3 text-right">
                           {val}

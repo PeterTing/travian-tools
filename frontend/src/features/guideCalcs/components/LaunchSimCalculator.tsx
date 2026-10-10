@@ -168,7 +168,7 @@ export default function LaunchSimCalculator() {
             </span>
           </PendingRow>
           <PendingRow className={s.row}>
-            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x, reference only)' : '拓荒者成本（3 名，參考，不算在時間裡）'} <PendingVerifyChip kind="units" /></span>
+            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x, reference only)' : '拓荒者成本（3 名，參考，不算在時間裡）'}{!TRIBE_SETTLER_COST[tribe].verified && <> <PendingVerifyChip kind="units" /></>}</span>
             <span className={s.value}>{settlerCost.toLocaleString()}</span>
           </PendingRow>
 

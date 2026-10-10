@@ -58,12 +58,12 @@ describe('FieldRoiCalculator.fieldRoi — Lumi Table 2 anchor + regression snaps
     expect(r.roiDays).toBeCloseTo(4.31, 1);
   });
 
-  it('Wood L1 (no bonuses) — L1 compares against zero prod', () => {
+  it('Wood L1 (no bonuses) — L0 already makes 3/hr, so L1 gains 4 (P0-18, ts11)', () => {
     const r = fieldRoi('wood', 1, { goldBonus: 0, bonusBuildingPct: 0, oasisPct: 0 });
-    // L1 base prod = 7/hr, vs 0 baseline. cost = 250. 7*24 = 168/day. 250/168 ≈ 1.488
-    expect(r.deltaBase).toBe(7);
+    // L0 = 3/hr, L1 = 7/hr (ts11). cost = 250. 4*24 = 96/day. 250/96 ≈ 2.604
+    expect(r.deltaBase).toBe(4);
     expect(r.cost).toBe(250);
-    expect(r.roiDays).toBeCloseTo(1.49, 1);
+    expect(r.roiDays).toBeCloseTo(2.604, 2);
   });
 
   it('No production gain → ROI is Infinity', () => {
@@ -109,18 +109,17 @@ describe('OasisRoi — Hero\'s Mansion cumulative cost (T4 formula)', () => {
   it('hmCumulativeCost(0) = 0', () => {
     expect(hmCumulativeCost(0)).toBe(0);
   });
-  it('hmCumulativeCost(1) = 360 (base [80,120,70,90])', () => {
-    expect(hmCumulativeCost(1)).toBe(360);
+  it('hmCumulativeCost(1) = 2310 (L1 700/670/700/240 read on ts11 manual/building/37)', () => {
+    expect(hmCumulativeCost(1)).toBe(2310);
   });
-  it('hmCumulativeCost(10) = 17805 [+1 oasis unlock]', () => {
-    expect(hmCumulativeCost(10)).toBe(17805);
+  it('hmCumulativeCost(10) = 114240 [+1 oasis unlock; ×1.33 per level still 待驗證]', () => {
+    expect(hmCumulativeCost(10)).toBe(114240);
   });
-  it('hmCumulativeCost(15) = 77535 [+2 oases unlock]', () => {
-    expect(hmCumulativeCost(15)).toBe(77535);
+  it('hmCumulativeCost(15) = 497535 [+2 oases unlock]', () => {
+    expect(hmCumulativeCost(15)).toBe(497535);
   });
-  it('hmCumulativeCost(20) = 326110 [+3 oases; NOT 249170 — pre-fix bug value]', () => {
-    expect(hmCumulativeCost(20)).toBe(326110);
-    expect(hmCumulativeCost(20)).not.toBe(249170);
+  it('hmCumulativeCost(20) = 2092605 [+3 oases]', () => {
+    expect(hmCumulativeCost(20)).toBe(2092605);
   });
 });
 
@@ -150,10 +149,10 @@ describe('OasisRoi — component math reproduction (prod × oasis × 24 × gold)
     expect(oasisDailyGain('15c', 10, 'single50_crop', false)).toBeCloseTo(50400, 0);
   });
 
-  it('ROI (HM Lv 10 / daily gain): 17805 / 63000 ≈ 0.28 days for 15c + 50% crop oasis + gold', () => {
+  it('ROI (HM Lv 10 / daily gain): 114240 / 63000 ≈ 1.81 days for 15c + 50% crop oasis + gold', () => {
     const daily = oasisDailyGain('15c', 10, 'single50_crop', true);
     const roi = hmCumulativeCost(10) / daily;
-    expect(roi).toBeCloseTo(0.28, 1);
+    expect(roi).toBeCloseTo(1.81, 1);
   });
 
   it('7c + Lv 10 + dual 25% wood/crop oasis + gold = (3×280×0.25 + 7×280×0.25) × 24 × 1.25', () => {
