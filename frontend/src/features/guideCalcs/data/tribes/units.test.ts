@@ -25,7 +25,7 @@ type PinnedStats = {
   attack: number;
   defInfantry: number;
   defCavalry: number;
-  carry: number;
+  carry: number | null; // null = not verified (Spartans, Vikings; P0-23 PM)
   upkeep: number;
   cost: [number, number, number, number];
   trainTime: number;
@@ -432,72 +432,72 @@ describe('Huns unit stats', () => {
 // ---------------------------------------------------------------------------
 
 describe('Spartans unit stats', () => {
-  it('Hoplite: atk 50 / defInf 35 / defCav 30 / carry 60 / upkeep 1', () => {
+  it('Hoplite: atk 50 / defInf 35 / defCav 30 / carry null / upkeep 1', () => {
     pin(find(spartans.units, 'hoplite'), {
-      attack: 50, defInfantry: 35, defCavalry: 30, carry: 60, upkeep: 1,
+      attack: 50, defInfantry: 35, defCavalry: 30, carry: null, upkeep: 1,
       cost: [110, 185, 110, 35], trainTime: 1700,
     });
   });
 
-  it('Sentinel: atk 0 / defInf 40 / defCav 22 / carry 0 / upkeep 1', () => {
+  it('Sentinel: atk 0 / defInf 40 / defCav 22 / carry null / upkeep 1', () => {
     pin(find(spartans.units, 'sentinel'), {
-      attack: 0, defInfantry: 40, defCavalry: 22, carry: 0, upkeep: 1,
+      attack: 0, defInfantry: 40, defCavalry: 22, carry: null, upkeep: 1,
       cost: [185, 150, 35, 75], trainTime: 1232,
     });
   });
 
-  it('Shieldsman: atk 40 / defInf 85 / defCav 45 / carry 40 / upkeep 1', () => {
+  it('Shieldsman: atk 40 / defInf 85 / defCav 45 / carry null / upkeep 1', () => {
     pin(find(spartans.units, 'shieldsman'), {
-      attack: 40, defInfantry: 85, defCavalry: 45, carry: 40, upkeep: 1,
+      attack: 40, defInfantry: 85, defCavalry: 45, carry: null, upkeep: 1,
       cost: [145, 95, 245, 45], trainTime: 1936,
     });
   });
 
-  it('Twinsteel Therion: atk 90 / defInf 55 / defCav 40 / carry 50 / upkeep 1', () => {
+  it('Twinsteel Therion: atk 90 / defInf 55 / defCav 40 / carry null / upkeep 1', () => {
     pin(find(spartans.units, 'twinsteel'), {
-      attack: 90, defInfantry: 55, defCavalry: 40, carry: 50, upkeep: 1,
+      attack: 90, defInfantry: 55, defCavalry: 40, carry: null, upkeep: 1,
       cost: [130, 200, 400, 65], trainTime: 2112,
     });
   });
 
-  it('Elpida Rider: atk 55 / defInf 120 / defCav 90 / carry 110 / upkeep 2', () => {
+  it('Elpida Rider: atk 55 / defInf 120 / defCav 90 / carry null / upkeep 2', () => {
     pin(find(spartans.units, 'elpida'), {
-      attack: 55, defInfantry: 120, defCavalry: 90, carry: 110, upkeep: 2,
+      attack: 55, defInfantry: 120, defCavalry: 90, carry: null, upkeep: 2,
       cost: [555, 445, 330, 110], trainTime: 2816,
     });
   });
 
-  it('Corinthian Crusher: atk 195 / defInf 80 / defCav 75 / carry 80 / upkeep 3', () => {
+  it('Corinthian Crusher: atk 195 / defInf 80 / defCav 75 / carry null / upkeep 3', () => {
     pin(find(spartans.units, 'corinthian'), {
-      attack: 195, defInfantry: 80, defCavalry: 75, carry: 80, upkeep: 3,
+      attack: 195, defInfantry: 80, defCavalry: 75, carry: null, upkeep: 3,
       cost: [660, 495, 995, 165], trainTime: 3432,
     });
   });
 
-  it('Ram: atk 65 / defInf 30 / defCav 80 / carry 0 / upkeep 3', () => {
+  it('Ram: atk 65 / defInf 30 / defCav 80 / carry null / upkeep 3', () => {
     pin(find(spartans.units, 'ram'), {
-      attack: 65, defInfantry: 30, defCavalry: 80, carry: 0, upkeep: 3,
+      attack: 65, defInfantry: 30, defCavalry: 80, carry: null, upkeep: 3,
       cost: [525, 260, 790, 130], trainTime: 4620,
     });
   });
 
-  it('Ballista: atk 50 / defInf 60 / defCav 10 / carry 0 / upkeep 6', () => {
+  it('Ballista: atk 50 / defInf 60 / defCav 10 / carry null / upkeep 6', () => {
     pin(find(spartans.units, 'ballista'), {
-      attack: 50, defInfantry: 60, defCavalry: 10, carry: 0, upkeep: 6,
+      attack: 50, defInfantry: 60, defCavalry: 10, carry: null, upkeep: 6,
       cost: [550, 1240, 825, 135], trainTime: 9900,
     });
   });
 
-  it('Ephor: atk 40 / defInf 60 / defCav 40 / carry 0 / upkeep 4', () => {
+  it('Ephor: atk 40 / defInf 60 / defCav 40 / carry null / upkeep 4', () => {
     pin(find(spartans.units, 'ephor'), {
-      attack: 40, defInfantry: 60, defCavalry: 40, carry: 0, upkeep: 4,
+      attack: 40, defInfantry: 60, defCavalry: 40, carry: null, upkeep: 4,
       cost: [33450, 30665, 36240, 13935], trainTime: 77550,
     });
   });
 
-  it('Settler: atk 10 / defInf 80 / defCav 80 / carry 3000 / upkeep 1', () => {
+  it('Settler: atk 10 / defInf 80 / defCav 80 / carry null / upkeep 1', () => {
     pin(find(spartans.units, 'settler'), {
-      attack: 10, defInfantry: 80, defCavalry: 80, carry: 3000, upkeep: 1,
+      attack: 10, defInfantry: 80, defCavalry: 80, carry: null, upkeep: 1,
       cost: [5115, 5580, 6045, 3255], trainTime: 34100,
     });
   });
@@ -508,72 +508,72 @@ describe('Spartans unit stats', () => {
 // ---------------------------------------------------------------------------
 
 describe('Vikings unit stats', () => {
-  it('Thrall: atk 45 / defInf 22 / defCav 5 / carry 50 / upkeep 1', () => {
+  it('Thrall: atk 45 / defInf 22 / defCav 5 / carry null / upkeep 1', () => {
     pin(find(vikings.units, 'thrall'), {
-      attack: 45, defInfantry: 22, defCavalry: 5, carry: 50, upkeep: 1,
+      attack: 45, defInfantry: 22, defCavalry: 5, carry: null, upkeep: 1,
       cost: [95, 80, 50, 40], trainTime: 800,
     });
   });
 
-  it('Shield Maiden: atk 20 / defInf 50 / defCav 30 / carry 30 / upkeep 1', () => {
+  it('Shield Maiden: atk 20 / defInf 50 / defCav 30 / carry null / upkeep 1', () => {
     pin(find(vikings.units, 'shieldMaiden'), {
-      attack: 20, defInfantry: 50, defCavalry: 30, carry: 30, upkeep: 1,
+      attack: 20, defInfantry: 50, defCavalry: 30, carry: null, upkeep: 1,
       cost: [125, 70, 85, 40], trainTime: 1080,
     });
   });
 
-  it('Berserker: atk 70 / defInf 30 / defCav 25 / carry 60 / upkeep 2', () => {
+  it('Berserker: atk 70 / defInf 30 / defCav 25 / carry null / upkeep 2', () => {
     pin(find(vikings.units, 'berserker'), {
-      attack: 70, defInfantry: 30, defCavalry: 25, carry: 60, upkeep: 2,
+      attack: 70, defInfantry: 30, defCavalry: 25, carry: null, upkeep: 2,
       cost: [235, 220, 200, 70], trainTime: 1550,
     });
   });
 
-  it("Heimdall's Eye: atk 0 / defInf 10 / defCav 5 / carry 0 / upkeep 1", () => {
+  it("Heimdall's Eye: atk 0 / defInf 10 / defCav 5 / carry null / upkeep 1", () => {
     pin(find(vikings.units, 'heimdallsEye'), {
-      attack: 0, defInfantry: 10, defCavalry: 5, carry: 0, upkeep: 1,
+      attack: 0, defInfantry: 10, defCavalry: 5, carry: null, upkeep: 1,
       cost: [155, 95, 50, 50], trainTime: 1120,
     });
   });
 
-  it('Huskarl Rider: atk 45 / defInf 95 / defCav 100 / carry 50 / upkeep 2', () => {
+  it('Huskarl Rider: atk 45 / defInf 95 / defCav 100 / carry null / upkeep 2', () => {
     pin(find(vikings.units, 'huskarlRider'), {
-      attack: 45, defInfantry: 95, defCavalry: 100, carry: 50, upkeep: 2,
+      attack: 45, defInfantry: 95, defCavalry: 100, carry: null, upkeep: 2,
       cost: [385, 295, 290, 85], trainTime: 2650,
     });
   });
 
-  it("Valkyrie's Blessing: atk 160 / defInf 50 / defCav 75 / carry 70 / upkeep 2", () => {
+  it("Valkyrie's Blessing: atk 160 / defInf 50 / defCav 75 / carry null / upkeep 2", () => {
     pin(find(vikings.units, 'valkyrie'), {
-      attack: 160, defInfantry: 50, defCavalry: 75, carry: 70, upkeep: 2,
+      attack: 160, defInfantry: 50, defCavalry: 75, carry: null, upkeep: 2,
       cost: [475, 535, 515, 100], trainTime: 3060,
     });
   });
 
-  it('Ram: atk 65 / defInf 30 / defCav 80 / carry 0 / upkeep 3', () => {
+  it('Ram: atk 65 / defInf 30 / defCav 80 / carry null / upkeep 3', () => {
     pin(find(vikings.units, 'ram'), {
-      attack: 65, defInfantry: 30, defCavalry: 80, carry: 0, upkeep: 3,
+      attack: 65, defInfantry: 30, defCavalry: 80, carry: null, upkeep: 3,
       cost: [950, 325, 375, 70], trainTime: 4200,
     });
   });
 
-  it('Catapult: atk 50 / defInf 60 / defCav 10 / carry 0 / upkeep 6', () => {
+  it('Catapult: atk 50 / defInf 60 / defCav 10 / carry null / upkeep 6', () => {
     pin(find(vikings.units, 'catapult'), {
-      attack: 50, defInfantry: 60, defCavalry: 10, carry: 0, upkeep: 6,
+      attack: 50, defInfantry: 60, defCavalry: 10, carry: null, upkeep: 6,
       cost: [850, 1225, 625, 60], trainTime: 9000,
     });
   });
 
-  it('Jarl: atk 40 / defInf 40 / defCav 60 / carry 0 / upkeep 4', () => {
+  it('Jarl: atk 40 / defInf 40 / defCav 60 / carry null / upkeep 4', () => {
     pin(find(vikings.units, 'jarl'), {
-      attack: 40, defInfantry: 40, defCavalry: 60, carry: 0, upkeep: 4,
+      attack: 40, defInfantry: 40, defCavalry: 60, carry: null, upkeep: 4,
       cost: [35500, 26600, 25000, 27200], trainTime: 70500,
     });
   });
 
-  it('Settler: atk 10 / defInf 80 / defCav 80 / carry 3000 / upkeep 1', () => {
+  it('Settler: atk 10 / defInf 80 / defCav 80 / carry null / upkeep 1', () => {
     pin(find(vikings.units, 'settler'), {
-      attack: 10, defInfantry: 80, defCavalry: 80, carry: 3000, upkeep: 1,
+      attack: 10, defInfantry: 80, defCavalry: 80, carry: null, upkeep: 1,
       cost: [5800, 4600, 4800, 4800], trainTime: 31000,
     });
   });

@@ -605,8 +605,30 @@ def test_carry_capacity_single_source_backend_and_frontend() -> None:
             assert troops[r["troop_id"]]["carry_capacity"] == r["carry"], r["troop_id"]
             kb = TRIBES_DATA[tribe]["troops"][r["kb_id"]]
             assert kb["capacity"] == r["carry"], r["troop_id"]
-            want = {"spartans": "community", "vikings": "estimate"}.get(tribe, "ts11")
+            want = "pending" if tribe in ("spartans", "vikings") else "ts11"
             assert r["carry_source"] == want, r["troop_id"]
             if want == "ts11":
+                assert isinstance(r["carry"], int)
                 assert r["stats"]["carry"] == r["carry"]
+            else:
+                # PM 決定（P0-23）：斯巴達、維京運載量留空，不放社群整理或推估的數字
+                assert r["carry"] is None, r["troop_id"]
+                assert r["carry_ref"] is None
     assert n == len(troops) == 70
+
+
+def test_spartan_viking_carry_is_null_everywhere_in_backend() -> None:
+    """troops.json、knowledge_base、API 都是 null；API 附上原因，不回 0."""
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    empty = [k for k, t in troops.items() if t["tribe"] in ("spartans", "vikings")]
+    assert len(empty) == 20
+    assert all(troops[k]["carry_capacity"] is None for k in empty)
+    for tribe in ("spartans", "vikings"):
+        assert all(t["capacity"] is None for t in TRIBES_DATA[tribe]["troops"].values())
+    gen_text = GEN.read_text(encoding="utf-8")
+    assert "CARRY_PENDING" not in gen_text
+    assert "community" not in gen_text.split("CARRY_SOURCES = {")[1].split("}")[0]

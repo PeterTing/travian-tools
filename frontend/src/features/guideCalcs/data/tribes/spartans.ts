@@ -19,10 +19,10 @@ import { withUnitSpeeds } from '../tribes-types';
 // Therefore the WendelTytan / adipiciu table remains the sole detailed source
 // we can cross-check against, and our file is consistent with it.
 //
-// Carry capacity is not in this file any more (P0-23): withUnitSpeeds() adds it
-// from src/data/unitSpeeds.gen.json (scripts/game_data/gen_game_data.py
-// CARRY_PENDING, source "community" = the table above), the same value the
-// backend troops.json gets. No official page has Spartan carry → 「待驗證」.
+// Carry capacity is not in this file (P0-23): no official page or ts11 has
+// Spartan carry, so the PM decided it stays EMPTY (null) — generated in
+// src/data/unitSpeeds.gen.json, same as the backend troops.json. The community
+// table above is not used for carry. Screens show 「—」 / 「無法計算」, never 0.
 
 export const spartans = withUnitSpeeds({
   id: 'spartans',
@@ -53,7 +53,7 @@ export const spartans = withUnitSpeeds({
 
   strengths: [
     { zh: 'Asclepeion 讓戰損大幅降低（尤其 def）', en: 'Asclepeion drastically reduces losses (especially on def)' },
-    { zh: 'Elpida Rider 高機動高防騎兵（120/90、速 16、carry 110）', en: 'Elpida Rider: fast heavy def cavalry (120/90, speed 16, carry 110)' },
+    { zh: 'Elpida Rider 高機動高防騎兵（120/90、速 16）', en: 'Elpida Rider: fast heavy def cavalry (120/90, speed 16)' },
     { zh: 'Corinthian Crusher 是全遊戲頂級 OFF 騎兵（攻擊 195）', en: 'Corinthian Crusher: one of the top OFF cavalry in the game (195 attack)' },
   ],
 
@@ -92,7 +92,7 @@ export const spartans = withUnitSpeeds({
       name: { zh: '爾必達騎士', en: 'Elpida Rider' },
       attack: 55, defInfantry: 120, defCavalry: 90, upkeep: 2,
       cost: { wood: 555, clay: 445, iron: 330, crop: 110 }, trainTime: 2816,
-      role: { zh: '高速重防騎兵（carry 110 還可當 farm）', en: 'Fast heavy def cavalry (carry 110 doubles as farmer)' } },
+      role: { zh: '高速重防騎兵', en: 'Fast heavy def cavalry' } },
     { id: 'corinthian', category: 'cavalry',
       name: { zh: '科林斯破壞者', en: 'Corinthian Crusher' },
       attack: 195, defInfantry: 80, defCavalry: 75, upkeep: 3,

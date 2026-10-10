@@ -5,7 +5,7 @@ import { resolve } from 'node:path'
 import { TRIBES } from '@/features/guideCalcs/data/tribes'
 import { tribeUnitSpeeds, carryPendingTribe, UNIT_SPEED_TRIBES } from './unitSpeeds'
 
-const backend = JSON.parse(readFileSync(resolve(__dirname, '../../../backend/data/static/troops.json'), 'utf8')).troops as Record<string, { tribe: string; carry_capacity: number }>
+const backend = JSON.parse(readFileSync(resolve(__dirname, '../../../backend/data/static/troops.json'), 'utf8')).troops as Record<string, { tribe: string; carry_capacity: number | null }>
 
 describe('carry capacity: frontend = backend troops.json for every unit', () => {
   it('covers all 70 units', () => {
@@ -26,9 +26,9 @@ describe('carry capacity: frontend = backend troops.json for every unit', () => 
     })
   }
 
-  it('sources: 5 tribes ts11; Spartans community, Vikings estimate → 待驗證 chip', () => {
+  it('sources: 5 tribes ts11; Spartans and Vikings pending (empty) → 待驗證 chip', () => {
     for (const tribe of UNIT_SPEED_TRIBES) {
-      const want = tribe === 'spartans' ? 'community' : tribe === 'vikings' ? 'estimate' : 'ts11'
+      const want = tribe === 'spartans' || tribe === 'vikings' ? 'pending' : 'ts11'
       for (const r of tribeUnitSpeeds(tribe)) {
         expect(r.carrySource).toBe(want)
         expect(carryPendingTribe(r.troopId)).toBe(want === 'ts11' ? null : tribe)
@@ -36,8 +36,14 @@ describe('carry capacity: frontend = backend troops.json for every unit', () => 
     }
   })
 
-  it('Viking / Spartan values (old backend numbers had no source and are gone)', () => {
-    expect(tribeUnitSpeeds('vikings').map((r) => r.carry)).toEqual([50, 30, 60, 0, 50, 70, 0, 0, 0, 3000])
-    expect(tribeUnitSpeeds('spartans').map((r) => r.carry)).toEqual([60, 0, 40, 50, 110, 80, 0, 0, 0, 3000])
+  it('PM decision: every Spartan and Viking unit has carry null (frontend, generated file, backend) — no community / estimated numbers', () => {
+    for (const tribe of ['spartans', 'vikings'] as const) {
+      expect(tribeUnitSpeeds(tribe).map((r) => r.carry)).toEqual(Array(10).fill(null))
+      expect(TRIBES[tribe].units.map((u) => u.carry)).toEqual(Array(10).fill(null))
+      for (const r of tribeUnitSpeeds(tribe)) expect(backend[r.troopId].carry_capacity, r.troopId).toBeNull()
+    }
+    for (const tribe of UNIT_SPEED_TRIBES.filter((t) => t !== 'spartans' && t !== 'vikings')) {
+      for (const r of tribeUnitSpeeds(tribe)) expect(typeof r.carry, r.troopId).toBe('number')
+    }
   })
 })

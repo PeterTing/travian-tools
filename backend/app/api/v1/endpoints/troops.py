@@ -6,6 +6,11 @@ from pydantic import BaseModel
 from app.domain.schemas.game_data import Troop, TroopCategory, TroopTribe
 from app.services.game_data_service import get_game_data_service
 
+# 運載量留空時給前端／API 使用者看的原因（P0-23 PM 決定）
+CARRY_UNVERIFIED_NOTE = (
+    "運載量還沒核對（官方說明頁和 ts11 都沒有這個數字），先不提供；不能當成 0 計算"
+)
+
 router = APIRouter()
 
 
@@ -47,7 +52,9 @@ class TroopDetailResponse(BaseModel):
     speed: int | None
     speed_source: str
     speed_ref: str | None = None
-    carry_capacity: int
+    # None＝斯巴達、維京運載量還沒核對（沒有官方或 ts11 數字），不提供；原因寫在 carry_capacity_note
+    carry_capacity: int | None
+    carry_capacity_note: str | None = None
     cost_wood: int
     cost_clay: int
     cost_iron: int
@@ -294,6 +301,9 @@ async def get_troop_detail(tribe: TroopTribe, troop_id: str) -> TroopDetailRespo
         speed_source=troop.speed_source,
         speed_ref=troop.speed_ref,
         carry_capacity=troop.carry_capacity,
+        carry_capacity_note=(
+            CARRY_UNVERIFIED_NOTE if troop.carry_capacity is None else None
+        ),
         cost_wood=troop.cost_wood,
         cost_clay=troop.cost_clay,
         cost_iron=troop.cost_iron,

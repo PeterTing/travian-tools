@@ -12,8 +12,7 @@
   },
   "carry_sources": {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-10 讀取",
-    "community": "社群整理的數字（斯巴達兵種表，出處見前端 tribes/spartans.ts 註解），待驗證",
-    "estimate": "照同類兵種推估，沒有出處，待驗證"
+    "pending": "沒有官方或 ts11 的運載量，留空（null，待驗證）"
   },
   "tribes": {
     "romans": [
@@ -1436,8 +1435,8 @@
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
         "stats": null,
-        "carry": 60,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1449,8 +1448,8 @@
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
         "stats": null,
-        "carry": 0,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1462,8 +1461,8 @@
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
         "stats": null,
-        "carry": 40,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1475,8 +1474,8 @@
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
         "stats": null,
-        "carry": 50,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1488,8 +1487,8 @@
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
         "stats": null,
-        "carry": 110,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1501,8 +1500,8 @@
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
         "stats": null,
-        "carry": 80,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1514,8 +1513,8 @@
         "source": "pending",
         "ref": null,
         "stats": null,
-        "carry": 0,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1527,8 +1526,8 @@
         "source": "pending",
         "ref": null,
         "stats": null,
-        "carry": 0,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1540,8 +1539,8 @@
         "source": "pending",
         "ref": null,
         "stats": null,
-        "carry": 0,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1553,8 +1552,8 @@
         "source": "pending",
         "ref": null,
         "stats": null,
-        "carry": 3000,
-        "carry_source": "community",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       }
     ],
@@ -1568,8 +1567,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 50,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1581,8 +1580,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 30,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1594,8 +1593,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 60,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1607,8 +1606,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 0,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1620,8 +1619,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 50,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1633,8 +1632,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 70,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1646,8 +1645,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 0,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1659,8 +1658,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 0,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1672,8 +1671,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 0,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       },
       {
@@ -1685,8 +1684,8 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 3000,
-        "carry_source": "estimate",
+        "carry": null,
+        "carry_source": "pending",
         "carry_ref": null
       }
     ]

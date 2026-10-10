@@ -35,6 +35,13 @@ _MARKDOWN_TOPICS: dict[str, str] = {
 }
 
 
+def _carry_text(capacity: int | None) -> str:
+    """運載量文字；None（斯巴達、維京還沒核對）不寫數字也不寫 0."""
+    if capacity is None:
+        return "還沒核對（官方說明頁沒有），先不提供"
+    return str(capacity)
+
+
 def _speed_text(speed: object, unit: str = "", source: object = None) -> str:
     """兵種速度；None（沒有第一手出處）顯示「待驗證」，官方頁但數字取自第三方計算器的加註."""
     if speed is None:
@@ -874,7 +881,7 @@ class TravianKnowledgeBase:
 步兵防禦: {troop["defense_infantry"]}
 騎兵防禦: {troop["defense_cavalry"]}
 速度: {_speed_text(troop.get("speed"), " 格/小時", troop.get("speed_source"))}
-載重: {troop["capacity"]}
+載重: {_carry_text(troop.get("capacity"))}
 糧食消耗: {troop["upkeep"]}
 成本: 木{cost.get("wood", 0)}/磚{cost.get("clay", 0)}/鐵{cost.get("iron", 0)}/糧{cost.get("crop", 0)}
 訓練時間: {troop["training_time"]}

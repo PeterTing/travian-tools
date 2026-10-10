@@ -1131,7 +1131,7 @@
       "source": "The current numbers are community-compiled and may be off."
     },
     "autofillUnits": {
-      "what": "Roman, Teuton, Gaul, Egyptian and Hun unit numbers are checked against the ts11 in-game help; Viking costs, upkeep, training times, attack and defence are checked against the official help page, but their carry capacity is estimated from similar units; ts11 has no Spartans, so their costs, upkeep, training times and carry capacity are still community-compiled.",
+      "what": "Roman, Teuton, Gaul, Egyptian and Hun unit numbers are checked against the ts11 in-game help; Viking costs, upkeep, training times, attack and defence are checked against the official help page, but their carry capacity is unverified and not shown yet; ts11 has no Spartans, so their costs, upkeep and training times are still community-compiled, and their carry capacity is not shown yet.",
       "source": "Spartan speeds come from the official help page (which says the numbers come from a third-party calculator); reverse TS leaves Spartan units out."
     },
     "spartanSpeed": {
@@ -1191,12 +1191,12 @@
       "source": "The official knowledge base has no effect numbers to compare; we are still checking where the current text comes from."
     },
     "vikingCarry": {
-      "what": "Viking carry capacity is unverified.",
-      "source": "The official help page S139 has no carry capacity; the current numbers are estimated from similar units, source still being checked."
+      "what": "Viking carry capacity is unverified, so it is not shown yet",
+      "source": "The official help page S139 has no carry capacity"
     },
     "spartanCarry": {
-      "what": "Spartan carry capacity is unverified.",
-      "source": "The official help pages S10 and S187 have no carry capacity; the current numbers are community-compiled."
+      "what": "Spartan carry capacity is unverified, so it is not shown yet",
+      "source": "The official help pages S10 and S187 have no carry capacity"
     }
   },
   "verifiedNotes": {

@@ -9,10 +9,9 @@ import { withUnitSpeeds } from '../tribes-types';
 // which now 404s; first read 2026-04-23, re-read 2026-10-09 for P0-15)
 // All combat stats, costs, upkeep, speed, and training times pulled from the
 // official Travian support article. Carry capacity is not published on that
-// page. It is not in this file any more: withUnitSpeeds() adds it from
-// src/data/unitSpeeds.gen.json (scripts/game_data/gen_game_data.py
-// CARRY_PENDING, source "estimate" — the values first written here were filled
-// in by category convention, with no source; shown as 「待驗證」).
+// page, so the PM decided it stays EMPTY (null) — generated in
+// src/data/unitSpeeds.gen.json, same as the backend troops.json. Screens show
+// 「—」 / 「無法計算」, never 0 (P0-23).
 
 export const vikings = withUnitSpeeds({
   id: 'vikings',

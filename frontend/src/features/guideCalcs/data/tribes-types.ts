@@ -33,7 +33,8 @@ export interface Unit {
   speed: number | null; // fields/hour at 1x; null = no first-hand source yet (待驗證)
   speedSource: UnitSpeedSource;
   speedRef: string | null;
-  carry: number;        // carry capacity — generated (unitSpeeds.gen.json), same as backend troops.json
+  /** carry capacity — generated (unitSpeeds.gen.json), same as backend troops.json; null = not verified (Spartans, Vikings), never treat as 0 */
+  carry: number | null;
   upkeep: number;       // crop per hour
   cost: UnitCost;
   trainTime: number;    // seconds at 1x, building L1

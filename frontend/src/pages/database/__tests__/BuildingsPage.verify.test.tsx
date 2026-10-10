@@ -148,4 +148,27 @@ describe('BuildingsPage effect column (official knowledge base, P0-23)', () => {
     const heading = await screen.findByTestId('building-effect-heading')
     expect(within(heading).queryByTestId('pending-verify-chip')).toBeNull()
   })
+
+  // TICKETS P0-17 (u)：選中的那一列底色是 bg-primary（深藍），✓ 字要淺綠，對比 ≥ 4.5:1
+  it('selected list row: ✓ 已核對 switches to light green with contrast ≥ 4.5:1 on bg-primary', async () => {
+    render(<BuildingsPage />)
+    const name = await screen.findByText('村莊大樓')
+    const before = within(name.closest('p')!).getByTestId('verified-mark')
+    expect(before).toHaveClass('text-green-700')
+    fireEvent.click(name)
+    const row = (await screen.findAllByText('村莊大樓'))[0]!.closest('div.rounded')!
+    expect(row).toHaveClass('bg-primary')
+    const mark = within(row as HTMLElement).getByTestId('verified-mark')
+    expect(mark).toHaveClass('text-green-300')
+    expect(mark).not.toHaveClass('text-green-700')
+    // index.css --primary: hsl(222.2 47.4% 11.2%) ≈ #0f172a；tailwind green-300 = #86efac
+    const lum = (hex: string) => {
+      const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+      return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!
+    }
+    const ratio = (a: string, b: string) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x! + 0.05) / (y! + 0.05) }
+    expect(ratio('#86efac', '#0f172a')).toBeGreaterThanOrEqual(4.5)
+    // 原本的 green-700 在深藍底上不到 4.5:1（這就是要修的）
+    expect(ratio('#15803d', '#0f172a')).toBeLessThan(4.5)
+  })
 })

@@ -6,6 +6,8 @@ import { buildingSource, isBuildingEffectVerified, isBuildingVerified } from '@/
 interface BuildingVerifyMarkProps {
   buildingId: string
   className?: string
+  /** 放在深色底（列表選中的那一列 bg-primary）上：字改淺綠，對比 ≥ 4.5:1（TICKETS P0-17 (u)） */
+  onDark?: boolean
 }
 
 /**
@@ -13,7 +15,7 @@ interface BuildingVerifyMarkProps {
  * 「ts11 遊戲內說明」／「官方知識庫」，P0-23）；其他給一個「待驗證」小灰標（不逐格標）。
  * 點擊範圍用透明延伸補到 44×44，外觀不變；只靠點，不靠 hover。
  */
-export default function BuildingVerifyMark({ buildingId, className = '' }: BuildingVerifyMarkProps) {
+export default function BuildingVerifyMark({ buildingId, className = '', onDark = false }: BuildingVerifyMarkProps) {
   const { t } = useTranslation()
   const id = useId()
   const panelId = `verified-note-${id.replace(/:/g, '')}`
@@ -37,7 +39,7 @@ export default function BuildingVerifyMark({ buildingId, className = '' }: Build
           aria-expanded={open}
           aria-controls={open ? panelId : undefined}
           onClick={onClick}
-          className={`relative ml-1 whitespace-nowrap align-middle text-[12px] font-normal text-green-700 before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] ${className}`}
+          className={`relative ml-1 whitespace-nowrap align-middle text-[12px] font-normal ${onDark ? 'text-green-300' : 'text-green-700'} before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] ${className}`}
         >
           {t('common.verifiedShort')}
         </button>

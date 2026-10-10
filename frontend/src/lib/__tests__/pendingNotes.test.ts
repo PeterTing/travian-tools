@@ -92,8 +92,8 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
     expect(bar).not.toMatch(/kind="units"/)
     const n = (zh as unknown as { pendingNotes: Notes }).pendingNotes.autofillUnits
     expect(n?.what).toContain('花費、糧耗、訓練時間')
-    expect(n?.what).toContain('維京的花費、糧耗、訓練時間、攻防已照官方說明頁核對，運載量是照同類兵種推估的')
-    expect(n?.what).toContain('斯巴達的花費、糧耗、訓練時間、運載量還是社群整理的數字')
+    expect(n?.what).toContain('維京的花費、糧耗、訓練時間、攻防已照官方說明頁核對，運載量還沒核對、先不顯示')
+    expect(n?.what).toContain('斯巴達的花費、糧耗、訓練時間還是社群整理的數字，運載量先不顯示')
     expect(n?.what).toContain('ts11 沒有斯巴達')
     expect(n?.source).toContain('斯巴達速度')
   })
@@ -113,8 +113,8 @@ describe('P0-17 新種類的文字（PM 定稿，2026-10-10；merchantCapacity�
     ['unitCarry', '兵種攜帶量還沒在 ts11 遊戲內核對。', '目前用的是社群整理的數字，可能有誤差。'],
     ['launchSim', '開局花費是試算表每一步的加總，含派對（用小慶典的糧）。', '這些數字還沒在 ts11 遊戲內核對。'],
     // P0-23：維京運載量（設計師兩行格式；出處照實寫，跟已帶入列「攜帶量還是社群整理的數字」一致）
-    ['vikingCarry', '維京運載量還沒核對。', '官方說明頁 S139 沒有運載量；目前的數字是照同類兵種推估的，來源還在查。'],
-    ['spartanCarry', '斯巴達運載量還沒核對。', '官方說明頁 S10、S187 都沒有運載量；目前用的是社群整理的數字。'],
+    ['vikingCarry', '維京運載量還沒核對，先不顯示', '官方說明頁 S139 沒有運載量'],
+    ['spartanCarry', '斯巴達運載量還沒核對，先不顯示', '官方說明頁 S10、S187 沒有運載量'],
     // P0-23：建築效果欄（官方知識庫沒有可對照數字的建築）
     ['buildingEffect', '這棟建築的效果還沒核對。', '官方知識庫沒有可以對照的效果數字；目前的文字來源還在查。'],
   ])('%s', (kind, what, source) => {
