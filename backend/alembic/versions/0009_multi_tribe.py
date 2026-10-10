@@ -20,9 +20,10 @@ the upgraded database):
 * ``game_worlds.keep_tribe_on_conquest`` — the per-world switch, default
   false (= every existing world stays a single-tribe world).
 
-Downgrade copies ``birth_tribe`` back into ``game_accounts.tribe`` (a no-op
-while the app keeps them equal, but it makes the round trip lossless for the
-account tribe) and drops the three columns. Only the per-village tribe
+Downgrade fills ``game_accounts.tribe`` from ``birth_tribe`` only where
+``tribe`` is NULL (``tribe`` stays the source of truth — it may have been
+changed by an older app revision while ``birth_tribe`` went stale) and drops
+the three columns. Only the per-village tribe
 choices and the world switch are lost — data that did not exist before this
 revision.
 
@@ -104,7 +105,8 @@ def downgrade() -> None:
     bind = op.get_bind()
     bind.execute(
         sa.text(
-            "UPDATE game_accounts SET tribe = birth_tribe WHERE birth_tribe IS NOT NULL"
+            "UPDATE game_accounts SET tribe = birth_tribe"
+            " WHERE tribe IS NULL AND birth_tribe IS NOT NULL"
         )
     )
     with op.batch_alter_table("game_worlds") as batch:

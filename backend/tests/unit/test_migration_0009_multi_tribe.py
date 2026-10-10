@@ -225,3 +225,28 @@ def test_downgrade_restores_account_tribe_from_birth_tribe(engine: Engine) -> No
     _run(engine, "downgrade")
     accounts = _rows(engine, "SELECT account_id, tribe FROM game_accounts")
     assert accounts["a-none"] == ("teutons",)
+
+
+def test_downgrade_keeps_tribe_changed_in_rollback_window(engine: Engine) -> None:
+    """退回舊版程式期間，舊版只改了 tribe（birth_tribe 變舊的）.
+
+    降級不能拿舊的 birth_tribe 蓋掉 tribe；之後再升級，出生部族 = 新的部族。
+    """
+    _run(engine, "upgrade")
+    with engine.begin() as conn:
+        conn.execute(
+            sa.text(
+                "UPDATE game_accounts SET tribe = 'teutons'"
+                " WHERE account_id = 'a-romans'"
+            )
+        )
+    _run(engine, "downgrade")
+    accounts = _rows(engine, "SELECT account_id, tribe FROM game_accounts")
+    assert accounts["a-romans"] == ("teutons",)
+
+    _run(engine, "upgrade")
+    accounts = _rows(engine, "SELECT account_id, tribe, birth_tribe FROM game_accounts")
+    assert accounts["a-romans"] == ("teutons", "teutons")
+    villages = _rows(engine, "SELECT village_id, tribe FROM villages")
+    assert villages["v1"] == ("teutons",)
+    assert villages["v2"] == ("teutons",)

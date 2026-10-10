@@ -78,13 +78,14 @@ class GameAccount(Base):
     )
     server_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     server_speed: Mapped[int] = mapped_column(Integer, default=1)
-    # 帳號的部族 = 出生部族（註冊時選的）。和 birth_tribe 永遠一樣，留著給舊程式讀。
+    # 帳號的部族 = 出生部族（註冊時選的）。**讀的時候以它為準**（P0-25 審查）：
+    # 退回舊版程式的期間只有這一欄會被改，birth_tribe 可能是舊的。
     tribe: Mapped[TribeType | None] = mapped_column(
         Enum(TribeType, values_callable=lambda x: [e.value for e in x]),
         nullable=True,
     )
     # 出生部族（P0-25）：英雄的部族能力永遠跟著它，就算之後控制別的部族的村莊。
-    # 每個村莊自己的部族存在 villages.tribe。
+    # 每個村莊自己的部族存在 villages.tribe。不要直接讀這一欄，用 resolved_birth_tribe。
     birth_tribe: Mapped[TribeType | None] = mapped_column(
         Enum(TribeType, values_callable=lambda x: [e.value for e in x]),
         nullable=True,
@@ -149,6 +150,15 @@ class GameAccount(Base):
         back_populates="account",
         cascade="all, delete-orphan",
     )
+
+    @property
+    def resolved_birth_tribe(self) -> TribeType | None:
+        """出生部族，以 tribe 為準（P0-25 審查）.
+
+        tribe 和 birth_tribe 本來永遠一樣。退回舊版程式時，舊版只會改 tribe，
+        birth_tribe 就舊了；所以 tribe 有值就用 tribe，沒有才用 birth_tribe。
+        """
+        return self.tribe if self.tribe is not None else self.birth_tribe
 
     @property
     def current_server_day(self) -> int:

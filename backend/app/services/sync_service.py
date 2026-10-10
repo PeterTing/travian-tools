@@ -107,7 +107,7 @@ class SyncService:
                 coordinate_x=x,
                 coordinate_y=y,
                 # 新村莊預設跟帳號的出生部族一樣（P0-25）
-                tribe=(account.birth_tribe or account.tribe) if account else None,
+                tribe=account.resolved_birth_tribe if account else None,
             )
             self.db.add(village)
             self.db.flush()

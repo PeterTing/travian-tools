@@ -69,7 +69,7 @@ class VillageService:
             is_capital=data.is_capital,
             role=data.role,
             # 沒指定就跟帳號的出生部族一樣（P0-25）
-            tribe=data.tribe or account.birth_tribe or account.tribe,
+            tribe=data.tribe or account.resolved_birth_tribe,
         )
         self.db.add(village)
         self.db.commit()

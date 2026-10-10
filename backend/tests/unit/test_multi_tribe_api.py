@@ -39,7 +39,9 @@ def client() -> Iterator[TestClient]:
     db.commit()
     app.dependency_overrides[get_db] = lambda: db
     app.dependency_overrides[get_current_user] = lambda: user
-    yield TestClient(app)
+    tc = TestClient(app)
+    tc.db = db  # type: ignore[attr-defined]  # 給「退回舊版期間」的測試直接改資料
+    yield tc
     app.dependency_overrides.clear()
     db.close()
 
@@ -128,7 +130,11 @@ def test_world_keep_tribe_flag_defaults_off_and_can_be_switched(
 def test_changing_birth_tribe_moves_following_villages_only(
     client: TestClient,
 ) -> None:
+    """征服保留部族的世界：只有跟著出生部族的村莊一起改."""
     acc = _account(client, "romans")
+    client.patch(
+        f"/api/v1/game-worlds/{acc['world_id']}", json={"keep_tribe_on_conquest": True}
+    )
     _village(client, acc["account_id"], "01")
     v2 = _village(client, acc["account_id"], "02")
     client.put(f"/api/v1/villages/{v2['village_id']}", json={"tribe": "gauls"})
@@ -150,3 +156,64 @@ def test_account_without_tribe_gets_villages_without_tribe(client: TestClient) -
     # 之後補上部族：還沒設定部族的村莊跟著補上
     client.put(f"/api/v1/game-accounts/{acc['account_id']}", json={"tribe": "huns"})
     assert _villages(client, acc["account_id"]) == {"01": "huns"}
+
+
+def test_single_tribe_world_moves_every_village(client: TestClient) -> None:
+    """一般伺服器：整個帳號一個部族，改帳號部族時所有村莊一起改."""
+    acc = _account(client, "romans")
+    _village(client, acc["account_id"], "01")
+    v2 = _village(client, acc["account_id"], "02")
+    client.put(f"/api/v1/villages/{v2['village_id']}", json={"tribe": "gauls"})
+    client.put(f"/api/v1/game-accounts/{acc['account_id']}", json={"tribe": "huns"})
+    assert _villages(client, acc["account_id"]) == {"01": "huns", "02": "huns"}
+
+
+def _old_version_changes_tribe(client: TestClient, account_id: str, tribe: str) -> None:
+    """模擬退回舊版程式期間：舊版只改 game_accounts.tribe，birth_tribe 留著舊的."""
+    from sqlalchemy import text
+
+    db = client.db  # type: ignore[attr-defined]
+    db.execute(
+        text("UPDATE game_accounts SET tribe = :t WHERE account_id = :a"),
+        {"t": tribe, "a": account_id},
+    )
+    db.commit()
+    db.expire_all()
+
+
+def test_rollback_window_tribe_change_wins_over_stale_birth_tribe(
+    client: TestClient,
+) -> None:
+    """舊版改了部族、再升回新版：一般伺服器的帳號顯示新的部族（tribe 為準）."""
+    acc = _account(client, "romans")
+    _village(client, acc["account_id"], "01")
+    _old_version_changes_tribe(client, acc["account_id"], "teutons")
+
+    got = client.get("/api/v1/game-accounts").json()["accounts"][0]
+    assert got["tribe"] == "teutons"
+    assert got["birth_tribe"] == "teutons"  # 舊的 birth_tribe（romans）不能蓋過 tribe
+    # 新村莊預設也是新的部族
+    assert _village(client, acc["account_id"], "02")["tribe"] == "teutons"
+    # 之後在新版改部族：所有村莊（一般伺服器）一起改，birth_tribe 也跟上
+    resp = client.put(
+        f"/api/v1/game-accounts/{acc['account_id']}", json={"tribe": "gauls"}
+    )
+    assert resp.json()["birth_tribe"] == "gauls"
+    assert _villages(client, acc["account_id"]) == {"01": "gauls", "02": "gauls"}
+
+
+def test_rollback_window_stale_birth_tribe_villages_follow_on_multi_tribe_world(
+    client: TestClient,
+) -> None:
+    """征服保留部族的世界：還停在舊 birth_tribe 的村莊也算「跟著出生部族」."""
+    acc = _account(client, "romans")
+    client.patch(
+        f"/api/v1/game-worlds/{acc['world_id']}", json={"keep_tribe_on_conquest": True}
+    )
+    _village(client, acc["account_id"], "01")  # romans（舊的出生部族）
+    v2 = _village(client, acc["account_id"], "02")
+    client.put(f"/api/v1/villages/{v2['village_id']}", json={"tribe": "egyptians"})
+    _old_version_changes_tribe(client, acc["account_id"], "teutons")
+
+    client.put(f"/api/v1/game-accounts/{acc['account_id']}", json={"tribe": "gauls"})
+    assert _villages(client, acc["account_id"]) == {"01": "gauls", "02": "egyptians"}

@@ -68,7 +68,11 @@ an upgraded database):
 | `villages.tribe` | `= the owning account's tribe`（NULL when the account has none） |
 | `game_worlds.keep_tribe_on_conquest` | `false`（server default `0`；every existing world stays single-tribe） |
 
-Downgrade first copies `birth_tribe` back into `game_accounts.tribe`, then
+Reads treat `game_accounts.tribe` as the source of truth (the API's
+`birth_tribe` is `tribe`, falling back to `birth_tribe` only when `tribe` is
+NULL), so a `birth_tribe` left stale while an older app revision was serving
+never overrides `tribe`. Downgrade fills `game_accounts.tribe` from
+`birth_tribe` only where `tribe IS NULL AND birth_tribe IS NOT NULL`, then
 drops the three columns. It loses only the per-village tribe choices and the
 world switch — data that did not exist before 0009. Tested by
 `tests/unit/test_migration_0009_multi_tribe.py` (upgrade → downgrade → upgrade

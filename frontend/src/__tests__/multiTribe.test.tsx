@@ -169,6 +169,13 @@ describe('一個帳號多個部族（P0-25）', () => {
       expect(screen.getByTestId('autofill-village')).toHaveTextContent('02 (33|-4)・羅馬人')
     })
 
+    it('hero line uses the account tribe when birth_tribe is stale', async () => {
+      setup({ keep: true, secondTribe: 'romans' })
+      db.accounts = [makeAccount({ tribe: 'teutons', birth_tribe: 'gauls', village_count: 2 })]
+      renderAt('/calculator/path')
+      await waitFor(() => expect(screen.getByTestId('autofill-hero-tribe')).toHaveTextContent('英雄：出生部族 日耳曼人'))
+    })
+
     it('villages page: one native tribe select per village (44px, 16px), default birth tribe, saves on change', async () => {
       setup({ keep: true, secondTribe: 'gauls' })
       db.villages[1].tribe = null // 還沒設定 = 出生部族
@@ -192,6 +199,15 @@ describe('一個帳號多個部族（P0-25）', () => {
       renderAt('/calculator/path')
       await waitFor(() => expect(summary()).toHaveTextContent('PeterT · ts3（x1・高盧人） · 02 (33|-4)'))
       expect(summary()).not.toHaveTextContent('羅馬人')
+      expect(screen.queryByTestId('autofill-hero-tribe')).not.toBeInTheDocument()
+    })
+
+    it('rollback window: old version changed the tribe, birth_tribe is stale → the new tribe is shown', async () => {
+      setup({ keep: false, secondTribe: 'gauls' })
+      db.accounts = [makeAccount({ tribe: 'teutons', birth_tribe: 'gauls', village_count: 2 })]
+      renderAt('/calculator/path')
+      await waitFor(() => expect(summary()).toHaveTextContent('PeterT · ts3（x1・日耳曼人） · 02 (33|-4)'))
+      expect(summary()).not.toHaveTextContent('高盧人')
       expect(screen.queryByTestId('autofill-hero-tribe')).not.toBeInTheDocument()
     })
 

@@ -33,6 +33,16 @@ describe('一個帳號多個部族（P0-25）', () => {
     expect(birthTribeOf(null)).toBeNull()
   })
 
+  it('account tribe is the source of truth: a stale birth_tribe (rollback window) never overrides it', () => {
+    // 退回舊版期間舊版只改了 tribe，birth_tribe 還是舊的羅馬人
+    const acc = makeAccount({ tribe: 'gauls', birth_tribe: 'romans' })
+    expect(birthTribeOf(acc)).toBe('gauls')
+    expect(villageTribeOf(village('romans'), acc, world(false))).toBe('gauls')
+    expect(villageTribeOf(null, acc, world(true))).toBe('gauls')
+    // tribe 沒值才用 birth_tribe
+    expect(birthTribeOf(makeAccount({ tribe: null, birth_tribe: 'huns' }))).toBe('huns')
+  })
+
   it('only worlds with Keep Tribe on Conquest are multi-tribe; missing flag (old API) = single tribe', () => {
     expect(isMultiTribeWorld(world(true))).toBe(true)
     expect(isMultiTribeWorld(world(false))).toBe(false)

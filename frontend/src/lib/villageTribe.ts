@@ -9,9 +9,13 @@ import type { GameAccount, GameWorld, TroopTribe, Village } from '@/types/game'
  * 出處：scripts/game_data/evidence/official_support_multitribe_2026-10-11.json
  */
 
-/** 出生部族：註冊時選的部族（英雄能力跟著它）；舊的 API 沒有 birth_tribe 就用 tribe */
+/**
+ * 出生部族：註冊時選的部族（英雄能力跟著它）。以帳號的 tribe 為準（P0-25 審查）：
+ * tribe 和 birth_tribe 本來一樣，退回舊版程式時只有 tribe 會被改、birth_tribe 可能是舊的，
+ * 所以 tribe 有值就用 tribe，沒有才用 birth_tribe。
+ */
 export function birthTribeOf(account: GameAccount | null | undefined): TroopTribe | null {
-  return account?.birth_tribe ?? account?.tribe ?? null
+  return account?.tribe ?? account?.birth_tribe ?? null
 }
 
 /** 這個世界是不是「征服保留部族」的特殊伺服器（同一個帳號可以有不同部族的村莊） */
