@@ -30,8 +30,33 @@ export interface TravelOpts {
   artifactMultiplier?: number
 }
 
+/**
+ * 伺服器倍速 → 兵速倍率。官方 S20「Game Versions and Speed」的表：
+ * Troops speed: X1 Normal、X2 *2、X3 *2、X5 *2、X10 *4（不是直接乘倍速）。
+ * 出處：scripts/game_data/evidence/official_s20_speed_2026-10-11.json（全文＋sha256）。
+ * Mirror: backend/app/utils/travian_formulas.py `TROOP_SPEED_MULTIPLIER`.
+ */
+export const TROOP_SPEED_MULTIPLIER: Readonly<Record<number, number>> = { 1: 1, 2: 2, 3: 2, 5: 2, 10: 4 }
+
+/** 這個倍速有沒有在 S20 的表上（沒有的話倍率是推估，待驗證）。 */
+export function isTroopSpeedMultiplierVerified(serverSpeed: number): boolean {
+  return serverSpeed in TROOP_SPEED_MULTIPLIER
+}
+
+/**
+ * 兵速倍率（S20）。表上沒有的倍速（例如 x4、x20）：待驗證，保守地用表上「不超過它的最大倍速」的倍率
+ * （x4 → 2、x20 → 4）；≤1 或不是數字 → 1。寧可把行軍時間算長，也不要算短。
+ */
+export function troopSpeedMultiplier(serverSpeed = 1): number {
+  if (!Number.isFinite(serverSpeed) || serverSpeed <= 1) return 1
+  const exact = TROOP_SPEED_MULTIPLIER[serverSpeed]
+  if (exact !== undefined) return exact
+  const lower = Object.keys(TROOP_SPEED_MULTIPLIER).map(Number).filter((s) => s <= serverSpeed)
+  return TROOP_SPEED_MULTIPLIER[Math.max(...lower)]
+}
+
 function effectiveSpeed(unitSpeed: number, serverSpeed = 1, artifactMultiplier = 1): number {
-  return unitSpeed * (serverSpeed > 0 ? serverSpeed : 1) * (artifactMultiplier > 0 ? artifactMultiplier : 1)
+  return unitSpeed * troopSpeedMultiplier(serverSpeed) * (artifactMultiplier > 0 ? artifactMultiplier : 1)
 }
 
 /**

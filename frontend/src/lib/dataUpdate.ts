@@ -19,8 +19,11 @@ export const DATA_UPDATE_HIDE_AT = new Date(new Date(`${DATA_UPDATE_RELEASE_DATE
 export interface DataUpdateItem {
   /** 改了什麼 */
   label: string
-  before: string
-  after: string
+  /** 舊值、新值；只有一句話的項目（例如行軍時間修正）兩個都不填 */
+  before?: string
+  after?: string
+  /** 只在伺服器倍速 ≥ 這個值的世界顯示（例如 x3 以上才有的修正） */
+  minServerSpeed?: number
   /** 縮排的第二行（例如羅馬人另外一組數字） */
   sub?: { label: string; before: string; after: string }
   /** 灰色小字補充（例如「田地回本會變短」） */
@@ -35,6 +38,8 @@ const tradeOffice = INGAME_BUILDINGS.trade_office!
  * 每一項的出處寫在 PR 說明。名稱一律讀遊戲內名稱表；舊名從表的 aliases 取（站上其他地方不顯示舊名）。
  */
 export const DATA_UPDATE_ITEMS: DataUpdateItem[] = [
+  // 官方說明頁 S20：兵速 x2/x3/x5 ×2、x10 ×4（之前直接乘倍速）。x1、x2 沒變，只給 x3 以上的世界看；放第一項，收合時也看得到（PM）
+  { label: 'x3 以上世界的行軍時間已修正（之前算得太短，請重新確認排好的攻擊）', minServerSpeed: 3 },
   // ts11 manual/troop/64
   { label: `${ingameUnitNameByGameId(64)}運載量`, before: '115', after: '75' },
   // 舊的後端兵種資料 5800 → ts11 manual/troop/10 開拓者花費 4600 木材
@@ -47,6 +52,12 @@ export const DATA_UPDATE_ITEMS: DataUpdateItem[] = [
   { label: '田地回本、建造順序的 Plus', before: '加總', after: '相乘', note: '田地回本會變短' },
   { label: '建築名稱', before: smithy.aliases[0]!, after: smithy.zh },
 ]
+
+/** 這個世界要顯示的項目（倍速不夠的項目拿掉；不知道倍速就當 x1） */
+export function dataUpdateItemsFor(serverSpeed?: number | null): DataUpdateItem[] {
+  const speed = serverSpeed ?? 1
+  return DATA_UPDATE_ITEMS.filter((it) => it.minServerSpeed === undefined || speed >= it.minServerSpeed)
+}
 
 /** 不展開時顯示幾項 */
 export const DATA_UPDATE_VISIBLE = 3
