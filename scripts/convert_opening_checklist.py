@@ -19,7 +19,7 @@ Excel 本身不進 repo（公開 repo，內容是 Caím 的攻略）；輸出檔
   「為什麼」（General 欄）能對上翻譯工作表的就用翻譯工作表，經 OpenCC s2twp
   轉成繁體再套用語修正；翻譯工作表沒有、或內容跟英文不一致（數字不同、翻錯）的，
   用 ``MANUAL_ADVICE`` 的人工翻譯。
-- 跟部族有關的欄位（拓荒者花費、打野兵）放在每一步的 ``by_tribe``，步驟本身不變。
+- 跟部族有關的欄位（開拓者花費、打野兵）放在每一步的 ``by_tribe``，步驟本身不變。
 """
 
 from __future__ import annotations
@@ -63,13 +63,13 @@ FARM_UNIT_BY_TRIBE = {
     "huns": "Steppe Rider",
 }
 UNIT_ZH = {
-    "Equites Imperatoris": "帝國騎兵",
-    "Legionnaire": "軍團兵",
+    "Equites Imperatoris": "帝國騎士",
+    "Legionnaire": "古羅馬步兵",
     "Theutates Thunders": "雷法師",
     "Phalanx": "方陣兵",
     "Clubswinger": "棍棒兵",
-    "Mercenary": "傭兵",
-    "Steppe Rider": "草原騎兵",
+    "Mercenary": "僱傭兵",
+    "Steppe Rider": "草原騎士",
     "Slave Malitia": "奴隸民兵",
 }
 
@@ -97,12 +97,12 @@ BUILDING_ZH = {
     "Woodcutters": "伐木場",
     "Clay pits": "泥坑",
     "Iron mines": "鐵礦場",
-    "Croplands": "農田",
+    "Croplands": "農場",
     "All woodcutters": "所有伐木場",
     "All clay pits": "所有泥坑",
     "All iron mines": "所有鐵礦場",
-    "All croplands": "所有農田",
-    "One cropland": "一塊農田",
+    "All croplands": "所有農場",
+    "One cropland": "一塊農場",
     "Rally Point": "集結點",
     "Rallypoint": "集結點",
     "Granary": "穀倉",
@@ -115,12 +115,12 @@ BUILDING_ZH = {
     "City wall": "城牆",
     "Barracs": "兵營",
     "Academy": "研究院",
-    "Smithy": "鐵匠鋪",
+    "Smithy": "盔甲廠",
     "Stable": "馬廄",
     "Workshop": "工場",
     "Town hall": "城鎮廳",
     "Residence": "行宮",
-    "Grain mill": "穀物磨坊",
+    "Grain mill": "麵粉廠",
     # 任務（不是建築）
     "Even growth": "任務：均衡發展",
     "Complete economy": "任務：完整經濟",
@@ -229,7 +229,7 @@ _TH_REMINDER = (
 
 # 翻譯工作表沒有、或內容跟英文對不上的（數字不同、翻錯）：人工翻譯
 MANUAL_ADVICE = {
-    # 翻譯表的版本是「騎兵 10 到 20」，英文是 7 到 12，且多了一句帝國騎兵
+    # 翻譯表的版本是「騎兵 10 到 20」，英文是 7 到 12，且多了一句帝國騎士
     ("4p-farm", 40): (
         "打野要做多少兵很難說。Excel 裡有一些簡單的試算，可以幫你判斷划不划算。\n"
         "建議數量：\n"
@@ -238,7 +238,7 @@ MANUAL_ADVICE = {
         "做兵的時機也很重要：綠洲要等動物全部清掉後才會開始產出，"
         "所以不建議一開始就做打野兵。最有效率的數量看情況，依附近綠洲的實際手感決定。"
     ),
-    ("4p-farm", 58): "重要提醒：雷法師、帝國騎兵和草原騎兵可以單獨派去沒有動物的綠洲！",
+    ("4p-farm", 58): "重要提醒：雷法師、帝國騎士和草原騎士可以單獨派去沒有動物的綠洲！",
     ("4p-farm", 61): "目標：12／16 小時內全部升到 4",
     ("4p-farm", 63): (
         "人口和文明點的獎勵（Excel 裡標橘色的）要看馬廄升到 3 還是 5，"
@@ -251,7 +251,7 @@ MANUAL_ADVICE = {
         "伐木場 67.4 小時\n"
         "泥坑 67.7 小時\n"
         "鐵礦場 82.5 小時\n"
-        "農田 76.7 小時\n"
+        "農場 76.7 小時\n"
         "ROI 以英雄 6 級領到的獎勵計算。不建議升鐵礦場，埃及人尤其不要。"
     ),
     ("4p-farm", 94): _PRO_TIP,
@@ -265,12 +265,12 @@ MANUAL_ADVICE = {
     # 翻譯表對應的那句是「最多 4 小時」，英文是 12 小時
     ("3p-sim", 50): "目標：12 小時內所有資源田升到 4。",
     ("3p-sim", 51): (
-        "建議：農田升到 6 級，因為每塊會多 1 點文明點產量。之後文明點的花費會越來越高，"
-        "可以把一塊農田看成 1250 資源的文明點投資，這樣農田本身只算 2000，"
+        "建議：農場升到 6 級，因為每塊會多 1 點文明點產量。之後文明點的花費會越來越高，"
+        "可以把一塊農場看成 1250 資源的文明點投資，這樣農場本身只算 2000，"
         "ROI 大約 66 小時，加上文明點換算的成本低，很划算。"
     ),
     ("3p-sim", 59): (
-        "選做：穀物磨坊 1 級也是一個選項，搭配 6 級農田、算進任務獎勵的 ROI 是 63 小時。"
+        "選做：麵粉廠 1 級也是一個選項，搭配 6 級農場、算進任務獎勵的 ROI 是 63 小時。"
         "不過要拆掉一個山洞才有空地。"
     ),
     # 翻譯表對應的那段是「山洞升到 7、3 次活動約 60 小時」，跟英文不同
@@ -281,7 +281,7 @@ MANUAL_ADVICE = {
         "再用下面的表補足。記得你有 3 場派對、至少 48 小時的產出可以補回少掉的文明點。"
     ),
     ("3p-sim", 78): "目標：72 小時內開第一場派對",
-    ("3p-sim", 80): "拓荒者的花費依部族不同，請在上方選部族。",
+    ("3p-sim", 80): "開拓者的花費依部族不同，請在上方選部族。",
     ("3p-sim", 90): _PRO_TIP,
     ("3p-sim", 99): _TH_REMINDER,
 }
@@ -405,7 +405,7 @@ def other_tables(wb: openpyxl.Workbook, ev: Evaluator) -> dict[str, Any]:
         "stable_cp": stable_cp,
         "stable_pop": stable_pop,
         "warehouse_unit": warehouse_unit,
-        "warehouse5": {  # Other!I54:L54（只有帝國騎兵：倉庫先升到 5）
+        "warehouse5": {  # Other!I54:L54（只有帝國騎士：倉庫先升到 5）
             "cost": ws["J54"].value,
             "cp": ws["K54"].value,
             "pop": ws["L54"].value,
@@ -545,13 +545,13 @@ class Converter:
         by_tribe: dict[str, dict[str, Any]] = {}
 
         if isinstance(c_raw, ArrayFormula) and "Other!G54" in c_raw.text:
-            # 4P 58 列：帝國騎兵才要先把倉庫升到 5，其他打野兵這列不用做
+            # 4P 58 列：帝國騎士才要先把倉庫升到 5，其他打野兵這列不用做
             w5 = self.other["warehouse5"]
             step.update(
                 kind="farm_unit_only",
                 building="倉庫",
                 building_en="Warehouse",
-                target="升到 5（只有帝國騎兵需要）",
+                target="升到 5（只有帝國騎士需要）",
                 target_en="to 5 (only applicable for EI)",
                 tier=None,
                 cost=None,
@@ -630,7 +630,7 @@ class Converter:
             count = int(e)
             step.update(
                 kind="settlers",
-                building="拓荒者",
+                building="開拓者",
                 building_en=name_en,
                 target=f"訓練 {count} 個",
                 target_en=str(count),
@@ -699,7 +699,7 @@ class Converter:
                 tier=tier,
             )
             if is_stable_variant:
-                # 4P 56 列：馬廄升到 3（一般）或 5（帝國騎兵）
+                # 4P 56 列：馬廄升到 3（一般）或 5（帝國騎士）
                 o = self.other
                 base_task = "to 3"
                 step.update(
@@ -721,7 +721,7 @@ class Converter:
                             "pop": o["stable_pop"][task],
                         }
             elif is_wh_variant:
-                # 4P 69 列：倉庫升到 7；帝國騎兵已經先升到 5，花費不同
+                # 4P 69 列：倉庫升到 7；帝國騎士已經先升到 5，花費不同
                 o = self.other
                 f_formula = ws.cell(r, 6).value.text
                 default_cost = int(re.search(r",(\d+)\)$", f_formula).group(1))
@@ -820,11 +820,11 @@ class Converter:
         task_zh = {
             "Culture point production": "文明點產量",
             "Population": "人口",
-            "Crop": "農田",
+            "Crop": "農場",
             "Wood": "伐木場",
             "Clay": "泥坑",
             "Iron": "鐵礦場",
-            "All crop": "所有農田",
+            "All crop": "所有農場",
             "All wood": "所有伐木場",
             "All clay": "所有泥坑",
             "All iron": "所有鐵礦場",
@@ -835,7 +835,7 @@ class Converter:
             "Barracks": "兵營",
             "Stable": "馬廄",
             "Academy": "研究院",
-            "Smithy": "鐵匠鋪",
+            "Smithy": "盔甲廠",
             "Town Hall": "城鎮廳",
             "Workshop": "工場",
             "Main Building": "村莊大樓",
@@ -848,9 +848,9 @@ class Converter:
             "Rally point": "集結點",
             "Sawmill": "鋸木廠",
             "Brickyard": "磚廠",
-            "Iron Foundry": "鑄造廠",
-            "Grain mill": "穀物磨坊",
-            "Bakery": "麵包坊",
+            "Iron Foundry": "鋼鐵鑄造廠",
+            "Grain mill": "麵粉廠",
+            "Bakery": "麵包店",
             "Party": "派對",
         }
 

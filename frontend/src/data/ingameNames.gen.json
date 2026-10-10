@@ -1,0 +1,918 @@
+{
+  "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
+  "_source": "ts11 遊戲內說明頁（scripts/game_data/evidence/ts11_manual_2026-10-10.json）；aliases 是以前用過的名字，只給搜尋用，不顯示",
+  "tribes": {
+    "romans": {
+      "zh": "羅馬人",
+      "ref": "manual/troop/1",
+      "aliases": [
+        "羅馬"
+      ]
+    },
+    "teutons": {
+      "zh": "日耳曼人",
+      "ref": "manual/troop/11",
+      "aliases": [
+        "條頓",
+        "條頓人",
+        "日耳曼"
+      ]
+    },
+    "gauls": {
+      "zh": "高盧人",
+      "ref": "manual/troop/21",
+      "aliases": [
+        "高盧"
+      ]
+    },
+    "egyptians": {
+      "zh": "埃及人",
+      "ref": "manual/troop/51",
+      "aliases": [
+        "埃及"
+      ]
+    },
+    "huns": {
+      "zh": "匈奴",
+      "ref": "manual/troop/61",
+      "aliases": [
+        "匈奴人"
+      ]
+    },
+    "spartans": {
+      "zh": "斯巴達人",
+      "ref": null,
+      "aliases": [
+        "斯巴達"
+      ]
+    },
+    "vikings": {
+      "zh": "維京人",
+      "ref": null,
+      "aliases": [
+        "維京"
+      ]
+    }
+  },
+  "buildings": {
+    "woodcutter": {
+      "gid": 1,
+      "zh": "伐木場",
+      "ref": "manual/building/1",
+      "aliases": []
+    },
+    "clay_pit": {
+      "gid": 2,
+      "zh": "泥坑",
+      "ref": "manual/building/2",
+      "aliases": [
+        "黏土坑",
+        "磚坑"
+      ]
+    },
+    "iron_mine": {
+      "gid": 3,
+      "zh": "鐵礦場",
+      "ref": "manual/building/3",
+      "aliases": []
+    },
+    "cropland": {
+      "gid": 4,
+      "zh": "農場",
+      "ref": "manual/building/4",
+      "aliases": [
+        "農田"
+      ]
+    },
+    "sawmill": {
+      "gid": 5,
+      "zh": "鋸木廠",
+      "ref": "manual/building/5",
+      "aliases": []
+    },
+    "brickyard": {
+      "gid": 6,
+      "zh": "磚廠",
+      "ref": "manual/building/6",
+      "aliases": []
+    },
+    "iron_foundry": {
+      "gid": 7,
+      "zh": "鋼鐵鑄造廠",
+      "ref": "manual/building/7",
+      "aliases": [
+        "鑄鐵廠",
+        "鑄造廠"
+      ]
+    },
+    "grain_mill": {
+      "gid": 8,
+      "zh": "麵粉廠",
+      "ref": "manual/building/8",
+      "aliases": [
+        "穀物磨坊"
+      ]
+    },
+    "bakery": {
+      "gid": 9,
+      "zh": "麵包店",
+      "ref": "manual/building/9",
+      "aliases": [
+        "麵包坊"
+      ]
+    },
+    "warehouse": {
+      "gid": 10,
+      "zh": "倉庫",
+      "ref": "manual/building/10",
+      "aliases": []
+    },
+    "granary": {
+      "gid": 11,
+      "zh": "穀倉",
+      "ref": "manual/building/11",
+      "aliases": [
+        "糧倉"
+      ]
+    },
+    "blacksmith": {
+      "gid": 13,
+      "zh": "盔甲廠",
+      "ref": "manual/building/13",
+      "aliases": [
+        "鐵匠鋪",
+        "兵工廠"
+      ]
+    },
+    "tournament_square": {
+      "gid": 14,
+      "zh": "競技場",
+      "ref": "manual/building/14",
+      "aliases": [
+        "比武場"
+      ]
+    },
+    "main_building": {
+      "gid": 15,
+      "zh": "村莊大樓",
+      "ref": "manual/building/15",
+      "aliases": [
+        "主建築"
+      ]
+    },
+    "rally_point": {
+      "gid": 16,
+      "zh": "集結點",
+      "ref": "manual/building/16",
+      "aliases": []
+    },
+    "marketplace": {
+      "gid": 17,
+      "zh": "市場",
+      "ref": "manual/building/17",
+      "aliases": []
+    },
+    "embassy": {
+      "gid": 18,
+      "zh": "大使館",
+      "ref": "manual/building/18",
+      "aliases": []
+    },
+    "barracks": {
+      "gid": 19,
+      "zh": "兵營",
+      "ref": "manual/building/19",
+      "aliases": [
+        "軍營"
+      ]
+    },
+    "stable": {
+      "gid": 20,
+      "zh": "馬廄",
+      "ref": "manual/building/20",
+      "aliases": []
+    },
+    "workshop": {
+      "gid": 21,
+      "zh": "工場",
+      "ref": "manual/building/21",
+      "aliases": [
+        "工坊"
+      ]
+    },
+    "academy": {
+      "gid": 22,
+      "zh": "研究院",
+      "ref": "manual/building/22",
+      "aliases": []
+    },
+    "cranny": {
+      "gid": 23,
+      "zh": "山洞",
+      "ref": "manual/building/23",
+      "aliases": [
+        "隱藏倉庫"
+      ]
+    },
+    "town_hall": {
+      "gid": 24,
+      "zh": "城鎮廳",
+      "ref": "manual/building/24",
+      "aliases": [
+        "市政廳"
+      ]
+    },
+    "residence": {
+      "gid": 25,
+      "zh": "行宮",
+      "ref": "manual/building/25",
+      "aliases": []
+    },
+    "palace": {
+      "gid": 26,
+      "zh": "皇宮",
+      "ref": "manual/building/26",
+      "aliases": []
+    },
+    "treasury": {
+      "gid": 27,
+      "zh": "寶物庫",
+      "ref": "manual/building/27",
+      "aliases": [
+        "寶庫"
+      ]
+    },
+    "trade_office": {
+      "gid": 28,
+      "zh": "交易所",
+      "ref": "manual/building/28",
+      "aliases": [
+        "貿易公司",
+        "商貿處"
+      ]
+    },
+    "great_barracks": {
+      "gid": 29,
+      "zh": "大兵營",
+      "ref": "manual/building/29",
+      "aliases": [
+        "大營房"
+      ]
+    },
+    "great_stable": {
+      "gid": 30,
+      "zh": "大馬廄",
+      "ref": "manual/building/30",
+      "aliases": []
+    },
+    "city_wall": {
+      "gid": 31,
+      "zh": "城牆",
+      "ref": "manual/building/31",
+      "aliases": []
+    },
+    "earth_wall": {
+      "gid": 32,
+      "zh": "土牆",
+      "ref": "manual/building/32",
+      "aliases": [
+        "土圍"
+      ]
+    },
+    "palisade": {
+      "gid": 33,
+      "zh": "木牆",
+      "ref": "manual/building/33",
+      "aliases": [
+        "柵欄",
+        "木柵欄"
+      ]
+    },
+    "stonemasons_lodge": {
+      "gid": 34,
+      "zh": "石匠鋪",
+      "ref": "manual/building/34",
+      "aliases": [
+        "石匠小屋"
+      ]
+    },
+    "brewery": {
+      "gid": 35,
+      "zh": "釀酒廠",
+      "ref": "manual/building/35",
+      "aliases": [
+        "酒館"
+      ]
+    },
+    "trapper": {
+      "gid": 36,
+      "zh": "陷阱機",
+      "ref": "manual/building/36",
+      "aliases": []
+    },
+    "heros_mansion": {
+      "gid": 37,
+      "zh": "英雄宅",
+      "ref": "manual/building/37",
+      "aliases": [
+        "英雄宅邸"
+      ]
+    },
+    "great_warehouse": {
+      "gid": 38,
+      "zh": "大倉庫",
+      "ref": "manual/building/38",
+      "aliases": []
+    },
+    "great_granary": {
+      "gid": 39,
+      "zh": "大穀倉",
+      "ref": "manual/building/39",
+      "aliases": [
+        "大糧倉"
+      ]
+    },
+    "wonder_of_the_world": {
+      "gid": 40,
+      "zh": "世界奇觀",
+      "ref": "manual/building/40",
+      "aliases": []
+    },
+    "horse_drinking_trough": {
+      "gid": 41,
+      "zh": "放牧水槽",
+      "ref": "manual/building/41",
+      "aliases": [
+        "馬飲水槽"
+      ]
+    },
+    "stone_wall": {
+      "gid": 42,
+      "zh": "石墻",
+      "ref": "manual/building/42",
+      "aliases": []
+    },
+    "makeshift_wall": {
+      "gid": 43,
+      "zh": "臨時的墻",
+      "ref": "manual/building/43",
+      "aliases": []
+    },
+    "command_center": {
+      "gid": 44,
+      "zh": "指揮中心",
+      "ref": "manual/building/44",
+      "aliases": []
+    },
+    "waterworks": {
+      "gid": 45,
+      "zh": "供水系統",
+      "ref": "manual/building/45",
+      "aliases": [
+        "水渠"
+      ]
+    }
+  },
+  "units": {
+    "legionnaire": {
+      "tribe": "romans",
+      "fe_id": "legionnaire",
+      "game_id": 1,
+      "zh": "古羅馬步兵",
+      "ref": "manual/troop/1",
+      "aliases": [
+        "軍團兵"
+      ]
+    },
+    "praetorian": {
+      "tribe": "romans",
+      "fe_id": "praetorian",
+      "game_id": 2,
+      "zh": "禁衛兵",
+      "ref": "manual/troop/2",
+      "aliases": []
+    },
+    "imperian": {
+      "tribe": "romans",
+      "fe_id": "imperian",
+      "game_id": 3,
+      "zh": "帝國兵",
+      "ref": "manual/troop/3",
+      "aliases": []
+    },
+    "equites_legati": {
+      "tribe": "romans",
+      "fe_id": "equitesLegati",
+      "game_id": 4,
+      "zh": "使者騎士",
+      "ref": "manual/troop/4",
+      "aliases": [
+        "使節騎兵",
+        "使者騎兵"
+      ]
+    },
+    "equites_imperatoris": {
+      "tribe": "romans",
+      "fe_id": "equitesImperatoris",
+      "game_id": 5,
+      "zh": "帝國騎士",
+      "ref": "manual/troop/5",
+      "aliases": [
+        "帝國騎兵"
+      ]
+    },
+    "equites_caesaris": {
+      "tribe": "romans",
+      "fe_id": "equitesCaesaris",
+      "game_id": 6,
+      "zh": "將軍騎士",
+      "ref": "manual/troop/6",
+      "aliases": [
+        "凱撒騎兵"
+      ]
+    },
+    "roman_ram": {
+      "tribe": "romans",
+      "fe_id": "ram",
+      "game_id": 7,
+      "zh": "衝撞車",
+      "ref": "manual/troop/7",
+      "aliases": [
+        "攻城槌"
+      ]
+    },
+    "fire_catapult": {
+      "tribe": "romans",
+      "fe_id": "fireCatapult",
+      "game_id": 8,
+      "zh": "火焰投石機",
+      "ref": "manual/troop/8",
+      "aliases": [
+        "火焰投石車"
+      ]
+    },
+    "senator": {
+      "tribe": "romans",
+      "fe_id": "senator",
+      "game_id": 9,
+      "zh": "參議員",
+      "ref": "manual/troop/9",
+      "aliases": [
+        "元老"
+      ]
+    },
+    "roman_settler": {
+      "tribe": "romans",
+      "fe_id": "settler",
+      "game_id": 10,
+      "zh": "開拓者",
+      "ref": "manual/troop/10",
+      "aliases": [
+        "拓荒者",
+        "移民",
+        "定居者"
+      ]
+    },
+    "clubswinger": {
+      "tribe": "teutons",
+      "fe_id": "maceman",
+      "game_id": 11,
+      "zh": "棍棒兵",
+      "ref": "manual/troop/11",
+      "aliases": [
+        "棍兵"
+      ]
+    },
+    "spearman": {
+      "tribe": "teutons",
+      "fe_id": "spearman",
+      "game_id": 12,
+      "zh": "矛兵",
+      "ref": "manual/troop/12",
+      "aliases": [
+        "長矛兵"
+      ]
+    },
+    "axeman": {
+      "tribe": "teutons",
+      "fe_id": "axeman",
+      "game_id": 13,
+      "zh": "斧頭兵",
+      "ref": "manual/troop/13",
+      "aliases": []
+    },
+    "teuton_scout": {
+      "tribe": "teutons",
+      "fe_id": "scout",
+      "game_id": 14,
+      "zh": "偵察兵",
+      "ref": "manual/troop/14",
+      "aliases": [
+        "斥候",
+        "偵查兵"
+      ]
+    },
+    "paladin": {
+      "tribe": "teutons",
+      "fe_id": "paladin",
+      "game_id": 15,
+      "zh": "遊俠",
+      "ref": "manual/troop/15",
+      "aliases": [
+        "聖騎士"
+      ]
+    },
+    "teutonic_knight": {
+      "tribe": "teutons",
+      "fe_id": "tk",
+      "game_id": 16,
+      "zh": "條頓騎士",
+      "ref": "manual/troop/16",
+      "aliases": []
+    },
+    "teuton_ram": {
+      "tribe": "teutons",
+      "fe_id": "ram",
+      "game_id": 17,
+      "zh": "破城槌",
+      "ref": "manual/troop/17",
+      "aliases": [
+        "攻城槌"
+      ]
+    },
+    "teuton_catapult": {
+      "tribe": "teutons",
+      "fe_id": "catapult",
+      "game_id": 18,
+      "zh": "弩炮",
+      "ref": "manual/troop/18",
+      "aliases": [
+        "投石車"
+      ]
+    },
+    "chief": {
+      "tribe": "teutons",
+      "fe_id": "chief",
+      "game_id": 19,
+      "zh": "司令官",
+      "ref": "manual/troop/19",
+      "aliases": [
+        "領袖"
+      ]
+    },
+    "teuton_settler": {
+      "tribe": "teutons",
+      "fe_id": "settler",
+      "game_id": 20,
+      "zh": "開拓者",
+      "ref": "manual/troop/20",
+      "aliases": [
+        "拓荒者",
+        "移民",
+        "定居者"
+      ]
+    },
+    "phalanx": {
+      "tribe": "gauls",
+      "fe_id": "phalanx",
+      "game_id": 21,
+      "zh": "方陣兵",
+      "ref": "manual/troop/21",
+      "aliases": []
+    },
+    "swordsman": {
+      "tribe": "gauls",
+      "fe_id": "swordsman",
+      "game_id": 22,
+      "zh": "劍士",
+      "ref": "manual/troop/22",
+      "aliases": []
+    },
+    "pathfinder": {
+      "tribe": "gauls",
+      "fe_id": "pathfinder",
+      "game_id": 23,
+      "zh": "探路者",
+      "ref": "manual/troop/23",
+      "aliases": [
+        "探路兵"
+      ]
+    },
+    "theutates_thunder": {
+      "tribe": "gauls",
+      "fe_id": "theutatesThunder",
+      "game_id": 24,
+      "zh": "雷法師",
+      "ref": "manual/troop/24",
+      "aliases": [
+        "圖塔特雷"
+      ]
+    },
+    "druidrider": {
+      "tribe": "gauls",
+      "fe_id": "druidrider",
+      "game_id": 25,
+      "zh": "德魯伊騎兵",
+      "ref": "manual/troop/25",
+      "aliases": []
+    },
+    "haeduan": {
+      "tribe": "gauls",
+      "fe_id": "haeduan",
+      "game_id": 26,
+      "zh": "海頓聖騎",
+      "ref": "manual/troop/26",
+      "aliases": [
+        "海頓騎兵"
+      ]
+    },
+    "gaul_ram": {
+      "tribe": "gauls",
+      "fe_id": "ram",
+      "game_id": 27,
+      "zh": "破城槌",
+      "ref": "manual/troop/27",
+      "aliases": [
+        "攻城槌"
+      ]
+    },
+    "trebuchet": {
+      "tribe": "gauls",
+      "fe_id": "trebuchet",
+      "game_id": 28,
+      "zh": "投石機",
+      "ref": "manual/troop/28",
+      "aliases": [
+        "投石車"
+      ]
+    },
+    "chieftain": {
+      "tribe": "gauls",
+      "fe_id": "chieftain",
+      "game_id": 29,
+      "zh": "族長",
+      "ref": "manual/troop/29",
+      "aliases": []
+    },
+    "gaul_settler": {
+      "tribe": "gauls",
+      "fe_id": "settler",
+      "game_id": 30,
+      "zh": "開拓者",
+      "ref": "manual/troop/30",
+      "aliases": [
+        "拓荒者",
+        "移民",
+        "定居者"
+      ]
+    },
+    "slave_militia": {
+      "tribe": "egyptians",
+      "fe_id": "slaveMilitia",
+      "game_id": 51,
+      "zh": "奴隸民兵",
+      "ref": "manual/troop/51",
+      "aliases": []
+    },
+    "ash_warden": {
+      "tribe": "egyptians",
+      "fe_id": "ashWarden",
+      "game_id": 52,
+      "zh": "看守人艾什",
+      "ref": "manual/troop/52",
+      "aliases": [
+        "灰燼守衛"
+      ]
+    },
+    "khopesh_warrior": {
+      "tribe": "egyptians",
+      "fe_id": "khopesh",
+      "game_id": 53,
+      "zh": "斧刀勇士",
+      "ref": "manual/troop/53",
+      "aliases": [
+        "鐮刀劍戰士"
+      ]
+    },
+    "sopdu_explorer": {
+      "tribe": "egyptians",
+      "fe_id": "sopdu",
+      "game_id": 54,
+      "zh": "探險者索普杜",
+      "ref": "manual/troop/54",
+      "aliases": [
+        "索普度探險者"
+      ]
+    },
+    "anhur_guard": {
+      "tribe": "egyptians",
+      "fe_id": "anhur",
+      "game_id": 55,
+      "zh": "守衛安赫",
+      "ref": "manual/troop/55",
+      "aliases": [
+        "安胡爾守衛"
+      ]
+    },
+    "resheph_chariot": {
+      "tribe": "egyptians",
+      "fe_id": "resheph",
+      "game_id": 56,
+      "zh": "瑞舍夫戰車",
+      "ref": "manual/troop/56",
+      "aliases": [
+        "瑞謝夫戰車"
+      ]
+    },
+    "egyptian_ram": {
+      "tribe": "egyptians",
+      "fe_id": "ram",
+      "game_id": 57,
+      "zh": "破城槌",
+      "ref": "manual/troop/57",
+      "aliases": [
+        "攻城槌"
+      ]
+    },
+    "stone_catapult": {
+      "tribe": "egyptians",
+      "fe_id": "catapult",
+      "game_id": 58,
+      "zh": "石弩",
+      "ref": "manual/troop/58",
+      "aliases": [
+        "石頭投石車"
+      ]
+    },
+    "nomarch": {
+      "tribe": "egyptians",
+      "fe_id": "nomarch",
+      "game_id": 59,
+      "zh": "州長",
+      "ref": "manual/troop/59",
+      "aliases": []
+    },
+    "egyptian_settler": {
+      "tribe": "egyptians",
+      "fe_id": "settler",
+      "game_id": 60,
+      "zh": "開拓者",
+      "ref": "manual/troop/60",
+      "aliases": [
+        "拓荒者",
+        "移民",
+        "定居者"
+      ]
+    },
+    "mercenary": {
+      "tribe": "huns",
+      "fe_id": "mercenary",
+      "game_id": 61,
+      "zh": "僱傭兵",
+      "ref": "manual/troop/61",
+      "aliases": [
+        "傭兵"
+      ]
+    },
+    "bowman": {
+      "tribe": "huns",
+      "fe_id": "bowman",
+      "game_id": 62,
+      "zh": "弓箭手",
+      "ref": "manual/troop/62",
+      "aliases": []
+    },
+    "spotter": {
+      "tribe": "huns",
+      "fe_id": "spotter",
+      "game_id": 63,
+      "zh": "探子",
+      "ref": "manual/troop/63",
+      "aliases": [
+        "斥候"
+      ]
+    },
+    "steppe_rider": {
+      "tribe": "huns",
+      "fe_id": "steppeRider",
+      "game_id": 64,
+      "zh": "草原騎士",
+      "ref": "manual/troop/64",
+      "aliases": [
+        "草原騎兵"
+      ]
+    },
+    "marksman": {
+      "tribe": "huns",
+      "fe_id": "marksman",
+      "game_id": 65,
+      "zh": "神射手",
+      "ref": "manual/troop/65",
+      "aliases": []
+    },
+    "marauder": {
+      "tribe": "huns",
+      "fe_id": "marauder",
+      "game_id": 66,
+      "zh": "掠奪者",
+      "ref": "manual/troop/66",
+      "aliases": []
+    },
+    "hun_ram": {
+      "tribe": "huns",
+      "fe_id": "ram",
+      "game_id": 67,
+      "zh": "破城槌",
+      "ref": "manual/troop/67",
+      "aliases": [
+        "攻城槌"
+      ]
+    },
+    "hun_catapult": {
+      "tribe": "huns",
+      "fe_id": "catapult",
+      "game_id": 68,
+      "zh": "弩炮",
+      "ref": "manual/troop/68",
+      "aliases": [
+        "投石車"
+      ]
+    },
+    "logades": {
+      "tribe": "huns",
+      "fe_id": "logades",
+      "game_id": 69,
+      "zh": "重步兵",
+      "ref": "manual/troop/69",
+      "aliases": [
+        "領袖"
+      ]
+    },
+    "hun_settler": {
+      "tribe": "huns",
+      "fe_id": "settler",
+      "game_id": 70,
+      "zh": "開拓者",
+      "ref": "manual/troop/70",
+      "aliases": [
+        "拓荒者",
+        "移民",
+        "定居者"
+      ]
+    },
+    "spartan_ram": {
+      "tribe": "spartans",
+      "fe_id": "ram",
+      "game_id": null,
+      "zh": "破城槌",
+      "ref": null,
+      "aliases": [
+        "攻城槌"
+      ]
+    },
+    "spartan_settler": {
+      "tribe": "spartans",
+      "fe_id": "settler",
+      "game_id": null,
+      "zh": "開拓者",
+      "ref": null,
+      "aliases": [
+        "拓荒者",
+        "移民",
+        "定居者"
+      ]
+    },
+    "viking_ram": {
+      "tribe": "vikings",
+      "fe_id": "ram",
+      "game_id": null,
+      "zh": "破城槌",
+      "ref": null,
+      "aliases": [
+        "攻城槌"
+      ]
+    },
+    "viking_catapult": {
+      "tribe": "vikings",
+      "fe_id": "catapult",
+      "game_id": null,
+      "zh": "弩炮",
+      "ref": null,
+      "aliases": [
+        "投石車"
+      ]
+    },
+    "viking_settler": {
+      "tribe": "vikings",
+      "fe_id": "settler",
+      "game_id": null,
+      "zh": "開拓者",
+      "ref": null,
+      "aliases": [
+        "拓荒者",
+        "移民",
+        "定居者"
+      ]
+    }
+  }
+}

@@ -270,6 +270,9 @@
           "effect_description": "建造時間 50%",
           "cp_per_day": 77
         }
+      ],
+      "aliases_zh": [
+        "主建築"
       ]
     },
     "barracks": {
@@ -551,6 +554,9 @@
           "effect_description": "訓練時間 14%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "軍營"
       ]
     },
     "rally_point": {
@@ -823,7 +829,8 @@
           "effect_description": "解鎖集結假攻",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "warehouse": {
       "building_id": "warehouse",
@@ -1100,15 +1107,16 @@
           "effect_description": "儲存容量 80,000",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "granary": {
       "building_id": "granary",
-      "name_zh": "糧倉",
+      "name_zh": "穀倉",
       "name_en": "Granary",
       "category": "storage",
       "max_level": 20,
-      "description_zh": "儲存糧食的建築。1 級可儲存 1,200 糧食，滿級可儲存 80,000 糧食。可建造多個糧倉來增加總儲存量。",
+      "description_zh": "儲存糧食的建築。1 級可儲存 1,200 糧食，滿級可儲存 80,000 糧食。可建造多個穀倉來增加總儲存量。",
       "description_en": "Stores crop. Level 1 stores 1,200 crop, max level stores 80,000. Multiple granaries can be built to increase total capacity.",
       "prerequisites": [
         {
@@ -1377,6 +1385,9 @@
           "effect_description": "儲存容量 80,000",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "糧倉"
       ]
     },
     "marketplace": {
@@ -1662,7 +1673,8 @@
           "effect_description": "商人數量 20",
           "cp_per_day": 115
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "stable": {
       "building_id": "stable",
@@ -1947,7 +1959,8 @@
           "effect_description": "訓練時間 14%",
           "cp_per_day": 77
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "academy": {
       "building_id": "academy",
@@ -2160,7 +2173,7 @@
           "population": 3,
           "culture_points": 62,
           "effect_value": 15,
-          "effect_description": "可研發投石車",
+          "effect_description": "可研發投石類攻城武器",
           "cp_per_day": 62
         },
         {
@@ -2228,11 +2241,12 @@
           "effect_description": "可研發所有兵種",
           "cp_per_day": 153
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "blacksmith": {
       "building_id": "blacksmith",
-      "name_zh": "鐵匠鋪",
+      "name_zh": "盔甲廠",
       "name_en": "Blacksmith",
       "category": "military_upgrade",
       "max_level": 20,
@@ -2509,6 +2523,10 @@
           "effect_description": "攻擊力 +30%",
           "cp_per_day": 77
         }
+      ],
+      "aliases_zh": [
+        "鐵匠鋪",
+        "兵工廠"
       ]
     },
     "cranny": {
@@ -2651,6 +2669,9 @@
           "effect_description": "隱藏容量 2000（高盧 ×1.5 → 3000）",
           "cp_per_day": 6
         }
+      ],
+      "aliases_zh": [
+        "隱藏倉庫"
       ]
     },
     "workshop": {
@@ -2679,7 +2700,7 @@
           "cost_iron": 600,
           "cost_crop": 320,
           "build_time_base": 3000,
-          "population": 4,
+          "population": 3,
           "culture_points": 4,
           "effect_value": 0.9,
           "effect_description": "訓練時間 90%",
@@ -2932,287 +2953,9 @@
           "effect_description": "訓練時間 12%",
           "cp_per_day": 115
         }
-      ]
-    },
-    "armoury": {
-      "building_id": "armoury",
-      "name_zh": "防具工坊",
-      "name_en": "Armoury",
-      "category": "military_upgrade",
-      "max_level": 20,
-      "description_zh": "研究提升兵種防禦力的建築。每升一級所有已研究兵種的防禦力 +1.5%，滿級時防禦力 +30%。",
-      "description_en": "Building for improving troop defense. Each level adds +1.5% defense to all researched troops, max level provides +30% defense.",
-      "prerequisites": [
-        {
-          "building_id": "main_building",
-          "level": 3
-        },
-        {
-          "building_id": "academy",
-          "level": 1
-        }
       ],
-      "levels": [
-        {
-          "level": 1,
-          "cost_wood": 130,
-          "cost_clay": 210,
-          "cost_iron": 410,
-          "cost_crop": 130,
-          "build_time_base": 2000,
-          "population": 4,
-          "culture_points": 2,
-          "effect_value": 1.5,
-          "effect_description": "防禦力 +1.5%",
-          "cp_per_day": 2
-        },
-        {
-          "level": 2,
-          "cost_wood": 165,
-          "cost_clay": 270,
-          "cost_iron": 525,
-          "cost_crop": 165,
-          "build_time_base": 2620,
-          "population": 2,
-          "culture_points": 3,
-          "effect_value": 3.0,
-          "effect_description": "防禦力 +3%",
-          "cp_per_day": 3
-        },
-        {
-          "level": 3,
-          "cost_wood": 215,
-          "cost_clay": 345,
-          "cost_iron": 670,
-          "cost_crop": 215,
-          "build_time_base": 3339,
-          "population": 2,
-          "culture_points": 3,
-          "effect_value": 4.5,
-          "effect_description": "防禦力 +4.5%",
-          "cp_per_day": 3
-        },
-        {
-          "level": 4,
-          "cost_wood": 275,
-          "cost_clay": 440,
-          "cost_iron": 860,
-          "cost_crop": 275,
-          "build_time_base": 4173,
-          "population": 2,
-          "culture_points": 4,
-          "effect_value": 6.0,
-          "effect_description": "防禦力 +6%",
-          "cp_per_day": 4
-        },
-        {
-          "level": 5,
-          "cost_wood": 350,
-          "cost_clay": 565,
-          "cost_iron": 1100,
-          "cost_crop": 350,
-          "build_time_base": 5141,
-          "population": 2,
-          "culture_points": 5,
-          "effect_value": 7.5,
-          "effect_description": "防禦力 +7.5%",
-          "cp_per_day": 5
-        },
-        {
-          "level": 6,
-          "cost_wood": 445,
-          "cost_clay": 720,
-          "cost_iron": 1410,
-          "cost_crop": 445,
-          "build_time_base": 6264,
-          "population": 3,
-          "culture_points": 6,
-          "effect_value": 9.0,
-          "effect_description": "防禦力 +9%",
-          "cp_per_day": 6
-        },
-        {
-          "level": 7,
-          "cost_wood": 570,
-          "cost_clay": 925,
-          "cost_iron": 1805,
-          "cost_crop": 570,
-          "build_time_base": 7566,
-          "population": 3,
-          "culture_points": 7,
-          "effect_value": 10.5,
-          "effect_description": "防禦力 +10.5%",
-          "cp_per_day": 7
-        },
-        {
-          "level": 8,
-          "cost_wood": 730,
-          "cost_clay": 1180,
-          "cost_iron": 2310,
-          "cost_crop": 730,
-          "build_time_base": 9077,
-          "population": 3,
-          "culture_points": 9,
-          "effect_value": 12.0,
-          "effect_description": "防禦力 +12%",
-          "cp_per_day": 9
-        },
-        {
-          "level": 9,
-          "cost_wood": 935,
-          "cost_clay": 1515,
-          "cost_iron": 2955,
-          "cost_crop": 935,
-          "build_time_base": 10829,
-          "population": 3,
-          "culture_points": 10,
-          "effect_value": 13.5,
-          "effect_description": "防禦力 +13.5%",
-          "cp_per_day": 10
-        },
-        {
-          "level": 10,
-          "cost_wood": 1200,
-          "cost_clay": 1935,
-          "cost_iron": 3780,
-          "cost_crop": 1200,
-          "build_time_base": 12861,
-          "population": 3,
-          "culture_points": 12,
-          "effect_value": 15.0,
-          "effect_description": "防禦力 +15%",
-          "cp_per_day": 12
-        },
-        {
-          "level": 11,
-          "cost_wood": 1535,
-          "cost_clay": 2480,
-          "cost_iron": 4840,
-          "cost_crop": 1535,
-          "build_time_base": 15219,
-          "population": 3,
-          "culture_points": 15,
-          "effect_value": 16.5,
-          "effect_description": "防禦力 +16.5%",
-          "cp_per_day": 15
-        },
-        {
-          "level": 12,
-          "cost_wood": 1965,
-          "cost_clay": 3175,
-          "cost_iron": 6195,
-          "cost_crop": 1965,
-          "build_time_base": 17954,
-          "population": 3,
-          "culture_points": 18,
-          "effect_value": 18.0,
-          "effect_description": "防禦力 +18%",
-          "cp_per_day": 18
-        },
-        {
-          "level": 13,
-          "cost_wood": 2515,
-          "cost_clay": 4060,
-          "cost_iron": 7930,
-          "cost_crop": 2515,
-          "build_time_base": 21127,
-          "population": 3,
-          "culture_points": 21,
-          "effect_value": 19.5,
-          "effect_description": "防禦力 +19.5%",
-          "cp_per_day": 21
-        },
-        {
-          "level": 14,
-          "cost_wood": 3220,
-          "cost_clay": 5200,
-          "cost_iron": 10150,
-          "cost_crop": 3220,
-          "build_time_base": 24807,
-          "population": 3,
-          "culture_points": 26,
-          "effect_value": 21.0,
-          "effect_description": "防禦力 +21%",
-          "cp_per_day": 26
-        },
-        {
-          "level": 15,
-          "cost_wood": 4120,
-          "cost_clay": 6655,
-          "cost_iron": 12995,
-          "cost_crop": 4120,
-          "build_time_base": 29077,
-          "population": 3,
-          "culture_points": 31,
-          "effect_value": 22.5,
-          "effect_description": "防禦力 +22.5%",
-          "cp_per_day": 31
-        },
-        {
-          "level": 16,
-          "cost_wood": 5275,
-          "cost_clay": 8520,
-          "cost_iron": 16630,
-          "cost_crop": 5275,
-          "build_time_base": 34029,
-          "population": 4,
-          "culture_points": 37,
-          "effect_value": 24.0,
-          "effect_description": "防禦力 +24%",
-          "cp_per_day": 37
-        },
-        {
-          "level": 17,
-          "cost_wood": 6750,
-          "cost_clay": 10905,
-          "cost_iron": 21290,
-          "cost_crop": 6750,
-          "build_time_base": 39774,
-          "population": 4,
-          "culture_points": 44,
-          "effect_value": 25.5,
-          "effect_description": "防禦力 +25.5%",
-          "cp_per_day": 44
-        },
-        {
-          "level": 18,
-          "cost_wood": 8640,
-          "cost_clay": 13955,
-          "cost_iron": 27250,
-          "cost_crop": 8640,
-          "build_time_base": 46437,
-          "population": 4,
-          "culture_points": 53,
-          "effect_value": 27.0,
-          "effect_description": "防禦力 +27%",
-          "cp_per_day": 53
-        },
-        {
-          "level": 19,
-          "cost_wood": 11060,
-          "cost_clay": 17865,
-          "cost_iron": 34880,
-          "cost_crop": 11060,
-          "build_time_base": 54167,
-          "population": 4,
-          "culture_points": 64,
-          "effect_value": 28.5,
-          "effect_description": "防禦力 +28.5%",
-          "cp_per_day": 64
-        },
-        {
-          "level": 20,
-          "cost_wood": 14155,
-          "cost_clay": 22865,
-          "cost_iron": 44645,
-          "cost_crop": 14155,
-          "build_time_base": 63134,
-          "population": 4,
-          "culture_points": 77,
-          "effect_value": 30.0,
-          "effect_description": "防禦力 +30%",
-          "cp_per_day": 77
-        }
+      "aliases_zh": [
+        "工坊"
       ]
     },
     "embassy": {
@@ -3490,7 +3233,8 @@
           "effect_description": "聯盟 60 名成員",
           "cp_per_day": 153
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "town_hall": {
       "building_id": "town_hall",
@@ -3518,7 +3262,7 @@
           "cost_iron": 1260,
           "cost_crop": 600,
           "build_time_base": 12500,
-          "population": 5,
+          "population": 4,
           "culture_points": 6,
           "effect_value": 500,
           "effect_description": "小慶典 CP＝本村每日 CP 產量（x1 上限 500）",
@@ -3771,6 +3515,9 @@
           "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
           "cp_per_day": 192
         }
+      ],
+      "aliases_zh": [
+        "市政廳"
       ]
     },
     "residence": {
@@ -4048,7 +3795,8 @@
           "effect_description": "可訓練第3名開拓者",
           "cp_per_day": 77
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "palace": {
       "building_id": "palace",
@@ -4329,7 +4077,8 @@
           "effect_description": "可訓練第3名開拓者",
           "cp_per_day": 192
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "treasury": {
       "building_id": "treasury",
@@ -4606,6 +4355,9 @@
           "effect_description": "可存放獨特神器",
           "cp_per_day": 230
         }
+      ],
+      "aliases_zh": [
+        "寶庫"
       ]
     },
     "heros_mansion": {
@@ -4629,11 +4381,11 @@
       "levels": [
         {
           "level": 1,
-          "cost_wood": 80,
-          "cost_clay": 120,
-          "cost_iron": 70,
-          "cost_crop": 90,
-          "build_time_base": 2000,
+          "cost_wood": 700,
+          "cost_clay": 670,
+          "cost_iron": 700,
+          "cost_crop": 240,
+          "build_time_base": 2300,
           "population": 2,
           "culture_points": 1,
           "effect_value": 0,
@@ -4642,11 +4394,11 @@
         },
         {
           "level": 2,
-          "cost_wood": 105,
-          "cost_clay": 160,
-          "cost_iron": 95,
-          "cost_crop": 120,
-          "build_time_base": 2620,
+          "cost_wood": 930,
+          "cost_clay": 890,
+          "cost_iron": 930,
+          "cost_crop": 320,
+          "build_time_base": 2968,
           "population": 1,
           "culture_points": 1,
           "effect_value": 0,
@@ -4655,11 +4407,11 @@
         },
         {
           "level": 3,
-          "cost_wood": 140,
-          "cost_clay": 210,
-          "cost_iron": 125,
-          "cost_crop": 160,
-          "build_time_base": 3339,
+          "cost_wood": 1240,
+          "cost_clay": 1185,
+          "cost_iron": 1240,
+          "cost_crop": 425,
+          "build_time_base": 3743,
           "population": 1,
           "culture_points": 2,
           "effect_value": 0,
@@ -4668,11 +4420,11 @@
         },
         {
           "level": 4,
-          "cost_wood": 190,
-          "cost_clay": 280,
-          "cost_iron": 165,
-          "cost_crop": 210,
-          "build_time_base": 4173,
+          "cost_wood": 1645,
+          "cost_clay": 1575,
+          "cost_iron": 1645,
+          "cost_crop": 565,
+          "build_time_base": 4642,
           "population": 1,
           "culture_points": 2,
           "effect_value": 0,
@@ -4681,11 +4433,11 @@
         },
         {
           "level": 5,
-          "cost_wood": 250,
-          "cost_clay": 375,
-          "cost_iron": 220,
-          "cost_crop": 280,
-          "build_time_base": 5141,
+          "cost_wood": 2190,
+          "cost_clay": 2095,
+          "cost_iron": 2190,
+          "cost_crop": 750,
+          "build_time_base": 5684,
           "population": 1,
           "culture_points": 2,
           "effect_value": 0,
@@ -4694,11 +4446,11 @@
         },
         {
           "level": 6,
-          "cost_wood": 335,
-          "cost_clay": 500,
-          "cost_iron": 290,
-          "cost_crop": 375,
-          "build_time_base": 6264,
+          "cost_wood": 2915,
+          "cost_clay": 2790,
+          "cost_iron": 2915,
+          "cost_crop": 1000,
+          "build_time_base": 6894,
           "population": 1,
           "culture_points": 3,
           "effect_value": 0,
@@ -4707,11 +4459,11 @@
         },
         {
           "level": 7,
-          "cost_wood": 445,
-          "cost_clay": 665,
-          "cost_iron": 385,
-          "cost_crop": 500,
-          "build_time_base": 7566,
+          "cost_wood": 3875,
+          "cost_clay": 3710,
+          "cost_iron": 3875,
+          "cost_crop": 1330,
+          "build_time_base": 8297,
           "population": 1,
           "culture_points": 4,
           "effect_value": 0,
@@ -4720,11 +4472,11 @@
         },
         {
           "level": 8,
-          "cost_wood": 590,
-          "cost_clay": 885,
-          "cost_iron": 515,
-          "cost_crop": 665,
-          "build_time_base": 9077,
+          "cost_wood": 5155,
+          "cost_clay": 4930,
+          "cost_iron": 5155,
+          "cost_crop": 1765,
+          "build_time_base": 9924,
           "population": 1,
           "culture_points": 4,
           "effect_value": 0,
@@ -4733,11 +4485,11 @@
         },
         {
           "level": 9,
-          "cost_wood": 785,
-          "cost_clay": 1175,
-          "cost_iron": 685,
-          "cost_crop": 880,
-          "build_time_base": 10829,
+          "cost_wood": 6855,
+          "cost_clay": 6560,
+          "cost_iron": 6855,
+          "cost_crop": 2350,
+          "build_time_base": 11812,
           "population": 1,
           "culture_points": 5,
           "effect_value": 0,
@@ -4746,11 +4498,11 @@
         },
         {
           "level": 10,
-          "cost_wood": 1040,
-          "cost_clay": 1565,
-          "cost_iron": 910,
-          "cost_crop": 1170,
-          "build_time_base": 12861,
+          "cost_wood": 9115,
+          "cost_clay": 8725,
+          "cost_iron": 9115,
+          "cost_crop": 3125,
+          "build_time_base": 14002,
           "population": 1,
           "culture_points": 6,
           "effect_value": 1,
@@ -4759,11 +4511,11 @@
         },
         {
           "level": 11,
-          "cost_wood": 1385,
-          "cost_clay": 2080,
-          "cost_iron": 1210,
-          "cost_crop": 1560,
-          "build_time_base": 15219,
+          "cost_wood": 12125,
+          "cost_clay": 11605,
+          "cost_iron": 12125,
+          "cost_crop": 4155,
+          "build_time_base": 16543,
           "population": 2,
           "culture_points": 7,
           "effect_value": 1,
@@ -4772,11 +4524,11 @@
         },
         {
           "level": 12,
-          "cost_wood": 1845,
-          "cost_clay": 2765,
-          "cost_iron": 1610,
-          "cost_crop": 2075,
-          "build_time_base": 17954,
+          "cost_wood": 16125,
+          "cost_clay": 15435,
+          "cost_iron": 16125,
+          "cost_crop": 5530,
+          "build_time_base": 19490,
           "population": 2,
           "culture_points": 9,
           "effect_value": 1,
@@ -4785,11 +4537,11 @@
         },
         {
           "level": 13,
-          "cost_wood": 2450,
-          "cost_clay": 3675,
-          "cost_iron": 2145,
-          "cost_crop": 2755,
-          "build_time_base": 21127,
+          "cost_wood": 21445,
+          "cost_clay": 20525,
+          "cost_iron": 21445,
+          "cost_crop": 7350,
+          "build_time_base": 22908,
           "population": 2,
           "culture_points": 11,
           "effect_value": 1,
@@ -4798,11 +4550,11 @@
         },
         {
           "level": 14,
-          "cost_wood": 3260,
-          "cost_clay": 4890,
-          "cost_iron": 2850,
-          "cost_crop": 3665,
-          "build_time_base": 24807,
+          "cost_wood": 28520,
+          "cost_clay": 27300,
+          "cost_iron": 28520,
+          "cost_crop": 9780,
+          "build_time_base": 26873,
           "population": 2,
           "culture_points": 13,
           "effect_value": 1,
@@ -4811,11 +4563,11 @@
         },
         {
           "level": 15,
-          "cost_wood": 4335,
-          "cost_clay": 6505,
-          "cost_iron": 3795,
-          "cost_crop": 4875,
-          "build_time_base": 29077,
+          "cost_wood": 37935,
+          "cost_clay": 36310,
+          "cost_iron": 37935,
+          "cost_crop": 13005,
+          "build_time_base": 31473,
           "population": 2,
           "culture_points": 15,
           "effect_value": 2,
@@ -4824,11 +4576,11 @@
         },
         {
           "level": 16,
-          "cost_wood": 5765,
-          "cost_clay": 8650,
-          "cost_iron": 5045,
-          "cost_crop": 6485,
-          "build_time_base": 34029,
+          "cost_wood": 50450,
+          "cost_clay": 48290,
+          "cost_iron": 50450,
+          "cost_crop": 17300,
+          "build_time_base": 36809,
           "population": 2,
           "culture_points": 18,
           "effect_value": 2,
@@ -4837,11 +4589,11 @@
         },
         {
           "level": 17,
-          "cost_wood": 7670,
-          "cost_clay": 11505,
-          "cost_iron": 6710,
-          "cost_crop": 8625,
-          "build_time_base": 39774,
+          "cost_wood": 67100,
+          "cost_clay": 64225,
+          "cost_iron": 67100,
+          "cost_crop": 23005,
+          "build_time_base": 42998,
           "population": 2,
           "culture_points": 22,
           "effect_value": 2,
@@ -4850,11 +4602,11 @@
         },
         {
           "level": 18,
-          "cost_wood": 10200,
-          "cost_clay": 15300,
-          "cost_iron": 8925,
-          "cost_crop": 11475,
-          "build_time_base": 46437,
+          "cost_wood": 89245,
+          "cost_clay": 85420,
+          "cost_iron": 89245,
+          "cost_crop": 30600,
+          "build_time_base": 50178,
           "population": 2,
           "culture_points": 27,
           "effect_value": 2,
@@ -4863,11 +4615,11 @@
         },
         {
           "level": 19,
-          "cost_wood": 13565,
-          "cost_clay": 20345,
-          "cost_iron": 11870,
-          "cost_crop": 15260,
-          "build_time_base": 54167,
+          "cost_wood": 118695,
+          "cost_clay": 113605,
+          "cost_iron": 118695,
+          "cost_crop": 40695,
+          "build_time_base": 58506,
           "population": 2,
           "culture_points": 32,
           "effect_value": 2,
@@ -4876,17 +4628,20 @@
         },
         {
           "level": 20,
-          "cost_wood": 18040,
-          "cost_clay": 27060,
-          "cost_iron": 15785,
-          "cost_crop": 20295,
-          "build_time_base": 63134,
+          "cost_wood": 157865,
+          "cost_clay": 151095,
+          "cost_iron": 157865,
+          "cost_crop": 54125,
+          "build_time_base": 68167,
           "population": 2,
           "culture_points": 38,
           "effect_value": 3,
           "effect_description": "可佔領 3 個綠洲",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "英雄宅邸"
       ]
     },
     "sawmill": {
@@ -4973,7 +4728,8 @@
           "effect_description": "木材 +25%",
           "cp_per_day": 2
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "brickyard": {
       "building_id": "brickyard",
@@ -5000,7 +4756,7 @@
           "cost_clay": 480,
           "cost_iron": 320,
           "cost_crop": 50,
-          "build_time_base": 2840,
+          "build_time_base": 2240,
           "population": 3,
           "culture_points": 1,
           "effect_value": 5,
@@ -5013,7 +4769,7 @@
           "cost_clay": 865,
           "cost_iron": 575,
           "cost_crop": 90,
-          "build_time_base": 5460,
+          "build_time_base": 4560,
           "population": 2,
           "culture_points": 1,
           "effect_value": 10,
@@ -5026,7 +4782,7 @@
           "cost_clay": 1555,
           "cost_iron": 1035,
           "cost_crop": 160,
-          "build_time_base": 9390,
+          "build_time_base": 8040,
           "population": 3,
           "culture_points": 2,
           "effect_value": 15,
@@ -5039,7 +4795,7 @@
           "cost_clay": 2800,
           "cost_iron": 1865,
           "cost_crop": 290,
-          "build_time_base": 15285,
+          "build_time_base": 13260,
           "population": 4,
           "culture_points": 2,
           "effect_value": 20,
@@ -5052,18 +4808,19 @@
           "cost_clay": 5040,
           "cost_iron": 3360,
           "cost_crop": 525,
-          "build_time_base": 24128,
+          "build_time_base": 21090,
           "population": 5,
           "culture_points": 2,
           "effect_value": 25,
           "effect_description": "磚塊 +25%",
           "cp_per_day": 2
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "iron_foundry": {
       "building_id": "iron_foundry",
-      "name_zh": "鑄鐵廠",
+      "name_zh": "鋼鐵鑄造廠",
       "name_en": "Iron Foundry",
       "category": "resource_boost",
       "max_level": 5,
@@ -5145,6 +4902,10 @@
           "effect_description": "鐵礦 +25%",
           "cp_per_day": 2
         }
+      ],
+      "aliases_zh": [
+        "鑄鐵廠",
+        "鑄造廠"
       ]
     },
     "grain_mill": {
@@ -5231,6 +4992,9 @@
           "effect_description": "糧食 +25%",
           "cp_per_day": 2
         }
+      ],
+      "aliases_zh": [
+        "穀物磨坊"
       ]
     },
     "bakery": {
@@ -5321,11 +5085,14 @@
           "effect_description": "糧食額外 +25%",
           "cp_per_day": 2
         }
+      ],
+      "aliases_zh": [
+        "麵包坊"
       ]
     },
     "stonemasons_lodge": {
       "building_id": "stonemasons_lodge",
-      "name_zh": "石匠小屋",
+      "name_zh": "石匠鋪",
       "name_en": "Stonemason's Lodge",
       "category": "infrastructure",
       "max_level": 20,
@@ -5348,7 +5115,7 @@
           "cost_clay": 130,
           "cost_iron": 125,
           "cost_crop": 70,
-          "build_time_base": 1700,
+          "build_time_base": 2200,
           "population": 2,
           "culture_points": 1,
           "effect_value": 2,
@@ -5361,7 +5128,7 @@
           "cost_clay": 165,
           "cost_iron": 160,
           "cost_crop": 90,
-          "build_time_base": 2272,
+          "build_time_base": 2852,
           "population": 1,
           "culture_points": 1,
           "effect_value": 4,
@@ -5374,7 +5141,7 @@
           "cost_clay": 215,
           "cost_iron": 205,
           "cost_crop": 115,
-          "build_time_base": 2936,
+          "build_time_base": 3608,
           "population": 1,
           "culture_points": 2,
           "effect_value": 6,
@@ -5387,7 +5154,7 @@
           "cost_clay": 275,
           "cost_iron": 260,
           "cost_crop": 145,
-          "build_time_base": 3705,
+          "build_time_base": 4486,
           "population": 1,
           "culture_points": 2,
           "effect_value": 8,
@@ -5400,7 +5167,7 @@
           "cost_clay": 350,
           "cost_iron": 335,
           "cost_crop": 190,
-          "build_time_base": 4598,
+          "build_time_base": 5503,
           "population": 1,
           "culture_points": 2,
           "effect_value": 10,
@@ -5413,7 +5180,7 @@
           "cost_clay": 445,
           "cost_iron": 430,
           "cost_crop": 240,
-          "build_time_base": 5634,
+          "build_time_base": 6684,
           "population": 2,
           "culture_points": 3,
           "effect_value": 12,
@@ -5426,7 +5193,7 @@
           "cost_clay": 570,
           "cost_iron": 550,
           "cost_crop": 310,
-          "build_time_base": 6835,
+          "build_time_base": 8053,
           "population": 2,
           "culture_points": 4,
           "effect_value": 14,
@@ -5439,7 +5206,7 @@
           "cost_clay": 730,
           "cost_iron": 705,
           "cost_crop": 395,
-          "build_time_base": 8229,
+          "build_time_base": 9642,
           "population": 2,
           "culture_points": 4,
           "effect_value": 16,
@@ -5452,7 +5219,7 @@
           "cost_clay": 935,
           "cost_iron": 900,
           "cost_crop": 505,
-          "build_time_base": 9845,
+          "build_time_base": 11485,
           "population": 2,
           "culture_points": 5,
           "effect_value": 18,
@@ -5465,7 +5232,7 @@
           "cost_clay": 1200,
           "cost_iron": 1155,
           "cost_crop": 645,
-          "build_time_base": 11721,
+          "build_time_base": 13622,
           "population": 2,
           "culture_points": 6,
           "effect_value": 20,
@@ -5478,7 +5245,7 @@
           "cost_clay": 1535,
           "cost_iron": 1475,
           "cost_crop": 825,
-          "build_time_base": 13896,
+          "build_time_base": 16102,
           "population": 2,
           "culture_points": 7,
           "effect_value": 22,
@@ -5491,7 +5258,7 @@
           "cost_clay": 1965,
           "cost_iron": 1890,
           "cost_crop": 1060,
-          "build_time_base": 16419,
+          "build_time_base": 18978,
           "population": 2,
           "culture_points": 9,
           "effect_value": 24,
@@ -5504,7 +5271,7 @@
           "cost_clay": 2515,
           "cost_iron": 2420,
           "cost_crop": 1355,
-          "build_time_base": 19346,
+          "build_time_base": 22314,
           "population": 2,
           "culture_points": 11,
           "effect_value": 26,
@@ -5517,7 +5284,7 @@
           "cost_clay": 3220,
           "cost_iron": 3095,
           "cost_crop": 1735,
-          "build_time_base": 22742,
+          "build_time_base": 26185,
           "population": 2,
           "culture_points": 13,
           "effect_value": 28,
@@ -5530,7 +5297,7 @@
           "cost_clay": 4120,
           "cost_iron": 3960,
           "cost_crop": 2220,
-          "build_time_base": 26680,
+          "build_time_base": 30674,
           "population": 2,
           "culture_points": 15,
           "effect_value": 30,
@@ -5543,7 +5310,7 @@
           "cost_clay": 5275,
           "cost_iron": 5070,
           "cost_crop": 2840,
-          "build_time_base": 31249,
+          "build_time_base": 35882,
           "population": 3,
           "culture_points": 18,
           "effect_value": 32,
@@ -5556,7 +5323,7 @@
           "cost_clay": 6750,
           "cost_iron": 6490,
           "cost_crop": 3635,
-          "build_time_base": 36549,
+          "build_time_base": 41923,
           "population": 3,
           "culture_points": 22,
           "effect_value": 34,
@@ -5569,7 +5336,7 @@
           "cost_clay": 8640,
           "cost_iron": 8310,
           "cost_crop": 4650,
-          "build_time_base": 42697,
+          "build_time_base": 48931,
           "population": 3,
           "culture_points": 27,
           "effect_value": 36,
@@ -5582,7 +5349,7 @@
           "cost_clay": 11060,
           "cost_iron": 10635,
           "cost_crop": 5955,
-          "build_time_base": 49828,
+          "build_time_base": 57060,
           "population": 3,
           "culture_points": 32,
           "effect_value": 38,
@@ -5595,18 +5362,21 @@
           "cost_clay": 14155,
           "cost_iron": 13610,
           "cost_crop": 7620,
-          "build_time_base": 58101,
+          "build_time_base": 66489,
           "population": 3,
           "culture_points": 38,
           "effect_value": 40,
           "effect_description": "建築耐久 +40%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "石匠小屋"
       ]
     },
     "trade_office": {
       "building_id": "trade_office",
-      "name_zh": "貿易公司",
+      "name_zh": "交易所",
       "name_en": "Trade Office",
       "category": "trade",
       "max_level": 20,
@@ -5634,7 +5404,7 @@
           "cost_iron": 1200,
           "cost_crop": 400,
           "build_time_base": 3000,
-          "population": 4,
+          "population": 3,
           "culture_points": 4,
           "effect_value": 20,
           "effect_description": "商人攜帶量 +20%",
@@ -5887,6 +5657,10 @@
           "effect_description": "商人攜帶量 +400%",
           "cp_per_day": 115
         }
+      ],
+      "aliases_zh": [
+        "貿易公司",
+        "商貿處"
       ]
     },
     "tournament_square": {
@@ -6164,6 +5938,9 @@
           "effect_description": "超過20格速度 +400%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "比武場"
       ]
     },
     "city_wall": {
@@ -6437,7 +6214,8 @@
           "effect_description": "防禦 +81%",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "earth_wall": {
       "building_id": "earth_wall",
@@ -6445,7 +6223,7 @@
       "name_en": "Earth Wall",
       "category": "defense",
       "max_level": 20,
-      "description_zh": "條頓人專屬防禦建築",
+      "description_zh": "日耳曼人專屬防禦建築",
       "description_en": "Teuton-only defensive structure",
       "prerequisites": [],
       "tribe_specific": "teutons",
@@ -6710,6 +6488,9 @@
           "effect_description": "防禦 +63%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "土圍"
       ]
     },
     "palisade": {
@@ -6983,6 +6764,10 @@
           "effect_description": "防禦 +63.86%（另每級 +8 基礎防禦）",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "柵欄",
+        "木柵欄"
       ]
     },
     "great_barracks": {
@@ -7264,6 +7049,9 @@
           "effect_description": "訓練時間 14%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "大營房"
       ]
     },
     "great_stable": {
@@ -7545,7 +7333,8 @@
           "effect_description": "訓練時間 14%",
           "cp_per_day": 77
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "trapper": {
       "building_id": "trapper",
@@ -7565,11 +7354,11 @@
       "levels": [
         {
           "level": 1,
-          "cost_wood": 100,
-          "cost_clay": 100,
-          "cost_iron": 100,
-          "cost_crop": 100,
-          "build_time_base": 1200,
+          "cost_wood": 80,
+          "cost_clay": 120,
+          "cost_iron": 70,
+          "cost_crop": 90,
+          "build_time_base": 2000,
           "population": 4,
           "culture_points": 1,
           "effect_value": 10,
@@ -7578,11 +7367,11 @@
         },
         {
           "level": 2,
-          "cost_wood": 130,
-          "cost_clay": 130,
-          "cost_iron": 130,
-          "cost_crop": 130,
-          "build_time_base": 1692,
+          "cost_wood": 100,
+          "cost_clay": 155,
+          "cost_iron": 90,
+          "cost_crop": 115,
+          "build_time_base": 2620,
           "population": 2,
           "culture_points": 1,
           "effect_value": 22,
@@ -7591,11 +7380,11 @@
         },
         {
           "level": 3,
-          "cost_wood": 165,
-          "cost_clay": 165,
-          "cost_iron": 165,
-          "cost_crop": 165,
-          "build_time_base": 2263,
+          "cost_wood": 130,
+          "cost_clay": 195,
+          "cost_iron": 115,
+          "cost_crop": 145,
+          "build_time_base": 3339,
           "population": 2,
           "culture_points": 2,
           "effect_value": 35,
@@ -7604,11 +7393,11 @@
         },
         {
           "level": 4,
-          "cost_wood": 210,
-          "cost_clay": 210,
-          "cost_iron": 210,
-          "cost_crop": 210,
-          "build_time_base": 2925,
+          "cost_wood": 170,
+          "cost_clay": 250,
+          "cost_iron": 145,
+          "cost_crop": 190,
+          "build_time_base": 4173,
           "population": 2,
           "culture_points": 2,
           "effect_value": 49,
@@ -7617,11 +7406,11 @@
         },
         {
           "level": 5,
-          "cost_wood": 270,
-          "cost_clay": 270,
-          "cost_iron": 270,
-          "cost_crop": 270,
-          "build_time_base": 3693,
+          "cost_wood": 215,
+          "cost_clay": 320,
+          "cost_iron": 190,
+          "cost_crop": 240,
+          "build_time_base": 5141,
           "population": 2,
           "culture_points": 2,
           "effect_value": 64,
@@ -7630,11 +7419,11 @@
         },
         {
           "level": 6,
-          "cost_wood": 345,
-          "cost_clay": 345,
-          "cost_iron": 345,
-          "cost_crop": 345,
-          "build_time_base": 4584,
+          "cost_wood": 275,
+          "cost_clay": 410,
+          "cost_iron": 240,
+          "cost_crop": 310,
+          "build_time_base": 6264,
           "population": 2,
           "culture_points": 3,
           "effect_value": 80,
@@ -7643,11 +7432,11 @@
         },
         {
           "level": 7,
-          "cost_wood": 440,
-          "cost_clay": 440,
-          "cost_iron": 440,
-          "cost_crop": 440,
-          "build_time_base": 5617,
+          "cost_wood": 350,
+          "cost_clay": 530,
+          "cost_iron": 310,
+          "cost_crop": 395,
+          "build_time_base": 7566,
           "population": 2,
           "culture_points": 4,
           "effect_value": 97,
@@ -7656,11 +7445,11 @@
         },
         {
           "level": 8,
-          "cost_wood": 565,
-          "cost_clay": 565,
-          "cost_iron": 565,
-          "cost_crop": 565,
-          "build_time_base": 6816,
+          "cost_wood": 450,
+          "cost_clay": 675,
+          "cost_iron": 395,
+          "cost_crop": 505,
+          "build_time_base": 9077,
           "population": 2,
           "culture_points": 4,
           "effect_value": 115,
@@ -7669,11 +7458,11 @@
         },
         {
           "level": 9,
-          "cost_wood": 720,
-          "cost_clay": 720,
-          "cost_iron": 720,
-          "cost_crop": 720,
-          "build_time_base": 8206,
+          "cost_wood": 575,
+          "cost_clay": 865,
+          "cost_iron": 505,
+          "cost_crop": 650,
+          "build_time_base": 10829,
           "population": 2,
           "culture_points": 5,
           "effect_value": 134,
@@ -7682,11 +7471,11 @@
         },
         {
           "level": 10,
-          "cost_wood": 920,
-          "cost_clay": 920,
-          "cost_iron": 920,
-          "cost_crop": 920,
-          "build_time_base": 9819,
+          "cost_wood": 740,
+          "cost_clay": 1105,
+          "cost_iron": 645,
+          "cost_crop": 830,
+          "build_time_base": 12861,
           "population": 2,
           "culture_points": 6,
           "effect_value": 154,
@@ -7695,11 +7484,11 @@
         },
         {
           "level": 11,
-          "cost_wood": 1180,
-          "cost_clay": 1180,
-          "cost_iron": 1180,
-          "cost_crop": 1180,
-          "build_time_base": 11690,
+          "cost_wood": 945,
+          "cost_clay": 1415,
+          "cost_iron": 825,
+          "cost_crop": 1065,
+          "build_time_base": 15219,
           "population": 3,
           "culture_points": 7,
           "effect_value": 175,
@@ -7708,11 +7497,11 @@
         },
         {
           "level": 12,
-          "cost_wood": 1510,
-          "cost_clay": 1510,
-          "cost_iron": 1510,
-          "cost_crop": 1510,
-          "build_time_base": 13861,
+          "cost_wood": 1210,
+          "cost_clay": 1815,
+          "cost_iron": 1060,
+          "cost_crop": 1360,
+          "build_time_base": 17954,
           "population": 3,
           "culture_points": 9,
           "effect_value": 196,
@@ -7721,11 +7510,11 @@
         },
         {
           "level": 13,
-          "cost_wood": 1935,
-          "cost_clay": 1935,
-          "cost_iron": 1935,
-          "cost_crop": 1935,
-          "build_time_base": 16378,
+          "cost_wood": 1545,
+          "cost_clay": 2320,
+          "cost_iron": 1355,
+          "cost_crop": 1740,
+          "build_time_base": 21127,
           "population": 3,
           "culture_points": 11,
           "effect_value": 218,
@@ -7734,11 +7523,11 @@
         },
         {
           "level": 14,
-          "cost_wood": 2475,
-          "cost_clay": 2475,
-          "cost_iron": 2475,
-          "cost_crop": 2475,
-          "build_time_base": 19299,
+          "cost_wood": 1980,
+          "cost_clay": 2970,
+          "cost_iron": 1735,
+          "cost_crop": 2230,
+          "build_time_base": 24807,
           "population": 3,
           "culture_points": 13,
           "effect_value": 241,
@@ -7747,11 +7536,11 @@
         },
         {
           "level": 15,
-          "cost_wood": 3170,
-          "cost_clay": 3170,
-          "cost_iron": 3170,
-          "cost_crop": 3170,
-          "build_time_base": 22687,
+          "cost_wood": 2535,
+          "cost_clay": 3805,
+          "cost_iron": 2220,
+          "cost_crop": 2850,
+          "build_time_base": 29077,
           "population": 3,
           "culture_points": 15,
           "effect_value": 265,
@@ -7760,11 +7549,11 @@
         },
         {
           "level": 16,
-          "cost_wood": 4055,
-          "cost_clay": 4055,
-          "cost_iron": 4055,
-          "cost_crop": 4055,
-          "build_time_base": 26616,
+          "cost_wood": 3245,
+          "cost_clay": 4870,
+          "cost_iron": 2840,
+          "cost_crop": 3650,
+          "build_time_base": 34029,
           "population": 3,
           "culture_points": 18,
           "effect_value": 290,
@@ -7773,11 +7562,11 @@
         },
         {
           "level": 17,
-          "cost_wood": 5190,
-          "cost_clay": 5190,
-          "cost_iron": 5190,
-          "cost_crop": 5190,
-          "build_time_base": 31175,
+          "cost_wood": 4155,
+          "cost_clay": 6230,
+          "cost_iron": 3635,
+          "cost_crop": 4675,
+          "build_time_base": 39774,
           "population": 3,
           "culture_points": 22,
           "effect_value": 316,
@@ -7786,11 +7575,11 @@
         },
         {
           "level": 18,
-          "cost_wood": 6645,
-          "cost_clay": 6645,
-          "cost_iron": 6645,
-          "cost_crop": 6645,
-          "build_time_base": 36463,
+          "cost_wood": 5315,
+          "cost_clay": 7975,
+          "cost_iron": 4650,
+          "cost_crop": 5980,
+          "build_time_base": 46437,
           "population": 3,
           "culture_points": 27,
           "effect_value": 343,
@@ -7799,11 +7588,11 @@
         },
         {
           "level": 19,
-          "cost_wood": 8505,
-          "cost_clay": 8505,
-          "cost_iron": 8505,
-          "cost_crop": 8505,
-          "build_time_base": 42597,
+          "cost_wood": 6805,
+          "cost_clay": 10210,
+          "cost_iron": 5955,
+          "cost_crop": 7655,
+          "build_time_base": 54167,
           "population": 3,
           "culture_points": 32,
           "effect_value": 371,
@@ -7812,26 +7601,27 @@
         },
         {
           "level": 20,
-          "cost_wood": 10890,
-          "cost_clay": 10890,
-          "cost_iron": 10890,
-          "cost_crop": 10890,
-          "build_time_base": 49713,
+          "cost_wood": 8710,
+          "cost_clay": 13065,
+          "cost_iron": 7620,
+          "cost_crop": 9800,
+          "build_time_base": 63134,
           "population": 3,
           "culture_points": 38,
           "effect_value": 400,
           "effect_description": "陷阱數量 400",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "brewery": {
       "building_id": "brewery",
-      "name_zh": "酒館",
+      "name_zh": "釀酒廠",
       "name_en": "Brewery",
       "category": "military_upgrade",
       "max_level": 20,
-      "description_zh": "條頓人專屬，提升攻擊力",
+      "description_zh": "日耳曼人專屬，提升攻擊力",
       "description_en": "Teuton-only, increase attack power",
       "prerequisites": [
         {
@@ -7847,11 +7637,11 @@
       "levels": [
         {
           "level": 1,
-          "cost_wood": 1460,
-          "cost_clay": 930,
-          "cost_iron": 1250,
-          "cost_crop": 1740,
-          "build_time_base": 3600,
+          "cost_wood": 3210,
+          "cost_clay": 2050,
+          "cost_iron": 2750,
+          "cost_crop": 3830,
+          "build_time_base": 8000,
           "population": 6,
           "culture_points": 5,
           "effect_value": 1,
@@ -7860,11 +7650,11 @@
         },
         {
           "level": 2,
-          "cost_wood": 2045,
-          "cost_clay": 1300,
-          "cost_iron": 1750,
-          "cost_crop": 2435,
-          "build_time_base": 4476,
+          "cost_wood": 4495,
+          "cost_clay": 2870,
+          "cost_iron": 3850,
+          "cost_crop": 5360,
+          "build_time_base": 9580,
           "population": 3,
           "culture_points": 6,
           "effect_value": 2,
@@ -7873,11 +7663,11 @@
         },
         {
           "level": 3,
-          "cost_wood": 2860,
-          "cost_clay": 1825,
-          "cost_iron": 2450,
-          "cost_crop": 3410,
-          "build_time_base": 5492,
+          "cost_wood": 6290,
+          "cost_clay": 4020,
+          "cost_iron": 5390,
+          "cost_crop": 7505,
+          "build_time_base": 11413,
           "population": 3,
           "culture_points": 7,
           "effect_value": 3,
@@ -7886,11 +7676,11 @@
         },
         {
           "level": 4,
-          "cost_wood": 4005,
-          "cost_clay": 2550,
-          "cost_iron": 3430,
-          "cost_crop": 4775,
-          "build_time_base": 6671,
+          "cost_wood": 8810,
+          "cost_clay": 5625,
+          "cost_iron": 7545,
+          "cost_crop": 10510,
+          "build_time_base": 13539,
           "population": 3,
           "culture_points": 8,
           "effect_value": 4,
@@ -7899,11 +7689,11 @@
         },
         {
           "level": 5,
-          "cost_wood": 5610,
-          "cost_clay": 3575,
-          "cost_iron": 4800,
-          "cost_crop": 6685,
-          "build_time_base": 8038,
+          "cost_wood": 12330,
+          "cost_clay": 7875,
+          "cost_iron": 10565,
+          "cost_crop": 14715,
+          "build_time_base": 16005,
           "population": 3,
           "culture_points": 10,
           "effect_value": 5,
@@ -7912,11 +7702,11 @@
         },
         {
           "level": 6,
-          "cost_wood": 7850,
-          "cost_clay": 5000,
-          "cost_iron": 6725,
-          "cost_crop": 9360,
-          "build_time_base": 9624,
+          "cost_wood": 17265,
+          "cost_clay": 11025,
+          "cost_iron": 14790,
+          "cost_crop": 20600,
+          "build_time_base": 18866,
           "population": 4,
           "culture_points": 12,
           "effect_value": 6,
@@ -7925,11 +7715,11 @@
         },
         {
           "level": 7,
-          "cost_wood": 10995,
-          "cost_clay": 7000,
-          "cost_iron": 9410,
-          "cost_crop": 13100,
-          "build_time_base": 11464,
+          "cost_wood": 24170,
+          "cost_clay": 15435,
+          "cost_iron": 20705,
+          "cost_crop": 28840,
+          "build_time_base": 22184,
           "population": 4,
           "culture_points": 14,
           "effect_value": 7,
@@ -7938,11 +7728,11 @@
         },
         {
           "level": 8,
-          "cost_wood": 15390,
-          "cost_clay": 9805,
-          "cost_iron": 13175,
-          "cost_crop": 18340,
-          "build_time_base": 13599,
+          "cost_wood": 33840,
+          "cost_clay": 21610,
+          "cost_iron": 28990,
+          "cost_crop": 40375,
+          "build_time_base": 26034,
           "population": 4,
           "culture_points": 17,
           "effect_value": 8,
@@ -7951,11 +7741,11 @@
         },
         {
           "level": 9,
-          "cost_wood": 21545,
-          "cost_clay": 13725,
-          "cost_iron": 18445,
-          "cost_crop": 25680,
-          "build_time_base": 16074,
+          "cost_wood": 47375,
+          "cost_clay": 30255,
+          "cost_iron": 40585,
+          "cost_crop": 56525,
+          "build_time_base": 30499,
           "population": 4,
           "culture_points": 21,
           "effect_value": 9,
@@ -7964,11 +7754,11 @@
         },
         {
           "level": 10,
-          "cost_wood": 30165,
-          "cost_clay": 19215,
-          "cost_iron": 25825,
-          "cost_crop": 35950,
-          "build_time_base": 18946,
+          "cost_wood": 66320,
+          "cost_clay": 42355,
+          "cost_iron": 56820,
+          "cost_crop": 79130,
+          "build_time_base": 35679,
           "population": 4,
           "culture_points": 25,
           "effect_value": 10,
@@ -7977,11 +7767,11 @@
         },
         {
           "level": 11,
-          "cost_wood": 42230,
-          "cost_clay": 26900,
-          "cost_iron": 36155,
-          "cost_crop": 50330,
-          "build_time_base": 22278,
+          "cost_wood": 92850,
+          "cost_clay": 59295,
+          "cost_iron": 79545,
+          "cost_crop": 110785,
+          "build_time_base": 41688,
           "population": 5,
           "culture_points": 30,
           "effect_value": 11,
@@ -7990,11 +7780,11 @@
         },
         {
           "level": 12,
-          "cost_wood": 59125,
-          "cost_clay": 37660,
-          "cost_iron": 50620,
-          "cost_crop": 70460,
-          "build_time_base": 26142,
+          "cost_wood": 129990,
+          "cost_clay": 83015,
+          "cost_iron": 111365,
+          "cost_crop": 155100,
+          "build_time_base": 48658,
           "population": 5,
           "culture_points": 36,
           "effect_value": 12,
@@ -8003,11 +7793,11 @@
         },
         {
           "level": 13,
-          "cost_wood": 82775,
-          "cost_clay": 52725,
-          "cost_iron": 70865,
-          "cost_crop": 98645,
-          "build_time_base": 30625,
+          "cost_wood": 181985,
+          "cost_clay": 116225,
+          "cost_iron": 155910,
+          "cost_crop": 217140,
+          "build_time_base": 56743,
           "population": 5,
           "culture_points": 43,
           "effect_value": 13,
@@ -8016,11 +7806,11 @@
         },
         {
           "level": 14,
-          "cost_wood": 115880,
-          "cost_clay": 73815,
-          "cost_iron": 99215,
-          "cost_crop": 138105,
-          "build_time_base": 35825,
+          "cost_wood": 254780,
+          "cost_clay": 162710,
+          "cost_iron": 218270,
+          "cost_crop": 303995,
+          "build_time_base": 66122,
           "population": 5,
           "culture_points": 51,
           "effect_value": 14,
@@ -8029,11 +7819,11 @@
         },
         {
           "level": 15,
-          "cost_wood": 162235,
-          "cost_clay": 103340,
-          "cost_iron": 138900,
-          "cost_crop": 193350,
-          "build_time_base": 41857,
+          "cost_wood": 356695,
+          "cost_clay": 227795,
+          "cost_iron": 305580,
+          "cost_crop": 425590,
+          "build_time_base": 77002,
           "population": 5,
           "culture_points": 62,
           "effect_value": 15,
@@ -8042,11 +7832,11 @@
         },
         {
           "level": 16,
-          "cost_wood": 227130,
-          "cost_clay": 144680,
-          "cost_iron": 194460,
-          "cost_crop": 270690,
-          "build_time_base": 48854,
+          "cost_wood": 499375,
+          "cost_clay": 318915,
+          "cost_iron": 427810,
+          "cost_crop": 595825,
+          "build_time_base": 89622,
           "population": 6,
           "culture_points": 74,
           "effect_value": 16,
@@ -8055,11 +7845,11 @@
         },
         {
           "level": 17,
-          "cost_wood": 317980,
-          "cost_clay": 202550,
-          "cost_iron": 272245,
-          "cost_crop": 378965,
-          "build_time_base": 56970,
+          "cost_wood": 699125,
+          "cost_clay": 446480,
+          "cost_iron": 598935,
+          "cost_crop": 834155,
+          "build_time_base": 104262,
           "population": 6,
           "culture_points": 89,
           "effect_value": 17,
@@ -8068,11 +7858,11 @@
         },
         {
           "level": 18,
-          "cost_wood": 445175,
-          "cost_clay": 283570,
-          "cost_iron": 381140,
-          "cost_crop": 530550,
-          "build_time_base": 66386,
+          "cost_wood": 978770,
+          "cost_clay": 625075,
+          "cost_iron": 838510,
+          "cost_crop": 1167820,
+          "build_time_base": 121243,
           "population": 6,
           "culture_points": 106,
           "effect_value": 18,
@@ -8081,11 +7871,11 @@
         },
         {
           "level": 19,
-          "cost_wood": 623245,
-          "cost_clay": 396995,
-          "cost_iron": 533600,
-          "cost_crop": 742770,
-          "build_time_base": 77307,
+          "cost_wood": 1370280,
+          "cost_clay": 875100,
+          "cost_iron": 1173915,
+          "cost_crop": 1634945,
+          "build_time_base": 140942,
           "population": 6,
           "culture_points": 128,
           "effect_value": 19,
@@ -8094,22 +7884,25 @@
         },
         {
           "level": 20,
-          "cost_wood": 872540,
-          "cost_clay": 555795,
-          "cost_iron": 747040,
-          "cost_crop": 1039875,
-          "build_time_base": 89976,
+          "cost_wood": 1918395,
+          "cost_clay": 1225140,
+          "cost_iron": 1643485,
+          "cost_crop": 2288925,
+          "build_time_base": 163793,
           "population": 6,
           "culture_points": 153,
           "effect_value": 20,
           "effect_description": "攻擊力 +20%",
           "cp_per_day": 153
         }
+      ],
+      "aliases_zh": [
+        "酒館"
       ]
     },
     "horse_drinking_trough": {
       "building_id": "horse_drinking_trough",
-      "name_zh": "馬飲水槽",
+      "name_zh": "放牧水槽",
       "name_en": "Horse Drinking Trough",
       "category": "military_upgrade",
       "max_level": 20,
@@ -8137,7 +7930,7 @@
           "cost_clay": 420,
           "cost_iron": 660,
           "cost_crop": 540,
-          "build_time_base": 4200,
+          "build_time_base": 2200,
           "population": 5,
           "culture_points": 4,
           "effect_value": 1,
@@ -8150,7 +7943,7 @@
           "cost_clay": 540,
           "cost_iron": 845,
           "cost_crop": 690,
-          "build_time_base": 5172,
+          "build_time_base": 2852,
           "population": 3,
           "culture_points": 4,
           "effect_value": 2,
@@ -8163,7 +7956,7 @@
           "cost_clay": 690,
           "cost_iron": 1080,
           "cost_crop": 885,
-          "build_time_base": 6300,
+          "build_time_base": 3608,
           "population": 3,
           "culture_points": 5,
           "effect_value": 3,
@@ -8176,7 +7969,7 @@
           "cost_clay": 880,
           "cost_iron": 1385,
           "cost_crop": 1130,
-          "build_time_base": 7607,
+          "build_time_base": 4486,
           "population": 3,
           "culture_points": 6,
           "effect_value": 4,
@@ -8189,7 +7982,7 @@
           "cost_clay": 1125,
           "cost_iron": 1770,
           "cost_crop": 1450,
-          "build_time_base": 9125,
+          "build_time_base": 5503,
           "population": 3,
           "culture_points": 7,
           "effect_value": 5,
@@ -8202,7 +7995,7 @@
           "cost_clay": 1445,
           "cost_iron": 2270,
           "cost_crop": 1855,
-          "build_time_base": 10885,
+          "build_time_base": 6684,
           "population": 3,
           "culture_points": 9,
           "effect_value": 6,
@@ -8215,7 +8008,7 @@
           "cost_clay": 1845,
           "cost_iron": 2905,
           "cost_crop": 2375,
-          "build_time_base": 12926,
+          "build_time_base": 8053,
           "population": 3,
           "culture_points": 11,
           "effect_value": 7,
@@ -8228,7 +8021,7 @@
           "cost_clay": 2365,
           "cost_iron": 3715,
           "cost_crop": 3040,
-          "build_time_base": 15294,
+          "build_time_base": 9642,
           "population": 3,
           "culture_points": 13,
           "effect_value": 8,
@@ -8241,7 +8034,7 @@
           "cost_clay": 3025,
           "cost_iron": 4755,
           "cost_crop": 3890,
-          "build_time_base": 18041,
+          "build_time_base": 11485,
           "population": 3,
           "culture_points": 15,
           "effect_value": 9,
@@ -8254,7 +8047,7 @@
           "cost_clay": 3875,
           "cost_iron": 6085,
           "cost_crop": 4980,
-          "build_time_base": 21228,
+          "build_time_base": 13622,
           "population": 3,
           "culture_points": 19,
           "effect_value": 10,
@@ -8267,7 +8060,7 @@
           "cost_clay": 4960,
           "cost_iron": 7790,
           "cost_crop": 6375,
-          "build_time_base": 24924,
+          "build_time_base": 16102,
           "population": 4,
           "culture_points": 22,
           "effect_value": 11,
@@ -8280,7 +8073,7 @@
           "cost_clay": 6345,
           "cost_iron": 9975,
           "cost_crop": 8160,
-          "build_time_base": 29212,
+          "build_time_base": 18978,
           "population": 4,
           "culture_points": 27,
           "effect_value": 12,
@@ -8293,7 +8086,7 @@
           "cost_clay": 8125,
           "cost_iron": 12765,
           "cost_crop": 10445,
-          "build_time_base": 34186,
+          "build_time_base": 22314,
           "population": 4,
           "culture_points": 32,
           "effect_value": 13,
@@ -8306,7 +8099,7 @@
           "cost_clay": 10400,
           "cost_iron": 16340,
           "cost_crop": 13370,
-          "build_time_base": 39956,
+          "build_time_base": 26185,
           "population": 4,
           "culture_points": 39,
           "effect_value": 14,
@@ -8319,7 +8112,7 @@
           "cost_clay": 13310,
           "cost_iron": 20915,
           "cost_crop": 17115,
-          "build_time_base": 46649,
+          "build_time_base": 30674,
           "population": 4,
           "culture_points": 46,
           "effect_value": 15,
@@ -8332,7 +8125,7 @@
           "cost_clay": 17035,
           "cost_iron": 26775,
           "cost_crop": 21905,
-          "build_time_base": 54413,
+          "build_time_base": 35882,
           "population": 5,
           "culture_points": 55,
           "effect_value": 16,
@@ -8345,7 +8138,7 @@
           "cost_clay": 21810,
           "cost_iron": 34270,
           "cost_crop": 28040,
-          "build_time_base": 63419,
+          "build_time_base": 41923,
           "population": 5,
           "culture_points": 67,
           "effect_value": 17,
@@ -8358,7 +8151,7 @@
           "cost_clay": 27915,
           "cost_iron": 43865,
           "cost_crop": 35890,
-          "build_time_base": 73866,
+          "build_time_base": 48931,
           "population": 5,
           "culture_points": 80,
           "effect_value": 18,
@@ -8371,7 +8164,7 @@
           "cost_clay": 35730,
           "cost_iron": 56145,
           "cost_crop": 45940,
-          "build_time_base": 85985,
+          "build_time_base": 57060,
           "population": 5,
           "culture_points": 96,
           "effect_value": 19,
@@ -8384,13 +8177,16 @@
           "cost_clay": 45735,
           "cost_iron": 71870,
           "cost_crop": 58800,
-          "build_time_base": 100042,
+          "build_time_base": 66489,
           "population": 5,
           "culture_points": 115,
           "effect_value": 20,
           "effect_description": "騎兵糧耗 -20%",
           "cp_per_day": 115
         }
+      ],
+      "aliases_zh": [
+        "馬飲水槽"
       ]
     },
     "great_warehouse": {
@@ -8668,11 +8464,12 @@
           "effect_description": "儲存容量 800,000",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "great_granary": {
       "building_id": "great_granary",
-      "name_zh": "大糧倉",
+      "name_zh": "大穀倉",
       "name_en": "Great Granary",
       "category": "storage",
       "max_level": 20,
@@ -8695,7 +8492,7 @@
           "population": 1,
           "culture_points": 1,
           "effect_value": 12000,
-          "effect_description": "糧倉容量 12,000",
+          "effect_description": "穀倉容量 12,000",
           "cp_per_day": 1
         },
         {
@@ -8708,7 +8505,7 @@
           "population": 1,
           "culture_points": 1,
           "effect_value": 17000,
-          "effect_description": "糧倉容量 17,000",
+          "effect_description": "穀倉容量 17,000",
           "cp_per_day": 1
         },
         {
@@ -8721,7 +8518,7 @@
           "population": 1,
           "culture_points": 2,
           "effect_value": 23000,
-          "effect_description": "糧倉容量 23,000",
+          "effect_description": "穀倉容量 23,000",
           "cp_per_day": 2
         },
         {
@@ -8734,7 +8531,7 @@
           "population": 1,
           "culture_points": 2,
           "effect_value": 31000,
-          "effect_description": "糧倉容量 31,000",
+          "effect_description": "穀倉容量 31,000",
           "cp_per_day": 2
         },
         {
@@ -8747,7 +8544,7 @@
           "population": 1,
           "culture_points": 2,
           "effect_value": 40000,
-          "effect_description": "糧倉容量 40,000",
+          "effect_description": "穀倉容量 40,000",
           "cp_per_day": 2
         },
         {
@@ -8760,7 +8557,7 @@
           "population": 1,
           "culture_points": 3,
           "effect_value": 50000,
-          "effect_description": "糧倉容量 50,000",
+          "effect_description": "穀倉容量 50,000",
           "cp_per_day": 3
         },
         {
@@ -8773,7 +8570,7 @@
           "population": 1,
           "culture_points": 4,
           "effect_value": 63000,
-          "effect_description": "糧倉容量 63,000",
+          "effect_description": "穀倉容量 63,000",
           "cp_per_day": 4
         },
         {
@@ -8786,7 +8583,7 @@
           "population": 1,
           "culture_points": 4,
           "effect_value": 78000,
-          "effect_description": "糧倉容量 78,000",
+          "effect_description": "穀倉容量 78,000",
           "cp_per_day": 4
         },
         {
@@ -8799,7 +8596,7 @@
           "population": 1,
           "culture_points": 5,
           "effect_value": 96000,
-          "effect_description": "糧倉容量 96,000",
+          "effect_description": "穀倉容量 96,000",
           "cp_per_day": 5
         },
         {
@@ -8812,7 +8609,7 @@
           "population": 1,
           "culture_points": 6,
           "effect_value": 118000,
-          "effect_description": "糧倉容量 118,000",
+          "effect_description": "穀倉容量 118,000",
           "cp_per_day": 6
         },
         {
@@ -8825,7 +8622,7 @@
           "population": 1,
           "culture_points": 7,
           "effect_value": 144000,
-          "effect_description": "糧倉容量 144,000",
+          "effect_description": "穀倉容量 144,000",
           "cp_per_day": 7
         },
         {
@@ -8838,7 +8635,7 @@
           "population": 1,
           "culture_points": 9,
           "effect_value": 176000,
-          "effect_description": "糧倉容量 176,000",
+          "effect_description": "穀倉容量 176,000",
           "cp_per_day": 9
         },
         {
@@ -8851,7 +8648,7 @@
           "population": 1,
           "culture_points": 11,
           "effect_value": 214000,
-          "effect_description": "糧倉容量 214,000",
+          "effect_description": "穀倉容量 214,000",
           "cp_per_day": 11
         },
         {
@@ -8864,7 +8661,7 @@
           "population": 1,
           "culture_points": 13,
           "effect_value": 259000,
-          "effect_description": "糧倉容量 259,000",
+          "effect_description": "穀倉容量 259,000",
           "cp_per_day": 13
         },
         {
@@ -8877,7 +8674,7 @@
           "population": 1,
           "culture_points": 15,
           "effect_value": 313000,
-          "effect_description": "糧倉容量 313,000",
+          "effect_description": "穀倉容量 313,000",
           "cp_per_day": 15
         },
         {
@@ -8890,7 +8687,7 @@
           "population": 2,
           "culture_points": 18,
           "effect_value": 379000,
-          "effect_description": "糧倉容量 379,000",
+          "effect_description": "穀倉容量 379,000",
           "cp_per_day": 18
         },
         {
@@ -8903,7 +8700,7 @@
           "population": 2,
           "culture_points": 22,
           "effect_value": 457000,
-          "effect_description": "糧倉容量 457,000",
+          "effect_description": "穀倉容量 457,000",
           "cp_per_day": 22
         },
         {
@@ -8916,7 +8713,7 @@
           "population": 2,
           "culture_points": 27,
           "effect_value": 551000,
-          "effect_description": "糧倉容量 551,000",
+          "effect_description": "穀倉容量 551,000",
           "cp_per_day": 27
         },
         {
@@ -8929,7 +8726,7 @@
           "population": 2,
           "culture_points": 32,
           "effect_value": 664000,
-          "effect_description": "糧倉容量 664,000",
+          "effect_description": "穀倉容量 664,000",
           "cp_per_day": 32
         },
         {
@@ -8942,9 +8739,12 @@
           "population": 2,
           "culture_points": 38,
           "effect_value": 800000,
-          "effect_description": "糧倉容量 800,000",
+          "effect_description": "穀倉容量 800,000",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "大糧倉"
       ]
     },
     "woodcutter": {
@@ -9217,11 +9017,12 @@
           "effect_description": "每小時 +2450 木材",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "clay_pit": {
       "building_id": "clay_pit",
-      "name_zh": "磚坑",
+      "name_zh": "泥坑",
       "name_en": "Clay Pit",
       "category": "resource",
       "max_level": 20,
@@ -9489,6 +9290,10 @@
           "effect_description": "每小時 +2450 磚塊",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "黏土坑",
+        "磚坑"
       ]
     },
     "iron_mine": {
@@ -9761,7 +9566,8 @@
           "effect_description": "每小時 +2450 鐵礦",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "cropland": {
       "building_id": "cropland",
@@ -10033,6 +9839,9 @@
           "effect_description": "每小時 +2450 糧食",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "農田"
       ]
     }
   }

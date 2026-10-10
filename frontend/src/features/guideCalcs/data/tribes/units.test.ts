@@ -1,8 +1,8 @@
 /**
- * Snapshot tests pinning every unit's stats against the verified values
- * currently in the tribe data files. These were audited against
- * kirilloid/travian + support.travian.com; this suite guards against
- * accidental regressions.
+ * Snapshot tests pinning every unit's stats. Romans, Teutons, Gauls,
+ * Egyptians and Huns are the numbers read from the ts11 in-game help
+ * (manual/troop/N, 2026-10-10, P0-18; training time is x1 seconds).
+ * Spartans and Vikings keep their previous numbers (待驗證 in the UI).
  *
  * Each `it` pins: attack, defInfantry, defCavalry, carry, upkeep,
  * cost (wood/clay/iron/crop), and trainTime.
@@ -55,42 +55,42 @@ describe('Romans unit stats', () => {
   it('Legionnaire: atk 40 / defInf 35 / defCav 50 / carry 50 / upkeep 1', () => {
     pin(find(romans.units, 'legionnaire'), {
       attack: 40, defInfantry: 35, defCavalry: 50, carry: 50, upkeep: 1,
-      cost: [120, 100, 150, 30], trainTime: 2000,
+      cost: [120, 100, 150, 30], trainTime: 1600,
     });
   });
 
   it('Praetorian: atk 30 / defInf 65 / defCav 35 / carry 20 / upkeep 1', () => {
     pin(find(romans.units, 'praetorian'), {
       attack: 30, defInfantry: 65, defCavalry: 35, carry: 20, upkeep: 1,
-      cost: [100, 130, 160, 70], trainTime: 2200,
+      cost: [100, 130, 160, 70], trainTime: 1760,
     });
   });
 
   it('Imperian: atk 70 / defInf 40 / defCav 25 / carry 50 / upkeep 1', () => {
     pin(find(romans.units, 'imperian'), {
       attack: 70, defInfantry: 40, defCavalry: 25, carry: 50, upkeep: 1,
-      cost: [150, 160, 210, 80], trainTime: 2400,
+      cost: [150, 160, 210, 80], trainTime: 1920,
     });
   });
 
   it('Equites Legati: atk 0 / defInf 20 / defCav 10 / carry 0 / upkeep 2', () => {
     pin(find(romans.units, 'equitesLegati'), {
       attack: 0, defInfantry: 20, defCavalry: 10, carry: 0, upkeep: 2,
-      cost: [140, 160, 20, 40], trainTime: 1700,
+      cost: [140, 160, 20, 40], trainTime: 1360,
     });
   });
 
   it('Equites Imperatoris: atk 120 / defInf 65 / defCav 50 / carry 100 / upkeep 3', () => {
     pin(find(romans.units, 'equitesImperatoris'), {
       attack: 120, defInfantry: 65, defCavalry: 50, carry: 100, upkeep: 3,
-      cost: [550, 440, 320, 100], trainTime: 3300,
+      cost: [550, 440, 320, 100], trainTime: 2640,
     });
   });
 
   it('Equites Caesaris: atk 180 / defInf 80 / defCav 105 / carry 70 / upkeep 4', () => {
     pin(find(romans.units, 'equitesCaesaris'), {
       attack: 180, defInfantry: 80, defCavalry: 105, carry: 70, upkeep: 4,
-      cost: [550, 640, 800, 180], trainTime: 4400,
+      cost: [550, 640, 800, 180], trainTime: 3520,
     });
   });
 
@@ -131,42 +131,42 @@ describe('Teutons unit stats', () => {
   it('Clubswinger: atk 40 / defInf 20 / defCav 5 / carry 60 / upkeep 1', () => {
     pin(find(teutons.units, 'maceman'), {
       attack: 40, defInfantry: 20, defCavalry: 5, carry: 60, upkeep: 1,
-      cost: [95, 75, 40, 40], trainTime: 900,
+      cost: [95, 75, 40, 40], trainTime: 720,
     });
   });
 
   it('Spearman: atk 10 / defInf 35 / defCav 60 / carry 40 / upkeep 1', () => {
     pin(find(teutons.units, 'spearman'), {
       attack: 10, defInfantry: 35, defCavalry: 60, carry: 40, upkeep: 1,
-      cost: [145, 70, 85, 40], trainTime: 1400,
+      cost: [145, 70, 85, 40], trainTime: 1120,
     });
   });
 
   it('Axeman: atk 60 / defInf 30 / defCav 30 / carry 50 / upkeep 1', () => {
     pin(find(teutons.units, 'axeman'), {
       attack: 60, defInfantry: 30, defCavalry: 30, carry: 50, upkeep: 1,
-      cost: [130, 120, 170, 70], trainTime: 1500,
+      cost: [130, 120, 170, 70], trainTime: 1200,
     });
   });
 
   it('Scout: atk 0 / defInf 10 / defCav 5 / carry 0 / upkeep 1', () => {
     pin(find(teutons.units, 'scout'), {
       attack: 0, defInfantry: 10, defCavalry: 5, carry: 0, upkeep: 1,
-      cost: [160, 100, 50, 50], trainTime: 1400,
+      cost: [160, 100, 50, 50], trainTime: 1120,
     });
   });
 
   it('Paladin: atk 55 / defInf 100 / defCav 40 / carry 110 / upkeep 2', () => {
     pin(find(teutons.units, 'paladin'), {
       attack: 55, defInfantry: 100, defCavalry: 40, carry: 110, upkeep: 2,
-      cost: [370, 270, 290, 75], trainTime: 3000,
+      cost: [370, 270, 290, 75], trainTime: 2400,
     });
   });
 
   it('Teutonic Knight: atk 150 / defInf 50 / defCav 75 / carry 80 / upkeep 3', () => {
     pin(find(teutons.units, 'tk'), {
       attack: 150, defInfantry: 50, defCavalry: 75, carry: 80, upkeep: 3,
-      cost: [450, 515, 480, 80], trainTime: 3700,
+      cost: [450, 515, 480, 80], trainTime: 2960,
     });
   });
 
@@ -207,42 +207,42 @@ describe('Gauls unit stats', () => {
   it('Phalanx: atk 15 / defInf 40 / defCav 50 / carry 35 / upkeep 1', () => {
     pin(find(gauls.units, 'phalanx'), {
       attack: 15, defInfantry: 40, defCavalry: 50, carry: 35, upkeep: 1,
-      cost: [100, 130, 55, 30], trainTime: 1300,
+      cost: [100, 130, 55, 30], trainTime: 1040,
     });
   });
 
   it('Swordsman: atk 65 / defInf 35 / defCav 20 / carry 45 / upkeep 1', () => {
     pin(find(gauls.units, 'swordsman'), {
       attack: 65, defInfantry: 35, defCavalry: 20, carry: 45, upkeep: 1,
-      cost: [140, 150, 185, 60], trainTime: 1800,
+      cost: [140, 150, 185, 60], trainTime: 1440,
     });
   });
 
   it('Pathfinder: atk 0 / defInf 20 / defCav 10 / carry 0 / upkeep 2', () => {
     pin(find(gauls.units, 'pathfinder'), {
       attack: 0, defInfantry: 20, defCavalry: 10, carry: 0, upkeep: 2,
-      cost: [170, 150, 20, 40], trainTime: 1700,
+      cost: [170, 150, 20, 40], trainTime: 1360,
     });
   });
 
   it('Theutates Thunder: atk 100 / defInf 25 / defCav 40 / carry 75 / upkeep 2', () => {
     pin(find(gauls.units, 'theutatesThunder'), {
       attack: 100, defInfantry: 25, defCavalry: 40, carry: 75, upkeep: 2,
-      cost: [350, 450, 230, 60], trainTime: 3100,
+      cost: [350, 450, 230, 60], trainTime: 2480,
     });
   });
 
   it('Druidrider: atk 45 / defInf 115 / defCav 55 / carry 35 / upkeep 2', () => {
     pin(find(gauls.units, 'druidrider'), {
       attack: 45, defInfantry: 115, defCavalry: 55, carry: 35, upkeep: 2,
-      cost: [360, 330, 280, 120], trainTime: 3200,
+      cost: [360, 330, 280, 120], trainTime: 2560,
     });
   });
 
   it('Haeduan: atk 140 / defInf 60 / defCav 165 / carry 65 / upkeep 3', () => {
     pin(find(gauls.units, 'haeduan'), {
       attack: 140, defInfantry: 60, defCavalry: 165, carry: 65, upkeep: 3,
-      cost: [500, 620, 675, 170], trainTime: 3900,
+      cost: [500, 620, 675, 170], trainTime: 3120,
     });
   });
 
@@ -290,7 +290,7 @@ describe('Egyptians unit stats', () => {
   it('Ash Warden: atk 30 / defInf 55 / defCav 40 / carry 50 / upkeep 1', () => {
     pin(find(egyptians.units, 'ashWarden'), {
       attack: 30, defInfantry: 55, defCavalry: 40, carry: 50, upkeep: 1,
-      cost: [115, 100, 145, 60], trainTime: 1320,
+      cost: [115, 100, 145, 60], trainTime: 1380,
     });
   });
 

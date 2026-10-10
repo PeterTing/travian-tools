@@ -35,6 +35,8 @@ export interface Unit {
   upkeep: number;       // crop per hour
   cost: UnitCost;
   trainTime: number;    // seconds at 1x, building L1
+  /** 花費／攻防／運載量／糧耗／訓練時間是 ts11 遊戲內說明頁讀到的（P0-18） */
+  statsVerified: boolean;
   role: { zh: string; en: string };
 }
 
@@ -69,7 +71,7 @@ export interface Tribe {
 }
 
 /** Unit as written in the tribe files: everything except the generated speed. */
-export type UnitData = Omit<Unit, 'speed' | 'speedSource' | 'speedRef'>;
+export type UnitData = Omit<Unit, 'speed' | 'speedSource' | 'speedRef' | 'statsVerified'>;
 
 export type TribeData = Omit<Tribe, 'units'> & { units: UnitData[] };
 
@@ -80,7 +82,17 @@ export function withUnitSpeeds(tribe: TribeData): Tribe {
     units: tribe.units.map(u => {
       const s = unitSpeed(tribe.id, u.id);
       if (!s) throw new Error(`no generated speed for ${tribe.id}.${u.id}`);
-      return { ...u, speed: s.speed, speedSource: s.source, speedRef: s.ref };
+      const st = s.stats;
+      // ts11 說明頁讀到的數字（P0-18）蓋掉檔案裡的舊數字；沒讀到的兵種維持原樣
+      const fromTs11 = st
+        ? {
+            name: { ...u.name, zh: st.nameZh },
+            attack: st.attack, defInfantry: st.defInf, defCavalry: st.defCav,
+            carry: st.carry, upkeep: st.upkeep, trainTime: st.trainTime,
+            cost: { wood: st.cost[0], clay: st.cost[1], iron: st.cost[2], crop: st.cost[3] },
+          }
+        : {};
+      return { ...u, ...fromTs11, speed: s.speed, speedSource: s.source, speedRef: s.ref, statsVerified: !!st };
     }),
   };
 }

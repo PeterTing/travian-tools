@@ -177,9 +177,30 @@ def test_smithy_l2_uses_t4_cost_not_t3() -> None:
     )
 
 
-def test_hero_mansion_uses_t4_cost_pending_ts11() -> None:
+def test_hero_mansion_l1_from_ts11_manual() -> None:
+    """P0-19: ts11 manual/building/37 L1 = 700/670/700/240, 2300 s, pop 2.
+    (80/120/70/90 is the trapper's L1, manual/building/36.)"""
     lv = _lv("heros_mansion", 1)
-    assert (lv.cost_wood, lv.cost_clay, lv.cost_iron, lv.cost_crop) == (80, 120, 70, 90)
+    assert (lv.cost_wood, lv.cost_clay, lv.cost_iron, lv.cost_crop) == (
+        700,
+        670,
+        700,
+        240,
+    )
+    assert lv.build_time_base == 2300
+    tr = _lv("trapper", 1)
+    assert (tr.cost_wood, tr.cost_clay, tr.cost_iron, tr.cost_crop) == (80, 120, 70, 90)
+
+
+@pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
+def test_every_l1_matches_ts11_manual() -> None:
+    """L1 cost / time of all 35 buildings + 4 fields equal the ts11 in-game help."""
+    mod = _gen_module()
+    pops = mod.check_l1_against_manual()
+    assert len(pops) == 35
+    assert _lv("workshop", 1).population == 3
+    assert _lv("town_hall", 1).population == 4
+    assert _lv("brickyard", 1).build_time_base == 2240
 
 
 # ─── ts11 calibration: CP ─────────────────────────────────────────
@@ -308,10 +329,13 @@ def test_celebration_rule() -> None:
     assert [start_cp(s) for s in (1, 2, 3, 5, 10)] == [500, 250, 167, 100, 50]
 
 
-def test_only_x1_village_2_is_verified() -> None:
-    assert is_verified(2, 1)
-    assert not is_verified(3, 1)
-    assert not is_verified(2, 3)
+def test_every_village_threshold_is_verified_against_official_s51() -> None:
+    """P0-19: all 50 villages x 5 speeds equal the official S51 table."""
+    for speed in (1, 2, 3, 5, 10):
+        for village in (2, 3, 10, 50):
+            assert is_verified(village, speed), (village, speed)
+    assert not is_verified(51, 1)
+    assert not is_verified(2, 4)
 
 
 # ─── 待驗證 follows the per-building verified flag ────────────────
@@ -325,7 +349,9 @@ def test_every_building_not_measured_in_ts11_is_pending() -> None:
         (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
     )
     not_measured = sorted(bid for bid, p in mod.PARAMS.items() if p["src"] != "ts11")
-    assert len(not_measured) == 27  # 22 + hero mansion + 4 kept-L1-time buildings
+    assert (
+        len(not_measured) == 26
+    )  # 21 + hero mansion + 4 kept-L1-time buildings (T3 armoury removed, #33)
     for bid in not_measured:
         assert not mod.PARAMS[bid]["verified"], bid
         assert {"cost", "time"} <= set(fe["pending"][bid]), bid

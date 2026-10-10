@@ -90,16 +90,19 @@ def _calculate_travel_time(
     return seconds / 3600.0
 
 
-# 部族中文名（跟前端 i18n tribes.* 同一套）
-_TRIBE_ZH = {
-    "romans": "羅馬",
-    "teutons": "條頓",
-    "gauls": "高盧",
-    "egyptians": "埃及",
-    "huns": "匈奴",
-    "vikings": "維京",
-    "spartans": "斯巴達",
-}
+# 部族中文名：遊戲內名稱表（data/static/ingame_names.json，前端讀同一份產生檔）
+_INGAME_NAMES = json.loads(
+    (Path(__file__).resolve().parents[2] / "data/static/ingame_names.json").read_text(
+        encoding="utf-8"
+    )
+)
+_TRIBE_ZH = {tribe: row["zh"] for tribe, row in _INGAME_NAMES["tribes"].items()}
+
+
+def _unit_zh(troop: dict) -> str:
+    """兵種中文名：遊戲內名稱表優先，表裡沒有（斯巴達、維京）才用 troops.json."""
+    row = _INGAME_NAMES["units"].get(troop["troop_id"])
+    return str(row["zh"]) if row else str(troop.get("name_zh") or troop["name_en"])
 
 
 def _load_troops_data() -> dict:
@@ -256,7 +259,7 @@ class AdvancedCalculatorService:
             def_inf_values = []
             def_cav_values = []
 
-            # Legends smithy (KIR; S187): base+(base+300·upkeep/7)·(1.007^L−1)
+            # 盔甲廠：base+(base+300·upkeep/7)·(1.007^L−1)，對官方 S187 20 級表最多差 0.2（P0-18）
             upkeep = int(troop.get("crop_consumption", 1))
             for level in request.research_levels:
                 attack_values.append(
@@ -278,6 +281,7 @@ class AdvancedCalculatorService:
             troop_rows.append(
                 TroopTechRow(
                     troop_name=troop["name_en"],
+                    troop_name_zh=troop.get("name_zh"),
                     troop_id=troop_id,
                     attack_values=attack_values,
                     defense_infantry_values=def_inf_values,
@@ -416,7 +420,7 @@ class AdvancedCalculatorService:
             speed_to_units.setdefault(int(spd), []).append(troop["name_en"])
             tribe_zh = _TRIBE_ZH.get(troop["tribe"], troop["tribe"])
             speed_to_units_zh.setdefault(int(spd), []).append(
-                f"{troop.get('name_zh') or troop['name_en']}（{tribe_zh}）"
+                f"{_unit_zh(troop)}（{tribe_zh}）"
             )
 
         all_speeds = sorted(speed_to_units.keys())

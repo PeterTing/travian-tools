@@ -60,6 +60,6 @@ def celebration_cp(daily_cp: int, kind: CelebrationKind, speed: float = 1) -> in
 
 
 def is_verified(village: int, speed: float = 1) -> bool:
-    """只有 x1 第 2 村（2,000）在 ts11 實測過；其他都標待驗證."""
+    """官方 S51 表（1–50 村 × x1/x2/x3/x5/x10）逐格比對過（P0-19）；表外的速度或村數才是待驗證."""
     v = _data()["verified"]
-    return int(speed) == int(v["speed"]) and village in v["villages"]
+    return float(speed) in [float(s) for s in v["speeds"]] and village in v["villages"]

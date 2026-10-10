@@ -10,7 +10,7 @@
  * - official_pending：官方說明頁，但頁面寫數字取自第三方計算器（斯巴達步兵、騎兵）；
  *   數字保留、畫面標「待驗證」、不列入反推 TS
  * - pending：還沒有第一手出處，速度是 null，畫面標「待驗證」
- * 遊戲內說明跟官方頁不一致時，以遊戲內為準（匈奴傭兵 6）。
+ * 遊戲內說明跟官方頁不一致時，以遊戲內為準（匈奴僱傭兵 6）。
  */
 import gen from './unitSpeeds.gen.json'
 
@@ -34,6 +34,35 @@ export interface UnitSpeedRow {
   source: UnitSpeedSource
   /** manual/troop/N 或官方網址；pending 是 null */
   ref: string | null
+  /** ts11 遊戲內說明頁讀到的其他數字（P0-18）；沒讀到的兵種是 null（維持舊資料、顯示待驗證） */
+  stats: UnitTs11Stats | null
+}
+
+export interface UnitTs11Stats {
+  /** 遊戲內中文名稱 */
+  nameZh: string
+  /** 木、黏土、鐵、糧 */
+  cost: [number, number, number, number]
+  attack: number
+  defInf: number
+  defCav: number
+  carry: number
+  upkeep: number
+  /** 訓練秒數（x1、1 級兵營／馬廄） */
+  trainTime: number
+  ref: string
+}
+
+interface GenStats {
+  name_zh: string
+  cost: [number, number, number, number]
+  attack: number
+  def_inf: number
+  def_cav: number
+  carry: number
+  upkeep: number
+  train_time: number
+  ref: string
 }
 
 interface GenRow {
@@ -44,6 +73,7 @@ interface GenRow {
   speed: number | null
   source: string
   ref: string | null
+  stats?: GenStats | null
 }
 
 const TRIBES = gen.tribes as Record<SpeedTribeId, GenRow[]>
@@ -56,6 +86,9 @@ function toRow(r: GenRow): UnitSpeedRow {
     speed: r.speed,
     source: r.source as UnitSpeedSource,
     ref: r.ref,
+    stats: r.stats
+      ? { nameZh: r.stats.name_zh, cost: r.stats.cost, attack: r.stats.attack, defInf: r.stats.def_inf, defCav: r.stats.def_cav, carry: r.stats.carry, upkeep: r.stats.upkeep, trainTime: r.stats.train_time, ref: r.stats.ref }
+      : null,
   }
 }
 

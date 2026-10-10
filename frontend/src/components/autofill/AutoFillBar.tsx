@@ -5,6 +5,7 @@ import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerify
 import { usesUnitData } from '@/components/layout/navItems'
 import { ROUTES } from '@/constants/routes'
 import { formatOffsetHours } from '@/lib/serverTime'
+import { showUnitPendingLine } from '@/lib/unitPending'
 import type { TroopTribe, Village } from '@/types/game'
 import { AUTOFILL_SPEEDS, useAutoFill, type AutoFillSpeed } from './AutoFillContext'
 
@@ -23,22 +24,28 @@ interface AutoFillBarProps {
   unitData?: boolean
   /** 第二行：這頁用的假設 */
   assumption?: ReactNode
+  /**
+   * 頁面自己的部族選單選了什麼（兵種資料庫可以是 'all'）。
+   * 沒給（undefined）就看帳號的部族（P0-17 (k)）
+   */
+  unitTribe?: string | null
 }
 
 /**
  * 計算器最上面的「已帶入」列（IA v2.2）：
  *   已帶入：PeterT · ts11（x1・高盧）· 主村 (0|0)   更改
  *   時差 +6 小時（從貼上的頁面讀到）／時差：貼一頁就會自動設好
- *   〔待驗證〕兵種花費、糧耗、訓練時間還沒在 ts11 核對   ← 只在用到兵種資料的頁面
- *             斯巴達速度待驗證                          （兩行對齊灰標右邊）
+ *   〔待驗證〕斯巴達、維京的兵種數字待驗證（斯巴達含速度）
+ *     ← 只在用到兵種資料的頁面，而且部族是斯巴達、維京（或兵種資料庫選「全部」）才顯示（P0-17 (k)）
  */
-export default function AutoFillBar({ usesVillage = true, unitData, assumption }: AutoFillBarProps) {
+export default function AutoFillBar({ usesVillage = true, unitData, assumption, unitTribe }: AutoFillBarProps) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const fill = useAutoFill()
   const [editing, setEditing] = useState(false)
-  const showUnitLine = unitData ?? usesUnitData(pathname)
   const { account, village, villages, speed, tribe, offsetHours, overrides } = fill
+  // 有部族選單的頁面看選單，沒有的看帳號的部族；已核對的五族不顯示
+  const showUnitLine = (unitData ?? usesUnitData(pathname)) && showUnitPendingLine(unitTribe === undefined ? tribe : unitTribe)
   const overridden = overrides.speed != null || overrides.tribe != null
 
   const worldParts = [`x${speed}`, tribe ? t(`tribes.${tribe}`) : null].filter(Boolean).join('・')
@@ -85,13 +92,10 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption }
       </p>
 
       {showUnitLine && (
-        // 兩行都對齊灰標右邊的文字起點（懸掛縮排），不折到灰標底下；一個灰標管這兩行（autofillUnits）
+        // 一行，對齊灰標右邊的文字起點（懸掛縮排），折行也不折到灰標底下
         <PendingRow className="flex items-baseline gap-1 text-xs text-muted-foreground" data-testid="autofill-unit-pending">
           <PendingVerifyChip className="shrink-0" kind="autofillUnits" />
-          <div className="min-w-0" data-testid="autofill-unit-pending-text">
-            <p data-testid="autofill-unit-pending-line1">{t('autofill.unitPending')}</p>
-            <p data-testid="autofill-unit-pending-line2">{t('autofill.unitPendingSpartan')}</p>
-          </div>
+          <p className="min-w-0" data-testid="autofill-unit-pending-text">{t('autofill.unitPending')}</p>
         </PendingRow>
       )}
 

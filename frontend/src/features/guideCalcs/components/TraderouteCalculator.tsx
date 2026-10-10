@@ -8,6 +8,7 @@ import type { PendingKind } from '@/lib/pendingNotes'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
+import { ingameTribeName } from '@/lib/ingameNames';
 
 const fmtInt = (n: number) => isFinite(n) ? Math.round(n).toLocaleString('en-US') : '—';
 const fmtHr = (h: number) => {
@@ -75,13 +76,9 @@ export default function TraderouteCalculator() {
             </PendingRow>
             <select id="traderoute-tribe" value={tribe} onChange={e => setTribe(e.target.value as TribeId)}>
               {Object.entries(MERCHANTS).map(([id, m]) => {
-                const zhNames: Record<string, string> = {
-                  romans: '羅馬', gauls: '高盧', teutons: '條頓',
-                  egyptians: '埃及', huns: '匈奴', spartans: '斯巴達', vikings: '維京',
-                };
                 const display = lang === 'en'
                   ? `${id.charAt(0).toUpperCase() + id.slice(1)} (${m.capacity}/${m.speed})`
-                  : `${zhNames[id]}（容量 ${m.capacity}、速度 ${m.speed}）`;
+                  : `${ingameTribeName(id)}（容量 ${m.capacity}、速度 ${m.speed}）`;
                 return <option key={id} value={id}>{display}</option>;
               })}
             </select>

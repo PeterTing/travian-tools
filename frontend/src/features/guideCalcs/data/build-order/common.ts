@@ -37,7 +37,7 @@ export const common: BuildStep[] = [
   },
   {
     step: 3,
-    building: { zh: '農田', en: 'Croplands' },
+    building: { zh: '農場', en: 'Croplands' },
     targetLevel: 2,
     tier: 1,
     cost: null,
@@ -152,7 +152,7 @@ export const common: BuildStep[] = [
   },
   {
     step: 14,
-    building: { zh: '所有農田', en: 'All croplands' },
+    building: { zh: '所有農場', en: 'All croplands' },
     targetLevel: 2,
     tier: 1,
     cost: 3325,
@@ -291,7 +291,7 @@ export const common: BuildStep[] = [
   },
   {
     step: 28,
-    building: { zh: '農田', en: 'Croplands' },
+    building: { zh: '農場', en: 'Croplands' },
     targetLevel: 4,
     tier: 2,
     cost: 1860,
@@ -376,7 +376,7 @@ export const common: BuildStep[] = [
   },
   {
     step: 37,
-    building: { zh: '一個農田', en: 'One cropland' },
+    building: { zh: '一個農場', en: 'One cropland' },
     targetLevel: 3,
     tier: null,
     cost: 695,

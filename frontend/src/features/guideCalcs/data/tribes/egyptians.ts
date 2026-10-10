@@ -41,7 +41,7 @@ export const egyptians = withUnitSpeeds({
     { zh: 'Khopesh 攻擊力一般（65），主要靠 Anhur/Resheph 做 OFF', en: 'Khopesh attack is mild (65); OFF relies on Anhur/Resheph Chariot' },
   ],
 
-  wallType: { name: { zh: '石牆 (Stone Wall)', en: 'Stone Wall' }, bonusPerLevel: 0.025 },
+  wallType: { name: { zh: '石墻 (Stone Wall)', en: 'Stone Wall' }, bonusPerLevel: 0.025 },
   merchant: { capacity: 750, speed: 16 },
   defenseMix: { zh: '50% 看守人艾什 / 50% 守衛安赫', en: '50% 看守人艾什 / 50% 守衛安赫' },
 

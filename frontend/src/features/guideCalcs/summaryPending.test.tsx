@@ -129,15 +129,12 @@ describe('貿易路線、農場收益、田地回本：明細裡用到待驗證�
     expect(tribe.closest('div')!.querySelector('[data-kind="merchantCapacity"]')).not.toBeNull()
     cleanup()
   })
-  it('farming: carry cap and daily yield -> unitCarry; troop cost and payback -> units; unit select label -> unitCarry', async () => {
+  it('farming: every listed unit is read from the ts11 in-game help (P0-18), so carry, cost and payback carry no 待驗證', async () => {
     const d = await open('features/guideCalcs/components/FarmingCalculator.tsx')
-    expect(chipNextTo(d, '搬運上限')).toBe('unitCarry')
-    expect(chipNextTo(d, '每日預估收益')).toBe('unitCarry')
-    expect(chipNextTo(d, '兵力初始成本')).toBe('units')
-    expect(chipNextTo(d, '回本天數')).toBe('units')
+    for (const label of ['搬運上限', '每日預估收益', '兵力初始成本', '回本天數']) expect(chipNextTo(d, label), label).toBeNull()
     const unit = screen.getByLabelText('單位')
     expect(unit.tagName).toBe('SELECT')
-    expect(unit.closest('div')!.querySelector('[data-kind="unitCarry"]')).not.toBeNull()
+    expect(unit.closest('div')!.querySelector('[data-kind="unitCarry"]')).toBeNull()
     cleanup()
   })
   it('field ROI (default L7): cost / production rows and compare table header -> building', async () => {
@@ -185,7 +182,7 @@ describe('首都產量模擬：加成建築算進去的數字都有 building', (
     expect(kindsOf(rowLabel(d, '糧食 /hr'))).toBe('fieldHighLevel cropSim')
     expect(kindsOf(rowLabel(d, '木 + 土 + 鐵 /hr'))).toBe('fieldHighLevel building cropSim')
     expect(kindsOf(screen.getByTestId('calc-result-title'))).toBe('fieldHighLevel building cropSim')
-    for (const l of ['鋸木廠', '磚廠', '鑄鐵廠']) set(l, 0)
+    for (const l of ['鋸木廠', '磚廠', '鋼鐵鑄造廠']) set(l, 0)
     expect(kindsOf(rowLabel(d, '木 + 土 + 鐵 /hr'))).toBe('fieldHighLevel cropSim')
     expect(kindsOf(screen.getByTestId('calc-result-title'))).toBe('fieldHighLevel cropSim')
     expect(kindsOf(within(d).getByTestId('cropsim-breakdown-title'))).toBe('fieldHighLevel cropSim')

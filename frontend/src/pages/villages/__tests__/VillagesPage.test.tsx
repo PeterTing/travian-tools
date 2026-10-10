@@ -366,7 +366,7 @@ describe('village list (P0-02 slice 2)', () => {
     fireEvent.click(screen.getByRole('button', { name: '目前世界：ts3' }))
     const sheet = screen.getByRole('dialog', { name: '切換帳號和世界' })
     expect(sheet).not.toHaveTextContent('舊號')
-    fireEvent.click(within(sheet).getByText(/^條頓/))
+    fireEvent.click(within(sheet).getByText(/^日耳曼人/))
 
     await waitFor(() => expect(rows()).toHaveLength(1))
     expect(villageApi.getAll).toHaveBeenLastCalledWith('acc-ts5')
@@ -383,7 +383,7 @@ describe('village list (P0-02 slice 2)', () => {
     renderPage()
     await waitFor(() => expect(villageApi.getAll).toHaveBeenCalledWith('acc-ts3'))
     fireEvent.click(screen.getByRole('button', { name: '目前世界：ts3' }))
-    fireEvent.click(within(screen.getByRole('dialog')).getByText(/^條頓/))
+    fireEvent.click(within(screen.getByRole('dialog')).getByText(/^日耳曼人/))
     await waitFor(() => expect(rows()).toHaveLength(1))
 
     releaseTs3({ villages: db.villages['acc-ts3'], total: 4, oldest_pasted_at: null })

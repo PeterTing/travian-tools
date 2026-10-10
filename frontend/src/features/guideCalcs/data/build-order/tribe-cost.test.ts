@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { TRIBE_SETTLER_COST } from './tribe-cost';
 
-describe('TRIBE_SETTLER_COST (all 7 tribes verified)', () => {
+describe('TRIBE_SETTLER_COST (5 tribes from the ts11 in-game help, Vikings from S139, Spartans 待驗證)', () => {
   it('Roman = 4600/4200/5800/4400 = 19000, training 26900s', () => {
     const c = TRIBE_SETTLER_COST.romans;
     expect([c.wood, c.clay, c.iron, c.crop]).toEqual([4600, 4200, 5800, 4400]);
@@ -57,19 +57,21 @@ describe('TRIBE_SETTLER_COST (all 7 tribes verified)', () => {
     });
   });
 
-  it('all 7 tribes have verified = true', () => {
-    const tribes = ['romans', 'teutons', 'gauls', 'vikings', 'egyptians', 'huns', 'spartans'] as const;
+  it('6 tribes verified from first-hand sources (ts11 in-game help / official S139); Spartans have none', () => {
+    const tribes = ['romans', 'teutons', 'gauls', 'vikings', 'egyptians', 'huns'] as const;
     tribes.forEach((id) => {
       expect(TRIBE_SETTLER_COST[id].verified, `${id} verified`).toBe(true);
       expect(TRIBE_SETTLER_COST[id].source.length, `${id} source non-empty`).toBeGreaterThan(0);
     });
+    expect(TRIBE_SETTLER_COST.spartans.verified).toBe(false);
+    for (const id of ['romans', 'teutons', 'gauls', 'egyptians', 'huns'] as const) {
+      expect(TRIBE_SETTLER_COST[id].source, id).toMatch(/ts11/);
+    }
   });
 
-  it('Egyptian settler has attack 0; all other tribes have attack 10', () => {
-    expect(TRIBE_SETTLER_COST.egyptians.combat.attack).toBe(0);
-    (['romans', 'teutons', 'gauls', 'vikings', 'huns', 'spartans'] as const).forEach((id) => {
-      expect(TRIBE_SETTLER_COST[id].combat.attack, `${id} attack`).toBe(10);
-    });
+  it('settler attack as read on ts11: Teutons and Huns 10, Romans, Gauls and Egyptians 0', () => {
+    for (const id of ['teutons', 'huns'] as const) expect(TRIBE_SETTLER_COST[id].combat.attack, `${id} attack`).toBe(10);
+    for (const id of ['romans', 'gauls', 'egyptians'] as const) expect(TRIBE_SETTLER_COST[id].combat.attack, `${id} attack`).toBe(0);
   });
 
   it('all tribes share defInf=80, defCav=80, carry=3000, upkeep=1', () => {

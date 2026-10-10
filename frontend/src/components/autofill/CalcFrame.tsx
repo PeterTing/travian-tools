@@ -16,10 +16,12 @@ export default function CalcFrame({ children, usesVillage = true }: { children: 
 
 /**
  * 放在頁面標題（和說明）之後、第一個輸入區之前。
+ * 頁面有自己的部族選單（兵種資料庫、盔甲廠升級、開局時間表、農場收益選的兵）要傳 tribe。
  * 不在 CalcFrame 裡（例如單頁測試、或頁面被別的地方重用）就什麼都不畫。
  */
-export function CalcBar() {
+export function CalcBar({ tribe }: { tribe?: string | null } = {}) {
   const frame = useContext(CalcFrameContext)
   if (!frame) return null
-  return <AutoFillBar usesVillage={frame.usesVillage} />
+  // tribe：頁面有部族選單就傳選單的值，兵種待驗證那一行看它（P0-17 (k)）
+  return <AutoFillBar usesVillage={frame.usesVillage} unitTribe={tribe} />
 }

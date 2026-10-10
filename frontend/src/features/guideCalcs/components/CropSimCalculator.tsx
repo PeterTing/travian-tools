@@ -7,6 +7,7 @@ import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
+import { ingameBuildingName } from '@/lib/ingameNames';
 
 const fmtInt = (n: number) => Math.round(n).toLocaleString('en-US');
 
@@ -112,14 +113,14 @@ export default function CropSimCalculator() {
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Bonus buildings' : '加成建築'}</h4>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>{lang === 'en' ? 'Sawmill' : '鋸木廠'}</label><input type="number" min={0} max={5} value={bonus.saw} onChange={e => setBonus(p => ({ ...p, saw: +e.target.value }))} /></div>
-            <div className={s.field}><label>{lang === 'en' ? 'Brickyard' : '磚廠'}</label><input type="number" min={0} max={5} value={bonus.bri} onChange={e => setBonus(p => ({ ...p, bri: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Sawmill' : ingameBuildingName('sawmill')}</label><input type="number" min={0} max={5} value={bonus.saw} onChange={e => setBonus(p => ({ ...p, saw: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Brickyard' : ingameBuildingName('brickyard')}</label><input type="number" min={0} max={5} value={bonus.bri} onChange={e => setBonus(p => ({ ...p, bri: +e.target.value }))} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>{lang === 'en' ? 'Iron Foundry' : '鑄鐵廠'}</label><input type="number" min={0} max={5} value={bonus.fnd} onChange={e => setBonus(p => ({ ...p, fnd: +e.target.value }))} /></div>
-            <div className={s.field}><label>{lang === 'en' ? 'Grain Mill' : '麵粉廠'}</label><input type="number" min={0} max={5} value={bonus.mil} onChange={e => setBonus(p => ({ ...p, mil: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Iron Foundry' : ingameBuildingName('iron_foundry')}</label><input type="number" min={0} max={5} value={bonus.fnd} onChange={e => setBonus(p => ({ ...p, fnd: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Grain Mill' : ingameBuildingName('grain_mill')}</label><input type="number" min={0} max={5} value={bonus.mil} onChange={e => setBonus(p => ({ ...p, mil: +e.target.value }))} /></div>
           </div>
-          <div className={s.field}><label>{lang === 'en' ? 'Bakery' : '麵包店'}</label><input type="number" min={0} max={5} value={bonus.bak} onChange={e => setBonus(p => ({ ...p, bak: +e.target.value }))} /></div>
+          <div className={s.field}><label>{lang === 'en' ? 'Bakery' : ingameBuildingName('bakery')}</label><input type="number" min={0} max={5} value={bonus.bak} onChange={e => setBonus(p => ({ ...p, bak: +e.target.value }))} /></div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Oasis bonuses (%)' : '綠洲加成 (%)'}</h4>
           <p className={s.muted} style={{ margin: '0 0 8px' }}>

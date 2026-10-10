@@ -242,7 +242,7 @@
     },
     "clay": {
       "resource_type": "clay",
-      "name_zh": "黏土坑",
+      "name_zh": "泥坑",
       "name_en": "Clay Pit",
       "max_level": 10,
       "max_level_capital": 20,

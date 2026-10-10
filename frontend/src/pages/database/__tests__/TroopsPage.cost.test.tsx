@@ -31,7 +31,7 @@ vi.mock('@/services/gameApi', () => ({
 describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / training time (P0-17)', () => {
   beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
 
-  it.each([['重裝步兵'], ['狂戰士'], ['古羅馬步兵']])('%s: exactly one units chip, next to the 「訓練成本」 heading (real data: no tribe is cost-verified)', async (name) => {
+  it.each([['重裝步兵'], ['狂戰士']])('%s: exactly one units chip, next to the 「訓練成本」 heading (Spartans / Vikings: no first-hand source)', async (name) => {
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText(name))
     const heading = await screen.findByTestId('troop-cost-heading')
@@ -42,6 +42,15 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
     const section = screen.getByTestId('troop-cost-section')
     expect(within(section).getAllByTestId('pending-verify-chip')).toHaveLength(1)
     expect(within(section).getByRole('table').querySelector('[data-testid="pending-verify-chip"]')).toBeNull()
+  })
+
+  it('古羅馬步兵: no units chip (Roman costs read from the ts11 in-game help, P0-18)', async () => {
+    render(<TroopsPage />)
+    fireEvent.click(await screen.findByText('古羅馬步兵'))
+    const section = await screen.findByTestId('troop-cost-section')
+    expect(within(section).getByRole('heading', { name: '訓練成本' })).toBeInTheDocument()
+    expect(screen.queryByTestId('troop-cost-heading')).toBeNull()
+    expect(within(section).queryByTestId('pending-verify-chip')).toBeNull()
   })
 
   it('tap: the units copy opens below the heading and fills the whole section', async () => {
@@ -60,7 +69,7 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText('狂戰士'))
     await screen.findByTestId('troop-cost-heading')
-    for (const zh of ['維京', '步兵', '兵營']) expect(screen.getByText(zh, { selector: 'td' })).toBeInTheDocument()
+    for (const zh of ['維京人', '步兵', '兵營']) expect(screen.getByText(zh, { selector: 'td' })).toBeInTheDocument()
     for (const en of ['vikings', 'infantry', 'barracks']) expect(screen.queryByText(en, { selector: 'td' })).toBeNull()
   })
 })

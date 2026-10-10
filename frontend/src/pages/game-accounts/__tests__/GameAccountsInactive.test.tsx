@@ -89,7 +89,7 @@ describe('deactivated accounts on the management page', () => {
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
     expect(within(section).getByText('小號')).toBeVisible()
-    expect(within(section).getByText('ts5 · 條頓 · 2 村')).toBeVisible()
+    expect(within(section).getByText('ts5 · 日耳曼人 · 2 村')).toBeVisible()
     expect(within(section).getByRole('button', { name: '重新啟用' })).toBeVisible()
     expect(gameAccountApi.getAll).toHaveBeenCalledWith(true)
   })

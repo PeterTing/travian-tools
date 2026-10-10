@@ -125,6 +125,7 @@ async def get_troops(
             t
             for t in troops
             if search_lower in t.name_zh.lower()
+            or any(search_lower in a.lower() for a in t.aliases_zh)
             or search_lower in t.name_en.lower()
             or search_lower in t.troop_id.lower()
         ]

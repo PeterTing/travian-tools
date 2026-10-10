@@ -18,7 +18,7 @@ describe('opening checklist helpers (P0-10)', () => {
     const teuton = resolveStep(step, 'teutons')
     expect(teuton.cost).toBe(20000)
     expect(teuton.id).toBe(step.id)
-    expect(teuton.building).toBe('拓荒者')
+    expect(teuton.building).toBe('開拓者')
     // 沒有覆寫的部族照原本的值
     expect(resolveStep(step, 'huns').cost).toBe(18100)
   })

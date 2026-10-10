@@ -63,10 +63,13 @@ describe('village CP thresholds — one source (official table)', () => {
     expect(villageRequirements(3)[1]).toBe(500)
     expect(villageRequirements(10)[49]).toBe(1234700)
   })
-  it('only x1 village 2 is ts11-verified', () => {
+  it('every village 1–50 on every speed matches the official S51 table (P0-19)', () => {
+    // P0-19：公式跟官方 S51 表 1–50 村 × 5 種速度都一樣 → 全部核對過
     expect(isVillageCpVerified(2, 1)).toBe(true)
-    expect(isVillageCpVerified(3, 1)).toBe(false)
-    expect(isVillageCpVerified(2, 3)).toBe(false)
+    expect(isVillageCpVerified(3, 1)).toBe(true)
+    expect(isVillageCpVerified(2, 3)).toBe(true)
+    expect(isVillageCpVerified(50, 10)).toBe(true)
+    expect(isVillageCpVerified(51, 1)).toBe(false)
   })
 })
 
@@ -88,8 +91,8 @@ describe('one set of building numbers', () => {
   it('field costs come from the generated table', () => {
     expect(FIELD_COSTS.crop[2]).toEqual({ level: 3, wood: 195, clay: 250, iron: 195, crop: 55 })
   })
-  it('hero mansion cost (T4) and small celebration crop are flagged 待驗證', () => {
-    expect(hmCumulativeCost(10)).toBe(17805)
+  it('hero mansion cost (L1 from ts11, multiplier unmeasured) and small celebration crop are flagged 待驗證', () => {
+    expect(hmCumulativeCost(10)).toBe(114240)
     expect(isPending('heros_mansion', 'cost')).toBe(true)
     expect(CELEBRATIONS.small.cost.crop).toBe(1340)
     expect(CELEBRATIONS.small.cp).toBe(500)
@@ -122,12 +125,12 @@ describe('PassiveCpCalculator UI', () => {
       dispatchEvent: () => false,
     })) as typeof window.matchMedia
   })
-  it('marks village 3+ thresholds 待驗證 but not village 2', () => {
+  it('no 待驗證 on any village threshold: all 50 villages x 5 speeds match the official S51 table (P0-19)', () => {
     render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
     const table = screen.getByTestId('cp-countdown')
     const rows = within(table).getAllByRole('row')
-    expect(within(rows[1]!).queryByTestId('pending-verify-chip')).toBeNull()
-    expect(within(rows[2]!).getByTestId('pending-verify-chip')).toBeInTheDocument()
+    expect(rows.length).toBeGreaterThan(2)
+    for (const r of rows) expect(within(r).queryByTestId('pending-verify-chip')).toBeNull()
     expect(screen.queryByText('+大慶典/天')).toBeNull()
   })
   it('chip tables: EVERY body row is at least 44px (h-11) with cells vertically centred, so 44px chip hit areas never reach the next row', () => {
@@ -162,7 +165,7 @@ describe('PassiveCpCalculator UI', () => {
     render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
     expect(screen.getAllByText('村莊大樓').length).toBeGreaterThan(0)
     expect(screen.getAllByText('城鎮廳').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('鐵匠鋪／防具工坊').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('盔甲廠').length).toBeGreaterThan(0)
     expect(screen.queryByText('Main Building')).toBeNull()
   })
   describe('in English', () => {
@@ -181,7 +184,7 @@ describe('PassiveCpCalculator UI', () => {
 
 describe('待驗證 follows the generator verified flag', () => {
   const unverified = [
-    'stable', 'academy', 'blacksmith', 'armoury', 'workshop', 'town_hall', 'residence', 'palace',
+    'stable', 'academy', 'blacksmith', 'workshop', 'town_hall', 'residence', 'palace',
     'treasury', 'sawmill', 'brickyard', 'iron_foundry', 'grain_mill', 'bakery', 'trade_office',
     'tournament_square', 'city_wall', 'earth_wall', 'great_barracks', 'great_stable',
     'great_warehouse', 'great_granary',

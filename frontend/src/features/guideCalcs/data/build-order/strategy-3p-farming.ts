@@ -26,7 +26,7 @@ const branchSteps: BuildStep[] = [
   // ----- pre-party-1 (step 41-79) -----
   {
     step: 41,
-    building: { zh: '所有農田', en: 'All croplands' },
+    building: { zh: '所有農場', en: 'All croplands' },
     targetLevel: 3,
     tier: 2,
     cost: 2780,
@@ -65,7 +65,7 @@ const branchSteps: BuildStep[] = [
   },
   {
     step: 45,
-    building: { zh: '一個農田', en: 'One cropland' },
+    building: { zh: '一個農場', en: 'One cropland' },
     targetLevel: 4,
     tier: null,
     cost: 1165,
@@ -154,7 +154,7 @@ const branchSteps: BuildStep[] = [
   },
   {
     step: 54,
-    building: { zh: '所有農田', en: 'All croplands' },
+    building: { zh: '所有農場', en: 'All croplands' },
     targetLevel: 5,
     tier: 3,
     cost: 9725,
@@ -197,7 +197,7 @@ const branchSteps: BuildStep[] = [
   },
   {
     step: 59,
-    building: { zh: '一個農田', en: '1x Cropland to 7' },
+    building: { zh: '一個農場', en: '1x Cropland to 7' },
     targetLevel: 7,
     tier: null,
     cost: 8675,

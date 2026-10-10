@@ -33,10 +33,10 @@ class VillageType(enum.StrEnum):
 
     TYPE_4446 = "4-4-4-6"  # 平衡型
     TYPE_3456 = "3-4-5-6"  # 混合型
-    TYPE_15C = "15c"  # 15 農田
-    TYPE_9C = "9c"  # 9 農田
-    TYPE_7C = "7c"  # 7 農田
-    TYPE_6C = "6c"  # 6 農田
+    TYPE_15C = "15c"  # 15 農場
+    TYPE_9C = "9c"  # 9 農場
+    TYPE_7C = "7c"  # 7 農場
+    TYPE_6C = "6c"  # 6 農場
 
 
 class Village(Base):

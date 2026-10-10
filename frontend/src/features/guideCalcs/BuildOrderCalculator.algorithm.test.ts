@@ -38,8 +38,9 @@ function baseInput(overrides: Partial<PlanInput> = {}): PlanInput {
 describe('planGreedy — step 1 picks the candidate with lowest ROI', () => {
   it('all fields L0: picks a field upgrade (no bonus building qualifies yet)', () => {
     // At L0, no bonus building's prerequisite (crop>=5 or res>=10) is met.
-    // Every field L0->L1 has ROI = 250 / (7 * 24) ≈ 1.49 days (wood/clay/crop)
-    // or 270 / (7 * 24) ≈ 1.61 days (iron). Lowest is any of wood/clay/crop.
+    // L0 already produces 3/hr (ts11), so L0->L1 gains 7 − 3 = 4/hr (P0-18).
+    // Every field L0->L1 has ROI = 250 / (4 * 24) ≈ 2.60 days (wood/clay/crop)
+    // or 270 / (4 * 24) ≈ 2.81 days (iron). Lowest is any of wood/clay/crop.
     const r = planGreedy(baseInput());
     expect(r.steps[0]!.kind).toBe('field');
     expect(r.steps[0]!.to).toBe(1);
@@ -48,7 +49,7 @@ describe('planGreedy — step 1 picks the candidate with lowest ROI', () => {
     // among the tied candidates, so the winner is wood #1.
     expect(r.steps[0]!.type).toBe('wood');
     expect(r.steps[0]!.cost).toBe(250); // 40+100+50+60
-    expect(r.steps[0]!.roi).toBeCloseTo(250 / (7 * 24), 3);
+    expect(r.steps[0]!.roi).toBeCloseTo(250 / (4 * 24), 3);
   });
 
   it('crop L5, non-crop L0: grain mill unlocks and its ROI beats most field upgrades', () => {
@@ -180,14 +181,14 @@ describe('planGreedy — step 1 picks the candidate with lowest ROI', () => {
 // canonical fieldTotalCost / bbTotalCost / FIELD_PRODUCTION constants.
 // =========================================================================
 describe('planGreedy — ROI scoring reference values', () => {
-  it('field L0→L1 ROI for wood with no bonuses = 250 / (7 × 24 × 1) days', () => {
+  it('field L0→L1 ROI for wood with no bonuses = 250 / ((7 − 3) × 24 × 1) days', () => {
     const r = planGreedy(baseInput());
     // First pick is wood L0→L1. Its ROI should equal the hand-computed value.
     const s = r.steps[0]!;
     expect(s.type).toBe('wood');
     expect(s.cost).toBe(fieldTotalCost('wood', 1));
     expect(s.cost).toBe(250);
-    const expectedRoi = 250 / (FIELD_PRODUCTION[1]! * 24);
+    const expectedRoi = 250 / ((FIELD_PRODUCTION[1]! - FIELD_PRODUCTION[0]!) * 24);
     expect(s.roi).toBeCloseTo(expectedRoi, 4);
   });
 

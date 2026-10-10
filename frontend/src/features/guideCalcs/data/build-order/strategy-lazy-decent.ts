@@ -31,7 +31,7 @@ const branchSteps: BuildStep[] = [
   },
   {
     step: 42,
-    building: { zh: '所有農田', en: 'All croplands' },
+    building: { zh: '所有農場', en: 'All croplands' },
     targetLevel: 3,
     tier: 2,
     cost: 2780,
@@ -116,7 +116,7 @@ const branchSteps: BuildStep[] = [
   },
   {
     step: 51,
-    building: { zh: '所有農田', en: 'All croplands' },
+    building: { zh: '所有農場', en: 'All croplands' },
     targetLevel: 5,
     tier: 3,
     cost: 11670,

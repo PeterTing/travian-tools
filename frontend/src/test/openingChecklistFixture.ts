@@ -69,7 +69,7 @@ export function makeOpeningChecklist(): OpeningChecklistData {
               step({
                 id: 'r084',
                 kind: 'settlers',
-                building: '拓荒者',
+                building: '開拓者',
                 target: '×1',
                 tier: null,
                 cost: 18100,

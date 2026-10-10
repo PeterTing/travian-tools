@@ -8,28 +8,34 @@ import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import Stepper from '@/components/common/Stepper'
 import RangeNumberField, { outOfRange } from '@/components/common/RangeNumberField'
 import { calculateTravelSeconds } from '@/lib/travianFormulas'
-import { speedPendingKinds } from '@/lib/pendingNotes'
+import { speedPendingKinds, type PendingKind } from '@/lib/pendingNotes'
 
-import { unitSpeedValue, type SpeedTribeId } from '@/data/unitSpeeds';
+import { getTribe } from '../data/tribes';
+import type { TribeId } from '../data/tribes-types';
 
-// Speed comes from src/data/unitSpeeds.gen.json (P0-15 phase 1: ts11 in-game help).
-// Carry and cost are the old values and have not been rebuilt yet (P0-15 later phases).
-interface UnitOpt { id: string; name: { zh: string; en: string }; tribe: SpeedTribeId; feId: string; carry: number; speed: number; cost: number }
-const UNIT_DEFS: Omit<UnitOpt, 'speed'>[] = [
-  { id: 'tt',     name: { zh: 'TT (高盧人',             en: 'TT (Gaul' },             tribe: 'gauls',   feId: 'theutatesThunder',   carry: 75,  cost: 1090 },
-  { id: 'ei',     name: { zh: 'EI (羅馬人',             en: 'EI (Roman' },            tribe: 'romans',  feId: 'equitesImperatoris', carry: 100, cost: 1410 },
-  { id: 'steppe', name: { zh: 'Steppe Rider (匈',       en: 'Steppe Rider (Hun' },    tribe: 'huns',    feId: 'steppeRider',        carry: 115, cost: 895 },
-  { id: 'paladin',name: { zh: 'Paladin (日耳曼人',      en: 'Paladin (Teuton' },      tribe: 'teutons', feId: 'paladin',            carry: 110, cost: 1005 },
-  { id: 'club',   name: { zh: 'Clubswinger (日耳曼人',  en: 'Clubswinger (Teuton' },  tribe: 'teutons', feId: 'maceman',            carry: 60,  cost: 250 },
-  { id: 'ec',     name: { zh: 'EC (羅馬人',             en: 'EC (Roman' },            tribe: 'romans',  feId: 'equitesCaesaris',    carry: 70,  cost: 2170 },
+// 速度、運載量、花費都來自產生檔（P0-18：ts11 遊戲內說明頁；scripts/game_data/gen_game_data.py），這裡不寫數字
+interface UnitOpt { id: string; tribeId: TribeId; nameZh: string; nameEn: string; tribeZh: string; tribeEn: string; carry: number; speed: number; cost: number; verified: boolean }
+const UNIT_PICKS: [string, TribeId, string][] = [
+  ['tt', 'gauls', 'theutatesThunder'],
+  ['ei', 'romans', 'equitesImperatoris'],
+  ['steppe', 'huns', 'steppeRider'],
+  ['paladin', 'teutons', 'paladin'],
+  ['club', 'teutons', 'maceman'],
+  ['ec', 'romans', 'equitesCaesaris'],
 ];
-const UNITS: UnitOpt[] = UNIT_DEFS.map(u => {
-  const speed = unitSpeedValue(u.tribe, u.feId);
-  if (speed === null) throw new Error(`no speed for ${u.tribe}.${u.feId}`);
-  return { ...u, speed };
+export const FARM_UNITS: UnitOpt[] = UNIT_PICKS.map(([id, tribeId, unitId]) => {
+  const tribe = getTribe(tribeId)!;
+  const u = tribe.units.find(x => x.id === unitId);
+  if (!u || u.speed === null) throw new Error(`no unit data for ${tribeId}.${unitId}`);
+  return {
+    id, tribeId, nameZh: u.name.zh, nameEn: u.name.en, tribeZh: tribe.name.zh, tribeEn: tribe.name.en,
+    carry: u.carry, speed: u.speed, cost: u.cost.wood + u.cost.clay + u.cost.iron + u.cost.crop, verified: u.statsVerified,
+  };
 });
 const unitLabel = (u: UnitOpt, lang: 'zh' | 'en') =>
-  lang === 'en' ? `${u.name.en}, speed ${u.speed})` : `${u.name.zh}, 速 ${u.speed})`;
+  lang === 'en'
+    ? `${u.nameEn} (${u.tribeEn}, speed ${u.speed}, carry ${u.carry})`
+    : `${u.nameZh}（${u.tribeZh}，速度 ${u.speed}、運載 ${u.carry}）`;
 
 export function lumiBracket(pop: number, lang: 'zh' | 'en') {
   if (pop < 150) return { bracket: '< 150', n: 0,
@@ -81,7 +87,11 @@ export default function FarmingCalculator() {
   const bootsOk = !outOfRange(boots, 0, 75);
   const speedKinds = speedPendingKinds(arena, bootsOk ? boots : 0);
 
-  const unit = UNITS.find(u => u.id === unitId)!;
+  const unit = FARM_UNITS.find(u => u.id === unitId)!;
+  // 兵種數字已在 ts11 核對（P0-18）就不標攜帶量／花費；速度種類接在後面
+  const carryKinds: PendingKind[] = unit.verified ? [] : ['unitCarry'];
+  const costKinds: PendingKind[] = unit.verified ? [] : ['units'];
+  const summaryKinds: PendingKind[] = [...carryKinds, ...speedKinds];
   const rec = lumiBracket(pop, lang);
 
   const calc = useMemo(
@@ -98,7 +108,8 @@ export default function FarmingCalculator() {
           ? 'Suggests how many horses to send to inactive targets and estimates daily loot. Under 150 pop: skip; 150–400: 1 horse; 400–550: 2; 550+: about 3–7 (default 5). Adjust loot per raid from your reports.'
           : '估算打不活躍村該派幾匹馬、一天大概能搶多少。人口不到 150 略過；150–400 派 1 匹；400–550 派 2 匹；550 以上大約 3–7 匹（預設 5）。每次搶到的量請依戰報調整。'}</p>
       </div>
-      <CalcBar />
+      {/* 這頁沒有部族選單：看選的兵是哪一族（P0-17 (k)） */}
+      <CalcBar tribe={unit.tribeId} />
 
       <div className={s.wrapper}>
         <div className={s.inputs}>
@@ -129,11 +140,11 @@ export default function FarmingCalculator() {
             {/* 選項裡有攜帶量：灰標放在欄位名稱旁（不放進 label，免得點名稱變成點灰標） */}
             <PendingRow className="flex min-h-11 items-center gap-1">
               <label htmlFor="farming-unit">{lang === 'en' ? 'Unit' : '單位'}</label>
-              <PendingVerifyChip kind="unitCarry" />
+              {!unit.verified && <PendingVerifyChip kind="unitCarry" />}
             </PendingRow>
             <select id="farming-unit" value={unitId} onChange={e => setUnitId(e.target.value)}>
-              {UNITS.map(u => (
-                <option key={u.id} value={u.id}>{unitLabel(u, lang)} · carry {u.carry}</option>
+              {FARM_UNITS.map(u => (
+                <option key={u.id} value={u.id}>{unitLabel(u, lang)}</option>
               ))}
             </select>
           </div>
@@ -155,8 +166,8 @@ export default function FarmingCalculator() {
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Daily yield' : '每日收益'}
-          // 摘要一個灰標，依序列出：攜帶量（社群整理）→ 行軍速度（有競技場／靴子才有，P0-22）；不放大數字旁
-          titlePending={['unitCarry', ...speedKinds]}
+          // 摘要一個灰標，依序列出：攜帶量（未核對的兵種才有）→ 行軍速度（有競技場／靴子才有，P0-22）；不放大數字旁
+          titlePending={summaryKinds.length > 0 ? summaryKinds : false}
           primary={<>{Math.round(calc.daily).toLocaleString()}</>}
           secondary={rec.msg}
         >
@@ -166,12 +177,12 @@ export default function FarmingCalculator() {
 
           <h4>{lang === 'en' ? 'Round-trip & haul' : '往返與搬運'}</h4>
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way' : '單程'}{speedKinds.length > 0 && <> <PendingVerifyChip kinds={speedKinds} /></>}</span><span className={s.value} data-testid="farming-one-way">{fmtHms(calc.owSec)}</span></PendingRow>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Carry cap (rec count)' : '搬運上限'} <PendingVerifyChip kind="unitCarry" /></span><span className={s.value}>{calc.carryCap.toLocaleString()}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Carry cap (rec count)' : '搬運上限'}{carryKinds.length > 0 && <> <PendingVerifyChip kinds={carryKinds} /></>}</span><span className={s.value}>{calc.carryCap.toLocaleString()}</span></PendingRow>
           {/* 每小時次數、每日收益、回本天數都用到單程時間：一列一個灰標，速度種類接在原本的後面（P0-22） */}
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Max raids /hr' : '每小時最多次數'}{speedKinds.length > 0 && <> <PendingVerifyChip kinds={speedKinds} /></>}</span><span className={s.value} data-testid="farming-raids-hr">{calc.maxRaidsHr.toFixed(2)}</span></PendingRow>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Daily yield' : '每日預估收益'} <PendingVerifyChip kinds={['unitCarry', ...speedKinds]} /></span><span className={`${s.value} ${s.highlight}`}>{Math.round(calc.daily).toLocaleString()}</span></PendingRow>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Initial troop cost' : '兵力初始成本'} <PendingVerifyChip kind="units" /></span><span className={s.value}>{calc.troopCost.toLocaleString()}</span></PendingRow>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Payback' : '回本天數'} <PendingVerifyChip kinds={['units', ...speedKinds]} /></span><span className={s.value}>{isFinite(calc.payback) ? `${calc.payback.toFixed(2)} ${lang === 'en' ? 'days' : '天'}` : '—'}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Daily yield' : '每日預估收益'}{summaryKinds.length > 0 && <> <PendingVerifyChip kinds={summaryKinds} /></>}</span><span className={`${s.value} ${s.highlight}`}>{Math.round(calc.daily).toLocaleString()}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Initial troop cost' : '兵力初始成本'}{costKinds.length > 0 && <> <PendingVerifyChip kinds={costKinds} /></>}</span><span className={s.value}>{calc.troopCost.toLocaleString()}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Payback' : '回本天數'}{[...costKinds, ...speedKinds].length > 0 && <> <PendingVerifyChip kinds={[...costKinds, ...speedKinds]} /></>}</span><span className={s.value}>{isFinite(calc.payback) ? `${calc.payback.toFixed(2)} ${lang === 'en' ? 'days' : '天'}` : '—'}</span></PendingRow>
 
           <div className={s.note}>
             {lang === 'en'

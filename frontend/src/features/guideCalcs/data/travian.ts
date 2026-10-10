@@ -126,7 +126,7 @@ export function bbTotalCost(bb: keyof typeof BONUS_BUILDINGS, lv: number): numbe
 // =========================================================================
 export type CpBuilding =
   | 'mainBuilding' | 'marketplace' | 'embassy' | 'academy' | 'townHall'
-  | 'residence' | 'palace' | 'treasury' | 'tradeOffice' | 'smithy' | 'armoury'
+  | 'residence' | 'palace' | 'treasury' | 'tradeOffice' | 'smithy'
   | 'stable' | 'greatStable' | 'barracks' | 'greatBarracks' | 'workshop'
   | 'warehouse' | 'granary' | 'greatWarehouse' | 'greatGranary'
   | 'tournamentSquare' | 'heroMansion' | 'cranny' | 'trapper' | 'rallyPoint'
@@ -139,7 +139,7 @@ export type CpBuilding =
 const CP_ID: Partial<Record<CpBuilding, string>> = {
   mainBuilding: 'main_building', marketplace: 'marketplace', embassy: 'embassy',
   academy: 'academy', townHall: 'town_hall', residence: 'residence', palace: 'palace',
-  treasury: 'treasury', tradeOffice: 'trade_office', smithy: 'blacksmith', armoury: 'armoury',
+  treasury: 'treasury', tradeOffice: 'trade_office', smithy: 'blacksmith',
   stable: 'stable', greatStable: 'great_stable', barracks: 'barracks',
   greatBarracks: 'great_barracks', workshop: 'workshop', warehouse: 'warehouse',
   granary: 'granary', greatWarehouse: 'great_warehouse', greatGranary: 'great_granary',
@@ -154,7 +154,7 @@ const CP_ID: Partial<Record<CpBuilding, string>> = {
 
 const ALL_CP_BUILDINGS: CpBuilding[] = [
   'mainBuilding', 'marketplace', 'embassy', 'academy', 'townHall', 'residence', 'palace',
-  'treasury', 'tradeOffice', 'smithy', 'armoury', 'stable', 'greatStable', 'barracks',
+  'treasury', 'tradeOffice', 'smithy', 'stable', 'greatStable', 'barracks',
   'greatBarracks', 'workshop', 'warehouse', 'granary', 'greatWarehouse', 'greatGranary',
   'tournamentSquare', 'heroMansion', 'cranny', 'trapper', 'rallyPoint', 'stonemason',
   'brewery', 'horseDrinkingTrough', 'cityWall', 'earthWall', 'palisade', 'stoneWall',
@@ -405,7 +405,8 @@ export function fieldRoi(
 
   const cost = fieldTotalCost(type, targetLevel);
   const prodAtL = FIELD_PRODUCTION[targetLevel] ?? 0;
-  const prodAtPrev = targetLevel === 1 ? 0 : (FIELD_PRODUCTION[targetLevel - 1] ?? 0);
+  // 0 級田也有產量（3/小時，ts11 實測），1 級的增加量是 7 − 3 = 4，不是 7（P0-18）
+  const prodAtPrev = FIELD_PRODUCTION[targetLevel - 1] ?? 0;
   const delta = prodAtL - prodAtPrev;
   const multiplier = 1 + bonusBuildingPct + oasisPct + goldBonus;
   const perHour = delta * multiplier;

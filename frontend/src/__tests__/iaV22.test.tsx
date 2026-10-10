@@ -152,51 +152,49 @@ describe('IA v2.2', () => {
   })
 
   describe('「已帶入」列', () => {
-    const renderBar = (path: string) =>
+    const renderBar = (path: string, unitTribe?: string | null) =>
       render(
         <MemoryRouter initialEntries={[path]}>
-          <AutoFillBar />
+          <AutoFillBar unitTribe={unitTribe} />
         </MemoryRouter>,
       )
 
     it('says the offset will be set by pasting when no page was pasted yet', () => {
-      renderBar('/calculator/passive-cp')
+      renderBar('/calculator/passive-cp', 'spartans')
       expect(screen.getByTestId('autofill-offset')).toHaveTextContent('時差：貼一頁就會自動設好')
-      // CP 頁沒用兵種資料：沒有兵種待驗證那行
+      // CP 頁沒用兵種資料：斯巴達也沒有兵種待驗證那行
       expect(screen.queryByTestId('autofill-unit-pending')).not.toBeInTheDocument()
     })
 
-    it('shows 兵種待驗證 on pages that use unit data, e.g. 糧食平衡', () => {
-      renderBar('/calculator/crop')
+    it('shows one 兵種待驗證 line for Spartans on pages that use unit data, e.g. 糧食平衡 (P0-17 (k))', () => {
+      renderBar('/calculator/crop', 'spartans')
       const line = screen.getByTestId('autofill-unit-pending')
-      // 兩行、沒有分號；灰標在最前面，兩行都掛在灰標右邊（同一個文字欄）
+      // 一行、沒有分號；灰標在最前面，文字掛在灰標右邊
       expect(line).not.toHaveTextContent('；')
-      expect(screen.getByTestId('autofill-unit-pending-line1')).toHaveTextContent(/^兵種花費、糧耗、訓練時間還沒在 ts11 核對$/)
-      expect(screen.getByTestId('autofill-unit-pending-line2')).toHaveTextContent(/^斯巴達速度待驗證$/)
+      const text = screen.getByTestId('autofill-unit-pending-text')
+      expect(text).toHaveTextContent(/^斯巴達、維京的兵種數字待驗證（斯巴達含速度）$/)
+      expect(text.tagName).toBe('P')
       const chip = within(line).getByTestId('pending-verify-chip')
       expect(chip).toHaveTextContent('待驗證')
       expect(line.firstElementChild).toContainElement(chip)
-      const text = screen.getByTestId('autofill-unit-pending-text')
       expect(line.lastElementChild).toBe(text)
-      expect(text).toContainElement(screen.getByTestId('autofill-unit-pending-line1'))
-      expect(text).toContainElement(screen.getByTestId('autofill-unit-pending-line2'))
       expect(line).toHaveClass('flex')
     })
 
     it('pages where speed is typed by hand or that use merchant data do not show the unit line (P0-17 (a))', () => {
       for (const path of ['/calculator/path', '/calculator/interception', '/calculator/save-troops', '/calculator/attack-planner', '/calculator/trade-route']) {
-        const { unmount } = renderBar(path)
+        const { unmount } = renderBar(path, 'spartans')
         expect(screen.queryByTestId('autofill-unit-pending')).not.toBeInTheDocument()
         unmount()
       }
     })
 
-    it('the 已帶入 chip uses the two-line autofillUnits copy (one chip governs both lines)', () => {
-      renderBar('/calculator/crop')
+    it('the 已帶入 chip uses the autofillUnits copy', () => {
+      renderBar('/calculator/crop', 'vikings')
       const line = screen.getByTestId('autofill-unit-pending')
       fireEvent.click(within(line).getByTestId('pending-verify-chip'))
       expect(screen.getByTestId('pending-note-what')).toHaveTextContent(
-        /^兵種花費、糧耗、訓練時間還沒在 ts11 遊戲內核對，目前用的是社群整理的數字。$/,
+        /^羅馬人、日耳曼人、高盧人、埃及人、匈奴的兵種數字已在 ts11 遊戲內說明頁核對；ts11 沒有斯巴達、維京，這兩族的花費、糧耗、訓練時間還是社群整理的數字。$/,
       )
       expect(screen.getByTestId('pending-note-source')).toHaveTextContent(
         /^斯巴達速度取自官方說明頁（頁面標示數字來自第三方計算器），反推 TS 不會算斯巴達兵種。$/,
@@ -204,7 +202,7 @@ describe('IA v2.2', () => {
     })
 
     it('「更改」 and the editor selects are at least 44px tall', () => {
-      renderBar('/calculator/crop')
+      renderBar('/calculator/crop', 'gauls')
       const edit = screen.getByTestId('autofill-edit')
       expect(edit).toHaveClass('inline-flex', 'min-h-[44px]', 'min-w-[44px]', 'items-center')
       fireEvent.click(edit)
@@ -257,7 +255,7 @@ describe('IA v2.2', () => {
       expect(screen.getByTestId('incoming-copy')).toHaveClass('min-h-[44px]')
     })
 
-    it('CP card shows progress from the numbers last entered in CP 與開村, with 待驗證 for village 3', () => {
+    it('CP card shows progress from the numbers last entered in CP 與開村; village 3 threshold is official (S51), no 待驗證', () => {
       writeCpProgress('acc-1', { currentCp: 846, dailyCp: 48, speed: 1 })
       render(
         <MemoryRouter>
@@ -266,7 +264,7 @@ describe('IA v2.2', () => {
       )
       expect(screen.getByText('開三村 · CP')).toBeInTheDocument()
       expect(screen.getByTestId('cp-card-progress')).toHaveTextContent('846 / 8,000 CP')
-      expect(screen.getByTestId('cp-card-progress')).toHaveTextContent('待驗證')
+      expect(screen.getByTestId('cp-card-progress')).not.toHaveTextContent('待驗證')
       expect(screen.getByText(/每天 \+48 → 約 150 天/)).toBeInTheDocument()
       expect(screen.getByTestId('cp-card-go')).toHaveClass('inline-flex', 'min-h-[44px]', 'min-w-[44px]', 'items-center')
     })
@@ -309,7 +307,7 @@ describe('IA v2.2', () => {
       expect(screen.queryByText(/去算/)).not.toBeInTheDocument()
     })
 
-    it('CP card for village 2 (ts11-verified) has no 待驗證', () => {
+    it('CP card for village 2 has no 待驗證', () => {
       writeCpProgress('acc-1', { currentCp: 500, dailyCp: 12, speed: 1 })
       render(
         <MemoryRouter>

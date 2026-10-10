@@ -73,7 +73,7 @@ class TestTroopsAPI:
 
     def test_get_troops_search_chinese(self) -> None:
         """測試中文名稱搜尋."""
-        response = client.get("/api/v1/troops?search=軍團")
+        response = client.get("/api/v1/troops?search=步兵")
         assert response.status_code == 200
 
         data = response.json()
@@ -81,9 +81,7 @@ class TestTroopsAPI:
 
         # 檢查搜尋結果包含關鍵字
         for troop in data["troops"]:
-            assert (
-                "軍團" in troop["name_zh"] or "legionnaire" in troop["troop_id"].lower()
-            )
+            assert "步兵" in troop["name_zh"]
 
     def test_get_troops_search_english(self) -> None:
         """測試英文名稱搜尋."""
@@ -125,7 +123,7 @@ class TestTroopsAPI:
 
         data = response.json()
         assert data["troop_id"] == "legionnaire"
-        assert data["name_zh"] == "軍團兵"
+        assert data["name_zh"] == "古羅馬步兵"  # ts11 遊戲內名稱（P0-18）
         assert data["name_en"] == "Legionnaire"
         assert data["tribe"] == "romans"
         assert data["category"] == "infantry"

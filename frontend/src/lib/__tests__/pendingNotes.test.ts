@@ -86,12 +86,13 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
     }
   })
 
-  it('the 已帶入 chip uses autofillUnits, whose two lines cover unit costs and Spartan speed', () => {
+  it('the 已帶入 chip uses autofillUnits, whose one line covers unit costs and Spartan speed', () => {
     const bar = Object.entries(sources).find(([f]) => f.endsWith('/components/autofill/AutoFillBar.tsx'))?.[1] ?? ''
     expect(bar).toMatch(/<PendingVerifyChip[^>]*kind="autofillUnits"/)
     expect(bar).not.toMatch(/kind="units"/)
     const n = (zh as unknown as { pendingNotes: Notes }).pendingNotes.autofillUnits
-    expect(n?.what).toContain('兵種花費、糧耗、訓練時間')
+    expect(n?.what).toContain('花費、糧耗、訓練時間')
+    expect(n?.what).toContain('斯巴達、維京')
     expect(n?.source).toContain('斯巴達速度')
   })
 
