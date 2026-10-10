@@ -1,7 +1,9 @@
 """Map.sql 解析服務."""
 
 import re
+from typing import Any
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.domain.schemas.map_sql import (
@@ -18,6 +20,22 @@ from app.infrastructure.database.models.map_data import (
     MapSnapshot,
     MapVillageData,
 )
+from app.utils.travian_formulas import distance_on_map
+
+MAP_SIZE = 401
+MAP_HALF = MAP_SIZE // 2  # 座標 -200..200
+
+
+def _wrapped_range(column: Any, center: int, radius: int) -> Any:
+    """column 在 center±radius 之間（地圖邊緣環繞，401 格）."""
+    if radius >= MAP_HALF:
+        return column.between(-MAP_HALF, MAP_HALF)
+    low, high = center - radius, center + radius
+    if low < -MAP_HALF:
+        return or_(column >= low + MAP_SIZE, column <= high)
+    if high > MAP_HALF:
+        return or_(column >= low, column <= high - MAP_SIZE)
+    return column.between(low, high)
 
 
 class MapSqlService:
@@ -313,11 +331,11 @@ class MapSqlService:
         center_y: int,
         radius: int,
     ) -> list[MapVillage]:
-        """取得指定範圍內的村莊."""
+        """取得指定範圍內的村莊：距離 ≤ 半徑，用全站共用的環繞距離（P0-22）."""
         return [
             v
             for v in parse_result.villages
-            if abs(v.x - center_x) <= radius and abs(v.y - center_y) <= radius
+            if distance_on_map(center_x, center_y, v.x, v.y) <= radius
         ]
 
     def save_to_database(
@@ -469,11 +487,15 @@ class MapSqlService:
             )
 
         if center_x is not None and center_y is not None and radius is not None:
+            # 先用方框粗篩（跨地圖邊緣時方框拆成兩段），再用環繞距離精篩（P0-22）
             query = query.filter(
-                MapVillageData.x >= center_x - radius,
-                MapVillageData.x <= center_x + radius,
-                MapVillageData.y >= center_y - radius,
-                MapVillageData.y <= center_y + radius,
+                _wrapped_range(MapVillageData.x, center_x, radius),
+                _wrapped_range(MapVillageData.y, center_y, radius),
             )
+            return [
+                v
+                for v in query.all()
+                if distance_on_map(center_x, center_y, v.x, v.y) <= radius
+            ]
 
         return query.all()

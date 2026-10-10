@@ -4,6 +4,11 @@ import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
+import Stepper from '@/components/common/Stepper'
+import RangeNumberField, { outOfRange } from '@/components/common/RangeNumberField'
+import { calculateTravelSeconds } from '@/lib/travianFormulas'
+import { speedPendingKinds } from '@/lib/pendingNotes'
 
 import { unitSpeedValue, type SpeedTribeId } from '@/data/unitSpeeds';
 
@@ -37,13 +42,31 @@ export function lumiBracket(pop: number, lang: 'zh' | 'en') {
     msg: lang === 'en' ? '3–7 horses (5 default)' : '3–7 馬（預設 5）' };
 }
 
-const fmtMin = (m: number) => {
-  if (!isFinite(m)) return '—';
-  if (m < 1) return `${(m * 60).toFixed(0)} s`;
-  if (m < 60) return `${m.toFixed(1)} m`;
-  const h = Math.floor(m / 60);
-  return `${h}h ${Math.round(m % 60)}m`;
+/** 秒數 → 遊戲裡的「H:MM:SS」 */
+const fmtHms = (sec: number) => {
+  if (!isFinite(sec)) return '—';
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const x = Math.round(sec % 60);
+  return `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}`;
 };
+
+/**
+ * 農場收益的計算（匯出給測試）：單程時間用全站共用的行軍公式（P0-22）——
+ * 前 20 格原速，超過的路段 ×(1＋競技場×0.2＋靴子%)，再乘伺服器速度。
+ */
+export function farmingCalc(opts: { dist: number; unitSpeed: number; carry: number; cost: number; n: number; freq: number; loot: number; serverSpeed: number; arena: number; boots: number }) {
+  const { dist, unitSpeed, carry, cost, n, freq, loot, serverSpeed, arena, boots } = opts;
+  const owSec = calculateTravelSeconds({ distance: dist, unitSpeed, serverSpeed, tournamentSquareLevel: arena, heroBonusPercent: boots });
+  const rtMin = (owSec * 2) / 60;
+  const carryCap = n * carry;
+  const maxRaidsHr = 60 / Math.max(freq, rtMin);
+  const perRaid = Math.min(loot, carryCap);
+  const daily = perRaid * maxRaidsHr * 24;
+  const troopCost = n * cost;
+  const payback = daily > 0 ? troopCost / daily : Infinity;
+  return { owSec, carryCap, maxRaidsHr, daily, troopCost, payback };
+}
 
 export default function FarmingCalculator() {
   const { lang } = useLang();
@@ -52,21 +75,19 @@ export default function FarmingCalculator() {
   const [unitId, setUnitId] = useState('steppe');
   const [freq, setFreq] = useState(15);
   const [loot, setLoot] = useState(400);
+  const [arena, setArena] = useState(0);
+  const [boots, setBoots] = useState(0);
+  const { speed: serverSpeed } = useAutoFill();
+  const bootsOk = !outOfRange(boots, 0, 75);
+  const speedKinds = speedPendingKinds(arena, bootsOk ? boots : 0);
 
   const unit = UNITS.find(u => u.id === unitId)!;
   const rec = lumiBracket(pop, lang);
 
-  const calc = useMemo(() => {
-    const owMin = (dist / unit.speed) * 60;
-    const rtMin = owMin * 2;
-    const carryCap = rec.n * unit.carry;
-    const maxRaidsHr = 60 / Math.max(freq, rtMin);
-    const perRaid = Math.min(loot, carryCap);
-    const daily = perRaid * maxRaidsHr * 24;
-    const troopCost = rec.n * unit.cost;
-    const payback = daily > 0 ? troopCost / daily : Infinity;
-    return { owMin, carryCap, maxRaidsHr, daily, troopCost, payback };
-  }, [dist, unit, rec.n, freq, loot]);
+  const calc = useMemo(
+    () => farmingCalc({ dist, unitSpeed: unit.speed, carry: unit.carry, cost: unit.cost, n: rec.n, freq, loot, serverSpeed, arena, boots: bootsOk ? boots : 0 }),
+    [dist, unit, rec.n, freq, loot, serverSpeed, arena, boots, bootsOk],
+  );
 
   return (
     <>
@@ -88,8 +109,22 @@ export default function FarmingCalculator() {
           </div>
           <div className={s.field}>
             <label>{lang === 'en' ? 'Distance (tiles)' : '距離（格）'}</label>
-            <input type="number" min={1} max={50} value={dist} onChange={e => setDist(+e.target.value)} />
+            <input type="number" min={1} max={300} value={dist} onChange={e => setDist(+e.target.value)} />
           </div>
+          {/* 競技場、靴子只加快超過 20 格的路段（共用行軍公式，P0-22） */}
+          <div className={s.field}>
+            <Stepper label={lang === 'en' ? 'Tournament Square level' : '競技場等級'} value={arena} onChange={setArena} min={0} max={20} testId="farming-arena" />
+          </div>
+          <RangeNumberField
+            className={s.field}
+            labelClassName=""
+            label={lang === 'en' ? 'Hero boots speed bonus (%)' : '英雄靴子速度加成（%）'}
+            min={0}
+            max={75}
+            testId="farming-boots"
+            value={boots}
+            onChange={setBoots}
+          />
           <div className={s.field}>
             {/* 選項裡有攜帶量：灰標放在欄位名稱旁（不放進 label，免得點名稱變成點灰標） */}
             <PendingRow className="flex min-h-11 items-center gap-1">
@@ -120,8 +155,8 @@ export default function FarmingCalculator() {
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Daily yield' : '每日收益'}
-          // 每日搶奪量受攜帶量限制（社群整理的數字）：灰標放標題旁，不放大數字旁
-          titlePending="unitCarry"
+          // 摘要一個灰標，依序列出：攜帶量（社群整理）→ 行軍速度（有競技場／靴子才有，P0-22）；不放大數字旁
+          titlePending={['unitCarry', ...speedKinds]}
           primary={<>{Math.round(calc.daily).toLocaleString()}</>}
           secondary={rec.msg}
         >
@@ -130,12 +165,13 @@ export default function FarmingCalculator() {
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Recommended count' : '建議兵數'}</span><span className={s.value}>{rec.msg}</span></div>
 
           <h4>{lang === 'en' ? 'Round-trip & haul' : '往返與搬運'}</h4>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way' : '單程'}</span><span className={s.value}>{fmtMin(calc.owMin)}</span></div>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way' : '單程'}{speedKinds.length > 0 && <> <PendingVerifyChip kinds={speedKinds} /></>}</span><span className={s.value} data-testid="farming-one-way">{fmtHms(calc.owSec)}</span></PendingRow>
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Carry cap (rec count)' : '搬運上限'} <PendingVerifyChip kind="unitCarry" /></span><span className={s.value}>{calc.carryCap.toLocaleString()}</span></PendingRow>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Max raids /hr' : '每小時最多次數'}</span><span className={s.value}>{calc.maxRaidsHr.toFixed(2)}</span></div>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Daily yield' : '每日預估收益'} <PendingVerifyChip kind="unitCarry" /></span><span className={`${s.value} ${s.highlight}`}>{Math.round(calc.daily).toLocaleString()}</span></PendingRow>
+          {/* 每小時次數、每日收益、回本天數都用到單程時間：一列一個灰標，速度種類接在原本的後面（P0-22） */}
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Max raids /hr' : '每小時最多次數'}{speedKinds.length > 0 && <> <PendingVerifyChip kinds={speedKinds} /></>}</span><span className={s.value} data-testid="farming-raids-hr">{calc.maxRaidsHr.toFixed(2)}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Daily yield' : '每日預估收益'} <PendingVerifyChip kinds={['unitCarry', ...speedKinds]} /></span><span className={`${s.value} ${s.highlight}`}>{Math.round(calc.daily).toLocaleString()}</span></PendingRow>
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Initial troop cost' : '兵力初始成本'} <PendingVerifyChip kind="units" /></span><span className={s.value}>{calc.troopCost.toLocaleString()}</span></PendingRow>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Payback' : '回本天數'} <PendingVerifyChip kind="units" /></span><span className={s.value}>{isFinite(calc.payback) ? `${calc.payback.toFixed(2)} ${lang === 'en' ? 'days' : '天'}` : '—'}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Payback' : '回本天數'} <PendingVerifyChip kinds={['units', ...speedKinds]} /></span><span className={s.value}>{isFinite(calc.payback) ? `${calc.payback.toFixed(2)} ${lang === 'en' ? 'days' : '天'}` : '—'}</span></PendingRow>
 
           <div className={s.note}>
             {lang === 'en'

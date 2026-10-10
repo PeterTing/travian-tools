@@ -30,6 +30,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { gameAccountApi } from '@/services/gameAccountApi'
 import { mapSqlApi, type MapParseResponse, type MapVillage, type MapPlayer, type MapAlliance } from '@/services/mapSqlApi'
 import type { GameAccount } from '@/types/game'
+import { distanceOnMap } from '@/lib/travianFormulas'
 
 type ViewMode = 'villages' | 'players' | 'alliances'
 type SearchMode = 'range' | 'player' | 'alliance'
@@ -151,10 +152,8 @@ export default function MapSqlPage() {
     }
   }
 
-  // 計算兩點之間的距離
-  const calcDistance = (x1: number, y1: number, x2: number, y2: number) => {
-    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
-  }
+  // 兩點距離：用全站共用的公式（地圖邊緣會環繞，401×401；P0-22）
+  const calcDistance = (x1: number, y1: number, x2: number, y2: number) => distanceOnMap(x1, y1, x2, y2)
 
   const handleSearch = () => {
     // 如果有已解析的結果，在本地進行搜尋
@@ -163,10 +162,9 @@ export default function MapSqlPage() {
       switch (searchMode) {
         case 'range':
           // 篩選範圍內的村莊並按距離排序
+          // 距離 ≤ 半徑（跟距離欄同一個公式；跨地圖邊緣的村莊也找得到）
           results = parseResult.villages
-            .filter(v =>
-              Math.abs(v.x - centerX) <= radius && Math.abs(v.y - centerY) <= radius
-            )
+            .filter(v => calcDistance(centerX, centerY, v.x, v.y) <= radius)
             .sort((a, b) =>
               calcDistance(centerX, centerY, a.x, a.y) - calcDistance(centerX, centerY, b.x, b.y)
             )

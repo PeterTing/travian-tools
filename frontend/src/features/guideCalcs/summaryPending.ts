@@ -37,7 +37,7 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
   },
   'features/guideCalcs/components/FarmingCalculator.tsx': {
     chips: [['unitCarry']],
-    note: '每日收益受兵種攜帶量限制（社群整理的數字）：標題「每日收益」旁一個；第二行是建議馬數，沒用到待驗證資料',
+    note: '每日收益受兵種攜帶量限制（社群整理的數字）：標題「每日收益」旁一個；有競技場或靴子時同一個灰標接著列出行軍速度（unitCarry → arenaSpeed 等，P0-22），預設兩個都 0 只有 unitCarry；第二行是建議馬數，沒用到待驗證資料',
   },
   'features/guideCalcs/components/FieldRoiCalculator.tsx': {
     chips: [['fieldHighLevel', 'plusFormula']],
