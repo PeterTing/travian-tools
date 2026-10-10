@@ -110,7 +110,7 @@ export default function BuildingCalculatorPage() {
             >
               {buildings.map((building) => (
                 <option key={building.building_id} value={building.building_id}>
-                  {isZh ? building.name_zh : building.name_en}{isBuildingVerified(building.building_id) ? ' ✓' : ''}
+                  {isZh ? building.name_zh : building.name_en}{isBuildingVerified(building.building_id) ? ` ${t('common.verifiedShort')}` : ''}
                 </option>
               ))}
             </select>

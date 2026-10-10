@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { MERCHANTS, merchantCapacity, type TribeId } from '../data/travian';
+import { MERCHANTS, merchantCapacity, TRADE_OFFICE_PER_LEVEL_DEFAULT, TRADE_OFFICE_PER_LEVEL_ROMAN, type TribeId } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
@@ -16,6 +16,10 @@ const fmtHr = (h: number) => {
   const M = totalMin % 60;
   return (H ? `${H}h ` : '') + `${M}m`;
 };
+
+// 頁首說明的交易所每級加成跟計算用同一組常數（P0-23）
+const OFFICE_PCT = Math.round(TRADE_OFFICE_PER_LEVEL_DEFAULT * 100);
+const OFFICE_PCT_ROMAN = Math.round(TRADE_OFFICE_PER_LEVEL_ROMAN * 100);
 
 export default function TraderouteCalculator() {
   const { lang } = useLang();
@@ -54,8 +58,8 @@ export default function TraderouteCalculator() {
       <div className={s.intro}>
         <h2>{lang === 'en' ? 'Trade Route' : '貿易路線'}</h2>
         <p>{lang === 'en'
-          ? "How many merchants you need to move a feeder village's hourly surplus. Tribe sets base capacity and speed; each Trade Office level adds +10% capacity (Romans +20%). Within about 60 fields, one or two merchants are often enough."
-          : '算支援村每小時多出來的資源，要幾個商人才能搬完。部族決定基礎容量與速度；交易所每級多 10% 容量（羅馬人每級 20%）。大約 60 格以內，通常一到兩個商人就夠。'}</p>
+          ? `How many merchants you need to move a feeder village's hourly surplus. Tribe sets base capacity and speed; each Trade Office level adds +${OFFICE_PCT}% capacity (Romans +${OFFICE_PCT_ROMAN}%). Within about 60 fields, one or two merchants are often enough.`
+          : `算支援村每小時多出來的資源，要幾個商人才能搬完。部族決定基礎容量與速度；交易所每級多 ${OFFICE_PCT}% 容量（羅馬人每級 ${OFFICE_PCT_ROMAN}%）。大約 60 格以內，通常一到兩個商人就夠。`}</p>
       </div>
       <CalcBar />
 

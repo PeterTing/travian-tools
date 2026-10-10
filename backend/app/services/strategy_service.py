@@ -39,7 +39,7 @@ ROLE_ADJUSTMENTS = {
         "population_weight": 1.2,
         "troop_weight": 0.6,
         "focus": "資源產出和村莊擴張",
-        "key_metrics": ["資源產量", "村莊數量", "文化點產出"],
+        "key_metrics": ["資源產量", "村莊數量", "CP 產出"],
     },
     # 混合型：平衡發展
     PlayerRole.HYBRID: {
@@ -83,7 +83,7 @@ PHASE_STANDARDS: dict[GamePhase, dict] = {
             target_population=300,
             key_objectives=[
                 "資源田升級至 Lv5-6",
-                "累積文化點達到開村門檻",
+                "累積 CP 達到開村門檻",
                 "建立穩定的農場收入",
                 "完成第二村定居",
             ],
@@ -331,7 +331,7 @@ class StrategyService:
             recommendations.append("持續開村，擴大經濟版圖")
             recommendations.append("升級資源田，最大化資源產出")
             if progress_status == ProgressStatus.BEHIND:
-                recommendations.append("優先累積文化點開設新村莊")
+                recommendations.append("優先累積 CP 開設新村莊")
                 recommendations.append("加快資源田升級")
             elif progress_status == ProgressStatus.AHEAD:
                 recommendations.append("考慮建立資源供給線支援盟友")
@@ -340,7 +340,7 @@ class StrategyService:
             recommendations.extend(standard.key_objectives[:2])
             if progress_status == ProgressStatus.BEHIND:
                 if village_count < standard.min_villages:
-                    recommendations.append("優先累積文化點開設新村莊")
+                    recommendations.append("優先累積 CP 開設新村莊")
                 if total_population < standard.min_population:
                     recommendations.append("加快資源田和建築升級以提升人口")
             elif progress_status == ProgressStatus.AHEAD:
@@ -532,23 +532,23 @@ class StrategyService:
 
         if village_count >= expected_villages:
             return HealthCheckItem(
-                name="文化點產出",
+                name="CP 產出",
                 status="good",
                 score=85,
-                message=f"村莊數 {village_count}，文化點產出正常",
+                message=f"村莊數 {village_count}，CP 產出正常",
                 suggestions=[],
             )
         elif village_count >= expected_villages * 0.7:
             return HealthCheckItem(
-                name="文化點產出",
+                name="CP 產出",
                 status="warning",
                 score=65,
-                message=f"村莊數 {village_count}，文化點產出略低",
-                suggestions=["升級城鎮廳加速文化點", "考慮舉辦慶典"],
+                message=f"村莊數 {village_count}，CP 產出略低",
+                suggestions=["升級城鎮廳加速 CP", "考慮舉辦慶典"],
             )
         else:
             return HealthCheckItem(
-                name="文化點產出",
+                name="CP 產出",
                 status="critical",
                 score=40,
                 message=f"村莊數 {village_count}，發展速度落後",

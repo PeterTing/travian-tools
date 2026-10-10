@@ -178,6 +178,23 @@ UNIT_SPEED_SOURCES = {
 }
 TRIBE_ORDER = ["romans", "teutons", "gauls", "egyptians", "huns", "spartans", "vikings"]
 
+# 運載量（唯一一份，前後端都從產生檔讀；P0-23）。5 族照 ts11 遊戲內說明頁（evidence/ts11_manual_2026-10-10.json）。
+# 斯巴達、維京沒有官方或 ts11 的運載量：官方說明頁 S10、S187（Capacity 是兵營／馬廄格數，不是運載量）、
+# S139 都沒有這一欄。以前前端 tribes/*.ts 和後端 troops.json 各有一份而且不一樣；統一成前端那份，
+# 因為只有它寫了來源，畫面標「待驗證」：
+#   community＝社群整理的斯巴達兵種表（出處寫在前端 tribes/spartans.ts 的註解；這裡不引用玩家網站）
+#   estimate ＝照同類兵種推估（前端 vikings.ts 的註解：S139 沒有運載量，照步兵／騎兵／攻城的慣例填），沒有出處
+# 後端舊的 troops.json 數字（例如維京奴僕 55）沒有任何來源紀錄，不採用。
+CARRY_SOURCES = {
+    "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-10 讀取",
+    "community": None,
+    "estimate": None,
+}
+CARRY_PENDING: dict[str, tuple[list[int], str]] = {
+    "spartans": ([60, 0, 40, 50, 110, 80, 0, 0, 0, 3000], "community"),
+    "vikings": ([50, 30, 60, 0, 50, 70, 0, 0, 0, 3000], "estimate"),
+}
+
 # One row per unit, game order t1..t10:
 #   (troops.json id, frontend id, knowledge_base/tribes.py key, speed, source, ref)
 # ref = in-game manual troop number for "ts11", UNIT_SPEED_SOURCES key for "official".
@@ -717,6 +734,16 @@ def gen_unit_speeds() -> dict:
             row = {"slot": slot, "troop_id": be_id, "fe_id": fe_id, "kb_id": kb_id,
                    "speed": speed, "source": src, "ref": ref_text, "stats": None}
             st = stats.get(str(ref)) if src == "ts11" else None
+            if tribe in CARRY_PENDING:
+                carries, carry_src = CARRY_PENDING[tribe]
+                row["carry"] = carries[slot - 1]
+                row["carry_source"] = carry_src
+                row["carry_ref"] = CARRY_SOURCES[carry_src]
+            else:
+                assert st, (tribe, be_id, "運載量要有 ts11 說明頁的數字")
+                row["carry"] = st["carry"]
+                row["carry_source"] = "ts11"
+                row["carry_ref"] = f"manual/troop/{ref}"
             if st:
                 # 說明頁的速度要跟速度表一樣（速度表 2026-10-09 讀的，這次 10-10 再讀一次）
                 assert st["speed"] == speed, (tribe, be_id, st["speed"], speed)
@@ -740,6 +767,9 @@ def gen_unit_speeds() -> dict:
                     "official": [UNIT_SPEED_SOURCES["s139"], UNIT_SPEED_SOURCES["s187"]],
                     "official_pending": "官方說明頁，數字標示取自第三方計算器（待驗證，不列入反推 TS）",
                     "pending": "沒有第一手出處，速度留空（待驗證）"},
+        "carry_sources": {"ts11": CARRY_SOURCES["ts11"],
+                          "community": "社群整理的數字（斯巴達兵種表，出處見前端 tribes/spartans.ts 註解），待驗證",
+                          "estimate": "照同類兵種推估，沒有出處，待驗證"},
         "tribes": tribes,
     }
 
@@ -765,6 +795,8 @@ def gen_troops(current: dict, speeds: dict) -> dict:
                     rebuilt["speed_ref"] = r["ref"]
             rebuilt.pop("stats_source", None)
             rebuilt.pop("stats_ref", None)
+            # 運載量全部照產生的那一份（前端讀同一份）
+            rebuilt["carry_capacity"] = r["carry"]
             st = r.get("stats")
             if st:
                 rebuilt.update(

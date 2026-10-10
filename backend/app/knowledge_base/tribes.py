@@ -3,6 +3,7 @@
 兵種速度不寫在這裡：由 scripts/game_data/gen_game_data.py 產生到
 backend/data/static/unit_speeds.json（P0-15，ts11 遊戲內說明／官方文章），
 模組載入時用 _apply_unit_speeds() 帶入。沒有第一手出處的兵種速度是 None（待驗證）。
+運載量也一樣由產生器帶入（P0-23）。
 其餘兵種數值（攻防、花費、糧耗、訓練時間）尚未重建，見 docs/TICKETS.md P0-15。
 """
 
@@ -1040,7 +1041,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
 
 
 def _apply_unit_speeds() -> None:
-    """把產生器的兵種速度與出處帶入 TRIBES_DATA（唯一一份速度資料）."""
+    """把產生器的兵種速度、運載量與出處帶入 TRIBES_DATA（唯一一份速度／運載量資料）."""
     data = json.loads(UNIT_SPEEDS_PATH.read_text(encoding="utf-8"))
     for tribe, rows in data["tribes"].items():
         troops = TRIBES_DATA[tribe]["troops"]
@@ -1048,6 +1049,9 @@ def _apply_unit_speeds() -> None:
             troop = troops[row["kb_id"]]
             troop["speed"] = row["speed"]
             troop["speed_source"] = row["source"]
+            # 運載量也照產生檔（P0-23：前端、troops.json 同一份）
+            troop["capacity"] = row["carry"]
+            troop["capacity_source"] = row["carry_source"]
 
 
 _apply_unit_speeds()

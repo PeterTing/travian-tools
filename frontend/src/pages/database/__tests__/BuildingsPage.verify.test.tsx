@@ -35,7 +35,7 @@ describe('BuildingsPage ts11 verification marks', () => {
 
   it('shows one grey legend line at the top', async () => {
     render(<BuildingsPage />)
-    expect(screen.getByTestId('building-verify-legend')).toHaveTextContent('除標 ✓ 的建築外，數值皆未核對')
+    expect(screen.getByTestId('building-verify-legend')).toHaveTextContent('除標「✓ 已核對」的建築外，數值皆未核對')
   })
 
   it('ts11-measured buildings get ✓, others get ONE 待驗證 chip by the name', async () => {
@@ -43,6 +43,9 @@ describe('BuildingsPage ts11 verification marks', () => {
     const mb = (await screen.findByText('村莊大樓')).closest('p')!
     const st = screen.getByText('馬廄').closest('p')!
     expect(within(mb).getByTestId('verified-mark')).toBeInTheDocument()
+    // 小字「✓ 已核對」，不只一個圖示（P0-23 設計師）
+    expect(within(mb).getByTestId('verified-mark')).toHaveTextContent(/^✓ 已核對$/)
+    expect(within(mb).getByTestId('verified-mark').className).toContain('text-[12px]')
     expect(within(mb).queryByTestId('pending-verify-chip')).toBeNull()
     expect(within(st).getAllByTestId('pending-verify-chip')).toHaveLength(1)
     expect(within(st).queryByTestId('verified-mark')).toBeNull()
@@ -79,7 +82,7 @@ describe('BuildingsPage ts11 verification marks', () => {
     fireEvent.click(mark)
     expect(mark).toHaveAttribute('aria-expanded', 'true')
     // 效果也照官方知識庫核對過：第一行加「效果」
-    expect(screen.getByTestId('pending-note-what')).toHaveTextContent('花費、時間、人口、文化點、效果已核對。')
+    expect(screen.getByTestId('pending-note-what')).toHaveTextContent('花費、時間、人口、CP、效果已核對。')
     // 第二行：知識庫沒錯，時間有乘村莊大樓加速（1 級 10000 = 2000 × 5），這裡列基本時間
     const src = screen.getByTestId('pending-note-source')
     expect(src).toHaveTextContent('1 級取自 ts11 遊戲內說明，2 級以上取自官方知識庫。')
@@ -136,7 +139,7 @@ describe('BuildingsPage effect column (official knowledge base, P0-23)', () => {
     expect(within(row).getByTestId('pending-note-source')).toHaveTextContent('官方知識庫沒有可以對照的效果數字；目前的文字來源還在查。')
     // ✓ 第一行不寫「效果」
     fireEvent.click(within((screen.getAllByText('集結點')[0]!).closest('p')!).getByTestId('verified-mark'))
-    expect(screen.getAllByTestId('pending-note-what').some((w) => w.textContent === '花費、時間、人口、文化點已核對。')).toBe(true)
+    expect(screen.getAllByTestId('pending-note-what').some((w) => w.textContent === '花費、時間、人口、CP已核對。')).toBe(true)
   })
 
   it('verified effect (main building): no chip by the 效果 heading', async () => {

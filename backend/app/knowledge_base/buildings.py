@@ -307,7 +307,7 @@ BUILDINGS_DATA = {
         "max_level": 20,
         "description": "與其他玩家交易資源",
         "merchants_per_level": "商人數量隨等級增加",
-        "cp_production": "每日產出較多文化點",
+        "cp_production": "每日產出較多 CP",
     },
     "trade_office": {
         "name_zh": "貿易所",
@@ -334,7 +334,7 @@ BUILDINGS_DATA = {
         "name_en": "Town Hall",
         "category": "infrastructure",
         "max_level": 20,
-        "description": "舉辦慶典獲得文化點",
+        "description": "舉辦慶典獲得 CP",
         "requirements": ["主建築 10級", "研究院 10級"],
         "celebrations": {
             # CP＝每日 CP 產量（小：本村；大：全帳號），cp 欄是 x1 上限
@@ -385,7 +385,7 @@ BUILDINGS_DATA = {
         "max_level": 20,
         "description": "存放神器",
         "requirements": ["主建築 10級"],
-        "cp_production": "高文化點產出（230點/最高級）",
+        "cp_production": "高 CP 產出（230點/最高級）",
     },
     "heros_mansion": {
         "name_zh": "英雄大廈",

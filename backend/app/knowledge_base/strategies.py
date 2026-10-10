@@ -62,7 +62,7 @@ EARLY_GAME_STRATEGIES = {
             "day_14_target": "休閒玩家的合理目標",
         },
         "tips": [
-            "持續舉辦慶典累積文化點",
+            "持續舉辦慶典累積 CP",
             "小型慶典：拿到本村每日 CP 產量（x1 上限 500）——開局一天才十幾 CP，別期待一次 500",
             "大型慶典（城鎮廳10級）：拿到全帳號每日 CP 產量（x1 上限 2000）",
             "小慶典成本 20,330 資源（糧食 1,340 待 ts11 驗證）",
@@ -348,8 +348,8 @@ HERO_GUIDE = {
 # 文化點系統
 CULTURE_POINTS_GUIDE = {
     "basics": {
-        "title": "文化點基礎",
-        "description": "文化點決定你可以擁有多少村莊",
+        "title": "CP 基礎",
+        "description": "CP 決定你可以擁有多少村莊",
         "sources": [
             "建築物每日產出",
             "城鎮廳慶典",
@@ -372,7 +372,7 @@ CULTURE_POINTS_GUIDE = {
         "tip": "慶典給的 CP＝每日 CP 產量（有上限）；x3／x5 上限減半、x10 剩 1/4（官方 Game Versions and Speed）",
     },
     "efficient_buildings": {
-        "title": "高效文化點建築",
+        "title": "高效 CP 建築",
         "list": [
             {"name": "密藏室", "max_cp": 6, "cost_per_cp": 834},
             {"name": "主建築", "max_cp": 77, "cost_per_cp": 1220},
@@ -381,7 +381,7 @@ CULTURE_POINTS_GUIDE = {
         ],
     },
     "village_requirements": {
-        "description": "每個新村莊需要的累積文化點（x1；第 3 村起待 ts11 驗證）",
+        "description": "每個新村莊需要的累積 CP（x1；第 3 村起待 ts11 驗證）",
         "formula": "官方表；約 1600 ÷ 速度 × (村數−1)^2.3",
         "example": [
             {"village": v, "cp_needed": village_requirements(1)[v - 1]}

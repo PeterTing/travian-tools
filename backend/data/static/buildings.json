@@ -3242,7 +3242,7 @@
       "name_en": "Town Hall",
       "category": "infrastructure",
       "max_level": 20,
-      "description_zh": "舉辦慶典產生文化點",
+      "description_zh": "舉辦慶典產生 CP",
       "description_en": "Hold celebrations to produce culture points",
       "prerequisites": [
         {

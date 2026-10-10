@@ -10,6 +10,11 @@
     "official_pending": "官方說明頁，數字標示取自第三方計算器（待驗證，不列入反推 TS）",
     "pending": "沒有第一手出處，速度留空（待驗證）"
   },
+  "carry_sources": {
+    "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-10 讀取",
+    "community": "社群整理的數字（斯巴達兵種表，出處見前端 tribes/spartans.ts 註解），待驗證",
+    "estimate": "照同類兵種推估，沒有出處，待驗證"
+  },
   "tribes": {
     "romans": [
       {
@@ -35,7 +40,10 @@
           "upkeep": 1,
           "train_time": 1600,
           "ref": "manual/troop/1"
-        }
+        },
+        "carry": 50,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/1"
       },
       {
         "slot": 2,
@@ -60,7 +68,10 @@
           "upkeep": 1,
           "train_time": 1760,
           "ref": "manual/troop/2"
-        }
+        },
+        "carry": 20,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/2"
       },
       {
         "slot": 3,
@@ -85,7 +96,10 @@
           "upkeep": 1,
           "train_time": 1920,
           "ref": "manual/troop/3"
-        }
+        },
+        "carry": 50,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/3"
       },
       {
         "slot": 4,
@@ -110,7 +124,10 @@
           "upkeep": 2,
           "train_time": 1360,
           "ref": "manual/troop/4"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/4"
       },
       {
         "slot": 5,
@@ -135,7 +152,10 @@
           "upkeep": 3,
           "train_time": 2640,
           "ref": "manual/troop/5"
-        }
+        },
+        "carry": 100,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/5"
       },
       {
         "slot": 6,
@@ -160,7 +180,10 @@
           "upkeep": 4,
           "train_time": 3520,
           "ref": "manual/troop/6"
-        }
+        },
+        "carry": 70,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/6"
       },
       {
         "slot": 7,
@@ -185,7 +208,10 @@
           "upkeep": 3,
           "train_time": 4600,
           "ref": "manual/troop/7"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/7"
       },
       {
         "slot": 8,
@@ -210,7 +236,10 @@
           "upkeep": 6,
           "train_time": 9000,
           "ref": "manual/troop/8"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/8"
       },
       {
         "slot": 9,
@@ -235,7 +264,10 @@
           "upkeep": 5,
           "train_time": 90700,
           "ref": "manual/troop/9"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/9"
       },
       {
         "slot": 10,
@@ -260,7 +292,10 @@
           "upkeep": 1,
           "train_time": 26900,
           "ref": "manual/troop/10"
-        }
+        },
+        "carry": 3000,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/10"
       }
     ],
     "teutons": [
@@ -287,7 +322,10 @@
           "upkeep": 1,
           "train_time": 720,
           "ref": "manual/troop/11"
-        }
+        },
+        "carry": 60,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/11"
       },
       {
         "slot": 2,
@@ -312,7 +350,10 @@
           "upkeep": 1,
           "train_time": 1120,
           "ref": "manual/troop/12"
-        }
+        },
+        "carry": 40,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/12"
       },
       {
         "slot": 3,
@@ -337,7 +378,10 @@
           "upkeep": 1,
           "train_time": 1200,
           "ref": "manual/troop/13"
-        }
+        },
+        "carry": 50,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/13"
       },
       {
         "slot": 4,
@@ -362,7 +406,10 @@
           "upkeep": 1,
           "train_time": 1120,
           "ref": "manual/troop/14"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/14"
       },
       {
         "slot": 5,
@@ -387,7 +434,10 @@
           "upkeep": 2,
           "train_time": 2400,
           "ref": "manual/troop/15"
-        }
+        },
+        "carry": 110,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/15"
       },
       {
         "slot": 6,
@@ -412,7 +462,10 @@
           "upkeep": 3,
           "train_time": 2960,
           "ref": "manual/troop/16"
-        }
+        },
+        "carry": 80,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/16"
       },
       {
         "slot": 7,
@@ -437,7 +490,10 @@
           "upkeep": 3,
           "train_time": 4200,
           "ref": "manual/troop/17"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/17"
       },
       {
         "slot": 8,
@@ -462,7 +518,10 @@
           "upkeep": 6,
           "train_time": 9000,
           "ref": "manual/troop/18"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/18"
       },
       {
         "slot": 9,
@@ -487,7 +546,10 @@
           "upkeep": 4,
           "train_time": 70500,
           "ref": "manual/troop/19"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/19"
       },
       {
         "slot": 10,
@@ -512,7 +574,10 @@
           "upkeep": 1,
           "train_time": 31000,
           "ref": "manual/troop/20"
-        }
+        },
+        "carry": 3000,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/20"
       }
     ],
     "gauls": [
@@ -539,7 +604,10 @@
           "upkeep": 1,
           "train_time": 1040,
           "ref": "manual/troop/21"
-        }
+        },
+        "carry": 35,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/21"
       },
       {
         "slot": 2,
@@ -564,7 +632,10 @@
           "upkeep": 1,
           "train_time": 1440,
           "ref": "manual/troop/22"
-        }
+        },
+        "carry": 45,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/22"
       },
       {
         "slot": 3,
@@ -589,7 +660,10 @@
           "upkeep": 2,
           "train_time": 1360,
           "ref": "manual/troop/23"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/23"
       },
       {
         "slot": 4,
@@ -614,7 +688,10 @@
           "upkeep": 2,
           "train_time": 2480,
           "ref": "manual/troop/24"
-        }
+        },
+        "carry": 75,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/24"
       },
       {
         "slot": 5,
@@ -639,7 +716,10 @@
           "upkeep": 2,
           "train_time": 2560,
           "ref": "manual/troop/25"
-        }
+        },
+        "carry": 35,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/25"
       },
       {
         "slot": 6,
@@ -664,7 +744,10 @@
           "upkeep": 3,
           "train_time": 3120,
           "ref": "manual/troop/26"
-        }
+        },
+        "carry": 65,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/26"
       },
       {
         "slot": 7,
@@ -689,7 +772,10 @@
           "upkeep": 3,
           "train_time": 5000,
           "ref": "manual/troop/27"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/27"
       },
       {
         "slot": 8,
@@ -714,7 +800,10 @@
           "upkeep": 6,
           "train_time": 9000,
           "ref": "manual/troop/28"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/28"
       },
       {
         "slot": 9,
@@ -739,7 +828,10 @@
           "upkeep": 4,
           "train_time": 90700,
           "ref": "manual/troop/29"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/29"
       },
       {
         "slot": 10,
@@ -764,7 +856,10 @@
           "upkeep": 1,
           "train_time": 22700,
           "ref": "manual/troop/30"
-        }
+        },
+        "carry": 3000,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/30"
       }
     ],
     "egyptians": [
@@ -791,7 +886,10 @@
           "upkeep": 1,
           "train_time": 530,
           "ref": "manual/troop/51"
-        }
+        },
+        "carry": 15,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/51"
       },
       {
         "slot": 2,
@@ -816,7 +914,10 @@
           "upkeep": 1,
           "train_time": 1380,
           "ref": "manual/troop/52"
-        }
+        },
+        "carry": 50,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/52"
       },
       {
         "slot": 3,
@@ -841,7 +942,10 @@
           "upkeep": 1,
           "train_time": 1440,
           "ref": "manual/troop/53"
-        }
+        },
+        "carry": 45,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/53"
       },
       {
         "slot": 4,
@@ -866,7 +970,10 @@
           "upkeep": 2,
           "train_time": 1360,
           "ref": "manual/troop/54"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/54"
       },
       {
         "slot": 5,
@@ -891,7 +998,10 @@
           "upkeep": 2,
           "train_time": 2560,
           "ref": "manual/troop/55"
-        }
+        },
+        "carry": 50,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/55"
       },
       {
         "slot": 6,
@@ -916,7 +1026,10 @@
           "upkeep": 3,
           "train_time": 3240,
           "ref": "manual/troop/56"
-        }
+        },
+        "carry": 70,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/56"
       },
       {
         "slot": 7,
@@ -941,7 +1054,10 @@
           "upkeep": 3,
           "train_time": 4800,
           "ref": "manual/troop/57"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/57"
       },
       {
         "slot": 8,
@@ -966,7 +1082,10 @@
           "upkeep": 6,
           "train_time": 9000,
           "ref": "manual/troop/58"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/58"
       },
       {
         "slot": 9,
@@ -991,7 +1110,10 @@
           "upkeep": 4,
           "train_time": 90700,
           "ref": "manual/troop/59"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/59"
       },
       {
         "slot": 10,
@@ -1016,7 +1138,10 @@
           "upkeep": 1,
           "train_time": 24800,
           "ref": "manual/troop/60"
-        }
+        },
+        "carry": 3000,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/60"
       }
     ],
     "huns": [
@@ -1043,7 +1168,10 @@
           "upkeep": 1,
           "train_time": 810,
           "ref": "manual/troop/61"
-        }
+        },
+        "carry": 50,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/61"
       },
       {
         "slot": 2,
@@ -1068,7 +1196,10 @@
           "upkeep": 1,
           "train_time": 1120,
           "ref": "manual/troop/62"
-        }
+        },
+        "carry": 30,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/62"
       },
       {
         "slot": 3,
@@ -1093,7 +1224,10 @@
           "upkeep": 2,
           "train_time": 1360,
           "ref": "manual/troop/63"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/63"
       },
       {
         "slot": 4,
@@ -1118,7 +1252,10 @@
           "upkeep": 2,
           "train_time": 2400,
           "ref": "manual/troop/64"
-        }
+        },
+        "carry": 75,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/64"
       },
       {
         "slot": 5,
@@ -1143,7 +1280,10 @@
           "upkeep": 2,
           "train_time": 2480,
           "ref": "manual/troop/65"
-        }
+        },
+        "carry": 105,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/65"
       },
       {
         "slot": 6,
@@ -1168,7 +1308,10 @@
           "upkeep": 3,
           "train_time": 2990,
           "ref": "manual/troop/66"
-        }
+        },
+        "carry": 80,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/66"
       },
       {
         "slot": 7,
@@ -1193,7 +1336,10 @@
           "upkeep": 3,
           "train_time": 4400,
           "ref": "manual/troop/67"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/67"
       },
       {
         "slot": 8,
@@ -1218,7 +1364,10 @@
           "upkeep": 6,
           "train_time": 9000,
           "ref": "manual/troop/68"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/68"
       },
       {
         "slot": 9,
@@ -1243,7 +1392,10 @@
           "upkeep": 4,
           "train_time": 90700,
           "ref": "manual/troop/69"
-        }
+        },
+        "carry": 0,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/69"
       },
       {
         "slot": 10,
@@ -1268,7 +1420,10 @@
           "upkeep": 1,
           "train_time": 28950,
           "ref": "manual/troop/70"
-        }
+        },
+        "carry": 3000,
+        "carry_source": "ts11",
+        "carry_ref": "manual/troop/70"
       }
     ],
     "spartans": [
@@ -1280,7 +1435,10 @@
         "speed": 6,
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null
+        "stats": null,
+        "carry": 60,
+        "carry_source": "community",
+        "carry_ref": null
       },
       {
         "slot": 2,
@@ -1290,7 +1448,10 @@
         "speed": 9,
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null
+        "stats": null,
+        "carry": 0,
+        "carry_source": "community",
+        "carry_ref": null
       },
       {
         "slot": 3,
@@ -1300,7 +1461,10 @@
         "speed": 8,
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null
+        "stats": null,
+        "carry": 40,
+        "carry_source": "community",
+        "carry_ref": null
       },
       {
         "slot": 4,
@@ -1310,7 +1474,10 @@
         "speed": 6,
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null
+        "stats": null,
+        "carry": 50,
+        "carry_source": "community",
+        "carry_ref": null
       },
       {
         "slot": 5,
@@ -1320,7 +1487,10 @@
         "speed": 16,
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null
+        "stats": null,
+        "carry": 110,
+        "carry_source": "community",
+        "carry_ref": null
       },
       {
         "slot": 6,
@@ -1330,7 +1500,10 @@
         "speed": 9,
         "source": "official_pending",
         "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null
+        "stats": null,
+        "carry": 80,
+        "carry_source": "community",
+        "carry_ref": null
       },
       {
         "slot": 7,
@@ -1340,7 +1513,10 @@
         "speed": null,
         "source": "pending",
         "ref": null,
-        "stats": null
+        "stats": null,
+        "carry": 0,
+        "carry_source": "community",
+        "carry_ref": null
       },
       {
         "slot": 8,
@@ -1350,7 +1526,10 @@
         "speed": null,
         "source": "pending",
         "ref": null,
-        "stats": null
+        "stats": null,
+        "carry": 0,
+        "carry_source": "community",
+        "carry_ref": null
       },
       {
         "slot": 9,
@@ -1360,7 +1539,10 @@
         "speed": null,
         "source": "pending",
         "ref": null,
-        "stats": null
+        "stats": null,
+        "carry": 0,
+        "carry_source": "community",
+        "carry_ref": null
       },
       {
         "slot": 10,
@@ -1370,7 +1552,10 @@
         "speed": null,
         "source": "pending",
         "ref": null,
-        "stats": null
+        "stats": null,
+        "carry": 3000,
+        "carry_source": "community",
+        "carry_ref": null
       }
     ],
     "vikings": [
@@ -1382,7 +1567,10 @@
         "speed": 7,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 50,
+        "carry_source": "estimate",
+        "carry_ref": null
       },
       {
         "slot": 2,
@@ -1392,7 +1580,10 @@
         "speed": 7,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 30,
+        "carry_source": "estimate",
+        "carry_ref": null
       },
       {
         "slot": 3,
@@ -1402,7 +1593,10 @@
         "speed": 5,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 60,
+        "carry_source": "estimate",
+        "carry_ref": null
       },
       {
         "slot": 4,
@@ -1412,7 +1606,10 @@
         "speed": 9,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 0,
+        "carry_source": "estimate",
+        "carry_ref": null
       },
       {
         "slot": 5,
@@ -1422,7 +1619,10 @@
         "speed": 12,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 50,
+        "carry_source": "estimate",
+        "carry_ref": null
       },
       {
         "slot": 6,
@@ -1432,7 +1632,10 @@
         "speed": 9,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 70,
+        "carry_source": "estimate",
+        "carry_ref": null
       },
       {
         "slot": 7,
@@ -1442,7 +1645,10 @@
         "speed": 4,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 0,
+        "carry_source": "estimate",
+        "carry_ref": null
       },
       {
         "slot": 8,
@@ -1452,7 +1658,10 @@
         "speed": 3,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 0,
+        "carry_source": "estimate",
+        "carry_ref": null
       },
       {
         "slot": 9,
@@ -1462,7 +1671,10 @@
         "speed": 5,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 0,
+        "carry_source": "estimate",
+        "carry_ref": null
       },
       {
         "slot": 10,
@@ -1472,7 +1684,10 @@
         "speed": 5,
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-        "stats": null
+        "stats": null,
+        "carry": 3000,
+        "carry_source": "estimate",
+        "carry_ref": null
       }
     ]
   }

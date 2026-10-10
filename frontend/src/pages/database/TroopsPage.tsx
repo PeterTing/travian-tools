@@ -6,6 +6,8 @@ import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerify
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import { isTribeCostVerified } from '@/data/unitCosts'
+import { carryPendingTribe } from '@/data/unitSpeeds'
+import type { PendingKind } from '@/lib/pendingNotes'
 import { ingameTribeName } from '@/lib/ingameNames'
 
 const TRIBES: { value: TroopTribe | 'all'; label: string }[] = [
@@ -55,6 +57,9 @@ export default function TroopsPage() {
   const [search, setSearch] = useState('')
 
   const isZh = i18n.language.startsWith('zh')
+  const carryPending = selectedTroop ? carryPendingTribe(selectedTroop.troop_id) : null
+  const spartanCarry = carryPending === 'spartans'
+  const carryKind: PendingKind = spartanCarry ? 'spartanCarry' : 'vikingCarry'
 
   useEffect(() => {
     const fetchTroops = async () => {
@@ -249,12 +254,12 @@ export default function TroopsPage() {
                         <td className="py-2 text-muted-foreground">類型</td>
                         <td className="py-2 text-right">{t(`database.troops.category.${selectedTroop.category}`, { defaultValue: selectedTroop.category })}</td>
                       </tr>
-                      {/* 維京運載量：官方說明頁 S139 沒有，數字是舊資料表的（P0-23）；說明畫在這一列下面 */}
+                      {/* 斯巴達、維京運載量：官方說明頁沒有，出處看產生檔 carry_source（P0-23）；說明畫在這一列下面 */}
                       <PendingRow as="tr" className="border-b" tableColSpan={2} data-testid="troop-carry-row">
                         <td className="py-2 text-muted-foreground">運載量</td>
                         <td className="py-2 text-right" data-testid="troop-carry">
                           {selectedTroop.carry_capacity}
-                          {selectedTroop.tribe === 'vikings' && <PendingVerifyChip kind="vikingCarry" className="ml-1" />}
+                          {carryPending && <PendingVerifyChip kind={carryKind} className="ml-1" />}
                         </td>
                       </PendingRow>
                       <tr className="border-b">

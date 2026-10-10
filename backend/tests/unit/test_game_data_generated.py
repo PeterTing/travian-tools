@@ -581,3 +581,32 @@ def test_ts11_reads_record_conditions() -> None:
     assert {r["L1_s"] for r in mb} == {10000}
     barracks0 = next(r for r in kb["runs"] if r["gid"] == 19 and r["mb_input"] == 0)
     assert barracks0["L1_s"] == 5 * 2000
+
+
+# ── 運載量只有一份（P0-23）────────────────────────────────────────────────
+def test_carry_capacity_single_source_backend_and_frontend() -> None:
+    """troops.json、unit_speeds.json、前端 unitSpeeds.gen.json、knowledge_base 每個兵種運載量都一樣."""
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    be = json.loads(
+        (ROOT / "backend/data/static/unit_speeds.json").read_text(encoding="utf-8")
+    )
+    fe = json.loads(
+        (ROOT / "frontend/src/data/unitSpeeds.gen.json").read_text(encoding="utf-8")
+    )
+    assert be == fe
+    n = 0
+    for tribe, rows in be["tribes"].items():
+        for r in rows:
+            n += 1
+            assert troops[r["troop_id"]]["carry_capacity"] == r["carry"], r["troop_id"]
+            kb = TRIBES_DATA[tribe]["troops"][r["kb_id"]]
+            assert kb["capacity"] == r["carry"], r["troop_id"]
+            want = {"spartans": "community", "vikings": "estimate"}.get(tribe, "ts11")
+            assert r["carry_source"] == want, r["troop_id"]
+            if want == "ts11":
+                assert r["stats"]["carry"] == r["carry"]
+    assert n == len(troops) == 70

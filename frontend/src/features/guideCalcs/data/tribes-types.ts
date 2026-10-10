@@ -5,6 +5,8 @@
  * Unit speed is the exception (P0-15 phase 1): it is not stored in the tribe
  * files any more. withUnitSpeeds() attaches it from src/data/unitSpeeds.gen.json
  * (ts11 in-game help / support.travian.com, generated with the backend copy).
+ * Carry capacity works the same way (P0-23): one generated value per unit, the
+ * same one the backend troops.json gets.
  */
 
 import type { TribeId } from './travian';
@@ -31,7 +33,7 @@ export interface Unit {
   speed: number | null; // fields/hour at 1x; null = no first-hand source yet (待驗證)
   speedSource: UnitSpeedSource;
   speedRef: string | null;
-  carry: number;        // carry capacity
+  carry: number;        // carry capacity — generated (unitSpeeds.gen.json), same as backend troops.json
   upkeep: number;       // crop per hour
   cost: UnitCost;
   trainTime: number;    // seconds at 1x, building L1
@@ -70,8 +72,8 @@ export interface Tribe {
   defTips?: { zh: string; en: string }[];
 }
 
-/** Unit as written in the tribe files: everything except the generated speed. */
-export type UnitData = Omit<Unit, 'speed' | 'speedSource' | 'speedRef' | 'statsVerified'>;
+/** Unit as written in the tribe files: everything except the generated speed and carry. */
+export type UnitData = Omit<Unit, 'speed' | 'speedSource' | 'speedRef' | 'statsVerified' | 'carry'>;
 
 export type TribeData = Omit<Tribe, 'units'> & { units: UnitData[] };
 
@@ -88,11 +90,12 @@ export function withUnitSpeeds(tribe: TribeData): Tribe {
         ? {
             name: { ...u.name, zh: st.nameZh },
             attack: st.attack, defInfantry: st.defInf, defCavalry: st.defCav,
-            carry: st.carry, upkeep: st.upkeep, trainTime: st.trainTime,
+            upkeep: st.upkeep, trainTime: st.trainTime,
             cost: { wood: st.cost[0], clay: st.cost[1], iron: st.cost[2], crop: st.cost[3] },
           }
         : {};
-      return { ...u, ...fromTs11, speed: s.speed, speedSource: s.source, speedRef: s.ref, statsVerified: !!st };
+      // 運載量一律用產生檔（跟後端 troops.json 同一份；P0-23）
+      return { ...u, ...fromTs11, carry: s.carry, speed: s.speed, speedSource: s.source, speedRef: s.ref, statsVerified: !!st };
     }),
   };
 }
