@@ -7,8 +7,12 @@ Compliance rules (enforced here and by ``tests/unit/test_compliance.py``):
 * No cookies, no credentials, no Authorization header, no browser.
 * Redirects are NOT followed (a redirect usually means a login/landing page).
 * A descriptive User-Agent identifying the tool.
-* Called only by the fixed daily schedule (``map_sql_scheduler``); there is no
-  user-triggered on-demand fetch. Manual data entry is via file upload.
+* Called only by fixed schedules: the in-process daily job
+  (``map_sql_scheduler``, off in production) and the Cloud Run Job
+  ``app.jobs.fetch_map_sql`` that Cloud Scheduler starts every 4 hours for the
+  worlds in ``map_sql_worlds.TRACKED_WORLDS``. One request per world per run,
+  no retries. There is no user-triggered on-demand fetch. Manual data entry is
+  via file upload.
 """
 
 from __future__ import annotations

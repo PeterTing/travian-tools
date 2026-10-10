@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import logging
 
 from sqlalchemy.orm import Session
@@ -26,6 +27,11 @@ from app.services.snapshot_diff_service import SnapshotDiffService
 logger = logging.getLogger(__name__)
 
 
+def map_sql_sha256(sql_content: str) -> str:
+    """SHA-256 (hex) of a decoded map.sql, used to skip unchanged fetches."""
+    return hashlib.sha256(sql_content.encode("utf-8")).hexdigest()
+
+
 class SnapshotService:
     """map.sql 快照服務：解析、儲存、與前一快照差異計算."""
 
@@ -39,15 +45,51 @@ class SnapshotService:
         self.diff_service = SnapshotDiffService()
 
     def fetch_and_ingest(self, server_url: str) -> dict | None:
-        """（僅供每日排程呼叫）抓取公開 map.sql 並匯入."""
+        """（僅供排程呼叫）抓取公開 map.sql 並匯入.
+
+        內容的 SHA-256 跟這個世界最新一筆快照相同時，不寫資料庫，
+        回傳 ``status="unchanged"``。抓取或匯入失敗回傳 None。
+        """
         try:
             sql_content = fetch_public_map_sql(server_url)
         except Exception:
             logger.exception("Failed to fetch public map.sql for %s", server_url)
             return None
-        return self.ingest(server_url, sql_content)
 
-    def ingest(self, server_url: str, sql_content: str) -> dict | None:
+        digest = map_sql_sha256(sql_content)
+        latest = self._latest_snapshot(server_url)
+        if latest is not None and latest.content_sha256 == digest:
+            logger.info(
+                "map.sql for %s unchanged (sha256 %s); no DB write",
+                server_url,
+                digest[:12],
+            )
+            return {
+                "status": "unchanged",
+                "snapshot_id": latest.snapshot_id,
+                "sha256": digest,
+                "total_villages": latest.total_villages,
+                "total_players": latest.total_players,
+                "total_alliances": latest.total_alliances,
+            }
+        return self.ingest(server_url, sql_content, content_sha256=digest)
+
+    def _latest_snapshot(self, server_url: str) -> MapSnapshot | None:
+        """這個世界最新的一筆快照（不論來源是排程抓取還是上傳）."""
+        return (
+            self.db.query(MapSnapshot)
+            .filter(MapSnapshot.server_url == server_url)
+            .order_by(MapSnapshot.created_at.desc())
+            .first()
+        )
+
+    def ingest(
+        self,
+        server_url: str,
+        sql_content: str,
+        *,
+        content_sha256: str | None = None,
+    ) -> dict | None:
         """解析 map.sql 內容、儲存並計算差異.
 
         完整流程：
@@ -63,6 +105,7 @@ class SnapshotService:
         Args:
             server_url: Travian 伺服器網址（快照歸屬用，不會連線）
             sql_content: map.sql 內容
+            content_sha256: 內容的 SHA-256；沒給就在這裡算
 
         Returns:
             成功時回傳包含 snapshot_id, total_villages, total_players, total_alliances 的 dict；
@@ -82,6 +125,7 @@ class SnapshotService:
                 total_villages=parse_result.total_villages,
                 total_players=parse_result.total_players,
                 total_alliances=parse_result.total_alliances,
+                content_sha256=content_sha256 or map_sql_sha256(sql_content),
             )
             self.db.add(snapshot)
             self.db.flush()
@@ -150,7 +194,9 @@ class SnapshotService:
 
             # Step 8: 回傳摘要
             return {
+                "status": "stored",
                 "snapshot_id": snapshot.snapshot_id,
+                "sha256": snapshot.content_sha256,
                 "total_villages": parse_result.total_villages,
                 "total_players": parse_result.total_players,
                 "total_alliances": parse_result.total_alliances,
