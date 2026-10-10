@@ -12,7 +12,7 @@
  */
 
 import {
-  buildingRows, CP_BASE_BY_ID, villageRequirements, celebration, celebrationCap,
+  buildingRows, CP_BASE_BY_ID, villageRequirements, celebration, celebrationCap, isBuildingVerified,
 } from '../../../data/gameData';
 
 export type ResourceType = 'wood' | 'clay' | 'iron' | 'crop';
@@ -94,6 +94,9 @@ const BB_ID: Record<keyof typeof BONUS_BUILDINGS, string> = {
   sawmill: 'sawmill', brickyard: 'brickyard', ironFoundry: 'iron_foundry',
   grainMill: 'grain_mill', bakery: 'bakery',
 };
+
+/** 5 種加成建築的花費、時間、每級 +5% 都核對過（官方知識庫，P0-23）→ 計算器不用標「待驗證」 */
+export const BONUS_BUILDINGS_VERIFIED: boolean = Object.values(BB_ID).every(isBuildingVerified);
 
 // Bonus-building L1 base cost (scales by 1.80^(L-1)) — generated data
 export const BB_BASE_COST: Record<keyof typeof BONUS_BUILDINGS, { wood: number; clay: number; iron: number; crop: number }> =
@@ -229,8 +232,8 @@ export const OASIS_TYPES: readonly OasisType[] = Object.freeze([
 // meaning modern T4 makes capturing oases FAR more attractive than the
 // numbers in the published Lumi guide suggest.
 // =========================================================================
-// Hero's Mansion cumulative cost — generated data (T4: 80/120/70/90 × 1.33^(L-1)).
-// 待驗證: not yet seen on a ts11 building page.
+// Hero's Mansion cumulative cost — generated data; L1 from the ts11 in-game help,
+// L2–20 from the official knowledge base table (P0-23, evidence/official_kb_buildings_2026-10-10.json).
 export function hmCumulativeCost(level: number): number {
   if (level <= 0) return 0;
   return buildingRows('heros_mansion')
@@ -278,9 +281,13 @@ export const CROPPER_LAYOUTS: readonly CropperLayout[] = Object.freeze([
 // Merchants / Trade Office
 //
 // Trade Office bonus is **tribe-dependent**:
-//   - Romans: +20%/level (max +400% / 5× at Lv 20)
-//   - Other tribes: +10%/level (max +200% / 3× at Lv 20)
-// (Per travian.fandom.com/wiki/Trade_office and Travian Answers aid 48.)
+//   - Romans: +40%/level (max +800% / 9× at Lv 20)
+//   - Other tribes: +20%/level (max +400% / 5× at Lv 20)
+// Official sources (P0-23, scripts/game_data/evidence/):
+//   - knowledge base Trade Office table (+20% / +40% per level),
+//   - support.travian.com S213 (Roman trade office twice as effective),
+//   - S88 ("Level 20 Trade Office (400%): 750 × 5").
+// Merchant capacity / speed: support.travian.com S3.
 // =========================================================================
 export type TribeId = 'romans' | 'teutons' | 'gauls' | 'egyptians' | 'huns' | 'spartans' | 'vikings';
 
@@ -289,13 +296,13 @@ export const MERCHANTS: Record<TribeId, { capacity: number; speed: number }> = {
   teutons:   { capacity: 1000, speed: 12 },
   gauls:     { capacity: 750,  speed: 24 },
   egyptians: { capacity: 750,  speed: 16 },
-  huns:      { capacity: 750,  speed: 20 },
+  huns:      { capacity: 500,  speed: 20 },
   spartans:  { capacity: 500,  speed: 14 },
   vikings:   { capacity: 750,  speed: 18 },
 };
 
-export const TRADE_OFFICE_PER_LEVEL_DEFAULT = 0.10; // +10%/level (most tribes)
-export const TRADE_OFFICE_PER_LEVEL_ROMAN = 0.20;   // Roman exception: +20%/level
+export const TRADE_OFFICE_PER_LEVEL_DEFAULT = 0.20; // +20%/level (most tribes)
+export const TRADE_OFFICE_PER_LEVEL_ROMAN = 0.40;   // Roman exception: +40%/level
 
 export function tradeOfficePerLevel(tribe: TribeId): number {
   return tribe === 'romans' ? TRADE_OFFICE_PER_LEVEL_ROMAN : TRADE_OFFICE_PER_LEVEL_DEFAULT;
@@ -378,7 +385,9 @@ export function formatDuration(sec: number): string {
 // =========================================================================
 // ROI helpers — calibrated to Lumi Table 2
 // Lumi convention: L1 compared against 0 production, L2+ compared against
-// prev level. Multipliers stack additively: (1 + bb + oasis + gold).
+// prev level. Bonus buildings and oases add up on the base production; Plus
+// (+25%) multiplies the total — official S129 "applies to the total production"
+// (P0-23): (1 + bb + oasis) × (1 + gold).
 // =========================================================================
 export interface FieldRoiOpts {
   goldBonus?: number;        // 0 or 0.25 (Plus)
@@ -408,7 +417,7 @@ export function fieldRoi(
   // 0 級田也有產量（3/小時，ts11 實測），1 級的增加量是 7 − 3 = 4，不是 7（P0-18）
   const prodAtPrev = FIELD_PRODUCTION[targetLevel - 1] ?? 0;
   const delta = prodAtL - prodAtPrev;
-  const multiplier = 1 + bonusBuildingPct + oasisPct + goldBonus;
+  const multiplier = (1 + bonusBuildingPct + oasisPct) * (1 + goldBonus);
   const perHour = delta * multiplier;
   const perDay = perHour * 24;
   return {
@@ -428,5 +437,5 @@ export function fieldProduction(
   const bonusBuildingPct = opts.bonusBuildingPct ?? 0;
   const oasisPct = opts.oasisPct ?? 0;
   const base = FIELD_PRODUCTION[level] ?? 0;
-  return base * (1 + bonusBuildingPct + oasisPct + goldBonus);
+  return base * (1 + bonusBuildingPct + oasisPct) * (1 + goldBonus);
 }

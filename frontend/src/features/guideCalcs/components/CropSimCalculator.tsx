@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { CROPPER_LAYOUTS, FIELD_PRODUCTION, type CropperId, type ResourceType } from '../data/travian';
+import { CROPPER_LAYOUTS, FIELD_PRODUCTION, BONUS_BUILDINGS_VERIFIED, type CropperId, type ResourceType } from '../data/travian';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip';
 import type { PendingKind } from '@/lib/pendingNotes';
 import { useLang } from '../i18n/LangContext';
@@ -17,7 +17,7 @@ export interface CropSimInput {
   bonus: { saw: number; bri: number; fnd: number; mil: number; bak: number };
   oasis: Record<ResourceType, number>; // percent
   gold: boolean;
-  /** Egyptian Waterworks level (0 = not Egyptian). +5% oasis bonus per level — 待驗證 */
+  /** Egyptian Waterworks level (0 = not Egyptian). +5% oasis bonus per level (official knowledge base, P0-23) */
   waterworks: number;
 }
 
@@ -25,7 +25,7 @@ export interface CropSimInput {
  * Capital production per hour.
  * production = fields × base × (1 + bonus buildings + oasis) × 1.25 (Plus gold, multiplied last)
  * This reproduces the small travian guide's Table 1 (non-Egyptian) cell by cell.
- * Gold multiplied vs added has no official statement yet → 待 ts11 開 Plus 實測.
+ * Plus multiplies the total: official support.travian.com S129 "applies to the total production" (P0-23).
  */
 export function cropSim(input: CropSimInput) {
   const layout = CROPPER_LAYOUTS.find(l => l.id === input.layoutId)!;
@@ -62,12 +62,10 @@ export default function CropSimCalculator() {
   const [oasis, setOasis] = useState({ wood: 0, clay: 0, iron: 0, crop: 150 });
   const [gold, setGold] = useState(true);
   const [waterworks, setWaterworks] = useState(0);
-  // 待驗證（一行一個灰標，依公式順序：田產量 ×（1＋加成建築＋綠洲）× Plus）：
-  // 資源田 3 級以上的產量是公式推算（fieldHighLevel）；加成建築（building，只算用到的那幾種資源）；Plus ×1.25、供水系統（cropSim）
+  // 資源田產量、供水系統 +5%/級：官方知識庫；Plus ×1.25 乘在總產量上：官方 S129（P0-23）。
+  // 加成建築（只算用到的那幾種資源）的資料哪天又標待驗證，這裡會自動帶回灰標
   const kindsFor = (bb: boolean): PendingKind[] => [
-    ...(flv >= 3 ? ['fieldHighLevel' as const] : []),
-    ...(bb ? ['building' as const] : []),
-    ...(gold || waterworks > 0 ? ['cropSim' as const] : []),
+    ...(bb && !BONUS_BUILDINGS_VERIFIED ? ['building' as const] : []),
   ];
   const bbNonCrop = bonus.saw > 0 || bonus.bri > 0 || bonus.fnd > 0;
   const bbCrop = bonus.mil > 0 || bonus.bak > 0;
@@ -145,16 +143,12 @@ export default function CropSimCalculator() {
               max={20}
             />
           </div>
-          <PendingRow as="p" className="text-xs text-gray-500" data-testid="cropsim-pending">
-            <span>{lang === 'en' ? 'Plus / Waterworks bonus' : 'Plus／供水系統加成'}</span>{' '}
-            <PendingVerifyChip kind="cropSim" />
-          </PendingRow>
         </div>
 
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Total /hr' : '總計 /hr'}
-          // 總計用到：資源田 3 級以上的產量（公式推算）、加成建築、Plus ×1.25／供水系統（還沒核對）；有用到才列
+          // 總計用到的資料有待驗證的才標（目前都核對過）
           titlePending={simKinds.length ? simKinds : false}
           primary={<>{fmtInt(total)}</>}
           secondary={

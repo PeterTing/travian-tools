@@ -255,3 +255,35 @@ class TestTroopsAPI:
             + data["cost_crop"]
         )
         assert data["total_cost"] == expected_total
+
+
+def test_spartan_viking_detail_carry_is_null_with_reason() -> None:
+    """斯巴達、維京運載量留空（P0-23 PM）：API 回 null＋原因，不回 0；其他族照常是數字、沒有原因."""
+    for tribe, troop_id in (
+        ("spartans", "hoplite"),
+        ("spartans", "elpida_rider"),
+        ("vikings", "thrall"),
+        ("vikings", "viking_settler"),
+    ):
+        r = client.get(f"/api/v1/troops/{tribe}/{troop_id}")
+        assert r.status_code == 200
+        d = r.json()
+        assert d["carry_capacity"] is None, troop_id
+        assert "還沒核對" in d["carry_capacity_note"]
+        assert "不能當成 0" in d["carry_capacity_note"]
+    d = client.get("/api/v1/troops/gauls/theutates_thunder").json()
+    assert d["carry_capacity"] == 75
+    assert d["carry_capacity_note"] is None
+
+
+def test_rag_troop_details_never_print_none_or_zero_for_empty_carry() -> None:
+    """知識庫兵種說明：運載量留空時寫「還沒核對」，不印 None 或 0."""
+    from app.knowledge_base.rag_service import TravianKnowledgeBase
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    kb = TravianKnowledgeBase.__new__(TravianKnowledgeBase)
+    text = kb._format_troop_details(TRIBES_DATA["spartans"]["troops"]["hoplite"])
+    line = next(x for x in text.splitlines() if x.startswith("載重"))
+    assert line == "載重: 還沒核對（官方說明頁沒有），先不提供"
+    text = kb._format_troop_details(TRIBES_DATA["gauls"]["troops"]["theutates_thunder"])
+    assert "載重: 75" in text

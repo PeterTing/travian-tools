@@ -120,10 +120,10 @@ class TestStrategySchemas:
                     suggestions=[],
                 ),
                 HealthCheckItem(
-                    name="文化點產出",
+                    name="CP 產出",
                     status="warning",
                     score=65,
-                    message="文化點產出略低",
+                    message="CP 產出略低",
                     suggestions=["升級市政廳"],
                 ),
             ],

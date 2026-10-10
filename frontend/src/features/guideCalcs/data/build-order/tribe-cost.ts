@@ -22,8 +22,8 @@ export interface SettlerCombatStats {
   defCav: number;
   /** Fields per hour (base travel speed); null = 待驗證. Generated, see header. */
   speed: number | null;
-  /** Carry capacity (resources per settler). */
-  carry: number;
+  /** Carry capacity (resources per settler); null = not verified (Spartans, Vikings), never 0. */
+  carry: number | null;
   /** Upkeep in crop per hour. */
   upkeep: number;
 }
@@ -58,7 +58,8 @@ const EGYPTIAN_COMBAT: Omit<SettlerCombatStats, 'speed'> = {
 };
 
 function settlerCombat(tribe: TribeId, base: Omit<SettlerCombatStats, 'speed'>): SettlerCombatStats {
-  return { ...base, speed: unitSpeedValue(tribe, 'settler') };
+  // 運載量照產生檔（斯巴達、維京是 null：還沒核對，P0-23）
+  return { ...base, carry: unitSpeed(tribe, 'settler')?.carry ?? null, speed: unitSpeedValue(tribe, 'settler') };
 }
 
 /** ts11 說明頁讀到的開拓者（產生檔）；沒讀到就用 fallback（不應該發生，測試會擋） */

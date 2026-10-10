@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button'
 import { buildingsApi } from '@/services/gameApi'
 import type { BuildingListItem, BuildingDetail, BuildingCategory } from '@/types/game'
 import BuildingVerifyMark, { BuildingVerifyLegend } from '@/components/common/BuildingVerifyMark'
+import { buildingRowLabel } from '@/lib/buildingVerify'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import { isBuildingEffectVerified } from '@/data/gameData'
 
 const CATEGORY_VALUES: (BuildingCategory | 'all')[] = [
   'all',
@@ -117,10 +120,13 @@ export default function BuildingsPage() {
           <h2 className="text-lg font-semibold mb-4">
             {t('database.buildings.list')} ({buildings.length})
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-2" role="list">
             {buildings.map((building) => (
               <div
                 key={building.building_id}
+                role="listitem"
+                aria-label={buildingRowLabel(isZh ? building.name_zh : building.name_en, building.building_id, t('common.effectPending'))}
+                data-testid="building-list-row"
                 className={`p-3 rounded cursor-pointer transition-colors ${
                   selectedBuilding?.building_id === building.building_id
                     ? 'bg-primary text-primary-foreground'
@@ -129,9 +135,9 @@ export default function BuildingsPage() {
                 onClick={() => handleSelectBuilding(building.building_id)}
               >
                 {/* 名稱這一行至少 44px、垂直置中：灰標的 44px 點擊範圍不會蓋到下一行（點下一行是選這棟建築） */}
-                <p className="flex min-h-11 items-center font-medium" data-testid="building-list-name">
+                <p className="flex min-h-11 flex-wrap items-center font-medium" data-testid="building-list-name">
                   {isZh ? building.name_zh : building.name_en}
-                  <BuildingVerifyMark buildingId={building.building_id} />
+                  <BuildingVerifyMark buildingId={building.building_id} variant="list" onDark={selectedBuilding?.building_id === building.building_id} />
                 </p>
                 <p className="text-sm opacity-70">
                   {t('common.level')}1-{building.max_level} {t('common.separator')} {t(`categories.${building.category}`)}
@@ -186,7 +192,8 @@ export default function BuildingsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b">
+                    {/* 效果欄沒辦法照官方知識庫核對的建築：「效果」標題旁一個灰標，說明畫在標題列下面（P0-23） */}
+                    <PendingRow as="tr" className="border-b" tableColSpan={9}>
                       <th className="py-2 px-2 text-left">{t('common.levelShort')}</th>
                       <th className="py-2 px-2 text-right">{t('database.buildings.wood')}</th>
                       <th className="py-2 px-2 text-right">{t('database.buildings.clay')}</th>
@@ -195,8 +202,11 @@ export default function BuildingsPage() {
                       <th className="py-2 px-2 text-right">{t('database.buildings.buildTime')}</th>
                       <th className="py-2 px-2 text-right">{t('database.buildings.population')}</th>
                       <th className="py-2 px-2 text-right">{t('database.buildings.culturePoints')}</th>
-                      <th className="py-2 px-2 text-left">{t('database.buildings.effect')}</th>
-                    </tr>
+                      <th className="py-2 px-2 text-left whitespace-nowrap" data-testid="building-effect-heading">
+                        {t('database.buildings.effect')}
+                        {!isBuildingEffectVerified(selectedBuilding.building_id) && <PendingVerifyChip kind="buildingEffect" className="ml-1" />}
+                      </th>
+                    </PendingRow>
                   </thead>
                   <tbody>
                     {selectedBuilding.levels.map((level) => (

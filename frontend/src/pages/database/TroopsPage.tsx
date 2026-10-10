@@ -6,6 +6,8 @@ import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerify
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import { isTribeCostVerified } from '@/data/unitCosts'
+import { carryPendingTribe } from '@/data/unitSpeeds'
+import type { PendingKind } from '@/lib/pendingNotes'
 import { ingameTribeName } from '@/lib/ingameNames'
 
 const TRIBES: { value: TroopTribe | 'all'; label: string }[] = [
@@ -29,8 +31,8 @@ const CATEGORIES: { value: TroopCategory | 'all'; label: string }[] = [
   { value: 'settler', label: '開拓者' },
 ]
 
-/** 官方頁數字取自第三方計算器的出處說明（P0-15，斯巴達步兵、騎兵） */
-const OFFICIAL_PENDING_SOURCE_TEXT = '官方說明頁，數字標示取自第三方計算器'
+/** 官方頁數字取自第三方計算器的出處說明（P0-15，斯巴達步兵、騎兵）：兩行（P0-23 PM） */
+const OFFICIAL_PENDING_SOURCE_LINES = ['斯巴達的數字還沒核對', '出處：官方說明頁 S187，頁面上註明數字取自第三方'] as const
 
 /** 速度出處說明（P0-15）：只給已核對的速度用（ts11 遊戲內說明／官方說明）；待驗證的看灰標 */
 function speedSourceLabel(t: Pick<TroopDetail, 'speed_source' | 'speed_ref'>): string {
@@ -55,6 +57,9 @@ export default function TroopsPage() {
   const [search, setSearch] = useState('')
 
   const isZh = i18n.language.startsWith('zh')
+  const carryPending = selectedTroop ? carryPendingTribe(selectedTroop.troop_id) : null
+  const spartanCarry = (carryPending ?? selectedTroop?.tribe) === 'spartans'
+  const carryKind: PendingKind = spartanCarry ? 'spartanCarry' : 'vikingCarry'
 
   useEffect(() => {
     const fetchTroops = async () => {
@@ -230,7 +235,9 @@ export default function TroopsPage() {
               </PendingRow>
               {selectedTroop.speed_source === 'official_pending' && (
                 <p className="mt-2 text-xs text-muted-foreground" data-testid="troop-speed-official-pending-source">
-                  {OFFICIAL_PENDING_SOURCE_TEXT}
+                  {OFFICIAL_PENDING_SOURCE_LINES[0]}
+                  <br />
+                  {OFFICIAL_PENDING_SOURCE_LINES[1]}
                 </p>
               )}
               </div>
@@ -249,10 +256,18 @@ export default function TroopsPage() {
                         <td className="py-2 text-muted-foreground">類型</td>
                         <td className="py-2 text-right">{t(`database.troops.category.${selectedTroop.category}`, { defaultValue: selectedTroop.category })}</td>
                       </tr>
-                      <tr className="border-b">
+                      {/* 斯巴達、維京運載量：官方說明頁沒有 → 留空（null，P0-23 PM）：顯示「—」、灰標緊跟在後；說明畫在這一列下面 */}
+                      <PendingRow as="tr" className="border-b" tableColSpan={2} data-testid="troop-carry-row">
                         <td className="py-2 text-muted-foreground">運載量</td>
-                        <td className="py-2 text-right">{selectedTroop.carry_capacity}</td>
-                      </tr>
+                        <td className="py-2 text-right" data-testid="troop-carry">
+                          {selectedTroop.carry_capacity === null ? (
+                            <span aria-label="未提供" data-testid="troop-carry-empty">—</span>
+                          ) : (
+                            selectedTroop.carry_capacity
+                          )}
+                          {(carryPending || selectedTroop.carry_capacity === null) && <PendingVerifyChip kind={carryKind} className="ml-1" />}
+                        </td>
+                      </PendingRow>
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">糧耗</td>
                         <td className="py-2 text-right">{selectedTroop.crop_consumption}/h</td>

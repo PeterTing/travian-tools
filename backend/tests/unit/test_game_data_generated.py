@@ -273,7 +273,104 @@ def test_marketplace_needs_granary_1() -> None:
 def test_main_building_effect_is_0964_power() -> None:
     assert _lv("main_building", 3).effect_value == 0.929
     assert _lv("main_building", 4).effect_value == 0.896
-    assert "93%" in (_lv("main_building", 3).effect_description or "")
+    # 效果文字照官方知識庫效果欄（92.9%），P0-23
+    assert "92.9%" in (_lv("main_building", 3).effect_description or "")
+
+
+# ─── 效果欄照官方知識庫（P0-23 幕僚長審查）─────────────────────────
+
+
+def _kb_effects(gid: int) -> dict[int, list[str]]:
+    kb = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/official_kb_buildings_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )
+    return {r["level"]: r["effects"] for r in kb["buildings"][str(gid)]["rows"]}
+
+
+@pytest.mark.parametrize(
+    ("bid", "level", "text"),
+    [
+        ("warehouse", 1, "1,200"),
+        ("warehouse", 20, "80,000"),
+        ("great_warehouse", 1, "3,600"),
+        ("great_warehouse", 20, "240,000"),
+        ("great_granary", 1, "3,600"),
+        ("great_granary", 20, "240,000"),
+        ("woodcutter", 1, "7"),
+        ("cropland", 20, "3,430"),
+        ("stonemasons_lodge", 1, "+10%"),
+        ("stonemasons_lodge", 20, "+200%"),
+        ("earth_wall", 20, "48.6%"),
+        ("city_wall", 19, "75.4%"),
+        ("city_wall", 11, "38.4%"),
+        ("workshop", 1, "100%"),
+        ("workshop", 20, "13.5%"),
+        ("horse_drinking_trough", 1, "騎兵訓練時間 99%"),
+        ("horse_drinking_trough", 20, "騎兵訓練時間 80%"),
+        ("trade_office", 1, "+20%（羅馬人 +40%）"),
+    ],
+)
+def test_effect_matches_official_kb(bid: str, level: int, text: str) -> None:
+    assert text in (_lv(bid, level).effect_description or "")
+
+
+def test_every_verified_effect_level_matches_kb() -> None:
+    gen = json.loads(
+        (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
+    )
+    pending = set(gen["effectsPending"])
+    assert pending == {"academy", "blacksmith", "embassy", "rally_point", "treasury"}
+    data = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    gid = {
+        "woodcutter": 1,
+        "clay_pit": 2,
+        "iron_mine": 3,
+        "cropland": 4,
+        "sawmill": 5,
+        "brickyard": 6,
+        "iron_foundry": 7,
+        "grain_mill": 8,
+        "bakery": 9,
+        "warehouse": 10,
+        "granary": 11,
+        "tournament_square": 14,
+        "main_building": 15,
+        "marketplace": 17,
+        "barracks": 19,
+        "stable": 20,
+        "workshop": 21,
+        "cranny": 23,
+        "town_hall": 24,
+        "residence": 25,
+        "palace": 26,
+        "trade_office": 28,
+        "great_barracks": 29,
+        "great_stable": 30,
+        "city_wall": 31,
+        "earth_wall": 32,
+        "palisade": 33,
+        "stonemasons_lodge": 34,
+        "brewery": 35,
+        "trapper": 36,
+        "heros_mansion": 37,
+        "great_warehouse": 38,
+        "great_granary": 39,
+        "horse_drinking_trough": 41,
+    }
+    assert set(gid) == set(data) - pending
+    for bid, g in gid.items():
+        kb = _kb_effects(g)
+        for lv in data[bid]["levels"]:
+            for cell in kb[lv["level"]]:
+                if not cell or (bid == "brewery" and ":" in cell):
+                    continue
+                assert (
+                    cell.replace(".0%", "%").lstrip("+") in lv["effect_description"]
+                ), (bid, lv["level"], cell)
 
 
 # ─── culture points: one source ───────────────────────────────────
@@ -342,31 +439,196 @@ def test_every_village_threshold_is_verified_against_official_s51() -> None:
 
 
 @pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
-def test_every_building_not_measured_in_ts11_is_pending() -> None:
-    """Cost AND time of every building whose src != "ts11" must be 待驗證."""
+def test_every_building_is_verified_against_the_official_knowledge_base() -> None:
+    """P0-23: every level of every building comes from the official knowledge base
+    table (the page the ts11 in-game help links to), so nothing is 待驗證."""
     mod = _gen_module()
     fe = json.loads(
         (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
     )
-    not_measured = sorted(bid for bid, p in mod.PARAMS.items() if p["src"] != "ts11")
-    assert (
-        len(not_measured) == 26
-    )  # 21 + hero mansion + 4 kept-L1-time buildings (T3 armoury removed, #33)
-    for bid in not_measured:
-        assert not mod.PARAMS[bid]["verified"], bid
-        assert {"cost", "time"} <= set(fe["pending"][bid]), bid
-    for bid, p in mod.PARAMS.items():
-        if p["src"] == "ts11":
-            assert p["verified"], bid
-            assert bid not in fe["pending"], bid
-    # resource fields are ts11-measured
-    assert not set(mod.FIELDS) & set(fe["pending"])
+    assert fe["pending"] == {}
+    backend = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    for bid, b in backend.items():
+        rows = mod._kb_levels(bid)
+        assert rows, bid
+        pop = 0
+        for lv in b["levels"]:
+            k = rows[lv["level"]]
+            pop += lv["population"]
+            cost = [lv["cost_wood"], lv["cost_clay"], lv["cost_iron"], lv["cost_crop"]]
+            assert cost == k["cost"], (bid, lv["level"])
+            assert pop == k["pop_total"], (bid, lv["level"])
+            assert lv["culture_points"] == k["cp"], (bid, lv["level"])
+            if bid != "main_building":
+                assert lv["build_time_base"] == k["time_s"], (bid, lv["level"])
+            elif lv["level"] > 1:  # KB times the MB with the previous MB level
+                t = lv["build_time_base"] * mod.MB_FACTOR ** (lv["level"] - 2)
+                assert abs(t - k["time_s"]) <= 10, lv["level"]
 
 
 @pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
-def test_flipping_verified_removes_the_chip() -> None:
+def test_values_corrected_by_the_official_table() -> None:
+    """P0-23 corrections: brewery cost, hero mansion / trapper build times."""
+    b = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    lv2 = b["brewery"]["levels"][1]
+    cost = [lv2["cost_wood"], lv2["cost_clay"], lv2["cost_iron"], lv2["cost_crop"]]
+    assert cost == [3980, 2540, 3410, 4750]
+    assert b["heros_mansion"]["levels"][1]["build_time_base"] == 2670
+    assert b["trapper"]["levels"][1]["build_time_base"] == 2320
+
+
+@pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
+def test_building_without_official_table_is_still_pending() -> None:
     mod = _gen_module()
     p = dict(mod.PARAMS["stable"])
-    assert mod.pending_fields(p) == ["cost", "time"]
+    assert mod.pending_fields("not_in_knowledge_base", p) == ["cost", "time"]
+    mod.KB_VERIFIED.add("stable")
+    assert mod.pending_fields("stable", p) == []
     p["verified"] = True
-    assert mod.pending_fields(p) == []
+    assert mod.pending_fields("not_in_knowledge_base", p) == []
+
+
+@pytest.mark.skipif(not GEN.exists(), reason="generator not shipped in this checkout")
+def test_viking_units_follow_official_s139() -> None:
+    """Vikings: cost / upkeep / training time / attack / defence from S139."""
+    t = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    vik = [r for r in t.values() if r.get("tribe") == "vikings"]
+    assert len(vik) == 10
+    assert all(r["stats_source"] == "official" for r in vik)
+    jarl = next(r for r in vik if r["troop_id"].endswith("jarl"))
+    assert (jarl["attack"], jarl["defense_infantry"], jarl["defense_cavalry"]) == (
+        40,
+        40,
+        60,
+    )
+    assert jarl["training_time_base"] == 70500
+    settler = next(r for r in vik if r["troop_id"].endswith("settler"))
+    assert settler["attack"] == 10
+    cost = [settler[f"cost_{k}"] for k in ("wood", "clay", "iron", "crop")]
+    assert cost == [5800, 4600, 4800, 4800]
+    assert settler["training_time_base"] == 31000
+
+
+# ─── 出處檔（P0-23 幕僚長審查）─────────────────────────────────────
+
+
+def test_support_pages_full_text_sha256_recomputable() -> None:
+    import hashlib
+
+    ev = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/official_support_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert "text_method" in ev
+    assert set(ev["articles"]) == {
+        "s3",
+        "s213",
+        "s88",
+        "s129",
+        "s48",
+        "s139",
+        "s187",
+        "s10",
+    }
+    for key, a in ev["articles"].items():
+        assert len(a["text"]) > 1000, key
+        assert (
+            hashlib.sha256(a["text"].encode("utf-8")).hexdigest() == a["text_sha256"]
+        ), key
+        assert len(a["html_sha256"]) == 64, key
+
+
+def test_merchant_numbers_are_in_s3_full_text() -> None:
+    a = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/official_support_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )["articles"]["s3"]
+    for cap, speed in a["merchants"].values():
+        assert f"Carry {cap} resources, move at {speed} fields/hour" in a["text"]
+
+
+def test_ts11_reads_record_conditions() -> None:
+    m = json.loads(
+        (ROOT / "scripts/game_data/evidence/ts11_manual_2026-10-10.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    rc = m["read_conditions"]
+    assert rc["main_building_level_at_read_time"] == 4
+    assert "x1" in rc["server_speed"]
+    mk = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/ts11_marketplace_read_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert mk["request"]["method"] == "GET"
+    kb = json.loads(
+        (
+            ROOT
+            / "scripts/game_data/evidence/official_kb_mb_level_experiment_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )
+    mb = [r for r in kb["runs"] if r["gid"] == 15]
+    # 村莊大樓頁不看輸入框：1 級永遠是 2000 × 5
+    assert {r["L1_s"] for r in mb} == {10000}
+    barracks0 = next(r for r in kb["runs"] if r["gid"] == 19 and r["mb_input"] == 0)
+    assert barracks0["L1_s"] == 5 * 2000
+
+
+# ── 運載量只有一份（P0-23）────────────────────────────────────────────────
+def test_carry_capacity_single_source_backend_and_frontend() -> None:
+    """troops.json、unit_speeds.json、前端 unitSpeeds.gen.json、knowledge_base 每個兵種運載量都一樣."""
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    be = json.loads(
+        (ROOT / "backend/data/static/unit_speeds.json").read_text(encoding="utf-8")
+    )
+    fe = json.loads(
+        (ROOT / "frontend/src/data/unitSpeeds.gen.json").read_text(encoding="utf-8")
+    )
+    assert be == fe
+    n = 0
+    for tribe, rows in be["tribes"].items():
+        for r in rows:
+            n += 1
+            assert troops[r["troop_id"]]["carry_capacity"] == r["carry"], r["troop_id"]
+            kb = TRIBES_DATA[tribe]["troops"][r["kb_id"]]
+            assert kb["capacity"] == r["carry"], r["troop_id"]
+            want = "pending" if tribe in ("spartans", "vikings") else "ts11"
+            assert r["carry_source"] == want, r["troop_id"]
+            if want == "ts11":
+                assert isinstance(r["carry"], int)
+                assert r["stats"]["carry"] == r["carry"]
+            else:
+                # PM 決定（P0-23）：斯巴達、維京運載量留空，不放社群整理或推估的數字
+                assert r["carry"] is None, r["troop_id"]
+                assert r["carry_ref"] is None
+    assert n == len(troops) == 70
+
+
+def test_spartan_viking_carry_is_null_everywhere_in_backend() -> None:
+    """troops.json、knowledge_base、API 都是 null；API 附上原因，不回 0."""
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    empty = [k for k, t in troops.items() if t["tribe"] in ("spartans", "vikings")]
+    assert len(empty) == 20
+    assert all(troops[k]["carry_capacity"] is None for k in empty)
+    for tribe in ("spartans", "vikings"):
+        assert all(t["capacity"] is None for t in TRIBES_DATA[tribe]["troops"].values())
+    gen_text = GEN.read_text(encoding="utf-8")
+    assert "CARRY_PENDING" not in gen_text
+    assert "community" not in gen_text.split("CARRY_SOURCES = {")[1].split("}")[0]

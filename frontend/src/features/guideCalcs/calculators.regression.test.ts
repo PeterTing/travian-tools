@@ -28,14 +28,14 @@ describe('FieldRoiCalculator.fieldRoi — Lumi Table 2 anchor + regression snaps
     expect(r.roiDays).toBeCloseTo(6.46, 1); // within 0.1 day
   });
 
-  it('Wood L7 (bb=0.25, oasis=0, gold=0.25) = 5.38 days', () => {
+  it('Wood L7 (bb=0.25, oasis=0, gold=0.25) = 5.17 days (Plus multiplies the total, S129)', () => {
     const r = fieldRoi('wood', 7, { goldBonus: 0.25, bonusBuildingPct: 0.25, oasisPct: 0 });
-    expect(r.roiDays).toBeCloseTo(5.38, 1);
+    expect(r.roiDays).toBeCloseTo(5.17, 1);
   });
 
-  it('Iron L10 (bb=0.25, oasis=0.75, gold=0.25) = 6.56 days', () => {
+  it('Iron L10 (bb=0.25, oasis=0.75, gold=0.25) = 5.90 days (Plus multiplies the total, S129)', () => {
     const r = fieldRoi('iron', 10, { goldBonus: 0.25, bonusBuildingPct: 0.25, oasisPct: 0.75 });
-    expect(r.roiDays).toBeCloseTo(6.56, 1);
+    expect(r.roiDays).toBeCloseTo(5.90, 1);
   });
 
   it('Iron L10 (bb=0, oasis=0, gold=0.25) = 11.81 days', () => {
@@ -43,9 +43,9 @@ describe('FieldRoiCalculator.fieldRoi — Lumi Table 2 anchor + regression snaps
     expect(r.roiDays).toBeCloseTo(11.81, 1);
   });
 
-  it('Crop L8 (bb=0.50, oasis=0, gold=0.25) = 5.13 days [max crop bonus]', () => {
+  it('Crop L8 (bb=0.50, oasis=0, gold=0.25) = 4.79 days [max crop bonus; Plus multiplies the total, S129]', () => {
     const r = fieldRoi('crop', 8, { goldBonus: 0.25, bonusBuildingPct: 0.50, oasisPct: 0 });
-    expect(r.roiDays).toBeCloseTo(5.13, 1);
+    expect(r.roiDays).toBeCloseTo(4.79, 1);
   });
 
   it('Crop L8 (bb=0, oasis=0, gold=0.25) = 7.19 days', () => {
@@ -72,11 +72,11 @@ describe('FieldRoiCalculator.fieldRoi — Lumi Table 2 anchor + regression snaps
     expect(r.roiDays).toBe(Infinity);
   });
 
-  it('multiplier stacks additively: 1 + bb + oasis + gold', () => {
+  it('bonus buildings and oasis add up on the base; Plus multiplies the total (official S129, P0-23)', () => {
     // Base delta for crop L10 = 280 - 203 = 77
     const r = fieldRoi('crop', 10, { goldBonus: 0.25, bonusBuildingPct: 0.50, oasisPct: 1.50 });
-    // multiplier = 1 + 0.50 + 1.50 + 0.25 = 3.25
-    expect(r.productionGainPerHour).toBeCloseTo(77 * 3.25, 0);
+    // multiplier = (1 + 0.50 + 1.50) × 1.25 = 3.75 (the old additive 3.25 was wrong)
+    expect(r.productionGainPerHour).toBeCloseTo(77 * 3.75, 0);
   });
 });
 

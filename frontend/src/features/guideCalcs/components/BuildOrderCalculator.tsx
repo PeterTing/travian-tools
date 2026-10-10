@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import {
-  CROPPER_LAYOUTS, FIELD_PRODUCTION,
+  CROPPER_LAYOUTS, FIELD_PRODUCTION, BONUS_BUILDINGS_VERIFIED,
   fieldTotalCost, fieldBuildTime, formatDuration, bbTotalCost, bbBuildTime,
   type CropperId, type ResourceType,
 } from '../data/travian';
@@ -111,7 +111,8 @@ export function planGreedy(input: PlanInput): PlanResult {
       const to = lowest + 1;
       const cost = fieldTotalCost(t, to);
       const baseDelta = (FIELD_PRODUCTION[to] ?? 0) - (FIELD_PRODUCTION[lowest] ?? 0); // 0 級也有 3/小時（P0-18）
-      const delta = baseDelta * (1 + bonusFor(t) + goldPct + (oasisPct[t] ?? 0));
+      // Plus 乘在總產量上（官方 S129），加成建築和綠洲加在基礎產量上
+      const delta = baseDelta * (1 + bonusFor(t) + (oasisPct[t] ?? 0)) * (1 + goldPct);
       const perDay = delta * 24;
       const roi = perDay > 0 ? cost / perDay : Infinity;
       cands.push({ kind: 'field', type: t, from: lowest, to, cost, roi,
@@ -157,6 +158,11 @@ export function planGreedy(input: PlanInput): PlanResult {
   return { steps, totalCost, totalTime };
 }
 
+/** 這次的建議有沒有用到 0 級資源田的產量：起始有 0 級的田，或有一步是 0 → 1 級 */
+export function planUsesFieldLevelZero(start: Record<ResourceType, number>, steps: Step[]): boolean {
+  return Object.values(start).some(lv => lv === 0) || steps.some(x => x.kind === 'field' && x.from === 0);
+}
+
 export default function BuildOrderCalculator() {
   const { lang } = useLang();
   const [cropperId, setCropperId] = useState<CropperId>('15c');
@@ -170,12 +176,13 @@ export default function BuildOrderCalculator() {
     () => planGreedy({ cropperId, isCap, start, bonus, mb, gold }),
     [cropperId, isCap, start, bonus, mb, gold],
   );
-  // 待驗證（一行一個灰標，依序）：資源田 4 級以上（fieldHighLevel）、加成建築（building）、
-  // 有勾 Plus 時排序（ROI）用到 Plus 加總算法（plusFormula，跟田地回本同一種算法）
+  // 待驗證：資源田、加成建築的花費和時間、Plus 算法都已照官方核對（P0-23）；
+  // 加成建築的資料哪天又標待驗證，這裡會自動帶回灰標
   const planKinds: PendingKind[] = [
-    ...(plan.steps.some(x => x.kind === 'field' && x.to >= 4) ? ['fieldHighLevel' as const] : []),
-    ...(plan.steps.some(x => x.kind === 'bb') ? ['building' as const] : []),
-    ...(gold ? ['plusFormula' as const] : []),
+    // 用到 0 級產量（官方資料從 1 級開始）就標：有田從 0 級升 1 級，或起始有 0 級的田
+    // （就算 20 步裡都沒升，總產量、加成建築的划算程度也照 0 級 3／小時算；PM，P0-23）
+    ...(planUsesFieldLevelZero(start, plan.steps) ? ['fieldLevelZero' as const] : []),
+    ...(!BONUS_BUILDINGS_VERIFIED && plan.steps.some(x => x.kind === 'bb') ? ['building' as const] : []),
   ];
 
   return (
@@ -235,8 +242,6 @@ export default function BuildOrderCalculator() {
           title={lang === 'en' ? 'Next upgrades' : '接下來升級'}
           primary={<>{formatDuration(plan.totalTime)}</>}
           secondary={
-            // 一行一個灰標：資源田升到 4 級以上（花費、時間是公式推算，也涵蓋上面的總時間）、
-            // 加成建築（鋸木廠等，數值還沒核對）。總時間用同一份資料，不另外在標題放灰標
             <SummaryPending kinds={planKinds} testId="build-order-summary-cost">
               {lang === 'en'
                 ? `20 steps · cost ${plan.totalCost.toLocaleString()}`

@@ -36,7 +36,14 @@ export interface UnitSpeedRow {
   ref: string | null
   /** ts11 遊戲內說明頁讀到的其他數字（P0-18）；沒讀到的兵種是 null（維持舊資料、顯示待驗證） */
   stats: UnitTs11Stats | null
+  /** 運載量（唯一一份，後端 troops.json 同一次產生；P0-23）；null＝還沒核對（斯巴達、維京），不能當 0 */
+  carry: number | null
+  /** ts11＝遊戲內說明；pending＝沒有官方或 ts11 數字，留空 */
+  carrySource: UnitCarrySource
+  carryRef: string | null
 }
+
+export type UnitCarrySource = 'ts11' | 'pending'
 
 export interface UnitTs11Stats {
   /** 遊戲內中文名稱 */
@@ -74,6 +81,9 @@ interface GenRow {
   source: string
   ref: string | null
   stats?: GenStats | null
+  carry: number | null
+  carry_source: string
+  carry_ref: string | null
 }
 
 const TRIBES = gen.tribes as Record<SpeedTribeId, GenRow[]>
@@ -89,6 +99,9 @@ function toRow(r: GenRow): UnitSpeedRow {
     stats: r.stats
       ? { nameZh: r.stats.name_zh, cost: r.stats.cost, attack: r.stats.attack, defInf: r.stats.def_inf, defCav: r.stats.def_cav, carry: r.stats.carry, upkeep: r.stats.upkeep, trainTime: r.stats.train_time, ref: r.stats.ref }
       : null,
+    carry: r.carry,
+    carrySource: r.carry_source as UnitCarrySource,
+    carryRef: r.carry_ref,
   }
 }
 
@@ -111,3 +124,22 @@ export function unitSpeedValue(tribe: SpeedTribeId, feId: string): number | null
 }
 
 export const UNIT_SPEED_SOURCE_NOTES = gen.sources
+
+/** 用後端 troops.json 的 id 查運載量出處；找不到回 undefined */
+export function unitCarrySource(troopId: string): UnitCarrySource | undefined {
+  for (const rows of Object.values(TRIBES)) {
+    const r = rows.find((x) => x.troop_id === troopId)
+    if (r) return r.carry_source as UnitCarrySource
+  }
+  return undefined
+}
+
+/** 運載量留空（斯巴達、維京，還沒核對）時回那一族，畫面標「待驗證」；ts11 或找不到回 null（P0-23） */
+export function carryPendingTribe(troopId: string): 'spartans' | 'vikings' | null {
+  for (const [tribe, rows] of Object.entries(TRIBES)) {
+    const r = rows.find((x) => x.troop_id === troopId)
+    if (!r || r.carry_source === 'ts11') continue
+    return tribe === 'spartans' ? 'spartans' : 'vikings'
+  }
+  return null
+}

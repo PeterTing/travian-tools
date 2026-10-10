@@ -27,9 +27,11 @@
     "error": "Error",
     "success": "Success",
     "pendingVerify": "Unverified",
+    "effectPending": "effect not verified",
     "pendingVerifyNote": "Not yet confirmed in the game",
-    "buildingVerifyLegend": "Except buildings marked ✓, these numbers have not been measured in ts11",
-    "verifiedTs11": "Measured in ts11",
+    "buildingVerifyLegend": "Except buildings marked “✓ Verified”, these numbers have not been checked",
+    "verifiedTs11": "Checked (tap for the source)",
+    "verifiedShort": "✓ Verified",
     "cancel": "Cancel",
     "decrease": "Decrease",
     "increase": "Increase",
@@ -1130,7 +1132,7 @@
       "source": "The current numbers are community-compiled and may be off."
     },
     "autofillUnits": {
-      "what": "Roman, Teuton, Gaul, Egyptian and Hun unit numbers are checked against the ts11 in-game help; ts11 has no Spartans or Vikings, so their costs, upkeep and training times are still community-compiled.",
+      "what": "Roman, Teuton, Gaul, Egyptian and Hun unit numbers are checked against the ts11 in-game help; Viking costs, upkeep, training times, attack and defence are checked against the official help page, but their carry capacity is unverified and not shown yet; ts11 has no Spartans, so their costs, upkeep and training times are still community-compiled, and their carry capacity is not shown yet.",
       "source": "Spartan speeds come from the official help page (which says the numbers come from a third-party calculator); reverse TS leaves Spartan units out."
     },
     "spartanSpeed": {
@@ -1157,37 +1159,13 @@
       "what": "The small celebration's crop and the great celebration's cost haven't been confirmed on a ts11 Town Hall yet.",
       "source": "The small celebration's crop comes from the opening build-order sheet; the source of the great celebration's cost is still being checked."
     },
-    "heroMansionCost": {
-      "what": "The Hero's Mansion cost hasn't been checked in-game on ts11 yet.",
-      "source": "We're still tracking down where the current numbers come from; they may be off."
-    },
-    "cropSim": {
-      "what": "Plus as ×1.25 (multiplied) and the Egyptian Waterworks +5% oasis bonus per level haven't been checked in-game on ts11 yet.",
-      "source": "Calculated with a community guide's formula; there is no official statement."
-    },
-    "merchantCapacity": {
-      "what": "Merchant capacity and speed haven't been checked in-game on ts11 yet.",
-      "source": "We currently use the community wiki's numbers; they may be off."
-    },
     "unitCarry": {
       "what": "Unit carry capacity hasn't been checked in-game on ts11 yet.",
       "source": "We currently use community-compiled numbers; they may be off."
     },
-    "plusFormula": {
-      "what": "How the Plus bonus is applied hasn't been checked in-game on ts11 yet.",
-      "source": "This page adds it on; the production sim and oasis pages multiply, so results may differ."
-    },
-    "fieldHighLevel": {
-      "what": "Resource field costs and times from level 4 up, and production from level 3 up, are calculated by formula.",
-      "source": "On ts11 only costs for levels 1–3 and production for levels 0–2 have been checked."
-    },
     "launchSim": {
       "what": "The opening cost is the sum of every step in the spreadsheet, including parties (using the small celebration's crop).",
       "source": "These numbers haven't been checked in-game on ts11 yet."
-    },
-    "merchantTradeOffice": {
-      "what": "Merchant capacity, speed and the Trade Office bonus haven't been checked in-game on ts11 yet.",
-      "source": "We currently use the community wiki's numbers; they may be off."
     },
     "arenaSpeed": {
       "what": "The Tournament Square speed-up hasn't been checked in-game on ts11 yet.",
@@ -1204,6 +1182,37 @@
     "smithyFormula": {
       "what": "Smithy-upgraded attack/defence values have not been checked in-game on ts11.",
       "source": "The formula was checked against the level-20 values in the official unit comparison table; it differs from that table by at most 0.2."
+    },
+    "fieldLevelZero": {
+      "what": "Level-0 resource field production is unverified.",
+      "source": "The official knowledge base starts at level 1; we use 3/hr, so level 1 adds only 4."
+    },
+    "buildingEffect": {
+      "what": "This building's effect is unverified.",
+      "source": "The official knowledge base has no effect numbers to compare; we are still checking where the current text comes from."
+    },
+    "vikingCarry": {
+      "what": "Viking carry capacity is unverified, so it is not shown yet",
+      "source": "The official help page S139 has no carry capacity"
+    },
+    "spartanCarry": {
+      "what": "Spartan carry capacity is unverified, so it is not shown yet",
+      "source": "The official help pages S10 and S187 have no carry capacity"
     }
+  },
+  "verifiedNotes": {
+    "ts11L1Kb": {
+      "what": "Cost, time, population and CP are checked.",
+      "source": "Level 1 from the ts11 in-game help, level 2 and up from the official knowledge base."
+    },
+    "mainTs11": {
+      "what": "Cost, time, population and CP are checked.",
+      "source": "Level 1 from the ts11 in-game help, level 2+ from the official knowledge base. Knowledge base times include the Main Building speed-up (Main Building level 1 shows 10000 s = 2000 × 5); this table lists the base time."
+    },
+    "kb": {
+      "what": "Cost, time, population and CP are checked.",
+      "source": "From the official knowledge base."
+    },
+    "whatWithEffect": "Cost, time, population, CP and effect are checked."
   }
 }

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { buildingsApi, calculatorApi } from '@/services/gameApi'
 import BuildingVerifyMark, { BuildingVerifyLegend } from '@/components/common/BuildingVerifyMark'
-import { isBuildingVerified } from '@/data/gameData'
+import { isBuildingFullyVerified } from '@/lib/buildingVerify'
 import type {
   BuildingListItem,
   BuildingUpgradeRequest,
@@ -110,7 +110,7 @@ export default function BuildingCalculatorPage() {
             >
               {buildings.map((building) => (
                 <option key={building.building_id} value={building.building_id}>
-                  {isZh ? building.name_zh : building.name_en}{isBuildingVerified(building.building_id) ? ' ✓' : ''}
+                  {isZh ? building.name_zh : building.name_en}{isBuildingFullyVerified(building.building_id) ? ` ${t('common.verifiedShort')}` : ''}
                 </option>
               ))}
             </select>

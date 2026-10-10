@@ -27,7 +27,8 @@ vi.mock('@/services/gameApi', () => ({
   },
 }))
 
-const SOURCE_TEXT = '官方說明頁，數字標示取自第三方計算器'
+// 斯巴達數字卡片下面的出處：兩行（P0-23 PM）
+const SOURCE_LINES = ['斯巴達的數字還沒核對', '出處：官方說明頁 S187，頁面上註明數字取自第三方']
 
 describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
   beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
@@ -50,7 +51,8 @@ describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
     const speed = await screen.findByTestId('troop-speed')
     expect(speed).toHaveTextContent('6')
     expect(within(speed).getAllByTestId('pending-verify-chip')).toHaveLength(1)
-    expect(screen.getByTestId('troop-speed-official-pending-source')).toHaveTextContent(SOURCE_TEXT)
+    const src = screen.getByTestId('troop-speed-official-pending-source')
+    expect(src.innerHTML.split('<br>').map((x) => x.trim())).toEqual(SOURCE_LINES)
     // 卡片裡不再重複「官方說明頁（待驗證）」；出處只寫在卡片下面那行和灰標說明
     expect(screen.queryByTestId('troop-speed-source')).toBeNull()
     expect(screen.queryByText('官方說明頁（待驗證）')).toBeNull()
@@ -73,6 +75,6 @@ describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
     const speed = await screen.findByTestId('troop-speed')
     expect(within(speed).queryByTestId('pending-verify-chip')).toBeNull()
     expect(screen.getByTestId('troop-speed-source')).toHaveTextContent('ts11 遊戲內說明')
-    expect(screen.queryByText(SOURCE_TEXT)).toBeNull()
+    expect(screen.queryByText(SOURCE_LINES[1]!)).toBeNull()
   })
 })

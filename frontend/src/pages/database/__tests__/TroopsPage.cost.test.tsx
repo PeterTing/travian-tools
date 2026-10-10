@@ -31,7 +31,7 @@ vi.mock('@/services/gameApi', () => ({
 describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / training time (P0-17)', () => {
   beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
 
-  it.each([['重裝步兵'], ['狂戰士']])('%s: exactly one units chip, next to the 「訓練成本」 heading (Spartans / Vikings: no first-hand source)', async (name) => {
+  it.each([['重裝步兵']])('%s: exactly one units chip, next to the 「訓練成本」 heading (Spartans: no first-hand source)', async (name) => {
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText(name))
     const heading = await screen.findByTestId('troop-cost-heading')
@@ -44,9 +44,12 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
     expect(within(section).getByRole('table').querySelector('[data-testid="pending-verify-chip"]')).toBeNull()
   })
 
-  it('古羅馬步兵: no units chip (Roman costs read from the ts11 in-game help, P0-18)', async () => {
+  it.each([
+    ['古羅馬步兵', 'Roman costs read from the ts11 in-game help, P0-18'],
+    ['狂戰士', 'Viking costs / upkeep / training time from official S139, P0-23'],
+  ])('%s: no units chip (%s)', async (name) => {
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('古羅馬步兵'))
+    fireEvent.click(await screen.findByText(name))
     const section = await screen.findByTestId('troop-cost-section')
     expect(within(section).getByRole('heading', { name: '訓練成本' })).toBeInTheDocument()
     expect(screen.queryByTestId('troop-cost-heading')).toBeNull()
@@ -55,7 +58,7 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
 
   it('tap: the units copy opens below the heading and fills the whole section', async () => {
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('狂戰士'))
+    fireEvent.click(await screen.findByText('重裝步兵'))
     const heading = await screen.findByTestId('troop-cost-heading')
     fireEvent.click(within(heading).getByTestId('pending-verify-chip'))
     const panel = screen.getByTestId('pending-note-panel')
@@ -68,7 +71,7 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
   it('基本資訊 shows tribe / type / training building in 繁體中文', async () => {
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText('狂戰士'))
-    await screen.findByTestId('troop-cost-heading')
+    await screen.findByTestId('troop-cost-section')
     for (const zh of ['維京人', '步兵', '兵營']) expect(screen.getByText(zh, { selector: 'td' })).toBeInTheDocument()
     for (const en of ['vikings', 'infantry', 'barracks']) expect(screen.queryByText(en, { selector: 'td' })).toBeNull()
   })

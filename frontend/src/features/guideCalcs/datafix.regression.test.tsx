@@ -91,9 +91,10 @@ describe('one set of building numbers', () => {
   it('field costs come from the generated table', () => {
     expect(FIELD_COSTS.crop[2]).toEqual({ level: 3, wood: 195, clay: 250, iron: 195, crop: 55 })
   })
-  it('hero mansion cost (L1 from ts11, multiplier unmeasured) and small celebration crop are flagged 待驗證', () => {
+  it('hero mansion cost (L1 from ts11, L2–20 from the official knowledge base, P0-23) is verified; small celebration crop stays 1,340', () => {
+    // 1–10 級花費加總＝知識庫英雄宅表（evidence/official_kb_buildings_2026-10-10.json gid 37）
     expect(hmCumulativeCost(10)).toBe(114240)
-    expect(isPending('heros_mansion', 'cost')).toBe(true)
+    expect(isPending('heros_mansion', 'cost')).toBe(false)
     expect(CELEBRATIONS.small.cost.crop).toBe(1340)
     expect(CELEBRATIONS.small.cp).toBe(500)
   })
@@ -183,36 +184,17 @@ describe('PassiveCpCalculator UI', () => {
 })
 
 describe('待驗證 follows the generator verified flag', () => {
-  const unverified = [
-    'stable', 'academy', 'blacksmith', 'workshop', 'town_hall', 'residence', 'palace',
-    'treasury', 'sawmill', 'brickyard', 'iron_foundry', 'grain_mill', 'bakery', 'trade_office',
-    'tournament_square', 'city_wall', 'earth_wall', 'great_barracks', 'great_stable',
-    'great_warehouse', 'great_granary',
-  ]
-  it.each(unverified)('%s cost and time are 待驗證', (id) => {
-    expect(isPending(id, 'cost')).toBe(true)
-    expect(isPending(id, 'time')).toBe(true)
-  })
-  it.each(['main_building', 'warehouse', 'granary', 'cranny', 'marketplace', 'embassy', 'palisade', 'barracks', 'rally_point'])(
-    '%s (ts11 measured) has no chip', (id) => {
+  // P0-23：每棟建築的每一級都照官方知識庫的表（ts11 遊戲內說明「知識庫」連過去的那一頁）→ 沒有待驗證
+  it.each(['stable', 'academy', 'town_hall', 'sawmill', 'trade_office', 'great_granary', 'heros_mansion',
+    'stonemasons_lodge', 'trapper', 'brewery', 'horse_drinking_trough', 'main_building', 'cranny'])(
+    '%s cost and time are verified (no chip)', (id) => {
       expect(isPending(id, 'cost')).toBe(false)
       expect(isPending(id, 'time')).toBe(false)
     },
   )
-  it('every building not measured in ts11 has cost AND time 待驗證', () => {
-    const measured = new Set(['main_building', 'barracks', 'rally_point', 'warehouse', 'granary', 'marketplace',
-      'cranny', 'embassy', 'palisade', 'woodcutter', 'clay_pit', 'iron_mine', 'cropland'])
-    for (const id of Object.keys(gen.buildings)) {
-      if (measured.has(id)) {
-        expect(isBuildingVerified(id), id).toBe(true)
-      } else {
-        expect(isPending(id, 'cost') && isPending(id, 'time'), id).toBe(true)
-        expect(isBuildingVerified(id), id).toBe(false)
-      }
-    }
-    for (const id of ['stonemasons_lodge', 'trapper', 'brewery', 'horse_drinking_trough']) {
-      expect(isPending(id, 'cost'), id).toBe(true)
-    }
+  it('every building is verified: gen.pending is empty', () => {
+    expect(gen.pending).toEqual({})
+    for (const id of Object.keys(gen.buildings)) expect(isBuildingVerified(id), id).toBe(true)
   })
   it('names come from the same data as the database page', () => {
     expect(buildingName('main_building', 'zh')).toBe('村莊大樓')

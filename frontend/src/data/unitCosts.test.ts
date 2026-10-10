@@ -3,9 +3,9 @@ import data from './unitCostVerified.json'
 import { isTribeCostVerified, UNIT_COST_VERIFIED } from './unitCosts'
 
 describe('unit cost verification flags (data/unitCostVerified.json)', () => {
-  it('real data: the 5 ts11 tribes are read from the in-game help (P0-18); Spartans and Vikings have no first-hand source', () => {
+  it('real data: the 5 ts11 tribes are read from the in-game help (P0-18); Vikings from official S139 (P0-23); Spartans have no first-hand source', () => {
     expect(Object.keys(data.tribes).sort()).toEqual(['egyptians', 'gauls', 'huns', 'romans', 'spartans', 'teutons', 'vikings'])
-    const expected: Record<string, boolean> = { romans: true, teutons: true, gauls: true, egyptians: true, huns: true, spartans: false, vikings: false }
+    const expected: Record<string, boolean> = { romans: true, teutons: true, gauls: true, egyptians: true, huns: true, spartans: false, vikings: true }
     for (const [tribe, v] of Object.entries(data.tribes)) expect(v, tribe).toBe(expected[tribe])
     for (const tribe of Object.keys(data.tribes)) expect(isTribeCostVerified(tribe), tribe).toBe(expected[tribe])
     expect(UNIT_COST_VERIFIED).toBe(data.tribes)

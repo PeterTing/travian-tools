@@ -67,7 +67,8 @@
       "ref": "manual/building/2",
       "aliases": [
         "黏土坑",
-        "磚坑"
+        "磚坑",
+        "採土場"
       ]
     },
     "iron_mine": {
@@ -102,7 +103,8 @@
       "ref": "manual/building/7",
       "aliases": [
         "鑄鐵廠",
-        "鑄造廠"
+        "鑄造廠",
+        "鍛造廠"
       ]
     },
     "grain_mill": {
@@ -110,7 +112,8 @@
       "zh": "麵粉廠",
       "ref": "manual/building/8",
       "aliases": [
-        "穀物磨坊"
+        "穀物磨坊",
+        "磨坊"
       ]
     },
     "bakery": {
@@ -141,7 +144,9 @@
       "ref": "manual/building/13",
       "aliases": [
         "鐵匠鋪",
-        "兵工廠"
+        "兵工廠",
+        "鐵匠舖",
+        "盔甲匠舖"
       ]
     },
     "tournament_square": {
@@ -211,7 +216,8 @@
       "zh": "山洞",
       "ref": "manual/building/23",
       "aliases": [
-        "隱藏倉庫"
+        "隱藏倉庫",
+        "密藏室"
       ]
     },
     "town_hall": {
@@ -248,7 +254,8 @@
       "ref": "manual/building/28",
       "aliases": [
         "貿易公司",
-        "商貿處"
+        "商貿處",
+        "貿易所"
       ]
     },
     "great_barracks": {
@@ -315,7 +322,8 @@
       "zh": "英雄宅",
       "ref": "manual/building/37",
       "aliases": [
-        "英雄宅邸"
+        "英雄宅邸",
+        "英雄大廈"
       ]
     },
     "great_warehouse": {
@@ -369,7 +377,8 @@
       "zh": "供水系統",
       "ref": "manual/building/45",
       "aliases": [
-        "水渠"
+        "水渠",
+        "水利工程"
       ]
     }
   },
@@ -557,7 +566,8 @@
       "zh": "司令官",
       "ref": "manual/troop/19",
       "aliases": [
-        "領袖"
+        "領袖",
+        "酋長"
       ]
     },
     "teuton_settler": {
@@ -605,7 +615,8 @@
       "zh": "雷法師",
       "ref": "manual/troop/24",
       "aliases": [
-        "圖塔特雷"
+        "圖塔特雷",
+        "雷神騎兵"
       ]
     },
     "druidrider": {
@@ -691,7 +702,8 @@
       "zh": "斧刀勇士",
       "ref": "manual/troop/53",
       "aliases": [
-        "鐮刀劍戰士"
+        "鐮刀劍戰士",
+        "彎刀戰士"
       ]
     },
     "sopdu_explorer": {
@@ -701,7 +713,8 @@
       "zh": "探險者索普杜",
       "ref": "manual/troop/54",
       "aliases": [
-        "索普度探險者"
+        "索普度探險者",
+        "索普杜探索者"
       ]
     },
     "anhur_guard": {
@@ -711,7 +724,8 @@
       "zh": "守衛安赫",
       "ref": "manual/troop/55",
       "aliases": [
-        "安胡爾守衛"
+        "安胡爾守衛",
+        "安赫爾守衛"
       ]
     },
     "resheph_chariot": {
@@ -721,7 +735,8 @@
       "zh": "瑞舍夫戰車",
       "ref": "manual/troop/56",
       "aliases": [
-        "瑞謝夫戰車"
+        "瑞謝夫戰車",
+        "雷謝夫戰車"
       ]
     },
     "egyptian_ram": {
@@ -750,7 +765,9 @@
       "game_id": 59,
       "zh": "州長",
       "ref": "manual/troop/59",
-      "aliases": []
+      "aliases": [
+        "諾馬克"
+      ]
     },
     "egyptian_settler": {
       "tribe": "egyptians",
@@ -789,7 +806,8 @@
       "zh": "探子",
       "ref": "manual/troop/63",
       "aliases": [
-        "斥候"
+        "斥候",
+        "觀察者"
       ]
     },
     "steppe_rider": {
@@ -845,7 +863,8 @@
       "zh": "重步兵",
       "ref": "manual/troop/69",
       "aliases": [
-        "領袖"
+        "領袖",
+        "洛加德"
       ]
     },
     "hun_settler": {
@@ -860,6 +879,66 @@
         "定居者"
       ]
     },
+    "hoplite": {
+      "tribe": "spartans",
+      "fe_id": "hoplite",
+      "game_id": null,
+      "zh": "重裝步兵",
+      "ref": null,
+      "aliases": [
+        "裝甲步兵"
+      ]
+    },
+    "sentinel": {
+      "tribe": "spartans",
+      "fe_id": "sentinel",
+      "game_id": null,
+      "zh": "哨兵",
+      "ref": null,
+      "aliases": []
+    },
+    "shieldsman": {
+      "tribe": "spartans",
+      "fe_id": "shieldsman",
+      "game_id": null,
+      "zh": "盾兵",
+      "ref": null,
+      "aliases": [
+        "盾牌手"
+      ]
+    },
+    "twinsteel_therion": {
+      "tribe": "spartans",
+      "fe_id": "twinsteel",
+      "game_id": null,
+      "zh": "雙刃獸戰士",
+      "ref": null,
+      "aliases": [
+        "雙鋼泰瑞恩",
+        "旋鏢兵"
+      ]
+    },
+    "elpida_rider": {
+      "tribe": "spartans",
+      "fe_id": "elpida",
+      "game_id": null,
+      "zh": "希望騎士",
+      "ref": null,
+      "aliases": [
+        "爾必達騎士",
+        "厄爾皮達騎兵"
+      ]
+    },
+    "corinthian_crusher": {
+      "tribe": "spartans",
+      "fe_id": "corinthian",
+      "game_id": null,
+      "zh": "科林斯粉碎者",
+      "ref": null,
+      "aliases": [
+        "科林斯破壞者"
+      ]
+    },
     "spartan_ram": {
       "tribe": "spartans",
       "fe_id": "ram",
@@ -868,6 +947,26 @@
       "ref": null,
       "aliases": [
         "攻城槌"
+      ]
+    },
+    "ballista": {
+      "tribe": "spartans",
+      "fe_id": "ballista",
+      "game_id": null,
+      "zh": "弩砲",
+      "ref": null,
+      "aliases": [
+        "賴達投石機"
+      ]
+    },
+    "ephor": {
+      "tribe": "spartans",
+      "fe_id": "ephor",
+      "game_id": null,
+      "zh": "監察官",
+      "ref": null,
+      "aliases": [
+        "五長官"
       ]
     },
     "spartan_settler": {
@@ -880,6 +979,64 @@
         "拓荒者",
         "移民",
         "定居者"
+      ]
+    },
+    "thrall": {
+      "tribe": "vikings",
+      "fe_id": "thrall",
+      "game_id": null,
+      "zh": "奴僕",
+      "ref": null,
+      "aliases": [
+        "奴隸"
+      ]
+    },
+    "shield_maiden": {
+      "tribe": "vikings",
+      "fe_id": "shieldMaiden",
+      "game_id": null,
+      "zh": "盾女",
+      "ref": null,
+      "aliases": [
+        "鋼盾少女"
+      ]
+    },
+    "berserker": {
+      "tribe": "vikings",
+      "fe_id": "berserker",
+      "game_id": null,
+      "zh": "狂戰士",
+      "ref": null,
+      "aliases": []
+    },
+    "heimdalls_eye": {
+      "tribe": "vikings",
+      "fe_id": "heimdallsEye",
+      "game_id": null,
+      "zh": "海姆達爾之眼",
+      "ref": null,
+      "aliases": []
+    },
+    "huskarl_rider": {
+      "tribe": "vikings",
+      "fe_id": "huskarlRider",
+      "game_id": null,
+      "zh": "侍衛騎士",
+      "ref": null,
+      "aliases": [
+        "禁衛軍騎士",
+        "胡斯卡爾騎士"
+      ]
+    },
+    "valkyries_blessing": {
+      "tribe": "vikings",
+      "fe_id": "valkyrie",
+      "game_id": null,
+      "zh": "女武神之賜",
+      "ref": null,
+      "aliases": [
+        "女武神的祝福",
+        "瓦爾基麗的祝福"
       ]
     },
     "viking_ram": {
@@ -900,6 +1057,17 @@
       "ref": null,
       "aliases": [
         "投石車"
+      ]
+    },
+    "jarl": {
+      "tribe": "vikings",
+      "fe_id": "jarl",
+      "game_id": null,
+      "zh": "領主",
+      "ref": null,
+      "aliases": [
+        "首領",
+        "雅爾"
       ]
     },
     "viking_settler": {

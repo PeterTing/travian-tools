@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import { resourcesApi } from '@/services/gameApi'
 import type { ResourceFieldListItem, ResourceFieldDetail, ResourceType } from '@/types/game'
 import { ingameBuildingName } from '@/lib/ingameNames'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 
 const RESOURCE_TYPES: { value: ResourceType; label: string; color: string }[] = [
   { value: 'wood', label: ingameBuildingName('woodcutter')!, color: 'bg-amber-100 text-amber-800' },
@@ -196,17 +196,19 @@ export default function ResourcesPage() {
                   </thead>
                   <tbody>
                     {selectedResource.levels.map((level) => (
-                      <tr
+                      <PendingRow
+                        as="tr"
+                        tableColSpan={9}
                         key={level.level}
                         className="border-b hover:bg-muted/50"
                       >
                         <td className="py-2 px-2 font-medium whitespace-nowrap">
                           {level.level}
-                          {/* 3 級以上產量、4 級以上花費／時間還沒對過 ts11（P0-18） */}
-                          {level.level >= 3 && <PendingVerifyChip kind="fieldHighLevel" className="ml-1" />}
                         </td>
                         <td className="py-2 px-2 text-right font-semibold text-green-600">
                           {level.production_per_hour}
+                          {/* 0 級產量官方資料沒有（官方知識庫從 1 級開始，P0-23） */}
+                          {level.level === 0 && <PendingVerifyChip kind="fieldLevelZero" className="ml-1" />}
                         </td>
                         <td className="py-2 px-2 text-right">
                           {level.cost_wood.toLocaleString()}
@@ -229,7 +231,7 @@ export default function ResourcesPage() {
                         <td className="py-2 px-2 text-right">
                           {level.population}
                         </td>
-                      </tr>
+                      </PendingRow>
                     ))}
                   </tbody>
                 </table>
@@ -249,19 +251,21 @@ export default function ResourcesPage() {
                   </thead>
                   <tbody>
                     {roiData.map((roi) => (
-                      <tr
+                      <PendingRow
+                        as="tr"
+                        tableColSpan={5}
                         key={roi.from_level}
                         className="border-b hover:bg-muted/50"
                       >
                         <td className="py-2 px-2 font-medium">
                           {roi.from_level} → {roi.to_level} 級
-                          {roi.to_level >= 3 && <PendingVerifyChip kind="fieldHighLevel" className="ml-1" />}
                         </td>
                         <td className="py-2 px-2 text-right">
                           {roi.upgrade_cost.toLocaleString()}
                         </td>
                         <td className="py-2 px-2 text-right text-green-600">
                           +{roi.production_increase}/h
+                          {roi.from_level === 0 && <PendingVerifyChip kind="fieldLevelZero" className="ml-1" />}
                         </td>
                         <td className="py-2 px-2 text-right font-semibold">
                           {formatRoiHours(roi.roi_hours)}
@@ -283,7 +287,7 @@ export default function ResourcesPage() {
                               : '延後升級'}
                           </span>
                         </td>
-                      </tr>
+                      </PendingRow>
                     ))}
                   </tbody>
                 </table>

@@ -98,7 +98,39 @@ describe('遊戲內名稱表', () => {
       if (g) { names.add(g.name.zh); guideHits++ }
       expect([...names], troopId).toEqual([u.zh])
     }
-    expect(guideHits).toBeGreaterThanOrEqual(50)
+    // 七族 70 種兵都在表裡（斯巴達、維京也是，#34），計算器資料每一種都找得到
+    expect(Object.keys(INGAME_UNITS)).toHaveLength(70)
+    expect(guideHits).toBe(70)
+  })
+
+  it('Spartan / Viking units: calculator names = troops page names (PM rule: S139/S187 have no zh page, keep the troops-page name)', () => {
+    const pairs: [string, string, string][] = [
+      ['vikings', 'thrall', '奴僕'], ['spartans', 'hoplite', '重裝步兵'],
+      ['spartans', 'elpida', '希望騎士'], ['vikings', 'huskarlRider', '侍衛騎士'],
+    ]
+    for (const [tribe, id, zhName] of pairs) {
+      expect(TRIBES[tribe as keyof typeof TRIBES].units.find(u => u.id === id)?.name.zh, id).toBe(zhName)
+    }
+  })
+
+  it('no English unit name inside Chinese text of the tribe guides and build-order data (one name per unit on screen)', () => {
+    const en = new Set<string>()
+    for (const t of Object.values(TRIBES)) for (const u of t.units) if (!/^(Ram|Catapult|Settler)$/.test(u.name.en)) en.add(u.name.en)
+    const files = import.meta.glob(['/src/features/guideCalcs/data/tribes/*.ts', '/src/features/guideCalcs/data/build-order/*.ts'], {
+      query: '?raw', import: 'default', eager: true,
+    }) as Record<string, string>
+    const bad: string[] = []
+    for (const [p, src] of Object.entries(files)) {
+      if (/\.test\./.test(p)) continue
+      for (const m of src.matchAll(/zh: (['"])(.*?)\1/g)) {
+        const text = m[2]!
+        const hits = [...en].filter(n => text.includes(n))
+        if (hits.length) bad.push(`${p}: ${hits.join('、')} in 「${text.slice(0, 40)}」`)
+      }
+    }
+    expect(bad).toEqual([])
+    // 英文欄也不能是中文（#33 的替換曾經把幾個兵種的英文名換成中文）
+    for (const t of Object.values(TRIBES)) for (const u of t.units) expect(u.name.en, `${t.id}.${u.id}`).not.toMatch(/[\u4e00-\u9fff]/)
   })
 
   it('no old name in front-end source (aliases only live in the table, for search)', () => {

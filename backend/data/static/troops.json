@@ -396,7 +396,8 @@
       "description_zh": "高盧最快的攻擊騎兵",
       "description_en": "Gaul fastest attack cavalry",
       "aliases_zh": [
-        "圖塔特雷"
+        "圖塔特雷",
+        "雷神騎兵"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/24"
@@ -826,7 +827,8 @@
       "description_zh": "日耳曼的征服者，降低敵方忠誠度",
       "description_en": "Teuton chief unit for conquering villages",
       "aliases_zh": [
-        "領袖"
+        "領袖",
+        "酋長"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/19"
@@ -942,7 +944,8 @@
       "description_zh": "匈奴的偵查騎兵，遊戲中最快的偵查單位",
       "description_en": "Hun scout cavalry, fastest scout in the game",
       "aliases_zh": [
-        "斥候"
+        "斥候",
+        "觀察者"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/63"
@@ -1112,7 +1115,8 @@
       "description_zh": "匈奴的征服者，降低敵方忠誠度 15-30%",
       "description_en": "Hun chief unit for conquering villages, reduces loyalty by 15-30%",
       "aliases_zh": [
-        "領袖"
+        "領袖",
+        "洛加德"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/69"
@@ -1228,7 +1232,8 @@
       "description_zh": "埃及的攻擊步兵",
       "description_en": "Egyptian attack infantry",
       "aliases_zh": [
-        "鐮刀劍戰士"
+        "鐮刀劍戰士",
+        "彎刀戰士"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/53"
@@ -1257,7 +1262,8 @@
       "description_zh": "埃及的偵查騎兵",
       "description_en": "Egyptian scout cavalry",
       "aliases_zh": [
-        "索普度探險者"
+        "索普度探險者",
+        "索普杜探索者"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/54"
@@ -1286,7 +1292,8 @@
       "description_zh": "埃及的防禦騎兵",
       "description_en": "Egyptian defensive cavalry",
       "aliases_zh": [
-        "安胡爾守衛"
+        "安胡爾守衛",
+        "安赫爾守衛"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/55"
@@ -1315,7 +1322,8 @@
       "description_zh": "埃及的重騎兵，防禦極強",
       "description_en": "Egyptian heavy cavalry with very strong defense",
       "aliases_zh": [
-        "瑞謝夫戰車"
+        "瑞謝夫戰車",
+        "雷謝夫戰車"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/56"
@@ -1401,7 +1409,9 @@
       "academy_level_required": 20,
       "description_zh": "埃及的征服者，降低敵方忠誠度 20-25%",
       "description_en": "Egyptian chief unit for conquering villages, reduces loyalty by 20-25%",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "諾馬克"
+      ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/59"
     },
@@ -1448,7 +1458,7 @@
       "speed": 7,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 55,
+      "carry_capacity": null,
       "cost_wood": 95,
       "cost_clay": 80,
       "cost_iron": 50,
@@ -1459,9 +1469,11 @@
       "academy_level_required": 0,
       "description_zh": "維京的基礎攻擊步兵",
       "description_en": "Viking basic attack infantry",
-      "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "aliases_zh": [
+        "奴隸"
+      ],
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "shield_maiden": {
       "troop_id": "shield_maiden",
@@ -1475,7 +1487,7 @@
       "speed": 7,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 40,
+      "carry_capacity": null,
       "cost_wood": 125,
       "cost_clay": 70,
       "cost_iron": 85,
@@ -1486,9 +1498,11 @@
       "academy_level_required": 1,
       "description_zh": "維京的防禦步兵",
       "description_en": "Viking defensive infantry",
-      "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "aliases_zh": [
+        "鋼盾少女"
+      ],
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "berserker": {
       "troop_id": "berserker",
@@ -1502,7 +1516,7 @@
       "speed": 5,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 50,
+      "carry_capacity": null,
       "cost_wood": 235,
       "cost_clay": 220,
       "cost_iron": 200,
@@ -1514,8 +1528,8 @@
       "description_zh": "維京的強力攻擊步兵，死亡時必殺一敵",
       "description_en": "Viking powerful attack infantry, kills one enemy on death",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "heimdalls_eye": {
       "troop_id": "heimdalls_eye",
@@ -1529,7 +1543,7 @@
       "speed": 9,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 0,
+      "carry_capacity": null,
       "cost_wood": 155,
       "cost_clay": 95,
       "cost_iron": 50,
@@ -1541,8 +1555,8 @@
       "description_zh": "維京的偵查步兵",
       "description_en": "Viking scout infantry",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "huskarl_rider": {
       "troop_id": "huskarl_rider",
@@ -1556,7 +1570,7 @@
       "speed": 12,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 85,
+      "carry_capacity": null,
       "cost_wood": 385,
       "cost_clay": 295,
       "cost_iron": 290,
@@ -1567,9 +1581,12 @@
       "academy_level_required": 5,
       "description_zh": "維京的防禦騎兵，均衡防禦",
       "description_en": "Viking defensive cavalry with balanced defense",
-      "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "aliases_zh": [
+        "禁衛軍騎士",
+        "胡斯卡爾騎士"
+      ],
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "valkyries_blessing": {
       "troop_id": "valkyries_blessing",
@@ -1583,7 +1600,7 @@
       "speed": 9,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 65,
+      "carry_capacity": null,
       "cost_wood": 475,
       "cost_clay": 535,
       "cost_iron": 515,
@@ -1594,9 +1611,12 @@
       "academy_level_required": 15,
       "description_zh": "維京的重騎兵，糧耗效率高",
       "description_en": "Viking heavy cavalry with efficient crop consumption",
-      "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "aliases_zh": [
+        "女武神的祝福",
+        "瓦爾基麗的祝福"
+      ],
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "viking_ram": {
       "troop_id": "viking_ram",
@@ -1610,7 +1630,7 @@
       "speed": 4,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 0,
+      "carry_capacity": null,
       "cost_wood": 950,
       "cost_clay": 325,
       "cost_iron": 375,
@@ -1624,8 +1644,8 @@
       "aliases_zh": [
         "攻城槌"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "viking_catapult": {
       "troop_id": "viking_catapult",
@@ -1639,7 +1659,7 @@
       "speed": 3,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 0,
+      "carry_capacity": null,
       "cost_wood": 850,
       "cost_clay": 1225,
       "cost_iron": 625,
@@ -1653,8 +1673,8 @@
       "aliases_zh": [
         "投石車"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "jarl": {
       "troop_id": "jarl",
@@ -1663,25 +1683,28 @@
       "tribe": "vikings",
       "category": "special",
       "attack": 40,
-      "defense_infantry": 60,
-      "defense_cavalry": 40,
+      "defense_infantry": 40,
+      "defense_cavalry": 60,
       "speed": 5,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 0,
+      "carry_capacity": null,
       "cost_wood": 35500,
       "cost_clay": 26600,
       "cost_iron": 25000,
       "cost_crop": 27200,
       "crop_consumption": 4,
-      "training_time_base": 77500,
+      "training_time_base": 70500,
       "training_building": "residence",
       "academy_level_required": 20,
       "description_zh": "維京的征服者，降低敵方忠誠度 15-30%",
       "description_en": "Viking chief unit for conquering villages, reduces loyalty by 15-30%",
-      "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "aliases_zh": [
+        "首領",
+        "雅爾"
+      ],
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "viking_settler": {
       "troop_id": "viking_settler",
@@ -1689,19 +1712,19 @@
       "name_en": "Settler",
       "tribe": "vikings",
       "category": "settler",
-      "attack": 0,
+      "attack": 10,
       "defense_infantry": 80,
       "defense_cavalry": 80,
       "speed": 5,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 3000,
-      "cost_wood": 5500,
-      "cost_clay": 7000,
-      "cost_iron": 5300,
-      "cost_crop": 4900,
+      "carry_capacity": null,
+      "cost_wood": 5800,
+      "cost_clay": 4600,
+      "cost_iron": 4800,
+      "cost_crop": 4800,
       "crop_consumption": 1,
-      "training_time_base": 28900,
+      "training_time_base": 31000,
       "training_building": "residence",
       "academy_level_required": 0,
       "description_zh": "維京的開拓者，用於建立新村莊",
@@ -1711,8 +1734,8 @@
         "移民",
         "定居者"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "official",
+      "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
     "hoplite": {
       "troop_id": "hoplite",
@@ -1726,7 +1749,7 @@
       "speed": 6,
       "speed_source": "official_pending",
       "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": 50,
+      "carry_capacity": null,
       "cost_wood": 110,
       "cost_clay": 185,
       "cost_iron": 110,
@@ -1737,7 +1760,9 @@
       "academy_level_required": 0,
       "description_zh": "斯巴達的基礎步兵，攻擊力強",
       "description_en": "Spartan basic infantry with strong attack",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "裝甲步兵"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1753,7 +1778,7 @@
       "speed": 9,
       "speed_source": "official_pending",
       "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": 0,
+      "carry_capacity": null,
       "cost_wood": 185,
       "cost_clay": 150,
       "cost_iron": 35,
@@ -1780,7 +1805,7 @@
       "speed": 8,
       "speed_source": "official_pending",
       "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": 35,
+      "carry_capacity": null,
       "cost_wood": 145,
       "cost_clay": 95,
       "cost_iron": 245,
@@ -1791,7 +1816,9 @@
       "academy_level_required": 3,
       "description_zh": "斯巴達的防禦步兵，最快的防禦步兵",
       "description_en": "Spartan defensive infantry, fastest defensive infantry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "盾牌手"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1807,7 +1834,7 @@
       "speed": 6,
       "speed_source": "official_pending",
       "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": 45,
+      "carry_capacity": null,
       "cost_wood": 130,
       "cost_clay": 200,
       "cost_iron": 400,
@@ -1818,7 +1845,10 @@
       "academy_level_required": 5,
       "description_zh": "斯巴達的強力攻擊步兵",
       "description_en": "Spartan powerful attack infantry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "雙鋼泰瑞恩",
+        "旋鏢兵"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1834,7 +1864,7 @@
       "speed": 16,
       "speed_source": "official_pending",
       "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": 70,
+      "carry_capacity": null,
       "cost_wood": 555,
       "cost_clay": 445,
       "cost_iron": 330,
@@ -1845,7 +1875,10 @@
       "academy_level_required": 5,
       "description_zh": "斯巴達的防禦騎兵",
       "description_en": "Spartan defensive cavalry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "爾必達騎士",
+        "厄爾皮達騎兵"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1861,7 +1894,7 @@
       "speed": 9,
       "speed_source": "official_pending",
       "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": 75,
+      "carry_capacity": null,
       "cost_wood": 660,
       "cost_clay": 495,
       "cost_iron": 995,
@@ -1872,7 +1905,9 @@
       "academy_level_required": 15,
       "description_zh": "斯巴達最強的重騎兵",
       "description_en": "Spartan most powerful heavy cavalry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "科林斯破壞者"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1888,7 +1923,7 @@
       "speed": null,
       "speed_source": "pending",
       "speed_ref": null,
-      "carry_capacity": 0,
+      "carry_capacity": null,
       "cost_wood": 525,
       "cost_clay": 260,
       "cost_iron": 790,
@@ -1917,7 +1952,7 @@
       "speed": null,
       "speed_source": "pending",
       "speed_ref": null,
-      "carry_capacity": 0,
+      "carry_capacity": null,
       "cost_wood": 550,
       "cost_clay": 1240,
       "cost_iron": 825,
@@ -1928,7 +1963,9 @@
       "academy_level_required": 15,
       "description_zh": "斯巴達的攻城武器，用於破壞建築",
       "description_en": "Spartan siege weapon for destroying buildings",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "賴達投石機"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1944,7 +1981,7 @@
       "speed": null,
       "speed_source": "pending",
       "speed_ref": null,
-      "carry_capacity": 0,
+      "carry_capacity": null,
       "cost_wood": 33450,
       "cost_clay": 30665,
       "cost_iron": 36240,
@@ -1955,7 +1992,9 @@
       "academy_level_required": 20,
       "description_zh": "斯巴達的征服者，降低敵方忠誠度",
       "description_en": "Spartan chief unit for conquering villages",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "五長官"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1971,7 +2010,7 @@
       "speed": null,
       "speed_source": "pending",
       "speed_ref": null,
-      "carry_capacity": 3000,
+      "carry_capacity": null,
       "cost_wood": 5115,
       "cost_clay": 5580,
       "cost_iron": 6045,

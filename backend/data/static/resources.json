@@ -36,7 +36,7 @@
           "cost_clay": 165,
           "cost_iron": 85,
           "cost_crop": 100,
-          "build_time_base": 616,
+          "build_time_base": 620,
           "population": 1,
           "culture_points": 1
         },
@@ -47,7 +47,7 @@
           "cost_clay": 280,
           "cost_iron": 140,
           "cost_crop": 165,
-          "build_time_base": 1186,
+          "build_time_base": 1190,
           "population": 1,
           "culture_points": 2
         },
@@ -58,7 +58,7 @@
           "cost_clay": 465,
           "cost_iron": 235,
           "cost_crop": 280,
-          "build_time_base": 2097,
+          "build_time_base": 2100,
           "population": 1,
           "culture_points": 2
         },
@@ -69,7 +69,7 @@
           "cost_clay": 780,
           "cost_iron": 390,
           "cost_crop": 465,
-          "build_time_base": 3555,
+          "build_time_base": 3560,
           "population": 1,
           "culture_points": 2
         },
@@ -80,7 +80,7 @@
           "cost_clay": 1300,
           "cost_iron": 650,
           "cost_crop": 780,
-          "build_time_base": 5888,
+          "build_time_base": 5890,
           "population": 2,
           "culture_points": 3
         },
@@ -91,7 +91,7 @@
           "cost_clay": 2170,
           "cost_iron": 1085,
           "cost_crop": 1300,
-          "build_time_base": 9621,
+          "build_time_base": 9620,
           "population": 2,
           "culture_points": 4
         },
@@ -102,7 +102,7 @@
           "cost_clay": 3625,
           "cost_iron": 1810,
           "cost_crop": 2175,
-          "build_time_base": 15594,
+          "build_time_base": 15590,
           "population": 2,
           "culture_points": 4
         },
@@ -135,7 +135,7 @@
           "cost_clay": 16870,
           "cost_iron": 8435,
           "cost_crop": 10125,
-          "build_time_base": 64904,
+          "build_time_base": 64900,
           "population": 2,
           "culture_points": 7
         },
@@ -146,7 +146,7 @@
           "cost_clay": 28175,
           "cost_iron": 14090,
           "cost_crop": 16905,
-          "build_time_base": 104047,
+          "build_time_base": 104050,
           "population": 2,
           "culture_points": 9
         },
@@ -157,7 +157,7 @@
           "cost_clay": 47055,
           "cost_iron": 23525,
           "cost_crop": 28230,
-          "build_time_base": 166675,
+          "build_time_base": 166680,
           "population": 2,
           "culture_points": 11
         },
@@ -179,7 +179,7 @@
           "cost_clay": 131230,
           "cost_iron": 65615,
           "cost_crop": 78740,
-          "build_time_base": 427208,
+          "build_time_base": 427210,
           "population": 2,
           "culture_points": 15
         },
@@ -190,7 +190,7 @@
           "cost_clay": 219155,
           "cost_iron": 109575,
           "cost_crop": 131490,
-          "build_time_base": 683733,
+          "build_time_base": 683730,
           "population": 3,
           "culture_points": 18
         },
@@ -201,7 +201,7 @@
           "cost_clay": 365985,
           "cost_iron": 182995,
           "cost_crop": 219590,
-          "build_time_base": 1094173,
+          "build_time_base": 1094170,
           "population": 3,
           "culture_points": 22
         },
@@ -212,7 +212,7 @@
           "cost_clay": 611195,
           "cost_iron": 305600,
           "cost_crop": 366715,
-          "build_time_base": 1750878,
+          "build_time_base": 1750880,
           "population": 3,
           "culture_points": 27
         },
@@ -223,7 +223,7 @@
           "cost_clay": 1020695,
           "cost_iron": 510350,
           "cost_crop": 612420,
-          "build_time_base": 2801604,
+          "build_time_base": 2801600,
           "population": 3,
           "culture_points": 32
         },
@@ -234,7 +234,7 @@
           "cost_clay": 1704565,
           "cost_iron": 852280,
           "cost_crop": 1022740,
-          "build_time_base": 4482767,
+          "build_time_base": 4482770,
           "population": 3,
           "culture_points": 38
         }
@@ -276,7 +276,7 @@
           "cost_clay": 65,
           "cost_iron": 135,
           "cost_crop": 85,
-          "build_time_base": 552,
+          "build_time_base": 550,
           "population": 1,
           "culture_points": 1
         },
@@ -287,7 +287,7 @@
           "cost_clay": 110,
           "cost_iron": 225,
           "cost_crop": 140,
-          "build_time_base": 1083,
+          "build_time_base": 1080,
           "population": 1,
           "culture_points": 2
         },
@@ -298,7 +298,7 @@
           "cost_clay": 185,
           "cost_iron": 375,
           "cost_crop": 235,
-          "build_time_base": 1933,
+          "build_time_base": 1930,
           "population": 1,
           "culture_points": 2
         },
@@ -309,7 +309,7 @@
           "cost_clay": 310,
           "cost_iron": 620,
           "cost_crop": 390,
-          "build_time_base": 3293,
+          "build_time_base": 3290,
           "population": 1,
           "culture_points": 2
         },
@@ -320,7 +320,7 @@
           "cost_clay": 520,
           "cost_iron": 1040,
           "cost_crop": 650,
-          "build_time_base": 5469,
+          "build_time_base": 5470,
           "population": 2,
           "culture_points": 3
         },
@@ -353,7 +353,7 @@
           "cost_clay": 2420,
           "cost_iron": 4840,
           "cost_crop": 3025,
-          "build_time_base": 23432,
+          "build_time_base": 23430,
           "population": 2,
           "culture_points": 5
         },
@@ -364,7 +364,7 @@
           "cost_clay": 4040,
           "cost_iron": 8080,
           "cost_crop": 5050,
-          "build_time_base": 37691,
+          "build_time_base": 37690,
           "population": 2,
           "culture_points": 6
         },
@@ -375,7 +375,7 @@
           "cost_clay": 6750,
           "cost_iron": 13500,
           "cost_crop": 8435,
-          "build_time_base": 60506,
+          "build_time_base": 60510,
           "population": 2,
           "culture_points": 7
         },
@@ -397,7 +397,7 @@
           "cost_clay": 18820,
           "cost_iron": 37645,
           "cost_crop": 23525,
-          "build_time_base": 155416,
+          "build_time_base": 155420,
           "population": 2,
           "culture_points": 11
         },
@@ -408,7 +408,7 @@
           "cost_clay": 31430,
           "cost_iron": 62865,
           "cost_crop": 39290,
-          "build_time_base": 248866,
+          "build_time_base": 248870,
           "population": 2,
           "culture_points": 13
         },
@@ -419,7 +419,7 @@
           "cost_clay": 52490,
           "cost_iron": 104985,
           "cost_crop": 65615,
-          "build_time_base": 398385,
+          "build_time_base": 398390,
           "population": 2,
           "culture_points": 15
         },
@@ -430,7 +430,7 @@
           "cost_clay": 87660,
           "cost_iron": 175320,
           "cost_crop": 109575,
-          "build_time_base": 637617,
+          "build_time_base": 637620,
           "population": 3,
           "culture_points": 18
         },
@@ -441,7 +441,7 @@
           "cost_clay": 146395,
           "cost_iron": 292790,
           "cost_crop": 182995,
-          "build_time_base": 1020387,
+          "build_time_base": 1020390,
           "population": 3,
           "culture_points": 22
         },
@@ -452,7 +452,7 @@
           "cost_clay": 244480,
           "cost_iron": 488955,
           "cost_crop": 305600,
-          "build_time_base": 1632818,
+          "build_time_base": 1632820,
           "population": 3,
           "culture_points": 27
         },
@@ -463,7 +463,7 @@
           "cost_clay": 408280,
           "cost_iron": 816555,
           "cost_crop": 510350,
-          "build_time_base": 2612709,
+          "build_time_base": 2612710,
           "population": 3,
           "culture_points": 32
         },
@@ -474,7 +474,7 @@
           "cost_clay": 681825,
           "cost_iron": 1363650,
           "cost_crop": 852280,
-          "build_time_base": 4180535,
+          "build_time_base": 4180540,
           "population": 3,
           "culture_points": 38
         }
@@ -527,7 +527,7 @@
           "cost_clay": 225,
           "cost_iron": 85,
           "cost_crop": 165,
-          "build_time_base": 1672,
+          "build_time_base": 1670,
           "population": 2,
           "culture_points": 2
         },
@@ -538,7 +538,7 @@
           "cost_clay": 375,
           "cost_iron": 140,
           "cost_crop": 280,
-          "build_time_base": 2875,
+          "build_time_base": 2880,
           "population": 2,
           "culture_points": 2
         },
@@ -560,7 +560,7 @@
           "cost_clay": 1040,
           "cost_iron": 390,
           "cost_crop": 780,
-          "build_time_base": 7881,
+          "build_time_base": 7880,
           "population": 2,
           "culture_points": 3
         },
@@ -571,7 +571,7 @@
           "cost_clay": 1735,
           "cost_iron": 650,
           "cost_crop": 1300,
-          "build_time_base": 12809,
+          "build_time_base": 12810,
           "population": 2,
           "culture_points": 4
         },
@@ -582,7 +582,7 @@
           "cost_clay": 2900,
           "cost_iron": 1085,
           "cost_crop": 2175,
-          "build_time_base": 20694,
+          "build_time_base": 20690,
           "population": 2,
           "culture_points": 4
         },
@@ -593,7 +593,7 @@
           "cost_clay": 4840,
           "cost_iron": 1815,
           "cost_crop": 3630,
-          "build_time_base": 33311,
+          "build_time_base": 33310,
           "population": 2,
           "culture_points": 5
         },
@@ -604,7 +604,7 @@
           "cost_clay": 8080,
           "cost_iron": 3030,
           "cost_crop": 6060,
-          "build_time_base": 53497,
+          "build_time_base": 53500,
           "population": 2,
           "culture_points": 6
         },
@@ -615,8 +615,8 @@
           "cost_clay": 13500,
           "cost_iron": 5060,
           "cost_crop": 10125,
-          "build_time_base": 85795,
-          "population": 2,
+          "build_time_base": 85800,
+          "population": 3,
           "culture_points": 7
         },
         {
@@ -626,8 +626,8 @@
           "cost_clay": 22540,
           "cost_iron": 8455,
           "cost_crop": 16905,
-          "build_time_base": 137472,
-          "population": 2,
+          "build_time_base": 137470,
+          "population": 3,
           "culture_points": 9
         },
         {
@@ -637,8 +637,8 @@
           "cost_clay": 37645,
           "cost_iron": 14115,
           "cost_crop": 28230,
-          "build_time_base": 220155,
-          "population": 2,
+          "build_time_base": 220160,
+          "population": 3,
           "culture_points": 11
         },
         {
@@ -648,8 +648,8 @@
           "cost_clay": 62865,
           "cost_iron": 23575,
           "cost_crop": 47150,
-          "build_time_base": 352449,
-          "population": 2,
+          "build_time_base": 352450,
+          "population": 3,
           "culture_points": 13
         },
         {
@@ -659,8 +659,8 @@
           "cost_clay": 104985,
           "cost_iron": 39370,
           "cost_crop": 78740,
-          "build_time_base": 564118,
-          "population": 2,
+          "build_time_base": 564120,
+          "population": 3,
           "culture_points": 15
         },
         {
@@ -670,7 +670,7 @@
           "cost_clay": 175320,
           "cost_iron": 65745,
           "cost_crop": 131490,
-          "build_time_base": 902789,
+          "build_time_base": 902790,
           "population": 3,
           "culture_points": 18
         },
@@ -681,7 +681,7 @@
           "cost_clay": 292790,
           "cost_iron": 109795,
           "cost_crop": 219590,
-          "build_time_base": 1444662,
+          "build_time_base": 1444660,
           "population": 3,
           "culture_points": 22
         },
@@ -692,7 +692,7 @@
           "cost_clay": 488955,
           "cost_iron": 183360,
           "cost_crop": 366715,
-          "build_time_base": 2311659,
+          "build_time_base": 2311660,
           "population": 3,
           "culture_points": 27
         },
@@ -703,7 +703,7 @@
           "cost_clay": 816555,
           "cost_iron": 306210,
           "cost_crop": 612420,
-          "build_time_base": 3698854,
+          "build_time_base": 3698850,
           "population": 3,
           "culture_points": 32
         },
@@ -714,7 +714,7 @@
           "cost_clay": 1363650,
           "cost_iron": 511370,
           "cost_crop": 1022740,
-          "build_time_base": 5918366,
+          "build_time_base": 5918370,
           "population": 3,
           "culture_points": 38
         }
@@ -767,7 +767,7 @@
           "cost_clay": 250,
           "cost_iron": 195,
           "cost_crop": 55,
-          "build_time_base": 904,
+          "build_time_base": 900,
           "population": 0,
           "culture_points": 2
         },
@@ -778,7 +778,7 @@
           "cost_clay": 420,
           "cost_iron": 325,
           "cost_crop": 95,
-          "build_time_base": 1646,
+          "build_time_base": 1650,
           "population": 0,
           "culture_points": 2
         },
@@ -789,7 +789,7 @@
           "cost_clay": 700,
           "cost_iron": 545,
           "cost_crop": 155,
-          "build_time_base": 2834,
+          "build_time_base": 2830,
           "population": 0,
           "culture_points": 2
         },
@@ -800,7 +800,7 @@
           "cost_clay": 1170,
           "cost_iron": 910,
           "cost_crop": 260,
-          "build_time_base": 4735,
+          "build_time_base": 4730,
           "population": 1,
           "culture_points": 3
         },
@@ -811,7 +811,7 @@
           "cost_clay": 1950,
           "cost_iron": 1520,
           "cost_crop": 435,
-          "build_time_base": 7776,
+          "build_time_base": 7780,
           "population": 1,
           "culture_points": 4
         },
@@ -822,7 +822,7 @@
           "cost_clay": 3260,
           "cost_iron": 2535,
           "cost_crop": 725,
-          "build_time_base": 12641,
+          "build_time_base": 12640,
           "population": 1,
           "culture_points": 4
         },
@@ -833,7 +833,7 @@
           "cost_clay": 5445,
           "cost_iron": 4235,
           "cost_crop": 1210,
-          "build_time_base": 20426,
+          "build_time_base": 20430,
           "population": 1,
           "culture_points": 5
         },
@@ -844,7 +844,7 @@
           "cost_clay": 9095,
           "cost_iron": 7070,
           "cost_crop": 2020,
-          "build_time_base": 32881,
+          "build_time_base": 32880,
           "population": 1,
           "culture_points": 6
         },
@@ -866,7 +866,7 @@
           "cost_clay": 25360,
           "cost_iron": 19725,
           "cost_crop": 5635,
-          "build_time_base": 84696,
+          "build_time_base": 84700,
           "population": 1,
           "culture_points": 9
         },
@@ -877,7 +877,7 @@
           "cost_clay": 42350,
           "cost_iron": 32940,
           "cost_crop": 9410,
-          "build_time_base": 135713,
+          "build_time_base": 135710,
           "population": 1,
           "culture_points": 11
         },
@@ -888,7 +888,7 @@
           "cost_clay": 70720,
           "cost_iron": 55005,
           "cost_crop": 15715,
-          "build_time_base": 217341,
+          "build_time_base": 217340,
           "population": 1,
           "culture_points": 13
         },
@@ -899,7 +899,7 @@
           "cost_clay": 118105,
           "cost_iron": 91860,
           "cost_crop": 26245,
-          "build_time_base": 347945,
+          "build_time_base": 347950,
           "population": 1,
           "culture_points": 15
         },
@@ -910,7 +910,7 @@
           "cost_clay": 197240,
           "cost_iron": 153405,
           "cost_crop": 43830,
-          "build_time_base": 556912,
+          "build_time_base": 556910,
           "population": 2,
           "culture_points": 18
         },
@@ -921,7 +921,7 @@
           "cost_clay": 329385,
           "cost_iron": 256190,
           "cost_crop": 73195,
-          "build_time_base": 891259,
+          "build_time_base": 891260,
           "population": 2,
           "culture_points": 22
         },
@@ -932,7 +932,7 @@
           "cost_clay": 550075,
           "cost_iron": 427835,
           "cost_crop": 122240,
-          "build_time_base": 1426215,
+          "build_time_base": 1426210,
           "population": 2,
           "culture_points": 27
         },
@@ -943,7 +943,7 @@
           "cost_clay": 918625,
           "cost_iron": 714485,
           "cost_crop": 204140,
-          "build_time_base": 2282144,
+          "build_time_base": 2282140,
           "population": 2,
           "culture_points": 32
         },

@@ -25,7 +25,7 @@ class TroopCategory(StrEnum):
     CAVALRY = "cavalry"  # 騎兵
     SIEGE = "siege"  # 攻城器械
     SCOUT = "scout"  # 偵察兵
-    SPECIAL = "special"  # 特殊兵種（如元首、酋長）
+    SPECIAL = "special"  # 特殊兵種（如參議員、司令官、族長）
     SETTLER = "settler"  # 開拓者
 
 
@@ -73,7 +73,10 @@ class Troop(BaseModel):
     speed_ref: str | None = Field(
         None, description="速度出處細節（manual/troop/N 或官方網址）"
     )
-    carry_capacity: int = Field(..., ge=0, description="運載量")
+    # 運載量由產生器帶入（P0-23）：斯巴達、維京沒有官方或 ts11 數字 → None（留空，不能當 0）
+    carry_capacity: int | None = Field(
+        ..., ge=0, description="運載量；None＝還沒核對、不提供"
+    )
 
     # 成本
     cost_wood: int = Field(..., ge=0, description="木材成本")

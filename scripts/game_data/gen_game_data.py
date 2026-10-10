@@ -57,6 +57,16 @@ Each PARAMS entry also has "verified": True only when ts11 has confirmed its
 cost base, multiplier and L1 time (src "ts11"). Every other building has
 verified=False, so its cost AND build time are 「待驗證」 in the UI; flip it to
 True after measuring in ts11 (and rerun this script) to remove the chip.
+
+P0-23 (2026-10-10): every level of every building and resource field is now
+taken from the official knowledge base tables
+(scripts/game_data/evidence/official_kb_buildings_2026-10-10.json — the page the
+ts11 in-game help links to as 「知識庫」, also embedded in support.travian.com
+article 33). Level 1 of 43 of the 44 buildings there equals the ts11 in-game
+help exactly (check_kb_against_manual). Cost, population, CP and build time per
+level come from that table; a building whose levels are all in the table counts
+as verified. The formulas above stay as a cross-check (and for levels the table
+does not list).
 """
 
 from __future__ import annotations
@@ -98,9 +108,8 @@ PARAMS: dict[str, dict] = {
     "palace":            {"c": (550, 800, 750, 250), "k": 1.28, "t1": 5000, "cp": 5, "src": "ingame", "verified": False},
     "treasury":          {"c": (2880, 2740, 2580, 990), "k": 1.26, "t1": 8000, "cp": 6, "src": "ingame", "verified": False},
     # L1 700/670/700/240, 2300 s read from ts11 manual/building/37 (P0-19); the old
-    # 80/120/70/90 was the trapper's L1. Multiplier not measured -> still 待驗證.
-    "heros_mansion":     {"c": (700, 670, 700, 240), "k": 1.33, "t1": 2300, "cp": 1, "src": "ingame", "verified": False,
-                          "pending": ["cost", "time"]},
+    # 80/120/70/90 was the trapper's L1. Every level: official knowledge base (P0-23).
+    "heros_mansion":     {"c": (700, 670, 700, 240), "k": 1.33, "t1": 2300, "cp": 1, "src": "ingame", "verified": False},
     "sawmill":           {"c": (520, 380, 290, 90), "k": 1.80, "t1": 3000, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
     "brickyard":         {"c": (440, 480, 320, 50), "k": 1.80, "t1": 2240, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
     "iron_foundry":      {"c": (200, 450, 510, 120), "k": 1.80, "t1": 4080, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
@@ -168,6 +177,15 @@ UNIT_SPEED_SOURCES = {
     "s187": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
 }
 TRIBE_ORDER = ["romans", "teutons", "gauls", "egyptians", "huns", "spartans", "vikings"]
+
+# 運載量（唯一一份，前後端都從產生檔讀；P0-23）。5 族照 ts11 遊戲內說明頁（evidence/ts11_manual_2026-10-10.json）。
+# 斯巴達、維京沒有官方或 ts11 的運載量：官方說明頁 S10、S187（Capacity 是兵營／馬廄格數，不是運載量）、
+# S139 都沒有這一欄 → PM 決定（#34）：這兩族 10 種兵的運載量一律留空（null），不放社群整理或推估的數字；
+# 畫面顯示「—」＋「待驗證」，用到運載量的計算顯示「無法計算」，不能當 0。
+CARRY_SOURCES = {
+    "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-10 讀取",
+}
+CARRY_EMPTY_TRIBES = ("spartans", "vikings")
 
 # One row per unit, game order t1..t10:
 #   (troops.json id, frontend id, knowledge_base/tribes.py key, speed, source, ref)
@@ -364,9 +382,191 @@ def check_l1_against_manual() -> dict[str, int]:
     return pops
 
 
+# P0-23：官方知識庫建築表（每一級的花費、累計人口、CP、x1 村莊大樓 1 級的建造秒數）
+OFFICIAL_KB = ROOT / "scripts/game_data/evidence/official_kb_buildings_2026-10-10.json"
+
+
+def _kb_levels(bid: str) -> dict[int, dict]:
+    """building_id → {level: 知識庫那一列}；沒有這棟就是空的."""
+    gid = INGAME_BUILDING_GID.get(bid)
+    if gid is None or not OFFICIAL_KB.exists():
+        return {}
+    b = json.loads(OFFICIAL_KB.read_text(encoding="utf-8"))["buildings"].get(str(gid))
+    return {r["level"]: r for r in b["rows"]} if b else {}
+
+
+def check_kb_against_manual() -> None:
+    """知識庫的 1 級要跟 ts11 遊戲內說明頁一樣（花費、人口、時間），才能拿它當 2 級以上的出處.
+    村莊大樓的時間在 apply_kb_levels 比：知識庫用前一級的村莊大樓算村莊大樓自己（1 級 = 基本時間 × 5）."""
+    manual = _ts11_buildings()
+    for bid, gid in INGAME_BUILDING_GID.items():
+        m = manual.get(str(gid))
+        k = _kb_levels(bid).get(1)
+        if not m or not k:
+            continue
+        assert k["cost"] == m["cost_l1"], (bid, k["cost"], m["cost_l1"])
+        assert k["pop_total"] == m["pop_l1"], (bid, k["pop_total"], m["pop_l1"])
+        if bid != "main_building":
+            assert k["time_s"] == m["time_l1_s"], (bid, k["time_s"], m["time_l1_s"])
+
+
+def apply_kb_levels(bid: str, levels: list[dict]) -> bool:
+    """把知識庫每一級的花費、人口（累計相減）、CP、建造秒數寫進 levels；全部等級都有才回 True.
+    村莊大樓的時間留公式（知識庫用前一級的村莊大樓算自己），但要跟知識庫差不到 10 秒."""
+    kb = _kb_levels(bid)
+    if not kb or any(lv["level"] not in kb for lv in levels if lv["level"] > 0):
+        return False
+    for lv in levels:
+        L = lv["level"]
+        if L == 0:
+            continue
+        k = kb[L]
+        assert k["cp"] == lv["culture_points"], (bid, L, k["cp"], lv["culture_points"])
+        prev = kb[L - 1]["pop_total"] if L > 1 else 0
+        lv.update(cost_wood=k["cost"][0], cost_clay=k["cost"][1], cost_iron=k["cost"][2],
+                  cost_crop=k["cost"][3], population=k["pop_total"] - prev)
+        if bid == "main_building":
+            # 知識庫的時間＝基本時間 × 村莊大樓加速（預設 x1、村莊大樓 1 級）；村莊大樓自己用前一級算，
+            # 1 級就是「0 級」的倍率 5（evidence/official_kb_mb_level_experiment_2026-10-10.json）。
+            # 知識庫沒錯，這裡存的是基本時間（跟 ts11 說明頁 2000 秒一樣）。
+            if L == 1:
+                assert k["time_s"] == 5 * lv["build_time_base"], (bid, k["time_s"], lv["build_time_base"])
+            else:
+                assert abs(lv["build_time_base"] * MB_FACTOR ** (L - 2) - k["time_s"]) <= 10, (bid, L)
+        else:
+            lv["build_time_base"] = k["time_s"]
+    return True
+
+
+KB_VERIFIED: set[str] = set()
+
+
+# P0-23（幕僚長審查）：建築資料庫「效果」欄照官方知識庫的效果欄，每一級都要一樣（生成時檢查）。
+# 知識庫沒有效果欄（研究院、盔甲廠、大使館、寶物庫）或欄位意思看不出來（集結點：只有圖示、數字 0–19）的，
+# 效果維持舊文字、標「待驗證」（EFFECT_PENDING，前端效果欄標題旁一個灰標）。
+_RES_ZH = {"lumberBonus": "木材", "clayBonus": "磚塊", "ironBonus": "鐵礦", "cropBonus": "糧食"}
+EFFECT_KB_KEYS = {
+    "main_building": ("constructionTime",),
+    "barracks": ("infantryBonusTime",), "great_barracks": ("infantryBonusTime",),
+    "stable": ("cavalryBonusTime",), "great_stable": ("cavalryBonusTime",),
+    "workshop": ("siegeBonusTime",), "horse_drinking_trough": ("cavalryBonusTime",),
+    "warehouse": ("warehouseCap",), "great_warehouse": ("warehouseCap",),
+    "granary": ("granaryCap",), "great_granary": ("granaryCap",),
+    "marketplace": ("merchants",), "cranny": ("crannyCap", "crannyCap"),
+    "town_hall": ("townhallSmallParty", "townhallBigParty"),
+    "residence": (None, "residenceBonusTime"), "palace": (None, "residenceBonusTime"),
+    "heros_mansion": ("oasis",),
+    "sawmill": ("lumberBonus",), "brickyard": ("clayBonus",), "iron_foundry": ("ironBonus",),
+    "grain_mill": ("cropBonus",), "bakery": ("cropBonus",),
+    "stonemasons_lodge": ("stabilityBonus",), "trade_office": ("merchantCap", "merchantCap"),
+    "tournament_square": ("troopSpeed",), "brewery": ("attackBonus", "breweryParty"),
+    "trapper": ("maxTraps",),
+    "city_wall": ("defenceBonus", "defenceFlat"), "earth_wall": ("defenceBonus", "defenceFlat"),
+    "palisade": ("defenceBonus", "defenceFlat"),
+    "woodcutter": ("lumberBonus",), "clay_pit": ("clayBonus",), "iron_mine": ("ironBonus",),
+    "cropland": ("cropBonus",),
+}
+EFFECT_VERIFIED: set[str] = set()
+
+
+def _num(text: str) -> float:
+    return float(text.replace(",", "").replace("+", "").replace("%", ""))
+
+
+def _pct(text: str) -> str:
+    """知識庫的百分比原樣顯示，只拿掉 .0（65.6% 照寫，90.0% 寫 90%）."""
+    return text.replace(".0%", "%")
+
+
+def kb_effect(bid: str, row: dict, carry: dict) -> tuple[float, str]:
+    """知識庫效果欄的一列 → (effect_value, 效果文字)。carry：空白格沿用上一級（知識庫只在變的那一級寫數字）."""
+    e = row["effects"]
+    if bid in ("woodcutter", "clay_pit", "iron_mine", "cropland"):
+        res = _RES_ZH[EFFECT_KB_KEYS[bid][0]]
+        return _num(e[0]), f"每小時 {e[0]} {res}"
+    if bid == "main_building":
+        return round(_num(e[0]) / 100, 3), f"建造時間 {_pct(e[0])}"
+    if bid in ("barracks", "great_barracks", "stable", "great_stable", "workshop"):
+        return round(_num(e[0]) / 100, 4), f"訓練時間 {_pct(e[0])}"
+    if bid == "horse_drinking_trough":
+        return round(_num(e[0]) / 100, 4), f"騎兵訓練時間 {_pct(e[0])}"
+    if bid in ("warehouse", "great_warehouse", "granary", "great_granary"):
+        return _num(e[0]), f"儲存容量 {e[0]}"
+    if bid == "marketplace":
+        return _num(e[0]), f"商人數量 {e[0]}"
+    if bid == "cranny":
+        return _num(e[0]), f"隱藏容量 {e[0]}（高盧 {e[1]}）"
+    if bid == "town_hall":
+        small, big = e[0], e[1] or carry.get("big", "")
+        if e[1]:
+            carry["big"] = e[1]
+        h, m, sec = (int(x) for x in small.split(":"))
+        return float(h * 3600 + m * 60 + sec), (f"小慶典 {small}／大慶典 {big}" if big else f"小慶典 {small}")
+    if bid in ("residence", "palace"):
+        if e[0]:
+            carry["slots"] = e[0]
+        slots = carry.get("slots", "0")
+        return _num(slots), f"訓練時間 {_pct(e[1])}；擴張槽 {slots}"
+    if bid == "heros_mansion":
+        if e[0]:
+            carry["oasis"] = e[0]
+        n = carry.get("oasis", "0")
+        return _num(n), f"可佔綠洲 {n}"
+    if bid in ("sawmill", "brickyard", "iron_foundry", "grain_mill", "bakery"):
+        return _num(e[0]), f"{_RES_ZH[EFFECT_KB_KEYS[bid][0]]} {e[0]}"
+    if bid == "stonemasons_lodge":
+        return _num(e[0]), f"建築耐久 {e[0]}"
+    if bid == "trade_office":
+        return _num(e[0]), f"商人運載量 {e[0]}（羅馬人 {e[1]}）"
+    if bid == "tournament_square":
+        return _num(e[0]), f"超過 20 格速度 {e[0]}"
+    if bid == "brewery":
+        return _num(e[0]), f"攻擊力 {e[0]}"
+    if bid == "trapper":
+        return _num(e[0]), f"陷阱數量 {e[0]}"
+    if bid in ("city_wall", "earth_wall", "palisade"):
+        return _num(e[0]), f"防禦 +{_pct(e[0])}、基礎防禦 +{e[1]}"
+    raise KeyError(bid)
+
+
+def apply_kb_effects(bid: str, levels: list[dict]) -> bool:
+    """效果欄照知識庫寫；每一級都要有、欄位要跟 EFFECT_KB_KEYS 一樣，才算核對過."""
+    keys = EFFECT_KB_KEYS.get(bid)
+    gid = INGAME_BUILDING_GID.get(bid)
+    if not keys or gid is None or not OFFICIAL_KB.exists():
+        return False
+    b = json.loads(OFFICIAL_KB.read_text(encoding="utf-8"))["buildings"][str(gid)]
+    cols = tuple(None if c.startswith("travianUnitImage") else c for c in b["effect_columns"])
+    assert cols == keys, (bid, cols, keys)
+    kb = {r["level"]: r for r in b["rows"]}
+    carry: dict = {}
+    for lv in sorted(levels, key=lambda x: x["level"]):
+        if lv["level"] == 0:
+            continue
+        lv["effect_value"], lv["effect_description"] = kb_effect(bid, kb[lv["level"]], carry)
+    return True
+
+
+def check_effects_against_kb(buildings: dict) -> None:
+    """生成後再對一次：核對過的建築，每一級效果文字裡的數字都要出現在知識庫那一列（防手改）."""
+    for bid in EFFECT_VERIFIED:
+        gid = INGAME_BUILDING_GID[bid]
+        kb = {r["level"]: r for r in json.loads(OFFICIAL_KB.read_text(encoding="utf-8"))["buildings"][str(gid)]["rows"]}
+        for lv in buildings["buildings"][bid]["levels"]:
+            if lv["level"] == 0:
+                continue
+            for cell in kb[lv["level"]]["effects"]:
+                if cell and not (bid == "brewery" and ":" in cell):  # 釀酒廠第二欄是慶典長度（固定 72 小時），不顯示
+                    want = cell.replace(".0%", "%") if "%" in cell else cell
+                    assert want.lstrip("+") in lv["effect_description"], (bid, lv["level"], cell, lv["effect_description"])
+
+
+
+
 def gen_buildings(current: dict) -> dict:
     out = json.loads(json.dumps(current))
     l1_pop = check_l1_against_manual()
+    check_kb_against_manual()
     for bid, b in out["buildings"].items():
         if bid in FIELDS:
             f = FIELDS[bid]
@@ -376,6 +576,8 @@ def gen_buildings(current: dict) -> dict:
                 lv.update(cost_wood=w, cost_clay=c, cost_iron=i, cost_crop=cr,
                           build_time_base=field_time(f["a"], L), culture_points=cp_at(1, L))
                 lv["cp_per_day"] = lv["culture_points"]
+            if apply_kb_levels(bid, b["levels"]):
+                KB_VERIFIED.add(bid)
             continue
         if bid not in PARAMS:  # 遊戲裡沒有的建築（apply_ingame_names 會拿掉）
             continue
@@ -389,10 +591,8 @@ def gen_buildings(current: dict) -> dict:
             lv["cp_per_day"] = lv["culture_points"]
             if L == 1 and bid in l1_pop:
                 lv["population"] = l1_pop[bid]
-            if bid == "main_building":
-                eff = mb_effect(L)
-                lv["effect_value"] = eff
-                lv["effect_description"] = f"建造時間 {round(eff * 100)}%"
+        if apply_kb_levels(bid, b["levels"]):
+            KB_VERIFIED.add(bid)
     mb = out["buildings"]["main_building"]
     mb["description_zh"] = (
         "村莊的行政中心。建造時間 × 0.964^(等級−1)：2 級 96%、3 級 93%、4 級 90%，20 級約 50%。"
@@ -403,12 +603,12 @@ def gen_buildings(current: dict) -> dict:
     cr = out["buildings"]["cranny"]
     if cr.get("description_en"):
         cr["description_en"] = cr["description_en"].replace("Gauls have double", "Gauls get 1.5×")
-    th = out["buildings"]["town_hall"]
-    th["levels"][0]["effect_value"] = 500
-    th["levels"][0]["effect_description"] = "小慶典 CP＝本村每日 CP 產量（x1 上限 500）"
-    for lv in th["levels"][1:]:
-        if lv["level"] >= 10:
-            lv["effect_description"] = "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）"
+    for bid, b in out["buildings"].items():
+        if apply_kb_effects(bid, b["levels"]):
+            EFFECT_VERIFIED.add(bid)
+    mbl = out["buildings"]["main_building"]["levels"]
+    assert all(abs(lv["effect_value"] - mb_effect(lv["level"])) < 1e-9 for lv in mbl), "MB factor != KB"
+    check_effects_against_kb(out)
     mk = out["buildings"]["marketplace"]
     if not any(pr["building_id"] == "granary" for pr in mk["prerequisites"]):
         mk["prerequisites"].append({"building_id": "granary", "level": 1})
@@ -427,6 +627,12 @@ def gen_resources(current: dict) -> dict:
             w, c, i, cr = build_cost(f["c"], FIELD_K, L)
             lv.update(cost_wood=w, cost_clay=c, cost_iron=i, cost_crop=cr,
                       build_time_base=field_time(f["a"], L), culture_points=cp_at(1, L))
+        fid = next(k for k, v in FIELDS.items() if v["res"] == rtype)
+        assert apply_kb_levels(fid, r["levels"]), fid
+        kb = _kb_levels(fid)
+        for lv in r["levels"]:
+            if lv["level"] > 0:  # 知識庫效果欄＝每小時產量（x1）；0 級知識庫沒有（P0-23 第 5 項）
+                assert int(kb[lv["level"]]["effects"][0].replace(",", "")) == lv["production_per_hour"], (fid, lv["level"])
     return out
 
 
@@ -462,12 +668,21 @@ def gen_culture_points() -> dict:
     }
 
 
-def pending_fields(p: dict) -> list[str]:
+def pending_fields(bid: str, p: dict) -> list[str]:
     """Fields shown as 「待驗證」: explicit notes, plus cost+time when not verified."""
     fields = list(p.get("pending", []))
-    if not p["verified"]:
+    if not p["verified"] and bid not in KB_VERIFIED:
         fields += [f for f in ("cost", "time") if f not in fields]
     return fields
+
+
+def building_source(bid: str) -> str | None:
+    if bid not in KB_VERIFIED:
+        return None
+    if bid == "main_building":
+        return "mainTs11"
+    in_ts11 = bid in TS11_MANUAL_BUILDING_GID or bid in FIELDS
+    return "ts11L1Kb" if in_ts11 else "kb"
 
 
 def gen_frontend(buildings: dict, cp: dict) -> dict:
@@ -475,7 +690,7 @@ def gen_frontend(buildings: dict, cp: dict) -> dict:
     for bid, b in buildings["buildings"].items():
         rows[bid] = [[lv["cost_wood"], lv["cost_clay"], lv["cost_iron"], lv["cost_crop"],
                       lv["build_time_base"], lv["culture_points"]] for lv in b["levels"]]
-    pending = {bid: pending_fields(p) for bid, p in PARAMS.items() if pending_fields(p)}
+    pending = {bid: pending_fields(bid, p) for bid, p in PARAMS.items() if pending_fields(bid, p)}
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "rowFormat": ["wood", "clay", "iron", "crop", "buildTimeBase", "cp"],
@@ -483,6 +698,11 @@ def gen_frontend(buildings: dict, cp: dict) -> dict:
         "names": {bid: [b["name_zh"], b["name_en"]] for bid, b in buildings["buildings"].items()},
         "cpBase": {bid: p["cp"] for bid, p in PARAMS.items()} | {fid: 1 for fid in FIELDS},
         "pending": pending,
+        # P0-23：✓ 點開寫出處——ts11L1Kb＝1 級 ts11 遊戲內說明、2 級以上官方知識庫；
+        # mainTs11＝村莊大樓（知識庫時間有乘村莊大樓加速，1 級寫 2000 × 5；這裡存基本時間）；kb＝只有知識庫
+        "buildingSources": {bid: building_source(bid) for bid in buildings["buildings"] if building_source(bid)},
+        # 效果欄沒辦法照官方知識庫核對的建築（效果欄標題旁標「待驗證」）
+        "effectsPending": sorted(bid for bid in buildings["buildings"] if bid not in EFFECT_VERIFIED),
         "villageRequirements": cp["village_requirements"],
         "startCp": cp["start_cp"],
         "celebrationCap": cp["celebration_cap"],
@@ -506,6 +726,15 @@ def gen_unit_speeds() -> dict:
             row = {"slot": slot, "troop_id": be_id, "fe_id": fe_id, "kb_id": kb_id,
                    "speed": speed, "source": src, "ref": ref_text, "stats": None}
             st = stats.get(str(ref)) if src == "ts11" else None
+            if tribe in CARRY_EMPTY_TRIBES:
+                row["carry"] = None
+                row["carry_source"] = "pending"
+                row["carry_ref"] = None
+            else:
+                assert st, (tribe, be_id, "運載量要有 ts11 說明頁的數字")
+                row["carry"] = st["carry"]
+                row["carry_source"] = "ts11"
+                row["carry_ref"] = f"manual/troop/{ref}"
             if st:
                 # 說明頁的速度要跟速度表一樣（速度表 2026-10-09 讀的，這次 10-10 再讀一次）
                 assert st["speed"] == speed, (tribe, be_id, st["speed"], speed)
@@ -529,6 +758,8 @@ def gen_unit_speeds() -> dict:
                     "official": [UNIT_SPEED_SOURCES["s139"], UNIT_SPEED_SOURCES["s187"]],
                     "official_pending": "官方說明頁，數字標示取自第三方計算器（待驗證，不列入反推 TS）",
                     "pending": "沒有第一手出處，速度留空（待驗證）"},
+        "carry_sources": {"ts11": CARRY_SOURCES["ts11"],
+                          "pending": "沒有官方或 ts11 的運載量，留空（null，待驗證）"},
         "tribes": tribes,
     }
 
@@ -554,6 +785,8 @@ def gen_troops(current: dict, speeds: dict) -> dict:
                     rebuilt["speed_ref"] = r["ref"]
             rebuilt.pop("stats_source", None)
             rebuilt.pop("stats_ref", None)
+            # 運載量全部照產生的那一份（前端讀同一份）
+            rebuilt["carry_capacity"] = r["carry"]
             st = r.get("stats")
             if st:
                 rebuilt.update(
@@ -561,7 +794,6 @@ def gen_troops(current: dict, speeds: dict) -> dict:
                     attack=st["attack"],
                     defense_infantry=st["def_inf"],
                     defense_cavalry=st["def_cav"],
-                    carry_capacity=st["carry"],
                     cost_wood=st["cost"][0],
                     cost_clay=st["cost"][1],
                     cost_iron=st["cost"][2],
@@ -578,11 +810,36 @@ def gen_troops(current: dict, speeds: dict) -> dict:
     return out
 
 
+# P0-23：維京沒有 ts11 來源，花費、糧耗、訓練時間、攻防照官方 S139「Viking Units Overview」表
+# （evidence/official_support_2026-10-10.json）；S139 沒有運載量 → 運載量留空（null，PM 決定），畫面顯示「—」／「無法計算」
+OFFICIAL_SUPPORT = ROOT / "scripts/game_data/evidence/official_support_2026-10-10.json"
+
+
+def _s139_units() -> list[dict]:
+    ev = json.loads(OFFICIAL_SUPPORT.read_text(encoding="utf-8"))
+    return ev["articles"]["s139"]["units"]
+
+
+def apply_s139_vikings(troops: dict, speeds: dict) -> None:
+    units = _s139_units()
+    rows = speeds["tribes"]["vikings"]
+    assert len(units) == len(rows) == 10
+    for r, u in zip(rows, units):
+        t = troops["troops"][r["troop_id"]]
+        assert r["speed"] == u["speed"], (r["troop_id"], r["speed"], u["speed"])
+        t.update(attack=u["atk"], defense_infantry=u["di"], defense_cavalry=u["dc"],
+                 cost_wood=u["cost"][0], cost_clay=u["cost"][1], cost_iron=u["cost"][2],
+                 cost_crop=u["cost"][3], crop_consumption=u["upkeep"], training_time_base=u["time_s"])
+        t["stats_source"] = "official"
+        t["stats_ref"] = UNIT_SPEED_SOURCES["s139"]
+
+
 def gen_cost_verified(speeds: dict) -> dict:
     """部族的 10 種兵都讀到 ts11 說明頁才算核對過（P0-18）；ts11 沒有斯巴達／維京 → false."""
     return {
-        "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在 ts11 遊戲內說明頁讀到（evidence/ts11_manual_2026-10-10.json）才是 true；ts11 是 5 族伺服器，斯巴達、維京沒有第一手來源，維持 false（兵種詳情顯示「待驗證」）。",
-        "tribes": {t: all(r["stats"] for r in speeds["tribes"][t]) for t in ["romans", "gauls", "teutons", "huns", "egyptians", "vikings", "spartans"]},
+        "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在 ts11 遊戲內說明頁讀到（evidence/ts11_manual_2026-10-10.json）才是 true；ts11 是 5 族伺服器：維京照官方說明頁 S139 的兵種表（evidence/official_support_2026-10-10.json）是 true，斯巴達只有標示第三方計算器的 S187，維持 false（兵種詳情顯示「待驗證」）。",
+        "tribes": {t: all(r["stats"] for r in speeds["tribes"][t]) for t in ["romans", "gauls", "teutons", "huns", "egyptians", "spartans"]}
+        | {"vikings": len(_s139_units()) == 10},
     }
 
 
@@ -603,14 +860,15 @@ INGAME_BUILDING_GID = {
 # 舊名（站上以前用過、或常見的別稱）→ 只拿來搜尋，不顯示
 BUILDING_ALIASES = {
     "main_building": ["主建築"],
-    "clay_pit": ["黏土坑", "磚坑"], "cropland": ["農田"], "iron_foundry": ["鑄鐵廠", "鑄造廠"],
-    "grain_mill": ["穀物磨坊"], "bakery": ["麵包坊"], "granary": ["糧倉"],
-    "blacksmith": ["鐵匠鋪", "兵工廠"], "tournament_square": ["比武場"],
-    "barracks": ["軍營"], "workshop": ["工坊"], "cranny": ["隱藏倉庫"],
-    "town_hall": ["市政廳"], "treasury": ["寶庫"], "trade_office": ["貿易公司", "商貿處"],
+    "clay_pit": ["黏土坑", "磚坑", "採土場"], "cropland": ["農田"],
+    "iron_foundry": ["鑄鐵廠", "鑄造廠", "鍛造廠"],
+    "grain_mill": ["穀物磨坊", "磨坊"], "bakery": ["麵包坊"], "granary": ["糧倉"],
+    "blacksmith": ["鐵匠鋪", "兵工廠", "鐵匠舖", "盔甲匠舖"], "tournament_square": ["比武場"],
+    "barracks": ["軍營"], "workshop": ["工坊"], "cranny": ["隱藏倉庫", "密藏室"],
+    "town_hall": ["市政廳"], "treasury": ["寶庫"], "trade_office": ["貿易公司", "商貿處", "貿易所"],
     "great_barracks": ["大營房"], "earth_wall": ["土圍"], "palisade": ["柵欄", "木柵欄"],
-    "stonemasons_lodge": ["石匠小屋"], "brewery": ["酒館"], "heros_mansion": ["英雄宅邸"],
-    "great_granary": ["大糧倉"], "horse_drinking_trough": ["馬飲水槽"], "waterworks": ["水渠"],
+    "stonemasons_lodge": ["石匠小屋"], "brewery": ["酒館"], "heros_mansion": ["英雄宅邸", "英雄大廈"],
+    "great_granary": ["大糧倉"], "horse_drinking_trough": ["馬飲水槽"], "waterworks": ["水渠", "水利工程"],
 }
 
 TRIBE_MANUAL_REF = {"romans": 1, "teutons": 11, "gauls": 21, "egyptians": 51, "huns": 61}
@@ -624,20 +882,35 @@ UNIT_ALIASES = {
     "equites_imperatoris": ["帝國騎兵"], "equites_caesaris": ["凱撒騎兵"],
     "roman_ram": ["攻城槌"], "fire_catapult": ["火焰投石車"], "senator": ["元老"],
     "clubswinger": ["棍兵"], "spearman": ["長矛兵"], "teuton_scout": ["斥候", "偵查兵"],
-    "paladin": ["聖騎士"], "teuton_ram": ["攻城槌"], "teuton_catapult": ["投石車"], "chief": ["領袖"],
-    "pathfinder": ["探路兵"], "theutates_thunder": ["圖塔特雷"],
+    "paladin": ["聖騎士"], "teuton_ram": ["攻城槌"], "teuton_catapult": ["投石車"], "chief": ["領袖", "酋長"],
+    "pathfinder": ["探路兵"], "theutates_thunder": ["圖塔特雷", "雷神騎兵"],
     "haeduan": ["海頓騎兵"], "gaul_ram": ["攻城槌"], "trebuchet": ["投石車"],
-    "ash_warden": ["灰燼守衛"], "khopesh_warrior": ["鐮刀劍戰士"], "sopdu_explorer": ["索普度探險者"],
-    "anhur_guard": ["安胡爾守衛"], "resheph_chariot": ["瑞謝夫戰車"], "egyptian_ram": ["攻城槌"],
-    "stone_catapult": ["石頭投石車"], "mercenary": ["傭兵"], "spotter": ["斥候"],
-    "steppe_rider": ["草原騎兵"], "hun_ram": ["攻城槌"], "hun_catapult": ["投石車"], "logades": ["領袖"],
+    "ash_warden": ["灰燼守衛"], "khopesh_warrior": ["鐮刀劍戰士", "彎刀戰士"],
+    "sopdu_explorer": ["索普度探險者", "索普杜探索者"],
+    "anhur_guard": ["安胡爾守衛", "安赫爾守衛"], "resheph_chariot": ["瑞謝夫戰車", "雷謝夫戰車"], "egyptian_ram": ["攻城槌"],
+    "stone_catapult": ["石頭投石車"], "nomarch": ["諾馬克"], "mercenary": ["傭兵"],
+    "spotter": ["斥候", "觀察者"],
+    "steppe_rider": ["草原騎兵"], "hun_ram": ["攻城槌"], "hun_catapult": ["投石車"], "logades": ["領袖", "洛加德"],
 }
 SETTLER_ALIASES = ["拓荒者", "移民", "定居者"]
-# 斯巴達、維京沒有遊戲內名稱；攻城武器、開拓者跟其他族同英文名的，比照遊戲內用詞
+# 斯巴達、維京沒有遊戲內名稱（ts11 是 5 族伺服器）；攻城武器、開拓者跟其他族同英文名的，比照遊戲內用詞。
+# PM 規則（#34）：用官方說明頁 S139（維京）、S187（斯巴達）的繁體中文名；官方說明頁沒有中文版
+# （support.travian.com 只有 en/de/fr/es/it/pl/pt/ru/tr/cs/ar），所以其他兵種維持目前兵種資料庫的名稱，
+# 計算器、攻略以前用的另一個名字只放 aliases 給搜尋用。
 NON_TS11_UNIT_NAMES = {
     "viking_ram": ("破城槌", ["攻城槌"]), "viking_catapult": ("弩炮", ["投石車"]),
     "viking_settler": ("開拓者", SETTLER_ALIASES), "spartan_ram": ("破城槌", ["攻城槌"]),
     "spartan_settler": ("開拓者", SETTLER_ALIASES),
+    "hoplite": ("重裝步兵", ["裝甲步兵"]), "sentinel": ("哨兵", []),
+    "shieldsman": ("盾兵", ["盾牌手"]), "twinsteel_therion": ("雙刃獸戰士", ["雙鋼泰瑞恩", "旋鏢兵"]),
+    "elpida_rider": ("希望騎士", ["爾必達騎士", "厄爾皮達騎兵"]),
+    "corinthian_crusher": ("科林斯粉碎者", ["科林斯破壞者"]),
+    "ballista": ("弩砲", ["賴達投石機"]), "ephor": ("監察官", ["五長官"]),
+    "thrall": ("奴僕", ["奴隸"]), "shield_maiden": ("盾女", ["鋼盾少女"]),
+    "berserker": ("狂戰士", []), "heimdalls_eye": ("海姆達爾之眼", []),
+    "huskarl_rider": ("侍衛騎士", ["禁衛軍騎士", "胡斯卡爾騎士"]),
+    "valkyries_blessing": ("女武神之賜", ["女武神的祝福", "瓦爾基麗的祝福"]),
+    "jarl": ("領主", ["首領", "雅爾"]),
 }
 
 
@@ -731,6 +1004,7 @@ def outputs() -> dict[Path, str]:
     cp = gen_culture_points()
     us = gen_unit_speeds()
     tr = gen_troops(_load(BACKEND_TROOPS), us)
+    apply_s139_vikings(tr, us)
     names = gen_ingame_names(us)
     apply_ingame_names(b, r, tr, names)
     return {

@@ -24,32 +24,32 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
     note: '預設（競技場 0 級）沒用到待驗證資料：兵種速度是使用者自己打的數字（預設 7），這頁沒有兵種選單、不從網址或帳號帶入速度；已帶入列只帶伺服器速度和出發座標（幕僚長確認不用標）。競技場 > 0 級或英雄靴子 > 0% 時第二行（距離 · 速度）放一個：只有競技場 arenaSpeed、只有靴子 heroBootsSpeed、兩個都有 arenaBootsSpeed（#27 後續、P0-20）',
   },
   'features/guideCalcs/components/CropSimCalculator.tsx': {
-    chips: [['fieldHighLevel', 'building', 'cropSim']],
-    note: '總計 /hr＝田產量（預設 18 級，3 級以上是公式推算，fieldHighLevel）×（1＋加成建築（預設全 5 級，building）＋綠洲）× Plus 1.25（預設開）／供水系統（cropSim）：標題旁一個，依公式順序，有用到才列',
+    chips: [],
+    note: '總計 /hr＝田產量 ×（1＋加成建築＋綠洲）× Plus 1.25：資源田、加成建築、供水系統照官方知識庫，Plus 相乘照官方 S129（P0-23），都核對過，不放灰標；加成建築的資料哪天又標待驗證，標題旁會自動放 building',
   },
   'features/guideCalcs/components/OasisRoiCalculator.tsx': {
-    chips: [['fieldHighLevel', 'cropSim', 'heroMansionCost']],
-    note: '第二行一個灰標，依序：「每天 +X」（田地 3 級以上產量 fieldHighLevel、有勾 Plus 的 ×1.25 cropSim）、「英雄宅成本」（heroMansionCost）；回本天數就是這兩個相除，標題不再重複放',
+    chips: [],
+    note: '「每天 +X」（資源田產量：官方知識庫；Plus ×1.25：官方 S129）、「英雄宅成本」（官方知識庫 2–20 級）都核對過（P0-23），不放灰標',
   },
   'features/guideCalcs/components/TraderouteCalculator.tsx': {
-    chips: [['merchantTradeOffice']],
-    note: '所需商人、容量、往返都用商人容量和速度算（社群 wiki 的數字）：第二行「容量 · 往返」旁一個；標題「所需商人」是同一份資料，不重複放（PM 去重）。預設交易所 10 級 → merchantTradeOffice（說明多寫交易所加成）；交易所 0 級 → merchantCapacity',
+    chips: [],
+    note: '商人容量和速度：官方 S3；交易所每級 +20%（羅馬人 +40%）：官方知識庫＋S213、S88（P0-23），不放灰標',
   },
   'features/guideCalcs/components/FarmingCalculator.tsx': {
     chips: [],
     note: '每日收益用兵種運載量、花費算：6 種兵都是 ts11 遊戲內說明頁讀到的數字（P0-18），不放 unitCarry；之後加的兵種沒讀到時（statsVerified false）標題旁放 unitCarry。有競技場或靴子時標題旁一個灰標依序列出 unitCarry（有的話）→ 行軍速度（P0-22），預設兩個都 0 不放。第二行是建議馬數，沒用到待驗證資料',
   },
   'features/guideCalcs/components/FieldRoiCalculator.tsx': {
-    chips: [['fieldHighLevel', 'plusFormula']],
-    note: '第二行一個灰標，依序：「成本」（目標等級 ≥ 4 的花費）／「每天 +」（目標等級 ≥ 3 的產量）→ fieldHighLevel（同一種只列一次；預設 L7）、有勾 Plus → plusFormula、有加成建築 → building；標題不重複放',
+    chips: [],
+    note: '資源田 1–20 級花費、產量：官方知識庫；Plus 乘在總產量上：官方 S129（P0-23），不放灰標；有加成建築且加成建築資料又標待驗證時第二行放 building',
   },
   'features/guideCalcs/components/PassiveCpCalculator.tsx': {
-    chips: [['building']],
-    note: '每日被動 CP 用建築 CP 數值算：等級 > 0 的建築裡有還沒核對的，標題旁放 building 灰標（不放大數字旁）',
+    chips: [],
+    note: '每日被動 CP 用建築 CP 數值算：全部建築照官方知識庫核對過（P0-23），不放灰標；等級 > 0 的建築裡有還沒核對的（isBuildingVerified false），標題旁放 building 灰標（不放大數字旁）',
   },
   'features/guideCalcs/components/BuildOrderCalculator.tsx': {
-    chips: [['fieldHighLevel', 'building', 'plusFormula']],
-    note: '第二行「成本」一個灰標：資源田升到 4 級以上（fieldHighLevel，也涵蓋上面的總時間）、加成建築（building）、有勾 Plus 時排序用到的 Plus 加總算法（plusFormula，預設有勾）；有用到才列',
+    chips: [],
+    note: '資源田、加成建築的花費和時間：官方知識庫；排序用的 Plus 相乘：官方 S129（P0-23），不放灰標；加成建築資料又標待驗證時第二行「成本」放 building',
   },
   'features/guideCalcs/components/LaunchSimCalculator.tsx': {
     chips: [['launchSim']],

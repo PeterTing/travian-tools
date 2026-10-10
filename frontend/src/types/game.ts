@@ -138,7 +138,9 @@ export interface TroopDetail {
   speed_source: TroopSpeedSource
   /** manual/troop/N（ts11 遊戲內說明）或官方網址 */
   speed_ref: string | null
-  carry_capacity: number
+  /** null＝還沒核對（斯巴達、維京，P0-23），畫面顯示「—」，不能當 0 */
+  carry_capacity: number | null
+  carry_capacity_note?: string | null
   cost_wood: number
   cost_clay: number
   cost_iron: number
