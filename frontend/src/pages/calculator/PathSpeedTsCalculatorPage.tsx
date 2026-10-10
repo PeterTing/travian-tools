@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
+import CoordPair from '@/components/common/CoordPair'
+import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
+import { useMapRadius } from '@/lib/mapRadius'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
@@ -21,12 +24,15 @@ function formatHms(sec: number): string {
   return `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}`
 }
 
+// 座標另外用文字存（預設空白、可打負號），按「計算」時才換成數字
+type PathSpeedTsForm = Omit<PathSpeedTsRequest, 'attacker_x' | 'attacker_y' | 'target_x' | 'target_y'>
+
 export default function PathSpeedTsCalculatorPage() {
-  const [form, setForm] = useState<PathSpeedTsRequest>({
-    attacker_x: 0,
-    attacker_y: 0,
-    target_x: 0,
-    target_y: 0,
+  const radius = useMapRadius()
+  const [attackerCoord, setAttackerCoord] = useState<CoordText>(EMPTY_COORD)
+  const [targetCoord, setTargetCoord] = useState<CoordText>(EMPTY_COORD)
+  const [showCoordErrors, setShowCoordErrors] = useState(false)
+  const [form, setForm] = useState<PathSpeedTsForm>({
     travel_time_seconds: 3600,
     server_speed: 1,
     hero_bonus: 0,
@@ -44,7 +50,7 @@ export default function PathSpeedTsCalculatorPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleChange = (field: keyof PathSpeedTsRequest, value: number) => {
+  const handleChange = (field: keyof PathSpeedTsForm, value: number) => {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -59,11 +65,25 @@ export default function PathSpeedTsCalculatorPage() {
 
   const handleCalculate = async () => {
     // 超出 0–75 的欄位：欄位下方已經寫「請輸入 0–75」，捲過去、不送出（P0-17 (j)）
+    // 座標空白或超出範圍：欄位下方標紅字、捲過去，不送出（不會拿 0 去算）
+    const atk = coordPairValue(attackerCoord, radius)
+    const tgt = coordPairValue(targetCoord, radius)
+    if (!atk || !tgt) {
+      setShowCoordErrors(true)
+      setTimeout(() => focusFirstInvalid(document.querySelector('main')), 0)
+      return
+    }
     if (focusFirstInvalid(document.querySelector('main'))) return
     try {
       setLoading(true)
       setError(null)
-      const res = await advancedCalculatorApi.calculatePathSpeedTs(form)
+      const res = await advancedCalculatorApi.calculatePathSpeedTs({
+        ...form,
+        attacker_x: atk.x,
+        attacker_y: atk.y,
+        target_x: tgt.x,
+        target_y: tgt.y,
+      })
       setResult(res)
       setUsedBoots(form.hero_bonus ?? 0)
     } catch {
@@ -94,55 +114,27 @@ export default function PathSpeedTsCalculatorPage() {
         <div className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">已知條件</h2>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">攻擊者 X</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.attacker_x}
-                onChange={(e) => handleChange('attacker_x', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">攻擊者 Y</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.attacker_y}
-                onChange={(e) => handleChange('attacker_y', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-          </div>
+          <CoordPair
+            className="grid grid-cols-2 gap-4 mb-4"
+            labelX="攻擊者 X"
+            labelY="攻擊者 Y"
+            testId="attacker"
+            radius={radius}
+            showErrors={showCoordErrors}
+            value={attackerCoord}
+            onChange={setAttackerCoord}
+          />
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">目標 X</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.target_x}
-                onChange={(e) => handleChange('target_x', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">目標 Y</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.target_y}
-                onChange={(e) => handleChange('target_y', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-          </div>
+          <CoordPair
+            className="grid grid-cols-2 gap-4 mb-4"
+            labelX="目標 X"
+            labelY="目標 Y"
+            testId="target"
+            radius={radius}
+            showErrors={showCoordErrors}
+            value={targetCoord}
+            onChange={setTargetCoord}
+          />
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">已知行進時間</label>

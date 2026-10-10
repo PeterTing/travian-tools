@@ -10,7 +10,7 @@ const { cases } = JSON.parse(
   readFileSync(resolve(__dirname, '../../../../../../docs/knowledge/travel-speed-cases.json'), 'utf-8'),
 ) as { cases: TravelCase[] }
 
-const base = { carry: 75, cost: 1090, n: 1, freq: 15, loot: 400 }
+const base = { carry: 75, cost: 1090, freq: 15, loot: 400 }
 
 describe('農場收益單程時間＝共用行軍公式（P0-22）', () => {
   it.each(cases)('距離 $distance、速度 $unitSpeed、競技場 $arenaLevel、靴子 $bootsPercent% → $seconds 秒', (c) => {

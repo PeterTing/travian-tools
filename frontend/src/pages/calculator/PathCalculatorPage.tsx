@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import RangeNumberField from '@/components/common/RangeNumberField'
+import CoordPair from '@/components/common/CoordPair'
+import { EMPTY_COORD, coordPairValue, coordText, type CoordText } from '@/lib/coords'
+import { useMapRadius } from '@/lib/mapRadius'
 import { useTranslation } from 'react-i18next'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import {
@@ -20,10 +23,10 @@ import Stepper from '@/components/common/Stepper'
 export default function PathCalculatorPage() {
   const { t, i18n } = useTranslation()
   const guideLang = (i18n.language || 'zh').toLowerCase().startsWith('zh') ? 'zh' : 'en'
-  const [startX, setStartX] = useState(0)
-  const [startY, setStartY] = useState(0)
-  const [targetX, setTargetX] = useState(0)
-  const [targetY, setTargetY] = useState(0)
+  // 座標用文字存：預設空白、可打負號；兩組都填好才算（不會拿 0 去算）
+  const radius = useMapRadius()
+  const [start, setStart] = useState<CoordText>(EMPTY_COORD)
+  const [target, setTarget] = useState<CoordText>(EMPTY_COORD)
   const [unitSpeed, setUnitSpeed] = useState(7)
   const [tsLevel, setTsLevel] = useState(0)
   const [heroBonus, setHeroBonus] = useState(0)
@@ -38,14 +41,18 @@ export default function PathCalculatorPage() {
   const fillX = fill.village?.coordinate_x
   const fillY = fill.village?.coordinate_y
   useEffect(() => {
-    if (fillX != null && fillY != null) {
-      setStartX(fillX)
-      setStartY(fillY)
-    }
+    if (fillX != null && fillY != null) setStart(coordText(fillX, fillY))
   }, [fillX, fillY])
 
+  const startXY = coordPairValue(start, radius)
+  const targetXY = coordPairValue(target, radius)
+  const sx = startXY?.x
+  const sy = startXY?.y
+  const tx = targetXY?.x
+  const ty = targetXY?.y
   const result = useMemo(() => {
-    const distance = distanceOnMap(startX, startY, targetX, targetY)
+    if (sx == null || sy == null || tx == null || ty == null) return null
+    const distance = distanceOnMap(sx, sy, tx, ty)
     const artifactMultiplier = artifact === 'none' ? 1 : 2
     const travelSeconds = calculateTravelSeconds({
       distance,
@@ -64,7 +71,7 @@ export default function PathCalculatorPage() {
       formatted: formatTravelTime(travelSeconds),
       arrivalSpeed: Math.round(arrivalSpeed * 100) / 100,
     }
-  }, [startX, startY, targetX, targetY, unitSpeed, tsLevel, heroBonus, artifact, serverSpeed])
+  }, [sx, sy, tx, ty, unitSpeed, tsLevel, heroBonus, artifact, serverSpeed])
 
   // 待驗證：競技場 > 0 級或英雄靴子 > 0% 時，移動時間和速度用了官方說明頁 S71 的公式（還沒在 ts11 遊戲內核對）；
   // 一行一個灰標，依用到的加成選一種說明（只有競技場／只有靴子／兩個都有）；兩個都 0 不標（全站共用 speedPendingKinds，P0-21）
@@ -88,55 +95,29 @@ export default function PathCalculatorPage() {
             {t('pathCalc.inputs')}
           </h2>
 
-          <div className="mb-3 grid grid-cols-2 gap-2">
-            <label className="block min-w-0 text-xs text-muted-foreground">
-              {t('pathCalc.startX')}
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={startX}
-                onChange={(e) => setStartX(Number(e.target.value))}
-                className={`${inputCls} mt-1`}
-              />
-            </label>
-            <label className="block min-w-0 text-xs text-muted-foreground">
-              {t('pathCalc.startY')}
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={startY}
-                onChange={(e) => setStartY(Number(e.target.value))}
-                className={`${inputCls} mt-1`}
-              />
-            </label>
-          </div>
+          <CoordPair
+            className="mb-3 grid grid-cols-2 gap-2"
+            fieldClassName="min-w-0 text-xs text-muted-foreground"
+            labelClassName="mb-1 block"
+            labelX={t('pathCalc.startX')}
+            labelY={t('pathCalc.startY')}
+            testId="path-start"
+            radius={radius}
+            value={start}
+            onChange={setStart}
+          />
 
-          <div className="mb-3 grid grid-cols-2 gap-2">
-            <label className="block min-w-0 text-xs text-muted-foreground">
-              {t('pathCalc.targetX')}
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={targetX}
-                onChange={(e) => setTargetX(Number(e.target.value))}
-                className={`${inputCls} mt-1`}
-              />
-            </label>
-            <label className="block min-w-0 text-xs text-muted-foreground">
-              {t('pathCalc.targetY')}
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={targetY}
-                onChange={(e) => setTargetY(Number(e.target.value))}
-                className={`${inputCls} mt-1`}
-              />
-            </label>
-          </div>
+          <CoordPair
+            className="mb-3 grid grid-cols-2 gap-2"
+            fieldClassName="min-w-0 text-xs text-muted-foreground"
+            labelClassName="mb-1 block"
+            labelX={t('pathCalc.targetX')}
+            labelY={t('pathCalc.targetY')}
+            testId="path-target"
+            radius={radius}
+            value={target}
+            onChange={setTarget}
+          />
 
           <label className="mb-3 block text-xs text-muted-foreground">
             {t('pathCalc.unitSpeed')}
@@ -192,6 +173,15 @@ export default function PathCalculatorPage() {
           </label>
         </div>
 
+        {!result ? (
+          // 起始或目標座標還沒填好（空白、超出範圍）：不算，只提示要填座標
+          <CalcResultPanel
+            lang={guideLang}
+            title={t('pathCalc.results')}
+            primary={<>{'—'}</>}
+            secondary={<span data-testid="path-need-coords">{t('pathCalc.needCoords')}</span>}
+          />
+        ) : (
         <CalcResultPanel
           lang={guideLang}
           title={t('pathCalc.results')}
@@ -227,6 +217,7 @@ export default function PathCalculatorPage() {
             </PendingRow>
           </dl>
         </CalcResultPanel>
+        )}
       </div>
     </div>
   )

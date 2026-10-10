@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
+import CoordPair from '@/components/common/CoordPair'
+import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
+import { useMapRadius } from '@/lib/mapRadius'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type {
   AttackerProfile,
@@ -32,7 +35,9 @@ export default function AttackPlannerPage() {
 // ─── TS Optimizer Form ───────────────────────────────────────────
 
 // 每個攻擊者一個穩定 id（React key、結果對回攻擊者都用它；兩個攻擊者同名也不會對錯人，P0-17 (i)）
-type AttackerRow = AttackerProfile & { attacker_id: string }
+// 座標用文字存（預設空白、可打負號），送出時才換成數字
+type AttackerFields = Omit<AttackerProfile, 'x' | 'y'>
+type AttackerRow = AttackerFields & { attacker_id: string; coord: CoordText }
 let nextAttackerId = 1
 const newAttackerId = () => `atk-${nextAttackerId++}`
 
@@ -46,14 +51,16 @@ function defaultArrival(): string {
 
 function TsOptimizerForm() {
   const { speed } = useAutoFill()
-  const [target, setTarget] = useState({ x: 0, y: 0 })
+  const radius = useMapRadius()
+  const [target, setTarget] = useState<CoordText>(EMPTY_COORD)
+  // 按過「計算」：空白的座標格也標紅
+  const [showCoordErrors, setShowCoordErrors] = useState(false)
   const [arrival, setArrival] = useState(defaultArrival)
   const [attackers, setAttackers] = useState<AttackerRow[]>(() => [
     {
       attacker_id: newAttackerId(),
       village_label: '攻擊者 1',
-      x: 10,
-      y: 0,
+      coord: EMPTY_COORD,
       unit_speed: 6,
       ts_level: 0,
       hero_bonus: 0,
@@ -72,8 +79,7 @@ function TsOptimizerForm() {
       {
         attacker_id: newAttackerId(),
         village_label: `攻擊者 ${attackers.length + 1}`,
-        x: 0,
-        y: 0,
+        coord: EMPTY_COORD,
         unit_speed: 6,
         ts_level: 0,
         hero_bonus: 0,
@@ -81,10 +87,10 @@ function TsOptimizerForm() {
       },
     ])
 
-  const updateAttacker = <K extends keyof AttackerProfile>(
+  const updateAttacker = <K extends keyof AttackerFields | 'coord'>(
     idx: number,
     field: K,
-    value: AttackerProfile[K],
+    value: AttackerRow[K],
   ) => {
     setAttackers((prev) =>
       prev.map((a, i) => (i === idx ? { ...a, [field]: value } : a)),
@@ -96,6 +102,14 @@ function TsOptimizerForm() {
 
   const handleCalculate = async () => {
     // 超出 0–75 的欄位：欄位下方已經寫「請輸入 0–75」，捲過去、不送出（P0-17 (j)）
+    // 座標空白或超出範圍：欄位下方標紅字、捲過去，不送出（不會拿 0 去算）
+    const targetXY = coordPairValue(target, radius)
+    const attackerXY = attackers.map((a) => coordPairValue(a.coord, radius))
+    if (!targetXY || attackerXY.some((c) => c == null)) {
+      setShowCoordErrors(true)
+      setTimeout(() => focusFirstInvalid(document.querySelector('main')), 0)
+      return
+    }
     if (focusFirstInvalid(document.querySelector('main'))) return
     const arrivalDate = parseLocalDateTimeInput(arrival)
     if (!arrivalDate) {
@@ -106,11 +120,20 @@ function TsOptimizerForm() {
       setLoading(true)
       setError(null)
       const req: TsOptimizerRequest = {
-        target_x: target.x,
-        target_y: target.y,
+        target_x: targetXY.x,
+        target_y: targetXY.y,
         // 使用者填的是自己時區的時間，送出前換成含時差的 ISO（後端照 UTC 算）
         target_arrival: arrivalDate.toISOString(),
-        attackers,
+        attackers: attackers.map((a, i) => ({
+          attacker_id: a.attacker_id,
+          village_label: a.village_label,
+          x: attackerXY[i]!.x,
+          y: attackerXY[i]!.y,
+          unit_speed: a.unit_speed,
+          ts_level: a.ts_level,
+          hero_bonus: a.hero_bonus,
+          allow_ts_adjustment: a.allow_ts_adjustment,
+        })),
         wave_spacing_seconds: 1,
         // 伺服器速度跟「已帶入」列一致（原本寫死 x1）
         server_speed: speed,
@@ -129,26 +152,16 @@ function TsOptimizerForm() {
     <div className="min-w-0 rounded-lg border p-4 sm:p-6">
       {/* 390 寬：目標 X／Y 一列兩格，抵達時間獨占一列（原本三欄太窄） */}
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">目標 X</label>
-          <input
-            type="number"
-            data-testid="target-x"
-            value={target.x}
-            onChange={(e) => setTarget({ ...target, x: Number(e.target.value) })}
-            className="w-full min-w-0 p-2 border rounded bg-background"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">目標 Y</label>
-          <input
-            type="number"
-            data-testid="target-y"
-            value={target.y}
-            onChange={(e) => setTarget({ ...target, y: Number(e.target.value) })}
-            className="w-full min-w-0 p-2 border rounded bg-background"
-          />
-        </div>
+        <CoordPair
+          className="contents"
+          labelX="目標 X"
+          labelY="目標 Y"
+          testId="target"
+          radius={radius}
+          showErrors={showCoordErrors}
+          value={target}
+          onChange={setTarget}
+        />
         <div className="col-span-2 min-w-0 sm:col-span-1">
           <label className="block text-sm font-medium mb-2" htmlFor="ts-arrival">
             希望抵達時間（{localZoneLabel('zh') || '本地'}時間）
@@ -179,26 +192,16 @@ function TsOptimizerForm() {
                 onChange={(e) => updateAttacker(i, 'village_label', e.target.value)}
               />
             </label>
-            <label className="min-w-0 text-xs text-muted-foreground">
-              <span className="sm:sr-only">X</span>
-              <input
-                type="number"
-                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
-                placeholder="X"
-                value={a.x}
-                onChange={(e) => updateAttacker(i, 'x', Number(e.target.value))}
-              />
-            </label>
-            <label className="min-w-0 text-xs text-muted-foreground">
-              <span className="sm:sr-only">Y</span>
-              <input
-                type="number"
-                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
-                placeholder="Y"
-                value={a.y}
-                onChange={(e) => updateAttacker(i, 'y', Number(e.target.value))}
-              />
-            </label>
+            <CoordPair
+              className="contents"
+              fieldClassName="min-w-0 text-xs text-muted-foreground"
+              labelClassName="mb-1 block sm:sr-only"
+              testId="attacker"
+              radius={radius}
+              showErrors={showCoordErrors}
+              value={a.coord}
+              onChange={(v) => updateAttacker(i, 'coord', v)}
+            />
             <label className="min-w-0 text-xs text-muted-foreground">
               <span className="sm:sr-only">最慢兵種速度（格／小時）</span>
               <input

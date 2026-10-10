@@ -12,6 +12,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { statisticsApi, type InactiveVillage } from '@/services/statisticsApi'
+import CoordPair from '@/components/common/CoordPair'
+import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
+import { useMapRadius } from '@/lib/mapRadius'
 
 const DEFAULT_SERVER = 'https://nys.x1.asia.travian.com'
 const PAGE_SIZE = 50
@@ -19,8 +22,13 @@ const PAGE_SIZE = 50
 export default function InactiveSearchPage() {
   const [serverUrl, setServerUrl] = useState(DEFAULT_SERVER)
   const [inputUrl, setInputUrl] = useState(DEFAULT_SERVER)
-  const [centerX, setCenterX] = useState(0)
-  const [centerY, setCenterY] = useState(0)
+  // 中心座標：預設空白、可打負號；兩格都合格才搜尋（不會拿 0 去搜）
+  const mapRadius = useMapRadius()
+  const [center, setCenter] = useState<CoordText>(EMPTY_COORD)
+  const [showCoordErrors, setShowCoordErrors] = useState(false)
+  const centerXY = coordPairValue(center, mapRadius)
+  const centerX = centerXY?.x
+  const centerY = centerXY?.y
   const [radius, setRadius] = useState(50)
   const [maxPopChange, setMaxPopChange] = useState(2)
   const [results, setResults] = useState<InactiveVillage[]>([])
@@ -33,6 +41,10 @@ export default function InactiveSearchPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   const fetchData = useCallback(async (searchPage: number) => {
+    if (centerX == null || centerY == null) {
+      setShowCoordErrors(true)
+      return
+    }
     try {
       setLoading(true)
       setError(null)
@@ -97,24 +109,17 @@ export default function InactiveSearchPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 items-end">
-            <div>
-              <Label htmlFor="centerX">中心 X</Label>
-              <Input
-                id="centerX"
-                type="number"
-                value={centerX}
-                onChange={(e) => setCenterX(Number(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="centerY">中心 Y</Label>
-              <Input
-                id="centerY"
-                type="number"
-                value={centerY}
-                onChange={(e) => setCenterY(Number(e.target.value))}
-              />
-            </div>
+            <CoordPair
+              className="contents"
+              labelClassName="mb-2 block text-sm font-medium leading-none"
+              labelX="中心 X"
+              labelY="中心 Y"
+              testId="inactive-center"
+              radius={mapRadius}
+              showErrors={showCoordErrors}
+              value={center}
+              onChange={setCenter}
+            />
             <div>
               <Label htmlFor="radius">半徑</Label>
               <Input

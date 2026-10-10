@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
+import CoordPair from '@/components/common/CoordPair'
+import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
+import { useMapRadius } from '@/lib/mapRadius'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
@@ -9,10 +12,14 @@ import Stepper from '@/components/common/Stepper'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { speedPendingKinds } from '@/lib/pendingNotes'
 
+// 座標另外用文字存（預設空白、可打負號），按「計算」時才換成數字
+type SaveTroopsForm = Omit<SaveTroopsRequest, 'village_x' | 'village_y'>
+
 export default function SaveTroopsCalculatorPage() {
-  const [form, setForm] = useState<SaveTroopsRequest>({
-    village_x: 0,
-    village_y: 0,
+  const radius = useMapRadius()
+  const [villageCoord, setVillageCoord] = useState<CoordText>(EMPTY_COORD)
+  const [showCoordErrors, setShowCoordErrors] = useState(false)
+  const [form, setForm] = useState<SaveTroopsForm>({
     unit_speed: 7,
     offline_hours: 8,
     server_speed: 1,
@@ -31,19 +38,27 @@ export default function SaveTroopsCalculatorPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleChange = (field: keyof SaveTroopsRequest, value: number) => {
+  const handleChange = (field: keyof SaveTroopsForm, value: number) => {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleCalculate = async () => {
     // 超出 0–75 的欄位：欄位下方已經寫「請輸入 0–75」，捲過去、不送出（P0-17 (j)）
+    // 座標空白或超出範圍：欄位下方標紅字、捲過去，不送出（不會拿 0 去算）
+    const xy = coordPairValue(villageCoord, radius)
+    if (!xy) {
+      setShowCoordErrors(true)
+      setTimeout(() => focusFirstInvalid(document.querySelector('main')), 0)
+      return
+    }
     if (focusFirstInvalid(document.querySelector('main'))) return
+    const req: SaveTroopsRequest = { ...form, village_x: xy.x, village_y: xy.y }
     try {
       setLoading(true)
       setError(null)
-      const res = await advancedCalculatorApi.calculateSaveTroops(form)
+      const res = await advancedCalculatorApi.calculateSaveTroops(req)
       setResult(res)
-      setUsed(form)
+      setUsed(req)
     } catch {
       setError('計算失敗，請檢查輸入')
     } finally {
@@ -66,30 +81,16 @@ export default function SaveTroopsCalculatorPage() {
         <div className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">參數設定</h2>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">村莊 X</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.village_x}
-                onChange={(e) => handleChange('village_x', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">村莊 Y</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.village_y}
-                onChange={(e) => handleChange('village_y', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-          </div>
+          <CoordPair
+            className="grid grid-cols-2 gap-4 mb-4"
+            labelX="村莊 X"
+            labelY="村莊 Y"
+            testId="village"
+            radius={radius}
+            showErrors={showCoordErrors}
+            value={villageCoord}
+            onChange={setVillageCoord}
+          />
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">部隊速度（格/小時）</label>

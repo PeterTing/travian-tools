@@ -14,6 +14,13 @@ vi.mock('@/contexts/CurrentAccountContext', () => ({
 
 const mockedApi = vi.mocked(advancedCalculatorApi)
 
+// 座標預設空白、空白不送出（2026-10-10）：先填攻擊者和目標
+const fillCoords = () => {
+  for (const [id, v] of [['attacker-x', '0'], ['attacker-y', '0'], ['target-x', '3'], ['target-y', '-5']]) {
+    fireEvent.change(screen.getByTestId(id), { target: { value: v } })
+  }
+}
+
 const SPARTANS = [
   'Hoplite', 'Sentinel', 'Shieldsman', 'Twinsteel Therion', 'Elpida Rider',
   'Corinthian Crusher', 'Ram', 'Ballista', 'Ephor', 'Settler',
@@ -38,6 +45,7 @@ describe('PathSpeedTsCalculatorPage unverified-units-note (P0-15)', () => {
       unverified_units: SPARTANS,
     })
     render(<PathSpeedTsCalculatorPage />)
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '反推速度 + TS' }))
 
     const notes = await screen.findAllByTestId('unverified-units-note')
@@ -56,6 +64,7 @@ describe('PathSpeedTsCalculatorPage unverified-units-note (P0-15)', () => {
   it('no note when the backend reports no unverified units', async () => {
     mockedApi.calculatePathSpeedTs.mockResolvedValueOnce({ distance: 6, possible_matches: [], unverified_units: [] })
     render(<PathSpeedTsCalculatorPage />)
+    fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '反推速度 + TS' }))
     expect(await screen.findByText(/無匹配結果/)).toBeInTheDocument()
     expect(screen.queryByTestId('unverified-units-note')).toBeNull()

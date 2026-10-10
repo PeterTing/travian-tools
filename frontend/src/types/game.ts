@@ -416,6 +416,8 @@ export interface GameWorld {
   server_url: string
   /** 伺服器時間的 UTC 時差（分鐘，例如 UTC+1 = 60）；null = 不換算，照伺服器時間顯示 */
   utc_offset: number | null
+  /** 地圖邊長（例如 401 → 座標 −200～200）。後端還沒有這個欄位；沒有時座標框退回 ±200（見 lib/mapRadius.ts） */
+  map_size?: number | null
   account_count: number
 }
 

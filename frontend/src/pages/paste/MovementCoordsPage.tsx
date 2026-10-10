@@ -3,7 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { CoordsCameraButton } from '@/components/ocr/CoordsCameraButton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import CoordPair from '@/components/common/CoordPair'
+import { EMPTY_COORD, coordPairValue, coordText, type CoordText } from '@/lib/coords'
+import { useMapRadius } from '@/lib/mapRadius'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { pasteApi, type Movement } from '@/services/pasteApi'
 
@@ -12,8 +14,10 @@ export default function MovementCoordsPage() {
   const { currentAccount } = useCurrentAccount()
   const navigate = useNavigate()
   const [row, setRow] = useState<Movement | null>(null)
-  const [x, setX] = useState('')
-  const [y, setY] = useState('')
+  // 預設空白、可打負號；兩格都合格才儲存（不會存成 0）
+  const mapRadius = useMapRadius()
+  const [coord, setCoord] = useState<CoordText>(EMPTY_COORD)
+  const [showCoordErrors, setShowCoordErrors] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -21,8 +25,9 @@ export default function MovementCoordsPage() {
     void pasteApi.listMovements(currentAccount.account_id).then((res) => {
       const found = res.movements.find((m) => m.movement_id === movementId) || null
       setRow(found)
-      if (found?.coordinate_x != null) setX(String(found.coordinate_x))
-      if (found?.coordinate_y != null) setY(String(found.coordinate_y))
+      if (found?.coordinate_x != null && found?.coordinate_y != null) {
+        setCoord(coordText(found.coordinate_x, found.coordinate_y))
+      }
     })
   }, [currentAccount, movementId])
 
@@ -46,29 +51,19 @@ export default function MovementCoordsPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-start gap-2">
-            <Input
-              value={x}
-              onChange={(e) => setX(e.target.value)}
-              placeholder="x"
-              className="min-w-0"
-              inputMode="numeric"
-              data-testid="coord-x"
-            />
-            <Input
-              value={y}
-              onChange={(e) => setY(e.target.value)}
-              placeholder="y"
-              className="min-w-0"
-              inputMode="numeric"
-              data-testid="coord-y"
+            <CoordPair
+              className="grid min-w-0 flex-1 grid-cols-2 gap-2"
+              labelClassName="sr-only"
+              testId="coord"
+              radius={mapRadius}
+              showErrors={showCoordErrors}
+              value={coord}
+              onChange={setCoord}
             />
             <CoordsCameraButton
               size="default"
               beta
-              onPick={(px, py) => {
-                setX(String(px))
-                setY(String(py))
-              }}
+              onPick={(px, py) => setCoord(coordText(px, py))}
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
@@ -78,9 +73,14 @@ export default function MovementCoordsPage() {
             </Link>
             <Button
               onClick={() => {
+                const xy = coordPairValue(coord, mapRadius)
+                if (!xy) {
+                  setShowCoordErrors(true)
+                  return
+                }
                 void (async () => {
                   try {
-                    await pasteApi.updateCoords(row.movement_id, Number(x), Number(y))
+                    await pasteApi.updateCoords(row.movement_id, xy.x, xy.y)
                     navigate('/')
                   } catch (e) {
                     setError(e instanceof Error ? e.message : '儲存失敗')

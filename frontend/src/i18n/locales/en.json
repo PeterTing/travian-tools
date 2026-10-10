@@ -980,7 +980,8 @@
     "travelTime": "Travel time",
     "seconds": "Seconds",
     "effectiveSpeed": "Effective speed",
-    "fieldsPerHour": "fields/h"
+    "fieldsPerHour": "fields/h",
+    "needCoords": "Enter both start and target coordinates"
   },
   "ocr": {
     "beta": {

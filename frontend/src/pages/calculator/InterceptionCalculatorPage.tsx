@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
+import CoordPair from '@/components/common/CoordPair'
+import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
+import { useMapRadius } from '@/lib/mapRadius'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
@@ -9,16 +12,19 @@ import Stepper from '@/components/common/Stepper'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { speedPendingKinds } from '@/lib/pendingNotes'
 
+// 座標另外用文字存（預設空白、可打負號），按「計算」時才換成數字
+type CoordKey = 'attacker_x' | 'attacker_y' | 'defender_x' | 'defender_y' | 'catcher_x' | 'catcher_y'
+type InterceptionForm = Omit<InterceptionRequest, CoordKey>
+
 export default function InterceptionCalculatorPage() {
-  const [form, setForm] = useState<InterceptionRequest>({
-    attacker_x: 0,
-    attacker_y: 0,
-    defender_x: 0,
-    defender_y: 0,
+  const radius = useMapRadius()
+  const [attackerCoord, setAttackerCoord] = useState<CoordText>(EMPTY_COORD)
+  const [defenderCoord, setDefenderCoord] = useState<CoordText>(EMPTY_COORD)
+  const [catcherCoord, setCatcherCoord] = useState<CoordText>(EMPTY_COORD)
+  const [showCoordErrors, setShowCoordErrors] = useState(false)
+  const [form, setForm] = useState<InterceptionForm>({
     attack_arrival_time: '12:00:00',
     attacker_speed: 7,
-    catcher_x: 0,
-    catcher_y: 0,
     catcher_speed: 10,
     server_speed: 1,
     catcher_ts_level: 0,
@@ -38,19 +44,37 @@ export default function InterceptionCalculatorPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleChange = (field: keyof InterceptionRequest, value: string | number) => {
+  const handleChange = (field: keyof InterceptionForm, value: string | number) => {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleCalculate = async () => {
     // 超出 0–75 的欄位：欄位下方已經寫「請輸入 0–75」，捲過去、不送出（P0-17 (j)）
+    // 座標空白或超出範圍：欄位下方標紅字、捲過去，不送出（不會拿 0 去算）
+    const atk = coordPairValue(attackerCoord, radius)
+    const def = coordPairValue(defenderCoord, radius)
+    const cat = coordPairValue(catcherCoord, radius)
+    if (!atk || !def || !cat) {
+      setShowCoordErrors(true)
+      setTimeout(() => focusFirstInvalid(document.querySelector('main')), 0)
+      return
+    }
     if (focusFirstInvalid(document.querySelector('main'))) return
+    const req: InterceptionRequest = {
+      ...form,
+      attacker_x: atk.x,
+      attacker_y: atk.y,
+      defender_x: def.x,
+      defender_y: def.y,
+      catcher_x: cat.x,
+      catcher_y: cat.y,
+    }
     try {
       setLoading(true)
       setError(null)
-      const res = await advancedCalculatorApi.calculateInterception(form)
+      const res = await advancedCalculatorApi.calculateInterception(req)
       setResult(res)
-      setUsed(form)
+      setUsed(req)
     } catch {
       setError('計算失敗，請檢查輸入')
     } finally {
@@ -77,56 +101,24 @@ export default function InterceptionCalculatorPage() {
         {/* Input */}
         <div className="border rounded-lg p-6 space-y-4">
           <h2 className="text-xl font-semibold">攻擊者村莊（敵方）</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">X</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.attacker_x}
-                onChange={(e) => handleChange('attacker_x', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Y</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.attacker_y}
-                onChange={(e) => handleChange('attacker_y', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-          </div>
+          <CoordPair
+            className="grid grid-cols-2 gap-4"
+            testId="attacker"
+            radius={radius}
+            showErrors={showCoordErrors}
+            value={attackerCoord}
+            onChange={setAttackerCoord}
+          />
 
           <h2 className="text-xl font-semibold pt-2">被攻擊村莊</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">X</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.defender_x}
-                onChange={(e) => handleChange('defender_x', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Y</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.defender_y}
-                onChange={(e) => handleChange('defender_y', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-          </div>
+          <CoordPair
+            className="grid grid-cols-2 gap-4"
+            testId="defender"
+            radius={radius}
+            showErrors={showCoordErrors}
+            value={defenderCoord}
+            onChange={setDefenderCoord}
+          />
 
           <div>
             <label className="block text-sm font-medium mb-2">攻擊到達時間 (HH:MM:SS)</label>
@@ -172,30 +164,14 @@ export default function InterceptionCalculatorPage() {
           />
 
           <h2 className="text-xl font-semibold pt-2">攔截者村莊（你的）</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">X</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.catcher_x}
-                onChange={(e) => handleChange('catcher_x', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Y</label>
-              <input
-                type="number"
-                min={-200}
-                max={200}
-                value={form.catcher_y}
-                onChange={(e) => handleChange('catcher_y', Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-          </div>
+          <CoordPair
+            className="grid grid-cols-2 gap-4"
+            testId="catcher"
+            radius={radius}
+            showErrors={showCoordErrors}
+            value={catcherCoord}
+            onChange={setCatcherCoord}
+          />
 
           <div>
             <label className="block text-sm font-medium mb-2">攔截部隊速度</label>

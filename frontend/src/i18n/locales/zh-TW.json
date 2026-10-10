@@ -1058,7 +1058,8 @@
     "travelTime": "行進時間",
     "seconds": "秒數",
     "effectiveSpeed": "有效速度",
-    "fieldsPerHour": "格／時"
+    "fieldsPerHour": "格／時",
+    "needCoords": "填好起始和目標座標後顯示"
   },
   "ocr": {
     "beta": {
