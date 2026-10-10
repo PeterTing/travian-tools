@@ -1094,7 +1094,7 @@
     "thisPageOnly": "(changed on this page)",
     "offsetUnknown": "Time offset: set automatically once you paste a page",
     "offsetKnown": "Time offset {{hours}} h (read from a pasted page)",
-    "unitPending": "Unit costs, upkeep and training times not yet checked on ts11",
+    "unitPending": "Spartan and Viking unit numbers unverified",
     "unitPendingSpartan": "Spartan speeds unverified",
     "speed": "Server speed",
     "tribe": "Tribe",
@@ -1131,7 +1131,7 @@
       "source": "The current numbers are community-compiled and may be off."
     },
     "autofillUnits": {
-      "what": "Unit costs, upkeep and training times haven't been checked in-game on ts11 yet; the current numbers are community-compiled.",
+      "what": "Roman, Teuton, Gaul, Egyptian and Hun unit numbers are checked against the ts11 in-game help; ts11 has no Spartans or Vikings, so their costs, upkeep and training times are still community-compiled.",
       "source": "Spartan speeds come from the official help page (which says the numbers come from a third-party calculator); reverse TS leaves Spartan units out."
     },
     "spartanSpeed": {

@@ -91,7 +91,8 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
     expect(bar).toMatch(/<PendingVerifyChip[^>]*kind="autofillUnits"/)
     expect(bar).not.toMatch(/kind="units"/)
     const n = (zh as unknown as { pendingNotes: Notes }).pendingNotes.autofillUnits
-    expect(n?.what).toContain('兵種花費、糧耗、訓練時間')
+    expect(n?.what).toContain('花費、糧耗、訓練時間')
+    expect(n?.what).toContain('斯巴達、維京')
     expect(n?.source).toContain('斯巴達速度')
   })
 

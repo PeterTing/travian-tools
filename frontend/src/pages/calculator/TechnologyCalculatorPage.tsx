@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { TechnologyRequest, TechnologyResponse } from '@/services/advancedCalculatorApi'
@@ -23,6 +23,11 @@ export default function TechnologyCalculatorPage() {
     tribe: accountTribe ?? 'romans',
     research_levels: [0, 5, 10, 15, 20],
   })
+  // 帳號資料晚一點才載入：使用者還沒自己選過部族就跟著帳號
+  const [tribeTouched, setTribeTouched] = useState(false)
+  useEffect(() => {
+    if (accountTribe && !tribeTouched) setForm((prev) => ({ ...prev, tribe: accountTribe }))
+  }, [accountTribe, tribeTouched])
   const [result, setResult] = useState<TechnologyResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -53,7 +58,7 @@ export default function TechnologyCalculatorPage() {
           <label className="block text-sm font-medium mb-2">部族</label>
           <select
             value={form.tribe}
-            onChange={(e) => setForm((prev) => ({ ...prev, tribe: e.target.value }))}
+            onChange={(e) => { setTribeTouched(true); setForm((prev) => ({ ...prev, tribe: e.target.value })) }}
             className="p-2 border rounded bg-background"
           >
             {TRIBES.map((t) => (

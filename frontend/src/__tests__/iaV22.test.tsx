@@ -171,7 +171,7 @@ describe('IA v2.2', () => {
       const line = screen.getByTestId('autofill-unit-pending')
       // 兩行、沒有分號；灰標在最前面，兩行都掛在灰標右邊（同一個文字欄）
       expect(line).not.toHaveTextContent('；')
-      expect(screen.getByTestId('autofill-unit-pending-line1')).toHaveTextContent(/^兵種花費、糧耗、訓練時間還沒在 ts11 核對$/)
+      expect(screen.getByTestId('autofill-unit-pending-line1')).toHaveTextContent(/^斯巴達、維京兵種數字待驗證$/)
       expect(screen.getByTestId('autofill-unit-pending-line2')).toHaveTextContent(/^斯巴達速度待驗證$/)
       const chip = within(line).getByTestId('pending-verify-chip')
       expect(chip).toHaveTextContent('待驗證')
@@ -196,7 +196,7 @@ describe('IA v2.2', () => {
       const line = screen.getByTestId('autofill-unit-pending')
       fireEvent.click(within(line).getByTestId('pending-verify-chip'))
       expect(screen.getByTestId('pending-note-what')).toHaveTextContent(
-        /^兵種花費、糧耗、訓練時間還沒在 ts11 遊戲內核對，目前用的是社群整理的數字。$/,
+        /^羅馬、條頓、高盧、埃及、匈奴的兵種數字已在 ts11 遊戲內說明頁核對；ts11 沒有斯巴達、維京，這兩族的花費、糧耗、訓練時間還是社群整理的數字。$/,
       )
       expect(screen.getByTestId('pending-note-source')).toHaveTextContent(
         /^斯巴達速度取自官方說明頁（頁面標示數字來自第三方計算器），反推 TS 不會算斯巴達兵種。$/,
