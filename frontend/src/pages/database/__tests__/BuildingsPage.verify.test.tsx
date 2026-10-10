@@ -114,6 +114,7 @@ describe('BuildingsPage ✓ source notes (real data, P0-23)', () => {
 describe('BuildingsPage effect column (official knowledge base, P0-23)', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('zh-TW')
+    list.push({ building_id: 'academy', name_zh: '研究院', name_en: 'Academy', category: 'research', max_level: 20 })
     list.push({ building_id: 'rally_point', name_zh: '集結點', name_en: 'Rally Point', category: 'military', max_level: 20 })
   })
   afterEach(() => {
@@ -122,13 +123,20 @@ describe('BuildingsPage effect column (official knowledge base, P0-23)', () => {
   })
 
   it('real data: only buildings without a comparable knowledge base effect column are pending', () => {
-    for (const id of ['academy', 'blacksmith', 'embassy', 'rally_point', 'treasury']) expect(gameData.isBuildingEffectVerified(id), id).toBe(false)
+    // 2026-10-11：大使館、寶物庫、集結點改照遊戲內說明＋官方說明頁核對；研究院、盔甲廠照 PM 決定改用官方寫法
+    // （evidence/pending_crosscheck_2026-10-11.json）→ 效果待驗證的建築沒有了，下面的灰標測試用 mock 模擬
+    for (const id of ['academy', 'blacksmith', 'embassy', 'rally_point', 'treasury']) expect(gameData.isBuildingEffectVerified(id), id).toBe(true)
     for (const id of ['main_building', 'warehouse', 'great_warehouse', 'stonemasons_lodge', 'horse_drinking_trough', 'trade_office', 'woodcutter']) expect(gameData.isBuildingEffectVerified(id), id).toBe(true)
   })
 
+  // 2026-10-11 起沒有效果待驗證的建築：模擬「研究院效果還沒核對」，確認灰標機制還在
+  const mockAcademyEffectPending = () =>
+    vi.spyOn(gameData, 'isBuildingEffectVerified').mockImplementation((id: string) => id !== 'academy')
+
   it('effect not verified: chip by the 效果 heading (note under the header row) and chip by the title, same two lines', async () => {
+    mockAcademyEffectPending()
     render(<BuildingsPage />)
-    fireEvent.click(await screen.findByText('集結點'))
+    fireEvent.click(await screen.findByText('研究院'))
     const heading = await screen.findByTestId('building-effect-heading')
     const chip = within(heading).getByTestId('pending-verify-chip')
     expect(chip).toHaveAttribute('data-kind', 'buildingEffect')
@@ -150,10 +158,11 @@ describe('BuildingsPage effect column (official knowledge base, P0-23)', () => {
     expect(screen.getByTestId('pending-note-source')).toHaveTextContent('官方知識庫沒有可以對照的效果數字；目前的文字來源還在查。')
   })
 
-  // #34 幕僚長／PM：效果待驗證的 5 棟（研究院、盔甲廠、大使館、集結點、寶物庫）不能有 ✓
+  // #34 幕僚長／PM：效果待驗證的建築不能有 ✓（2026-10-11 起沒有這種建築，用 mock 模擬研究院）
   it('effect not verified: no ✓ anywhere (list or title); list shows a non-clickable 待驗證 label, row aria-label says 效果待驗證', async () => {
+    mockAcademyEffectPending()
     render(<BuildingsPage />)
-    const name = (await screen.findByText('集結點')).closest('p')!
+    const name = (await screen.findByText('研究院')).closest('p')!
     expect(within(name).queryByTestId('verified-mark')).toBeNull()
     expect(name.textContent).not.toContain('✓')
     const label = within(name).getByTestId('pending-verify-label')
@@ -164,7 +173,7 @@ describe('BuildingsPage effect column (official knowledge base, P0-23)', () => {
     expect(within(name).queryByRole('button')).toBeNull()
     const row = name.closest('[data-testid=building-list-row]')!
     expect(row).toHaveAttribute('role', 'listitem')
-    expect(row).toHaveAttribute('aria-label', '集結點，效果待驗證')
+    expect(row).toHaveAttribute('aria-label', '研究院，效果待驗證')
     // 點字樣＝點這一列（選到這棟建築），不會打開說明
     fireEvent.click(label)
     const title = await screen.findByTestId('building-detail-name')
@@ -176,13 +185,47 @@ describe('BuildingsPage effect column (official knowledge base, P0-23)', () => {
     expect(within(mb as HTMLElement).getByTestId('verified-mark')).toBeInTheDocument()
   })
 
-  it('real data: none of the 5 effect-pending buildings is fully verified', () => {
+  it('real data: academy, smithy, embassy, treasury, rally point are fully verified (2026-10-11, PM decision for academy / smithy)', () => {
     vi.restoreAllMocks()
     for (const id of ['academy', 'blacksmith', 'embassy', 'rally_point', 'treasury']) {
-      expect(isBuildingFullyVerified(id), id).toBe(false)
+      expect(isBuildingFullyVerified(id), id).toBe(true)
       expect(gameData.isBuildingVerified(id), id).toBe(true)
     }
+    expect(gameData.effectSource('academy')).toBe('effectAcademy')
+    expect(gameData.effectSource('blacksmith')).toBe('effectBlacksmith')
+    expect(gameData.effectSource('embassy')).toBe('effectEmbassy')
+    expect(gameData.effectSource('treasury')).toBe('effectTreasury')
+    expect(gameData.effectSource('rally_point')).toBe('effectRallyPoint')
+    expect(gameData.effectSource('main_building')).toBeNull()
     expect(isBuildingFullyVerified('main_building')).toBe(true)
+  })
+
+  it('rally point ✓: the note has two parts — numbers (ts11 + knowledge base) and effect (official S65、S181)', async () => {
+    render(<BuildingsPage />)
+    const name = (await screen.findByText('集結點')).closest('p')!
+    expect(within(name).queryByTestId('pending-verify-label')).toBeNull()
+    fireEvent.click(within(name).getByTestId('verified-mark'))
+    const entries = screen.getAllByTestId('pending-note-entry')
+    expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['ts11L1Kb', 'effectRallyPoint'])
+    expect(within(entries[0]!).getByTestId('pending-note-what')).toHaveTextContent('花費、時間、人口、CP已核對。')
+    expect(within(entries[1]!).getByTestId('pending-note-what')).toHaveTextContent('效果已核對。')
+    expect(within(entries[1]!).getByTestId('pending-note-source')).toHaveTextContent('官方說明頁 S65、S181')
+    // 列表那一列：效果核對過，aria-label 只有名稱
+    expect(name.closest('[data-testid=building-list-row]')).toHaveAttribute('aria-label', '集結點')
+  })
+
+  it('academy ✓ (PM 2026-10-11): no 待驗證, note names the in-game help, effect column has no chip', async () => {
+    render(<BuildingsPage />)
+    const name = (await screen.findByText('研究院')).closest('p')!
+    expect(within(name).queryByTestId('pending-verify-label')).toBeNull()
+    expect(name.closest('[data-testid=building-list-row]')).toHaveAttribute('aria-label', '研究院')
+    fireEvent.click(within(name).getByTestId('verified-mark'))
+    const entries = screen.getAllByTestId('pending-note-entry')
+    expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['ts11L1Kb', 'effectAcademy'])
+    expect(within(entries[1]!).getByTestId('pending-note-source')).toHaveTextContent('遊戲內說明')
+    fireEvent.click(screen.getByText('研究院', { selector: 'p *, p' }))
+    const heading = await screen.findByTestId('building-effect-heading')
+    expect(within(heading).queryByTestId('pending-verify-chip')).toBeNull()
   })
 
   it('verified effect (main building): no chip by the 效果 heading', async () => {

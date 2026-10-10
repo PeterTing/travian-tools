@@ -11,7 +11,9 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import os
 import re
+import warnings
 from pathlib import Path
 
 import pytest
@@ -323,7 +325,10 @@ def test_every_verified_effect_level_matches_kb() -> None:
         (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
     )
     pending = set(gen["effectsPending"])
-    assert pending == {"academy", "blacksmith", "embassy", "rally_point", "treasury"}
+    assert pending == set()
+    # 2026-10-11：這五棟照遊戲內說明＋官方說明頁核對（不是知識庫），下面另外測；研究院、盔甲廠是 PM 決定的寫法
+    official = set(gen["effectSources"])
+    assert official == {"academy", "blacksmith", "embassy", "rally_point", "treasury"}
     data = json.loads(
         (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
     )["buildings"]
@@ -363,7 +368,7 @@ def test_every_verified_effect_level_matches_kb() -> None:
         "great_granary": 39,
         "horse_drinking_trough": 41,
     }
-    assert set(gid) == set(data) - pending
+    assert set(gid) == set(data) - pending - official
     for bid, g in gid.items():
         kb = _kb_effects(g)
         for lv in data[bid]["levels"]:
@@ -373,6 +378,149 @@ def test_every_verified_effect_level_matches_kb() -> None:
                 assert (
                     cell.replace(".0%", "%").lstrip("+") in lv["effect_description"]
                 ), (bid, lv["level"], cell)
+
+
+# ─── 2026-10-11：效果照遊戲內說明＋官方說明頁（evidence/pending_crosscheck_2026-10-11.json） ───
+
+PENDING_EV = ROOT / "scripts/game_data/evidence/pending_crosscheck_2026-10-11.json"
+
+
+def test_pending_crosscheck_evidence_hashes_recompute() -> None:
+    ev = json.loads(PENDING_EV.read_text(encoding="utf-8"))
+    for key, art in ev["official_articles"].items():
+        if "text" in art:
+            assert (
+                hashlib.sha256(art["text"].encode("utf-8")).hexdigest()
+                == art["text_sha256"]
+            ), key
+    html = ev["eu12_ingame"]["manual_building_14"]["html"]
+    assert (
+        hashlib.sha256(html.encode("utf-8")).hexdigest()
+        == ev["eu12_ingame"]["manual_building_14"]["html_sha256"]
+    )
+    assert "beyond a minimum distance of 20 squares" in html
+    for gid, f in ev["eu12_ingame"]["level0_fields"].items():
+        png = (PENDING_EV.parent / f["screenshot"]).read_bytes()
+        assert hashlib.sha256(png).hexdigest() == f["screenshot_sha256"], gid
+        assert "Current production:\t3 per hour" in f["raw_text_production_lines"], gid
+        assert "Production at level 1:\t7 per hour" in f["raw_text_production_lines"], (
+            gid
+        )
+
+
+# 測試帳號名、村莊名、大廳信箱：原字串放在 CI secret TT_ID_DENYLIST（一行一個），repo 裡不留任何形式
+# （短字串的雜湊可以暴力反推，#45 幕僚長）。CI 沒設 secret 要失敗；本機沒設就略過並印警告。
+def _id_denylist() -> list[str]:
+    raw = os.environ.get("TT_ID_DENYLIST", "")
+    names = [n.strip().casefold() for n in raw.splitlines() if n.strip()]
+    if names:
+        return names
+    if os.environ.get("CI"):
+        pytest.fail("TT_ID_DENYLIST 沒設：CI 一定要有這個 secret（帳號名／村莊名清單）")
+    warnings.warn("TT_ID_DENYLIST 沒設：本機略過帳號名／村莊名比對", stacklevel=2)
+    print(
+        "WARNING: TT_ID_DENYLIST is not set; skipping the account/village name scan locally"
+    )
+    pytest.skip("TT_ID_DENYLIST not set (local run)")
+
+
+def _normalize_for_id_scan(text: str) -> str:
+    """遊戲頁面的數字常夾 U+202D/U+202C（方向控制字元），負號是 U+2212：先拿掉／換成 '-' 再比."""
+    return text.replace("\u202d", "").replace("\u202c", "").replace("\u2212", "-")
+
+
+def test_pending_crosscheck_evidence_has_no_account_identifiers() -> None:
+    text = _normalize_for_id_scan(PENDING_EV.read_text(encoding="utf-8"))
+    # 公開 repo：不能有 email、密碼、村莊座標、帶村莊／座標的網址參數、大廳帳號 ID
+    assert not re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", text)
+    assert "password" not in text.lower()
+    assert not re.search(r"\(\s*-?\d+\s*\|\s*-?\d+\s*\)", text)
+    assert not re.search(r"[?&;](x|y)=-?\d", text)
+    assert not re.search(r"newdid", text, re.I)
+    assert not re.search(r"[?&;]did=", text)
+    assert not re.search(r"\bh\d{6,}", text)
+
+
+def test_evidence_has_no_denylisted_names() -> None:
+    names = _id_denylist()
+    for path in sorted(PENDING_EV.parent.rglob("*")):
+        if path.suffix not in (".json", ".md", ".txt", ".html"):
+            continue
+        folded = _normalize_for_id_scan(path.read_text(encoding="utf-8")).casefold()
+        for k, name in enumerate(names):
+            # 失敗訊息只給檔名和清單第幾個，不印字串本身
+            assert name not in folded, (path.name, f"denylist entry #{k}")
+
+
+def test_boots_beyond_20_fields_two_official_sources() -> None:
+    """#45 T6：靴子只加 20 格外＝S93＋S71（寫法不同）；競技場＋靴子相加仍待驗證."""
+    ev = json.loads(PENDING_EV.read_text(encoding="utf-8"))
+    s93 = ev["official_articles"]["s93"]["text"]
+    s71 = ev["official_articles"]["s71"]["text"]
+    for tier in ("Mercenary \u2013 +25%", "Warrior \u2013 +50%", "Archon \u2013 +75%"):
+        assert f"Boots of the {tier} troop speed after the first 20 fields" in s93
+    assert "The first 20 fields are always traveled without this bonus." in s71
+    assert "add together" not in s93
+    c = ev["conclusions"]
+    assert c["heroBootsSpeed"]["result"].startswith("verified")
+    assert c["arenaBootsSpeed"]["result"] == "pending"
+
+
+def test_identifier_scan_normalization() -> None:
+    raw = "\u202d\u2212154\u202c|\u202d42\u202c"
+    assert _normalize_for_id_scan(raw) == "-154|42"
+    assert re.search(
+        r"\(\s*-?\d+\s*\|\s*-?\d+\s*\)", _normalize_for_id_scan("(" + raw + ")")
+    )
+
+
+@pytest.mark.parametrize(
+    ("bid", "level", "text"),
+    [
+        ("embassy", 1, "可加入聯盟"),
+        ("embassy", 2, "可加入聯盟"),
+        ("embassy", 3, "可建立聯盟"),
+        ("embassy", 20, "可建立聯盟"),
+        ("treasury", 9, "還不能存放神器"),
+        ("treasury", 10, "小型神器"),
+        ("treasury", 19, "小型神器"),
+        ("treasury", 20, "大型或獨特神器"),
+        ("rally_point", 1, "隨機目標"),
+        ("rally_point", 3, "倉庫、穀倉"),
+        ("rally_point", 5, "資源田"),
+        ("rally_point", 10, "山洞、石匠鋪、陷阱機以外"),
+        ("rally_point", 20, "2 個目標"),
+        ("academy", 1, "研究新兵種；可研究的兵種依部族不同"),
+        ("academy", 20, "研究新兵種；可研究的兵種依部族不同"),
+        ("blacksmith", 1, "改良部隊的武器和護甲"),
+        ("blacksmith", 20, "等級越高，可以改良得越多"),
+    ],
+)
+def test_official_effects_2026_10_11(bid: str, level: int, text: str) -> None:
+    assert text in (_lv(bid, level).effect_description or "")
+
+
+def test_smithy_effect_is_s40_wording_not_percent() -> None:
+    """PM 2026-10-11：盔甲廠效果照 S40，不寫數字；舊的「攻擊力 +1.5%/級」跟 S40 不符。研究院也不寫數字。"""
+    data = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    for bid in ("blacksmith", "academy"):
+        b = data[bid]
+        assert "%" not in b["description_zh"] and "%" not in b["description_en"], bid
+        assert all("%" not in lv["effect_description"] for lv in b["levels"]), bid
+    assert "耗糧" in data["blacksmith"]["description_zh"]
+    assert "crop consumption" in data["blacksmith"]["description_en"]
+    assert "依部族不同" in data["academy"]["description_zh"]
+
+
+def test_embassy_no_longer_claims_members_per_level() -> None:
+    data = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    emb = data["embassy"]
+    assert "60" in emb["description_zh"] and "3 名成員" not in emb["description_zh"]
+    assert all("名成員" not in lv["effect_description"] for lv in emb["levels"])
 
 
 # ─── culture points: one source ───────────────────────────────────

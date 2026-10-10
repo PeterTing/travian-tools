@@ -39,25 +39,69 @@ export const PENDING_KIND_USAGE: Record<PendingKind, string> = {
   building: '建築資料庫列表與詳情、建築升級花費結果的建築名稱旁；CP 與開村「每日被動 CP」摘要標題；建造順序摘要的成本（有加成建築時）；田地回本有加成建築時的摘要與產量；首都產量模擬有加成建築時的「總計 /hr」摘要標題、「產量分解」標題、合計列（只標用到的那幾種資源）',
   cpThreshold: 'CP 與開村的開村門檻表與下方說明、首頁開村卡進度',
   unitCarry: '農場收益：結果摘要「每日收益」標題（第一個，後面接行軍速度）、搬運上限、每日預估收益、單位選單（選項裡有攜帶量）',
-  fieldLevelZero: '資源田 0 級產量（3／小時）用到的地方：資源資料庫等級表的 0 級列、回本表的 0 → 1 級列；田地回本目標 1 級時的結果摘要、產量增加兩列、比較表；建造順序有田從 0 級升 1 級、或起始有 0 級的田（就算 20 步都沒升）時的結果摘要與清單標題（P0-23）',
-  buildingEffect: '建築資料庫詳情：等級表「效果」欄標題旁（官方知識庫沒有可對照效果數字的建築：研究院、盔甲廠、大使館、集結點、寶物庫；gameData.gen.json effectsPending）（P0-23）',
+  fieldLevelZero: '（2026-10-11 EU12 遊戲內讀到、FIELD_LEVEL_ZERO_VERIFIED，目前不出現；改回 false 才會出現）資源田 0 級產量（3／小時）用到的地方：資源資料庫等級表的 0 級列、回本表的 0 → 1 級列；田地回本目標 1 級時的結果摘要、產量增加兩列、比較表；建造順序有田從 0 級升 1 級、或起始有 0 級的田（就算 20 步都沒升）時的結果摘要與清單標題（P0-23）',
+  buildingEffect: '建築資料庫詳情：等級表「效果」欄標題旁（gameData.gen.json effectsPending 裡的建築；2026-10-11 起是空的：大使館、寶物庫、集結點照官方說明頁核對，研究院、盔甲廠照 PM 決定改用官方寫法，機制保留）（P0-23）',
   vikingCarry: '維京運載量留空（null，官方說明頁 S139 沒有運載量；P0-23 PM 決定；2026-10-11 幕僚長：社群兩份出處不明，退回待驗證）：兵種資料庫詳情的運載量「—」旁；農場收益選到維京兵種時（目前清單沒有，函式和元件測試涵蓋）結果「無法計算」第二行原因旁、單位欄位旁',
-  launchSim: '開局衝村模擬：結果摘要第二行（第幾天）、總時數、伺服器天、里程碑表（開局花費是試算表每一步的加總）',
-  arenaSpeed: '只有競技場（> 0 級、英雄靴子 0）時（兩個都 0 不標；speedPendingKinds 選）：行軍時間的結果摘要第二行（距離 · 速度）、行進時間、秒數、有效速度；攔截三張卡的標籤：「攻擊者回到家時間」（看攻方）、「你應該在此時發送攔截部隊」（攻方＋攔截方，依序列出）、「攔截行進時間」（看攔截方）；OP 規劃（TS 優化器）每張結果卡／每列的標題（村莊名，涵蓋建議 TS、發兵、行進時間；看那一列的攻擊者）；反推 TS 結果表每列的計算行進時間（看那一列的競技場等級和靴子欄位）；躲兵「計算結果」標題旁一個（整區同一份說明）（P0-21）；農場收益：「單程」、「每小時最多次數」，以及「每日收益」摘要標題、「每日預估收益」、「回本天數」的灰標裡接在原本種類後面（同一個灰標、依序列出；P0-22）',
-  heroBootsSpeed: '只有英雄靴子（> 0%、競技場 0 級）時：位置同 arenaSpeed（P0-20、P0-21）',
-  arenaBootsSpeed: '競技場 > 0 級且英雄靴子 > 0% 時：位置同 arenaSpeed（P0-20、P0-21）',
+  launchSim: '（PM 2026-10-11：是估算、LAUNCH_SIM_ESTIMATE_ONLY，目前不出現，改放估算說明灰字；改回 false 才會出現）開局衝村模擬：結果摘要第二行（第幾天）、總時數、伺服器天、里程碑表（開局花費是試算表每一步的加總）',
+  arenaSpeed: '（2026-10-11 起核對過、ARENA_SPEED_VERIFIED，目前不出現；改回 false 才會出現）只有競技場（> 0 級、英雄靴子 0）時（兩個都 0 不標；speedPendingKinds 選）：行軍時間的結果摘要第二行（距離 · 速度）、行進時間、秒數、有效速度；攔截三張卡的標籤：「攻擊者回到家時間」（看攻方）、「你應該在此時發送攔截部隊」（攻方＋攔截方，依序列出）、「攔截行進時間」（看攔截方）；OP 規劃（TS 優化器）每張結果卡／每列的標題（村莊名，涵蓋建議 TS、發兵、行進時間；看那一列的攻擊者）；反推 TS 結果表每列的計算行進時間（看那一列的競技場等級和靴子欄位）；躲兵「計算結果」標題旁一個（整區同一份說明）（P0-21）；農場收益：「單程」、「每小時最多次數」，以及「每日收益」摘要標題、「每日預估收益」、「回本天數」的灰標裡接在原本種類後面（同一個灰標、依序列出；P0-22）',
+  heroBootsSpeed: '（2026-10-11 起核對過、BOOTS_SPEED_VERIFIED：S93＋S71，目前不出現；改回 false 才會出現）只有英雄靴子（> 0%、競技場 0 級）時：位置同 arenaSpeed（P0-20、P0-21）',
+  arenaBootsSpeed: '競技場 > 0 級且英雄靴子 > 0% 時（相加只有 S71、沒實測，ARENA_BOOTS_ADDITIVE_VERIFIED false）：位置同 arenaSpeed（P0-20、P0-21）',
   smithyFormula: '盔甲廠升級：結果三張表的標題旁（攻擊力、步兵防禦、騎兵防禦；整張表同一份說明）（P0-18）',
   unitNameZhPending: '兵種資料庫詳情：維京 10 種兵的標題旁（列表整列可點，放不能點的「待驗證」字樣；名稱顯示「中文暫譯（官方英文名）」；ingameNames.gen.json zh_pending）（P0-23 後續；斯巴達 2026-10-11 起是 ASIA x1 遊戲內名稱）',
 }
 
 /**
- * 行軍速度的灰標（P0-20、P0-21）：一行一個，三種擇一——只有競技場 arenaSpeed、只有靴子 heroBootsSpeed、
- * 兩個都有 arenaBootsSpeed；兩個都 0 不標（回傳空陣列）。行軍時間、攔截、OP 規劃、反推 TS、躲兵共用。
+ * 競技場單獨的行軍加速已核對（2026-10-11，evidence/pending_crosscheck_2026-10-11.json）：
+ * 前 20 格不加速＝EU12、ts11 遊戲內說明；每級 +20%＝官方知識庫（遊戲內說明連過去的那一個）。
+ * 改回 false 時 arenaSpeed 灰標會自動回來。
  */
-export function speedPendingKinds(arenaLevel: number, bootsPercent: number): PendingKind[] {
+export const ARENA_SPEED_VERIFIED = true
+
+/**
+ * 英雄靴子「只加快 20 格以外」：官方 S93（道具列表）＋S71（速度規則），兩篇寫法不同、互不引用（PM 2026-10-11，#45 T6）
+ * → 只有靴子時不放 heroBootsSpeed 灰標。改回 false 灰標就回來。
+ */
+export const BOOTS_SPEED_VERIFIED = true
+
+/**
+ * 「競技場＋靴子相加」只有 S71 一個出處、沒有實測（#45 幕僚長）→ 兩個都有時照舊放 arenaBootsSpeed 灰標。
+ */
+export const ARENA_BOOTS_ADDITIVE_VERIFIED = false
+
+/**
+ * 行軍速度的灰標種類（P0-20、P0-21）：一行一個，三種擇一——只有競技場 arenaSpeed、只有靴子 heroBootsSpeed、
+ * 兩個都有 arenaBootsSpeed；兩個都 0 回傳空陣列。
+ */
+export function speedKindsFor(arenaLevel: number, bootsPercent: number): PendingKind[] {
   const kinds: PendingKind[] = arenaLevel > 0 && bootsPercent > 0 ? ['arenaBootsSpeed' as const] : arenaLevel > 0 ? ['arenaSpeed' as const] : bootsPercent > 0 ? ['heroBootsSpeed' as const] : []
   return kinds
 }
+
+/**
+ * 行軍速度要放的灰標：行軍時間、攔截、OP 規劃、反推 TS、躲兵、農場收益共用。
+ * 競技場＋靴子 → 相加還沒核對（ARENA_BOOTS_ADDITIVE_VERIFIED false）就放 arenaBootsSpeed；
+ * 只有競技場 → ARENA_SPEED_VERIFIED；只有靴子 → BOOTS_SPEED_VERIFIED；核對過的不放。
+ */
+export function speedPendingKinds(arenaLevel: number, bootsPercent: number): PendingKind[] {
+  const arena = arenaLevel > 0
+  const boots = bootsPercent > 0
+  if (arena && boots) return ARENA_BOOTS_ADDITIVE_VERIFIED && ARENA_SPEED_VERIFIED && BOOTS_SPEED_VERIFIED ? [] : speedKindsFor(arenaLevel, bootsPercent)
+  if (arena) return ARENA_SPEED_VERIFIED ? [] : speedKindsFor(arenaLevel, 0)
+  if (boots) return BOOTS_SPEED_VERIFIED ? [] : speedKindsFor(0, bootsPercent)
+  return []
+}
+
+/**
+ * 資源田 0 級產量（3／小時，1 級 7／小時）已在 EU12 遊戲內資源田頁面讀到（2026-10-11，四種資源田都一樣）。
+ * 改回 false 時 fieldLevelZero 灰標會自動回來。
+ */
+export const FIELD_LEVEL_ZERO_VERIFIED = true
+
+/**
+ * PM 2026-10-11（#45）：開局衝村模擬是模型估算，不放「待驗證」灰標，
+ * 結果下面改放一行 12px 灰字「依模型估算，實際會因任務、冒險和操作不同」。改回 false 灰標就回來。
+ */
+export const LAUNCH_SIM_ESTIMATE_ONLY = true
 
 export function pendingNoteKeys(kind: PendingKind): { what: string; source: string } {
   return { what: `pendingNotes.${kind}.what`, source: `pendingNotes.${kind}.source` }

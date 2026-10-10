@@ -8,7 +8,7 @@ Source: Travian Support [Troops Speed Increase & Tournament Square](https://supp
 - Prerequisites: **Rally Point Lv 15**.
 - Max level: 20.
 - Speeds up troops traveling **beyond a fixed distance threshold**. Does not affect short-range travel.
-- **Hero boots** (speed bonus %) work the same way: only the stretch beyond 20 fields, and the boots % is **added** to the Tournament Square bonus (not multiplied). Source: same official help page (S71).
+- **Hero boots** (speed bonus %) work the same way: only the stretch beyond 20 fields, and the boots % is **added** to the Tournament Square bonus (not multiplied). Sources: "only beyond 20 fields" is ✓ (official S93 + S71, see the 2026-10-11 section below); "added, not multiplied" is **待驗證** (S71 only, not measured).
 
 ## Speed Formula
 
@@ -83,5 +83,25 @@ Consistency cases shared by the frontend and backend tests: `docs/knowledge/trav
 
 Not yet modelled in the shared formula: whole-trip multipliers — pennants/standards (官方說明頁: multiply the whole trip) and artefacts (only the march time page has an artefact field today) — TICKETS P1-24 「整趟倍率：旗幟和神器」.
 
-Every result that uses arena or boots shows the 「待驗證」 chip (`arenaSpeed` / `heroBootsSpeed` / `arenaBootsSpeed`):
-not yet checked in-game on ts11.
+Checked 2026-10-11 (`scripts/game_data/evidence/pending_crosscheck_2026-10-11.json`). Flags in `frontend/src/lib/pendingNotes.ts`:
+`ARENA_SPEED_VERIFIED = true` (arena only: no chip), `BOOTS_SPEED_VERIFIED = true` (boots only: no chip),
+`ARENA_BOOTS_ADDITIVE_VERIFIED = false` (arena + boots: the `arenaBootsSpeed` chip shows). Set a flag back to `false`
+and its chip returns.
+
+- **20-field threshold** (✓): in-game help on EU12 (`manual/building/14`: "the faster your troops are beyond a minimum
+  distance of 20 squares") and ts11 (same text in Chinese). They are the same in-game help, so they count as one source.
+- **+20% per level, linear (+400% at level 20)** (✓): official knowledge base table (the page the in-game help links to).
+  S71 is only a side reference here: it says "+500%" at level 20 and calls each level "multiplicative", which disagrees with the table.
+- **Boots only beyond 20 fields** (✓, PM 2026-10-11, #45 T6): two official pages with different wording that don't copy
+  each other — S93 Hero Armour Items ("Boots of the Mercenary – +25% troop speed after the first 20 fields"; Warrior +50%,
+  Archon +75%) and S71 ("The first 20 fields are always traveled without this bonus"). The generator checks both quotes.
+- **Boots added to the arena bonus (not multiplied)** — **待驗證**: only S71 says this ("Boots and Tournament Square bonuses
+  add together, but only apply after 20 fields"; S93 doesn't say how they stack), S71 contradicts itself elsewhere, and it
+  has not been measured. The code uses additive.
+  - S71's worked example is arena **level 10** (+200%), boots +25%, artefact ×2, standard ×1.2:
+    2 × 1.2 × (1 + 0.25 + 2) = **7.8×**, which S71 prints as "5.65×". 7.8× is that example, not level 20.
+  - At level 20 with 75% boots: additive 1 + 4 + 0.75 = **5.75×**; multiplicative 5 × 1.75 = **8.75×**.
+  - One quick pass for a second independent source found none: the old Freshdesk copy is the same article, S93 (hero
+    armour) gives only +25/50/75% beyond 20 fields, S45 just links to S71, the in-game Tournament Square help doesn't mention
+    boots, and the knowledge base only uses the same `troopSpeed` field for both (inference, not a statement).
+- Not measured in-game: the test avatars have no Tournament Square (needs Rally Point 15) and no boots.

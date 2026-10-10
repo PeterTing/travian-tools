@@ -1,7 +1,7 @@
 import { useId, useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import PendingVerifyChip, { PendingNotePanel } from './PendingVerifyChip'
-import { buildingSource, isBuildingVerified } from '@/data/gameData'
+import { buildingSource, effectSource, isBuildingVerified } from '@/data/gameData'
 import { isBuildingFullyVerified } from '@/lib/buildingVerify'
 
 interface BuildingVerifyMarkProps {
@@ -29,6 +29,8 @@ export default function BuildingVerifyMark({ buildingId, className = '', onDark 
   const [open, setOpen] = useState(false)
   if (isBuildingFullyVerified(buildingId)) {
     const source = buildingSource(buildingId) ?? 'ts11L1Kb'
+    // 效果照遊戲內說明＋官方說明頁核對的（大使館、寶物庫、集結點）：數字一段、效果一段，各自寫出處
+    const effSource = effectSource(buildingId)
     const onClick = (e: MouseEvent<HTMLButtonElement>) => {
       // 在可點的列表項目裡：只開說明，不要順便選到那一棟
       e.stopPropagation()
@@ -51,12 +53,14 @@ export default function BuildingVerifyMark({ buildingId, className = '', onDark 
           {t('common.verifiedShort')}
         </button>
         {/* 數字和效果都照官方知識庫核對過（P0-23）：第一行寫「花費、時間、人口、CP、效果已核對」 */}
-        {open && <PendingNotePanel fill id={panelId} kinds={[source]} ns="verifiedNotes" whatKeys={['verifiedNotes.whatWithEffect']} />}
+        {open && (effSource
+          ? <PendingNotePanel fill id={panelId} kinds={[source, effSource]} ns="verifiedNotes" />
+          : <PendingNotePanel fill id={panelId} kinds={[source]} ns="verifiedNotes" whatKeys={['verifiedNotes.whatWithEffect']} />)}
       </>
     )
   }
   if (isBuildingVerified(buildingId)) {
-    // 數字核對過、效果還沒（研究院、盔甲廠、大使館、集結點、寶物庫）：沒有 ✓
+    // 數字核對過、效果還沒（2026-10-11 起沒有這種建築，機制保留）：沒有 ✓
     if (variant === 'list') {
       return (
         <span

@@ -3,7 +3,7 @@ import { fieldRoi, FIELD_COSTS, BONUS_BUILDINGS_VERIFIED, type ResourceType } fr
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
-import type { PendingKind } from '@/lib/pendingNotes';
+import { FIELD_LEVEL_ZERO_VERIFIED, type PendingKind } from '@/lib/pendingNotes';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import BuildingIcon from '@/components/common/BuildingIcon'
@@ -41,9 +41,9 @@ export default function FieldRoiCalculator() {
   // 資源田 1–20 級花費、時間、產量：官方知識庫；Plus 乘在總產量上：官方 S129（P0-23）。
   // 加成建築（鋸木廠等）的資料哪天又標待驗證，這裡會自動帶回灰標
   const costKinds: PendingKind[] = [];
-  // 目標 1 級：增加量 = 1 級 − 0 級，0 級產量官方資料沒有（fieldLevelZero）
+  // 目標 1 級：增加量 = 1 級 − 0 級；0 級 3／小時已在 EU12 遊戲內讀到（FIELD_LEVEL_ZERO_VERIFIED），改回 false 才標 fieldLevelZero
   const prodKinds: PendingKind[] = [
-    ...(level === 1 ? ['fieldLevelZero' as const] : []),
+    ...(level === 1 && !FIELD_LEVEL_ZERO_VERIFIED ? ['fieldLevelZero' as const] : []),
     ...(bonus > 0 && !BONUS_BUILDINGS_VERIFIED ? ['building' as const] : []),
   ];
   // 一行一個灰標，依數字在這一行出現的順序：先「成本」、再「每天 +」（同一種只列一次）

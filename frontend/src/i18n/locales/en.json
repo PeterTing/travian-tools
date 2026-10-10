@@ -1202,7 +1202,7 @@
       "source": "We follow the official help page: boots only speed up the stretch beyond 20 fields."
     },
     "arenaBootsSpeed": {
-      "what": "The Tournament Square and hero boots speed-ups haven't been checked in-game on ts11 yet.",
+      "what": "That the Tournament Square and hero boots bonuses add together is not checked yet: only one official help page says so, and it has not been measured.",
       "source": "We follow the official help page: no bonus for the first 20 fields, then +20% per Tournament Square level plus the boots bonus beyond them (added together, not multiplied)."
     },
     "smithyFormula": {
@@ -1243,6 +1243,26 @@
     "celebration": {
       "what": "Small and great celebration costs (wood, clay, iron, crop) are checked.",
       "source": "Source: Travian Answers (official, 2021 snapshot) and Travian Wiki agree."
+    },
+    "effectEmbassy": {
+      "what": "The effect is checked.",
+      "source": "Source: ts11 in-game help and official help pages S84 and S85 (join at level 1, found at level 3; up to 60 members)."
+    },
+    "effectTreasury": {
+      "what": "The effect is checked.",
+      "source": "Source: ts11 in-game help and official help page S101 (small artefact at level 10, large or unique at level 20)."
+    },
+    "effectRallyPoint": {
+      "what": "The effect is checked.",
+      "source": "Source: official help pages S65 and S181 (they agree: the Rally Point level sets which catapult targets you can pick)."
+    },
+    "effectAcademy": {
+      "what": "The effect is checked (no numbers).",
+      "source": "Source: the in-game help (the Academy researches new troop types); each tribe's troop help lists different Academy levels."
+    },
+    "effectBlacksmith": {
+      "what": "The effect is checked (worded as the official help page puts it).",
+      "source": "Source: official help page S40 and the in-game help. The upgrade formula numbers are not checked yet."
     }
   },
   "cropFieldsCalc": {
