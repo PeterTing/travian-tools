@@ -295,31 +295,34 @@ map.sql 快照全部保留，所以：
      auto-increase 會一直把硬碟加大，utilization 可能永遠不到 70%，這條才會在接近上限前提醒）：
      `deploy/monitoring/cloudsql-disk-bytes-21gib.yaml`
    - 通知管道只有一個 email，是專案 Owner 的 Google 帳號；不用群組、不用第三方。Owner 有兩位
-     （2026-10-11 唯讀 `gcloud projects get-iam-policy`）：`dainy@artogo.co`、`peter_ting@artogo.co`，
-     由幕僚長選定後填進 `<OWNER_EMAIL>`。
+     （2026-10-11 唯讀 `gcloud projects get-iam-policy`）：`dainy@artogo.co`、`peter_ting@artogo.co`；
+     幕僚長選定 **`peter_ting@artogo.co`**（2026-10-11）。
 
 ```bash
 export CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools
 PROJECT=artogo-travian-tools
-OWNER_EMAIL=<OWNER_EMAIL>   # dainy@artogo.co 或 peter_ting@artogo.co，由幕僚長選
+OWNER_EMAIL=peter_ting@artogo.co   # 幕僚長選定（2026-10-11）
 
 # 1) auto-increase（上限 30 GB）。會跳確認，不加 --quiet
 gcloud sql instances patch travian-tools-db --project artogo-travian-tools --storage-auto-increase --storage-auto-increase-limit=30
 
-# 2) email 通知管道（gcloud alpha 元件）
-gcloud alpha monitoring channels create --project ${PROJECT} \
+# 2) email 通知管道（gcloud alpha 元件）。直接用 create 回傳的 name，不再 list（避免撿到舊的或重複的管道）
+CHANNEL=$(gcloud alpha monitoring channels create --project ${PROJECT} \
   --display-name "travian-tools owner email" --type email \
-  --channel-labels email_address=${OWNER_EMAIL}
-CHANNEL=$(gcloud alpha monitoring channels list --project ${PROJECT} \
-  --filter "type=\"email\" AND labels.email_address=\"${OWNER_EMAIL}\"" --format 'value(name)')
+  --channel-labels email_address=${OWNER_EMAIL} --format 'value(name)')
+echo "CHANNEL=${CHANNEL}"
+# 沒拿到通知管道就不建警報：不建立沒有通知對象的警報（幕僚長 #40）
+test -n "$CHANNEL" || echo "STOP: no notification channel — do not run step 3" >&2
 
-# 3) 兩條警報，都只通知這個 email
-gcloud alpha monitoring policies create --project ${PROJECT} \
-  --policy-from-file deploy/monitoring/cloudsql-disk-70.yaml \
-  --notification-channels ${CHANNEL}
-gcloud alpha monitoring policies create --project ${PROJECT} \
-  --policy-from-file deploy/monitoring/cloudsql-disk-bytes-21gib.yaml \
-  --notification-channels ${CHANNEL}
+# 3) 兩條警報，都只通知這個 email；CHANNEL 是空的就整段不跑
+if test -n "$CHANNEL"; then
+  gcloud alpha monitoring policies create --project ${PROJECT} \
+    --policy-from-file deploy/monitoring/cloudsql-disk-70.yaml \
+    --notification-channels "${CHANNEL}"
+  gcloud alpha monitoring policies create --project ${PROJECT} \
+    --policy-from-file deploy/monitoring/cloudsql-disk-bytes-21gib.yaml \
+    --notification-channels "${CHANNEL}"
+fi
 ```
 
 確認：
