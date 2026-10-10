@@ -1,0 +1,70 @@
+{
+ "_what": "官方知識庫（knowledgebase.legends.travian.com，核對建築用的那一個，見 official_kb_buildings_2026-10-10.json）有沒有斯巴達、維京的兵種頁、運載量：2026-10-10 21:20（台北）用瀏覽器唯讀打開英文版、下載它的 main.js 查路由。結果：知識庫只有 buildings、items（英雄裝備）兩種頁面，沒有兵種頁，也沒有任何運載量欄位 → 斯巴達、維京運載量維持 null＋灰標。",
+ "source": "https://knowledgebase.legends.travian.com/en-US",
+ "read_at": "2026-10-10T21:20:45+08:00",
+ "bundle": {
+  "url": "https://knowledgebase.legends.travian.com/main.js",
+  "sha256": "8e5349bdebc784b3c7f70971c78e662d5885739b8bf111ef25c247e861180107",
+  "bytes": 631181,
+  "routes": [
+   ":language",
+   "buildings",
+   "buildings/:gid",
+   "items"
+  ],
+  "note": "react-router 只有 :language、buildings、buildings/:gid、items 四條路由；Hoplite／Thrall／Huskarl 只出現在英雄裝備名稱（例如 Spear of the Hoplite、Axe of the Thrall），bundle 裡沒有 carry 字樣，capacity 只出現在建築效果（倉庫、穀倉、山洞、商人）",
+  "string_counts": {
+   "Hoplite": 21,
+   "Thrall": 42,
+   "Huskarl": 63,
+   "carry": 0,
+   "Carry": 0,
+   "\"capacity\"": 0
+  }
+ },
+ "rendered_pages": [
+  {
+   "url": "https://knowledgebase.legends.travian.com/en-US",
+   "final_url": "https://knowledgebase.legends.travian.com/en-US",
+   "text_file": "rendered_en-US.txt",
+   "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "text_head": ""
+  },
+  {
+   "url": "https://knowledgebase.legends.travian.com/en-US/buildings",
+   "final_url": "https://knowledgebase.legends.travian.com/en-US/buildings",
+   "text_file": "rendered_en-US_buildings.txt",
+   "text_sha256": "68187b765f1ddb5ce2f653c6f2e3e9fd1374fd26c86741df13170cce9e0cc5e9",
+   "text_head": "x1\nx2\nx3\nx5\nx10\nResources\nBakery\nBrickyard\nClay Pit\nCropland\nGrain Mill\nIron Foundry\nIron Mine\nSawmill\nWoodcutter\nInfrastructure\nBrewery\nCommand Center\nCranny\nEmbassy\nGranary\nGreat Granary\nGreat Warehouse\nHarbor\nHorse Drinking Trough\nMain Building\nMarketplace\nPalace\nResidence\nStonemason's Lodge\nTown"
+  },
+  {
+   "url": "https://knowledgebase.legends.travian.com/en-US/troops",
+   "final_url": "https://knowledgebase.legends.travian.com/en-US/troops",
+   "text_file": "rendered_en-US_troops.txt",
+   "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "text_head": ""
+  },
+  {
+   "url": "https://knowledgebase.legends.travian.com/en-US/units",
+   "final_url": "https://knowledgebase.legends.travian.com/en-US/units",
+   "text_file": "rendered_en-US_units.txt",
+   "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "text_head": ""
+  },
+  {
+   "url": "https://knowledgebase.legends.travian.com/en-US/tribes",
+   "final_url": "https://knowledgebase.legends.travian.com/en-US/tribes",
+   "text_file": "rendered_en-US_tribes.txt",
+   "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "text_head": ""
+  },
+  {
+   "url": "https://knowledgebase.legends.travian.com/en-US/items",
+   "final_url": "https://knowledgebase.legends.travian.com/en-US/items",
+   "text_file": "rendered_en-US_items.txt",
+   "text_sha256": "737e0f6e00756c86f9cdc769fceee7c07d6f670cea89e5f1cb546e47bfe71fff",
+   "text_head": "x1x2x3x5x10\n%% quality_all (en-US) %%\nCrafting\nAll\n%% filterByBonusType (en-US) %%\nx\nHelmet of Awareness\n+15%\nHelmet of Enlightenment\n+20%\nHelmet of Wisdom\n+25%\nHelmet of Regeneration\n+10\nHelmet of Health\n+15\nHelmet of Healing\n+20\nHelmet of the Gladiator\n+100\nHelmet of the Tribune\n+400\nHelmet of the"
+  }
+ ],
+ "raw_files": "review/sv-2026-10-10/evidence/kb/（main.js、vendor.js、runtime.js、rendered_*.txt；不進 repo）"
+}

@@ -33,21 +33,36 @@ const SOURCE_LINES = ['斯巴達的數字還沒核對', '出處：官方說明�
 describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
   beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
 
-  it('list: pending/null speeds get one chip, verified speeds get none', async () => {
+  it('list: pending/null speeds get a non-clickable 「待驗證」 label (row is clickable: no nested button, #35), verified speeds none', async () => {
     render(<TroopsPage />)
-    const hop = (await screen.findByText('重裝步兵')).closest('div')!
-    const ram = screen.getByText('衝撞車').closest('div')!
-    const leg = screen.getByText('古羅馬步兵').closest('div')!
-    expect(within(hop).getAllByTestId('pending-verify-chip')).toHaveLength(1)
-    expect(within(hop).getByTestId('troop-list-speed')).toHaveTextContent('速度 6')
-    expect(within(ram).getAllByTestId('pending-verify-chip')).toHaveLength(1)
+    const row = (text: string) => screen.getAllByTestId('troop-list-row').find(r => r.textContent!.includes(text))!
+    await screen.findByText('重裝步兵（Hoplite）')
+    const hop = row('重裝步兵（Hoplite）')
+    const ram = row('破城槌')
+    const leg = row('古羅馬步兵')
+    for (const r of [hop, ram, leg]) {
+      expect(r.querySelector('button')).toBeNull()
+      expect(within(r).queryByTestId('pending-verify-chip')).toBeNull()
+    }
+    const hopSpeed = within(hop).getByTestId('troop-list-speed')
+    expect(hopSpeed).toHaveTextContent('速度 6')
+    expect(within(hopSpeed).getAllByTestId('pending-verify-label')).toHaveLength(1)
     expect(within(ram).getByTestId('troop-list-speed')).toHaveTextContent('速度 —')
-    expect(within(leg).queryByTestId('pending-verify-chip')).toBeNull()
+    expect(within(within(ram).getByTestId('troop-list-speed')).getAllByTestId('pending-verify-label')).toHaveLength(1)
+    // 名稱一個（中文暫譯）＋速度一個；字樣 aria-hidden，整列 aria-label 寫出來
+    expect(within(hop).getAllByTestId('pending-verify-label')).toHaveLength(2)
+    for (const l of within(hop).getAllByTestId('pending-verify-label')) {
+      expect(l).toHaveAttribute('aria-hidden', 'true')
+      expect(l.tagName).toBe('SPAN')
+    }
+    expect(hop).toHaveAttribute('aria-label', '重裝步兵（Hoplite），中文名為暫譯，速度待驗證')
+    expect(leg).toHaveAttribute('aria-label', '古羅馬步兵')
+    expect(within(leg).queryByTestId('pending-verify-label')).toBeNull()
   })
 
   it('detail, official_pending: keeps the number, shows chip and the source line below the stats', async () => {
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('重裝步兵'))
+    fireEvent.click(await screen.findByText('重裝步兵（Hoplite）'))
     const speed = await screen.findByTestId('troop-speed')
     expect(speed).toHaveTextContent('6')
     expect(within(speed).getAllByTestId('pending-verify-chip')).toHaveLength(1)
@@ -60,7 +75,7 @@ describe('TroopsPage speed 待驗證 chips (P0-15)', () => {
 
   it('detail, speed null: shows — with chip and no official source line', async () => {
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('衝撞車'))
+    fireEvent.click(await screen.findByText('破城槌'))
     const speed = await screen.findByTestId('troop-speed')
     expect(speed).toHaveTextContent('—')
     expect(within(speed).getAllByTestId('pending-verify-chip')).toHaveLength(1)

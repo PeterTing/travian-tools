@@ -104,7 +104,7 @@ export const spartans = withUnitSpeeds({
       cost: { wood: 525, clay: 260, iron: 790, crop: 130 }, trainTime: 4620,
       role: { zh: '破牆', en: 'Wall breaker' } },
     { id: 'ballista', category: 'siege',
-      name: { zh: '弩砲', en: 'Ballista' },
+      name: { zh: '弩炮', en: 'Ballista' },
       attack: 50, defInfantry: 60, defCavalry: 10, upkeep: 6,
       cost: { wood: 550, clay: 1240, iron: 825, crop: 135 }, trainTime: 9900,
       role: { zh: '摧毀建築', en: 'Destroys buildings' } },

@@ -28,6 +28,8 @@
     "success": "成功",
     "pendingVerify": "待驗證",
     "effectPending": "效果待驗證",
+    "nameProvisional": "中文名為暫譯",
+    "speedPending": "速度待驗證",
     "pendingVerifyNote": "這個數值還沒在遊戲裡實測確認",
     "buildingVerifyLegend": "除標「✓ 已核對」的建築外，數值皆未核對",
     "verifiedTs11": "已核對（點開看出處）",
@@ -1175,6 +1177,7 @@
     "offsetUnknown": "時差：貼一頁就會自動設好",
     "offsetKnown": "時差 {{hours}} 小時（從貼上的頁面讀到）",
     "unitPending": "斯巴達、維京的兵種數字待驗證（斯巴達含速度）",
+    "unitNameProvisional": "，兵種中文名為暫譯",
     "speed": "伺服器速度",
     "tribe": "部族",
     "village": "村莊",
@@ -1215,7 +1218,7 @@
     },
     "spartanSpeed": {
       "what": "斯巴達速度還沒在 ts11 遊戲內核對，反推 TS 不會算斯巴達兵種。",
-      "source": "斯巴達速度只有官方說明頁的數字，頁面標示取自第三方計算器；破城槌、弩砲、監察官、開拓者目前沒有可靠來源。"
+      "source": "斯巴達速度只有官方說明頁的數字，頁面標示取自第三方計算器；破城槌、弩炮、監察官、開拓者目前沒有可靠來源。"
     },
     "unitSpeedOfficialPending": {
       "what": "斯巴達速度只有官方說明頁的數字，頁面標示取自第三方計算器。",
@@ -1276,6 +1279,10 @@
     "spartanCarry": {
       "what": "斯巴達運載量還沒核對，先不顯示",
       "source": "官方說明頁 S10、S187 沒有運載量"
+    },
+    "unitNameZhPending": {
+      "what": "中文名稱是暫譯，還沒核對",
+      "source": "官方說明頁只有英文版，括號裡是官方英文名（官方沒寫的不加）；ts11 沒有這一族，遊戲內看不到中文名"
     }
   },
   "verifiedNotes": {

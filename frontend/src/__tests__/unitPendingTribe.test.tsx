@@ -27,6 +27,8 @@ import FarmingCalculator, { FARM_UNITS } from '@/features/guideCalcs/components/
 import { showUnitPendingLine } from '@/lib/unitPending'
 
 const LINE = /^斯巴達、維京的兵種數字待驗證（斯巴達含速度）$/
+// 選斯巴達、維京：同一行後面加「兵種中文名為暫譯」（P0-23 後續，PM）
+const LINE_PROVISIONAL = /^斯巴達、維京的兵種數字待驗證（斯巴達含速度），兵種中文名為暫譯$/
 const VERIFIED = ['romans', 'teutons', 'gauls', 'egyptians', 'huns']
 const line = () => screen.queryByTestId('autofill-unit-pending')
 
@@ -63,7 +65,7 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     for (const tr of ['spartans', 'vikings']) {
       fill.tribe = tr
       const { unmount } = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
-      expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE)
+      expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE_PROVISIONAL)
       unmount()
     }
   })
@@ -78,6 +80,28 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     fill.tribe = 'gauls'
     render(<MemoryRouter initialEntries={['/database/troops']}><CalcFrame usesVillage={false}><CalcBar tribe="all" /></CalcFrame></MemoryRouter>)
     expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE)
+  })
+
+  it('Spartans / Vikings: the same line adds 「兵種中文名為暫譯」 (no extra chip); 「全部」 and unknown tribe do not', () => {
+    for (const tr of ['spartans', 'vikings']) {
+      fill.tribe = tr
+      const { unmount } = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
+      const row = screen.getByTestId('autofill-unit-pending')
+      expect(screen.getAllByTestId('autofill-unit-pending-text')).toHaveLength(1)
+      expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE_PROVISIONAL)
+      expect(row.querySelectorAll('[data-testid="pending-verify-chip"]')).toHaveLength(1)
+      unmount()
+    }
+    // 頁面選單選斯巴達也一樣（帳號是高盧）
+    fill.tribe = 'gauls'
+    const a = render(<MemoryRouter initialEntries={['/database/troops']}><CalcFrame usesVillage={false}><CalcBar tribe="vikings" /></CalcFrame></MemoryRouter>)
+    expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE_PROVISIONAL)
+    a.unmount()
+    // 不知道部族：只有原本那句
+    fill.tribe = null
+    const b = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
+    expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE)
+    b.unmount()
   })
 
   it('one line only (no second Spartan-speed line)', () => {

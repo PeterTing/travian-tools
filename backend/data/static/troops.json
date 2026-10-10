@@ -1534,7 +1534,7 @@
     "heimdalls_eye": {
       "troop_id": "heimdalls_eye",
       "name_zh": "海姆達爾之眼",
-      "name_en": "Heimdall's Eye",
+      "name_en": "Heimdall’s Eye",
       "tribe": "vikings",
       "category": "scout",
       "attack": 0,
@@ -1591,7 +1591,7 @@
     "valkyries_blessing": {
       "troop_id": "valkyries_blessing",
       "name_zh": "女武神之賜",
-      "name_en": "Valkyrie's Blessing",
+      "name_en": "Valkyrie’s Blessing",
       "tribe": "vikings",
       "category": "cavalry",
       "attack": 160,
@@ -1942,7 +1942,7 @@
     },
     "ballista": {
       "troop_id": "ballista",
-      "name_zh": "弩砲",
+      "name_zh": "弩炮",
       "name_en": "Ballista",
       "tribe": "spartans",
       "category": "siege",
@@ -1964,6 +1964,7 @@
       "description_zh": "斯巴達的攻城武器，用於破壞建築",
       "description_en": "Spartan siege weapon for destroying buildings",
       "aliases_zh": [
+        "弩砲",
         "賴達投石機"
       ],
       "stats_source": "pending",

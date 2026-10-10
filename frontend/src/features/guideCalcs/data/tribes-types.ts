@@ -11,7 +11,7 @@
 
 import type { TribeId } from './travian';
 import { unitSpeed, type UnitSpeedSource } from '@/data/unitSpeeds';
-import { ingameUnitName } from '@/lib/ingameNames';
+import { ingameUnitEn, ingameUnitName } from '@/lib/ingameNames';
 
 export type { TribeId };
 
@@ -98,7 +98,9 @@ export function withUnitSpeeds(tribe: TribeData): Tribe {
         : {};
       // 中文名一律讀名稱表（斯巴達、維京也是；#34），表裡沒有才用檔案裡的
       const zhName = ingameUnitName(tribe.id, u.id);
-      const named = zhName ? { name: { ...u.name, zh: zhName } } : {};
+      // 英文名：斯巴達、維京照官方說明頁（S139／S187／S10），表裡沒有才用檔案裡的
+      const enName = ingameUnitEn(tribe.id, u.id) ?? u.name.en;
+      const named = zhName ? { name: { ...u.name, zh: zhName, en: enName } } : {};
       // 運載量一律用產生檔（跟後端 troops.json 同一份；P0-23）
       return { ...u, ...fromTs11, ...named, carry: s.carry, speed: s.speed, speedSource: s.source, speedRef: s.ref, statsVerified: !!st };
     }),

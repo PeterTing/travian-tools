@@ -74,6 +74,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -905,13 +906,53 @@ NON_TS11_UNIT_NAMES = {
     "shieldsman": ("盾兵", ["盾牌手"]), "twinsteel_therion": ("雙刃獸戰士", ["雙鋼泰瑞恩", "旋鏢兵"]),
     "elpida_rider": ("希望騎士", ["爾必達騎士", "厄爾皮達騎兵"]),
     "corinthian_crusher": ("科林斯粉碎者", ["科林斯破壞者"]),
-    "ballista": ("弩砲", ["賴達投石機"]), "ephor": ("監察官", ["五長官"]),
+    # 弩炮：照 ts11 的寫法（manual/troop/18、68 都寫「弩炮」；#34 PM 決定統一），「弩砲」只留給搜尋
+    "ballista": ("弩炮", ["弩砲", "賴達投石機"]), "ephor": ("監察官", ["五長官"]),
     "thrall": ("奴僕", ["奴隸"]), "shield_maiden": ("盾女", ["鋼盾少女"]),
     "berserker": ("狂戰士", []), "heimdalls_eye": ("海姆達爾之眼", []),
     "huskarl_rider": ("侍衛騎士", ["禁衛軍騎士", "胡斯卡爾騎士"]),
     "valkyries_blessing": ("女武神之賜", ["女武神的祝福", "瓦爾基麗的祝福"]),
     "jarl": ("領主", ["首領", "雅爾"]),
 }
+
+# 斯巴達、維京的中文名是暫譯（官方說明頁沒有中文版）→ 畫面顯示「中文暫譯（官方英文名）」，中文部分標待驗證。
+# 英文名只用官方說明頁上逐字出現的寫法（evidence/official_support_2026-10-10.json 的 text，生成時檢查）：
+# 維京＝S139「Viking Units Overview」表（Heimdall’s Eye、Jarl 拿掉表上補充說明的「(Scout)」「(Administrator)」，
+# 兩個名字本身都逐字出現在 S139；PM 核准，#35）；斯巴達步兵、騎兵 6 種＝S187 表頭；
+# 監察官＝官方說明頁 S10「Ephor」（S187 沒有監察官；PM 核准，#35）。
+# 斯巴達破城槌、弩炮、開拓者：官方說明頁（S10、S187、S3）都沒有寫英文名 → None，只顯示中文暫譯＋待驗證。
+OFFICIAL_EN_NAMES = {
+    "thrall": ("Thrall", "s139"), "shield_maiden": ("Shield Maiden", "s139"),
+    "berserker": ("Berserker", "s139"), "heimdalls_eye": ("Heimdall’s Eye", "s139"),
+    "huskarl_rider": ("Huskarl Rider", "s139"), "valkyries_blessing": ("Valkyrie’s Blessing", "s139"),
+    "viking_ram": ("Ram", "s139"), "viking_catapult": ("Catapult", "s139"),
+    "jarl": ("Jarl", "s139"), "viking_settler": ("Settler", "s139"),
+    "hoplite": ("Hoplite", "s187"), "sentinel": ("Sentinel", "s187"),
+    "shieldsman": ("Shieldsman", "s187"), "twinsteel_therion": ("Twinsteel Therion", "s187"),
+    "elpida_rider": ("Elpida Rider", "s187"), "corinthian_crusher": ("Corinthian Crusher", "s187"),
+    "ephor": ("Ephor", "s10"),
+    "spartan_ram": None, "ballista": None, "spartan_settler": None,
+}
+OFFICIAL_ARTICLE_URL = {
+    "s139": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
+    "s187": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+    "s10": "https://support.travian.com/en/articles/10-the-spartans-and-their-advantages",
+}
+
+
+def _official_en(tid: str) -> tuple[str | None, str | None]:
+    """官方英文名＋出處網址；生成時確認這個名字逐字出現在官方說明頁全文（表格的一格）."""
+    hit = OFFICIAL_EN_NAMES[tid]
+    if hit is None:
+        return None, None
+    en, art = hit
+    ev = json.loads(OFFICIAL_SUPPORT.read_text(encoding="utf-8"))["articles"][art]
+    assert ev["url"] == OFFICIAL_ARTICLE_URL[art], art
+    # 表格一格是「\n<名字>\n」或「| <名字>\n」；S139 的 Heimdall’s Eye、Jarl 後面接著「 (Scout)」「 (Administrator)」
+    pat = rf"(?:^|\n|\| ){re.escape(en)}(?:\n| \()"
+    if not re.search(pat, ev["text"]):
+        raise SystemExit(f"{tid}: 官方說明頁 {art} 找不到英文名 {en!r}")
+    return en, ev["url"]
 
 
 def gen_ingame_names(speeds: dict) -> dict:
@@ -936,15 +977,23 @@ def gen_ingame_names(speeds: dict) -> dict:
                 zh = r["stats"]["name_zh"]
                 al = SETTLER_ALIASES if tid.endswith("settler") else UNIT_ALIASES.get(tid, [])
                 units[tid] = {"tribe": tribe, "fe_id": r["fe_id"], "game_id": n,
-                              "zh": zh, "ref": r["stats"]["ref"], "aliases": [a for a in al if a != zh]}
+                              "zh": zh, "ref": r["stats"]["ref"], "aliases": [a for a in al if a != zh],
+                              "zh_pending": False, "en": None, "en_ref": None, "display_zh": zh}
             elif tid in NON_TS11_UNIT_NAMES:
                 zh, al = NON_TS11_UNIT_NAMES[tid]
+                en, en_ref = _official_en(tid)
                 units[tid] = {"tribe": tribe, "fe_id": r["fe_id"], "game_id": None,
-                              "zh": zh, "ref": None, "aliases": al}
+                              "zh": zh, "ref": None, "aliases": al,
+                              # 中文是暫譯（待驗證）；display_zh＝畫面上顯示的「中文暫譯（官方英文名）」
+                              "zh_pending": True, "en": en, "en_ref": en_ref,
+                              "display_zh": f"{zh}（{en}）" if en else zh}
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "_source": "ts11 遊戲內說明頁（scripts/game_data/evidence/ts11_manual_2026-10-10.json）；"
-                   "aliases 是以前用過的名字，只給搜尋用，不顯示",
+                   "aliases 是以前用過的名字，只給搜尋用，不顯示；斯巴達、維京 zh 是暫譯（zh_pending），"
+                   "en 是官方說明頁 S139／S187／S10 的英文名（en_ref；evidence/official_support_2026-10-10.json 的 "
+                   "unit_en_names），畫面顯示 display_zh。監察官 Ephor 取自官方 S10；S139 的 Heimdall’s Eye (Scout)、"
+                   "Jarl (Administrator) 拿掉括號裡的補充說明（兩項 PM 核准，#35）",
         "tribes": tribes, "buildings": buildings, "units": units,
     }
 
@@ -986,6 +1035,8 @@ def apply_ingame_names(buildings: dict, resources: dict, troops: dict, names: di
         if u:
             t["name_zh"] = u["zh"]
             t["aliases_zh"] = u["aliases"]
+            if u.get("en"):  # 斯巴達、維京：英文名照官方說明頁
+                t["name_en"] = u["en"]
         else:
             t.setdefault("aliases_zh", [])
         if t.get("description_zh"):

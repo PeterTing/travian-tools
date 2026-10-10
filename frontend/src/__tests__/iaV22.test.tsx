@@ -172,7 +172,7 @@ describe('IA v2.2', () => {
       // 一行、沒有分號；灰標在最前面，文字掛在灰標右邊
       expect(line).not.toHaveTextContent('；')
       const text = screen.getByTestId('autofill-unit-pending-text')
-      expect(text).toHaveTextContent(/^斯巴達、維京的兵種數字待驗證（斯巴達含速度）$/)
+      expect(text).toHaveTextContent(/^斯巴達、維京的兵種數字待驗證（斯巴達含速度），兵種中文名為暫譯$/)
       expect(text.tagName).toBe('P')
       const chip = within(line).getByTestId('pending-verify-chip')
       expect(chip).toHaveTextContent('待驗證')

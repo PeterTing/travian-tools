@@ -11,3 +11,11 @@ export function showUnitPendingLine(tribe: string | null | undefined): boolean {
   if (!tribe) return true
   return tribe === 'all' || UNVERIFIED_UNIT_TRIBES.includes(tribe)
 }
+
+/**
+ * 選的是斯巴達、維京（頁面選單或帳號部族）：兵種中文名是暫譯，「已帶入」列那一行後面加「兵種中文名為暫譯」
+ * （計算器只顯示中文暫譯、不加英文括號、不另加灰標；PM，P0-23 後續）。「全部」、不知道部族不加
+ */
+export function unitNameProvisional(tribe: string | null | undefined): boolean {
+  return !!tribe && UNVERIFIED_UNIT_TRIBES.includes(tribe)
+}

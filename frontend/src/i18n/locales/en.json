@@ -28,6 +28,8 @@
     "success": "Success",
     "pendingVerify": "Unverified",
     "effectPending": "effect not verified",
+    "nameProvisional": "Chinese name provisional",
+    "speedPending": "speed not verified",
     "pendingVerifyNote": "Not yet confirmed in the game",
     "buildingVerifyLegend": "Except buildings marked “✓ Verified”, these numbers have not been checked",
     "verifiedTs11": "Checked (tap for the source)",
@@ -1097,6 +1099,7 @@
     "offsetUnknown": "Time offset: set automatically once you paste a page",
     "offsetKnown": "Time offset {{hours}} h (read from a pasted page)",
     "unitPending": "Spartan and Viking unit numbers unverified (incl. Spartan speeds)",
+    "unitNameProvisional": ", Chinese unit names are provisional translations",
     "speed": "Server speed",
     "tribe": "Tribe",
     "village": "Village",
@@ -1198,6 +1201,10 @@
     "spartanCarry": {
       "what": "Spartan carry capacity is unverified, so it is not shown yet",
       "source": "The official help pages S10 and S187 have no carry capacity"
+    },
+    "unitNameZhPending": {
+      "what": "The Chinese name is a provisional translation, not yet verified",
+      "source": "The official help pages are English only; the name in brackets is the official English name (left out where they give none). ts11 has no such tribe, so there is no in-game Chinese name"
     }
   },
   "verifiedNotes": {
