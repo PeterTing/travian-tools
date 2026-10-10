@@ -25,7 +25,7 @@ import AutoFillBar from '@/components/autofill/AutoFillBar'
 import CalcFrame, { CalcBar } from '@/components/autofill/CalcFrame'
 import FarmingCalculator, { FARM_UNITS } from '@/features/guideCalcs/components/FarmingCalculator'
 import { showUnitPendingLine, unitPendingLineKey } from '@/lib/unitPending'
-import { vikingCarryPending } from '@/data/unitSpeeds'
+import { tribeUnitSpeeds, vikingCarryPending } from '@/data/unitSpeeds'
 
 // 維京運載量 2026-10-11 起 ✓（Fandom、Siegewise 兩份一致），這一行只剩中文名暫譯
 // 「全部」／不知道部族
@@ -118,6 +118,26 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     expect(zh('vikings', true)).toBe('維京的運載量待驗證，兵種中文名為暫譯')
     expect(zh('all', true)).toBe('維京的兵種運載量待驗證')
     expect(zh(null, true)).toBe('維京的兵種運載量待驗證')
+  })
+
+  it('only raiding units count: a pending Viking Settler does not trigger the 運載量待驗證 wording (designer, round 4)', () => {
+    // 現在的資料：開拓者留空（PM 第 4 輪），前 9 種 ✓
+    const rows = tribeUnitSpeeds('vikings').map((r) => ({ slot: r.slot, carry_source: r.carrySource }))
+    expect(rows.find((r) => r.slot === 10)?.carry_source).toBe('pending')
+    expect(rows.filter((r) => r.slot !== 10).every((r) => r.carry_source === 'two_sources')).toBe(true)
+    expect(vikingCarryPending(rows)).toBe(false)
+    expect(vikingCarryPending()).toBe(false)
+    expect(i18n.t(unitPendingLineKey('vikings', vikingCarryPending()))).toBe('兵種中文名為暫譯')
+    // 會搶資源的兵種（例如奴僕）留空才換成「維京的運載量待驗證，兵種中文名為暫譯」
+    const thrallPending = rows.map((r) => (r.slot === 1 ? { ...r, carry_source: 'pending' } : r))
+    expect(vikingCarryPending(thrallPending)).toBe(true)
+    expect(i18n.t(unitPendingLineKey('vikings', vikingCarryPending(thrallPending)))).toBe('維京的運載量待驗證，兵種中文名為暫譯')
+    // 畫面上選維京：只有「兵種中文名為暫譯」
+    fill.tribe = 'vikings'
+    const v = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
+    expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(/^兵種中文名為暫譯$/)
+    expect(screen.queryByText(/運載量待驗證/)).not.toBeInTheDocument()
+    v.unmount()
   })
 
   it('one line only (no Spartan line any more)', () => {

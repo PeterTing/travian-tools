@@ -258,16 +258,16 @@ class TestTroopsAPI:
 
 
 def test_detail_carry_is_a_number_for_every_tribe() -> None:
-    """維京運載量 2026-10-11 起是 Fandom、Siegewise 兩份一致的數字；留空的原因欄只在 null 時才有."""
-    for tribe, troop_id, carry in (
-        ("vikings", "thrall", 55),
-        ("vikings", "viking_settler", 3000),
-    ):
-        r = client.get(f"/api/v1/troops/{tribe}/{troop_id}")
-        assert r.status_code == 200
-        d = r.json()
-        assert d["carry_capacity"] == carry, troop_id
-        assert d["carry_capacity_note"] is None
+    """維京運載量（前 9 種）2026-10-11 起是 Fandom、Siegewise 兩份一致的數字；開拓者留空，原因欄只在 null 時才有."""
+    r = client.get("/api/v1/troops/vikings/thrall")
+    assert r.status_code == 200
+    d = r.json()
+    assert d["carry_capacity"] == 55
+    assert d["carry_capacity_note"] is None
+    # PM 第 4 輪：維京開拓者只有一份來源 → 留空（null），原因欄有字
+    d = client.get("/api/v1/troops/vikings/viking_settler").json()
+    assert d["carry_capacity"] is None
+    assert d["carry_capacity_note"]
     d = client.get("/api/v1/troops/gauls/theutates_thunder").json()
     assert d["carry_capacity"] == 75
     assert d["carry_capacity_note"] is None

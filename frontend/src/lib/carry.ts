@@ -1,6 +1,6 @@
 /**
  * 運載量加總（P0-23 PM／設計師）：還沒核對的運載量是 null（留空）。斯巴達 2026-10-11 在 ASIA x1 核對過；
- * 維京 2026-10-11 起用 Fandom、Siegewise 兩份一致的數字，目前沒有留空的兵種。
+ * 維京 2026-10-11 起用 Fandom、Siegewise 兩份一致的數字（前 9 種）；維京開拓者留空（只有一份來源，PM 第 4 輪）。
  * 任何一個選到的兵種運載量是 null，總運載量和收益都「無法計算」——不算部分加總、不當 0。
  */
 import type { PendingKind } from '@/lib/pendingNotes'

@@ -1845,9 +1845,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 3000,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       }
     ]
   }

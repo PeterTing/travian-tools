@@ -574,9 +574,9 @@ describe('Vikings unit stats', () => {
     });
   });
 
-  it('Settler: atk 10 / defInf 80 / defCav 80 / carry 3000 / upkeep 1', () => {
+  it('Settler: atk 10 / defInf 80 / defCav 80 / carry null (only one source, PM round 4) / upkeep 1', () => {
     pin(find(vikings.units, 'settler'), {
-      attack: 10, defInfantry: 80, defCavalry: 80, carry: 3000, upkeep: 1,
+      attack: 10, defInfantry: 80, defCavalry: 80, carry: null, upkeep: 1,
       cost: [5800, 4600, 4800, 4800], trainTime: 31000,
     });
   });

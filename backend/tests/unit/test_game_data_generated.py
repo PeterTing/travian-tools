@@ -607,6 +607,14 @@ def test_carry_capacity_single_source_backend_and_frontend() -> None:
             kb = TRIBES_DATA[tribe]["troops"][r["kb_id"]]
             assert kb["capacity"] == r["carry"], r["troop_id"]
             want = {"vikings": "two_sources", "spartans": "asia_x1"}.get(tribe, "ts11")
+            if r["troop_id"] == "viking_settler":
+                # PM 第 4 輪：開拓者只有 Siegewise 一份 → 留空、待驗證
+                assert (r["carry"], r["carry_source"], r["carry_ref"]) == (
+                    None,
+                    "pending",
+                    None,
+                )
+                continue
             assert r["carry_source"] == want, r["troop_id"]
             assert isinstance(r["carry"], int)
             if want == "two_sources":
@@ -626,7 +634,7 @@ def test_viking_carry_two_sources_everywhere_in_backend() -> None:
         (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
     )["troops"]
     vk = [t for t in troops.values() if t["tribe"] == "vikings"]
-    assert [t["carry_capacity"] for t in vk] == [55, 40, 75, 0, 110, 80, 0, 0, 0, 3000]
+    assert [t["carry_capacity"] for t in vk] == [55, 40, 75, 0, 110, 80, 0, 0, 0, None]
     assert [t["capacity"] for t in TRIBES_DATA["vikings"]["troops"].values()] == [
         55,
         40,
@@ -637,13 +645,16 @@ def test_viking_carry_two_sources_everywhere_in_backend() -> None:
         0,
         0,
         0,
-        3000,
+        None,
     ]
     sp = [t for t in troops.values() if t["tribe"] == "spartans"]
     assert [t["carry_capacity"] for t in sp] == [60, 0, 40, 50, 110, 80, 0, 0, 0, 3000]
-    assert all(t["carry_capacity"] is not None for t in troops.values())
+    # 留空的只有維京開拓者（PM 第 4 輪）
+    assert [tid for tid, t in troops.items() if t["carry_capacity"] is None] == [
+        "viking_settler"
+    ]
     gen_text = GEN.read_text(encoding="utf-8")
-    assert "CARRY_PENDING" not in gen_text
+    assert 'CARRY_PENDING_UNITS = ("viking_settler",)' in gen_text
     assert "community" not in gen_text.split("CARRY_SOURCES = {")[1].split("}")[0]
 
 
@@ -879,7 +890,14 @@ def test_crosscheck_vikings_and_carry_independence():
         (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
     )["troops"]
     vk = [t for t in troops.values() if t["tribe"] == "vikings"]
-    assert [t["carry_capacity"] for t in vk] == [*ind["agree"].values(), 3000]
+    assert [t["carry_capacity"] for t in vk] == [*ind["agree"].values(), None]
+    # 第 4 輪：Siegewise 運載量從哪來，查一次（幕僚長）
+    tr = ind["siegewise_source_trace"]
+    assert tr["finding"] == "Siegewise 運載量出處不明"
+    assert len(tr["checked"]) >= 5
+    assert "沒有證據" in tr["uses_fandom_2024_video"]
+    assert "沒有證據" in tr["same_sheet_as_fandom"]
+    assert "改回留空" in ind["settler"]["decision"]
 
 
 def test_multitribe_support_pages_sha256_and_quotes() -> None:

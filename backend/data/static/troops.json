@@ -1718,7 +1718,7 @@
       "speed": 5,
       "speed_source": "official",
       "speed_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
-      "carry_capacity": 3000,
+      "carry_capacity": null,
       "cost_wood": 5800,
       "cost_clay": 4600,
       "cost_iron": 4800,

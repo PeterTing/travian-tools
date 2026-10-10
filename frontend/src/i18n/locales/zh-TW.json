@@ -1320,7 +1320,8 @@
     "whatWithEffect": "花費、時間、人口、CP、效果已核對。",
     "vikingCarry": {
       "what": "維京運載量已核對（官方未寫運載量）。",
-      "source": "出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）"
+      "source": "出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）",
+      "note": "社群資料，官方未公布"
     },
     "celebration": {
       "what": "小慶典、大慶典的花費（木、泥、鐵、糧）已核對。",

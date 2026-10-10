@@ -9,6 +9,7 @@ const base = { category: 'infantry', attack: 45, defense_infantry: 22, defense_c
 const rows = [
   { ...base, troop_id: 'thrall', name_zh: '奴僕', name_en: 'Thrall', tribe: 'vikings', carry_capacity: null },
   { ...base, troop_id: 'berserker', name_zh: '狂戰士', name_en: 'Berserker', tribe: 'vikings', carry_capacity: 75 },
+  { ...base, troop_id: 'viking_settler', name_zh: '開拓者', name_en: 'Settler', tribe: 'vikings', carry_capacity: null },
   { ...base, troop_id: 'hoplite', name_zh: '裝甲步兵', name_en: 'Hoplite', tribe: 'spartans', speed: 6, speed_source: 'asia_x1', speed_ref: 'asia_x1/help/spartans/1', carry_capacity: 60, carry_source: 'asia_x1' },
   { ...base, troop_id: 'legionnaire', name_zh: '古羅馬步兵', name_en: 'Legionnaire', tribe: 'romans', speed_source: 'ts11', speed_ref: 'manual/troop/1', carry_capacity: 50 },
 ]
@@ -76,7 +77,21 @@ describe('TroopsPage: carry capacity cell', () => {
     expect(row.querySelector('td')).toHaveAttribute('colspan', '2')
     expect(within(row).getByTestId('pending-note-what')).toHaveTextContent('維京運載量已核對（官方未寫運載量）。')
     expect(within(row).getByTestId('pending-note-source')).toHaveTextContent(/^出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）$/)
+    // PM 第 4 輪：出處後面再一行
+    const extra = within(row).getByTestId('pending-note-extra')
+    expect(extra).toHaveTextContent(/^社群資料，官方未公布$/)
+    expect(within(row).getByTestId('pending-note-source').nextElementSibling).toBe(extra)
     fireEvent.click(mark)
     expect(screen.queryByTestId('troop-carry-verified-row')).toBeNull()
+  })
+
+  it('Viking Settler (PM round 4, only one source): 「—」 + 待驗證 chip, no ✓', async () => {
+    render(<TroopsPage />)
+    fireEvent.click(await screen.findByText('開拓者（Settler）'))
+    const cell = await screen.findByTestId('troop-carry')
+    expect(within(cell).getByTestId('troop-carry-empty')).toHaveTextContent(/^—$/)
+    expect(cell.textContent).not.toMatch(/\d/)
+    expect(within(cell).getAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind'))).toEqual(['vikingCarry'])
+    expect(within(cell).queryByTestId('troop-carry-verified-mark')).toBeNull()
   })
 })

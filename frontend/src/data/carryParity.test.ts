@@ -26,24 +26,26 @@ describe('carry capacity: frontend = backend troops.json for every unit', () => 
     })
   }
 
-  it('sources: 5 tribes ts11; Spartans ASIA x1 in-game help; Vikings two matching sources (Fandom + Siegewise, 2026-10-11) → no 待驗證 chip', () => {
+  it('sources: 5 tribes ts11; Spartans ASIA x1 in-game help; Vikings 1–9 two matching sources (Fandom + Siegewise), Viking Settler pending', () => {
     for (const tribe of UNIT_SPEED_TRIBES) {
-      const want = tribe === 'vikings' ? 'two_sources' : tribe === 'spartans' ? 'asia_x1' : 'ts11'
       for (const r of tribeUnitSpeeds(tribe)) {
-        expect(r.carrySource).toBe(want)
-        expect(carryPendingTribe(r.troopId)).toBeNull()
+        const settler = r.troopId === 'viking_settler'
+        const want = settler ? 'pending' : tribe === 'vikings' ? 'two_sources' : tribe === 'spartans' ? 'asia_x1' : 'ts11'
+        expect(r.carrySource, r.troopId).toBe(want)
+        expect(carryPendingTribe(r.troopId), r.troopId).toBe(settler ? 'vikings' : null)
       }
     }
+    // 開拓者不會去搶資源：不算「運載量待驗證」
     expect(vikingCarryPending()).toBe(false)
   })
 
-  it('every unit has a carry number (frontend, generated file, backend); Vikings 55/40/75/0/110/80/0/0/0/3000', () => {
-    const viking = [55, 40, 75, 0, 110, 80, 0, 0, 0, 3000]
+  it('every unit has a carry number except the Viking Settler (frontend, generated file, backend); Vikings 55/40/75/0/110/80/0/0/0/—', () => {
+    const viking = [55, 40, 75, 0, 110, 80, 0, 0, 0, null]
     expect(tribeUnitSpeeds('vikings').map((r) => r.carry)).toEqual(viking)
     expect(TRIBES.vikings.units.map((u) => u.carry)).toEqual(viking)
     for (const r of tribeUnitSpeeds('vikings')) expect(backend[r.troopId].carry_capacity, r.troopId).toBe(r.carry)
     for (const tribe of UNIT_SPEED_TRIBES) {
-      for (const r of tribeUnitSpeeds(tribe)) expect(typeof r.carry, r.troopId).toBe('number')
+      for (const r of tribeUnitSpeeds(tribe)) expect(typeof r.carry, r.troopId).toBe(r.troopId === 'viking_settler' ? 'object' : 'number')
     }
     // 斯巴達：ASIA x1 遊戲內說明（2026-10-11）
     expect(tribeUnitSpeeds('spartans').map((r) => r.carry)).toEqual([60, 0, 40, 50, 110, 80, 0, 0, 0, 3000])

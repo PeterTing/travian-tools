@@ -137,9 +137,15 @@ export function unitCarrySource(troopId: string): UnitCarrySource | undefined {
   return undefined
 }
 
-/** 還有沒有維京兵種的運載量留空（待驗證）；(k) 那一行的字照這個換 */
-export function vikingCarryPending(): boolean {
-  return (TRIBES.vikings ?? []).some((r) => r.carry_source === 'pending')
+/**
+ * 不會去搶資源的兵種（設計師，#43 第 4 輪）：開拓者（第 10 格）。它的運載量留空不影響「運載量待驗證」那句話。
+ * 偵察兵、攻城、行政長官的運載量都是 0 而且已核對，所以不用列。
+ */
+export const NON_RAIDING_SLOTS: readonly number[] = [10]
+
+/** 還有沒有「會搶資源」的維京兵種運載量留空（待驗證）；(k) 那一行的字、資料更新卡 (a) 照這個換。開拓者不算 */
+export function vikingCarryPending(rows: readonly { slot: number; carry_source: string }[] = TRIBES.vikings ?? []): boolean {
+  return rows.some((r) => r.carry_source === 'pending' && !NON_RAIDING_SLOTS.includes(r.slot))
 }
 
 /** 運載量留空（維京，還沒核對）時回那一族，畫面標「待驗證」；有遊戲內數字或找不到回 null（P0-23） */

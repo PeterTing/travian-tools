@@ -240,10 +240,12 @@ CARRY_SOURCES = {
 # （evidence/crosscheck_spartans_vikings_2026-10-11.json viking_carry_independence）。不獨立就改回 ("vikings",)
 CARRY_EMPTY_TRIBES: tuple[str, ...] = ()
 CARRY_TWO_SOURCE_TRIBES = ("vikings",)
+# 第 4 輪（PM）：維京開拓者只有 Siegewise 有數字（Fandom 那列抄錯），不算兩份一致 → 留空、待驗證
+CARRY_PENDING_UNITS = ("viking_settler",)
 
 
 def viking_carry_two_sources() -> dict[str, int]:
-    """be_id → 運載量：Fandom、Siegewise 重新比一次（開拓者 Fandom 那列是錯的，照 evidence 的判斷用 3000）."""
+    """be_id → 運載量：Fandom、Siegewise 重新比一次（前 9 種；開拓者留空，見 CARRY_PENDING_UNITS）."""
     xc = _crosscheck()
     ind = xc["viking_carry_independence"]
     assert ind["conclusion"] == "independent"
@@ -258,8 +260,8 @@ def viking_carry_two_sources() -> dict[str, int]:
     for be_id, a, b in zip(ind["agree"], sw_names, fd_names, strict=True):
         assert sw[a]["carry"] == fd[b]["carry"] == ind["agree"][be_id], (be_id, sw[a]["carry"], fd[b]["carry"])
         out[be_id] = sw[a]["carry"]
+    # 開拓者：只有 Siegewise 一份（3000），Fandom 那列是抄錯的衝撞車列 → 不放進來（CARRY_PENDING_UNITS）
     assert sw["Settler"]["carry"] == ind["settler"]["siegewise"] == 3000
-    out["viking_settler"] = 3000
     return out
 
 # One row per unit, game order t1..t10:
@@ -841,7 +843,11 @@ def gen_unit_speeds() -> dict:
                     }
                 rows.append(row)
                 continue
-            if tribe in CARRY_TWO_SOURCE_TRIBES:
+            if be_id in CARRY_PENDING_UNITS:
+                row["carry"] = None
+                row["carry_source"] = "pending"
+                row["carry_ref"] = None
+            elif tribe in CARRY_TWO_SOURCE_TRIBES:
                 row["carry"] = viking_carry_two_sources()[be_id]
                 row["carry_source"] = "two_sources"
                 row["carry_ref"] = "fandom+siegewise"

@@ -939,13 +939,53 @@
     "settler": {
       "siegewise": 3000,
       "fandom": null,
-      "decision": "Fandom 沒有開拓者的數字（那列是錯的），開拓者 3000 只有 Siegewise 一份；但 7 族開拓者運載量都是 3000，其他 6 族在遊戲內讀到的都是 3000（ts11 5 族＋ASIA x1 斯巴達），所以照 3000 標 ✓。這一點是判斷，PR 說明有寫"
+      "decision": "第 4 輪（PM，2026-10-11 02:00 台北）：開拓者只有 Siegewise 一份（Fandom 那列是抄錯的衝撞車列），不算兩份一致 → 改回留空、待驗證（產生器 CARRY_PENDING_UNITS）。前 9 種維持 ✓",
+      "superseded_decision": "第 3 輪：照其他 6 族的 3000 標 ✓（已撤回）"
     },
     "conclusion": "independent",
     "decision": "兩份互不引用、沒有共同出處 → 維京運載量 ✓：55/40/75/0/110/80/0/0/0/3000，出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）",
     "caveats": [
       "Fandom 自己註明數字可能不對（出處是 2024 年影片）",
-      "Siegewise 把這些數字標 sheet-only（沒有獨立確認）"
-    ]
+      "Siegewise 把這些數字標 sheet-only（沒有獨立確認）",
+      "Siegewise 運載量出處不明（第 4 輪查一次：試算表沒公開、Wayback 當時離線）"
+    ],
+    "siegewise_source_trace": {
+      "_what": "第 4 輪（幕僚長）：Siegewise 說兵種數字抄自官方說明頁，但官方 S139 沒有運載量 → 它的運載量從哪來？查一次，不深挖",
+      "checked_at": "2026-10-11T02:01:08+08:00",
+      "checked": [
+        {
+          "what": "維京兵種表 https://siegewise.com/en/travian/units/vikings",
+          "found": "運載量欄 55/40/75/0/110/80/0/0/0/3000；頁尾「verified against T4.6 · checked 2026-08-31」；沒有逐格出處、沒有連到試算表或其他網站"
+        },
+        {
+          "what": "單一兵種頁 https://siegewise.com/en/travian/units/vikings/thrall",
+          "found": "Carry capacity 55；只說「Every figure below is produced by the same engine behind the calculators」，沒有出處"
+        },
+        {
+          "what": "About https://siegewise.com/en/about",
+          "found": "「This started as a spreadsheet … it lived on one machine and could not be shared」「Siegewise is that spreadsheet rebuilt properly」；sheet-only＝「taken from the original spreadsheet … not independently confirmed」。試算表沒有公開，也沒有連結"
+        },
+        {
+          "what": "Credits https://siegewise.com/en/credits",
+          "found": "「Unit statistics are transcribed from the official Travian support site and checked against in-game values」；沒有提到 Fandom、YouTube、試算表連結"
+        },
+        {
+          "what": "三頁 HTML 搜尋 docs.google／youtube／youtu.be／fandom／xlsx／spreadsheet 連結／github／archive.org",
+          "found": "沒有外部連結（只有 game-icons.net、Lucide、廣告）"
+        },
+        {
+          "what": "Wayback Machine（CDX 和 available API）",
+          "found": "2026-10-11 02:00 台北查詢時 Internet Archive 回「Temporarily Offline」，查不到快照"
+        },
+        {
+          "what": "網路搜尋「siegewise travian vikings carry capacity spreadsheet source」",
+          "found": "只找到 2018 年 Reddit 一個使用者（u/Globularist）分享的 Travian 試算表；那時還沒有維京，也沒有證據跟 Siegewise 有關，不算出處"
+        }
+      ],
+      "uses_fandom_2024_video": "沒有證據（Siegewise 沒有提到影片或 Fandom）",
+      "same_sheet_as_fandom": "沒有證據（Siegewise 的試算表沒公開；Fandom 寫的出處是 2024 年 YouTube 影片，不是試算表）",
+      "finding": "Siegewise 運載量出處不明",
+      "decision": "找不到跟 Fandom 共用出處的證據，也找不到 Siegewise 自己的出處 → 照規則寫「Siegewise 運載量出處不明」，前 9 種維持 ✓，由幕僚長決定"
+    }
   }
 }
