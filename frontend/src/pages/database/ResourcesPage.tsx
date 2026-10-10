@@ -5,6 +5,7 @@ import { resourcesApi } from '@/services/gameApi'
 import type { ResourceFieldListItem, ResourceFieldDetail, ResourceType } from '@/types/game'
 import { ingameBuildingName } from '@/lib/ingameNames'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import BuildingIcon from '@/components/common/BuildingIcon'
 
 const RESOURCE_TYPES: { value: ResourceType; label: string; color: string }[] = [
   { value: 'wood', label: ingameBuildingName('woodcutter')!, color: 'bg-amber-100 text-amber-800' },
@@ -98,8 +99,9 @@ export default function ResourcesPage() {
               selectedResource?.resource_type === res.value ? 'default' : 'outline'
             }
             onClick={() => handleSelectResource(res.value)}
-            className="min-w-[120px]"
+            className="min-w-[120px] gap-2"
           >
+            <BuildingIcon id={res.value} size={20} />
             {res.label}
           </Button>
         ))}
@@ -109,7 +111,8 @@ export default function ResourcesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 基本資訊 */}
           <div className="border rounded-lg p-4">
-            <h2 className="text-2xl font-bold mb-4">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <BuildingIcon id={selectedResource.resource_type} size={32} />
               {isZh ? selectedResource.name_zh : selectedResource.name_en}
             </h2>
 

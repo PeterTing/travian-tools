@@ -33,6 +33,7 @@ import { villageApi } from '@/services/villageApi'
 import { syncApi, type SyncLog, type SyncStats } from '@/services/syncApi'
 import type { VillageDetail } from '@/types/game'
 import VillageForm from './VillageForm'
+import BuildingIcon from '@/components/common/BuildingIcon'
 
 export default function VillageDetailPage() {
   const { t } = useTranslation()
@@ -374,7 +375,12 @@ export default function VillageDetailPage() {
                   .map((building) => (
                     <TableRow key={building.instance_id}>
                       <TableCell>{building.position ?? '-'}</TableCell>
-                      <TableCell>{t(`buildingNames.${building.building_id}`, { defaultValue: building.building_id })}</TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center gap-2">
+                          <BuildingIcon id={building.building_id} size={20} />
+                          {t(`buildingNames.${building.building_id}`, { defaultValue: building.building_id })}
+                        </span>
+                      </TableCell>
                       <TableCell>{building.current_level}</TableCell>
                       <TableCell>
                         {building.is_upgrading ? (

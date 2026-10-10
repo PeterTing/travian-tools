@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     MAP_SQL_FETCH_MINUTE_UTC: int = 15
     MAP_SQL_USER_AGENT: str = (
         "travian-tools-mapsql/0.1 (+https://github.com/PeterTing/travian-tools; "
-        "public map.sql, once per day)"
+        "public map.sql, at most every 4 hours)"
     )
 
     # 截圖辨識（P0-07）：後端把使用者上傳的截圖轉給 tt-ocr（RapidOCR，自架 Cloud Run）。

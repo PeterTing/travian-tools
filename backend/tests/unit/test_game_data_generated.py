@@ -408,7 +408,7 @@ def test_advanced_calculator_uses_the_single_source() -> None:
 
 def test_celebration_rule() -> None:
     assert celebration_cp(12, "small") == 12  # ts11 day 4: 12 CP/day
-    assert celebration_cp(531, "small") == 500
+    assert celebration_cp(529, "small") == 500  # Lumi 常用配置 529 CP/天
     assert celebration_cp(5000, "great") == 2000
     assert [celebration_cap("small", s) for s in (1, 2, 3, 5, 10)] == [
         500,
@@ -880,3 +880,92 @@ def test_crosscheck_vikings_and_carry_independence():
     )["troops"]
     vk = [t for t in troops.values() if t["tribe"] == "vikings"]
     assert [t["carry_capacity"] for t in vk] == [*ind["agree"].values(), 3000]
+
+
+def test_multitribe_support_pages_sha256_and_quotes() -> None:
+    """P0-25 官方出處：全文 sha256 可以重算，摘錄的句子都在全文裡."""
+    import hashlib
+
+    ev = json.loads(
+        (
+            ROOT
+            / "scripts/game_data/evidence/official_support_multitribe_2026-10-11.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert "text_method" in ev
+    assert set(ev["articles"]) == {"s29", "s197", "s45", "s32", "s21"}
+    for key, a in ev["articles"].items():
+        assert a["url"].startswith("https://support.travian.com/en/articles/"), key
+        assert (
+            hashlib.sha256(a["text"].encode("utf-8")).hexdigest() == a["text_sha256"]
+        ), key
+        assert len(a["html_sha256"]) == 64, key
+        for quote in a["quotes"]:
+            assert quote in a["text"], (key, quote)
+    s29 = ev["articles"]["s29"]["text"]
+    assert "the village keeps its original tribe" in s29
+    assert "They always remain based on the tribe you chose at registration" in s29
+
+
+# ─── 慶典花費：兩份來源一致（2026-10-11 PM 規則）─────────────────────────
+
+
+def test_celebration_cost_two_sources_agree_and_text_sha256() -> None:
+    import hashlib
+
+    ev = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/celebration_sources_2026-10-11.json"
+        ).read_text(encoding="utf-8")
+    )
+    a = ev["official_answers"]
+    assert hashlib.sha256(a["text"].encode("utf-8")).hexdigest() == a["text_sha256"]
+    assert len(a["html_sha256"]) == 64
+    assert a["snapshot_url"].startswith("https://web.archive.org/web/20211206")
+    # 官方原文裡兩列花費照木、泥、鐵、糧的順序出現
+    assert "Small celebration |\n6400 |\n6650 |\n5940 |\n1340 |" in a["text"]
+    assert "Great celebration |\n29700 |\n33250 |\n32000 |\n6700 |" in a["text"]
+    w = ev["travian_wiki"]
+    assert w["independence"]["cites_answers_or_travian_help"] is False
+    assert len(w["wikitext_sha256"]) == 64
+    data = json.loads(
+        (ROOT / "backend/data/static/culture_points.json").read_text(encoding="utf-8")
+    )["celebrations"]
+    for kind in ("small", "great"):
+        assert w["cost_rows_quoted"][kind] == ev["celebrations"][kind]["cost"], kind
+        assert data[kind]["cost"] == ev["celebrations"][kind]["cost"], kind
+        assert data[kind]["min_town_hall"] == ev["celebrations"][kind]["min_town_hall"]
+        assert data[kind]["pending"] == [], kind
+    assert ev["source_line_zh"] == (
+        "出處：Travian Answers（官方，2021 年快照）、Travian Wiki 兩份來源一致"
+    )
+
+
+def test_celebration_durations_match_answers_and_knowledge_base() -> None:
+    ev = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/celebration_sources_2026-10-11.json"
+        ).read_text(encoding="utf-8")
+    )
+    kb = json.loads(
+        (
+            ROOT / "scripts/game_data/evidence/official_kb_buildings_2026-10-10.json"
+        ).read_text(encoding="utf-8")
+    )
+    rows = {r["level"]: r["effects"] for r in kb["buildings"]["24"]["rows"]}
+    d = ev["durations"]
+
+    def hms(sec: float) -> str:
+        s = round(sec)
+        return f"{s // 3600}:{s % 3600 // 60:02d}:{s % 60:02d}"
+
+    for lvl in range(1, 21):
+        assert hms(d["small_base_s"] * d["factor"] ** (lvl - 1)) == rows[lvl][0], lvl
+        great = rows[lvl][1]
+        if lvl < 10:
+            assert great == "", lvl
+        else:
+            assert hms(d["great_base_s"] * d["factor"] ** (lvl - 1)) == great, lvl
+            assert great in ev["official_answers"]["text"], lvl
+    assert rows[1][0] == d["answers_small_l1"] == "24:00:00"
+    assert rows[10][1] == d["answers_great_l10"] == "43:08:11"

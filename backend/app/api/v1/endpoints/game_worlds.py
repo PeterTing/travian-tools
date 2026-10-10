@@ -24,6 +24,7 @@ def _to_response(world: GameWorld) -> GameWorldResponse:
         world_id=world.world_id,
         server_url=world.server_url,
         utc_offset=world.utc_offset,
+        keep_tribe_on_conquest=bool(world.keep_tribe_on_conquest),
         account_count=len(accounts),
     )
 

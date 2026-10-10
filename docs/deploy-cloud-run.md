@@ -159,11 +159,204 @@ curl -s -o /dev/null -D - -X OPTIONS https://tt-api-138672009807.asia-east1.run.
 curl -s -o /dev/null -w '%{http_code}\n' https://tt-web-138672009807.asia-east1.run.app/   # 舊網址仍 200
 ```
 
+## map.sql 定時抓取（Cloud Run Job＋Cloud Scheduler，每 4 小時）
+
+正式環境不靠 tt-api 裡的 APScheduler（min-instances 0 時沒有 instance 活著）。改成：
+
+- **Cloud Run Job `tt-mapsql-fetch`**：跑 `python -m app.jobs.fetch_map_sql`，只抓
+  `backend/app/services/map_sql_worlds.py` 列出的世界（目前 `asia-x1` = `https://rog.x1.asia.travian.com`、
+  `eu12` = `https://ts12.x1.europe.travian.com`）。每個世界每次只發一個 `GET /map.sql`，不登入、不帶 cookie、
+  不跟 redirect、不重試，逾時 60 秒。內容的 SHA-256 跟該世界最新一筆快照相同就不寫資料庫。
+  有任何世界失敗時 exit 1（其他世界照抓）。job 不簽發登入憑證，所以不給 `JWT_SECRET_KEY`。
+- **Cloud Scheduler `tt-mapsql-fetch-4h`**：`17 */4 * * *`（Asia/Taipei），用 OAuth 呼叫 Cloud Run Admin API
+  的 `jobs/tt-mapsql-fetch:run`。
+- 兩個專用 service account：
+  - `travian-tools-mapsql`（job 執行身分）：只有 `travian-tools-db` 的 `roles/cloudsql.client`（IAM 條件限定這個 instance）
+    和 `DATABASE_URL` 這一個 secret 的 `secretAccessor`。
+  - `travian-tools-scheduler`（Scheduler 呼叫身分）：只有 `tt-mapsql-fetch` 這個 job 的 `roles/run.invoker`。
+
+**真正的開關是「建立 Cloud Scheduler」**：job 不讀 `MAP_SQL_DAILY_FETCH_ENABLED`；tt-api 的
+`MAP_SQL_DAILY_FETCH_ENABLED` 永遠維持 `false`（不要打開，否則 tt-api 程序內也會抓）。沒有 Scheduler，job 只會在手動 execute 時跑。
+
+前置：這個功能依賴 P0-25（#39，migration `0009_multi_tribe`），要等 #39 先合併。
+
+**上線順序（幕僚長 2026-10-11 定）**：
+
+1. 依序合併 #38 → #42 → #39 → #36 → #40
+2. Cloud SQL 備份（`gcloud sql backups create --instance travian-tools-db --project artogo-travian-tools`）
+3. `scripts/deploy_cloud_run.sh build`（產生新的 backend image；下面的 `TAG` 是這次 build 的 short SHA）
+4. `scripts/deploy_cloud_run.sh migrate`（跑 `0009_multi_tribe`＋`0010_mapsql_content_sha256`；
+   0010 是 `map_snapshots.content_sha256` 欄位＋索引，舊版 tt-api 不讀這個欄位）
+5. `scripts/deploy_cloud_run.sh deploy`
+6. 下一節「Cloud SQL 硬碟：auto-increase＋兩條警報」——**一定要在建立 Scheduler 之前做完**
+7. 本節指令 0)–5)：啟用 Cloud Scheduler API、service accounts、Cloud Run Job、手動跑一次確認、invoker 權限
+8. 本節指令 6)：**最後才建立 Scheduler**
+
+```bash
+export CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools
+PROJECT=artogo-travian-tools
+REGION=asia-east1
+TAG=<合併後 build 的 short SHA>
+IMAGE=${REGION}-docker.pkg.dev/${PROJECT}/travian-tools/backend:${TAG}
+JOB_SA=travian-tools-mapsql@${PROJECT}.iam.gserviceaccount.com
+SCHED_SA=travian-tools-scheduler@${PROJECT}.iam.gserviceaccount.com
+
+# 0) Cloud Scheduler API（2026-10-11 查過：尚未啟用）
+gcloud services enable cloudscheduler.googleapis.com --project ${PROJECT}
+
+# 1) service accounts
+gcloud iam service-accounts create travian-tools-mapsql --project ${PROJECT} \
+  --display-name "tt-mapsql-fetch job (map.sql every 4h)"
+gcloud iam service-accounts create travian-tools-scheduler --project ${PROJECT} \
+  --display-name "Cloud Scheduler -> tt-mapsql-fetch"
+
+# 2) job SA：Cloud SQL client（只限 travian-tools-db）＋只讀 DATABASE_URL
+gcloud projects add-iam-policy-binding ${PROJECT} \
+  --member "serviceAccount:${JOB_SA}" --role roles/cloudsql.client \
+  --condition 'title=only-travian-tools-db,expression=resource.name == "projects/artogo-travian-tools/instances/travian-tools-db" && resource.service == "sqladmin.googleapis.com"'
+gcloud secrets add-iam-policy-binding DATABASE_URL --project ${PROJECT} \
+  --member "serviceAccount:${JOB_SA}" --role roles/secretmanager.secretAccessor
+
+# 3) Cloud Run Job（不會自己跑；沒有 min-instances 的概念，閒置不計費）
+gcloud run jobs deploy tt-mapsql-fetch --project ${PROJECT} --region ${REGION} \
+  --image ${IMAGE} \
+  --service-account ${JOB_SA} \
+  --set-cloudsql-instances ${PROJECT}:${REGION}:travian-tools-db \
+  --set-secrets DATABASE_URL=DATABASE_URL:latest \
+  --set-env-vars "^@^DEBUG=false@MAP_SQL_WORLDS=asia-x1,eu12" \
+  --command python --args=-m,app.jobs.fetch_map_sql \
+  --tasks 1 --parallelism 1 --max-retries 0 --task-timeout 900s \
+  --cpu 1 --memory 1Gi
+
+# 4) 先手動跑一次確認（第一次會寫入兩個世界各一份快照）
+gcloud run jobs execute tt-mapsql-fetch --project ${PROJECT} --region ${REGION} --wait
+
+# 5) Scheduler SA 只能啟動這個 job
+gcloud run jobs add-iam-policy-binding tt-mapsql-fetch --project ${PROJECT} --region ${REGION} \
+  --member "serviceAccount:${SCHED_SA}" --role roles/run.invoker
+
+# 6) 每 4 小時（台北時間 00:17、04:17、08:17、12:17、16:17、20:17）
+gcloud scheduler jobs create http tt-mapsql-fetch-4h --project ${PROJECT} --location ${REGION} \
+  --schedule "17 */4 * * *" --time-zone "Asia/Taipei" \
+  --http-method POST \
+  --uri "https://run.googleapis.com/v2/projects/${PROJECT}/locations/${REGION}/jobs/tt-mapsql-fetch:run" \
+  --oauth-service-account-email ${SCHED_SA} \
+  --oauth-token-scope https://www.googleapis.com/auth/cloud-platform \
+  --max-retry-attempts 0 --attempt-deadline 180s
+```
+
+確認：
+
+```bash
+gcloud scheduler jobs describe tt-mapsql-fetch-4h --project ${PROJECT} --location ${REGION} --format='value(state,schedule,timeZone)'
+gcloud run jobs executions list --job tt-mapsql-fetch --project ${PROJECT} --region ${REGION} --limit 5
+gcloud logging read 'resource.type="cloud_run_job" AND resource.labels.job_name="tt-mapsql-fetch" AND textPayload:"map_sql_fetch_done"' \
+  --project ${PROJECT} --limit 5 --format='value(timestamp,textPayload)'
+```
+
+停用／回復（由輕到重）：
+
+```bash
+# 暫停（保留設定，隨時 resume）
+gcloud scheduler jobs pause tt-mapsql-fetch-4h --project ${PROJECT} --location ${REGION}
+gcloud scheduler jobs resume tt-mapsql-fetch-4h --project ${PROJECT} --location ${REGION}
+
+# 整個拿掉
+gcloud scheduler jobs delete tt-mapsql-fetch-4h --project ${PROJECT} --location ${REGION} --quiet
+gcloud run jobs remove-iam-policy-binding tt-mapsql-fetch --project ${PROJECT} --region ${REGION} \
+  --member "serviceAccount:${SCHED_SA}" --role roles/run.invoker
+gcloud run jobs delete tt-mapsql-fetch --project ${PROJECT} --region ${REGION} --quiet
+gcloud secrets remove-iam-policy-binding DATABASE_URL --project ${PROJECT} \
+  --member "serviceAccount:${JOB_SA}" --role roles/secretmanager.secretAccessor
+gcloud projects remove-iam-policy-binding ${PROJECT} \
+  --member "serviceAccount:${JOB_SA}" --role roles/cloudsql.client --all
+gcloud iam service-accounts delete ${JOB_SA} --project ${PROJECT} --quiet
+gcloud iam service-accounts delete ${SCHED_SA} --project ${PROJECT} --quiet
+# （選擇性）沒有其他 Scheduler job 時再停 API
+gcloud services disable cloudscheduler.googleapis.com --project ${PROJECT}
+```
+
+**快照全部保留，不自動刪除（Peter 決定，2026-10-11）。** 估算每月約 0.4 GB（兩個世界每天各換一次內容），
+最壞每月約 2.4 GB（每 4 小時都換）；Cloud SQL 只有 10 GB 且沒開 storage auto-increase。
+PM＋幕僚長決定：開 auto-increase（上限 30 GB）＋兩條警報，見下一節「Cloud SQL 硬碟：auto-increase＋兩條警報」。
+
+資料：job 寫進的是現有的 `map_snapshots`／`map_villages`／`map_players`／`map_alliances`（＋差異表）。
+要清掉這兩個世界的快照要另外核准，刪 `map_snapshots` 會連帶刪掉子表（FK `ON DELETE CASCADE`）。
+欄位本身可用 `alembic downgrade 0009_multi_tribe` 拿掉（要先部署不含這個欄位的 tt-api）。
+
+## Cloud SQL 硬碟：auto-increase＋兩條警報（待幕僚長核准後執行；要在建立 map.sql Scheduler 之前）
+
+map.sql 快照全部保留，所以：
+
+1. **storage auto-increase，上限 30 GB**。改這個設定不用重啟 instance。硬碟只會變大、**不能縮回**。
+2. **兩條 Cloud Monitoring 警報**（5 分鐘平均，超過就寄信）：
+   - `cloudsql.googleapis.com/database/disk/utilization` > **0.7**（目前配置硬碟的 70%）：`deploy/monitoring/cloudsql-disk-70.yaml`
+   - `cloudsql.googleapis.com/database/disk/bytes_used` > **21 GiB = 21 × 1024³ = 22,548,578,304 bytes**（30 GB 上限的 70%；
+     auto-increase 會一直把硬碟加大，utilization 可能永遠不到 70%，這條才會在接近上限前提醒）：
+     `deploy/monitoring/cloudsql-disk-bytes-21gib.yaml`
+   - 通知管道只有一個 email，是專案 Owner 的 Google 帳號；不用群組、不用第三方。Owner 有兩位
+     （2026-10-11 唯讀 `gcloud projects get-iam-policy`）：`dainy@artogo.co`、`peter_ting@artogo.co`；
+     幕僚長選定 **`peter_ting@artogo.co`**（2026-10-11）。
+
+```bash
+export CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools
+PROJECT=artogo-travian-tools
+OWNER_EMAIL=peter_ting@artogo.co   # 幕僚長選定（2026-10-11）
+
+# 1) auto-increase（上限 30 GB）。會跳確認，不加 --quiet
+gcloud sql instances patch travian-tools-db --project artogo-travian-tools --storage-auto-increase --storage-auto-increase-limit=30
+
+# 2) email 通知管道（gcloud alpha 元件）。直接用 create 回傳的 name，不再 list（避免撿到舊的或重複的管道）
+CHANNEL=$(gcloud alpha monitoring channels create --project ${PROJECT} \
+  --display-name "travian-tools owner email" --type email \
+  --channel-labels email_address=${OWNER_EMAIL} --format 'value(name)')
+echo "CHANNEL=${CHANNEL}"
+# 沒拿到通知管道就不建警報：不建立沒有通知對象的警報（幕僚長 #40）
+test -n "$CHANNEL" || echo "STOP: no notification channel — do not run step 3" >&2
+
+# 3) 兩條警報，都只通知這個 email；CHANNEL 是空的就整段不跑
+if test -n "$CHANNEL"; then
+  gcloud alpha monitoring policies create --project ${PROJECT} \
+    --policy-from-file deploy/monitoring/cloudsql-disk-70.yaml \
+    --notification-channels "${CHANNEL}"
+  gcloud alpha monitoring policies create --project ${PROJECT} \
+    --policy-from-file deploy/monitoring/cloudsql-disk-bytes-21gib.yaml \
+    --notification-channels "${CHANNEL}"
+fi
+```
+
+確認：
+
+```bash
+gcloud sql instances describe travian-tools-db --project ${PROJECT} \
+  --format='value(settings.storageAutoResize,settings.storageAutoResizeLimit,settings.dataDiskSizeGb)'
+gcloud alpha monitoring policies list --project ${PROJECT} \
+  --format='value(name,displayName,enabled,notificationChannels)'
+```
+
+回復：
+
+```bash
+# 關 auto-increase（已經長大的硬碟不會縮回）
+gcloud sql instances patch travian-tools-db --project artogo-travian-tools --no-storage-auto-increase
+# 刪兩條警報與通知管道
+for NAME in "travian-tools-db disk > 70%" "travian-tools-db disk bytes_used > 21 GiB"; do
+  POLICY=$(gcloud alpha monitoring policies list --project ${PROJECT} \
+    --filter "displayName=\"${NAME}\"" --format 'value(name)')
+  gcloud alpha monitoring policies delete ${POLICY} --project ${PROJECT}
+done
+gcloud alpha monitoring channels delete ${CHANNEL} --project ${PROJECT}
+```
+
+費用：兩條警報目前 $0（Google 公告最早 2027-09-01 起收：每個 metric reference $0.35／月＋每百萬回傳點 $0.50；
+每條每 30 秒 1 點、約 86,400 點／月 → 每條約 $0.39、兩條約 $0.78／月）；email 通知 $0。auto-increase 只有硬碟真的長大才多付，
+SSD 約 $0.17–0.19／GB／月，長到上限 30 GB 時最多多約 $3.4–3.8／月。
+
 ## 已知限制
 
 - **每日 map.sql 抓取在正式環境關閉**（`MAP_SQL_DAILY_FETCH_ENABLED=false`）：排程（APScheduler）跑在
   後端 process 裡，min-instances 0 時沒有請求就沒有 instance 活著，04:15 UTC 的抓取只會偶爾碰巧觸發，
-  所以乾脆明確關掉。要每天抓需要另外加 Cloud Scheduler（或 min-instances 1，費用較高）；目前先不加。
+  所以乾脆明確關掉。正式環境改用上面的「map.sql 定時抓取」（Cloud Run Job＋Cloud Scheduler）。
 - **Cloud SQL 只有 10 GB、沒有開 storage auto-increase**：硬碟滿了資料庫會變成唯讀／寫入失敗。
   map.sql 快照（`map_snapshots`＋`map_villages`／`map_players`／`map_alliances`，每個世界每次匯入一份）是最會長大的資料，要定期看用量
   （Console 的 Cloud SQL 監控「Storage usage」，或

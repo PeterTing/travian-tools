@@ -396,6 +396,8 @@ export interface GameAccount {
   server_name: string | null
   server_speed: number
   tribe: TroopTribe | null
+  /** 出生部族（註冊時選的部族，英雄能力跟著它）；跟 tribe 一樣。舊的 API 沒有這個欄位 */
+  birth_tribe?: TroopTribe | null
   player_name: string | null
   alliance_name: string | null
   server_start_date: string | null
@@ -420,6 +422,8 @@ export interface GameWorld {
   utc_offset: number | null
   /** 地圖邊長（例如 401 → 座標 −200～200）。後端還沒有這個欄位；沒有時座標框退回 ±200（見 lib/mapRadius.ts） */
   map_size?: number | null
+  /** 「征服保留部族」特殊伺服器：同一個帳號可以有不同部族的村莊（P0-25）；舊的 API 沒有這個欄位 = 關 */
+  keep_tribe_on_conquest?: boolean
   account_count: number
 }
 
@@ -430,6 +434,7 @@ export interface GameWorldListResponse {
 
 export interface GameWorldUpdate {
   utc_offset?: number | null
+  keep_tribe_on_conquest?: boolean
 }
 
 export interface GameAccountListResponse {
@@ -474,6 +479,8 @@ export interface Village {
   village_type: VillageType | null
   is_capital: boolean
   role: VillageRole | null
+  /** 村莊的部族（P0-25）；null = 跟帳號的出生部族一樣。只有「征服保留部族」的世界會用到 */
+  tribe?: TroopTribe | null
   /** 每小時糧食淨產量（已扣消耗，可以是負的）；還沒上傳過村莊總覽是 null */
   crop_net_per_hour?: number | null
   /** 這個村莊最後一次貼上／上傳村莊資料的時間（UTC，沒有時區標記）；沒有過是 null */
@@ -513,4 +520,5 @@ export interface VillageUpdate {
   village_type?: VillageType
   is_capital?: boolean
   role?: VillageRole
+  tribe?: TroopTribe | null
 }

@@ -1,0 +1,96 @@
+{
+ "_what": "慶典花費（x1）兩份來源核對（PM 規則 2026-10-11：兩份互不相抄、數字一致的來源即可標 ✓ 已核對）。只存官方原文與第三方頁面的雜湊和那兩列數字，不存第三方整張表。",
+ "captured_at": "2026-10-11T00:25:00+08:00",
+ "source_line_zh": "出處：Travian Answers（官方，2021 年快照）、Travian Wiki 兩份來源一致",
+ "celebrations": {
+  "small": {
+   "min_town_hall": 1,
+   "cost": [
+    6400,
+    6650,
+    5940,
+    1340
+   ]
+  },
+  "great": {
+   "min_town_hall": 10,
+   "cost": [
+    29700,
+    33250,
+    32000,
+    6700
+   ]
+  }
+ },
+ "official_answers": {
+  "publisher": "Travian Games GmbH（Travian Answers，官方客服站，已下線）",
+  "title": "Town Hall",
+  "original_url": "http://answers.travian.com/?view=answers&action=answer&aid=46",
+  "snapshot_url": "https://web.archive.org/web/20211206142644id_/http://answers.travian.com/?view=answers&action=answer&aid=46",
+  "snapshot_utc": "2021-12-06T14:26:44Z",
+  "html_sha256": "159aab603975e634b3b960345523dcf45bce8f0b1b16c770d01fb1625ba73497",
+  "text_method": "HTML 去掉 script/style 後取文章本文（Town Hall 標題到 'Has your question been answered' 之前），表格格子以 ' | ' 分隔",
+  "text": "Town Hall\nPrerequisites: Main Building Level 10, Academy Level 10\nYou can hold pompous celebrations in the town hall. Such a celebration increases your culture points. Building up your town hall to a higher level will decrease the length of the celebration.\nCulture points are necessary to found or conquer new villages. Each building produces culture points, the higher its level the more it produces. With celebrations you can increase this production for a short while.\nThe celebrations give the culture points directly after you initiated a celebration. After a celebration, there is a cool-down time (see table below). Furthermore a small celebration grants the culture points production of the village where the Town Hall is located up to a maximum of 500 on 1x and 2x speed servers and 250 on 3x speed servers, and a great celebration grants the account-production of culture points up to 2000 on 1x and 2x speed servers and 1000 on 3x speed servers.\nThe small celebration grants only culture points but the great celebration even affects the effectiveness of senators, chiefs and chieftains. The great celebration increases the lowering of the target village's loyalty by up to 5% per chief/chieftain/senator. The same happens the other way around when the attacked village holds a great celebration.\nCelebrations Costs and Outcome |\nTown Hall Level |\n|\n|\n|\n|\n|\n1 |\nSmall celebration |\n6400 |\n6650 |\n5940 |\n1340 |\n10 |\nGreat celebration |\n29700 |\n33250 |\n32000 |\n6700 |\nThe  level dependent attributes (such as construction costs and generated  culture points) can be found  here.\nFor the full table of construction times click this link for server with 1x speed, this link for server with 2x speed and this link for server with 3x speed.\nCelebrations Cool-Down Time |\n|\nspeed: 1x |\nTown Hall Level |\nSmall celebration |\nGreat celebration |\n1 |\n24:00:00 |\nn.a. |\n2 |\n23:08:10 |\nn.a. |\n3 |\n22:18:11 |\nn.a. |\n4 |\n21:30:01 |\nn.a. |\n5 |\n20:43:34 |\nn.a. |\n6 |\n19:58:48 |\nn.a. |\n7 |\n19:15:39 |\nn.a. |\n8 |\n18:34:03 |\nn.a. |\n9 |\n17:53:56 |\nn.a. |\n10 |\n17:15:17 |\n43:08:11 |\n11 |\n16:38:00 |\n41:35:01 |\n12 |\n16:02:05 |\n40:05:12 |\n13 |\n15:27:27 |\n38:38:36 |\n14 |\n14:54:03 |\n37:15:08 |\n15 |\n14:21:52 |\n35:54:40 |\n16 |\n13:50:50 |\n34:37:06 |\n17 |\n13:20:56 |\n33:22:20 |\n18 |\n12:52:06 |\n32:10:15 |\n19 |\n12:24:18 |\n31:00:45 |\n20 |\n11:57:30 |\n29:53:46 |\nThe formula for speed server is: cool-down time = cool-down time on 1x speed server / ( RoundDown (speed / 3) +1 )\nExample: The cool-down time on a 1x speed server for a small celebration on a level 1 Town Hall is 24 hours. The cool-down time on a 3x speed server is 12 hours therefore:\n24 / ( RoundDown (3 / 3) +1 ) = 24 / (1 + 1) = 24 / 2 = 12\n\n",
+  "text_sha256": "036eedd491c39537a5fd5f78a7a45bbd2dc3ee2cf00972640962024e1ee289ef",
+  "column_order": [
+   "Lumber",
+   "Clay",
+   "Iron",
+   "Crop"
+  ]
+ },
+ "travian_wiki": {
+  "publisher": "Travian Wiki（travian.fandom.com，社群 wiki，CC-BY-SA）",
+  "page_url": "https://travian.fandom.com/wiki/Town_hall",
+  "api_url": "https://travian.fandom.com/api.php?action=parse&page=Town_hall&prop=wikitext&format=json",
+  "latest_revid": 18134,
+  "latest_rev_utc": "2018-03-10T15:46:50Z",
+  "first_rev_with_costs": {
+   "revid": 3721,
+   "utc": "2008-04-12T00:15:01Z",
+   "row_names": [
+    "Little party",
+    "Big party"
+   ]
+  },
+  "rev_8813_utc": "2009-12-08T14:11:06Z",
+  "api_response_sha256": "1025b9c5adc284eb5a50f8acab6fccc23e7edd4aea2348619da94c1e6eb52186",
+  "wikitext_sha256": "7cd2fc13bc0c4f2bda7c36a81b2b0853e3e7dc1ef09c2d746f1275530d0341ed",
+  "cost_rows_quoted": {
+   "small": [
+    6400,
+    6650,
+    5940,
+    1340
+   ],
+   "great": [
+    29700,
+    33250,
+    32000,
+    6700
+   ]
+  },
+  "talk_page_sha256": "6e3ab4ff20dca65b8f5c9d0edb69771fdb9c014761504040d63357d6118be5f5",
+  "independence": {
+   "cites_answers_or_travian_help": false,
+   "external_links_or_refs_in_page": 0,
+   "own_typos_not_in_official": [
+    "Town Hall 13 級鐵 27370（官方 24370）",
+    "6 級糧 2063（官方 2060）",
+    "小慶典 5 級時長 20:43:44（官方 20:43:34）",
+    "公式行把小慶典糧寫成 500"
+   ],
+   "note": "頁面與討論頁都沒有引用 Answers 或官方說明；2008 年起就有這兩列，用自己的欄位（Res/1 CP）與錯字，判定為另外抄寫，不是照抄 Answers。"
+  }
+ },
+ "durations": {
+  "_what": "時長另有現行官方知識庫可對（evidence/official_kb_buildings_2026-10-10.json gid 24），這裡記公式：小慶典 24h × 0.964^(城鎮廳等級−1)，大慶典 60h × 0.964^(等級−1)，10 級起才能辦大慶典。",
+  "small_base_s": 86400,
+  "great_base_s": 216000,
+  "factor": 0.964,
+  "answers_small_l1": "24:00:00",
+  "answers_great_l10": "43:08:11",
+  "answers_small_l20": "11:57:30",
+  "answers_great_l20": "29:53:46"
+ }
+}

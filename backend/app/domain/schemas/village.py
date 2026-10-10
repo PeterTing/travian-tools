@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from app.infrastructure.database.models.game_account import TribeType
 from app.infrastructure.database.models.village import VillageRole, VillageType
 
 # ============ 建築實例 ============
@@ -93,6 +94,11 @@ class VillageBase(BaseModel):
     village_type: VillageType | None = Field(None, description="村莊類型")
     is_capital: bool = Field(False, description="是否為首都")
     role: VillageRole | None = Field(None, description="村莊角色")
+    tribe: TribeType | None = Field(
+        None,
+        description="村莊的部族（P0-25）；null = 跟帳號的出生部族一樣。"
+        "只有「征服保留部族」的世界會用到",
+    )
 
 
 class VillageCreate(VillageBase):
@@ -111,6 +117,7 @@ class VillageUpdate(BaseModel):
     village_type: VillageType | None = None
     is_capital: bool | None = None
     role: VillageRole | None = None
+    tribe: TribeType | None = None
 
 
 class VillageResponse(VillageBase):

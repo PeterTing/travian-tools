@@ -14,6 +14,10 @@ class GameWorldUpdate(BaseModel):
         None,
         description="伺服器時間的 UTC 時差（分鐘，例如 UTC+1 = 60）；null = 不換算",
     )
+    keep_tribe_on_conquest: bool | None = Field(
+        None,
+        description="「征服保留部族」特殊伺服器：同一個帳號可以有不同部族的村莊（P0-25）",
+    )
 
     @field_validator("utc_offset")
     @classmethod
@@ -35,6 +39,10 @@ class GameWorldResponse(BaseModel):
     server_url: str
     utc_offset: int | None = Field(
         None, description="null = 還不知道，時間照伺服器顯示、不換算"
+    )
+    keep_tribe_on_conquest: bool = Field(
+        False,
+        description="「征服保留部族」特殊伺服器：同一個帳號可以有不同部族的村莊",
     )
     account_count: int = Field(0, description="這個世界裡有幾個遊戲帳號")
 

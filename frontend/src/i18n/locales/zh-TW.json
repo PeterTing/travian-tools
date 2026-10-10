@@ -567,7 +567,11 @@
     "summary": "伺服器時差 {{offset}}",
     "change": "更改",
     "collapse": "收合",
-    "derivedFromPage": "從貼上頁面上的伺服器時鐘自動算出；不對再按「更改」。"
+    "derivedFromPage": "從貼上頁面上的伺服器時鐘自動算出；不對再按「更改」。",
+    "tribeRule": "部族規則",
+    "tribeRuleSingle": "一般伺服器（整個帳號一個部族）",
+    "tribeRuleKeep": "征服保留部族（一個帳號多個部族）",
+    "tribeRuleHint": "特殊伺服器才有（例如年度特殊伺服器），看伺服器公告。開了之後可以在村莊列表設定每個村莊的部族；英雄永遠是出生部族。"
   },
   "gameAccounts": {
     "title": "遊戲帳號管理",
@@ -677,7 +681,11 @@
       "emptyTitle": "這個帳號還沒有村莊資料",
       "emptyHint": "到首頁貼上多村總覽；也可以手動新增。",
       "addManually": "＋ 手動新增村莊",
-      "openDetail": "打開 {{name}} 的詳情"
+      "openDetail": "打開 {{name}} 的詳情",
+      "tribe": "部族",
+      "tribeAria": "{{name}} 的部族",
+      "birthTribeOption": "{{tribe}}（出生部族）",
+      "tribeSaveError": "部族沒有存到，請再試一次"
     },
     "title": "村莊管理",
     "description": "管理您的 Travian 村莊",
@@ -1202,7 +1210,8 @@
     "editNote": "只改這一頁，不會動到帳號設定；換頁就回到帳號的值。村莊會記住，下次預設用它。",
     "manual": "已手動修改",
     "restore": "還原",
-    "fromAccount": "帳號帶入"
+    "fromAccount": "帳號帶入",
+    "heroBirthTribe": "英雄：出生部族 {{tribe}}"
   },
   "external": {
     "heroRevive": "英雄復活",
@@ -1253,10 +1262,6 @@
     "cpThreshold": {
       "what": "開村 CP 門檻還沒在 ts11 遊戲內核對。",
       "source": "目前用公式推算，可能有誤差。"
-    },
-    "celebration": {
-      "what": "小慶典的糧和大慶典的花費還沒在 ts11 城鎮廳頁確認。",
-      "source": "小慶典的糧目前用的是開局試算表的數字；大慶典的花費來源還在查。"
     },
     "unitCarry": {
       "what": "兵種攜帶量還沒在 ts11 遊戲內核對。",
@@ -1316,6 +1321,10 @@
     "vikingCarry": {
       "what": "維京運載量已核對（官方未寫運載量）。",
       "source": "出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）"
+    },
+    "celebration": {
+      "what": "小慶典、大慶典的花費（木、泥、鐵、糧）已核對。",
+      "source": "出處：Travian Answers（官方，2021 年快照）、Travian Wiki 兩份來源一致"
     }
   },
   "cropFieldsCalc": {

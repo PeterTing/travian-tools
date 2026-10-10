@@ -6,7 +6,8 @@ import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
 import { CalcBar } from '@/components/autofill/CalcFrame'
-import Stepper from '@/components/common/Stepper'
+import LevelSelect from '@/components/common/LevelSelect'
+import BuildingIcon from '@/components/common/BuildingIcon'
 import { ingameBuildingName } from '@/lib/ingameNames';
 
 const fmtInt = (n: number) => Math.round(n).toLocaleString('en-US');
@@ -69,8 +70,6 @@ export function oasisPercent(slotIds: string[]): Record<ResourceType, number> {
   return out;
 }
 
-const BONUS_LEVELS = [0, 1, 2, 3, 4, 5];
-
 export default function CropSimCalculator() {
   const { lang } = useLang();
   const [layoutId, setLayoutId] = useState<CropperId>('15c');
@@ -121,23 +120,21 @@ export default function CropSimCalculator() {
               {CROPPER_LAYOUTS.map(l => <option key={l.id} value={l.id}>{l.id}</option>)}
             </select>
           </div>
-          <div className={s.field}>
-            <label>{lang === 'en' ? 'Field level' : '田地等級'}</label>
-            <select value={flv} onChange={e => setFlv(+e.target.value)}>
-              {Array.from({ length: 20 }, (_, i) => i + 1).map(L => <option key={L} value={L}>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</option>)}
-            </select>
+          <div className="mb-3.5">
+            {/* 1–20 級（稽核 2026-10-10 拿掉 21 級）；所有田同一個等級，圖示用農場 */}
+            <LevelSelect lang={lang} label={lang === 'en' ? 'Field level' : '田地等級'} buildingId="cropland" min={1} max={20} value={flv} onChange={setFlv} testId="crop-sim-field-level" />
           </div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Bonus buildings' : '加成建築'}</h4>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>{lang === 'en' ? 'Sawmill (0–5)' : `${ingameBuildingName('sawmill')}（0–5 級）`}</label><select data-testid="cropsim-bonus-saw" value={bonus.saw} onChange={e => setBonus(p => ({ ...p, saw: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
-            <div className={s.field}><label>{lang === 'en' ? 'Brickyard (0–5)' : `${ingameBuildingName('brickyard')}（0–5 級）`}</label><select data-testid="cropsim-bonus-bri" value={bonus.bri} onChange={e => setBonus(p => ({ ...p, bri: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Sawmill' : ingameBuildingName('sawmill')!} buildingId="sawmill" min={0} max={5} value={bonus.saw} onChange={v => setBonus(p => ({ ...p, saw: v }))} testId="cropsim-bonus-saw" /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Brickyard' : ingameBuildingName('brickyard')!} buildingId="brickyard" min={0} max={5} value={bonus.bri} onChange={v => setBonus(p => ({ ...p, bri: v }))} testId="cropsim-bonus-bri" /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>{lang === 'en' ? 'Iron Foundry (0–5)' : `${ingameBuildingName('iron_foundry')}（0–5 級）`}</label><select data-testid="cropsim-bonus-fnd" value={bonus.fnd} onChange={e => setBonus(p => ({ ...p, fnd: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
-            <div className={s.field}><label>{lang === 'en' ? 'Grain Mill (0–5)' : `${ingameBuildingName('grain_mill')}（0–5 級）`}</label><select data-testid="cropsim-bonus-mil" value={bonus.mil} onChange={e => setBonus(p => ({ ...p, mil: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Iron Foundry' : ingameBuildingName('iron_foundry')!} buildingId="iron_foundry" min={0} max={5} value={bonus.fnd} onChange={v => setBonus(p => ({ ...p, fnd: v }))} testId="cropsim-bonus-fnd" /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Grain Mill' : ingameBuildingName('grain_mill')!} buildingId="grain_mill" min={0} max={5} value={bonus.mil} onChange={v => setBonus(p => ({ ...p, mil: v }))} testId="cropsim-bonus-mil" /></div>
           </div>
-          <div className={s.field}><label>{lang === 'en' ? 'Bakery (0–5)' : `${ingameBuildingName('bakery')}（0–5 級）`}</label><select data-testid="cropsim-bonus-bak" value={bonus.bak} onChange={e => setBonus(p => ({ ...p, bak: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
+          <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Bakery' : ingameBuildingName('bakery')!} buildingId="bakery" min={0} max={5} value={bonus.bak} onChange={v => setBonus(p => ({ ...p, bak: v }))} testId="cropsim-bonus-bak" /></div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Oases (up to 3)' : '綠洲（最多 3 塊）'}</h4>
           <p className={s.muted} style={{ margin: '0 0 8px' }}>
@@ -165,12 +162,15 @@ export default function CropSimCalculator() {
 
           <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> {lang === 'en' ? 'Gold production bonus +25%' : '金幣產量加成 +25%'}</label>
           <div className="mb-3.5">
-            <Stepper
-              label={lang === 'en' ? 'Egyptian Waterworks level (0 = not Egyptian)' : '埃及供水系統等級（不是埃及填 0）'}
+            <LevelSelect
+              lang={lang}
+              label={lang === 'en' ? 'Egyptian Waterworks level (0 = not Egyptian)' : '埃及供水系統等級（不是埃及選 0）'}
+              buildingId="waterworks"
               value={waterworks}
               onChange={setWaterworks}
               min={0}
               max={20}
+              testId="crop-sim-waterworks"
             />
           </div>
         </div>
@@ -211,14 +211,13 @@ export default function CropSimCalculator() {
             </thead>
             <tbody>
               {result.rows.map(r => {
-                const icons: Record<string, string> = { wood: '🪵', clay: '🧱', iron: '⛏️', crop: '🌾' };
                 const names: Record<string, string> = lang === 'en'
                   ? { wood: 'Wood', clay: 'Clay', iron: 'Iron', crop: 'Crop' }
                   : { wood: '木材', clay: '黏土', iron: '鐵礦', crop: '糧食' };
                 return (
                   <tr key={r.t} className="h-11">
                     {/* 390 寬第一欄只放圖示（名稱給螢幕閱讀器），≥640 才顯示名稱（P0-17 (d)） */}
-                    <td className="whitespace-nowrap"><span aria-hidden="true">{icons[r.t]}</span><span className="sr-only sm:not-sr-only"> {names[r.t]}</span></td>
+                    <td className="whitespace-nowrap"><span className="inline-flex items-center gap-2"><BuildingIcon id={r.t} size={20} /><span className="sr-only sm:not-sr-only">{names[r.t]}</span></span></td>
                     <td>{r.n} × {r.base}</td>
                     <td>{(r.n * r.base).toLocaleString()}</td>
                     <td>+{(r.bb * 100).toFixed(0)}%</td>

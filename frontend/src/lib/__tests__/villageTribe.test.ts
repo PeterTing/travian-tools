@@ -1,0 +1,72 @@
+import { describe, expect, it } from 'vitest'
+import { birthTribeOf, isMultiTribeWorld, villageTribeOf } from '@/lib/villageTribe'
+import { makeAccount } from '@/test/accountFixtures'
+import type { GameWorld, Village } from '@/types/game'
+
+const world = (keep?: boolean): GameWorld => ({
+  world_id: 'w',
+  server_url: 'https://ts11.x1.asia.travian.com',
+  utc_offset: null,
+  account_count: 1,
+  ...(keep === undefined ? {} : { keep_tribe_on_conquest: keep }),
+})
+const village = (tribe: Village['tribe']): Village => ({
+  village_id: 'v',
+  account_id: 'acc-ts3',
+  name: '02',
+  coordinate_x: 1,
+  coordinate_y: 2,
+  population: 0,
+  village_type: null,
+  is_capital: false,
+  role: null,
+  tribe,
+  last_updated: null,
+  created_at: '2026-10-01T00:00:00',
+})
+
+describe('一個帳號多個部族（P0-25）', () => {
+  it('birth tribe comes from birth_tribe, falling back to tribe for the old API', () => {
+    expect(birthTribeOf(makeAccount({ tribe: 'romans', birth_tribe: 'romans' }))).toBe('romans')
+    expect(birthTribeOf(makeAccount({ tribe: 'gauls' }))).toBe('gauls')
+    expect(birthTribeOf(makeAccount({ tribe: null }))).toBeNull()
+    expect(birthTribeOf(null)).toBeNull()
+  })
+
+  it('account tribe is the source of truth: a stale birth_tribe (rollback window) never overrides it', () => {
+    // 退回舊版期間舊版只改了 tribe，birth_tribe 還是舊的羅馬人
+    const acc = makeAccount({ tribe: 'gauls', birth_tribe: 'romans' })
+    expect(birthTribeOf(acc)).toBe('gauls')
+    expect(villageTribeOf(village('romans'), acc, world(false))).toBe('gauls')
+    expect(villageTribeOf(null, acc, world(true))).toBe('gauls')
+    // tribe 沒值才用 birth_tribe
+    expect(birthTribeOf(makeAccount({ tribe: null, birth_tribe: 'huns' }))).toBe('huns')
+  })
+
+  it('only worlds with Keep Tribe on Conquest are multi-tribe; missing flag (old API) = single tribe', () => {
+    expect(isMultiTribeWorld(world(true))).toBe(true)
+    expect(isMultiTribeWorld(world(false))).toBe(false)
+    expect(isMultiTribeWorld(world())).toBe(false)
+    expect(isMultiTribeWorld(null)).toBe(false)
+  })
+
+  it('single-tribe worlds always use the birth tribe, even if a village has another tribe stored', () => {
+    const acc = makeAccount({ tribe: 'romans', birth_tribe: 'romans' })
+    expect(villageTribeOf(village('gauls'), acc, world(false))).toBe('romans')
+    expect(villageTribeOf(village('gauls'), acc, null)).toBe('romans')
+  })
+
+  it('multi-tribe worlds use the village tribe; unset village follows the birth tribe', () => {
+    const acc = makeAccount({ tribe: 'romans', birth_tribe: 'romans' })
+    expect(villageTribeOf(village('gauls'), acc, world(true))).toBe('gauls')
+    expect(villageTribeOf(village(null), acc, world(true))).toBe('romans')
+    expect(villageTribeOf(null, acc, world(true))).toBe('romans')
+  })
+
+  it('multi-tribe worlds: a village with an explicit tribe never follows the birth tribe, even if it equals an old one', () => {
+    // 帳號從羅馬人改成高盧人；明確設成羅馬人的村莊（可能是征服來的）還是羅馬人，NULL 的跟著高盧人
+    const acc = makeAccount({ tribe: 'gauls', birth_tribe: 'gauls' })
+    expect(villageTribeOf(village('romans'), acc, world(true))).toBe('romans')
+    expect(villageTribeOf(village(null), acc, world(true))).toBe('gauls')
+  })
+})

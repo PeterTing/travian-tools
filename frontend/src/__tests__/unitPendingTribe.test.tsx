@@ -15,7 +15,7 @@ vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
     ...mod,
     useAutoFill: (): AutoFillValue => ({
       account: null, village: null, villages: [], speed: 1, tribe: fill.tribe as TroopTribe | null, accountSpeed: 1,
-      accountTribe: fill.tribe as TroopTribe | null, offsetHours: null, overrides: {}, setOverride: () => undefined,
+      accountTribe: fill.tribe as TroopTribe | null, birthTribe: fill.tribe as TroopTribe | null, multiTribe: false, offsetHours: null, overrides: {}, setOverride: () => undefined,
       clearOverride: () => undefined, selectVillage: () => undefined,
     }),
   }

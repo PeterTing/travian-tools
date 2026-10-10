@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { UtcOffsetField } from '@/components/world/UtcOffsetField'
+import { useAccountData } from '@/contexts/AccountDataContext'
 import { describeServerUrl } from '@/lib/worldUrl'
 import { gameWorldApi } from '@/services/gameWorldApi'
 import type { GameWorld } from '@/types/game'
@@ -18,6 +19,7 @@ type RowStatus = 'idle' | 'saving' | 'saved' | 'error'
  * 世界設定：手動改伺服器的 UTC 時差。
  * 沒設定（null）= 時間照伺服器顯示，不換算。從貼上的頁面自動算是 P0-05 的事。
  * 已設定時預設收成一行「伺服器時差 UTC+1 · 更改」。
+ * 部族規則（P0-25）：一般伺服器／征服保留部族（一個帳號多個部族），選了就存。
  */
 export default function WorldSettings({ refreshKey = '' }: WorldSettingsProps) {
   const { t } = useTranslation()
@@ -25,6 +27,8 @@ export default function WorldSettings({ refreshKey = '' }: WorldSettingsProps) {
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const [status, setStatus] = useState<Record<string, RowStatus>>({})
   const [editing, setEditing] = useState<Record<string, boolean>>({})
+  const [tribeStatus, setTribeStatus] = useState<Record<string, RowStatus>>({})
+  const { reload: reloadAccountData } = useAccountData()
 
   const load = useCallback(async () => {
     try {
@@ -58,6 +62,19 @@ export default function WorldSettings({ refreshKey = '' }: WorldSettingsProps) {
       }
     } catch {
       setStatus((s) => ({ ...s, [world.world_id]: 'error' }))
+    }
+  }
+
+  const saveTribeRule = async (world: GameWorld, keep: boolean) => {
+    setTribeStatus((s) => ({ ...s, [world.world_id]: 'saving' }))
+    try {
+      const updated = await gameWorldApi.update(world.world_id, { keep_tribe_on_conquest: keep })
+      setWorlds((list) => list.map((w) => (w.world_id === updated.world_id ? updated : w)))
+      setTribeStatus((s) => ({ ...s, [world.world_id]: 'saved' }))
+      // 「已帶入」列和村莊列表看的世界設定也要更新
+      void reloadAccountData()
+    } catch {
+      setTribeStatus((s) => ({ ...s, [world.world_id]: 'error' }))
     }
   }
 
@@ -138,6 +155,11 @@ export default function WorldSettings({ refreshKey = '' }: WorldSettingsProps) {
                         ) : null
                       }
                     />
+                    <TribeRuleField
+                      world={world}
+                      status={tribeStatus[world.world_id] ?? 'idle'}
+                      onChange={(keep) => void saveTribeRule(world, keep)}
+                    />
                   </div>
                 </li>
               )
@@ -146,5 +168,40 @@ export default function WorldSettings({ refreshKey = '' }: WorldSettingsProps) {
         )}
       </CardContent>
     </Card>
+  )
+}
+
+/** 部族規則：原生下拉選單（高 44px、字 16px），選了就存 */
+function TribeRuleField({
+  world,
+  status,
+  onChange,
+}: {
+  world: GameWorld
+  status: RowStatus
+  onChange: (keep: boolean) => void
+}) {
+  const { t } = useTranslation()
+  const id = `tribe-rule-${world.world_id}`
+  return (
+    <div className="mt-3 flex flex-col gap-1" data-testid={id}>
+      <label htmlFor={id} className="text-sm font-medium">
+        {t('worldSettings.tribeRule')}
+      </label>
+      <select
+        id={id}
+        className="h-11 rounded border bg-background px-2 text-base"
+        value={world.keep_tribe_on_conquest ? 'keep' : 'single'}
+        disabled={status === 'saving'}
+        onChange={(event) => onChange(event.target.value === 'keep')}
+      >
+        <option value="single">{t('worldSettings.tribeRuleSingle')}</option>
+        <option value="keep">{t('worldSettings.tribeRuleKeep')}</option>
+      </select>
+      <p className="text-xs text-muted-foreground">{t('worldSettings.tribeRuleHint')}</p>
+      <span className="text-xs text-muted-foreground" role="status">
+        {status === 'saved' ? t('worldSettings.saved') : status === 'error' ? t('worldSettings.saveError') : ''}
+      </span>
+    </div>
   )
 }

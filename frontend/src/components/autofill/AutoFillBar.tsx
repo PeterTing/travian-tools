@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
-import { usesUnitData } from '@/components/layout/navItems'
+import { usesHero, usesUnitData } from '@/components/layout/navItems'
 import { ROUTES } from '@/constants/routes'
 import { formatOffsetHours } from '@/lib/serverTime'
 import { showUnitPendingLine, unitPendingLineKey } from '@/lib/unitPending'
@@ -36,22 +36,33 @@ interface AutoFillBarProps {
  * 計算器最上面的「已帶入」列（IA v2.2）：
  *   已帶入：PeterT · ts11（x1・高盧）· 主村 (0|0)   更改
  *   時差 +6 小時（從貼上的頁面讀到）／時差：貼一頁就會自動設好
- *   〔待驗證〕維京的兵種運載量待驗證[，兵種中文名為暫譯 ← 選維京時]
+ *   〔待驗證〕兵種中文名為暫譯 ← 選維京時（維京運載量 2026-10-11 起 ✓；改回待驗證時是「維京的運載量待驗證，兵種中文名為暫譯」）
  *     ← 只在用到兵種資料的頁面，而且部族是維京（或兵種資料庫選「全部」、不知道部族）才顯示（P0-17 (k)）
  *     斯巴達 2026-10-11 在 ASIA x1 遊戲內說明核對完，不再出現
+ *
+ * 征服保留部族的世界（一個帳號多個部族，P0-25）：
+ *   已帶入：PeterT · ts11（x1）· 01 (33|-4)・高盧人   更改
+ *   英雄：出生部族 羅馬人      ← 只在跟英雄有關的頁面（navItems.HERO_ROUTES）
+ *   部族跟著目前村莊；用不到村莊的計算器也顯示村莊（部族看它）。一般伺服器完全不變。
  */
 export default function AutoFillBar({ usesVillage = true, unitData, assumption, unitTribe }: AutoFillBarProps) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const fill = useAutoFill()
   const [editing, setEditing] = useState(false)
-  const { account, village, villages, speed, tribe, offsetHours, overrides } = fill
+  const { account, village, villages, speed, tribe, offsetHours, overrides, multiTribe, birthTribe } = fill
+  // 征服保留部族的世界：部族看村莊，所以一定顯示村莊和村莊選單
+  const showVillage = usesVillage || multiTribe
+  const showHeroLine = multiTribe && birthTribe != null && usesHero(pathname)
   // 有部族選單的頁面看選單，沒有的看帳號的部族；已核對的五族不顯示
   const lineTribe = unitTribe === undefined ? tribe : unitTribe
   const showUnitLine = (unitData ?? usesUnitData(pathname)) && showUnitPendingLine(lineTribe)
   const overridden = overrides.speed != null || overrides.tribe != null
 
-  const worldParts = [`x${speed}`, tribe ? t(`tribes.${tribe}`) : null].filter(Boolean).join('・')
+  // 部族寫在村莊後面（多部族世界、而且有村莊）或世界後面（一般伺服器，跟以前一樣）
+  const tribeAfterVillage = multiTribe && showVillage && village != null
+  const tribeLabel = tribe ? t(`tribes.${tribe}`) : null
+  const worldParts = [`x${speed}`, tribeAfterVillage ? null : tribeLabel].filter(Boolean).join('・')
 
   return (
     <div
@@ -65,7 +76,15 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption, 
             {account.player_name || account.server_name || account.server_url}
             {' · '}
             {account.server_name || account.server_url}（{worldParts}）
-            {usesVillage && village && <> · {villageLabel(village)}</>}
+            {showVillage && village && (
+              <>
+                {' · '}
+                <span data-testid="autofill-village">
+                  {villageLabel(village)}
+                  {tribeAfterVillage && tribeLabel && `・${tribeLabel}`}
+                </span>
+              </>
+            )}
             {overridden && <span className="ml-1 text-xs text-orange-700">{t('autofill.thisPageOnly')}</span>}
           </span>
         ) : (
@@ -93,6 +112,12 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption, 
           ? t('autofill.offsetUnknown')
           : t('autofill.offsetKnown', { hours: formatOffsetHours(offsetHours) })}
       </p>
+
+      {showHeroLine && (
+        <p className="text-xs text-muted-foreground" data-testid="autofill-hero-tribe">
+          {t('autofill.heroBirthTribe', { tribe: t(`tribes.${birthTribe}`) })}
+        </p>
+      )}
 
       {showUnitLine && (
         // 一行，對齊灰標右邊的文字起點（懸掛縮排），折行也不折到灰標底下
@@ -139,7 +164,7 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption, 
               ))}
             </select>
           </label>
-          {usesVillage && villages.length > 0 && (
+          {showVillage && villages.length > 0 && (
             <label className="flex flex-col gap-1 text-xs">
               {t('autofill.village')}
               <select

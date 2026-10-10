@@ -44,7 +44,7 @@ function Item({ it }: { it: DataUpdateItem }) {
 }
 
 /**
- * 首頁資料更新卡（#33 + #34 一張）：淺灰資訊卡，前 3 項直接看到，「再看 3 項」展開其餘。
+ * 首頁資料更新卡：淺灰資訊卡，前 3 項直接看到，超過 3 項時「再看 N 項」展開其餘。
  * 卡片最高半個螢幕（內容多就卡片裡捲動），有來襲時來襲卡在上面。
  */
 /** serverSpeed：目前世界的倍速，決定 x3 以上才有的項目要不要顯示 */
@@ -62,7 +62,7 @@ export default function DataUpdateCard({ now, serverSpeed }: { now?: Date; serve
       aria-labelledby="data-update-title"
     >
       <h2 id="data-update-title" className="text-base font-semibold">{DATA_UPDATE_TITLE}</h2>
-      <p className="mt-1 text-sm">數值已對照 ts11 遊戲內說明和官方說明頁更正</p>
+      <p className="mt-1 text-sm">依官方說明頁和社群資料核對</p>
       <ul className="mt-2 space-y-1 text-sm" data-testid="data-update-items">
         {first.map((it) => <Item key={it.label} it={it} />)}
         {expanded && rest.map((it) => <Item key={it.label} it={it} />)}

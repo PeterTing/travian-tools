@@ -3,7 +3,11 @@
 from sqlalchemy.orm import Session
 
 from app.domain.schemas.game_account import GameAccountCreate, GameAccountUpdate
-from app.infrastructure.database.models.game_account import GameAccount, TimeDisplay
+from app.infrastructure.database.models.game_account import (
+    GameAccount,
+    TimeDisplay,
+    TribeType,
+)
 from app.services.game_world_service import GameWorldService
 from app.utils.world_url import describe_server_url
 
@@ -26,6 +30,7 @@ class GameAccountService:
             server_name=data.server_name,
             server_speed=data.server_speed or 1,
             tribe=data.tribe,
+            birth_tribe=data.tribe,
             player_name=data.player_name,
             alliance_name=data.alliance_name,
             server_start_date=data.server_start_date,
@@ -92,6 +97,8 @@ class GameAccountService:
             del update_data["server_speed"]
         for field, value in update_data.items():
             setattr(account, field, value)
+        if "tribe" in update_data:
+            self._change_birth_tribe(account, update_data["tribe"])
         if "server_url" in update_data:
             # 換了世界就接到那個世界（沒有就建一筆）
             world = GameWorldService(self.db).get_or_create(user_id, account.server_url)
@@ -100,6 +107,23 @@ class GameAccountService:
         self.db.commit()
         self.db.refresh(account)
         return account
+
+    def _change_birth_tribe(
+        self,
+        account: GameAccount,
+        new_tribe: TribeType | None,
+    ) -> None:
+        """帳號的部族就是出生部族（P0-25）：兩個欄位一起改.
+
+        一般伺服器：所有村莊一起改（整個帳號一個部族）。
+        「征服保留部族」世界（PM 決定，#39）：只有還沒設定部族（NULL）的村莊跟著改；
+        有設定部族的村莊一律不動——就算剛好等於舊的部族，也可能是真的征服來的那一族。
+        """
+        account.birth_tribe = new_tribe
+        multi_tribe = bool(account.world and account.world.keep_tribe_on_conquest)
+        for village in account.villages:
+            if not multi_tribe or village.tribe is None:
+                village.tribe = new_tribe
 
     def delete_account(self, account_id: str, user_id: str) -> bool:
         """刪除遊戲帳號."""

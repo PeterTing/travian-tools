@@ -9,7 +9,7 @@ import { INGAME_TRIBES } from '@/lib/ingameNames'
 vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
   const mod = await importOriginal<typeof import('@/components/autofill/AutoFillContext')>()
   const value: AutoFillValue = {
-    account: null, village: null, villages: [], speed: 1, tribe: 'teutons', accountSpeed: 1, accountTribe: 'teutons',
+    account: null, village: null, villages: [], speed: 1, tribe: 'teutons', accountSpeed: 1, accountTribe: 'teutons', birthTribe: 'teutons', multiTribe: false,
     offsetHours: null, overrides: {}, setOverride: () => undefined, clearOverride: () => undefined,
     selectVillage: () => undefined,
   }

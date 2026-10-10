@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { MERCHANTS, merchantCapacity, TRADE_OFFICE_PER_LEVEL_DEFAULT, TRADE_OFFICE_PER_LEVEL_ROMAN, type TribeId } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import { CalcBar } from '@/components/autofill/CalcFrame'
-import Stepper from '@/components/common/Stepper'
+import LevelSelect from '@/components/common/LevelSelect'
 import { ingameTribeName } from '@/lib/ingameNames';
 
 const fmtInt = (n: number) => isFinite(n) ? Math.round(n).toLocaleString('en-US') : '—';
@@ -23,9 +23,14 @@ const OFFICE_PCT_ROMAN = Math.round(TRADE_OFFICE_PER_LEVEL_ROMAN * 100);
 
 export default function TraderouteCalculator() {
   const { lang } = useLang();
-  // 部族預設跟「已帶入」列的帳號
+  // 部族預設跟「已帶入」列（目前村莊的部族）
   const { tribe: accountTribe } = useAutoFill();
   const [tribe, setTribe] = useState<TribeId>(() => (accountTribe && accountTribe in MERCHANTS ? accountTribe as TribeId : 'gauls'));
+  // 換村莊（征服保留部族的世界，村莊可以是不同部族）或帳號晚點載入：使用者還沒自己選過就跟著（P0-25）
+  const [tribeTouched, setTribeTouched] = useState(false);
+  useEffect(() => {
+    if (!tribeTouched && accountTribe && accountTribe in MERCHANTS) setTribe(accountTribe as TribeId);
+  }, [accountTribe, tribeTouched]);
   const [office, setOffice] = useState(10);
   // 距離用文字存：空白、0、負數在欄位下方寫原因（以前負距離會算出負時間）
   const [distText, setDistText] = useState('30');
@@ -78,7 +83,7 @@ export default function TraderouteCalculator() {
 
           <div className={s.field}>
             <label htmlFor="traderoute-tribe">{lang === 'en' ? 'Tribe' : '部族'}</label>
-            <select id="traderoute-tribe" value={tribe} onChange={e => setTribe(e.target.value as TribeId)}>
+            <select id="traderoute-tribe" value={tribe} onChange={e => { setTribe(e.target.value as TribeId); setTribeTouched(true); }}>
               {Object.entries(MERCHANTS).map(([id, m]) => {
                 const display = lang === 'en'
                   ? `${id.charAt(0).toUpperCase() + id.slice(1)} (${m.capacity}/${m.speed})`
@@ -89,7 +94,7 @@ export default function TraderouteCalculator() {
           </div>
 
           <div className="mb-3.5">
-            <Stepper label={lang === 'en' ? 'Trade Office level (0–20)' : '交易所等級 (0–20)'} value={office} onChange={setOffice} min={0} max={20} />
+            <LevelSelect lang={lang} label={lang === 'en' ? 'Trade Office level (0–20)' : '交易所等級 (0–20)'} buildingId="trade_office" value={office} onChange={setOffice} min={0} max={20} testId="traderoute-office" />
           </div>
 
           <div className={s.field}>

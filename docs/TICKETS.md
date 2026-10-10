@@ -416,6 +416,12 @@
 - ⬜（#37 審查，不擋 merge）`NumberInput` 打了非數字（例如「abc」）時，值變成空白（NaN），離開欄位後字也清掉，沒有任何提示；之後要像座標框一樣在欄位下方給紅字
 - ⬜（#37 審查，不擋 merge）S20 速度那張 PR merge 後，要改 `FarmingCalculator.tsx` 第 71 行 `farmingCalc` 上面註解裡的行軍公式說明
 
+### P0-25 一個帳號多個部族（征服保留部族的世界）🔄 審核中（[#39](https://github.com/PeterTing/travian-tools/pull/39)）
+- 村莊各自存部族、帳號存出生部族（讀的時候以 `game_accounts.tribe` 為準）、世界加「征服保留部族」開關（預設關）；兵種／建築／商人跟著目前村莊，英雄頁多一行「英雄：出生部族 X」；一般伺服器畫面不變。官方出處：`scripts/game_data/evidence/official_support_multitribe_2026-10-11.json`
+- 改帳號部族（PM 決定，#39）：一般伺服器所有村莊一起改；征服保留部族的世界只有部族是 NULL 的村莊跟著改，有設定部族的村莊不動（就算等於舊的部族）。注意：0009 回填和新建村莊都會明確寫入部族，所以征服保留部族的世界裡通常沒有 NULL 的村莊，改帳號部族時村莊都不會動
+- ⬜（#39 審查，不擋 merge）後端沒有擋「一般伺服器改村莊部族」：`PUT /villages/{id}` 在 `keep_tribe_on_conquest = false` 的世界也收 `tribe`（前端只在征服保留部族的世界顯示選單；一般伺服器的計算一律用出生部族，存了也不會用到）。之後要嘛回 422，要嘛忽略
+- ⬜（#39 審查，不擋 merge）#40（`0010_mapsql_content_sha256`，接在 0009 後面）merge 之後，`backend/alembic/README_MIGRATIONS.md` 裡 0009 的退回指令 `alembic downgrade 0008_sync_type_rally` 會連 0010 一起退；要改寫退回目標與說明（只退 0009 要先確認 0010 可以一起退，或改成依序 `downgrade -1` 兩次並寫清楚影響）
+
 ## P1：聯盟防守
 
 | 票 | 內容 | 估計 | 備註 |
@@ -428,7 +434,7 @@
 | P1-06 | 戰鬥模擬器重寫 | 4 到 6 天 | 照公式自己寫，數值只拿 kirilloid 比對 |
 | P1-07 | 偵查找田照 Friso 的規則重做 | 1.5 到 2 天 | |
 | P1-08 | 知識庫 | 約 1 天校對 | 以 travian-guide 為主體，舊內容逐條照公式與官方說明校對（外部網站只拿來比對） |
-| P1-09 | 每日 map.sql 改由 Cloud Scheduler 觸發（Cloud Run） | 0.5 到 1 天 | 正式環境現在 `MAP_SQL_DAILY_FETCH_ENABLED=false`：min-instances 0 時程序內排程不會可靠執行，兩個 instance 也可能各抓一次。做法：Cloud Scheduler 每天打一個只收 OIDC（Scheduler 專用 service account）的內部端點，同世界同一天只抓一次；合規測試的 map.sql 白名單照舊 |
+| P1-09 | 定時 map.sql 改由 Cloud Scheduler 觸發（Cloud Run）🔄 [#40](https://github.com/PeterTing/travian-tools/pull/40) | 0.5 到 1 天 | 改成 Cloud Run Job `tt-mapsql-fetch`＋Cloud Scheduler 每 4 小時（Asia - x1、Europe 12），SHA-256 相同不寫 DB，快照全部保留。#40 幕僚長不擋項：① 補一個測試，確認抓取請求永遠不帶 cookie（含 client 有 cookie jar 時）；② `MAP_SQL_DAILY_FETCH_ENABLED` job 不讀，tt-api 永遠維持 `false`，真正的開關是「建立 Cloud Scheduler」（已寫進 `docs/deploy-cloud-run.md`） |
 | P1-10 | 首頁：新使用者還沒有遊戲帳號時，「新增遊戲帳號」改成卡片最上方的主按鈕 | 0.5 天 | 設計師建議；現在是橘色文字連結（`frontend/src/pages/HomePage.tsx` 約 341–349 行） |
 | P1-11 | 截圖辨識拿掉「測試版」：第一次有真實來襲時，補集結點來襲截圖（手機＋桌機）當測試素材，重算「確定」欄位讀錯率 | 0.5 天 | PM 條件：P0-07 先上但入口標「測試版」（首頁「📷 上傳截圖」、補座標頁相機按鈕，元件 `OcrBetaTag`）。ts11 新手保護期間沒有真實來襲，現有來襲案例是真實頁面骨架＋假資料。觸發：ts11 第一次收到來襲。完成條件：真實截圖進 fixture、讀錯率重算寫進 PR、讀錯率 0 才拿掉標籤 |
 | P1-12 | 截圖辨識：低信心欄位的確認改用伺服器簽章 token | 1 天 | 幕僚長 #21 審核建議（之後開票）。現在 `/paste/confirm`（source=ocr）是依前端送回的欄位狀態判斷「低信心已確認」。改成 `/ocr/rally` 回一個簽章 token（含每個低信心欄位的位置與原值），confirm 時驗簽，不再信任前端送回的狀態 |
@@ -474,6 +480,7 @@
 
 | 日期 | 版本 | 內容 |
 |---|---|---|
+| 2026-10-11 | v2.0.43 | P0-25 一個帳號多個部族送審（#39）；記下兩個不擋 merge 的審查項目（一般伺服器改村莊部族沒擋、#40 merge 後要改 0009 退回目標） |
 | 2026-10-11 | v2.0.42 | #37 追加：農場收益距離清空維持空白、不算（摘要「—」）；掠奪量清空摘要「—」不再顯示「× 0 匹」；記下四個不擋 merge 的審查項目 |
 | 2026-10-10 | v2.0.41 | 座標框與農場收益緊急修正：全站座標框改共用 CoordPair（預設空白、可打負號、貼上自動拆 X／Y、清方向字元、範圍走世界地圖大小，沒資料退回 ±200）；農場收益改依掠奪量與運載量算每組兵數、依往返算組數，人口規則只當攻略參考；新增 NumberInput（千分位、去前導 0）；待辦：地圖大小欄位、掠奪量上限提示、NumberInput 推廣、可打字的速度欄位 |
 | 2026-10-10 | v2.0.34 | #33 審查：新增 P0-23 遊戲資料出處補齊（維京改照官方 S139、原文 sha256、建築 12 號與重抓紀錄、拿掉 knowledge_base／前端部族舊數字、0 級田產量證據、地圖 401 證據）、P0-24 不活躍村莊搜尋用環繞距離；P0-17 補 (k) 已帶入列兵種灰標看部族、(l) 資源田頁點擊範圍、(m)「文字格式說明」44px、(n) 390 太擠的表、(o) 農場速度灰標只在往返超過派兵間隔時出現、(p) 首都頁 Plus 勾選框標籤點擊範圍、(q) 開局時間表部族預設跟帳號、(r) 糧食平衡 × 按鈕點擊範圍 |

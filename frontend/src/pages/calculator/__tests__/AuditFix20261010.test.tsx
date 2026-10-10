@@ -36,7 +36,7 @@ import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 const api = vi.mocked(advancedCalculatorApi)
 const village = { village_id: 'v1', name: '01', coordinate_x: -12, coordinate_y: 34, population: 300 } as unknown as Village
 const fillWith = (speed: 1 | 2 | 3 | 5 | 10, v: Village | null = null): AutoFillValue => ({
-  account: null, village: v, villages: v ? [v] : [], speed, tribe: 'gauls', accountSpeed: 1, accountTribe: null,
+  account: null, village: v, villages: v ? [v] : [], speed, tribe: 'gauls', accountSpeed: 1, accountTribe: null, birthTribe: null, multiTribe: false,
   offsetHours: null, overrides: {}, setOverride: () => undefined, clearOverride: () => undefined, selectVillage: () => undefined,
 })
 const setCoords = (prefix: string, x: string, y: string) => {

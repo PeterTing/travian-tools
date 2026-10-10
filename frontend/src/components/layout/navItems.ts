@@ -157,6 +157,25 @@ export function usesUnitData(pathname: string): boolean {
   return UNIT_DATA_ROUTES.some((p) => startsWithSegment(pathname, p))
 }
 
+/**
+ * 跟英雄有關的計算器（英雄靴子、英雄產糧／耗糧）。征服保留部族的世界，
+ * 這些頁的「已帶入」列多一行灰字「英雄：出生部族 X」——英雄能力永遠跟著
+ * 出生部族，不跟著目前村莊的部族（官方說明頁 S29，P0-25）。
+ */
+export const HERO_ROUTES: readonly string[] = [
+  '/calculator/path',
+  '/calculator/path-speed-ts',
+  '/calculator/save-troops',
+  '/calculator/interception',
+  '/calculator/attack-planner',
+  '/calculator/farming',
+  ROUTES.CALCULATOR.CROP,
+]
+
+export function usesHero(pathname: string): boolean {
+  return HERO_ROUTES.some((p) => startsWithSegment(pathname, p))
+}
+
 /** 目前網址屬於哪一個底部分頁（登入、註冊等頁面不屬於任何分頁） */
 export function activeTabFor(pathname: string): TabId | null {
   if (pathname === ROUTES.HOME || startsWithSegment(pathname, '/paste')) return 'home'

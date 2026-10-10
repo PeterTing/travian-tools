@@ -5,7 +5,7 @@ import CalcResultPanel from './CalcResultPanel';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
-import Stepper from '@/components/common/Stepper'
+import LevelSelect from '@/components/common/LevelSelect'
 import RangeNumberField, { outOfRange } from '@/components/common/RangeNumberField'
 import NumberInput from '@/components/common/NumberInput'
 import { calculateTravelSeconds } from '@/lib/travianFormulas'
@@ -193,7 +193,7 @@ export default function FarmingCalculator({ units = FARM_UNITS }: { units?: Unit
           </div>
           {/* 競技場、靴子只加快超過 20 格的路段（共用行軍公式，P0-22） */}
           <div className={s.field}>
-            <Stepper label={lang === 'en' ? 'Tournament Square level' : '競技場等級'} value={arena} onChange={setArena} min={0} max={20} testId="farming-arena" />
+            <LevelSelect lang={lang} label={lang === 'en' ? 'Tournament Square level' : '競技場等級'} buildingId="tournament_square" value={arena} onChange={setArena} min={0} max={20} testId="farming-arena" />
           </div>
           <RangeNumberField
             className={s.field}
