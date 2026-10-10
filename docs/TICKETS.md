@@ -418,6 +418,7 @@
 
 ### P0-25 一個帳號多個部族（征服保留部族的世界）🔄 審核中（[#39](https://github.com/PeterTing/travian-tools/pull/39)）
 - 村莊各自存部族、帳號存出生部族（讀的時候以 `game_accounts.tribe` 為準）、世界加「征服保留部族」開關（預設關）；兵種／建築／商人跟著目前村莊，英雄頁多一行「英雄：出生部族 X」；一般伺服器畫面不變。官方出處：`scripts/game_data/evidence/official_support_multitribe_2026-10-11.json`
+- 改帳號部族（PM 決定，#39）：一般伺服器所有村莊一起改；征服保留部族的世界只有部族是 NULL 的村莊跟著改，有設定部族的村莊不動（就算等於舊的部族）。注意：0009 回填和新建村莊都會明確寫入部族，所以征服保留部族的世界裡通常沒有 NULL 的村莊，改帳號部族時村莊都不會動
 - ⬜（#39 審查，不擋 merge）後端沒有擋「一般伺服器改村莊部族」：`PUT /villages/{id}` 在 `keep_tribe_on_conquest = false` 的世界也收 `tribe`（前端只在征服保留部族的世界顯示選單；一般伺服器的計算一律用出生部族，存了也不會用到）。之後要嘛回 422，要嘛忽略
 - ⬜（#39 審查，不擋 merge）#40（`0010_mapsql_content_sha256`，接在 0009 後面）merge 之後，`backend/alembic/README_MIGRATIONS.md` 裡 0009 的退回指令 `alembic downgrade 0008_sync_type_rally` 會連 0010 一起退；要改寫退回目標與說明（只退 0009 要先確認 0010 可以一起退，或改成依序 `downgrade -1` 兩次並寫清楚影響）
 

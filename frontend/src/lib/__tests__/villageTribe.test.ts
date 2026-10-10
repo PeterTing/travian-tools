@@ -62,4 +62,11 @@ describe('一個帳號多個部族（P0-25）', () => {
     expect(villageTribeOf(village(null), acc, world(true))).toBe('romans')
     expect(villageTribeOf(null, acc, world(true))).toBe('romans')
   })
+
+  it('multi-tribe worlds: a village with an explicit tribe never follows the birth tribe, even if it equals an old one', () => {
+    // 帳號從羅馬人改成高盧人；明確設成羅馬人的村莊（可能是征服來的）還是羅馬人，NULL 的跟著高盧人
+    const acc = makeAccount({ tribe: 'gauls', birth_tribe: 'gauls' })
+    expect(villageTribeOf(village('romans'), acc, world(true))).toBe('romans')
+    expect(villageTribeOf(village(null), acc, world(true))).toBe('gauls')
+  })
 })

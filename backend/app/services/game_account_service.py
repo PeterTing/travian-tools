@@ -95,11 +95,10 @@ class GameAccountService:
                 update_data["server_speed"] = info.server_speed or 1
         if "server_speed" in update_data and update_data["server_speed"] is None:
             del update_data["server_speed"]
-        old_tribe = account.resolved_birth_tribe
         for field, value in update_data.items():
             setattr(account, field, value)
         if "tribe" in update_data:
-            self._change_birth_tribe(account, old_tribe, update_data["tribe"])
+            self._change_birth_tribe(account, update_data["tribe"])
         if "server_url" in update_data:
             # 換了世界就接到那個世界（沒有就建一筆）
             world = GameWorldService(self.db).get_or_create(user_id, account.server_url)
@@ -112,21 +111,18 @@ class GameAccountService:
     def _change_birth_tribe(
         self,
         account: GameAccount,
-        old_tribe: TribeType | None,
         new_tribe: TribeType | None,
     ) -> None:
         """帳號的部族就是出生部族（P0-25）：兩個欄位一起改.
 
         一般伺服器：所有村莊一起改（整個帳號一個部族）。
-        「征服保留部族」世界：原本跟著出生部族的村莊（部族一樣、還沒設定、或等於
-        退回舊版期間留下的舊 birth_tribe）一起改，設成別的部族的村莊不動。
+        「征服保留部族」世界（PM 決定，#39）：只有還沒設定部族（NULL）的村莊跟著改；
+        有設定部族的村莊一律不動——就算剛好等於舊的部族，也可能是真的征服來的那一族。
         """
-        stale_birth = account.birth_tribe
         account.birth_tribe = new_tribe
         multi_tribe = bool(account.world and account.world.keep_tribe_on_conquest)
-        followers = {None, old_tribe, stale_birth}
         for village in account.villages:
-            if not multi_tribe or village.tribe in followers:
+            if not multi_tribe or village.tribe is None:
                 village.tribe = new_tribe
 
     def delete_account(self, account_id: str, user_id: str) -> bool:

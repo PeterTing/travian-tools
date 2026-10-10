@@ -127,17 +127,35 @@ def test_world_keep_tribe_flag_defaults_off_and_can_be_switched(
     assert resp.json()["utc_offset"] == 60
 
 
-def test_changing_birth_tribe_moves_following_villages_only(
+def _clear_village_tribe(client: TestClient, village_id: str) -> None:
+    """村莊部族設成 NULL（還沒設定）；API 建立村莊時一定會帶出生部族."""
+    from sqlalchemy import text
+
+    db = client.db  # type: ignore[attr-defined]
+    db.execute(
+        text("UPDATE villages SET tribe = NULL WHERE village_id = :v"),
+        {"v": village_id},
+    )
+    db.commit()
+    db.expire_all()
+
+
+def test_multi_tribe_world_only_unset_villages_follow_birth_tribe(
     client: TestClient,
 ) -> None:
-    """征服保留部族的世界：只有跟著出生部族的村莊一起改."""
+    """征服保留部族的世界（PM 決定，#39）：只有部族是 NULL 的村莊跟著改.
+
+    有設定部族的村莊不動，就算剛好等於舊的出生部族（可能是真的征服來的那一族）。
+    """
     acc = _account(client, "romans")
     client.patch(
         f"/api/v1/game-worlds/{acc['world_id']}", json={"keep_tribe_on_conquest": True}
     )
-    _village(client, acc["account_id"], "01")
+    _village(client, acc["account_id"], "01")  # 明確設成 romans（= 舊的出生部族）
     v2 = _village(client, acc["account_id"], "02")
     client.put(f"/api/v1/villages/{v2['village_id']}", json={"tribe": "gauls"})
+    v3 = _village(client, acc["account_id"], "03")
+    _clear_village_tribe(client, v3["village_id"])
 
     resp = client.put(
         f"/api/v1/game-accounts/{acc['account_id']}", json={"tribe": "teutons"}
@@ -145,7 +163,11 @@ def test_changing_birth_tribe_moves_following_villages_only(
     assert resp.status_code == 200, resp.text
     assert resp.json()["tribe"] == "teutons"
     assert resp.json()["birth_tribe"] == "teutons"
-    assert _villages(client, acc["account_id"]) == {"01": "teutons", "02": "gauls"}
+    assert _villages(client, acc["account_id"]) == {
+        "01": "romans",
+        "02": "gauls",
+        "03": "teutons",
+    }
 
 
 def test_account_without_tribe_gets_villages_without_tribe(client: TestClient) -> None:
@@ -202,18 +224,28 @@ def test_rollback_window_tribe_change_wins_over_stale_birth_tribe(
     assert _villages(client, acc["account_id"]) == {"01": "gauls", "02": "gauls"}
 
 
-def test_rollback_window_stale_birth_tribe_villages_follow_on_multi_tribe_world(
+def test_rollback_window_multi_tribe_world_set_villages_do_not_follow(
     client: TestClient,
 ) -> None:
-    """征服保留部族的世界：還停在舊 birth_tribe 的村莊也算「跟著出生部族」."""
+    """征服保留部族的世界、退回舊版期間 birth_tribe 變舊的：
+
+    部族等於舊 birth_tribe（romans）或舊 tribe（teutons）的村莊都不動，
+    只有 NULL 的村莊跟著改。
+    """
     acc = _account(client, "romans")
     client.patch(
         f"/api/v1/game-worlds/{acc['world_id']}", json={"keep_tribe_on_conquest": True}
     )
-    _village(client, acc["account_id"], "01")  # romans（舊的出生部族）
+    _village(client, acc["account_id"], "01")  # romans（= 舊的 birth_tribe）
     v2 = _village(client, acc["account_id"], "02")
-    client.put(f"/api/v1/villages/{v2['village_id']}", json={"tribe": "egyptians"})
+    client.put(f"/api/v1/villages/{v2['village_id']}", json={"tribe": "teutons"})
+    v3 = _village(client, acc["account_id"], "03")
+    _clear_village_tribe(client, v3["village_id"])
     _old_version_changes_tribe(client, acc["account_id"], "teutons")
 
     client.put(f"/api/v1/game-accounts/{acc['account_id']}", json={"tribe": "gauls"})
-    assert _villages(client, acc["account_id"]) == {"01": "gauls", "02": "egyptians"}
+    assert _villages(client, acc["account_id"]) == {
+        "01": "romans",
+        "02": "teutons",
+        "03": "gauls",
+    }
