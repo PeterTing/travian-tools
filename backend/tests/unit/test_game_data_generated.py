@@ -323,10 +323,10 @@ def test_every_verified_effect_level_matches_kb() -> None:
         (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
     )
     pending = set(gen["effectsPending"])
-    assert pending == {"academy", "blacksmith"}
-    # 2026-10-11：這三棟照遊戲內說明＋官方說明頁核對（不是知識庫），下面另外測
+    assert pending == set()
+    # 2026-10-11：這五棟照遊戲內說明＋官方說明頁核對（不是知識庫），下面另外測；研究院、盔甲廠是 PM 決定的寫法
     official = set(gen["effectSources"])
-    assert official == {"embassy", "rally_point", "treasury"}
+    assert official == {"academy", "blacksmith", "embassy", "rally_point", "treasury"}
     data = json.loads(
         (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
     )["buildings"]
@@ -430,10 +430,28 @@ def test_pending_crosscheck_evidence_has_no_account_identifiers() -> None:
         ("rally_point", 5, "資源田"),
         ("rally_point", 10, "山洞、石匠鋪、陷阱機以外"),
         ("rally_point", 20, "2 個目標"),
+        ("academy", 1, "研究新兵種；可研究的兵種依部族不同"),
+        ("academy", 20, "研究新兵種；可研究的兵種依部族不同"),
+        ("blacksmith", 1, "改良部隊的武器和護甲"),
+        ("blacksmith", 20, "等級越高，可以改良得越多"),
     ],
 )
 def test_official_effects_2026_10_11(bid: str, level: int, text: str) -> None:
     assert text in (_lv(bid, level).effect_description or "")
+
+
+def test_smithy_effect_is_s40_wording_not_percent() -> None:
+    """PM 2026-10-11：盔甲廠效果照 S40，不寫數字；舊的「攻擊力 +1.5%/級」跟 S40 不符。研究院也不寫數字。"""
+    data = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    for bid in ("blacksmith", "academy"):
+        b = data[bid]
+        assert "%" not in b["description_zh"] and "%" not in b["description_en"], bid
+        assert all("%" not in lv["effect_description"] for lv in b["levels"]), bid
+    assert "耗糧" in data["blacksmith"]["description_zh"]
+    assert "crop consumption" in data["blacksmith"]["description_en"]
+    assert "依部族不同" in data["academy"]["description_zh"]
 
 
 def test_embassy_no_longer_claims_members_per_level() -> None:

@@ -60,7 +60,7 @@ export default function BuildingVerifyMark({ buildingId, className = '', onDark 
     )
   }
   if (isBuildingVerified(buildingId)) {
-    // 數字核對過、效果還沒（研究院、盔甲廠）：沒有 ✓
+    // 數字核對過、效果還沒（2026-10-11 起沒有這種建築，機制保留）：沒有 ✓
     if (variant === 'list') {
       return (
         <span

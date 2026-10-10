@@ -52,7 +52,7 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
     note: '資源田、加成建築的花費和時間：官方知識庫；0 級產量：EU12 遊戲內資源田頁（2026-10-11）；排序用的 Plus 相乘：官方 S129（P0-23），不放灰標；加成建築資料又標待驗證時第二行「成本」放 building',
   },
   'features/guideCalcs/components/LaunchSimCalculator.tsx': {
-    chips: [['launchSim']],
-    note: '第二行一個灰標：「第 X 天」＝試算表每一步加總（launchSim）；時數用同一份資料，標題不重複放。開拓者花費沒有用在計算裡，P0-17 (b) 從摘要拿掉（明細最後一列仍列出，旁邊有 units 灰標）',
+    chips: [],
+    note: 'PM 2026-10-11：是模型估算，不放灰標（LAUNCH_SIM_ESTIMATE_ONLY）；第二行「第 X 天」下面一行 12px 灰字「依模型估算，實際會因任務、冒險和操作不同」。開拓者花費沒有用在計算裡，P0-17 (b) 從摘要拿掉（明細最後一列仍列出，旁邊有 units 灰標）',
   },
 }

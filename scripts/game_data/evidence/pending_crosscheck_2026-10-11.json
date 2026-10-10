@@ -52,7 +52,8 @@
       "quotes": [
         "The higher the Smithy level, the more you can improve your units.",
         "The effect strength depends on the unit’s crop consumption — higher-upkeep units gain a larger improvement per upgrade level."
-      ]
+      ],
+      "text": "Go to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nAll collectionsBasic GameplayVillageTroop Upgrades and Smithy\nTroop Upgrades and Smithy\nTroop Upgrades and Smithy\n\nThe strength of your troops in attack and defense can be improved in several ways — through hero items, Smithy upgrades, and alliance bonuses.\n\n1. Hero Items\nWeapons\n\nEquipping your hero with right-hand weapons increases the attack and defense values of specific troop types.\n> Hero Item Overview and Mounts\n\nHorn of the Natarian\n\nThis special hero item increases the attack strength of your hero and all accompanying troops when attacking the Natars.\n\n2. Alliance Metallurgy Bonus\n\nYour alliance can unlock the Metallurgy Bonus, which boosts both offensive and defensive power for all members’ troops.\n> Alliance Bonuses\n\n3. The Smithy\n\nThe Smithy improves the weapons and armor of your units.\n\nEach upgrade increases the combat efficiency of a troop type.\n\nThe higher the Smithy level, the more you can improve your units.\n\nThe improvement level is specific to the village where the Smithy is located.\n\nKey Details\n\nUpgrades apply to all units of that type trained in the same village.\n\nUnits trained in another village are not affected.\n\nThe effect strength depends on the unit’s crop consumption — higher-upkeep units gain a larger improvement per upgrade level.\n\nWhen troop merging is enabled, merged units inherit the upgrade level of the village they are moved to.\n\nTip:\nAlways keep upgrading your Smithy as your army grows. Even small improvements across many troops add up to a massive difference in battle outcomes.\n\nDid this answer your question?\n😞\n😐\n😁\n1. Hero Items\nWeapons\nHorn of the Natarian\n2. Alliance Metallurgy Bonus\n3. The Smithy\nKey Details\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\n               \nAsk a question!"
     },
     "s187": {
       "url": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
@@ -124,7 +125,18 @@
       "sources": [
         "official_articles.s71：'Boots and Tournament Square bonuses add together'，範例公式 (1+0.25+2) 是相加"
       ],
-      "caveat": "S71 範例算術有錯（20 級寫成 +500%、5.65× 應為 7.8×）；採用的是它明寫的『相加』規則，不是範例數字"
+      "caveat": "S71 範例算術有錯（20 級寫成 +500%、5.65× 應為 7.8×）；採用的是它明寫的『相加』規則，不是範例數字",
+      "second_source_pass_2026-10-11": {
+        "status": "沒有找到第二份獨立出處（狀態先不改）",
+        "checked": [
+          "support.travian.com 舊版 Freshdesk 7000068300：跟 S71 同一篇（內容逐句相同），不算獨立",
+          "S93 Hero Armour Items：只寫靴子 +25/50/75%、20 格以外、英雄要同行，沒寫怎麼跟競技場疊加",
+          "S45 Hero overview：只連到 S71",
+          "EU12／ts11 遊戲內競技場說明（building/14）：只寫 20 格門檻，沒提靴子",
+          "官方知識庫：競技場和靴子都用同一個 troopSpeed 百分比欄位，只能推論可能相加，不是明文"
+        ],
+        "note": "S71 還有一處自相矛盾：競技場每級 +20% 寫成「multiplicative after 20 fields」，但同一篇的表和知識庫都是線性"
+      }
     },
     "fieldLevelZero": {
       "result": "verified",
@@ -158,12 +170,20 @@
       "change": "舊效果文字沒有出處，換成官方的投石目標等級"
     },
     "buildingEffect.academy": {
-      "result": "pending",
-      "reason": "效果依種族不同，要 PM 決定怎麼呈現"
+      "result": "verified (PM 決定 2026-10-11，#45)",
+      "decision": "不寫數字；效果文字「研究新兵種；可研究的兵種依部族不同」",
+      "sources": [
+        "ts11 遊戲內說明 manual/building/22：「研究院是用來研究新的兵種。研究院等級越高，越高級的兵種就可以被開發。」",
+        "ts11 遊戲內兵種說明的研究院等級需求各族不同（evidence/ts11_manual_2026-10-10.json troops：羅馬禁衛兵 1、帝國兵 5；日耳曼斧頭兵 3；高盧探路者 5）"
+      ]
     },
     "buildingEffect.blacksmith": {
-      "result": "pending",
-      "reason": "目前『攻擊力 +1.5%/級』跟 official_articles.s40 不符，措辭要 PM 定"
+      "result": "verified (PM 決定 2026-10-11，#45)",
+      "decision": "效果文字直接照 S40 的寫法，不寫數字；舊的「攻擊力 +1.5%/級」刪掉。升級公式數字仍待驗證（smithyFormula）",
+      "sources": [
+        "official_articles.s40（全文＋sha256）",
+        "ts11 遊戲內說明 manual/building/13"
+      ]
     },
     "smithyFormula": {
       "result": "pending",
@@ -172,6 +192,10 @@
     "spartanNormalWorldTimes": {
       "result": "pending",
       "reason": "EU12、ts11 遊戲內說明都沒有斯巴達（manual troops 71/78/79 回 error）"
+    },
+    "launchSim": {
+      "result": "no chip (PM 決定 2026-10-11，#45)",
+      "decision": "是模型估算，不放待驗證灰標；結果下面一行 12px 灰字「依模型估算，實際會因任務、冒險和操作不同」"
     }
   }
 }

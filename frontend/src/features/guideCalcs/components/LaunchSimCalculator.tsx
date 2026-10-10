@@ -8,6 +8,7 @@ import { TRIBES } from '../data/tribes/index';
 import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import { LAUNCH_SIM_ESTIMATE_ONLY } from '@/lib/pendingNotes'
 
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import { CalcBar } from '@/components/autofill/CalcFrame'
@@ -168,19 +169,29 @@ export default function LaunchSimCalculator() {
             // 一行一個灰標，依數字出現順序：「第 X 天」＝試算表每一步花費加總÷產量（launchSim）、
             // 「開拓者」花費（社群整理的兵種數字，units）。上面的時數用同一份資料，標題不另外放
             // 開拓者花費沒有用在計算裡，摘要不放（P0-17 (b)）；明細最後一列仍列出，給玩家參考
-            <SummaryPending kinds={['launchSim']} testId="launch-sim-summary-settlers">
-              {lang === 'en'
-                ? `Day ${(result.totalHours / 24).toFixed(1)}`
-                : `第 ${(result.totalHours / 24).toFixed(1)} 天`}
-            </SummaryPending>
+            // PM 2026-10-11：模型估算，不放灰標（LAUNCH_SIM_ESTIMATE_ONLY），下面一行 12px 灰字說明
+            <>
+              <SummaryPending kinds={LAUNCH_SIM_ESTIMATE_ONLY ? [] : ['launchSim']} testId="launch-sim-summary-settlers">
+                {lang === 'en'
+                  ? `Day ${(result.totalHours / 24).toFixed(1)}`
+                  : `第 ${(result.totalHours / 24).toFixed(1)} 天`}
+              </SummaryPending>
+              {LAUNCH_SIM_ESTIMATE_ONLY && (
+                <span className="block text-xs text-gray-500" data-testid="launch-sim-estimate-note">
+                  {lang === 'en'
+                    ? 'Model estimate; real results vary with quests, adventures and how you play.'
+                    : '依模型估算，實際會因任務、冒險和操作不同'}
+                </span>
+              )}
+            </>
           }
         >
           <PendingRow className={s.row}>
-            <span className={s.label}>{lang === 'en' ? 'Total hours' : '總時數'} <PendingVerifyChip kind="launchSim" /></span>
+            <span className={s.label}>{lang === 'en' ? 'Total hours' : '總時數'}{!LAUNCH_SIM_ESTIMATE_ONLY && <> <PendingVerifyChip kind="launchSim" /></>}</span>
             <span className={s.value}>{result.totalHours.toFixed(1)} h</span>
           </PendingRow>
           <PendingRow className={s.row}>
-            <span className={s.label}>{lang === 'en' ? 'Server day' : '伺服器天'} <PendingVerifyChip kind="launchSim" /></span>
+            <span className={s.label}>{lang === 'en' ? 'Server day' : '伺服器天'}{!LAUNCH_SIM_ESTIMATE_ONLY && <> <PendingVerifyChip kind="launchSim" /></>}</span>
             <span className={s.value}>
               {lang === 'en' ? 'Day ' : '第 '}
               {(result.totalHours / 24).toFixed(1)}
@@ -199,7 +210,7 @@ export default function LaunchSimCalculator() {
               <PendingRow as="tr" className="h-11" tableColSpan={5}>
                 <th>#</th>
                 <th>{lang === 'en' ? 'Milestone' : '里程碑'}</th>
-                <th>{lang === 'en' ? 'Cum. cost' : '累計成本'} <PendingVerifyChip kind="launchSim" /></th>
+                <th>{lang === 'en' ? 'Cum. cost' : '累計成本'}{!LAUNCH_SIM_ESTIMATE_ONLY && <> <PendingVerifyChip kind="launchSim" /></>}</th>
                 <th>{lang === 'en' ? 'Cum. hours' : '累計時數'}</th>
                 <th>{lang === 'en' ? 'Day' : '天'}</th>
               </PendingRow>

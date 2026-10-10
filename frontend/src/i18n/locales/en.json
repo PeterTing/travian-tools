@@ -1255,6 +1255,14 @@
     "effectRallyPoint": {
       "what": "The effect is checked.",
       "source": "Source: official help pages S65 and S181 (they agree: the Rally Point level sets which catapult targets you can pick)."
+    },
+    "effectAcademy": {
+      "what": "The effect is checked (no numbers).",
+      "source": "Source: the in-game help (the Academy researches new troop types); each tribe's troop help lists different Academy levels."
+    },
+    "effectBlacksmith": {
+      "what": "The effect is checked (worded as the official help page puts it).",
+      "source": "Source: official help page S40 and the in-game help. The upgrade formula numbers are not checked yet."
     }
   },
   "cropFieldsCalc": {

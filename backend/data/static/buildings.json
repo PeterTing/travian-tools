@@ -1968,8 +1968,8 @@
       "name_en": "Academy",
       "category": "research",
       "max_level": 20,
-      "description_zh": "研發新兵種的建築。等級越高，可研發的兵種越多。需要達到特定等級才能研發高級兵種。",
-      "description_en": "Building for researching new troop types. Higher levels unlock more advanced troop research. Specific levels required to research advanced units.",
+      "description_zh": "研究新兵種。研究院等級越高，可以研究越高級的兵種；可研究的兵種依部族不同。",
+      "description_en": "Researches new troop types. The higher its level, the more advanced the troops you can research; which troops you can research depends on your tribe.",
       "prerequisites": [
         {
           "building_id": "main_building",
@@ -1990,8 +1990,8 @@
           "build_time_base": 2000,
           "population": 4,
           "culture_points": 5,
-          "effect_value": 1,
-          "effect_description": "可研發基礎步兵",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 5
         },
         {
@@ -2003,8 +2003,8 @@
           "build_time_base": 2620,
           "population": 2,
           "culture_points": 6,
-          "effect_value": 2,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 6
         },
         {
@@ -2016,8 +2016,8 @@
           "build_time_base": 3340,
           "population": 2,
           "culture_points": 7,
-          "effect_value": 3,
-          "effect_description": "可研發偵察兵",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 7
         },
         {
@@ -2029,8 +2029,8 @@
           "build_time_base": 4170,
           "population": 2,
           "culture_points": 8,
-          "effect_value": 4,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 8
         },
         {
@@ -2042,8 +2042,8 @@
           "build_time_base": 5140,
           "population": 2,
           "culture_points": 10,
-          "effect_value": 5,
-          "effect_description": "可研發騎兵",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 10
         },
         {
@@ -2055,8 +2055,8 @@
           "build_time_base": 6260,
           "population": 3,
           "culture_points": 12,
-          "effect_value": 6,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 12
         },
         {
@@ -2068,8 +2068,8 @@
           "build_time_base": 7570,
           "population": 3,
           "culture_points": 14,
-          "effect_value": 7,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 14
         },
         {
@@ -2081,8 +2081,8 @@
           "build_time_base": 9080,
           "population": 3,
           "culture_points": 17,
-          "effect_value": 8,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 17
         },
         {
@@ -2094,8 +2094,8 @@
           "build_time_base": 10830,
           "population": 3,
           "culture_points": 21,
-          "effect_value": 9,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 21
         },
         {
@@ -2107,8 +2107,8 @@
           "build_time_base": 12860,
           "population": 3,
           "culture_points": 25,
-          "effect_value": 10,
-          "effect_description": "可研發撞車",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 25
         },
         {
@@ -2120,8 +2120,8 @@
           "build_time_base": 15220,
           "population": 3,
           "culture_points": 30,
-          "effect_value": 11,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 30
         },
         {
@@ -2133,8 +2133,8 @@
           "build_time_base": 17950,
           "population": 3,
           "culture_points": 36,
-          "effect_value": 12,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 36
         },
         {
@@ -2146,8 +2146,8 @@
           "build_time_base": 21130,
           "population": 3,
           "culture_points": 43,
-          "effect_value": 13,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 43
         },
         {
@@ -2159,8 +2159,8 @@
           "build_time_base": 24810,
           "population": 3,
           "culture_points": 51,
-          "effect_value": 14,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 51
         },
         {
@@ -2172,8 +2172,8 @@
           "build_time_base": 29080,
           "population": 3,
           "culture_points": 62,
-          "effect_value": 15,
-          "effect_description": "可研發投石類攻城武器",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 62
         },
         {
@@ -2185,8 +2185,8 @@
           "build_time_base": 34030,
           "population": 4,
           "culture_points": 74,
-          "effect_value": 16,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 74
         },
         {
@@ -2198,8 +2198,8 @@
           "build_time_base": 39770,
           "population": 4,
           "culture_points": 89,
-          "effect_value": 17,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 89
         },
         {
@@ -2211,8 +2211,8 @@
           "build_time_base": 46440,
           "population": 4,
           "culture_points": 106,
-          "effect_value": 18,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 106
         },
         {
@@ -2224,8 +2224,8 @@
           "build_time_base": 54170,
           "population": 4,
           "culture_points": 128,
-          "effect_value": 19,
-          "effect_description": "解鎖更多研究",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 128
         },
         {
@@ -2237,8 +2237,8 @@
           "build_time_base": 63130,
           "population": 4,
           "culture_points": 153,
-          "effect_value": 20,
-          "effect_description": "可研發所有兵種",
+          "effect_value": 1.0,
+          "effect_description": "研究新兵種；可研究的兵種依部族不同",
           "cp_per_day": 153
         }
       ],
@@ -2250,8 +2250,8 @@
       "name_en": "Blacksmith",
       "category": "military_upgrade",
       "max_level": 20,
-      "description_zh": "研究提升兵種攻擊力的建築。每升一級所有已研究兵種的攻擊力 +1.5%，滿級時攻擊力 +30%。",
-      "description_en": "Building for improving troop attack. Each level adds +1.5% attack to all researched troops, max level provides +30% attack.",
+      "description_zh": "改良部隊的武器和護甲。每次改良提升一種兵種的戰鬥效率；盔甲廠等級越高，可以改良得越多。改良只對在這個村莊訓練的該兵種有效；效果強弱依兵種的耗糧而定，耗糧越高的兵種每級提升越多。",
+      "description_en": "Improves the weapons and armor of your units. Each upgrade increases the combat efficiency of one troop type, and the higher the Smithy level, the more you can improve your units. Upgrades apply to units of that type trained in the same village; the effect strength depends on the unit's crop consumption, so higher-upkeep units gain more per upgrade level.",
       "prerequisites": [
         {
           "building_id": "main_building",
@@ -2272,8 +2272,8 @@
           "build_time_base": 2000,
           "population": 4,
           "culture_points": 2,
-          "effect_value": 1.5,
-          "effect_description": "攻擊力 +1.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 2
         },
         {
@@ -2285,8 +2285,8 @@
           "build_time_base": 2620,
           "population": 2,
           "culture_points": 3,
-          "effect_value": 3.0,
-          "effect_description": "攻擊力 +3%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 3
         },
         {
@@ -2298,8 +2298,8 @@
           "build_time_base": 3340,
           "population": 2,
           "culture_points": 3,
-          "effect_value": 4.5,
-          "effect_description": "攻擊力 +4.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 3
         },
         {
@@ -2311,8 +2311,8 @@
           "build_time_base": 4170,
           "population": 2,
           "culture_points": 4,
-          "effect_value": 6.0,
-          "effect_description": "攻擊力 +6%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 4
         },
         {
@@ -2324,8 +2324,8 @@
           "build_time_base": 5140,
           "population": 2,
           "culture_points": 5,
-          "effect_value": 7.5,
-          "effect_description": "攻擊力 +7.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 5
         },
         {
@@ -2337,8 +2337,8 @@
           "build_time_base": 6260,
           "population": 3,
           "culture_points": 6,
-          "effect_value": 9.0,
-          "effect_description": "攻擊力 +9%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 6
         },
         {
@@ -2350,8 +2350,8 @@
           "build_time_base": 7570,
           "population": 3,
           "culture_points": 7,
-          "effect_value": 10.5,
-          "effect_description": "攻擊力 +10.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 7
         },
         {
@@ -2363,8 +2363,8 @@
           "build_time_base": 9080,
           "population": 3,
           "culture_points": 9,
-          "effect_value": 12.0,
-          "effect_description": "攻擊力 +12%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 9
         },
         {
@@ -2376,8 +2376,8 @@
           "build_time_base": 10830,
           "population": 3,
           "culture_points": 10,
-          "effect_value": 13.5,
-          "effect_description": "攻擊力 +13.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 10
         },
         {
@@ -2389,8 +2389,8 @@
           "build_time_base": 12860,
           "population": 3,
           "culture_points": 12,
-          "effect_value": 15.0,
-          "effect_description": "攻擊力 +15%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 12
         },
         {
@@ -2402,8 +2402,8 @@
           "build_time_base": 15220,
           "population": 3,
           "culture_points": 15,
-          "effect_value": 16.5,
-          "effect_description": "攻擊力 +16.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 15
         },
         {
@@ -2415,8 +2415,8 @@
           "build_time_base": 17950,
           "population": 3,
           "culture_points": 18,
-          "effect_value": 18.0,
-          "effect_description": "攻擊力 +18%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 18
         },
         {
@@ -2428,8 +2428,8 @@
           "build_time_base": 21130,
           "population": 3,
           "culture_points": 21,
-          "effect_value": 19.5,
-          "effect_description": "攻擊力 +19.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 21
         },
         {
@@ -2441,8 +2441,8 @@
           "build_time_base": 24810,
           "population": 3,
           "culture_points": 26,
-          "effect_value": 21.0,
-          "effect_description": "攻擊力 +21%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 26
         },
         {
@@ -2454,8 +2454,8 @@
           "build_time_base": 29080,
           "population": 3,
           "culture_points": 31,
-          "effect_value": 22.5,
-          "effect_description": "攻擊力 +22.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 31
         },
         {
@@ -2467,8 +2467,8 @@
           "build_time_base": 34030,
           "population": 4,
           "culture_points": 37,
-          "effect_value": 24.0,
-          "effect_description": "攻擊力 +24%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 37
         },
         {
@@ -2480,8 +2480,8 @@
           "build_time_base": 39770,
           "population": 4,
           "culture_points": 44,
-          "effect_value": 25.5,
-          "effect_description": "攻擊力 +25.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 44
         },
         {
@@ -2493,8 +2493,8 @@
           "build_time_base": 46440,
           "population": 4,
           "culture_points": 53,
-          "effect_value": 27.0,
-          "effect_description": "攻擊力 +27%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 53
         },
         {
@@ -2506,8 +2506,8 @@
           "build_time_base": 54170,
           "population": 4,
           "culture_points": 64,
-          "effect_value": 28.5,
-          "effect_description": "攻擊力 +28.5%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 64
         },
         {
@@ -2519,8 +2519,8 @@
           "build_time_base": 63130,
           "population": 4,
           "culture_points": 77,
-          "effect_value": 30.0,
-          "effect_description": "攻擊力 +30%",
+          "effect_value": 1.0,
+          "effect_description": "改良部隊的武器和護甲；等級越高，可以改良得越多",
           "cp_per_day": 77
         }
       ],

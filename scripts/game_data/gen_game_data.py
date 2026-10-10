@@ -590,6 +590,29 @@ EFFECT_OFFICIAL: dict[str, dict] = {
         "description_en": "Where troops gather and are sent out. Its level sets which catapult targets you can pick: random only at level 1, Warehouse and Granary at 3, resource fields and resource bonus buildings at 5, everything except Cranny, Stonemason's Lodge and Trapper at 10, and two targets at 20.",
         "source": "effectRallyPoint",
     },
+    # PM 2026-10-11：研究院不寫數字。遊戲內說明（ts11 manual/building/22）＋各族兵種說明的研究院等級需求各不相同
+    "academy": {
+        "levels": [(1, "研究新兵種；可研究的兵種依部族不同")],
+        "ingame": ("22", "研究院是用來研究新的兵種。研究院等級越高，越高級的兵種就可以被開發。"),
+        "ingame_troops": [("2", "研究院 等級 1"), ("3", "研究院 等級 5"), ("13", "研究院 等級 3"), ("23", "研究院 等級 5")],
+        "official": [],
+        "description_zh": "研究新兵種。研究院等級越高，可以研究越高級的兵種；可研究的兵種依部族不同。",
+        "description_en": "Researches new troop types. The higher its level, the more advanced the troops you can research; which troops you can research depends on your tribe.",
+        "source": "effectAcademy",
+    },
+    # PM 2026-10-11：盔甲廠效果直接照官方 S40 的寫法（舊的「攻擊力 +1.5%/級」跟 S40 不符，刪掉）；升級公式數字仍待驗證（smithyFormula）
+    "blacksmith": {
+        "levels": [(1, "改良部隊的武器和護甲；等級越高，可以改良得越多")],
+        "ingame": ("13", "盔甲廠用來製造及改良您部隊的戰具，藉以增加部隊的戰力。"),
+        "official": [("s40", "The Smithy improves the weapons and armor of your units."),
+                     ("s40", "Each upgrade increases the combat efficiency of a troop type."),
+                     ("s40", "The higher the Smithy level, the more you can improve your units."),
+                     ("s40", "Upgrades apply to all units of that type trained in the same village."),
+                     ("s40", "The effect strength depends on the unit\u2019s crop consumption \u2014 higher-upkeep units gain a larger improvement per upgrade level.")],
+        "description_zh": "改良部隊的武器和護甲。每次改良提升一種兵種的戰鬥效率；盔甲廠等級越高，可以改良得越多。改良只對在這個村莊訓練的該兵種有效；效果強弱依兵種的耗糧而定，耗糧越高的兵種每級提升越多。",
+        "description_en": "Improves the weapons and armor of your units. Each upgrade increases the combat efficiency of one troop type, and the higher the Smithy level, the more you can improve your units. Upgrades apply to units of that type trained in the same village; the effect strength depends on the unit's crop consumption, so higher-upkeep units gain more per upgrade level.",
+        "source": "effectBlacksmith",
+    },
 }
 
 
@@ -597,7 +620,8 @@ def apply_official_effects(buildings: dict) -> dict[str, str]:
     """EFFECT_OFFICIAL 寫進效果欄；出處原文每一句都要在 evidence 裡（遊戲內說明＋官方說明頁）。回傳 {bid: 出處 key}."""
     ev = json.loads(PENDING_CROSSCHECK.read_text(encoding="utf-8"))
     arts = ev["official_articles"]
-    manual = json.loads(TS11_MANUAL_STATS.read_text(encoding="utf-8"))["buildings"]
+    ts11 = json.loads(TS11_MANUAL_STATS.read_text(encoding="utf-8"))
+    manual, troops = ts11["buildings"], ts11["troops"]
     sources: dict[str, str] = {}
     for bid, spec in EFFECT_OFFICIAL.items():
         for art, quote in spec["official"]:
@@ -607,6 +631,8 @@ def apply_official_effects(buildings: dict) -> dict[str, str]:
         if spec["ingame"]:
             gid, quote = spec["ingame"]
             assert quote in manual[gid]["body_text"], (bid, gid)
+        for tid, req in spec.get("ingame_troops", []):
+            assert req in troops[tid]["prereqs_text"], (bid, tid, req)
         b = buildings["buildings"][bid]
         starts = [lv for lv, _ in spec["levels"]]
         for lv in b["levels"]:
