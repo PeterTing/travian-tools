@@ -69,6 +69,13 @@ export function isBuildingEffectVerified(buildingId: string): boolean {
   return !((gen as { effectsPending?: string[] }).effectsPending ?? []).includes(buildingId)
 }
 
+/** 效果欄不是照知識庫、是照遊戲內說明＋官方說明頁核對的建築（大使館、寶物庫、集結點，2026-10-11）：✓ 說明多一段效果出處 */
+export type EffectSource = 'effectEmbassy' | 'effectTreasury' | 'effectRallyPoint'
+
+export function effectSource(buildingId: string): EffectSource | null {
+  return ((gen as { effectSources?: Record<string, string> }).effectSources?.[buildingId] as EffectSource | undefined) ?? null
+}
+
 export function isBuildingVerified(buildingId: string): boolean {
   return buildingId in gen.buildings && (PENDING[buildingId] ?? []).length === 0
 }

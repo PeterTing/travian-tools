@@ -5,6 +5,7 @@ import { resourcesApi } from '@/services/gameApi'
 import type { ResourceFieldListItem, ResourceFieldDetail, ResourceType } from '@/types/game'
 import { ingameBuildingName } from '@/lib/ingameNames'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import { FIELD_LEVEL_ZERO_VERIFIED } from '@/lib/pendingNotes'
 import BuildingIcon from '@/components/common/BuildingIcon'
 
 const RESOURCE_TYPES: { value: ResourceType; label: string; color: string }[] = [
@@ -211,7 +212,7 @@ export default function ResourcesPage() {
                         <td className="py-2 px-2 text-right font-semibold text-green-600">
                           {level.production_per_hour}
                           {/* 0 級產量官方資料沒有（官方知識庫從 1 級開始，P0-23） */}
-                          {level.level === 0 && <PendingVerifyChip kind="fieldLevelZero" className="ml-1" />}
+                          {level.level === 0 && !FIELD_LEVEL_ZERO_VERIFIED && <PendingVerifyChip kind="fieldLevelZero" className="ml-1" />}
                         </td>
                         <td className="py-2 px-2 text-right">
                           {level.cost_wood.toLocaleString()}
@@ -268,7 +269,7 @@ export default function ResourcesPage() {
                         </td>
                         <td className="py-2 px-2 text-right text-green-600">
                           +{roi.production_increase}/h
-                          {roi.from_level === 0 && <PendingVerifyChip kind="fieldLevelZero" className="ml-1" />}
+                          {roi.from_level === 0 && !FIELD_LEVEL_ZERO_VERIFIED && <PendingVerifyChip kind="fieldLevelZero" className="ml-1" />}
                         </td>
                         <td className="py-2 px-2 text-right font-semibold">
                           {formatRoiHours(roi.roi_hours)}

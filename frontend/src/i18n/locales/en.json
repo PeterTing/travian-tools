@@ -1243,6 +1243,18 @@
     "celebration": {
       "what": "Small and great celebration costs (wood, clay, iron, crop) are checked.",
       "source": "Source: Travian Answers (official, 2021 snapshot) and Travian Wiki agree."
+    },
+    "effectEmbassy": {
+      "what": "The effect is checked.",
+      "source": "Source: ts11 in-game help and official help pages S84 and S85 (join at level 1, found at level 3; up to 60 members)."
+    },
+    "effectTreasury": {
+      "what": "The effect is checked.",
+      "source": "Source: ts11 in-game help and official help page S101 (small artefact at level 10, large or unique at level 20)."
+    },
+    "effectRallyPoint": {
+      "what": "The effect is checked.",
+      "source": "Source: official help pages S65 and S181 (they agree: the Rally Point level sets which catapult targets you can pick)."
     }
   },
   "cropFieldsCalc": {

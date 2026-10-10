@@ -76,6 +76,7 @@ does not list).
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import re
@@ -546,6 +547,83 @@ EFFECT_KB_KEYS = {
 }
 EFFECT_VERIFIED: set[str] = set()
 
+# 2026-10-11 待驗證清單（evidence/pending_crosscheck_2026-10-11.json）：知識庫沒有效果欄的建築，
+# 效果改照「遊戲內說明＋官方說明頁」逐級寫，生成時檢查每一句出處原文都還在 evidence 裡。
+# (from_level, 效果文字)：從那一級起套用，到下一個 from_level 前一級為止。
+PENDING_CROSSCHECK = ROOT / "scripts/game_data/evidence/pending_crosscheck_2026-10-11.json"
+EFFECT_OFFICIAL: dict[str, dict] = {
+    # 遊戲內說明（ts11 manual/building/18）＋官方 S84、S85：1 級可加入、3 級可建立；聯盟最多 60 人（跟大使館等級無關）
+    "embassy": {
+        "levels": [(1, "可加入聯盟"), (3, "可建立聯盟")],
+        "ingame": ("18", "當您自己的大使館有等級1時，您可以加入公會，等級3時，您可以自己建立一個公會。 聯盟成員的最大數量為60。"),
+        "official": [("s84", "An alliance is a group of up to 60 players working together."),
+                     ("s85", "You can create your own alliance once your\u00a0Embassy reaches level 3."),  # 原文是不換行空白
+                     ("s85", "You have built an\u00a0Embassy level 1")],
+        "description_zh": "外交建築。1 級可加入聯盟，3 級可自己建立聯盟。聯盟成員最多 60 人，跟大使館等級無關。",
+        "description_en": "Diplomatic building. Level 1 lets you join an alliance, level 3 lets you found one. An alliance has at most 60 members, whatever the Embassy level.",
+        "source": "effectEmbassy",
+    },
+    # 遊戲內說明（ts11 manual/building/27）＋官方 S101：10 級存放小型神器，20 級存放大型或獨特神器
+    "treasury": {
+        "levels": [(1, "還不能存放神器"), (10, "可存放 1 個小型神器"), (20, "可存放 1 個大型或獨特神器")],
+        "ingame": ("27", "每個寶物庫只可以存放一個工藝品。 等級10的寶物庫可以存放一個粗糙工藝品，等級20的寶物庫可以存放一個精緻的工藝品。"),
+        "official": [("s101", "Treasury level 10 is required for small artefacts"),
+                     ("s101", "Treasury level 20 is required for large or unique artefacts")],
+        "description_zh": "存放神器。每個寶物庫只能放 1 個神器：10 級可放小型神器，20 級可放大型或獨特神器。",
+        "description_en": "Holds artefacts, one per Treasury: level 10 for a small artefact, level 20 for a large or unique one.",
+        "source": "effectTreasury",
+    },
+    # 官方 S65、S181（兩篇一致）：集結點等級決定投石攻擊能指定的目標
+    "rally_point": {
+        "levels": [(1, "投石攻擊只能打隨機目標"), (3, "投石可指定：倉庫、穀倉"),
+                   (5, "投石可再指定：資源田、鋸木廠、磚廠、鋼鐵鑄造廠、麵粉廠、麵包店"),
+                   (10, "投石可指定山洞、石匠鋪、陷阱機以外的所有建築"),
+                   (20, "投石可指定 2 個目標（至少 20 台投石類攻城武器，火力平分）")],
+        "ingame": None,
+        "official": [("s65", "Only random target available."),
+                     ("s65", "Storage buildings: Warehouse, Granary."),
+                     ("s65", "Adds resource production buildings: Resource fields, Brickyard, Iron Foundry, Sawmill, Grain Mill, Bakery."),
+                     ("s65", "Any building except Cranny, Stonemason’s Lodge, and Trapper."),
+                     ("s65", "Two targets per attack (requires at least 20 catapults). Catapult strength is split equally between both targets."),
+                     ("s181", "RP Level 20 – You can target two different buildings in one attack")],
+        "description_zh": "軍隊集結、出兵的地方。集結點等級決定投石攻擊能指定哪些目標：1 級只能隨機、3 級倉庫和穀倉、5 級加資源田和資源加成建築、10 級山洞、石匠鋪、陷阱機以外都可以、20 級可以同時指定 2 個目標。",
+        "description_en": "Where troops gather and are sent out. Its level sets which catapult targets you can pick: random only at level 1, Warehouse and Granary at 3, resource fields and resource bonus buildings at 5, everything except Cranny, Stonemason's Lodge and Trapper at 10, and two targets at 20.",
+        "source": "effectRallyPoint",
+    },
+}
+
+
+def apply_official_effects(buildings: dict) -> dict[str, str]:
+    """EFFECT_OFFICIAL 寫進效果欄；出處原文每一句都要在 evidence 裡（遊戲內說明＋官方說明頁）。回傳 {bid: 出處 key}."""
+    ev = json.loads(PENDING_CROSSCHECK.read_text(encoding="utf-8"))
+    arts = ev["official_articles"]
+    manual = json.loads(TS11_MANUAL_STATS.read_text(encoding="utf-8"))["buildings"]
+    sources: dict[str, str] = {}
+    for bid, spec in EFFECT_OFFICIAL.items():
+        for art, quote in spec["official"]:
+            a = arts[art]
+            assert hashlib.sha256(a["text"].encode("utf-8")).hexdigest() == a["text_sha256"], art
+            assert quote in a["text"], (bid, art, quote)
+        if spec["ingame"]:
+            gid, quote = spec["ingame"]
+            assert quote in manual[gid]["body_text"], (bid, gid)
+        b = buildings["buildings"][bid]
+        starts = [lv for lv, _ in spec["levels"]]
+        for lv in b["levels"]:
+            if lv["level"] == 0:
+                continue
+            i = max(k for k, s in enumerate(starts) if s <= lv["level"])
+            lv["effect_value"] = float(starts[i])
+            lv["effect_description"] = spec["levels"][i][1]
+        b["description_zh"] = spec["description_zh"]
+        b["description_en"] = spec["description_en"]
+        EFFECT_VERIFIED.add(bid)
+        sources[bid] = spec["source"]
+    return sources
+
+
+EFFECT_SOURCES: dict[str, str] = {}
+
 
 def _num(text: str) -> float:
     return float(text.replace(",", "").replace("+", "").replace("%", ""))
@@ -687,6 +765,7 @@ def gen_buildings(current: dict) -> dict:
     mbl = out["buildings"]["main_building"]["levels"]
     assert all(abs(lv["effect_value"] - mb_effect(lv["level"])) < 1e-9 for lv in mbl), "MB factor != KB"
     check_effects_against_kb(out)
+    EFFECT_SOURCES.update(apply_official_effects(out))
     mk = out["buildings"]["marketplace"]
     if not any(pr["building_id"] == "granary" for pr in mk["prerequisites"]):
         mk["prerequisites"].append({"building_id": "granary", "level": 1})
@@ -781,6 +860,8 @@ def gen_frontend(buildings: dict, cp: dict) -> dict:
         "buildingSources": {bid: building_source(bid) for bid in buildings["buildings"] if building_source(bid)},
         # 效果欄沒辦法照官方知識庫核對的建築（效果欄標題旁標「待驗證」）
         "effectsPending": sorted(bid for bid in buildings["buildings"] if bid not in EFFECT_VERIFIED),
+        # 效果欄不是照知識庫、是照遊戲內說明＋官方說明頁核對的建築：✓ 說明多一段效果出處（2026-10-11）
+        "effectSources": dict(sorted(EFFECT_SOURCES.items())),
         "villageRequirements": cp["village_requirements"],
         "startCp": cp["start_cp"],
         "celebrationCap": cp["celebration_cap"],

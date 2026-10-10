@@ -1321,6 +1321,18 @@
     "celebration": {
       "what": "小慶典、大慶典的花費（木、泥、鐵、糧）已核對。",
       "source": "出處：Travian Answers（官方，2021 年快照）、Travian Wiki 兩份來源一致"
+    },
+    "effectEmbassy": {
+      "what": "效果已核對。",
+      "source": "出處：ts11 遊戲內說明、官方說明頁 S84、S85（1 級可加入聯盟、3 級可建立；聯盟最多 60 人）。"
+    },
+    "effectTreasury": {
+      "what": "效果已核對。",
+      "source": "出處：ts11 遊戲內說明、官方說明頁 S101（10 級放小型神器、20 級放大型或獨特神器）。"
+    },
+    "effectRallyPoint": {
+      "what": "效果已核對。",
+      "source": "出處：官方說明頁 S65、S181（兩篇一致：集結點等級決定投石能指定的目標）。"
     }
   },
   "cropFieldsCalc": {

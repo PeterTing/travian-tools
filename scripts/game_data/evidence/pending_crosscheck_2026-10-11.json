@@ -1,0 +1,177 @@
+{
+  "_what": "2026-10-11 待驗證清單交叉比對（PM／幕僚長規則：每項查一輪就下結論；✓ 只能是遊戲內實測、官方出處，或兩份可追溯來源、互不引用的獨立來源）。官方說明頁原文（innerText）與 EU12 遊戲內唯讀讀取的原文都在這裡。不含帳號名稱、大廳 email、村莊名稱、座標。",
+  "text_method": "official_articles.*.text＝用瀏覽器打開頁面、等網路靜止後 document.body.innerText 的原文；text_sha256＝sha256(text 的 UTF-8 位元組)，可重算。原始 HTML 只記 html_sha256（檔案在 review/pending-2026-10-11/official/，不進 repo）。",
+  "official_articles": {
+    "s71": {
+      "url": "https://support.travian.com/en/articles/71-troops-speed-increase-and-tournament-square",
+      "fetched_at_utc": "2026-10-10T19:22:26.974Z",
+      "text_sha256": "2b5e8c518b6bf0b16cc6dbffaca9dc3b2fa0c2421e7b3bc5acf771eea2a1c907",
+      "html_sha256": "af21cfaa0482eddbffbd08e79cba1c3149b96bd263a91e1f6d65a09125f25ca0",
+      "text": "Go to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nAll collectionsAdvanced GameplayAdvanced featuresTroops Speed Increase & Tournament Square\nTroops Speed Increase & Tournament Square\nTroops Speed Increase & Tournament Square\n\nTroop movement speed can be increased in several ways. These bonuses can come from hero items, artefacts, and the Tournament Square building. All speed bonuses are stackable, but some work differently depending on distance.\n\nHero Items That Increase Speed\nPennants\n\nIncrease troop movement speed between your own villages.\n\nBonus applies only when the hero travels with the troops.\n\nBonus range: 30%–50% faster.\n\nStandards\n\nIncrease troop movement speed between alliance or confederacy members.\n\nBonus applies only when the hero travels with the troops.\n\nBonus range: 15%–25% faster.\n\nHero Item Overview and Mounts\n\nBoots\n\nIncrease troop movement speed after the first 20 fields of travel.\n\nBonus applies only when the hero travels with the troops.\n\nBonus range: 25%–75% faster.\n\nThe first 20 fields are always traveled without this bonus.\n\nHero Armour\n\nArtefact Bonus\nTitan’s Boots\n\nLarge artefact: 1.5× speed\n\nSmall or unique artefact: 2× speed\n\nThese bonuses apply regardless of distance.\n\nArtefacts\n\nArtefact Effects\n\nTournament Square\n\nThe Tournament Square increases movement speed after the first 20 fields.\n\nEach level adds +20% speed (multiplicative after 20 fields).\n\nAt level 20, the total bonus is +500%, meaning troops move 5× their base speed after the first 20 fields.\n\nTournament Square requires Rally Point level 15.\n\nHow Multiple Bonuses Stack\n\nSpeed bonuses follow specific stacking rules:\n\nBoots and Tournament Square bonuses add together, but only apply after 20 fields.\n\nAll other bonuses (Pennants, Standards, Artefacts) multiply with each other.\n\nFinal speed is calculated by multiplying all applicable bonuses.\n\nExample\n\nBoots of the Mercenary: +25%\n\nTournament Square level 10: +200%\n\nArtefact bonus: ×2\n\nStandard: +20%\n\nFirst 20 fields:\nBase speed × 2 (artefact) × 1.2 (standard) = 2.4× base speed\n\nAfter 20 fields:\nBase speed × 2 (artefact) × 1.2 (standard) × (1 + 0.25 + 2) = 5.65× base speed\n\nIn the table below you can find the construction costs and time, as well as the bonus for each level of Tournament Square.\n\nDid this answer your question?\n😞\n😐\n😁\nHero Items That Increase Speed\nPennants\nStandards\nBoots\nArtefact Bonus\nTitan’s Boots\nTournament Square\nHow Multiple Bonuses Stack\nExample\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\n               \nAsk a question!"
+    },
+    "s84": {
+      "url": "https://support.travian.com/en/articles/84-alliance-confed-and-nap",
+      "fetched_at_utc": "2026-10-10T19:22:35.011Z",
+      "text_sha256": "34d57177bff028782a86003038d54c52c2557ca3db5b74c29504f4a3ec99838e",
+      "html_sha256": "b5075e837d45772bdd2ef1abc42960941f03babcfb96f400149d8ca6742e0ea0",
+      "text": "Go to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nAll collectionsAdvanced GameplayAllianceAlliance, Confed & NAP\nAlliance, Confed & NAP\nAlliance, Confed & NAP\n\nTravian: Legends is built on cooperation and diplomacy. Joining or leading an alliance allows players to coordinate attacks, defenses, and resource sharing — all crucial to victory in the endgame.\n\nWhat Is an Alliance?\n\nAn alliance is a group of up to 60 players working together.\nAlliances can share intelligence, reinforce one another, trade resources, and compete for artefacts that grant powerful bonuses.\n\nAction\n\n\t\n\nRequirement\n\n\n\n\nCreate an Alliance\n\n\t\n\nEmbassy level 3\n\n\n\n\nJoin an Alliance\n\n\t\n\nEmbassy level 1\n\nIf the Embassy is destroyed, the alliance remains intact — no members are removed.\n\nAlliances can form larger partnerships known as confederacies, or choose non-aggression pacts (NAPs) to establish peace with others.\n\nConfederacies\n\nA confederacy is a formal cooperation agreement between up to three alliances.\nMembers of a confederacy can:\n\nSend resources and reinforcements to one another.\n\nPlan joint attacks and shared defenses.\n\nCoordinate against common enemies.\n\nConfederacies must be interconnected, meaning all alliances are directly linked — not just indirectly through others.\n\nOnly alliances in the same confederacy can exchange resources and reinforcements.\nNAPs are not affected by these restrictions.\n\nHow to Create a Confederacy\n\nAlliance A sends a confederacy offer to another alliance (e.g., Alliance B).\n\nIf Alliance B accepts, the confederacy is formed.\n\nTo add a third alliance (Alliance C):\n\nOne existing alliance sends the offer to Alliance C.\n\nThe other alliance(s) in the confederacy must approve it.\n\nAlliance C then accepts to finalize the addition.\n\nAny alliance can leave a confederacy at any time.\nAn alliance can also be removed, but only if all remaining confederacy members agree.\n\nExample: Alliance Diplomacy Screen\n\nThis menu allows leaders to:\n\nOffer a confederacy or NAP,\n\nDeclare war,\n\nManage existing relationships (listed below).\n\nTip:\nIn your alliance description, you can automatically display connections by using tags like [diplomatic], [ally], [nap], or [war].\n\nSending Reinforcements and Resources\n\nYou can only send resources or reinforcements to:\n\nYour own villages\n\nMembers of your alliance\n\nMembers of your confederacy\n\nThe Marketplace remains open to all players, but you can restrict offers to alliance members using the “own alliance only” checkbox.\n\nExample:\n\nLeaving an Alliance or Confederacy\n\nWhen a connection that allows reinforcement or resource exchange is broken (for example, a player leaves an alliance, or an alliance leaves a confederacy):\n\nNew resources cannot be sent to villages outside the alliance or confederacy.\n\nMerchants already en route will still deliver their cargo.\n\nNew reinforcements cannot be sent.\n\nA 1-hour timer starts.\n\nAfter one hour:\n\nThe system checks all active memberships.\n\nAny reinforcements from players no longer in the same alliance or confederacy are automatically returned.\n\nReinforcements still traveling when the timer ends will return immediately upon arrival.\n\nIf a player rejoins or leaves again, a new 1-hour timer starts.\n\nNon-Aggression Pacts (NAPs)\n\nA Non-Aggression Pact (NAP) is a diplomatic agreement where two alliances agree not to attack each other. However, unlike confederacies, NAPs do not allow resource or troop sharing.\n\nThey are often used by strong alliances to avoid mutual damage while focusing on other fronts.\nEach alliance may hold up to three NAPs at a time.\n\nWar\n\nA war is a declared state of hostility between alliances.\nConfederacy members typically support each other during wars by reinforcing and sharing strategy.\n\nSummary\n\nDiplomatic Type\n\n\t\n\nMaximum Members\n\n\t\n\nAllows Resources or\nReinforcements\n\n\t\n\nTypical Purpose\n\n\n\n\nAlliance\n\n\t\n\n60 players\n\n\t\n\nYes (within alliance)\n\n\t\n\nCooperative play\n\n\n\n\nConfederacy\n\n\t\n\n3 alliances\n\n\t\n\nYes\n\n\t\n\nJoint defense & coordination\n\n\n\n\nNAP\n\n\t\n\n3 per alliance\n\n\t\n\nNo\n\n\t\n\nPeace & neutrality\n\n\n\n\nWar\n\n\t\n\nUnlimited\n\n\t\n\nNo\n\n\t\n\nActive hostility\n\nTips\n\nForm confederacies with trusted alliances to share defense and resources effectively.\n\nUse NAPs for short-term peace, but be prepared — they don’t guarantee long-term cooperation.\n\nMonitor alliance changes: when confederacy links break, reinforcement recalls begin automatically.\n\nDid this answer your question?\n😞\n😐\n😁\nWhat Is an Alliance?\nConfederacies\nHow to Create a Confederacy\nSending Reinforcements and Resources\nLeaving an Alliance or Confederacy\nNon-Aggression Pacts (NAPs)\nWar\nSummary\nTips\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\n               \nAsk a question!"
+    },
+    "s85": {
+      "url": "https://support.travian.com/en/articles/85-joining-creating-and-leaving-an-alliance",
+      "fetched_at_utc": "2026-10-10T19:22:40.369Z",
+      "text_sha256": "a8985d8d97a2ecb216377be867f530fbc71e42f9ae50f676855253615cbb0b23",
+      "html_sha256": "ac59253043552012256fcad1b2f20eeff12c48f52e9503cc21bbbe1aba324a6a",
+      "text": "Go to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nAll collectionsAdvanced GameplayAllianceJoining, Creating and Leaving an Alliance\nJoining, Creating and Leaving an Alliance\nJoining, Creating and Leaving an Alliance\n\nAlliances are a core part of advanced gameplay in Travian: Legends. This article explains how to join an alliance, how to create one, how invitations work, and when and how you can leave an alliance. The information below follows the in-game rules and mechanics exactly and is intended to help you resolve common questions without contacting support.\n\nJoining an Alliance\n\nTo join an alliance, you must meet both of the following conditions:\n\nYou have built an Embassy level 1\n\nYou have received an alliance invitation from that alliance\n\nFinding Alliances Near You\n\nOnce your Embassy is at least level 1, you can view nearby alliances:\n\nOpen your Embassy\n\nGo to the Find alliance tab\n\nReview the list of local alliances in your area\n\nFrom this list, you can click an alliance name to view its leaders. You may contact them directly via message to ask whether they are willing to invite you.\n\nAccepting an Alliance Invitation\n\nIf an alliance leader sends you an invitation:\n\nYou will receive a message from the Ambassador\n\nThe invitation will appear inside your Embassy\n\nTo join the alliance, open your Embassy and accept the invitation there. If you do not yet have an Embassy, you must build one before you can accept the invite.\n\nCreating an Alliance\n\nYou can create your own alliance once your Embassy reaches level 3.\n\nTo create an alliance:\n\nOpen your Embassy\n\nSelect Found Alliance\n\nEnter an alliance tag (short name)\n\nEnter the full alliance name\n\nSave your changes\n\nOnce created, you become the alliance founder and receive full alliance rights by default.\n\nSending Alliance Invitations\n\nOnly players with the appropriate rights can invite others to an alliance:\n\nThe alliance founder (default full rights)\n\nMembers who have been explicitly granted permission to invite players\n\nTo send an invitation:\n\nOpen the alliance interface\n\nEnter the player’s name exactly as it appears in-game\n\nConfirm the invitation\n\nIf the invitation is sent successfully:\n\nThe message “An invitation has been sent to …” will be displayed\n\nThe invitation will appear in the alliance Invitations list\n\nOnce the invited player accepts the invitation, they will immediately become a member of the alliance.\n\nLeaving an Alliance\n\nThere are specific rules regarding when you can leave an alliance:\n\nYou can leave an alliance no earlier than 24 hours after joining\n\nDuring this initial 24-hour period, you also cannot be kicked from the alliance\n\nAfter this protection period has passed, you may leave the alliance at any time:\n\nOpen the Alliance interface\n\nGo to the Options tab\n\nSelect Quit alliance\n\nLeaving an alliance does not require approval from alliance leadership.\n\nDid this answer your question?\n😞\n😐\n😁\nJoining an Alliance\nFinding Alliances Near You\nAccepting an Alliance Invitation\nCreating an Alliance\nSending Alliance Invitations\nLeaving an Alliance\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\n               \nAsk a question!"
+    },
+    "s101": {
+      "url": "https://support.travian.com/en/articles/101-artefacts",
+      "fetched_at_utc": "2026-10-10T19:22:45.579Z",
+      "text_sha256": "32f592e112adf5c403b42cffe96d222e0923cde15d29301cda6fd30f81b2e462",
+      "html_sha256": "9d231f3a4dad4b8fd0eef7a6e4e4d6e7ebc2218651ff383585b4bf6b3eb70caa",
+      "text": "Go to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nAll collectionsAdvanced GameplayLate GameArtefacts\nArtefacts\nArtefacts\n\nArtefacts are powerful items created by the ancient Natars. Once activated, they provide strong advantages such as reduced crop consumption or increased troop speed. This article explains how artefacts work, when they appear, how they are captured and activated, and which limitations apply.\n\nWhat Are Artefacts?\n\nArtefacts grant special effects to the village that activates them. The exact effect depends on the artefact type, while the strength and scope of the effect depend on its size:\n\nSmall artefacts – affect a single village\n\nLarge artefacts – affect all villages in an account\n\nUnique artefacts – very strong effects with account-wide impact\n\nA full list of possible effects is available in the Artefact Effects article.\n\nWhen Artefacts Appear\n\nOn regular game worlds, artefacts appear during the mid-game phase.\n\nArtefacts spawn in special Natar villages\n\nThey are inactive while owned by Natars\n\nNatars do not receive artefact effects\n\nConstruction Plans are a special case and are stored in a Treasury level 10, while all other artefacts are stored in Treasury level 20.\n\nNatar Villages and Defence\n\nArtefacts in Natar villages are usually heavily defended.\n\nNatar defence strength differs from server to server\n\nDefence values are based on the top 100 offensive armies of the game world\n\nVillages holding an artefact will not disappear from the map, even if all buildings are destroyed. This protection only ends once the artefact is moved or captured.\n\nRequirements to Capture an Artefact\n\nBefore attempting to capture an artefact, you must prepare a suitable treasury:\n\nTreasury level 10 is required for small artefacts\n\nTreasury level 20 is required for large or unique artefacts\n\nThe treasury must be empty and completed before the attack lands.\n\nHow to Capture an Artefact\n\nThere are two possible ways to capture an artefact:\n\n1. Capturing With Your Hero\n\nSend an attack (not a raid) on the village holding the artefact\n\nYour hero must be part of the attacking army\n\nThe treasury in the target village must be destroyed\n\nYou must win the battle\n\nThe hero can carry artefacts without limit.\n\n2. Conquering the Village\n\nConquer the village that contains the artefact\n\nThe artefact transfers together with the village\n\nBoth methods require meeting the treasury requirements in advance.\n\nArtefact Activation Time\n\nAfter an artefact is captured, it does not activate immediately. An activation period applies:\n\n1x server: 24 hours\n\n2x server: 16 hours\n\n3x server: 12 hours\n\n5x server: 8 hours\n\n10x server: 4 hours\n\nOnce an artefact has completed its activation period, it will not require reactivation again, even if it is temporarily disabled due to artefact limitations.\n\nSpecial Servers and Ancient Powers\n\nOn some special servers (such as Annual Specials like Path to Pandora):\n\nArtefacts do not exist\n\nRegions instead provide Ancient Powers with similar effects\n\nThese mechanics follow different rules and are explained separately.\n\nArtefact Effects and Limitations\n\nArtefacts are subject to limitations that affect:\n\nHow many artefacts can be active\n\nWhich artefacts can be activated at the same time\n\nHow effects interact\n\nDid this answer your question?\n😞\n😐\n😁\nWhat Are Artefacts?\nWhen Artefacts Appear\nNatar Villages and Defence\nRequirements to Capture an Artefact\nHow to Capture an Artefact\n1. Capturing With Your Hero\n2. Conquering the Village\nArtefact Activation Time\nSpecial Servers and Ancient Powers\nArtefact Effects and Limitations\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\n               \nAsk a question!"
+    },
+    "s65": {
+      "url": "https://support.travian.com/en/articles/65-catapults",
+      "fetched_at_utc": "2026-10-10T19:22:50.564Z",
+      "text_sha256": "525e61981086ff72fc0b793f56c01a0febaeb36899536d90c05a1c9be87da6ca",
+      "html_sha256": "c386502904f96156bfa91d8f5f24a79d2b5304cd7f4a8a6f78152d5127a069e4",
+      "text": "Go to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nAll collectionsAdvanced GameplayBattlesCatapults\nCatapults\nCatapults\n\nCatapults are long-range siege weapons used to destroy the resource fields and buildings of enemy villages. They can only be used in normal attacks — not raids — and need time to prepare their shots.\n\nCatapults have low attack strength on their own. Even a small defending army can easily destroy them. To use catapults effectively, first clear the enemy defence, then follow with waves of catapult attacks supported by other troops.\n\nTargeting\n\nYou can decide which structure the catapults should hit, depending on your Rally Point level:\n\nRally Point Level\n\n\t\n\nAvailable Targets\n\n\n\n\n1\n\n\t\n\nOnly random target available.\n\n\n\n\n3\n\n\t\n\nStorage buildings: Warehouse, Granary.\n\n\n\n\n5\n\n\t\n\nAdds resource production buildings: Resource fields, Brickyard, Iron Foundry, Sawmill, Grain Mill, Bakery.\n\n\n\n\n10\n\n\t\n\nAny building except Cranny, Stonemason’s Lodge, and Trapper.\n\n\n\n\n20\n\n\t\n\nTwo targets per attack (requires at least 20 catapults). Catapult strength is split equally between both targets.\n\nNote:\n\nWhen targeting is set to random, catapults can hit any structure, even those normally excluded (like Cranny).\n\nStonemason’s Lodge is always the last building in a village to be hit.\n\nIf the selected target does not exist, the catapults will automatically choose another random target.\n\nVillages protected by certain artefacts may also cause the target to change randomly.\n\nSee: Artefact Effects\n\nMultiple Buildings of the Same Type\n\nIf a village has more than one building or field of the same type (for example, multiple Warehouses or Croplands), catapults will hit the one with the highest level.\nThis rule does not apply to randomly selected targets.\n\nDurability\n\nThe durability of buildings and resource fields can be increased by:\n\nThe Stonemason’s Lodge\n\nCertain Artefacts\n\nIncreased durability means more catapults are required to destroy the structure.\n\nException:\n\nThe World Wonder is not affected by the durability artefact or Stonemason’s Lodge.\n\nThe lodge cannot be built in a World Wonder village, as it can only exist in a capital.\n\nLearn more:\n\nArtefact Effects\n\nVillage Destruction\n\nFurther Reading\n\nFor practical advice and advanced tactics, visit: The Use of Catapults\n\nDid this answer your question?\n😞\n😐\n😁\nTargeting\nMultiple Buildings of the Same Type\nDurability\nFurther Reading\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\n               \nAsk a question!"
+    },
+    "s181": {
+      "url": "https://support.travian.com/en/articles/181-the-use-of-catapults",
+      "fetched_at_utc": "2026-10-10T19:22:55.665Z",
+      "text_sha256": "acf25be8479f36605747ce33f19cd1ab3073533dab88a1f08d92f6f30a7a729c",
+      "html_sha256": "0bb68adec58506419430f26261798e829dc091bd5949db8492eafe3ebaa8069b",
+      "text": "Go to Travian: Legends\nArabic\nCzech\nGerman\nEnglish\nSpanish\nFrench\nItalian\nPolish\nPortuguese\nRussian\nTurkish\nAll collectionsGame GuidesMilitary DevelopmentThe Use of Catapults\nThe Use of Catapults\nThe Use of Catapults\n\nCatapults are long-range siege units used to destroy enemy buildings and resource fields in Travian: Legends. They require careful planning because their effectiveness depends on attack type, Rally Point level, upgrades, and artefact effects.\n\nWhat Catapults Can (and Cannot) Do\n\nCatapults only fire in a normal attack, not in raids.\n\nThey need time to shoot, so their damage is applied only after they arrive.\n\nTheir efficiency is influenced by various factors, including your Rally Point, smithy upgrades, and defender bonuses.\n\nRally Point Requirements\n\nYour Rally Point level determines which buildings you can target:\n\nRP Level 1 – Only random targets\nRP Level 3 – Warehouse and Granary\nRP Level 5 – Resource production buildings (fields, brickyard, iron foundry, sawmill, grain mill, bakery)\nRP Level 10 – Everything except Cranny, Stonemason’s Lodge, Trapper\nRP Level 20 – You can target two different buildings in one attack\n\nRequires at least 20 catapults\n\nDamage is split evenly between the two targets\n\nImportant:\nIf you only want to hit one building at RP20, leave the second target slot empty.\nSelecting the same building twice splits your damage and is weaker, especially dangerous in World Wonder operations.\n\nWhat Affects Catapult Damage?\nCapital With Stonemason’s Lodge\n\nIncreases building durability by 10% per level\n\nUp to 300% total durability at level 20\n\nApplies to both resource fields and village buildings\n\nAlliance Metallurgy Bonus\n\nIncreases attack stat only\n\nDoes NOT increase catapult destruction power\n\nArchitect Artefact (Defender)\n\nIncreases building durability:\n\nSmall: ×4\n\nGreat: ×3 (applies to whole account)\n\nUnique: ×5\n\nMore catapults are needed to destroy the same target\n\nConfusion (Random Target) Artefact\n\nMakes catapults hit semi-random targets\n\nInternals vs. resource fields are still respected\n\nAfter all buildings of a selected type are destroyed, catapults hit remaining buildings\n\nStonemason’s Lodge is always hit last\n\nSpecial rules:\n\nSmall Confusion: Treasury can still be targeted\n\nGreat Confusion: Treasury + World Wonder\n\nUnique Confusion: Only World Wonder\n\nBrewery (Attacker)\n\nWhen active, catapults hit entirely random buildings, ignoring internal/resource categories\n\nBrewery effect overrides defender confusion artefact\n\nEven if you select specific targets, randomization applies\n\n(Useful for large-scale destruction, but risky for precision hits)\n\nInvalid or Random Target Selection (Attacker)\n\nIf you choose a target that doesn’t exist, catapults may hit any level of any building\n\nThe highest-level building is targeted only when a valid building type is selected\n\nStonemason’s Lodge Behavior\n\nAlways hit last\n\nIf you need to protect your capital from full destruction, build several low-level buildings/fields so the attacker wastes hits on them first\n\nWonder of the World\n\nAlways targetable (RP1 or higher)\n\nImmune to artefact protection (Architect and Confusion do nothing)\n\nHow Many Catapults Do You Need?\n\nCatapult efficiency depends heavily on smithy upgrade level.\nThe full destruction table shows how many catapults you need to destroy a building at each level, based on your catapult upgrade level.\n\nImportant rules:\n\nFor double-target waves, add the required number for both buildings\n\nFor Stonemason’s Lodge level 20, multiply by ×3\n\nFor Architect artefacts, multiply again by the artefact factor\n\nExample\n\nYou want to destroy a level 20 building in a capital with:\n\nStonemason’s Lodge 20\n\nSmall Architect (×4)\n\nCatapult level 20 (needs 36 catapults for a level 20 building)\n\nCalculation:\n36 × 3 × 4 = 432 catapults needed to destroy one level 20 building completely.\n\nDid this answer your question?\n😞\n😐\n😁\nWhat Catapults Can (and Cannot) Do\nRally Point Requirements\nWhat Affects Catapult Damage?\nCapital With Stonemason’s Lodge\nAlliance Metallurgy Bonus\nArchitect Artefact (Defender)\nConfusion (Random Target) Artefact\nBrewery (Attacker)\nInvalid or Random Target Selection (Attacker)\nStonemason’s Lodge Behavior\nWonder of the World\nHow Many Catapults Do You Need?\nExample\nTerms & Conditions\nImprint\nDiscord\nGame World Status\nGame World Calendar\nKnown Bugs & Issues\n               \nAsk a question!"
+    },
+    "s40": {
+      "url": "https://support.travian.com/en/articles/40-troop-upgrades-and-smithy",
+      "fetched_at_utc": "2026-10-10T19:23:01.115Z",
+      "text_sha256": "b9cf030a131bb3038ef6fbefc59ca143e82e81a984186c886b3ce769a8e4ee4e",
+      "html_sha256": "c29dac04bd680e7dac0fd0be34414c8920f47118a422bb3633d6f612b1a3a47a",
+      "quotes": [
+        "The higher the Smithy level, the more you can improve your units.",
+        "The effect strength depends on the unit’s crop consumption — higher-upkeep units gain a larger improvement per upgrade level."
+      ]
+    },
+    "s187": {
+      "url": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
+      "fetched_at_utc": "2026-10-10T19:23:07.193Z",
+      "text_sha256": "75dc2b5cf7c7f854c2a8a6ff6178812b260b3d1a3131a63275070212e97c55e4",
+      "html_sha256": "ee6cbf8fc451661d8f43fa5dcdd7ca32da9ca7e058fd4be078117b3392470bfb",
+      "quotes": [
+        "Disclaimer: Calculations are based on a third-party calculator and may slightly differ from the in-game values / simulation."
+      ]
+    }
+  },
+  "eu12_ingame": {
+    "_what": "EUROPE 12（ts12.x1.europe.travian.com，一般 x1 世界）測試帳號（已去識別），另開一個不保存的瀏覽器工作階段唯讀讀取（只有 GET：說明 API 和資源田頁面，沒有按任何建造或金幣按鈕；bot 照常跑、沒有第二個 bot）。2026-10-11 03:19–03:21（台北）。",
+    "manual_building_14": {
+      "api": "GET /api/v1/manual/building/14（遊戲內說明，Travian.api）",
+      "html": "<div class=\"cf\">\n    <p><a class=\"manualBack arrow back\" onclick=\"Travian.Game.Manual.open()\">to Overview</a></p>\n    <h1 class=\"titleInHeader\"><i class=\"building_small tribe3 type14\"></i> Tournament Square</h1>\n    <img class=\"building big g14 gaul\" src=\"/img/x.gif\" alt=\"Tournament Square\" title=\"Tournament Square\"/>\n    <p class=\"description\">Your troops can increase their stamina at the Tournament Square. The further the building is upgraded, the faster your troops are beyond a minimum distance of 20 squares.</p>\n    <p class=\"costsHeader\"><b>Costs</b> and <b>construction time</b> for level 1:<br />\n    <div class=\"inlineIconList resourceWrapper charges\"><div class=\"inlineIcon resource\" title=\"Lumber\"><i class=\"r1Big\"></i><span class=\"value value\">&#x202d;1,750&#x202c;</span></div><div class=\"inlineIcon resource\" title=\"Clay\"><i class=\"r2Big\"></i><span class=\"value value\">&#x202d;2,250&#x202c;</span></div><div class=\"inlineIcon resource\" title=\"Iron\"><i class=\"r3Big\"></i><span class=\"value value\">&#x202d;1,530&#x202c;</span></div><div class=\"inlineIcon resource\" title=\"Crop\"><i class=\"r4Big\"></i><span class=\"value value\">&#x202d;240&#x202c;</span></div><div class=\"inlineIcon resource\" title=\"Free crop\"><i class=\"cropConsumptionBig\"></i><span class=\"value value\">&#x202d;1&#x202c;</span></div></div><br />\n    <div class=\"inlineIcon duration\" title=\"Duration\"><div class=\"iconWrapper\"><i class=\"clock_medium\"></i></div><span class=\"value \">0:58:20</span></div>    <div id=\"prereqs\"><b>Prerequisites</b><br /><a onclick=\"Travian.Game.Manual.open('building', 16)\">Rally Point</a> Level 15</div>\n    <div class=\"answers\">\t<a class=\"a arrow\" href=\"https://game-configuration.service.legends.travian.info/knowledgebase/building14?lang=en\" target=\"_blank\" title=\"Knowledge Base\">Knowledge Base</a></div>\n</div>\n",
+      "html_sha256": "a7ce314fda587aaa3c6a66d0f1c2f41d99a9f246fd540165be81e82aa1f7360a",
+      "quote": "The further the building is upgraded, the faster your troops are beyond a minimum distance of 20 squares.",
+      "knowledge_base_link": "https://game-configuration.service.legends.travian.info/knowledgebase/building14?lang=en"
+    },
+    "manual_troops_71_78_79": "回 error（跟 ts11 一樣）：EU12 說明手冊裡沒有斯巴達 → 一般世界的賴達投石機、五長官訓練時間這裡讀不到",
+    "level0_fields": {
+      "gid1": {
+        "title": "Woodcutter Level 0",
+        "raw_text_production_lines": "Current production:\t3 per hour\nProduction at level 1:\t7 per hour",
+        "screenshot": "eu12_field_level0_2026-10-11/gid1_level0.png",
+        "screenshot_sha256": "2b83b1031d22f271d6794bb14ca9cfd0eb101c63b4d87f22d50976ab749a0032"
+      },
+      "gid2": {
+        "title": "Clay Pit Level 0",
+        "raw_text_production_lines": "Current production:\t3 per hour\nProduction at level 1:\t7 per hour",
+        "screenshot": "eu12_field_level0_2026-10-11/gid2_level0.png",
+        "screenshot_sha256": "86c181383bba509a5cc8774e7107c702c4d506feeaa97129e70cff74a259bf71"
+      },
+      "gid3": {
+        "title": "Iron Mine Level 0",
+        "raw_text_production_lines": "Current production:\t3 per hour\nProduction at level 1:\t7 per hour",
+        "screenshot": "eu12_field_level0_2026-10-11/gid3_level0.png",
+        "screenshot_sha256": "664d340667874b3a37e50fe122f5abf4e960ed37a4f4e859818e002684e97e36"
+      },
+      "gid4": {
+        "title": "Cropland Level 0",
+        "raw_text_production_lines": "Current production:\t3 per hour\nProduction at level 1:\t7 per hour",
+        "screenshot": "eu12_field_level0_2026-10-11/gid4_level0.png",
+        "screenshot_sha256": "19aaa7dd22d4634b34653be0c45032a8a345ddd165e592b631b349bbb5a292fd"
+      }
+    }
+  },
+  "conclusions": {
+    "arenaSpeed": {
+      "result": "verified",
+      "sources": [
+        "eu12_ingame.manual_building_14（遊戲內說明：超過 20 格才加速）",
+        "ts11 遊戲內說明（evidence/ingame_manual_ts11_*，同一句）",
+        "官方知識庫 building14 表（每級 +20%，線性，20 級 +400%；遊戲內說明直接連到這頁）",
+        "official_articles.s71"
+      ],
+      "note": "遊戲內說明＋官方說明頁，都是官方出處；沒有實際派兵量時間"
+    },
+    "heroBootsSpeed": {
+      "result": "verified",
+      "sources": [
+        "official_articles.s71（靴子只在 20 格以外生效，寫了兩次）",
+        "官方知識庫 items（+25/50/75%，troopSpeed）"
+      ]
+    },
+    "arenaBootsSpeed": {
+      "result": "verified",
+      "sources": [
+        "official_articles.s71：'Boots and Tournament Square bonuses add together'，範例公式 (1+0.25+2) 是相加"
+      ],
+      "caveat": "S71 範例算術有錯（20 級寫成 +500%、5.65× 應為 7.8×）；採用的是它明寫的『相加』規則，不是範例數字"
+    },
+    "fieldLevelZero": {
+      "result": "verified",
+      "sources": [
+        "eu12_ingame.level0_fields gid1–4：0 級每小時 3、1 級每小時 7（遊戲內實測，2026-10-11 03:19–03:21 台北時間）"
+      ]
+    },
+    "buildingEffect.embassy": {
+      "result": "verified",
+      "sources": [
+        "ts11 遊戲內說明",
+        "official_articles.s84",
+        "official_articles.s85"
+      ],
+      "change": "舊的『每級多 3 名成員』刪掉；1–2 級可加入、3 級起可建立；成員上限 60 跟等級無關"
+    },
+    "buildingEffect.treasury": {
+      "result": "verified",
+      "sources": [
+        "ts11 遊戲內說明",
+        "official_articles.s101"
+      ],
+      "caveat": "S101 自己有一處前後不一致（第 41 行附近），採用跟遊戲內說明一致的 10 級小型／20 級大型或獨特"
+    },
+    "buildingEffect.rally_point": {
+      "result": "verified",
+      "sources": [
+        "official_articles.s65",
+        "official_articles.s181"
+      ],
+      "change": "舊效果文字沒有出處，換成官方的投石目標等級"
+    },
+    "buildingEffect.academy": {
+      "result": "pending",
+      "reason": "效果依種族不同，要 PM 決定怎麼呈現"
+    },
+    "buildingEffect.blacksmith": {
+      "result": "pending",
+      "reason": "目前『攻擊力 +1.5%/級』跟 official_articles.s40 不符，措辭要 PM 定"
+    },
+    "smithyFormula": {
+      "result": "pending",
+      "reason": "S187 自己註明是第三方計算機、可能有出入；S186 是兵量門檻表不是單位數值；要有鐵匠鋪的帳號才能實測"
+    },
+    "spartanNormalWorldTimes": {
+      "result": "pending",
+      "reason": "EU12、ts11 遊戲內說明都沒有斯巴達（manual troops 71/78/79 回 error）"
+    }
+  }
+}

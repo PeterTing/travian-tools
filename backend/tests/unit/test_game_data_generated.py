@@ -323,7 +323,10 @@ def test_every_verified_effect_level_matches_kb() -> None:
         (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
     )
     pending = set(gen["effectsPending"])
-    assert pending == {"academy", "blacksmith", "embassy", "rally_point", "treasury"}
+    assert pending == {"academy", "blacksmith"}
+    # 2026-10-11：這三棟照遊戲內說明＋官方說明頁核對（不是知識庫），下面另外測
+    official = set(gen["effectSources"])
+    assert official == {"embassy", "rally_point", "treasury"}
     data = json.loads(
         (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
     )["buildings"]
@@ -363,7 +366,7 @@ def test_every_verified_effect_level_matches_kb() -> None:
         "great_granary": 39,
         "horse_drinking_trough": 41,
     }
-    assert set(gid) == set(data) - pending
+    assert set(gid) == set(data) - pending - official
     for bid, g in gid.items():
         kb = _kb_effects(g)
         for lv in data[bid]["levels"]:
@@ -373,6 +376,73 @@ def test_every_verified_effect_level_matches_kb() -> None:
                 assert (
                     cell.replace(".0%", "%").lstrip("+") in lv["effect_description"]
                 ), (bid, lv["level"], cell)
+
+
+# ─── 2026-10-11：效果照遊戲內說明＋官方說明頁（evidence/pending_crosscheck_2026-10-11.json） ───
+
+PENDING_EV = ROOT / "scripts/game_data/evidence/pending_crosscheck_2026-10-11.json"
+
+
+def test_pending_crosscheck_evidence_hashes_recompute() -> None:
+    ev = json.loads(PENDING_EV.read_text(encoding="utf-8"))
+    for key, art in ev["official_articles"].items():
+        if "text" in art:
+            assert (
+                hashlib.sha256(art["text"].encode("utf-8")).hexdigest()
+                == art["text_sha256"]
+            ), key
+    html = ev["eu12_ingame"]["manual_building_14"]["html"]
+    assert (
+        hashlib.sha256(html.encode("utf-8")).hexdigest()
+        == ev["eu12_ingame"]["manual_building_14"]["html_sha256"]
+    )
+    assert "beyond a minimum distance of 20 squares" in html
+    for gid, f in ev["eu12_ingame"]["level0_fields"].items():
+        png = (PENDING_EV.parent / f["screenshot"]).read_bytes()
+        assert hashlib.sha256(png).hexdigest() == f["screenshot_sha256"], gid
+        assert "Current production:\t3 per hour" in f["raw_text_production_lines"], gid
+        assert "Production at level 1:\t7 per hour" in f["raw_text_production_lines"], (
+            gid
+        )
+
+
+def test_pending_crosscheck_evidence_has_no_account_identifiers() -> None:
+    text = PENDING_EV.read_text(encoding="utf-8")
+    # 公開 repo：不能有 email、密碼、村莊座標
+    assert not re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", text)
+    assert "password" not in text.lower()
+    assert not re.search(r"\(\s*-?\d+\s*\|\s*-?\d+\s*\)", text)
+
+
+@pytest.mark.parametrize(
+    ("bid", "level", "text"),
+    [
+        ("embassy", 1, "可加入聯盟"),
+        ("embassy", 2, "可加入聯盟"),
+        ("embassy", 3, "可建立聯盟"),
+        ("embassy", 20, "可建立聯盟"),
+        ("treasury", 9, "還不能存放神器"),
+        ("treasury", 10, "小型神器"),
+        ("treasury", 19, "小型神器"),
+        ("treasury", 20, "大型或獨特神器"),
+        ("rally_point", 1, "隨機目標"),
+        ("rally_point", 3, "倉庫、穀倉"),
+        ("rally_point", 5, "資源田"),
+        ("rally_point", 10, "山洞、石匠鋪、陷阱機以外"),
+        ("rally_point", 20, "2 個目標"),
+    ],
+)
+def test_official_effects_2026_10_11(bid: str, level: int, text: str) -> None:
+    assert text in (_lv(bid, level).effect_description or "")
+
+
+def test_embassy_no_longer_claims_members_per_level() -> None:
+    data = json.loads(
+        (ROOT / "backend/data/static/buildings.json").read_text(encoding="utf-8")
+    )["buildings"]
+    emb = data["embassy"]
+    assert "60" in emb["description_zh"] and "3 名成員" not in emb["description_zh"]
+    assert all("名成員" not in lv["effect_description"] for lv in emb["levels"])
 
 
 # ─── culture points: one source ───────────────────────────────────

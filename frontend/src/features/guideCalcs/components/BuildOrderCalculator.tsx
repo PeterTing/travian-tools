@@ -8,7 +8,7 @@ import { useLang } from '../i18n/LangContext';
 import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip';
-import type { PendingKind } from '@/lib/pendingNotes';
+import { FIELD_LEVEL_ZERO_VERIFIED, type PendingKind } from '@/lib/pendingNotes';
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import LevelSelect from '@/components/common/LevelSelect'
 import BuildingIcon from '@/components/common/BuildingIcon'
@@ -193,7 +193,7 @@ export default function BuildOrderCalculator() {
   const planKinds: PendingKind[] = [
     // 用到 0 級產量（官方資料從 1 級開始）就標：有田從 0 級升 1 級，或起始有 0 級的田
     // （就算 20 步裡都沒升，總產量、加成建築的划算程度也照 0 級 3／小時算；PM，P0-23）
-    ...(planUsesFieldLevelZero(start, plan.steps) ? ['fieldLevelZero' as const] : []),
+    ...(!FIELD_LEVEL_ZERO_VERIFIED && planUsesFieldLevelZero(start, plan.steps) ? ['fieldLevelZero' as const] : []),
     ...(!BONUS_BUILDINGS_VERIFIED && plan.steps.some(x => x.kind === 'bb') ? ['building' as const] : []),
   ];
 

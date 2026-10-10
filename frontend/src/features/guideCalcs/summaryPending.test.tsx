@@ -8,6 +8,13 @@ import i18n from '@/i18n/i18n'
 import type { AutoFillValue } from '@/components/autofill/AutoFillContext'
 import { SUMMARY_PENDING } from './summaryPending'
 
+// 競技場、靴子 2026-10-11 核對過（ARENA_BOOTS_VERIFIED）：這裡測「改回待驗證時」灰標放的位置，
+// 所以把 speedPendingKinds 換成只選種類的 speedKindsFor（真實資料不放灰標，見 verifiedChips2026-10-11.test.tsx）
+vi.mock('@/lib/pendingNotes', async (importOriginal) => {
+  const m = await importOriginal<typeof import('@/lib/pendingNotes')>()
+  return { ...m, speedPendingKinds: m.speedKindsFor, FIELD_LEVEL_ZERO_VERIFIED: false }
+})
+
 // 沒登入、沒帳號：計算器用預設輸入
 vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
   const mod = await importOriginal<typeof import('@/components/autofill/AutoFillContext')>()
