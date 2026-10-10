@@ -99,12 +99,15 @@ class SyncService:
 
         # 3. 建立新村莊
         if not village:
+            account = self.db.get(GameAccount, account_id)
             village = Village(
                 account_id=account_id,
                 travian_village_id=travian_village_id,
                 name=name,
                 coordinate_x=x,
                 coordinate_y=y,
+                # 新村莊預設跟帳號的出生部族一樣（P0-25）
+                tribe=account.resolved_birth_tribe if account else None,
             )
             self.db.add(village)
             self.db.flush()

@@ -632,3 +632,28 @@ def test_spartan_viking_carry_is_null_everywhere_in_backend() -> None:
     gen_text = GEN.read_text(encoding="utf-8")
     assert "CARRY_PENDING" not in gen_text
     assert "community" not in gen_text.split("CARRY_SOURCES = {")[1].split("}")[0]
+
+
+def test_multitribe_support_pages_sha256_and_quotes() -> None:
+    """P0-25 官方出處：全文 sha256 可以重算，摘錄的句子都在全文裡."""
+    import hashlib
+
+    ev = json.loads(
+        (
+            ROOT
+            / "scripts/game_data/evidence/official_support_multitribe_2026-10-11.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert "text_method" in ev
+    assert set(ev["articles"]) == {"s29", "s197", "s45", "s32", "s21"}
+    for key, a in ev["articles"].items():
+        assert a["url"].startswith("https://support.travian.com/en/articles/"), key
+        assert (
+            hashlib.sha256(a["text"].encode("utf-8")).hexdigest() == a["text_sha256"]
+        ), key
+        assert len(a["html_sha256"]) == 64, key
+        for quote in a["quotes"]:
+            assert quote in a["text"], (key, quote)
+    s29 = ev["articles"]["s29"]["text"]
+    assert "the village keeps its original tribe" in s29
+    assert "They always remain based on the tribe you chose at registration" in s29

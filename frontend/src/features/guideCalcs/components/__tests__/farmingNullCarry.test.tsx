@@ -10,7 +10,7 @@ import FarmingCalculator, { FARM_UNITS, farmUnit, farmingCalc } from '../Farming
 vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
   const mod = await importOriginal<typeof import('@/components/autofill/AutoFillContext')>()
   const value: AutoFillValue = {
-    account: null, village: null, villages: [], speed: 1, tribe: null, accountSpeed: 1, accountTribe: null,
+    account: null, village: null, villages: [], speed: 1, tribe: null, accountSpeed: 1, accountTribe: null, birthTribe: null, multiTribe: false,
     offsetHours: null, overrides: {}, setOverride: () => undefined, clearOverride: () => undefined,
     selectVillage: () => undefined,
   }

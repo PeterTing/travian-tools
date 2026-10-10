@@ -18,7 +18,7 @@ const TRIBES = [
 ]
 
 export default function TechnologyCalculatorPage() {
-  // 部族預設跟著已帶入的帳號（沒有才用羅馬）
+  // 部族預設跟著已帶入的村莊部族（一般伺服器 = 帳號的部族；沒有才用羅馬）
   const { tribe: accountTribe } = useAutoFill()
   const [form, setForm] = useState<TechnologyRequest>({
     tribe: accountTribe ?? 'romans',

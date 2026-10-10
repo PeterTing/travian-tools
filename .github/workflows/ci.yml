@@ -62,6 +62,21 @@ jobs:
           alembic upgrade head
           alembic check
 
+      - name: Latest migration round trip (downgrade one step, upgrade again)
+        env:
+          DATABASE_URL: mysql+mysqlconnector://root:test_password@localhost:3306/travian_tools_test
+        run: |
+          alembic downgrade -1
+          alembic upgrade head
+          alembic check
+
+      - name: Migration 0009 data conversion on MySQL (upgrade -> downgrade -> upgrade)
+        env:
+          MIGRATION_TEST_MYSQL_URL: mysql+mysqlconnector://root:test_password@localhost:3306/travian_tools_migration_test
+        run: |
+          python -c "import mysql.connector as m; c = m.connect(host='127.0.0.1', port=3306, user='root', password='test_password'); c.cursor().execute('CREATE DATABASE IF NOT EXISTS travian_tools_migration_test')"
+          pytest tests/unit/test_migration_0009_multi_tribe.py --no-cov -q
+
       - name: Type check with mypy
         run: |
           mypy app --ignore-missing-imports

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLang } from '../i18n/LangContext';
 import { common, STRATEGY_LIST, STRATEGIES } from '../data/build-order';
 import { TRIBE_SETTLER_COST } from '../data/build-order/tribe-cost';
@@ -74,9 +74,14 @@ export function simulate(
 export default function LaunchSimCalculator() {
   const { lang } = useLang();
   const [strategyId, setStrategyId] = useState<StrategyId>('4p-sim');
-  // 部族預設跟「已帶入」列的帳號（沒有帳號才用羅馬）
+  // 部族預設跟「已帶入」列（目前村莊的部族；沒有帳號才用羅馬）
   const { tribe: accountTribe } = useAutoFill();
   const [tribe, setTribe] = useState<TribeId>(() => (accountTribe && accountTribe in TRIBES ? accountTribe as TribeId : 'romans'));
+  // 換村莊（征服保留部族的世界，村莊可以是不同部族）或帳號晚點載入：使用者還沒自己選過就跟著（P0-25）
+  const [tribeTouched, setTribeTouched] = useState(false);
+  useEffect(() => {
+    if (!tribeTouched && accountTribe && accountTribe in TRIBES) setTribe(accountTribe as TribeId);
+  }, [accountTribe, tribeTouched]);
   // 產量用文字存：空白、0、負數都不偷偷改成 100，而是在欄位下方寫原因、不出結果
   const [prodText, setProdText] = useState<string>('2000');
   const prodPerHour = Number(prodText);
@@ -120,7 +125,7 @@ export default function LaunchSimCalculator() {
 
           <div className={s.field}>
             <label>{lang === 'en' ? 'Tribe (settler cost reference only)' : '部族（只影響下面的開拓者成本參考）'}</label>
-            <select value={tribe} onChange={(e) => setTribe(e.target.value as TribeId)}>
+            <select value={tribe} onChange={(e) => { setTribe(e.target.value as TribeId); setTribeTouched(true); }}>
               {TRIBE_ORDER.map((id) => (
                 <option key={id} value={id}>
                   {TRIBES[id].icon} {TRIBES[id].name[lang]}

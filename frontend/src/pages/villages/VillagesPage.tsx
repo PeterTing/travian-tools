@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ROUTES } from '@/constants/routes'
+import { useAccountData } from '@/contexts/AccountDataContext'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import {
   formatCoordinates,
@@ -18,8 +19,9 @@ import {
   type FreshnessLevel,
   type VillageSortKey,
 } from '@/lib/villageDisplay'
+import { birthTribeOf, isMultiTribeWorld, TRIBE_OPTIONS } from '@/lib/villageTribe'
 import { villageApi } from '@/services/villageApi'
-import type { Village } from '@/types/game'
+import type { TroopTribe, Village } from '@/types/game'
 import VillageForm from './VillageForm'
 
 const SORT_KEYS: VillageSortKey[] = ['population', 'crop', 'name']
@@ -56,6 +58,7 @@ function useNow(intervalMs = 60_000): Date {
  * 只顯示頂部選的那個帳號＋世界（只會是啟用中的）；
  * 頂部提示「最舊的資料是 n 小時前貼上的」（照最舊的村莊分三種程度），
  * 每列：名稱＋座標，下面人口和每小時糧食淨產量（負的標紅），超過 24 小時的村莊多標幾天前。
+ * 征服保留部族的世界（P0-25）每列多一個部族選單（預設 = 出生部族）；一般伺服器不顯示。
  */
 export default function VillagesPage() {
   const { t } = useTranslation()
@@ -71,6 +74,16 @@ export default function VillagesPage() {
   const [sortKey, setSortKey] = useState<VillageSortKey>('population')
   const [reloadToken, setReloadToken] = useState(0)
   const now = useNow()
+  const { world, reload: reloadAccountData } = useAccountData()
+  const multiTribe = isMultiTribeWorld(world)
+  const birthTribe = birthTribeOf(currentAccount)
+
+  const changeTribe = async (villageId: string, tribe: TroopTribe) => {
+    const updated = await villageApi.update(villageId, { tribe })
+    setVillages((list) => list.map((v) => (v.village_id === villageId ? { ...v, tribe: updated.tribe ?? tribe } : v)))
+    // 「已帶入」列讀的是共用的村莊資料，也要更新
+    void reloadAccountData()
+  }
 
   useEffect(() => {
     setVillages([])
@@ -229,7 +242,12 @@ export default function VillagesPage() {
 
           <ul className="divide-y overflow-hidden rounded-lg border bg-card" data-testid="village-list">
             {rows.map((village) => (
-              <VillageRow key={village.village_id} village={village} now={now} />
+              <VillageRow
+                key={village.village_id}
+                village={village}
+                now={now}
+                tribeSelect={multiTribe ? { birthTribe, onChange: changeTribe } : undefined}
+              />
             ))}
           </ul>
 
@@ -243,7 +261,12 @@ export default function VillagesPage() {
   )
 }
 
-function VillageRow({ village, now }: { village: Village; now: Date }) {
+interface TribeSelectProps {
+  birthTribe: TroopTribe | null
+  onChange: (villageId: string, tribe: TroopTribe) => Promise<void>
+}
+
+function VillageRow({ village, now, tribeSelect }: { village: Village; now: Date; tribeSelect?: TribeSelectProps }) {
   const { t } = useTranslation()
   const name = village.name || t('villages.unnamed')
   const coordinates = formatCoordinates(village.coordinate_x, village.coordinate_y)
@@ -296,6 +319,60 @@ function VillageRow({ village, now }: { village: Village; now: Date }) {
         </div>
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
       </Link>
+      {tribeSelect && <VillageTribeSelect village={village} name={name} {...tribeSelect} />}
     </li>
+  )
+}
+
+/** 村莊的部族（只在征服保留部族的世界）：原生下拉選單，高 44px、字 16px，預設 = 出生部族 */
+function VillageTribeSelect({
+  village,
+  name,
+  birthTribe,
+  onChange,
+}: TribeSelectProps & { village: Village; name: string }) {
+  const { t } = useTranslation()
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(false)
+  const value = village.tribe ?? birthTribe ?? ''
+  const id = `village-tribe-${village.village_id}`
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 px-3 pb-3" data-testid="village-tribe">
+      <label htmlFor={id} className="text-xs text-muted-foreground">
+        {t('villages.list.tribe')}
+      </label>
+      <select
+        id={id}
+        className="h-11 min-w-0 flex-1 rounded border bg-background px-2 text-base sm:max-w-xs"
+        value={value}
+        disabled={saving}
+        aria-label={t('villages.list.tribeAria', { name })}
+        data-testid="village-tribe-select"
+        onChange={(event) => {
+          const tribe = event.target.value as TroopTribe
+          if (!tribe) return
+          setSaving(true)
+          setError(false)
+          onChange(village.village_id, tribe)
+            .catch(() => setError(true))
+            .finally(() => setSaving(false))
+        }}
+      >
+        {value === '' && <option value="">—</option>}
+        {TRIBE_OPTIONS.map((tribe) => (
+          <option key={tribe} value={tribe}>
+            {tribe === birthTribe
+              ? t('villages.list.birthTribeOption', { tribe: t(`tribes.${tribe}`) })
+              : t(`tribes.${tribe}`)}
+          </option>
+        ))}
+      </select>
+      {error && (
+        <p className="w-full text-xs text-red-700" role="alert">
+          {t('villages.list.tribeSaveError')}
+        </p>
+      )}
+    </div>
   )
 }

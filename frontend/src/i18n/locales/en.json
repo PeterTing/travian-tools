@@ -467,7 +467,11 @@
     "summary": "Server offset {{offset}}",
     "change": "Change",
     "collapse": "Collapse",
-    "derivedFromPage": "Worked out from the server clock on the pasted page; tap Change if it is wrong."
+    "derivedFromPage": "Worked out from the server clock on the pasted page; tap Change if it is wrong.",
+    "tribeRule": "Tribe rule",
+    "tribeRuleSingle": "Regular server (one tribe per account)",
+    "tribeRuleKeep": "Keep Tribe on Conquest (several tribes per account)",
+    "tribeRuleHint": "Only on special servers (e.g. Annual Specials); check the server announcement. When on, set each village's tribe on the villages list; the hero always keeps the birth tribe."
   },
   "gameAccounts": {
     "title": "Game Account Management",
@@ -577,7 +581,11 @@
       "emptyTitle": "No villages for this account yet",
       "emptyHint": "Paste the multi-village overview on the home page, or add one by hand.",
       "addManually": "+ Add a village by hand",
-      "openDetail": "Open {{name}}"
+      "openDetail": "Open {{name}}",
+      "tribe": "Tribe",
+      "tribeAria": "Tribe of {{name}}",
+      "birthTribeOption": "{{tribe}} (birth tribe)",
+      "tribeSaveError": "Tribe was not saved, please try again"
     },
     "title": "Village Management",
     "description": "Manage your Travian villages",
@@ -1122,7 +1130,8 @@
     "editNote": "Only changes this page, not your account settings; other pages keep the account values. The village is remembered as your default.",
     "manual": "Edited by you",
     "restore": "Restore",
-    "fromAccount": "From account"
+    "fromAccount": "From account",
+    "heroBirthTribe": "Hero: birth tribe {{tribe}}"
   },
   "external": {
     "heroRevive": "Hero revival",

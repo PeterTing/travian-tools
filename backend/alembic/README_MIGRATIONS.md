@@ -56,3 +56,48 @@ rebuild the database with `alembic upgrade head`, and re-import. This path was
 tested against a database created with `Base.metadata.create_all()` from the
 pre-P0 `main` models and stamped `012_statistics_tables`: after the steps
 above, `alembic check` reported no differences.
+
+## `0009_multi_tribe`（P0-25 一個帳號多個部族）
+
+Adds three columns, all additive (the previous app revision keeps working on
+an upgraded database):
+
+| Column | Backfill |
+|---|---|
+| `game_accounts.birth_tribe` | `= game_accounts.tribe`（出生部族） |
+| `villages.tribe` | `= the owning account's tribe`（NULL when the account has none） |
+| `game_worlds.keep_tribe_on_conquest` | `false`（server default `0`；every existing world stays single-tribe） |
+
+Reads treat `game_accounts.tribe` as the source of truth (the API's
+`birth_tribe` is `tribe`, falling back to `birth_tribe` only when `tribe` is
+NULL), so a `birth_tribe` left stale while an older app revision was serving
+never overrides `tribe`. Downgrade fills `game_accounts.tribe` from
+`birth_tribe` only where `tribe IS NULL AND birth_tribe IS NOT NULL`, then
+drops the three columns. It loses only the per-village tribe choices and the
+world switch — data that did not exist before 0009. Tested by
+`tests/unit/test_migration_0009_multi_tribe.py` (upgrade → downgrade → upgrade
+with data, SQLite always, MySQL 8 when `MIGRATION_TEST_MYSQL_URL` is set; CI
+runs it on its MySQL 8 service and also runs `alembic downgrade -1 && alembic
+upgrade head && alembic check`).
+
+Production order (from the repo root, never skip the backup):
+
+```bash
+export CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools
+# 1. on-demand Cloud SQL backup, then confirm it is SUCCESSFUL
+gcloud sql backups create --instance travian-tools-db --project artogo-travian-tools \
+  --description "before 0009_multi_tribe"
+gcloud sql backups list --instance travian-tools-db --project artogo-travian-tools --limit 3
+# 2. build -> migrate -> deploy
+scripts/deploy_cloud_run.sh build
+scripts/deploy_cloud_run.sh migrate   # alembic upgrade head && alembic check (Cloud Run Job)
+scripts/deploy_cloud_run.sh deploy
+```
+
+Rollback: route traffic back to the previous `tt-api` revision (the schema is
+additive, so no downgrade is needed for that). Only if the columns must go:
+
+```bash
+gcloud run jobs execute travian-tools-migrate --project artogo-travian-tools \
+  --region asia-east1 --wait --args="-c,alembic downgrade 0008_sync_type_rally"
+```

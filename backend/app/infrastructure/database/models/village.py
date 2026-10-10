@@ -9,6 +9,7 @@ from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, fun
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base
+from app.infrastructure.database.models.game_account import TribeType
 
 if TYPE_CHECKING:
     from app.infrastructure.database.models.building_instance import BuildingInstance
@@ -71,6 +72,13 @@ class Village(Base):
         nullable=True,
     )
     is_capital: Mapped[bool] = mapped_column(Boolean, default=False)
+    # 村莊的部族（P0-25）。一般伺服器 = 帳號的出生部族；「征服保留部族」的
+    # 特殊伺服器，征服來的村莊保留原本的部族。NULL = 跟帳號的出生部族一樣。
+    tribe: Mapped[TribeType | None] = mapped_column(
+        Enum(TribeType, values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+        comment="村莊的部族；NULL = 跟帳號的出生部族一樣",
+    )
     role: Mapped[VillageRole | None] = mapped_column(
         Enum(VillageRole, values_callable=lambda x: [e.value for e in x]),
         nullable=True,

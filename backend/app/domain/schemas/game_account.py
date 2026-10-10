@@ -154,6 +154,10 @@ class GameAccountResponse(BaseModel):
     server_name: str | None
     server_speed: int
     tribe: TribeType | None
+    birth_tribe: TribeType | None = Field(
+        None,
+        description="出生部族（註冊時選的部族，英雄能力跟著它）；和 tribe 一樣",
+    )
     player_name: str | None
     alliance_name: str | None
     server_start_date: date | None
