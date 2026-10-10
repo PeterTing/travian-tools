@@ -229,17 +229,18 @@ TRIBE_ORDER = ["romans", "teutons", "gauls", "egyptians", "huns", "spartans", "v
 # 運載量（唯一一份，前後端都從產生檔讀；P0-23）。5 族照 ts11 遊戲內說明頁（evidence/ts11_manual_2026-10-10.json），
 # 斯巴達照 ASIA x1 遊戲內說明頁（evidence/asia_x1_manual_spartans_2026-10-11.json）。
 # 維京沒有官方或遊戲內的運載量：官方說明頁 S139 沒有這一欄，現在也沒有可以選維京的世界。以前（#34 PM）一律留空；
-# 2026-10-11 起改用兩份一致的社群數字（two_sources，✓ 已核對；見下方 CARRY_TWO_SOURCE_TRIBES）。
+# 2026-10-11 第 3 輪曾改用兩份一致的社群數字（two_sources）；第 5 輪幕僚長決定：出處不明，退回待驗證（又是一律留空）。
 # 留空（null）的寫法還在：畫面顯示「—」＋「待驗證」，用到運載量的計算顯示「無法計算」，不能當 0。
 CARRY_SOURCES = {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-10 讀取",
     "asia_x1": "ASIA x1 遊戲內說明實測（說明 → 建築與兵種 → 斯巴達），2026-10-11 讀取",
     "two_sources": "出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）",
 }
-# 維京運載量（2026-10-11 幕僚長規則）：官方沒寫；Fandom、Siegewise 互不引用、沒有共同出處 → 兩份一致就 ✓
-# （evidence/crosscheck_spartans_vikings_2026-10-11.json viking_carry_independence）。不獨立就改回 ("vikings",)
-CARRY_EMPTY_TRIBES: tuple[str, ...] = ()
-CARRY_TWO_SOURCE_TRIBES = ("vikings",)
+# 維京運載量（2026-10-11 幕僚長）：官方沒寫；Fandom、Siegewise 沒辦法證明互相獨立（Siegewise 運載量出處不明）
+# → 出處不明，退回待驗證（evidence/crosscheck_spartans_vikings_2026-10-11.json viking_carry_independence.final_decision）。
+# two_sources 的寫法留著：以後真的有兩份獨立來源，再把維京放回 CARRY_TWO_SOURCE_TRIBES
+CARRY_EMPTY_TRIBES: tuple[str, ...] = ("vikings",)
+CARRY_TWO_SOURCE_TRIBES: tuple[str, ...] = ()
 # 第 4 輪（PM）：維京開拓者只有 Siegewise 有數字（Fandom 那列抄錯），不算兩份一致 → 留空、待驗證
 CARRY_PENDING_UNITS = ("viking_settler",)
 
@@ -876,7 +877,7 @@ def gen_unit_speeds() -> dict:
                     "pending": "沒有第一手出處，速度留空（待驗證）"},
         "carry_sources": {"ts11": CARRY_SOURCES["ts11"],
                           "asia_x1": CARRY_SOURCES["asia_x1"],
-                          "two_sources": CARRY_SOURCES["two_sources"],
+                          **({"two_sources": CARRY_SOURCES["two_sources"]} if CARRY_TWO_SOURCE_TRIBES else {}),
                           "pending": "沒有官方或遊戲內的運載量，留空（null，待驗證）"},
         "tribes": tribes,
     }

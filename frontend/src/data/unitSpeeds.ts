@@ -45,7 +45,7 @@ export interface UnitSpeedRow {
   carryRef: string | null
 }
 
-/** two_sources：維京（官方沒寫）Fandom、Siegewise 兩份互不引用、數字一致（2026-10-11 幕僚長規則） */
+/** two_sources：官方沒寫、兩份互相獨立的社群來源數字一致（2026-10-11 幕僚長規則）；目前沒有兵種用到（維京退回待驗證） */
 export type UnitCarrySource = 'ts11' | 'asia_x1' | 'two_sources' | 'pending'
 
 export interface UnitTs11Stats {

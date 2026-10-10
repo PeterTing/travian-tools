@@ -1,12 +1,12 @@
-import { useState, useEffect, useId } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { troopsApi } from '@/services/gameApi'
-import PendingVerifyChip, { PendingNotePanel, PendingRow } from '@/components/common/PendingVerifyChip'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import { isTribeCostVerified } from '@/data/unitCosts'
-import { carryPendingTribe, unitCarrySource } from '@/data/unitSpeeds'
+import { carryPendingTribe } from '@/data/unitSpeeds'
 import type { PendingKind } from '@/lib/pendingNotes'
 import { ingameTribeName, ingameUnitDisplay } from '@/lib/ingameNames'
 
@@ -106,13 +106,8 @@ export default function TroopsPage() {
 
   const isZh = i18n.language.startsWith('zh')
   const carryPending = selectedTroop ? carryPendingTribe(selectedTroop.troop_id) : null
-  // 運載量留空的只會是維京（斯巴達 2026-10-11 在 ASIA x1 核對過；維京 2026-10-11 起用兩份一致的數字）
+  // 運載量留空的只有維京（斯巴達 2026-10-11 在 ASIA x1 核對過）
   const carryKind: PendingKind = 'vikingCarry'
-  // 維京運載量：官方沒寫，Fandom、Siegewise 兩份一致 → 數字旁「✓ 已核對」，點開兩行說明（第二行出處）
-  const carryTwoSources = selectedTroop ? unitCarrySource(selectedTroop.troop_id) === 'two_sources' : false
-  const carryNoteId = `carry-verified-${useId().replace(/:/g, '')}`
-  const [carryNoteOpen, setCarryNoteOpen] = useState(false)
-  useEffect(() => { setCarryNoteOpen(false) }, [selectedTroop?.troop_id])
 
   useEffect(() => {
     const fetchTroops = async () => {
@@ -321,29 +316,8 @@ export default function TroopsPage() {
                             selectedTroop.carry_capacity
                           )}
                           {(carryPending || selectedTroop.carry_capacity === null) && <PendingVerifyChip kind={carryKind} className="ml-1" />}
-                          {carryTwoSources && selectedTroop.carry_capacity !== null && (
-                            <button
-                              type="button"
-                              id={`${carryNoteId}-chip`}
-                              data-testid="troop-carry-verified-mark"
-                              aria-label={t('common.verifiedTs11')}
-                              aria-expanded={carryNoteOpen}
-                              aria-controls={carryNoteOpen ? carryNoteId : undefined}
-                              onClick={() => setCarryNoteOpen((v) => !v)}
-                              className="relative ml-1 whitespace-nowrap align-middle text-[12px] font-normal text-green-700 before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
-                            >
-                              {t('common.verifiedShort')}
-                            </button>
-                          )}
                         </td>
                       </PendingRow>
-                      {carryTwoSources && carryNoteOpen && (
-                        <tr data-testid="troop-carry-verified-row">
-                          <td colSpan={2}>
-                            <PendingNotePanel fill id={carryNoteId} kinds={['vikingCarry']} ns="verifiedNotes" />
-                          </td>
-                        </tr>
-                      )}
                       <tr className="border-b">
                         <td className="py-2 text-muted-foreground">糧耗</td>
                         <td className="py-2 text-right">{selectedTroop.crop_consumption}/h</td>

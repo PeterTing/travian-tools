@@ -14,7 +14,6 @@
   "carry_sources": {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-10 讀取",
     "asia_x1": "ASIA x1 遊戲內說明實測（說明 → 建築與兵種 → 斯巴達），2026-10-11 讀取",
-    "two_sources": "出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）",
     "pending": "沒有官方或遊戲內的運載量，留空（null，待驗證）"
   },
   "tribes": {
@@ -1728,9 +1727,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 55,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       },
       {
         "slot": 2,
@@ -1741,9 +1740,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 40,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       },
       {
         "slot": 3,
@@ -1754,9 +1753,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 75,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       },
       {
         "slot": 4,
@@ -1767,9 +1766,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 0,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       },
       {
         "slot": 5,
@@ -1780,9 +1779,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 110,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       },
       {
         "slot": 6,
@@ -1793,9 +1792,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 80,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       },
       {
         "slot": 7,
@@ -1806,9 +1805,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 0,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       },
       {
         "slot": 8,
@@ -1819,9 +1818,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 0,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       },
       {
         "slot": 9,
@@ -1832,9 +1831,9 @@
         "source": "official",
         "ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
         "stats": null,
-        "carry": 0,
-        "carry_source": "two_sources",
-        "carry_ref": "fandom+siegewise"
+        "carry": null,
+        "carry_source": "pending",
+        "carry_ref": null
       },
       {
         "slot": 10,

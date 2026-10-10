@@ -1,5 +1,4 @@
-// 運載量留空的兵種（P0-23 PM；斯巴達 2026-10-11 在 ASIA x1 核對過，維京 2026-10-11 起用 Fandom、Siegewise 兩份一致的數字，兩族都有數字；
-// 留空那條路還在，這裡把維京兵的 carry 設成 null 來測）：農場收益不出數字，大數字換成灰字「無法計算」、第二行寫原因＋灰標、沒有「展開明細」；
+// 運載量留空的兵種（維京，P0-23 PM；2026-10-11 幕僚長：出處不明，退回待驗證；斯巴達 2026-10-11 在 ASIA x1 核對過，有數字）：農場收益不出數字，大數字換成灰字「無法計算」、第二行寫原因＋灰標、沒有「展開明細」；
 // 換回其他部族的兵馬上恢復。目前農場收益的清單沒有斯巴達、維京（FARM_UNITS 6 種都是 ts11 兵），這裡用 units 換清單測這條路徑。
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
@@ -19,8 +18,7 @@ vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
 })
 
 const elpida = farmUnit(['elpida', 'spartans', 'elpida'])
-const huskarlReal = farmUnit(['huskarl', 'vikings', 'huskarlRider'])
-const huskarl = { ...huskarlReal, carry: null }
+const huskarl = farmUnit(['huskarl', 'vikings', 'huskarlRider'])
 const base = { dist: 10, unitSpeed: 16, cost: 1000, freq: 15, loot: 400, serverSpeed: 1, arena: 0, boots: 0 }
 
 describe('farming: unit with empty (null) carry', () => {
@@ -39,9 +37,9 @@ describe('farming: unit with empty (null) carry', () => {
     expect(FARM_UNITS.every((u) => typeof u.carry === 'number')).toBe(true)
   })
 
-  it('Spartan units have the ASIA x1 number; Viking units the two-source number (no 無法計算 for real data)', () => {
+  it('Viking farm units carry null; Spartan units have the ASIA x1 number', () => {
     expect(elpida.carry).toBe(110)
-    expect(huskarlReal.carry).toBe(110)
+    expect(huskarl.carry).toBeNull()
   })
 
   it('farmingCalc: carry null → carry cap, daily yield, payback are null (no number, never 0)', () => {
@@ -59,7 +57,7 @@ describe('farming: unit with empty (null) carry', () => {
   })
 
   it.each([
-    ['empty-carry (Viking name)', huskarl, '維京運載量還沒核對', 'vikingCarry'],
+    ['Viking', huskarl, '維京運載量還沒核對', 'vikingCarry'],
   ] as const)('page: %s unit selected → 「無法計算」 grey, same size; reason 12px grey + chip; no 展開明細; switching back restores the number', (_label, u, reason, kind) => {
     render(<MemoryRouter><FarmingCalculator units={[u, ...FARM_UNITS]} /></MemoryRouter>)
     fireEvent.change(screen.getByLabelText('單位'), { target: { value: u.id } })

@@ -166,7 +166,7 @@ describe('IA v2.2', () => {
       expect(screen.queryByTestId('autofill-unit-pending')).not.toBeInTheDocument()
     })
 
-    it('shows one 兵種待驗證 line for Vikings (carry ✓ since 2026-10-11 → only 「兵種中文名為暫譯」) on pages that use unit data, e.g. 糧食平衡 (P0-17 (k)); none for Spartans (ASIA x1, 2026-10-11)', () => {
+    it('shows one 兵種待驗證 line for Vikings (carry 待驗證: 「維京的運載量待驗證，兵種中文名為暫譯」) on pages that use unit data, e.g. 糧食平衡 (P0-17 (k)); none for Spartans (ASIA x1, 2026-10-11)', () => {
       const sp = renderBar('/calculator/crop', 'spartans')
       expect(screen.queryByTestId('autofill-unit-pending')).not.toBeInTheDocument()
       sp.unmount()
@@ -175,7 +175,7 @@ describe('IA v2.2', () => {
       // 一行、沒有分號；灰標在最前面，文字掛在灰標右邊
       expect(line).not.toHaveTextContent('；')
       const text = screen.getByTestId('autofill-unit-pending-text')
-      expect(text).toHaveTextContent(/^兵種中文名為暫譯$/)
+      expect(text).toHaveTextContent(/^維京的運載量待驗證，兵種中文名為暫譯$/)
       expect(text.tagName).toBe('P')
       const chip = within(line).getByTestId('pending-verify-chip')
       expect(chip).toHaveTextContent('待驗證')
@@ -197,10 +197,10 @@ describe('IA v2.2', () => {
       const line = screen.getByTestId('autofill-unit-pending')
       fireEvent.click(within(line).getByTestId('pending-verify-chip'))
       expect(screen.getByTestId('pending-note-what')).toHaveTextContent(
-        /^羅馬人、日耳曼人、高盧人、埃及人、匈奴的兵種數字已在 ts11 遊戲內說明頁核對；斯巴達的兵種數字、速度、運載量已在 ASIA x1 遊戲內說明頁核對；維京的花費、糧耗、訓練時間、攻防已照官方說明頁核對，運載量照 Fandom、Siegewise 兩份一致的數字；維京的中文名是暫譯。$/,
+        /^羅馬人、日耳曼人、高盧人、埃及人、匈奴的兵種數字已在 ts11 遊戲內說明頁核對；斯巴達的兵種數字、速度、運載量已在 ASIA x1 遊戲內說明頁核對；維京的花費、糧耗、訓練時間、攻防已照官方說明頁核對，運載量還沒核對、先不顯示。$/,
       )
       expect(screen.getByTestId('pending-note-source')).toHaveTextContent(
-        /^維京的數字取自官方說明頁 S139；運載量官方沒寫，取自 Fandom、Siegewise（兩份互不引用、數字一致）；ts11 沒有維京，現在也沒有可以選維京的世界，遊戲內看不到中文名。$/,
+        /^維京的數字取自官方說明頁 S139；ts11 沒有維京，現在也沒有可以選維京的世界，遊戲內還看不到。$/,
       )
     })
 

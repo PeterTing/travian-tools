@@ -158,10 +158,6 @@ export function PendingNotePanel({ id, kinds, labels, fill = false, ns = 'pendin
               {clauses(t(keys.what))}
             </span>
             <span className="block" data-testid="pending-note-source">{clauses(t(keys.source))}</span>
-            {/* ✓ 的說明可以在出處後面多一行（verifiedNotes.<kind>.note，例如維京運載量「社群資料，官方未公布」） */}
-            {ns === 'verifiedNotes' && t(`${ns}.${k}.note`, { defaultValue: '' }) && (
-              <span className="block" data-testid="pending-note-extra">{clauses(t(`${ns}.${k}.note`))}</span>
-            )}
           </span>
         )
       })}

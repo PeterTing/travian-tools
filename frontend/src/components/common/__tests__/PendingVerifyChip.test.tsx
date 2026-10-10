@@ -77,13 +77,10 @@ describe('「待驗證」灰標（P0-17）', () => {
     fireEvent.click(screen.getByTestId('pending-verify-chip'))
     const src = screen.getByTestId('pending-note-source')
     const segs = within(src).getAllByTestId('pending-note-clause')
-    expect(segs.map((s) => s.textContent)).toEqual([
-      '維京的數字取自官方說明頁 S139；', '運載量官方沒寫，', '取自 Fandom、', 'Siegewise', '（兩份互不引用、', '數字一致）；',
-      'ts11 沒有維京，', '現在也沒有可以選維京的世界，', '遊戲內看不到中文名。',
-    ])
+    expect(segs.map((s) => s.textContent)).toEqual(['維京的數字取自官方說明頁 S139；', 'ts11 沒有維京，', '現在也沒有可以選維京的世界，', '遊戲內還看不到。'])
     for (const seg of segs) expect(seg).toHaveClass('inline-block')
     // 切段不改文字
-    expect(src).toHaveTextContent(/^維京的數字取自官方說明頁 S139；運載量官方沒寫，取自 Fandom、Siegewise（兩份互不引用、數字一致）；ts11 沒有維京，現在也沒有可以選維京的世界，遊戲內看不到中文名。$/)
+    expect(src).toHaveTextContent(/^維京的數字取自官方說明頁 S139；ts11 沒有維京，現在也沒有可以選維京的世界，遊戲內還看不到。$/)
   })
 
   it('only one open per page: opening another closes the previous', () => {

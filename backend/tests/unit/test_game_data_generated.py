@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -606,55 +607,37 @@ def test_carry_capacity_single_source_backend_and_frontend() -> None:
             assert troops[r["troop_id"]]["carry_capacity"] == r["carry"], r["troop_id"]
             kb = TRIBES_DATA[tribe]["troops"][r["kb_id"]]
             assert kb["capacity"] == r["carry"], r["troop_id"]
-            want = {"vikings": "two_sources", "spartans": "asia_x1"}.get(tribe, "ts11")
-            if r["troop_id"] == "viking_settler":
-                # PM 第 4 輪：開拓者只有 Siegewise 一份 → 留空、待驗證
-                assert (r["carry"], r["carry_source"], r["carry_ref"]) == (
-                    None,
-                    "pending",
-                    None,
-                )
-                continue
+            want = {"vikings": "pending", "spartans": "asia_x1"}.get(tribe, "ts11")
             assert r["carry_source"] == want, r["troop_id"]
-            assert isinstance(r["carry"], int)
-            if want == "two_sources":
-                # 維京（2026-10-11 幕僚長規則）：官方沒寫，Fandom、Siegewise 互不引用且一致
-                assert r["carry_ref"] == "fandom+siegewise"
-                assert r["stats"] is None
-            else:
+            if want != "pending":
+                assert isinstance(r["carry"], int)
                 assert r["stats"]["carry"] == r["carry"]
+            else:
+                # PM 決定（P0-23）：維京運載量留空，不放社群整理或推估的數字
+                assert r["carry"] is None, r["troop_id"]
+                assert r["carry_ref"] is None
     assert n == len(troops) == 70
 
 
-def test_viking_carry_two_sources_everywhere_in_backend() -> None:
-    """維京運載量：Fandom、Siegewise 兩份一致（官方未寫）→ troops.json、knowledge_base 都是數字."""
+def test_viking_carry_is_null_everywhere_in_backend() -> None:
+    """維京：troops.json、knowledge_base、API 都是 null；API 附上原因，不回 0."""
     from app.knowledge_base.tribes import TRIBES_DATA
 
     troops = json.loads(
         (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
     )["troops"]
-    vk = [t for t in troops.values() if t["tribe"] == "vikings"]
-    assert [t["carry_capacity"] for t in vk] == [55, 40, 75, 0, 110, 80, 0, 0, 0, None]
-    assert [t["capacity"] for t in TRIBES_DATA["vikings"]["troops"].values()] == [
-        55,
-        40,
-        75,
-        0,
-        110,
-        80,
-        0,
-        0,
-        0,
-        None,
-    ]
+    empty = [k for k, t in troops.items() if t["tribe"] == "vikings"]
+    assert len(empty) == 10
+    assert all(troops[k]["carry_capacity"] is None for k in empty)
+    assert all(t["capacity"] is None for t in TRIBES_DATA["vikings"]["troops"].values())
+    # 斯巴達 2026-10-11 在 ASIA x1 讀到運載量，不再留空
     sp = [t for t in troops.values() if t["tribe"] == "spartans"]
     assert [t["carry_capacity"] for t in sp] == [60, 0, 40, 50, 110, 80, 0, 0, 0, 3000]
-    # 留空的只有維京開拓者（PM 第 4 輪）
-    assert [tid for tid, t in troops.items() if t["carry_capacity"] is None] == [
-        "viking_settler"
-    ]
     gen_text = GEN.read_text(encoding="utf-8")
-    assert 'CARRY_PENDING_UNITS = ("viking_settler",)' in gen_text
+    # 單一兵種留空的名單只有維京開拓者（PM 第 4 輪；現在維京整族都留空，這條是備用）
+    assert re.findall(r"^CARRY_PENDING\w* = .*$", gen_text, re.M) == [
+        'CARRY_PENDING_UNITS = ("viking_settler",)'
+    ]
     assert "community" not in gen_text.split("CARRY_SOURCES = {")[1].split("}")[0]
 
 
@@ -851,8 +834,8 @@ def test_crosscheck_evidence_records_sources_and_rog_only_fields():
     assert "（" not in kb["hoplite"]["training_time"]
 
 
-def test_crosscheck_vikings_and_carry_independence():
-    """維京：官方 S139 跟社群一致；運載量官方沒有，Fandom、Siegewise 互不引用、沒有共同出處 → ✓."""
+def test_crosscheck_vikings_carry_back_to_pending():
+    """維京：官方 S139 跟社群一致；運載量官方沒有，Siegewise 運載量出處不明 → 幕僚長：出處不明，退回待驗證."""
     xc = json.loads(CROSSCHECK.read_text(encoding="utf-8"))
     s139 = xc["sources"]["s139"]["vikings"]
     sw = xc["sources"]["siegewise_vikings"]["units"]
@@ -879,7 +862,15 @@ def test_crosscheck_vikings_and_carry_independence():
         ), n
     assert xc["conclusions"]["vikings"]["carry"]["official"] is None
     ind = xc["viking_carry_independence"]
-    assert ind["conclusion"] == "independent"
+    assert ind["conclusion"] == "出處不明，退回待驗證"
+    fd = ind["final_decision"]
+    assert (fd["by"], fd["date"], fd["conclusion"]) == (
+        "幕僚長",
+        "2026-10-11",
+        "出處不明，退回待驗證",
+    )
+    # 第 3、4 輪的調查留著
+    assert ind["conclusion_round3"] == "independent"
     assert ind["fandom"]["cites_siegewise"] is False
     assert ind["siegewise"]["cites_fandom"] is False
     assert ind["fandom"]["carry_added_revision"]["revid"] == 18687
@@ -890,7 +881,7 @@ def test_crosscheck_vikings_and_carry_independence():
         (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
     )["troops"]
     vk = [t for t in troops.values() if t["tribe"] == "vikings"]
-    assert [t["carry_capacity"] for t in vk] == [*ind["agree"].values(), None]
+    assert [t["carry_capacity"] for t in vk] == [None] * 10
     # 第 4 輪：Siegewise 運載量從哪來，查一次（幕僚長）
     tr = ind["siegewise_source_trace"]
     assert tr["finding"] == "Siegewise 運載量出處不明"
@@ -898,6 +889,9 @@ def test_crosscheck_vikings_and_carry_independence():
     assert "沒有證據" in tr["uses_fandom_2024_video"]
     assert "沒有證據" in tr["same_sheet_as_fandom"]
     assert "改回留空" in ind["settler"]["decision"]
+    gen_text = GEN.read_text(encoding="utf-8")
+    assert 'CARRY_EMPTY_TRIBES: tuple[str, ...] = ("vikings",)' in gen_text
+    assert "CARRY_TWO_SOURCE_TRIBES: tuple[str, ...] = ()" in gen_text
 
 
 def test_multitribe_support_pages_sha256_and_quotes() -> None:

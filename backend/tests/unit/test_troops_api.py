@@ -257,17 +257,18 @@ class TestTroopsAPI:
         assert data["total_cost"] == expected_total
 
 
-def test_detail_carry_is_a_number_for_every_tribe() -> None:
-    """維京運載量（前 9 種）2026-10-11 起是 Fandom、Siegewise 兩份一致的數字；開拓者留空，原因欄只在 null 時才有."""
-    r = client.get("/api/v1/troops/vikings/thrall")
-    assert r.status_code == 200
-    d = r.json()
-    assert d["carry_capacity"] == 55
-    assert d["carry_capacity_note"] is None
-    # PM 第 4 輪：維京開拓者只有一份來源 → 留空（null），原因欄有字
-    d = client.get("/api/v1/troops/vikings/viking_settler").json()
-    assert d["carry_capacity"] is None
-    assert d["carry_capacity_note"]
+def test_viking_detail_carry_is_null_with_reason() -> None:
+    """維京運載量留空（P0-23 PM）：API 回 null＋原因，不回 0；其他族照常是數字、沒有原因."""
+    for tribe, troop_id in (
+        ("vikings", "thrall"),
+        ("vikings", "viking_settler"),
+    ):
+        r = client.get(f"/api/v1/troops/{tribe}/{troop_id}")
+        assert r.status_code == 200
+        d = r.json()
+        assert d["carry_capacity"] is None, troop_id
+        assert "還沒核對" in d["carry_capacity_note"]
+        assert "不能當成 0" in d["carry_capacity_note"]
     d = client.get("/api/v1/troops/gauls/theutates_thunder").json()
     assert d["carry_capacity"] == 75
     assert d["carry_capacity_note"] is None
@@ -283,12 +284,8 @@ def test_rag_troop_details_never_print_none_or_zero_for_empty_carry() -> None:
     from app.knowledge_base.tribes import TRIBES_DATA
 
     kb = TravianKnowledgeBase.__new__(TravianKnowledgeBase)
-    # 目前沒有留空的兵種（維京 2026-10-11 起有數字）；留空的寫法用假資料測
-    empty = {**TRIBES_DATA["vikings"]["troops"]["thrall"], "capacity": None}
-    text = kb._format_troop_details(empty)
+    text = kb._format_troop_details(TRIBES_DATA["vikings"]["troops"]["thrall"])
     line = next(x for x in text.splitlines() if x.startswith("載重"))
     assert line == "載重: 還沒核對（官方說明頁沒有），先不提供"
-    text = kb._format_troop_details(TRIBES_DATA["vikings"]["troops"]["thrall"])
-    assert "載重: 55" in text
     text = kb._format_troop_details(TRIBES_DATA["gauls"]["troops"]["theutates_thunder"])
     assert "載重: 75" in text

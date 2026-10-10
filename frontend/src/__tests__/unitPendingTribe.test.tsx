@@ -27,11 +27,11 @@ import FarmingCalculator, { FARM_UNITS } from '@/features/guideCalcs/components/
 import { showUnitPendingLine, unitPendingLineKey } from '@/lib/unitPending'
 import { tribeUnitSpeeds, vikingCarryPending } from '@/data/unitSpeeds'
 
-// 維京運載量 2026-10-11 起 ✓（Fandom、Siegewise 兩份一致），這一行只剩中文名暫譯
-// 「全部」／不知道部族
-const LINE = /^維京的兵種中文名為暫譯$/
-// 選維京（設計師）：只寫「兵種中文名為暫譯」
-const LINE_PROVISIONAL = /^兵種中文名為暫譯$/
+// 維京運載量待驗證（2026-10-11 幕僚長：出處不明，退回待驗證）
+// 「全部」／不知道部族：原本那句
+const LINE = /^維京的兵種運載量待驗證$/
+// 選維京（設計師，一字不差）
+const LINE_PROVISIONAL = /^維京的運載量待驗證，兵種中文名為暫譯$/
 // 5 族 ts11 核對；斯巴達 2026-10-11 在 ASIA x1 遊戲內說明核對（數字、速度、運載量、中文名）
 const VERIFIED = ['romans', 'teutons', 'gauls', 'egyptians', 'huns', 'spartans']
 const line = () => screen.queryByTestId('autofill-unit-pending')
@@ -83,7 +83,7 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE)
   })
 
-  it('Vikings: only 「兵種中文名為暫譯」 (one chip); Spartans no line; 「全部」 and unknown tribe 「維京的兵種中文名為暫譯」', () => {
+  it('Vikings: 「維京的運載量待驗證，兵種中文名為暫譯」 (one chip); Spartans no line; 「全部」 and unknown tribe 「維京的兵種運載量待驗證」', () => {
     fill.tribe = 'vikings'
     const v = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
     const row = screen.getByTestId('autofill-unit-pending')
@@ -108,8 +108,8 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     b.unmount()
   })
 
-  it('wording follows Viking carry: ✓ now; if it went back to 待驗證 the exact designer strings come back', () => {
-    expect(vikingCarryPending()).toBe(false)
+  it('wording follows Viking carry: 待驗證 now (exact designer strings); the ✓ wording is only used if raiding units become verified', () => {
+    expect(vikingCarryPending()).toBe(true)
     const zh = (tribe: string | null, pending: boolean) => i18n.t(unitPendingLineKey(tribe, pending))
     expect(zh('vikings', false)).toBe('兵種中文名為暫譯')
     expect(zh('all', false)).toBe('維京的兵種中文名為暫譯')
@@ -120,23 +120,22 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     expect(zh(null, true)).toBe('維京的兵種運載量待驗證')
   })
 
-  it('only raiding units count: a pending Viking Settler does not trigger the 運載量待驗證 wording (designer, round 4)', () => {
-    // 現在的資料：開拓者留空（PM 第 4 輪），前 9 種 ✓
+  it('only raiding units count: a pending Viking Settler alone does not trigger the 運載量待驗證 wording (designer)', () => {
+    // 現在的資料：維京 10 種都留空（幕僚長 2026-10-11）
     const rows = tribeUnitSpeeds('vikings').map((r) => ({ slot: r.slot, carry_source: r.carrySource }))
-    expect(rows.find((r) => r.slot === 10)?.carry_source).toBe('pending')
-    expect(rows.filter((r) => r.slot !== 10).every((r) => r.carry_source === 'two_sources')).toBe(true)
-    expect(vikingCarryPending(rows)).toBe(false)
-    expect(vikingCarryPending()).toBe(false)
-    expect(i18n.t(unitPendingLineKey('vikings', vikingCarryPending()))).toBe('兵種中文名為暫譯')
-    // 會搶資源的兵種（例如奴僕）留空才換成「維京的運載量待驗證，兵種中文名為暫譯」
-    const thrallPending = rows.map((r) => (r.slot === 1 ? { ...r, carry_source: 'pending' } : r))
+    expect(rows.every((r) => r.carry_source === 'pending')).toBe(true)
+    expect(vikingCarryPending(rows)).toBe(true)
+    // 假設前 9 種有核對、只剩開拓者留空：不算
+    const settlerOnly = rows.map((r) => ({ ...r, carry_source: r.slot === 10 ? 'pending' : 'two_sources' }))
+    expect(vikingCarryPending(settlerOnly)).toBe(false)
+    expect(i18n.t(unitPendingLineKey('vikings', vikingCarryPending(settlerOnly)))).toBe('兵種中文名為暫譯')
+    // 會搶資源的兵種（例如奴僕）留空就算
+    const thrallPending = settlerOnly.map((r) => (r.slot === 1 ? { ...r, carry_source: 'pending' } : r))
     expect(vikingCarryPending(thrallPending)).toBe(true)
-    expect(i18n.t(unitPendingLineKey('vikings', vikingCarryPending(thrallPending)))).toBe('維京的運載量待驗證，兵種中文名為暫譯')
-    // 畫面上選維京：只有「兵種中文名為暫譯」
+    // 畫面上選維京：一字不差
     fill.tribe = 'vikings'
     const v = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
-    expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(/^兵種中文名為暫譯$/)
-    expect(screen.queryByText(/運載量待驗證/)).not.toBeInTheDocument()
+    expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(/^維京的運載量待驗證，兵種中文名為暫譯$/)
     v.unmount()
   })
 

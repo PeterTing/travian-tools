@@ -942,8 +942,6 @@
       "decision": "第 4 輪（PM，2026-10-11 02:00 台北）：開拓者只有 Siegewise 一份（Fandom 那列是抄錯的衝撞車列），不算兩份一致 → 改回留空、待驗證（產生器 CARRY_PENDING_UNITS）。前 9 種維持 ✓",
       "superseded_decision": "第 3 輪：照其他 6 族的 3000 標 ✓（已撤回）"
     },
-    "conclusion": "independent",
-    "decision": "兩份互不引用、沒有共同出處 → 維京運載量 ✓：55/40/75/0/110/80/0/0/0/3000，出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）",
     "caveats": [
       "Fandom 自己註明數字可能不對（出處是 2024 年影片）",
       "Siegewise 把這些數字標 sheet-only（沒有獨立確認）",
@@ -986,6 +984,21 @@
       "same_sheet_as_fandom": "沒有證據（Siegewise 的試算表沒公開；Fandom 寫的出處是 2024 年 YouTube 影片，不是試算表）",
       "finding": "Siegewise 運載量出處不明",
       "decision": "找不到跟 Fandom 共用出處的證據，也找不到 Siegewise 自己的出處 → 照規則寫「Siegewise 運載量出處不明」，前 9 種維持 ✓，由幕僚長決定"
+    },
+    "conclusion_round3": "independent",
+    "decision_round3": "兩份互不引用、沒有共同出處 → 維京運載量 ✓：55/40/75/0/110/80/0/0/0/3000，出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）",
+    "conclusion": "出處不明，退回待驗證",
+    "final_decision": {
+      "by": "幕僚長",
+      "date": "2026-10-11",
+      "decided_at": "2026-10-11T02:12:00+08:00",
+      "conclusion": "出處不明，退回待驗證",
+      "reason": "Siegewise 運載量出處不明（見 siegewise_source_trace），沒辦法證明 Fandom、Siegewise 互相獨立",
+      "effect": "維京 10 種兵的運載量全部留空（null，待驗證）：產生器 CARRY_EMPTY_TRIBES = (\"vikings\",)、CARRY_TWO_SOURCE_TRIBES = ()；兵種頁「—」＋待驗證，農場收益「無法計算」",
+      "supersedes": [
+        "conclusion_round3（independent → 前 9 種 ✓）",
+        "settler.decision（第 4 輪開拓者留空，現在 10 種都留空）"
+      ]
     }
   }
 }

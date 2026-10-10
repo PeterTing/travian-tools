@@ -1162,8 +1162,8 @@
       "source": "The current numbers are community-compiled and may be off."
     },
     "autofillUnits": {
-      "what": "Roman, Teuton, Gaul, Egyptian and Hun unit numbers are checked against the ts11 in-game help; Spartan unit numbers, speeds and carry capacity are checked against the ASIA x1 in-game help; Viking costs, upkeep, training times, attack and defence are checked against the official help page, and their carry capacity uses the matching figures from Fandom and Siegewise; Viking Chinese names are provisional translations.",
-      "source": "Viking numbers come from the official help page S139; carry capacity isn't on any official page and comes from Fandom and Siegewise (they don't cite each other and agree); ts11 has no Vikings and no current world offers them, so the Chinese names can't be read in-game yet."
+      "what": "Roman, Teuton, Gaul, Egyptian and Hun unit numbers are checked against the ts11 in-game help; Spartan unit numbers, speeds and carry capacity are checked against the ASIA x1 in-game help; Viking costs, upkeep, training times, attack and defence are checked against the official help page, but their carry capacity is unverified and not shown yet.",
+      "source": "Viking numbers come from the official help page S139; ts11 has no Vikings and no current world offers them, so they can't be read in-game yet."
     },
     "reverseTsUnverified": {
       "what": "Some unit speeds haven't been checked yet; reverse TS leaves those units out.",
@@ -1240,11 +1240,6 @@
       "source": "From the official knowledge base."
     },
     "whatWithEffect": "Cost, time, population, CP and effect are checked.",
-    "vikingCarry": {
-      "what": "Viking carry capacity is checked (no official figure).",
-      "source": "Source: Fandom and Siegewise agree (the official pages don't list carry capacity)",
-      "note": "Community data; not published officially"
-    },
     "celebration": {
       "what": "Small and great celebration costs (wood, clay, iron, crop) are checked.",
       "source": "Source: Travian Answers (official, 2021 snapshot) and Travian Wiki agree."
