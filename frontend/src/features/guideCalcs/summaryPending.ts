@@ -52,7 +52,7 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
     note: '第二行「成本」一個灰標：資源田升到 4 級以上（fieldHighLevel，也涵蓋上面的總時間）、加成建築（building）、有勾 Plus 時排序用到的 Plus 加總算法（plusFormula，預設有勾）；有用到才列',
   },
   'features/guideCalcs/components/LaunchSimCalculator.tsx': {
-    chips: [['launchSim', 'units']],
-    note: '第二行一個灰標：「第 X 天」＝試算表每一步加總（launchSim）、「拓荒者」花費（units）；時數用同一份資料，標題不重複放',
+    chips: [['launchSim']],
+    note: '第二行一個灰標：「第 X 天」＝試算表每一步加總（launchSim）；時數用同一份資料，標題不重複放。拓荒者花費沒有用在計算裡，P0-17 (b) 從摘要拿掉（明細最後一列仍列出，旁邊有 units 灰標）',
   },
 }

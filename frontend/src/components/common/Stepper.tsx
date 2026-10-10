@@ -9,19 +9,26 @@ interface StepperProps {
   max?: number
   step?: number
   testId?: string
+  /**
+   * 欄位名稱的樣式要跟同一頁其他欄位一樣（設計師）：
+   * - 'calc'（預設）：攻略計算器的欄位名稱，12px 灰字、名稱和欄位隔 4px
+   * - 'form'：行軍時間／攔截等表單頁的欄位名稱，14px、名稱和欄位隔 8px
+   */
+  labelStyle?: 'calc' | 'form'
 }
 
 /**
  * 等級輸入：− 數字 ＋（IA v2.2「等級輸入一律用加減鈕」）。
  * 加減鈕是真的 <button>，aria-label「減少」「增加」，點擊範圍 44×44；中間仍可直接打字。
  */
-export default function Stepper({ label, value, onChange, min = 0, max = 20, step = 1, testId }: StepperProps) {
+export default function Stepper({ label, value, onChange, min = 0, max = 20, step = 1, testId, labelStyle = 'calc' }: StepperProps) {
   const { t } = useTranslation()
   const id = useId()
   const clamp = (v: number) => Math.max(min, Math.min(max, Number.isFinite(v) ? v : min))
   return (
-    <div className="flex min-w-0 flex-col gap-1" data-testid={testId}>
-      <label htmlFor={id} className="truncate text-xs text-muted-foreground">
+    <div className={`flex min-w-0 flex-col ${labelStyle === 'form' ? 'gap-2' : 'gap-1'}`} data-testid={testId}>
+      {/* 名稱可以換行，不截斷（390 兩欄時長名稱會被切掉） */}
+      <label htmlFor={id} className={labelStyle === 'form' ? 'text-sm font-medium' : 'text-xs text-muted-foreground'}>
         {label}
       </label>
       <div role="group" aria-label={label} className="flex items-center">

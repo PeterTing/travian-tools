@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import {
   CROPPER_LAYOUTS, FIELD_PRODUCTION,
-  fieldTotalCost, fieldBuildTime, formatDuration, bbTotalCost,
+  fieldTotalCost, fieldBuildTime, formatDuration, bbTotalCost, bbBuildTime,
   type CropperId, type ResourceType,
 } from '../data/travian';
 import { useLang } from '../i18n/LangContext';
@@ -14,6 +14,10 @@ import Stepper from '@/components/common/Stepper'
 
 export type BB = 'sawmill' | 'brickyard' | 'ironFoundry' | 'grainMill' | 'bakery';
 
+const FIELD_ZH: Record<ResourceType, string> = { wood: '伐木場', clay: '磚坑', iron: '鐵礦場', crop: '農場' };
+const RES_ZH: Record<ResourceType, string> = { wood: '木材', clay: '黏土', iron: '鐵礦', crop: '糧食' };
+const BB_ZH: Record<BB, string> = { sawmill: '鋸木廠', brickyard: '磚廠', ironFoundry: '鑄鐵廠', grainMill: '麵粉廠', bakery: '麵包店' };
+
 export const BB_REQ: Record<BB, { res: ResourceType; field: number; alsoMill?: number }> = {
   sawmill:     { res: 'wood', field: 10 },
   brickyard:   { res: 'clay', field: 10 },
@@ -24,6 +28,8 @@ export const BB_REQ: Record<BB, { res: ResourceType; field: number; alsoMill?: n
 
 export interface Step {
   label: string;
+  /** 中文步驟名稱（畫面用） */
+  labelZh: string;
   cost: number;
   time: number;
   roi: number;
@@ -101,7 +107,8 @@ export function planGreedy(input: PlanInput): PlanResult {
       const roi = perDay > 0 ? cost / perDay : Infinity;
       cands.push({ kind: 'field', type: t, from: lowest, to, cost, roi,
         time: fieldBuildTime(t, to, mb),
-        label: `${t[0]!.toUpperCase() + t.slice(1)} #${lowestIdx + 1} → Lv ${to}` });
+        label: `${t[0]!.toUpperCase() + t.slice(1)} #${lowestIdx + 1} → Lv ${to}`,
+        labelZh: `${FIELD_ZH[t]} #${lowestIdx + 1} → ${to} 級` });
     });
 
     // Bonus-building candidates (prerequisites must be met)
@@ -118,8 +125,9 @@ export function planGreedy(input: PlanInput): PlanResult {
       const delta = totalProdHr * 0.05;
       const perDay = delta * 24;
       const roi = perDay > 0 ? cost / perDay : Infinity;
-      cands.push({ kind: 'bb', bb: b, from: cur, to, cost, roi, time: 0,
-        label: `${b[0]!.toUpperCase() + b.slice(1)} → Lv ${to} (+5% ${req.res})` });
+      cands.push({ kind: 'bb', bb: b, from: cur, to, cost, roi, time: bbBuildTime(b, to, mb),
+        label: `${b[0]!.toUpperCase() + b.slice(1)} → Lv ${to} (+5% ${req.res})`,
+        labelZh: `${BB_ZH[b]} → ${to} 級（${RES_ZH[req.res]} +5%）` });
     });
 
     if (!cands.length) break;
@@ -185,32 +193,32 @@ export default function BuildOrderCalculator() {
 
           <label className={s.check}>
             <input type="checkbox" checked={isCap} onChange={e => setIsCap(e.target.checked)} />
-            {lang === 'en' ? 'Capital (unlocks Lv 11–20)' : '首都（解鎖 Lv 11–20）'}
+            {lang === 'en' ? 'Capital (unlocks Lv 11–20)' : '首都（田可升到 11–20 級）'}
           </label>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Current field levels' : '現況：田地等級'}</h4>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label="Wood" value={start.wood} onChange={v => setStart(p => ({ ...p, wood: v }))} min={0} max={20} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label="Clay" value={start.clay} onChange={v => setStart(p => ({ ...p, clay: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Wood' : '伐木場'} value={start.wood} onChange={v => setStart(p => ({ ...p, wood: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Clay' : '磚坑'} value={start.clay} onChange={v => setStart(p => ({ ...p, clay: v }))} min={0} max={20} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label="Iron" value={start.iron} onChange={v => setStart(p => ({ ...p, iron: v }))} min={0} max={20} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label="Crop" value={start.crop} onChange={v => setStart(p => ({ ...p, crop: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Iron' : '鐵礦場'} value={start.iron} onChange={v => setStart(p => ({ ...p, iron: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Crop' : '農場'} value={start.crop} onChange={v => setStart(p => ({ ...p, crop: v }))} min={0} max={20} /></div>
           </div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Bonus building levels' : '加成建築等級'}</h4>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label="Sawmill" value={bonus.sawmill} onChange={v => setBonus(p => ({ ...p, sawmill: v }))} min={0} max={5} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label="Brickyard" value={bonus.brickyard} onChange={v => setBonus(p => ({ ...p, brickyard: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Sawmill' : '鋸木廠'} value={bonus.sawmill} onChange={v => setBonus(p => ({ ...p, sawmill: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Brickyard' : '磚廠'} value={bonus.brickyard} onChange={v => setBonus(p => ({ ...p, brickyard: v }))} min={0} max={5} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label="Iron Foundry" value={bonus.ironFoundry} onChange={v => setBonus(p => ({ ...p, ironFoundry: v }))} min={0} max={5} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label="Grain Mill" value={bonus.grainMill} onChange={v => setBonus(p => ({ ...p, grainMill: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Iron Foundry' : '鑄鐵廠'} value={bonus.ironFoundry} onChange={v => setBonus(p => ({ ...p, ironFoundry: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Grain Mill' : '麵粉廠'} value={bonus.grainMill} onChange={v => setBonus(p => ({ ...p, grainMill: v }))} min={0} max={5} /></div>
           </div>
-          <div className="mb-3.5 min-w-0"><Stepper label="Bakery" value={bonus.bakery} onChange={v => setBonus(p => ({ ...p, bakery: v }))} min={0} max={5} /></div>
+          <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Bakery' : '麵包店'} value={bonus.bakery} onChange={v => setBonus(p => ({ ...p, bakery: v }))} min={0} max={5} /></div>
 
-          <div className="mb-3.5 min-w-0"><Stepper label="Main Building Lv" value={mb} onChange={setMb} min={1} max={20} /></div>
-          <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> Plus +25% gold</label>
+          <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Main Building Lv' : '村莊大樓等級'} value={mb} onChange={setMb} min={1} max={20} /></div>
+          <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> {lang === 'en' ? 'Plus +25% (gold)' : 'Plus 產量 +25%（金幣）'}</label>
         </div>
 
         <CalcResultPanel
@@ -240,7 +248,7 @@ export default function BuildOrderCalculator() {
             {plan.steps.map((st, i) => (
               <li key={i}>
                 <span className={s.stepNum}>#{i + 1}</span>
-                <span>{st.label}</span>
+                <span>{lang === 'en' ? st.label : st.labelZh}</span>
                 <span className={s.stepCost}>{st.cost.toLocaleString()}</span>
                 <span className={s.stepTime}>{st.time > 0 ? formatDuration(st.time) : '—'}</span>
               </li>
@@ -252,7 +260,7 @@ export default function BuildOrderCalculator() {
           <div className={s.note}>
             {lang === 'en'
               ? 'Time uses MB speed-up (0.964^(MB Lv − 1)) but does not model dual queues, Roman-dual, gold instant-5m, or celebration speed-ups. Reality will be a bit faster.'
-              : '時間已套用村莊大樓加速（0.964^(MB Lv − 1)），但未計入單/雙佇列、羅馬人雙隊、金幣 5 分鐘補時、慶典加速。實際略快。'}
+              : '時間已套用村莊大樓加速（0.964^(MB Lv − 1)），但未計入羅馬人可同時蓋田和建築、金幣 5 分鐘補時、慶典加速。實際略快。'}
           </div>
         </CalcResultPanel>
       </div>

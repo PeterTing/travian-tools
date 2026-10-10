@@ -224,6 +224,8 @@ class SpeedTsMatch(BaseModel):
 
     unit_speed: int
     possible_units: list[str]  # 該速度的兵種名稱
+    # 中文名稱（含部族），跟 possible_units 同順序；畫面顯示用（P0-17 (h)）
+    possible_units_zh: list[str] = []
     tournament_square_level: int
     calculated_travel_time_seconds: int
     calculated_travel_time_formatted: str
@@ -336,6 +338,11 @@ class CropScouterResponse(BaseModel):
 class AttackerProfile(BaseModel):
     """單一攻擊村莊的時速/TS 配置."""
 
+    attacker_id: str | None = Field(
+        None,
+        max_length=64,
+        description="前端給的穩定 id，原樣回傳（兩個攻擊者同名也對得回去）",
+    )
     village_label: str = Field(..., description="識別名，例如 'Hammer-1'")
     x: int = Field(..., ge=-200, le=200)
     y: int = Field(..., ge=-200, le=200)
@@ -373,6 +380,7 @@ class TsOptimizerRequest(BaseModel):
 class TsOptimizerResult(BaseModel):
     """單一攻擊者的最優發送設定."""
 
+    attacker_id: str | None = None
     village_label: str
     recommended_ts_level: int
     send_time: str  # ISO 8601

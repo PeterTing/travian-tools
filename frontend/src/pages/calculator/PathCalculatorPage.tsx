@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import RangeNumberField from '@/components/common/RangeNumberField'
 import { useTranslation } from 'react-i18next'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import {
@@ -51,7 +52,8 @@ export default function PathCalculatorPage() {
       unitSpeed,
       serverSpeed,
       tournamentSquareLevel: tsLevel,
-      heroBonusPercent: heroBonus,
+      // 超出 0–75 時欄位下方會寫「請輸入 0–75」；結果先用夾在範圍內的值算
+      heroBonusPercent: Number.isFinite(heroBonus) ? Math.max(0, Math.min(75, heroBonus)) : 0,
       artifactMultiplier,
     })
     const hours = travelSeconds / 3600
@@ -66,7 +68,7 @@ export default function PathCalculatorPage() {
 
   // 待驗證：競技場 > 0 級或英雄靴子 > 0% 時，移動時間和速度用了官方說明頁 S71 的公式（還沒在 ts11 遊戲內核對）；
   // 一行一個灰標，依用到的加成選一種說明（只有競技場／只有靴子／兩個都有）；兩個都 0 不標（全站共用 speedPendingKinds，P0-21）
-  const arenaKinds = speedPendingKinds(tsLevel, heroBonus)
+  const arenaKinds = speedPendingKinds(tsLevel, Number.isFinite(heroBonus) ? Math.max(0, Math.min(75, heroBonus)) : 0)
   const arenaChip = arenaKinds.length ? <> <PendingVerifyChip kinds={arenaKinds} /></> : null
 
   const inputCls =
@@ -151,16 +153,16 @@ export default function PathCalculatorPage() {
             <Stepper label={t('pathCalc.tsLevel')} value={tsLevel} onChange={setTsLevel} min={0} max={20} testId="path-ts-level" />
           </div>
 
-          <label className="mb-3 block text-xs text-muted-foreground">
-            {t('pathCalc.heroBonus')}
-            <input
-              type="number"
-              min={0}
-              value={heroBonus}
-              onChange={(e) => setHeroBonus(Number(e.target.value))}
-              className={`${inputCls} mt-1`}
-            />
-          </label>
+          <RangeNumberField
+            className="mb-3 text-xs text-muted-foreground"
+            labelClassName="block mb-1"
+            label={t('pathCalc.heroBonus')}
+            min={0}
+            max={75}
+            testId="path-boots"
+            value={heroBonus}
+            onChange={setHeroBonus}
+          />
 
           <label className="mb-3 block text-xs text-muted-foreground">
             {t('pathCalc.artifact')}

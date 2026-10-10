@@ -39,10 +39,10 @@ export default function CropScouterPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">首都類型反推（Crop Scouter）</h1>
+      <h1 className="text-3xl font-bold mb-2">首都類型反推</h1>
       <p className="text-muted-foreground mb-6">
         輸入偵查到的對手每小時資源產量，估算其首都類型（15c / 9c / 7c / 6c /
-        4446 / 3347）。以 crop-to-others 比例啟發式判斷。
+        4446 / 3347）。用糧食和其他三種資源產量的比例來推測。
       </p>
       <CalcBar />
 
@@ -55,7 +55,7 @@ export default function CropScouterPage() {
                 ['wood_production', '木材 / 小時', 'wood'],
                 ['clay_production', '磚塊 / 小時', 'clay'],
                 ['iron_production', '鐵礦 / 小時', 'iron'],
-                ['crop_production', '穀物 / 小時', 'crop'],
+                ['crop_production', '糧食 / 小時', 'crop'],
                 ['population', '人口數', 'population'],
               ] as const
             ).map(([key, label, testId]) => (

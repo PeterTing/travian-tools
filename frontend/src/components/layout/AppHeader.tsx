@@ -17,7 +17,7 @@ export default function AppHeader() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
       <div className="flex h-14 items-center gap-2 px-3 lg:gap-4 lg:px-4">
-        <Link to={ROUTES.HOME} className="shrink-0 whitespace-nowrap text-base font-bold lg:text-lg">
+        <Link to={ROUTES.HOME} className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap text-base font-bold lg:text-lg">
           {t('nav.title')}
         </Link>
         {isAuthenticated && (
@@ -31,7 +31,7 @@ export default function AppHeader() {
               {/* 手機的浮動「＋ 貼上」在電腦改成頂列按鈕 */}
               <Link
                 to={{ pathname: ROUTES.HOME, hash: 'paste' }}
-                className="inline-flex h-9 items-center rounded-md bg-orange-600 px-3 text-sm font-medium text-white hover:bg-orange-700"
+                className="inline-flex h-11 items-center rounded-md bg-orange-600 px-3 text-sm font-medium text-white hover:bg-orange-700"
                 data-testid="header-paste"
               >
                 ＋ {t('home.pasteFab')}

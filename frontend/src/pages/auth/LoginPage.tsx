@@ -86,7 +86,7 @@ export default function LoginPage() {
             </Button>
             <p className="text-sm text-center text-muted-foreground">
               {t('auth.noAccount')}{' '}
-              <Link to="/register" className="text-primary hover:underline">
+              <Link to="/register" className="inline-flex min-h-11 items-center px-1 text-primary hover:underline">
                 {t('auth.registerLink')}
               </Link>
             </p>

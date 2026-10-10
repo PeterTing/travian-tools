@@ -74,3 +74,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+/*
+ * P0-17 (f) 全站點擊目標（設計師規格）：
+ * - 輸入框、下拉選單本身高 44px（不用透明點擊範圍撐），字 16px，iOS 點進去不會自動放大
+ * - 按鈕至少 44×44；「待驗證」灰標維持原本外觀，44×44 點擊範圍由元件自己的透明延伸負責
+ * - 勾選框放大到 20px，外層 label 由各頁補到 44px 高
+ */
+@layer base {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='hidden']):not([type='file']),
+  select,
+  textarea {
+    min-height: 2.75rem;
+    font-size: 16px;
+  }
+  input[type='file'] {
+    min-height: 2.75rem;
+  }
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  button:not([data-testid='pending-verify-chip']),
+  [role='button'],
+  [role='tab'] {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+}

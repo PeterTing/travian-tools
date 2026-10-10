@@ -166,8 +166,8 @@ describe('IA v2.2', () => {
       expect(screen.queryByTestId('autofill-unit-pending')).not.toBeInTheDocument()
     })
 
-    it('shows 兵種待驗證 on pages that use unit data, e.g. 行軍時間', () => {
-      renderBar('/calculator/path')
+    it('shows 兵種待驗證 on pages that use unit data, e.g. 糧食平衡', () => {
+      renderBar('/calculator/crop')
       const line = screen.getByTestId('autofill-unit-pending')
       // 兩行、沒有分號；灰標在最前面，兩行都掛在灰標右邊（同一個文字欄）
       expect(line).not.toHaveTextContent('；')
@@ -183,8 +183,16 @@ describe('IA v2.2', () => {
       expect(line).toHaveClass('flex')
     })
 
+    it('pages where speed is typed by hand or that use merchant data do not show the unit line (P0-17 (a))', () => {
+      for (const path of ['/calculator/path', '/calculator/interception', '/calculator/save-troops', '/calculator/attack-planner', '/calculator/trade-route']) {
+        const { unmount } = renderBar(path)
+        expect(screen.queryByTestId('autofill-unit-pending')).not.toBeInTheDocument()
+        unmount()
+      }
+    })
+
     it('the 已帶入 chip uses the two-line autofillUnits copy (one chip governs both lines)', () => {
-      renderBar('/calculator/path')
+      renderBar('/calculator/crop')
       const line = screen.getByTestId('autofill-unit-pending')
       fireEvent.click(within(line).getByTestId('pending-verify-chip'))
       expect(screen.getByTestId('pending-note-what')).toHaveTextContent(
@@ -196,7 +204,7 @@ describe('IA v2.2', () => {
     })
 
     it('「更改」 and the editor selects are at least 44px tall', () => {
-      renderBar('/calculator/path')
+      renderBar('/calculator/crop')
       const edit = screen.getByTestId('autofill-edit')
       expect(edit).toHaveClass('inline-flex', 'min-h-[44px]', 'min-w-[44px]', 'items-center')
       fireEvent.click(edit)

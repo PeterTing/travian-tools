@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import { resourcesApi } from '@/services/gameApi'
 import type { ResourceFieldListItem, ResourceFieldDetail, ResourceType } from '@/types/game'
 
@@ -162,14 +163,14 @@ export default function ResourcesPage() {
                       100
                     }%`,
                   }}
-                  title={`Lv.${level.level}: ${level.production_per_hour}/h`}
+                  title={`${level.level} 級：${level.production_per_hour}/小時`}
                 />
               ))}
             </div>
             <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>Lv.0</span>
-              <span>Lv.10</span>
-              <span>Lv.20</span>
+              <span>0 級</span>
+              <span>10 級</span>
+              <span>20 級</span>
             </div>
           </div>
 
@@ -181,15 +182,15 @@ export default function ResourcesPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b">
-                      <th className="py-2 px-2 text-left">Lv</th>
-                      <th className="py-2 px-2 text-right">產量/h</th>
-                      <th className="py-2 px-2 text-right">Wood</th>
-                      <th className="py-2 px-2 text-right">Clay</th>
-                      <th className="py-2 px-2 text-right">Iron</th>
-                      <th className="py-2 px-2 text-right">Crop</th>
+                      <th className="py-2 px-2 text-left">等級</th>
+                      <th className="py-2 px-2 text-right">產量/小時</th>
+                      <th className="py-2 px-2 text-right">木材</th>
+                      <th className="py-2 px-2 text-right">黏土</th>
+                      <th className="py-2 px-2 text-right">鐵礦</th>
+                      <th className="py-2 px-2 text-right">糧食</th>
                       <th className="py-2 px-2 text-right">總成本</th>
-                      <th className="py-2 px-2 text-right">Time</th>
-                      <th className="py-2 px-2 text-right">Pop</th>
+                      <th className="py-2 px-2 text-right">時間（1 倍速）</th>
+                      <th className="py-2 px-2 text-right">人口</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -198,7 +199,11 @@ export default function ResourcesPage() {
                         key={level.level}
                         className="border-b hover:bg-muted/50"
                       >
-                        <td className="py-2 px-2 font-medium">{level.level}</td>
+                        <td className="py-2 px-2 font-medium whitespace-nowrap">
+                          {level.level}
+                          {/* 3 級以上產量、4 級以上花費／時間還沒對過 ts11（P0-18） */}
+                          {level.level >= 3 && <PendingVerifyChip kind="fieldHighLevel" className="ml-1" />}
+                        </td>
                         <td className="py-2 px-2 text-right font-semibold text-green-600">
                           {level.production_per_hour}
                         </td>
@@ -248,7 +253,8 @@ export default function ResourcesPage() {
                         className="border-b hover:bg-muted/50"
                       >
                         <td className="py-2 px-2 font-medium">
-                          Lv.{roi.from_level} → {roi.to_level}
+                          {roi.from_level} → {roi.to_level} 級
+                          {roi.to_level >= 3 && <PendingVerifyChip kind="fieldHighLevel" className="ml-1" />}
                         </td>
                         <td className="py-2 px-2 text-right">
                           {roi.upgrade_cost.toLocaleString()}

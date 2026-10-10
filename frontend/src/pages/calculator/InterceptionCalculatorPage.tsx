@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
@@ -42,6 +43,8 @@ export default function InterceptionCalculatorPage() {
   }
 
   const handleCalculate = async () => {
+    // 超出 0–75 的欄位：欄位下方已經寫「請輸入 0–75」，捲過去、不送出（P0-17 (j)）
+    if (focusFirstInvalid(document.querySelector('main'))) return
     try {
       setLoading(true)
       setError(null)
@@ -57,8 +60,10 @@ export default function InterceptionCalculatorPage() {
 
   const returnKinds = used ? speedPendingKinds(used.attacker_ts_level ?? 0, used.attacker_hero_bonus ?? 0) : []
   const catchKinds = used ? speedPendingKinds(used.catcher_ts_level ?? 0, used.catcher_hero_bonus ?? 0) : []
-  // 發送時間用到兩邊：先攻擊方（回到家時間）、再攔截者（行進時間），同一種只列一次
-  const sendKinds = [...new Set([...returnKinds, ...catchKinds])]
+  // 發送時間用到兩邊：先攻方（回到家時間）、再攔截方（行進時間）。每一條前面寫是哪一方；
+  // 兩方用到同一種加成時兩方都列出來，文字重複沒關係（PM＋設計師，P0-17）
+  const sendKinds = [...returnKinds, ...catchKinds]
+  const sendLabels = [...returnKinds.map(() => '攻方：'), ...catchKinds.map(() => '攔截方：')]
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -148,6 +153,7 @@ export default function InterceptionCalculatorPage() {
           {/* 攻擊方回程也照共用行軍公式：競技場、靴子只加快超過 20 格的路段（P0-21） */}
           <div>
             <Stepper
+              labelStyle="form"
               label="攻方競技場等級"
               value={form.attacker_ts_level ?? 0}
               onChange={(v) => handleChange('attacker_ts_level', v)}
@@ -156,18 +162,14 @@ export default function InterceptionCalculatorPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">攻方英雄靴子速度加成（%）</label>
-            <input
-              type="number"
-              min={0}
-              max={75}
-              data-testid="attacker-boots"
-              value={form.attacker_hero_bonus ?? 0}
-              onChange={(e) => handleChange('attacker_hero_bonus', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
-            />
-          </div>
+          <RangeNumberField
+            label="攻方英雄靴子速度加成（%）"
+            min={0}
+            max={75}
+            testId="attacker-boots"
+            value={form.attacker_hero_bonus ?? 0}
+            onChange={(v) => handleChange('attacker_hero_bonus', v)}
+          />
 
           <h2 className="text-xl font-semibold pt-2">攔截者村莊（你的）</h2>
           <div className="grid grid-cols-2 gap-4">
@@ -208,6 +210,7 @@ export default function InterceptionCalculatorPage() {
 
           <div>
             <Stepper
+              labelStyle="form"
               label="攔截方競技場等級"
               value={form.catcher_ts_level ?? 0}
               onChange={(v) => handleChange('catcher_ts_level', v)}
@@ -216,18 +219,14 @@ export default function InterceptionCalculatorPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">攔截方英雄靴子速度加成（%）</label>
-            <input
-              type="number"
-              min={0}
-              max={75}
-              data-testid="catcher-boots"
-              value={form.catcher_hero_bonus ?? 0}
-              onChange={(e) => handleChange('catcher_hero_bonus', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
-            />
-          </div>
+          <RangeNumberField
+            label="攔截方英雄靴子速度加成（%）"
+            min={0}
+            max={75}
+            testId="catcher-boots"
+            value={form.catcher_hero_bonus ?? 0}
+            onChange={(v) => handleChange('catcher_hero_bonus', v)}
+          />
 
           <div>
             <label className="block text-sm font-medium mb-2">伺服器速度</label>
@@ -267,7 +266,7 @@ export default function InterceptionCalculatorPage() {
                 {/* 發送時間 ＝ 回到家時間 − 攔截行進時間：灰標放標籤後面，點開依序列出攻擊方、攔截者用到的種類（P0-21 設計師） */}
                 <PendingRow as="p" className="text-sm text-muted-foreground" data-testid="intercept-send-label">
                   你應該在此時發送攔截部隊
-                  {sendKinds.length > 0 && <> <PendingVerifyChip kinds={sendKinds} /></>}
+                  {sendKinds.length > 0 && <> <PendingVerifyChip kinds={sendKinds} labels={sendLabels} /></>}
                 </PendingRow>
                 <p className="text-3xl font-bold text-primary">{result.send_time}</p>
               </div>

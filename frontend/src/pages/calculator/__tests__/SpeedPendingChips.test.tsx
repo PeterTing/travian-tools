@@ -77,7 +77,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
   it('TS optimizer: boots field per attacker; one chip per result card / row on its title (village), none on the travel row', async () => {
     api.calculateTsOptimizer.mockResolvedValue({
       target_arrival: '2030-01-01T12:00:00+00:00',
-      results: [{ village_label: 'Hammer-1', recommended_ts_level: 0, send_time: '2030-01-01T06:26:40+00:00', travel_time_formatted: '5:33:20', distance: 50 }],
+      results: [{ attacker_id: 'x', village_label: '攻擊者 1', recommended_ts_level: 0, send_time: '2030-01-01T06:26:40+00:00', travel_time_formatted: '5:33:20', distance: 50 }],
       warnings: [],
     })
     render(<AttackPlannerPage />)
@@ -86,7 +86,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     fireEvent.click(screen.getByTestId('ts-submit'))
     const title = await screen.findByTestId('ts-card-title')
     expect(api.calculateTsOptimizer).toHaveBeenCalledWith(expect.objectContaining({ attackers: [expect.objectContaining({ hero_bonus: 25, ts_level: 0 })] }))
-    expect(title).toHaveTextContent('Hammer-1')
+    expect(title).toHaveTextContent('攻擊者 1')
     expect(chipKinds(title)).toEqual(['heroBootsSpeed'])
     expect(chipKinds(screen.getByTestId('ts-row-title'))).toEqual(['heroBootsSpeed'])
     expect(chipKinds(screen.getByTestId('ts-travel-card'))).toEqual([])

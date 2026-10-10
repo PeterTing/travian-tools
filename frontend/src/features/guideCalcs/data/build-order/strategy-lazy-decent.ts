@@ -380,7 +380,7 @@ const branchSteps: BuildStep[] = [
 
 export const strategyLazyDecent: Strategy = {
   id: 'lazy-decent',
-  name: { zh: '佛系 · Sim', en: 'Lazy Sim' },
+  name: { zh: '佛系 · 經濟（Sim）', en: 'Lazy Sim' },
   tagline: {
     zh: '輕鬆玩不衝時間,120-144h 結帳。適合新手或上班族',
     en: 'Chill play, settle in 120-144h. Great for new or casual players.',

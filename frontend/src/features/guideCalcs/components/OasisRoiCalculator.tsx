@@ -78,7 +78,7 @@ export default function OasisRoiCalculator() {
             <label>{lang === 'en' ? 'Field level (all)' : '田地等級（所有）'}</label>
             <select value={fieldLv} onChange={e => setFieldLv(+e.target.value)}>
               {Array.from({ length: 16 }, (_, i) => i + 5).map(L => (
-                <option key={L} value={L}>Lv {L}</option>
+                <option key={L} value={L}>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</option>
               ))}
             </select>
           </div>
@@ -95,15 +95,15 @@ export default function OasisRoiCalculator() {
           <div className={s.field}>
             <label>{lang === 'en' ? "Hero's Mansion target" : '英雄宅目標等級'}</label>
             <select value={hm} onChange={e => setHm(+e.target.value)}>
-              <option value={10}>Lv 10 (+1 oasis)</option>
-              <option value={15}>Lv 15 (+2 oases)</option>
-              <option value={20}>Lv 20 (+3 oases)</option>
+              <option value={10}>{lang === 'en' ? 'Lv 10 (+1 oasis)' : '10 級（可佔 1 塊綠洲）'}</option>
+              <option value={15}>{lang === 'en' ? 'Lv 15 (+2 oases)' : '15 級（可佔 2 塊綠洲）'}</option>
+              <option value={20}>{lang === 'en' ? 'Lv 20 (+3 oases)' : '20 級（可佔 3 塊綠洲）'}</option>
             </select>
           </div>
 
           <label className={s.check}>
             <input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} />
-            Plus +25% {lang === 'en' ? 'gold' : '金幣'}
+            {lang === 'en' ? 'Plus +25% (gold)' : 'Plus 產量 +25%（金幣）'}
           </label>
 
           <div className={s.note}>
@@ -150,7 +150,7 @@ export default function OasisRoiCalculator() {
                 const r = c / dailyGain;
                 return (
                   <tr key={L} className={`h-11 ${L === hm ? s.tableRowHi : ''}`}>
-                    <td>Lv {L}</td>
+                    <td>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</td>
                     <td>{fmt(c)}</td>
                     <td>{r.toFixed(2)}</td>
                     <td>{verdict(r, lang)}</td>

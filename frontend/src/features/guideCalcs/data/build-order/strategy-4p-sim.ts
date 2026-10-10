@@ -589,7 +589,7 @@ const branchSteps: BuildStep[] = [
 
 export const strategy4pSim: Strategy = {
   id: '4p-sim',
-  name: { zh: '4 派對 · Sim', en: '4P Sim' },
+  name: { zh: '4 派對 · 經濟（Sim）', en: '4P Sim' },
   tagline: {
     zh: '純 Hero 打綠洲 + 經濟 sim。最便宜、最快的結帳路線',
     en: 'Pure hero oasis farming + economy sim. Cheapest & fastest settle.',

@@ -578,7 +578,7 @@ const branchSteps: BuildStep[] = [
 
 export const strategy3pSim: Strategy = {
   id: '3p-sim',
-  name: { zh: '3 派對 · Sim', en: '3P Sim' },
+  name: { zh: '3 派對 · 經濟（Sim）', en: '3P Sim' },
   tagline: {
     zh: '基礎好、結帳快。Town Hall 提早升,定居後 CP +10%、資源產量略高',
     en: 'Better base, fast settle. Higher Town Hall earlier gives +10% CP prod and more income post-settle.',
