@@ -81,7 +81,7 @@
       "culturePoints": "CP 計算器",
       "npc": "購物清單（NPC）",
       "technology": "盔甲廠升級",
-      "cropScouter": "首都類型反推",
+      "cropScouter": "糧田判斷",
       "launchSim": "開局時間表",
       "buildOrder": "建造順序",
       "passiveCp": "CP 與開村",
@@ -131,7 +131,7 @@
       "pathSpeedTs": "從抵達時間反推對方 TS 等級",
       "interception": "算出能攔截的出發時間",
       "saveTroops": "躲兵出發與回來的時間",
-      "cropScouter": "偵查資源推敵方首都類型（跟查糧不同）",
+      "cropScouter": "輸入田地種類就標出幾糧田",
       "oasisRoi": "佔綠洲多久回本",
       "farming": "掠奪農場的收益"
     },
@@ -179,7 +179,8 @@
       "allVillages": "全部村莊",
       "listNote": "依抵達時間排序，倒數每秒更新。資料來自最後一次存入的集結點。",
       "none": "還沒有來襲。貼上集結點後會出現在這裡。",
-      "arrived": "已抵達"
+      "arrived": "已抵達",
+      "intercept": "攔截"
     },
     "todayTitle": "今天要做的事",
     "pasteFab": "貼上",
@@ -409,6 +410,12 @@
       "cropProduction": "糧食產量設定",
       "cropFieldsProduction": "農場總產量 (/h)",
       "cropFieldsHint": "輸入所有農場的總產量（不含英雄）",
+      "population": "人口",
+      "popDirect": "直接填人口",
+      "popByBuildings": "逐棟建築算",
+      "populationInput": "村莊人口",
+      "populationHint": "遊戲村莊頁上的人口數；1 人口每小時吃 1 糧",
+      "statusNote": "分級是本站自訂：結餘 ≥ 消耗的一半＝盈餘、≥ 0＝平衡、赤字在消耗的 20% 內＝赤字、再多＝危急",
       "oasisBonus": "綠洲加成",
       "buildings": "建築",
       "addBuilding": "新增建築",
@@ -445,7 +452,7 @@
       "heroProduction": "英雄糧食產量 (/h)",
       "heroProductionHint": "含資源點產出與固定 +6",
       "heroConsumption": "英雄糧食消耗 (/h)",
-      "heroConsumptionHint": "英雄在村時通常為 6",
+      "heroConsumptionHint": "英雄在村每小時吃 6 糧（官方 S75）；沒有英雄或英雄不在這村就填 0",
       "serverSpeed": "伺服器速度",
       "heroConsumptionResult": "英雄消耗",
       "heroProductionResult": "英雄產量",
@@ -456,6 +463,10 @@
       "description": "將現有資源按指定比例重新分配（模擬 NPC 交易）。",
       "currentResources": "當前資源",
       "desiredRatio": "期望比例",
+      "ratioHint": "可以直接填想蓋的東西的花費（例如 木 500、磚 400、鐵 300、穀 200），就照花費的比例分。",
+      "errNegativeRatio": "比例不能是負數",
+      "errAllZero": "比例至少要有一個大於 0",
+      "errNegativeResource": "資源不能是負數",
       "capacityOptional": "容量上限（選填）",
       "capacityHint": "NPC 分配不得超過倉庫／穀倉容量。",
       "warehouseCapacity": "倉庫容量",
@@ -1016,7 +1027,9 @@
     "recheck": "重新檢查",
     "noAccountSelected": "請選擇遊戲帳號以執行健康檢查",
     "protectionDays": "新手保護天數",
-    "protectionDaysHint": "依世界設定（x1 預設 5 天）"
+    "protectionDaysHint": "不知道就選「依伺服器速度」：官方 x1 5 天、x2 3 天、x3 3 天、x5 2 天、x10 1 天（不含可選延長）",
+    "protectionAuto": "依伺服器速度（官方天數）",
+    "protectionDaysN": "{{count}} 天"
   },
   "paste": {
     "emptyRecognized": "認得出「{{page}}」，但沒有可存的資料。",
@@ -1046,10 +1059,12 @@
     "targetX": "目標 X",
     "targetY": "目標 Y",
     "unitSpeed": "單位速度（格／小時）",
+    "unit": "兵種",
     "tsLevel": "競技場等級（0–20）",
     "heroBonus": "英雄靴子速度加成（%）",
     "artifact": "神器",
     "artifactNone": "無",
+    "artifactAccount15x": "大型神器（帳號）1.5×",
     "artifactUnique2x": "獨特 2×",
     "artifactVillage2x": "村莊 2×",
     "serverSpeed": "伺服器速度",
@@ -1296,5 +1311,14 @@
       "source": "取自官方知識庫。"
     },
     "whatWithEffect": "花費、時間、人口、CP、效果已核對。"
+  },
+  "cropFieldsCalc": {
+    "title": "糧田判斷",
+    "intro": "輸入田地種類（四種田各幾塊）就標出幾糧田。地圖上點那一格就看得到田地種類。",
+    "inputs": "田地種類（共 {{n}} 塊）",
+    "choose": "選擇",
+    "blocks": "{{n}} 塊",
+    "result": "結果",
+    "empty": "選好四種田的塊數就會標出幾糧田"
   }
 }

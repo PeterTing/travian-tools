@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, within } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import i18n from '@/i18n/i18n'
 import InterceptionCalculatorPage from '../InterceptionCalculatorPage'
 import AttackPlannerPage from '../AttackPlannerPage'
@@ -27,6 +28,9 @@ const fillCoords = () => {
   for (const el of document.querySelectorAll<HTMLInputElement>('input[data-testid$="-x"], input[data-testid$="-y"]')) {
     if (el.value === '') fireEvent.change(el, { target: { value: '0' } })
   }
+  // 攔截頁的到達時間預設空白（稽核 2026-10-10：以前預設 12:00:00）
+  const arrival = document.querySelector<HTMLInputElement>('[data-testid="intercept-arrival"]')
+  if (arrival && arrival.value === '') fireEvent.change(arrival, { target: { value: '12:00:00' } })
 }
 const chipKinds = (el: HTMLElement) => within(el).queryAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind'))
 const setStepper = (label: string, v: number) => {
@@ -53,7 +57,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     api.calculateInterception.mockResolvedValue({
       attacker_return_time: '17:00:00', send_time: '14:30:00', travel_time_formatted: '2h 30m 0s', distance_to_attacker: 30,
     })
-    render(<InterceptionCalculatorPage />)
+    render(<MemoryRouter><InterceptionCalculatorPage /></MemoryRouter>)
     setStepper('攻方競技場等級', 5)
     fireEvent.change(screen.getByTestId('attacker-boots'), { target: { value: '25' } })
     fireEvent.change(screen.getByTestId('catcher-boots'), { target: { value: '20' } })
@@ -75,7 +79,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     api.calculateInterception.mockResolvedValue({
       attacker_return_time: '19:08:34', send_time: '16:38:34', travel_time_formatted: '3h 0m 0s', distance_to_attacker: 30,
     })
-    render(<InterceptionCalculatorPage />)
+    render(<MemoryRouter><InterceptionCalculatorPage /></MemoryRouter>)
     fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '計算攔截時間' }))
     await screen.findByTestId('intercept-return-label')
@@ -183,7 +187,7 @@ describe('新欄位不填：送出的值跟以前一樣（新欄位都是 0，�
 
   it('interception', async () => {
     api.calculateInterception.mockResolvedValue({ attacker_return_time: '0', send_time: '0', travel_time_formatted: '0', distance_to_attacker: 0 })
-    render(<InterceptionCalculatorPage />)
+    render(<MemoryRouter><InterceptionCalculatorPage /></MemoryRouter>)
     fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '計算攔截時間' }))
     await screen.findByTestId('intercept-return-label')
@@ -205,7 +209,7 @@ describe('新欄位不填：送出的值跟以前一樣（新欄位都是 0，�
     render(<PathSpeedTsCalculatorPage />)
     fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '反推速度 + TS' }))
-    await screen.findByText(/無匹配結果/)
+    await screen.findByText(/沒有對得上的兵種/)
     expect(api.calculatePathSpeedTs).toHaveBeenCalledWith(expect.objectContaining({ hero_bonus: 0 }))
   })
 

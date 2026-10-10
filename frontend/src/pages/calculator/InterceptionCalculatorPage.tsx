@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
 import CoordPair from '@/components/common/CoordPair'
-import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
+import { EMPTY_COORD, coordPairValue, coordText, type CoordText } from '@/lib/coords'
 import { useMapRadius } from '@/lib/mapRadius'
-import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
+import ServerSpeedSelect from '@/components/common/ServerSpeedSelect'
+import UnitSpeedSelect from '@/components/common/UnitSpeedSelect'
+import { apiFieldErrors } from '@/lib/apiFieldErrors'
+import { dayOffsetLabel, isHms } from '@/lib/clockInput'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { InterceptionRequest, InterceptionResponse } from '@/services/advancedCalculatorApi'
@@ -18,12 +23,16 @@ type InterceptionForm = Omit<InterceptionRequest, CoordKey>
 
 export default function InterceptionCalculatorPage() {
   const radius = useMapRadius()
-  const [attackerCoord, setAttackerCoord] = useState<CoordText>(EMPTY_COORD)
-  const [defenderCoord, setDefenderCoord] = useState<CoordText>(EMPTY_COORD)
+  // 從來襲列表點「攔截」過來：帶入到達時間和攻方、被攻擊村莊座標（網址參數）
+  const [params] = useSearchParams()
+  const paramCoord = (x: string | null, y: string | null): CoordText =>
+    x != null && y != null && x !== '' && y !== '' ? { x, y } : EMPTY_COORD
+  const [attackerCoord, setAttackerCoord] = useState<CoordText>(() => paramCoord(params.get('ax'), params.get('ay')))
+  const [defenderCoord, setDefenderCoord] = useState<CoordText>(() => paramCoord(params.get('dx'), params.get('dy')))
   const [catcherCoord, setCatcherCoord] = useState<CoordText>(EMPTY_COORD)
   const [showCoordErrors, setShowCoordErrors] = useState(false)
   const [form, setForm] = useState<InterceptionForm>({
-    attack_arrival_time: '12:00:00',
+    attack_arrival_time: params.get('arrival') ?? '',
     attacker_speed: 7,
     catcher_speed: 10,
     server_speed: 1,
@@ -32,12 +41,19 @@ export default function InterceptionCalculatorPage() {
     attacker_ts_level: 0,
     attacker_hero_bonus: 0,
   })
-  const { currentAccount } = useCurrentAccount()
+  // 「已帶入」：伺服器速度跟上方列（含這頁的「更改」），攔截者村莊用帶入的村莊
+  const fill = useAutoFill()
   useEffect(() => {
-    if (currentAccount?.server_speed) {
-      setForm((prev) => ({ ...prev, server_speed: currentAccount.server_speed }))
-    }
-  }, [currentAccount])
+    setForm((prev) => ({ ...prev, server_speed: fill.speed }))
+  }, [fill.speed])
+  const fillX = fill.village?.coordinate_x
+  const fillY = fill.village?.coordinate_y
+  useEffect(() => {
+    if (fillX != null && fillY != null) setCatcherCoord(coordText(fillX, fillY))
+  }, [fillX, fillY])
+  // 欄位錯誤（前端先驗，後端 422 的也放這裡），顯示在欄位正下方
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const timeError = fieldErrors.attack_arrival_time
   const [result, setResult] = useState<InterceptionResponse | null>(null)
   // 結果是用哪一組輸入算的（灰標看這組，不看還沒按「計算」的新輸入）
   const [used, setUsed] = useState<InterceptionRequest | null>(null)
@@ -59,6 +75,12 @@ export default function InterceptionCalculatorPage() {
       setTimeout(() => focusFirstInvalid(document.querySelector('main')), 0)
       return
     }
+    if (!isHms(form.attack_arrival_time)) {
+      setFieldErrors({ attack_arrival_time: '請輸入 時:分:秒，例如 23:05:00（時 0–23，分、秒 0–59）' })
+      setTimeout(() => focusFirstInvalid(document.querySelector('main')), 0)
+      return
+    }
+    setFieldErrors({})
     if (focusFirstInvalid(document.querySelector('main'))) return
     const req: InterceptionRequest = {
       ...form,
@@ -75,8 +97,14 @@ export default function InterceptionCalculatorPage() {
       const res = await advancedCalculatorApi.calculateInterception(req)
       setResult(res)
       setUsed(req)
-    } catch {
-      setError('計算失敗，請檢查輸入')
+    } catch (err) {
+      const fe = apiFieldErrors(err)
+      if (Object.keys(fe).length) {
+        setFieldErrors(fe)
+        setTimeout(() => focusFirstInvalid(document.querySelector('main')), 0)
+      } else {
+        setError('計算失敗，請檢查輸入')
+      }
     } finally {
       setLoading(false)
     }
@@ -121,26 +149,36 @@ export default function InterceptionCalculatorPage() {
           />
 
           <div>
-            <label className="block text-sm font-medium mb-2">攻擊到達時間 (HH:MM:SS)</label>
+            <label htmlFor="intercept-arrival" className="block text-sm font-medium mb-2">攻擊到達時間（伺服器時間，時:分:秒）</label>
             <input
+              id="intercept-arrival"
               type="text"
+              inputMode="numeric"
+              data-testid="intercept-arrival"
               value={form.attack_arrival_time}
-              onChange={(e) => handleChange('attack_arrival_time', e.target.value)}
+              onChange={(e) => {
+                handleChange('attack_arrival_time', e.target.value)
+                if (timeError) {
+                  setFieldErrors((prev) => {
+                    const next = { ...prev }
+                    delete next.attack_arrival_time
+                    return next
+                  })
+                }
+              }}
               placeholder="12:00:00"
-              className="w-full p-2 border rounded bg-background"
+              aria-invalid={timeError ? true : undefined}
+              aria-describedby={timeError ? 'intercept-arrival-err' : undefined}
+              className={`w-full p-2 border rounded bg-background ${timeError ? 'border-red-600 outline-red-600' : ''}`}
             />
+            {timeError && (
+              <p id="intercept-arrival-err" role="alert" className="mt-1 text-xs text-red-600" data-testid="intercept-arrival-error">
+                {timeError}
+              </p>
+            )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">攻擊方部隊速度</label>
-            <input
-              type="number"
-              min={1}
-              value={form.attacker_speed}
-              onChange={(e) => handleChange('attacker_speed', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
-            />
-          </div>
+          <UnitSpeedSelect label="攻擊方兵種（最慢的那種）" testId="attacker-unit" onChange={(v) => handleChange('attacker_speed', v)} />
 
           {/* 攻擊方回程也照共用行軍公式：競技場、靴子只加快超過 20 格的路段（P0-21） */}
           <div>
@@ -173,16 +211,7 @@ export default function InterceptionCalculatorPage() {
             onChange={setCatcherCoord}
           />
 
-          <div>
-            <label className="block text-sm font-medium mb-2">攔截部隊速度</label>
-            <input
-              type="number"
-              min={1}
-              value={form.catcher_speed}
-              onChange={(e) => handleChange('catcher_speed', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
-            />
-          </div>
+          <UnitSpeedSelect label="攔截兵種（最慢的那種）" testId="catcher-unit" defaultTribe={fill.tribe} onChange={(v) => handleChange('catcher_speed', v)} />
 
           <div>
             <Stepper
@@ -204,18 +233,7 @@ export default function InterceptionCalculatorPage() {
             onChange={(v) => handleChange('catcher_hero_bonus', v)}
           />
 
-          <div>
-            <label className="block text-sm font-medium mb-2">伺服器速度</label>
-            <select
-              value={form.server_speed}
-              onChange={(e) => handleChange('server_speed', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
-            >
-              <option value={1}>1x</option>
-              <option value={2}>2x</option>
-              <option value={3}>3x</option>
-            </select>
-          </div>
+          <ServerSpeedSelect value={form.server_speed ?? 1} onChange={(v) => handleChange('server_speed', v)} testId="intercept-server-speed" />
 
           <Button onClick={handleCalculate} disabled={loading} className="w-full">
             {loading ? '計算中...' : '計算攔截時間'}
@@ -236,7 +254,10 @@ export default function InterceptionCalculatorPage() {
                   攻擊者回到家時間
                   {returnKinds.length > 0 && <> <PendingVerifyChip kinds={returnKinds} /></>}
                 </PendingRow>
-                <p className="text-2xl font-bold">{result.attacker_return_time}</p>
+                <p className="text-2xl font-bold" data-testid="intercept-return-time">
+                  {result.attacker_return_time}
+                  <span className="ml-1 text-base font-semibold">{dayOffsetLabel(result.return_day_offset)}</span>
+                </p>
               </div>
               <div className="p-4 bg-primary/10 rounded text-center">
                 {/* 發送時間 ＝ 回到家時間 − 攔截行進時間：灰標放標籤後面，點開依序列出攻擊方、攔截者用到的種類（P0-21 設計師） */}
@@ -244,7 +265,11 @@ export default function InterceptionCalculatorPage() {
                   你應該在此時發送攔截部隊
                   {sendKinds.length > 0 && <> <PendingVerifyChip kinds={sendKinds} labels={sendLabels} /></>}
                 </PendingRow>
-                <p className="text-3xl font-bold text-primary">{result.send_time}</p>
+                <p className="text-3xl font-bold text-primary" data-testid="intercept-send-time">
+                  {result.send_time}
+                  <span className="ml-1 text-base font-semibold">{dayOffsetLabel(result.send_day_offset)}</span>
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">伺服器時間；「明天」是指攻擊到達那天的隔天</p>
               </div>
               {/* 390 寬一欄：灰標的說明要有整張卡的寬度（窄格子撐滿的規則） */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

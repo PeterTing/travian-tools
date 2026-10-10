@@ -1,6 +1,7 @@
 """進階計算器服務單元測試."""
 
 import pytest
+from pydantic import ValidationError
 
 from app.domain.schemas.advanced_calculator import (
     CulturePointsRequest,
@@ -186,8 +187,8 @@ class TestPathCalculator:
             server_speed=3,
         )
         res = service.calculate_path(req)
-        # 10 / (10 * 3) = 1/3 hour ≈ 1200s
-        assert res.travel_time_seconds == 1200
+        # 官方 S20：x3 兵速 ×2（不是 ×3）→ 10 / (10 * 2) = 0.5h = 1800s
+        assert res.travel_time_seconds == 1800
 
 
 # ============ Interception Calculator 測試 ============
@@ -390,20 +391,27 @@ class TestNpcCalculator:
         assert res.difference["iron"] == res.result["iron"] - 300
         assert res.difference["crop"] == res.result["crop"] - 400
 
-    def test_zero_ratios_defaults_equal(
-        self, service: AdvancedCalculatorService
-    ) -> None:
-        """比例全為零時預設等比分配."""
-        req = NpcCalculatorRequest(
-            wood=400,
-            clay=400,
-            iron=400,
-            crop=400,
-            desired_ratios={"wood": 0, "clay": 0, "iron": 0, "crop": 0},
-        )
-        res = service.calculate_npc(req)
-        assert res.result["wood"] == 400
-        assert res.result["crop"] == 400
+    def test_zero_ratios_rejected(self) -> None:
+        """比例全為零 → 422（之前默默變 1:1:1:1，稽核 2026-10-10）."""
+        with pytest.raises(ValidationError, match="至少要有一個大於 0"):
+            NpcCalculatorRequest(
+                wood=400,
+                clay=400,
+                iron=400,
+                crop=400,
+                desired_ratios={"wood": 0, "clay": 0, "iron": 0, "crop": 0},
+            )
+
+    def test_negative_ratio_rejected(self) -> None:
+        """負比例 → 422（之前算出負的木材）."""
+        with pytest.raises(ValidationError, match="不能是負數"):
+            NpcCalculatorRequest(
+                wood=400,
+                clay=400,
+                iron=400,
+                crop=400,
+                desired_ratios={"wood": -1, "clay": 1, "iron": 1, "crop": 1},
+            )
 
 
 # ============ Save Troops Calculator 測試 ============
@@ -438,8 +446,8 @@ class TestSaveTroopsCalculator:
             server_speed=3,
         )
         res = service.calculate_save_troops(req)
-        # 單程 2h, speed 10*3=30 → 距離 60
-        assert res.ideal_distance == pytest.approx(60.0)
+        # 單程 2h；官方 S20：x3 兵速 ×2 → 10*2=20 → 距離 40
+        assert res.ideal_distance == pytest.approx(40.0)
 
     def test_save_troops_with_ts(self, service: AdvancedCalculatorService) -> None:
         """含 TS 的避兵計算，距離 > 20 時 TS 生效."""

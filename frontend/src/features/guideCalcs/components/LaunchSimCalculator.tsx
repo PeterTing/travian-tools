@@ -36,6 +36,10 @@ export function simulate(
   settlerTotalCost: number = 0,
 ): { totalHours: number; milestones: Milestone[]; allSteps: BuildStep[] } {
   void settlerTotalCost; // reserved for future settler-cost milestones; kept for call-site compat
+  // 產量 0 會算出 NaN／無限大、負數會算出負時間（稽核 2026-10-10）：呼叫端要先擋
+  if (!Number.isFinite(prodPerHour) || prodPerHour <= 0) {
+    throw new RangeError('prodPerHour must be > 0');
+  }
   const strategy = STRATEGIES[strategyId];
   const allSteps = [...common, ...strategy.branchSteps];
   const milestones: Milestone[] = [];
@@ -73,13 +77,18 @@ export default function LaunchSimCalculator() {
   // 部族預設跟「已帶入」列的帳號（沒有帳號才用羅馬）
   const { tribe: accountTribe } = useAutoFill();
   const [tribe, setTribe] = useState<TribeId>(() => (accountTribe && accountTribe in TRIBES ? accountTribe as TribeId : 'romans'));
-  const [prodPerHour, setProdPerHour] = useState<number>(2000);
+  // 產量用文字存：空白、0、負數都不偷偷改成 100，而是在欄位下方寫原因、不出結果
+  const [prodText, setProdText] = useState<string>('2000');
+  const prodPerHour = Number(prodText);
+  const prodError = prodText.trim() === '' || !Number.isFinite(prodPerHour) || prodPerHour <= 0
+    ? (lang === 'en' ? 'Enter a production above 0' : '請填大於 0 的產量')
+    : null;
 
   const settlerCost = TRIBE_SETTLER_COST[tribe].total * 3;
 
   const result = useMemo(
-    () => simulate(strategyId, prodPerHour, settlerCost),
-    [strategyId, prodPerHour, settlerCost]
+    () => (prodError ? null : simulate(strategyId, prodPerHour, settlerCost)),
+    [strategyId, prodPerHour, settlerCost, prodError]
   );
 
   return (
@@ -126,11 +135,16 @@ export default function LaunchSimCalculator() {
             </label>
             <input
               type="number"
-              min={100}
+              min={1}
               step={100}
-              value={prodPerHour}
-              onChange={(e) => setProdPerHour(Math.max(100, Number(e.target.value) || 100))}
+              value={prodText}
+              aria-invalid={prodError ? true : undefined}
+              data-testid="launch-prod"
+              onChange={(e) => setProdText(e.target.value)}
             />
+            {prodError && (
+              <p role="alert" className="mt-1 text-xs text-red-600" data-testid="launch-prod-error">{prodError}</p>
+            )}
           </div>
 
           <div className={s.note}>
@@ -140,6 +154,7 @@ export default function LaunchSimCalculator() {
           </div>
         </div>
 
+        {result ? (
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Estimated settle time' : '預估結帳時間'}
@@ -197,6 +212,13 @@ export default function LaunchSimCalculator() {
             </tbody>
           </table>
         </CalcResultPanel>
+        ) : (
+          <CalcResultPanel
+            lang={lang}
+            title={lang === 'en' ? 'Estimated settle time' : '預估結帳時間'}
+            primary={<>—</>}
+          />
+        )}
       </div>
     </>
   );

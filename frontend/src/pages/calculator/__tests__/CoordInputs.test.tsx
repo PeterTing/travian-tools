@@ -38,9 +38,8 @@ describe('座標框：全站共用規則', () => {
   })
 
   it.each([
-    ['interception', () => render(<InterceptionCalculatorPage />), 6],
+    ['interception', () => render(<MemoryRouter><InterceptionCalculatorPage /></MemoryRouter>), 6],
     ['OP planner', () => render(<AttackPlannerPage />), 4],
-    ['save troops', () => render(<SaveTroopsCalculatorPage />), 2],
     ['march time', () => render(<MemoryRouter><PathCalculatorPage /></MemoryRouter>), 4],
   ] as const)('%s: every coordinate box starts empty (no 0), text + full keyboard, 16px / 44px', (_n, doRender, count) => {
     doRender()
@@ -55,9 +54,14 @@ describe('座標框：全站共用規則', () => {
     }
   })
 
+  it('save troops: no village coordinates any more (only the distance matters, audit 2026-10-10)', () => {
+    render(<SaveTroopsCalculatorPage />)
+    expect(coordInputs()).toHaveLength(0)
+  })
+
   it('interception: empty coords → not sent, red text under the empty boxes', async () => {
     vi.useFakeTimers()
-    render(<InterceptionCalculatorPage />)
+    render(<MemoryRouter><InterceptionCalculatorPage /></MemoryRouter>)
     fireEvent.click(screen.getByRole('button', { name: '計算攔截時間' }))
     await act(async () => { vi.runAllTimers() })
     vi.useRealTimers()
@@ -67,13 +71,14 @@ describe('座標框：全站共用規則', () => {
 
   it('interception: negative coords (typed and pasted from ts11) are sent as numbers', async () => {
     api.calculateInterception.mockResolvedValueOnce({} as never)
-    render(<InterceptionCalculatorPage />)
+    render(<MemoryRouter><InterceptionCalculatorPage /></MemoryRouter>)
     fireEvent.change(screen.getByTestId('attacker-x'), { target: { value: '-4' } })
     fireEvent.change(screen.getByTestId('attacker-y'), { target: { value: '\u221212' } })
     // ts11 複製原文（review/realtest/clip/03-153811.txt 第 44 行）
     fireEvent.paste(screen.getByTestId('defender-x'), { clipboardData: { getData: () => '\u202d(\u202d33\u202c|\u202d\u2212\u202d4\u202c\u202c)\u202c' } })
     fireEvent.change(screen.getByTestId('catcher-x'), { target: { value: '-200' } })
     fireEvent.change(screen.getByTestId('catcher-y'), { target: { value: '200' } })
+    fireEvent.change(screen.getByTestId('intercept-arrival'), { target: { value: '12:00:00' } })
     fireEvent.click(screen.getByRole('button', { name: '計算攔截時間' }))
     expect(api.calculateInterception).toHaveBeenCalledWith(expect.objectContaining({
       attacker_x: -4, attacker_y: -12, defender_x: 33, defender_y: -4, catcher_x: -200, catcher_y: 200,

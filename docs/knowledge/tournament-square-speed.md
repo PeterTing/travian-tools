@@ -26,7 +26,11 @@ else:
     travel_time    = threshold_time + beyond_time
 ```
 
-`unit_speed` here already includes server speed (and artifacts on the march time page).
+`unit_speed` here already includes the server-speed troop multiplier (and artifacts on the march time page).
+The troop multiplier is NOT the server speed itself: official S20 ("Game Versions and Speed") lists
+troop speed x1 Normal, x2 ×2, x3 ×2, x5 ×2, x10 ×4 (evidence: `scripts/game_data/evidence/official_s20_speed_2026-10-11.json`;
+code: `TROOP_SPEED_MULTIPLIER` / `troopSpeedMultiplier`). Speeds not in that table (e.g. x4, x20) are 待驗證 and fall
+back to the multiplier of the largest listed speed below them, so travel times err on the long side.
 Travel time is rounded to the nearest second.
 
 Where:

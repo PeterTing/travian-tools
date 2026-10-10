@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
+import { apiErrorMessage } from '@/lib/apiFieldErrors'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { buildingsApi, calculatorApi } from '@/services/gameApi'
@@ -32,14 +33,13 @@ export default function BuildingCalculatorPage() {
   const [fromLevel, setFromLevel] = useState<number>(0)
   const [toLevel, setToLevel] = useState<number>(10)
   const [mainBuildingLevel, setMainBuildingLevel] = useState<number>(20)
-  const [serverSpeed, setServerSpeed] = useState<number>(1)
-  const { currentAccount } = useCurrentAccount()
+  // 伺服器速度跟「已帶入」列（含這頁的「更改」，稽核 2026-10-10）
+  const fill = useAutoFill()
+  const [serverSpeed, setServerSpeed] = useState<number>(fill.speed)
 
   useEffect(() => {
-    if (currentAccount?.server_speed) {
-      setServerSpeed(currentAccount.server_speed)
-    }
-  }, [currentAccount])
+    setServerSpeed(fill.speed)
+  }, [fill.speed])
   const [result, setResult] = useState<BuildingUpgradeResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -55,7 +55,7 @@ export default function BuildingCalculatorPage() {
           setSelectedBuilding(response.buildings[0].building_id)
         }
       } catch {
-        setError('Failed to load buildings')
+        setError('建築資料載入失敗，請重新整理')
       }
     }
     fetchBuildings()
@@ -76,8 +76,9 @@ export default function BuildingCalculatorPage() {
       }
       const response = await calculatorApi.calculateBuildingUpgrade(request)
       setResult(response)
-    } catch {
-      setError('Failed to calculate upgrade cost')
+    } catch (err) {
+      // 後端的中文訊息直接顯示（例如「目標等級要比目前等級高」）
+      setError(apiErrorMessage(err) ?? '計算失敗，請檢查輸入')
     } finally {
       setLoading(false)
     }
@@ -160,6 +161,11 @@ export default function BuildingCalculatorPage() {
             <p className="text-xs text-muted-foreground mt-1">
               {t('calculator.building.mainBuildingNote')}
             </p>
+            {selectedBuilding === 'main_building' && (
+              <p className="text-xs text-muted-foreground mt-1" data-testid="mb-self-note">
+                升村莊大樓本身：每一級用「蓋這一級時」的大樓等級算（填的等級比較高就用填的）。
+              </p>
+            )}
           </div>
 
           {/* Server speed */}
@@ -168,6 +174,7 @@ export default function BuildingCalculatorPage() {
               {t('calculator.building.serverSpeed')}
             </label>
             <select
+              data-testid="building-server-speed"
               value={serverSpeed}
               onChange={(e) => setServerSpeed(Number(e.target.value))}
               className="w-full p-2 border rounded bg-background"

@@ -51,6 +51,31 @@ ROLE_ADJUSTMENTS = {
     },
 }
 
+# ============ 倍速（官方 S20「Game Versions and Speed」）============
+# 新手保護（不含可選延長）：X1 5 天＋選擇性 3 天、X2 3+3、X3 3+3、X5 2+2、X10 1+1
+# 出處：scripts/game_data/evidence/official_s20_speed_2026-10-11.json
+BEGINNER_PROTECTION_DAYS_S20: dict[int, int] = {1: 5, 2: 3, 3: 3, 5: 2, 10: 1}
+
+
+def beginner_protection_days_for_speed(server_speed: int | None) -> int:
+    """官方 S20 的新手保護天數；表上沒有的倍速用不超過它的最大表上倍速（待驗證）."""
+    speed = int(server_speed or 1)
+    if speed in BEGINNER_PROTECTION_DAYS_S20:
+        return BEGINNER_PROTECTION_DAYS_S20[speed]
+    lower = [s for s in BEGINNER_PROTECTION_DAYS_S20 if s <= speed] or [1]
+    return BEGINNER_PROTECTION_DAYS_S20[max(lower)]
+
+
+def x1_equivalent_day(day: int, server_speed: int | None) -> int:
+    """換算成 x1 的第幾天：天數 × 倍速.
+
+    官方 S20 的時程表剛好是這個比例：神器出現 x1 第 90 天、x2 45、x3 30、x5 18、x10 9；
+    建築藍圖 180／90／60／36／18。健檢的各階段門檻（幾村、幾兵）都是本站自訂的 x1 經驗值，
+    用這個天數去比，速服才不會一直被判落後。
+    """
+    return day * max(1, int(server_speed or 1))
+
+
 # ============ 階段標準定義 ============
 
 PHASE_STANDARDS: dict[GamePhase, dict] = {
@@ -189,16 +214,17 @@ class StrategyService:
         return account
 
     def _determine_phase(
-        self, day: int, beginner_protection_days: int = 5
+        self, day: int, beginner_protection_days: int = 5, server_speed: int = 1
     ) -> GamePhase:
         """根據天數判斷遊戲階段.
 
-        beginner_protection_days 依世界設定（S12）：x1 預設 5 天，可再延長。
+        新手保護天數照官方 S20（依倍速）；之後的階段用換算成 x1 的天數（天數 × 倍速）。
         """
         protection = max(1, beginner_protection_days)
         if day <= protection:
             return GamePhase.BEGINNER_PROTECTION
-        elif day <= max(7, protection):
+        day = x1_equivalent_day(day, server_speed)
+        if day <= max(7, protection):
             return GamePhase.EARLY_DEVELOPMENT
         elif day <= 30:
             return GamePhase.MID_EXPANSION
@@ -356,12 +382,15 @@ class StrategyService:
         self,
         account_id: str,
         user_id: str,
-        beginner_protection_days: int = 5,
+        beginner_protection_days: int | None = None,
     ) -> PhaseDetectionResponse | None:
         """檢測遊戲階段."""
         account = self._verify_account_ownership(account_id, user_id)
         if not account:
             return None
+        speed = account.server_speed or 1
+        if beginner_protection_days is None:
+            beginner_protection_days = beginner_protection_days_for_speed(speed)
 
         # 計算基本數據
         day = account.current_server_day
@@ -376,7 +405,7 @@ class StrategyService:
                 total_troops += troop.count or 0
 
         # 判斷階段（保護天數可設定；S12）
-        phase = self._determine_phase(day, beginner_protection_days)
+        phase = self._determine_phase(day, beginner_protection_days, speed)
         phase_info = dict(PHASE_STANDARDS[phase])
         if phase == GamePhase.BEGINNER_PROTECTION:
             phase_info = {
@@ -419,11 +448,12 @@ class StrategyService:
         self,
         account_id: str,
         user_id: str,
-        beginner_protection_days: int = 5,
+        beginner_protection_days: int | None = None,
     ) -> HealthCheckResponse | None:
         """帳號健康檢查.
 
-        beginner_protection_days: 新手保護天數（世界相關；S12）。
+        beginner_protection_days: 新手保護天數；不填照官方 S20 依倍速。
+        各項門檻用換算成 x1 的天數（天數 × 倍速，見 x1_equivalent_day）。
         """
         _ = beginner_protection_days  # reserved for phase-aware checks
         account = self._verify_account_ownership(account_id, user_id)
@@ -491,7 +521,36 @@ class StrategyService:
                 suggestions=["請同步村莊數據"],
             )
 
-        # 計算總人口（簡化計算，實際應該考慮部隊糧耗）
+        # 有上傳過村莊總覽：直接看每小時糧食淨產量（已扣掉人口和部隊消耗）
+        nets = [v.crop_net_per_hour for v in villages]
+        known = [n for n in nets if n is not None]
+        if known:
+            negative = [
+                v.name or "（未命名）"
+                for v, n in zip(villages, nets, strict=True)
+                if n is not None and n < 0
+            ]
+            total_net = sum(known)
+            if negative:
+                return HealthCheckItem(
+                    name="糧食平衡",
+                    status="critical",
+                    score=40,
+                    message=f"{'、'.join(negative)} 的糧食淨產量是負的（全帳號 {total_net}/小時）",
+                    suggestions=[
+                        "升級農場或麵粉廠、麵包店",
+                        "把部隊移到糧食有剩的村莊",
+                    ],
+                )
+            return HealthCheckItem(
+                name="糧食平衡",
+                status="good",
+                score=85,
+                message=f"糧食淨產量 {total_net}/小時，沒有村莊是負的",
+                suggestions=[],
+            )
+
+        # 還沒有產量資料：只能用人口粗估（本站自訂門檻）
         total_population = sum(v.population or 0 for v in villages)
 
         # 根據人口判斷糧食壓力（這是簡化邏輯）
@@ -525,10 +584,10 @@ class StrategyService:
         """檢查文化點產出."""
         villages = account.villages or []
         village_count = len(villages)
-        day = account.current_server_day
+        day = x1_equivalent_day(account.current_server_day, account.server_speed)
 
-        # 根據天數和村莊數評估（簡化邏輯）
-        expected_villages = max(1, day // 5)  # 大約每 5 天一村
+        # 根據天數和村莊數評估（本站自訂經驗值，用換算成 x1 的天數）
+        expected_villages = max(1, day // 5)  # x1 大約每 5 天一村
 
         if village_count >= expected_villages:
             return HealthCheckItem(
@@ -614,9 +673,9 @@ class StrategyService:
             for troop in village.troop_instances or []:
                 total_troops += troop.count or 0
 
-        day = account.current_server_day
+        day = x1_equivalent_day(account.current_server_day, account.server_speed)
 
-        # 根據天數評估部隊數量（簡化邏輯）
+        # 根據天數評估部隊數量（本站自訂經驗值，用換算成 x1 的天數）
         if day < 7:
             expected_troops = 50
         elif day < 30:

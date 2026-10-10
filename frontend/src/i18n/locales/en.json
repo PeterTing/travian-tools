@@ -79,7 +79,8 @@
       "allVillages": "All villages",
       "listNote": "Sorted by arrival; countdowns update every second. From the last saved rally point.",
       "none": "No incoming yet. Paste the rally point and they show up here.",
-      "arrived": "Arrived"
+      "arrived": "Arrived",
+      "intercept": "Intercept"
     },
     "todayTitle": "Today",
     "pasteFab": "Paste",
@@ -309,6 +310,12 @@
       "cropProduction": "Crop Production Settings",
       "cropFieldsProduction": "Total Crop Field Production (/h)",
       "cropFieldsHint": "Total cropland production (excluding hero)",
+      "population": "Population",
+      "popDirect": "Enter population",
+      "popByBuildings": "From buildings",
+      "populationInput": "Village population",
+      "populationHint": "The population shown on the village page; 1 population eats 1 crop per hour",
+      "statusNote": "Levels are this site's own: surplus ≥ half of consumption = surplus, ≥ 0 = balanced, deficit within 20% of consumption = deficit, more = critical",
       "oasisBonus": "Oasis Bonus",
       "buildings": "Buildings",
       "addBuilding": "Add Building",
@@ -345,7 +352,7 @@
       "heroProduction": "Hero crop production (/h)",
       "heroProductionHint": "Resource points + fixed +6",
       "heroConsumption": "Hero crop consumption (/h)",
-      "heroConsumptionHint": "Usually 6 while hero is in the village",
+      "heroConsumptionHint": "A hero at home eats 6 crop/h (official S75); enter 0 if no hero or the hero is elsewhere",
       "serverSpeed": "Server speed",
       "heroConsumptionResult": "Hero consumption",
       "heroProductionResult": "Hero production",
@@ -356,6 +363,10 @@
       "description": "Redistribute current resources by a target ratio (simulates NPC trade).",
       "currentResources": "Current resources",
       "desiredRatio": "Desired ratio",
+      "ratioHint": "You can enter the cost of what you want to build (e.g. wood 500, clay 400, iron 300, crop 200) to split by that cost.",
+      "errNegativeRatio": "Ratios cannot be negative",
+      "errAllZero": "At least one ratio must be above 0",
+      "errNegativeResource": "Resources cannot be negative",
       "capacityOptional": "Capacity limits (optional)",
       "capacityHint": "NPC allocation cannot exceed warehouse / granary capacity.",
       "warehouseCapacity": "Warehouse capacity",
@@ -696,7 +707,7 @@
       "culturePoints": "CP calculator",
       "npc": "Shopping list (NPC)",
       "technology": "Smithy upgrades",
-      "cropScouter": "Capital Type Finder",
+      "cropScouter": "Crop field check",
       "launchSim": "Opening timeline",
       "buildOrder": "Build Order",
       "passiveCp": "CP & new villages",
@@ -746,7 +757,7 @@
       "pathSpeedTs": "Work out the attacker’s TS level",
       "interception": "Send times that intercept",
       "saveTroops": "When to leave and come back",
-      "cropScouter": "Guess an enemy capital type from scouting (not crop scouting)",
+      "cropScouter": "Enter the field types to see how many croplands",
       "oasisRoi": "How long an oasis takes to pay back",
       "farming": "Farm-list income"
     },
@@ -884,7 +895,9 @@
     "loadError": "Failed to load data",
     "checkError": "Health check failed",
     "protectionDays": "Beginner protection days",
-    "protectionDaysHint": "World-dependent (x1 default 5 days)"
+    "protectionDaysHint": "Pick \"by server speed\" if unsure: official x1 5 days, x2 3, x3 3, x5 2, x10 1 (without the optional extension)",
+    "protectionAuto": "By server speed (official)",
+    "protectionDaysN": "{{count}} d"
   },
   "mapSql": {
     "title": "Map.sql Analyzer",
@@ -968,10 +981,12 @@
     "targetX": "Target X",
     "targetY": "Target Y",
     "unitSpeed": "Unit speed (fields/hour)",
+    "unit": "Unit",
     "tsLevel": "Tournament Square level (0–20)",
     "heroBonus": "Hero boots speed bonus (%)",
     "artifact": "Artifact",
     "artifactNone": "None",
+    "artifactAccount15x": "Large artefact (account) 1.5×",
     "artifactUnique2x": "Unique 2×",
     "artifactVillage2x": "Village 2×",
     "serverSpeed": "Server speed",
@@ -1218,5 +1233,14 @@
       "source": "From the official knowledge base."
     },
     "whatWithEffect": "Cost, time, population, CP and effect are checked."
+  },
+  "cropFieldsCalc": {
+    "title": "Crop field check",
+    "intro": "Enter how many of each resource field the tile has to see how many croplands it is. Click the tile on the map to see its fields.",
+    "inputs": "Resource fields ({{n}} in total)",
+    "choose": "Choose",
+    "blocks": "{{n}}",
+    "result": "Result",
+    "empty": "Choose all four counts to see the result"
   }
 }

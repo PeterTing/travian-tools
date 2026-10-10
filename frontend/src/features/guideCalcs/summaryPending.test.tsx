@@ -157,7 +157,7 @@ describe('首都產量模擬、綠洲、田地回本、建造順序：任何等�
     noChip()
     setSelect('2 級', 3)
     noChip()
-    fireEvent.click(screen.getByRole('checkbox', { name: /Plus/ }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /金幣產量加成/ }))
     noChip()
     cleanup()
   })
@@ -166,13 +166,15 @@ describe('首都產量模擬、綠洲、田地回本、建造順序：任何等�
     const { default: FieldRoi } = await import('./components/FieldRoiCalculator')
     render(<MemoryRouter><FieldRoi /></MemoryRouter>)
     fireEvent.click(screen.getByTestId('calc-result-toggle'))
+    // 11–20 級只有主村（稽核 2026-10-10）
+    fireEvent.change(screen.getByTestId('field-roi-village'), { target: { value: 'capital' } })
     let cur = 7
     for (const lv of [2, 3, 4, 10, 20]) {
       setSelect(`${cur} 級`, lv)
       cur = lv
       noChip()
     }
-    fireEvent.click(screen.getByRole('checkbox', { name: /Plus/ }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /金幣產量加成/ }))
     noChip()
     cleanup()
   })
@@ -182,7 +184,7 @@ describe('首都產量模擬、綠洲、田地回本、建造順序：任何等�
     render(<MemoryRouter><Oasis /></MemoryRouter>)
     expect(screen.getByTestId('calc-result-secondary')).toHaveTextContent('英雄宅成本')
     noChip()
-    fireEvent.click(screen.getByRole('checkbox', { name: /Plus/ }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /金幣產量加成/ }))
     noChip()
     cleanup()
   })

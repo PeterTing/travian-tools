@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
 import CoordPair from '@/components/common/CoordPair'
-import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
+import { EMPTY_COORD, coordPairValue, coordText, type CoordText } from '@/lib/coords'
 import { useMapRadius } from '@/lib/mapRadius'
-import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
+import ServerSpeedSelect from '@/components/common/ServerSpeedSelect'
+import { formatTravelTime } from '@/lib/travianFormulas'
 import { Button } from '@/components/ui/button'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
-import type { PathSpeedTsRequest, PathSpeedTsResponse } from '@/services/advancedCalculatorApi'
+import type { ArtifactBonus, PathSpeedTsRequest, PathSpeedTsResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import { speedPendingKinds } from '@/lib/pendingNotes'
 
@@ -16,13 +18,10 @@ function unitNames(match: { possible_units: string[]; possible_units_zh?: string
   return match.possible_units_zh?.length ? match.possible_units_zh : match.possible_units
 }
 
-/** 秒數 → 遊戲裡的「H:MM:SS」 */
-function formatHms(sec: number): string {
-  const h = Math.floor(sec / 3600)
-  const m = Math.floor((sec % 3600) / 60)
-  const x = sec % 60
-  return `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}`
-}
+// 時間寫法跟其他行軍工具一樣（Xh Ym Zs，稽核 2026-10-10 統一）
+const formatHms = formatTravelTime
+
+const TOLERANCE_OPTIONS = [10, 30, 60, 120]
 
 // 座標另外用文字存（預設空白、可打負號），按「計算」時才換成數字
 type PathSpeedTsForm = Omit<PathSpeedTsRequest, 'attacker_x' | 'attacker_y' | 'target_x' | 'target_y'>
@@ -36,13 +35,20 @@ export default function PathSpeedTsCalculatorPage() {
     travel_time_seconds: 3600,
     server_speed: 1,
     hero_bonus: 0,
+    artifact_bonus: 'none',
+    tolerance_seconds: 30,
   })
-  const { currentAccount } = useCurrentAccount()
+  // 「已帶入」：伺服器速度跟上方列（含這頁的「更改」），被攻擊的目標預設是帶入的村莊
+  const fill = useAutoFill()
   useEffect(() => {
-    if (currentAccount?.server_speed) {
-      setForm((prev) => ({ ...prev, server_speed: currentAccount.server_speed }))
-    }
-  }, [currentAccount])
+    setForm((prev) => ({ ...prev, server_speed: fill.speed }))
+  }, [fill.speed])
+  const fillX = fill.village?.coordinate_x
+  const fillY = fill.village?.coordinate_y
+  useEffect(() => {
+    if (fillX != null && fillY != null) setTargetCoord(coordText(fillX, fillY))
+  }, [fillX, fillY])
+  const [usedTolerance, setUsedTolerance] = useState(30)
   const [timeInput, setTimeInput] = useState({ hours: 1, minutes: 0, seconds: 0 })
   const [result, setResult] = useState<PathSpeedTsResponse | null>(null)
   // 結果是用哪個靴子 % 算的（灰標看這個）
@@ -86,6 +92,7 @@ export default function PathSpeedTsCalculatorPage() {
       })
       setResult(res)
       setUsedBoots(form.hero_bonus ?? 0)
+      setUsedTolerance(form.tolerance_seconds ?? 30)
     } catch {
       setError('計算失敗，請檢查輸入')
     } finally {
@@ -94,7 +101,7 @@ export default function PathSpeedTsCalculatorPage() {
   }
 
   // 20 格以內競技場／靴子不影響（S71），同一速度會出現 21 列一模一樣的時間：只留 0 級那列（P0-17 (h) 實測 390）
-  const withinBase = (result?.distance ?? Infinity) <= 20
+  const withinBase = result?.ts_irrelevant ?? (result?.distance ?? Infinity) <= 20
   const displayMatches = !result
     ? []
     : withinBase
@@ -188,17 +195,38 @@ export default function PathSpeedTsCalculatorPage() {
             onChange={(v) => handleChange('hero_bonus', v)}
           />
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">伺服器速度</label>
+          {/* 對方的神器（官方 S102）：有加速神器時不選會反推錯 */}
+          <label className="mb-4 block text-sm font-medium">
+            <span className="mb-2 block">攻擊方神器</span>
             <select
-              value={form.server_speed}
-              onChange={(e) => handleChange('server_speed', Number(e.target.value))}
+              data-testid="reverse-artifact"
+              value={form.artifact_bonus ?? 'none'}
+              onChange={(e) => setForm((prev) => ({ ...prev, artifact_bonus: e.target.value as ArtifactBonus }))}
               className="w-full p-2 border rounded bg-background"
             >
-              <option value={1}>1x</option>
-              <option value={2}>2x</option>
-              <option value={3}>3x</option>
+              <option value="none">沒有</option>
+              <option value="account_1_5x">大型神器（帳號）1.5×</option>
+              <option value="unique_2x">獨特 2×</option>
+              <option value="village_2x">村莊 2×</option>
             </select>
+          </label>
+
+          <label className="mb-4 block text-sm font-medium">
+            <span className="mb-2 block">容許誤差（本站自訂）</span>
+            <select
+              data-testid="reverse-tolerance"
+              value={form.tolerance_seconds ?? 30}
+              onChange={(e) => handleChange('tolerance_seconds', Number(e.target.value))}
+              className="w-full p-2 border rounded bg-background"
+            >
+              {TOLERANCE_OPTIONS.map((n) => (
+                <option key={n} value={n}>{`±${n} 秒`}</option>
+              ))}
+            </select>
+          </label>
+
+          <div className="mb-4">
+            <ServerSpeedSelect value={form.server_speed ?? 1} onChange={(v) => handleChange('server_speed', v)} testId="reverse-server-speed" />
           </div>
 
           <Button onClick={handleCalculate} disabled={loading} className="w-full">
@@ -276,7 +304,7 @@ export default function PathSpeedTsCalculatorPage() {
                 </>
               ) : (
                 <div className="text-center text-muted-foreground py-4">
-                  在 +-30 秒容差內無匹配結果
+                  在 ±{usedTolerance} 秒誤差內沒有對得上的兵種
                 </div>
               )}
 

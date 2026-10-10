@@ -6,7 +6,8 @@ Sources:
 - S35: Cranny — https://support.travian.com/en/articles/35
 - S41: Trapper — https://support.travian.com/en/articles/41
 - S187: Unit comparison (smithy L20 values)
-- S20: Celebrations fixed CP
+- S20: Game Versions and Speed — troop speed multiplier table (x1 1, x2/x3/x5 2, x10 4)
+  and celebration fixed CP
 - TS11: in-game verification on ts11 International x1 (2026-10-05); the build-time
   formula (0.964^(MB−1), rounded to 10 s) 公式經 ts11 實測校正, pinned by
   tests/unit/test_travian_formulas_ts11.py
@@ -44,10 +45,38 @@ def calculate_build_time(
     return max(0, int(round(actual / 10.0) * 10))
 
 
+# 伺服器倍速 → 兵速倍率。官方 S20「Game Versions and Speed」：
+# Troops speed: X1 Normal, X2 *2, X3 *2, X5 *2, X10 *4（不是直接乘倍速）。
+# 出處：scripts/game_data/evidence/official_s20_speed_2026-10-11.json（全文＋sha256）。
+# Mirror: frontend/src/lib/travianFormulas.ts `TROOP_SPEED_MULTIPLIER`.
+TROOP_SPEED_MULTIPLIER: dict[int, int] = {1: 1, 2: 2, 3: 2, 5: 2, 10: 4}
+
+
+def is_troop_speed_multiplier_verified(server_speed: float) -> bool:
+    """這個倍速有沒有在 S20 的表上（沒有的話倍率是推估，待驗證）."""
+    return (
+        float(server_speed).is_integer() and int(server_speed) in TROOP_SPEED_MULTIPLIER
+    )
+
+
+def troop_speed_multiplier(server_speed: float = 1.0) -> int:
+    """兵速倍率（S20）.
+
+    表上沒有的倍速（x4、x20…）：待驗證，保守地用表上「不超過它的最大倍速」的倍率
+    （x4 → 2、x20 → 4），寧可把行軍時間算長也不要算短；≤1 → 1。
+    """
+    if not math.isfinite(server_speed) or server_speed <= 1:
+        return 1
+    if is_troop_speed_multiplier_verified(server_speed):
+        return TROOP_SPEED_MULTIPLIER[int(server_speed)]
+    lower = max(s for s in TROOP_SPEED_MULTIPLIER if s <= server_speed)
+    return TROOP_SPEED_MULTIPLIER[lower]
+
+
 def _effective_speed(
     unit_speed: float, server_speed: float = 1.0, artifact_multiplier: float = 1.0
 ) -> float:
-    speed = float(unit_speed) * float(server_speed if server_speed > 0 else 1.0)
+    speed = float(unit_speed) * troop_speed_multiplier(server_speed)
     return speed * (artifact_multiplier if artifact_multiplier > 0 else 1.0)
 
 

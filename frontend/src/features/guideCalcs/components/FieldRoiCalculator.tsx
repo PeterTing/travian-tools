@@ -22,9 +22,13 @@ export default function FieldRoiCalculator() {
   const { t, lang } = useLang();
   const [type, setType] = useState<ResourceType>('crop');
   const [level, setLevel] = useState(7);
+  // 一般村資源田最高 10 級，主村（首都）才能再升（官方 S214、S221）
+  const [capital, setCapital] = useState(false);
+  const maxLevel = capital ? 20 : 10;
   const [bonus, setBonus] = useState(0);
   const [oasis, setOasis] = useState(0);
-  const [gold, setGold] = useState(true);
+  // 金幣產量加成（官方 S129）：不是 Plus 帳號，預設不勾
+  const [gold, setGold] = useState(false);
 
   const result = useMemo(() => {
     const opts = { goldBonus: gold ? 0.25 : 0, bonusBuildingPct: bonus, oasisPct: oasis };
@@ -54,10 +58,10 @@ export default function FieldRoiCalculator() {
     <>
       <div className={s.intro}>
         {/* Validation vs Lumi Table 2 (Wood L7 = 6.46d) lives in calculators.regression.test.ts */}
-        <h2>{lang === 'en' ? 'Field ROI (normal village)' : '田地回本（一般村）'}</h2>
+        <h2>{lang === 'en' ? 'Field ROI' : '田地回本'}</h2>
         <p>{lang === 'en'
-          ? 'How many days until a field upgrade pays for itself. Fewer days = upgrade that field first. Building and oasis bonuses add together; Plus (+25%) then multiplies the total production.'
-          : '升一級資源田要幾天回本，天數越少越值得先升。加成建築和綠洲加成相加，Plus（+25%）再乘上總產量。'}</p>
+          ? 'How many days until a field upgrade pays for itself. Fewer days = upgrade that field first. Building and oasis bonuses add together; the gold production bonus (+25%) then multiplies the total production.'
+          : '升一級資源田要幾天回本，天數越少越值得先升。加成建築和綠洲加成相加，金幣產量加成（+25%）再乘上總產量。'}</p>
       </div>
       <CalcBar />
 
@@ -75,9 +79,21 @@ export default function FieldRoiCalculator() {
           </div>
 
           <div className={s.field}>
+            <label>{lang === 'en' ? 'Village' : '村莊'}</label>
+            <select data-testid="field-roi-village" value={capital ? 'capital' : 'normal'} onChange={e => {
+              const cap = e.target.value === 'capital';
+              setCapital(cap);
+              if (!cap && level > 10) setLevel(10);
+            }}>
+              <option value="normal">{lang === 'en' ? 'Normal village (fields up to Lv 10)' : '一般村（田最高 10 級）'}</option>
+              <option value="capital">{lang === 'en' ? 'Capital (fields above Lv 10)' : '主村（田可以超過 10 級）'}</option>
+            </select>
+          </div>
+
+          <div className={s.field}>
             <label>{lang === 'en' ? 'Target level' : '目標等級'}</label>
-            <select value={level} onChange={e => setLevel(+e.target.value)}>
-              {Array.from({ length: 20 }, (_, i) => i + 1).map(L => (
+            <select data-testid="field-roi-level" value={level} onChange={e => setLevel(+e.target.value)}>
+              {Array.from({ length: maxLevel }, (_, i) => i + 1).map(L => (
                 <option key={L} value={L}>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</option>
               ))}
             </select>
@@ -104,14 +120,14 @@ export default function FieldRoiCalculator() {
               <option value={0.25}>+25%</option>
               <option value={0.50}>+50%</option>
               <option value={0.75}>{lang === 'en' ? '+75% (3×25)' : '+75%（3 塊 25%）'}</option>
-              <option value={1.00}>{lang === 'en' ? '+100% (2×50)' : '+100%（2 塊 50%）'}</option>
+              <option value={1.00}>{lang === 'en' ? '+100% (2×50; wood/clay/iron only in the Natarian area)' : '+100%（2 塊 50%；木／土／鐵只有納塔區）'}</option>
               <option value={1.50}>{lang === 'en' ? '+150% (3×50, crop only)' : '+150%（3 塊 50%，只有糧）'}</option>
             </select>
           </div>
 
           <label className={s.check}>
-            <input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} />
-            {lang === 'en' ? 'Plus +25% gold production bonus' : 'Plus 產量 +25%（金幣）'}
+            <input type="checkbox" checked={gold} data-testid="field-roi-gold" onChange={e => setGold(e.target.checked)} />
+            {lang === 'en' ? 'Gold production bonus +25%' : '金幣產量加成 +25%'}
           </label>
         </div>
 

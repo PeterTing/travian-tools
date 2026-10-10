@@ -3,8 +3,6 @@
 from fastapi import APIRouter
 
 from app.domain.schemas.advanced_calculator import (
-    CropScouterRequest,
-    CropScouterResponse,
     CulturePointsRequest,
     CulturePointsResponse,
     InterceptionRequest,
@@ -93,15 +91,6 @@ async def calculate_village_builder(
     """最佳建造順序計算器 — 依 cropper 類型 + 綠洲 + Plus 產出 Lumi 風格建造序列."""
     service = get_advanced_calculator_service()
     return service.calculate_village_builder(request)
-
-
-@router.post("/crop-scouter", response_model=CropScouterResponse)
-async def calculate_crop_scouter(
-    request: CropScouterRequest,
-) -> CropScouterResponse:
-    """首都類型反推器 — 從偵查產量推測對手 cropper 類型."""
-    service = get_advanced_calculator_service()
-    return service.calculate_crop_scouter(request)
 
 
 @router.post("/ts-optimizer", response_model=TsOptimizerResponse)

@@ -1,7 +1,7 @@
 """計算器相關 API 端點."""
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.services.game_data_service import get_game_data_service
 
@@ -20,7 +20,17 @@ class BuildingUpgradeRequest(BaseModel):
     main_building_level: int = Field(
         1, ge=1, le=20, description="村莊大樓等級（計算時間用）"
     )
-    server_speed: float = Field(1.0, gt=0, description="伺服器速度倍率")
+    server_speed: float = Field(
+        1.0, description="伺服器速度倍率（1、2、3、5、10，官方 S20）"
+    )
+
+    @field_validator("server_speed")
+    @classmethod
+    def _check_speed(cls, v: float) -> float:
+        # 之前 0.0001 也收；官方只有 x1／x2／x3／x5／x10（S20）
+        if v not in (1, 2, 3, 5, 10):
+            raise ValueError("伺服器速度只能是 1、2、3、5、10")
+        return v
 
 
 class BuildingUpgradeResponse(BaseModel):
@@ -117,7 +127,11 @@ class CropBalanceRequest(BaseModel):
     """糧食平衡計算請求."""
 
     buildings: list[dict] = Field(
-        ..., description="建築列表，每項包含 building_id 和 level"
+        default_factory=list, description="建築列表，每項包含 building_id 和 level"
+    )
+    # 遊戲裡村莊人口直接看得到：有填就用這個，不用逐棟輸入建築（稽核 2026-10-10）
+    population: int | None = Field(
+        None, ge=0, description="村莊人口（有填就不看 buildings）"
     )
     troops: list[BattleUnit] = Field(default_factory=list, description="部隊列表")
     crop_fields_production: int = Field(
@@ -203,16 +217,14 @@ async def calculate_building_upgrade(
     支援村莊大樓等級加成和伺服器速度倍率。
     """
     if request.from_level >= request.to_level:
-        raise HTTPException(
-            status_code=400, detail="from_level must be less than to_level"
-        )
+        raise HTTPException(status_code=400, detail="目標等級要比目前等級高")
 
     service = get_game_data_service()
     building = service.buildings.get_building(request.building_id)
 
     if not building:
         raise HTTPException(
-            status_code=404, detail=f"Building '{request.building_id}' not found"
+            status_code=404, detail=f"找不到這棟建築（{request.building_id}）"
         )
 
     # 計算總成本
@@ -223,13 +235,27 @@ async def calculate_building_upgrade(
     total_build_time = 0
     total_population = 0
     total_culture_points = 0
+    actual_build_time = 0
+    # 升村莊大樓本身時，每升一級大樓就變快：蓋第 lvl 級時大樓是 lvl−1 級（之前整段都用起始等級，高估）
+    is_main_building = request.building_id == "main_building"
 
     for lvl in range(request.from_level + 1, request.to_level + 1):
         level_data = building.get_level(lvl)
         if not level_data:
+            max_level = max((lv.level for lv in building.levels), default=0)
             raise HTTPException(
-                status_code=400, detail=f"Level {lvl} data not available"
+                status_code=400,
+                detail=f"{building.name_zh}最高 {max_level} 級，沒有第 {lvl} 級",
             )
+        mb_level = (
+            max(request.main_building_level, lvl - 1)
+            if is_main_building
+            else request.main_building_level
+        )
+        # 遊戲每一級各自四捨五入到 10 秒（公式經 ts11 實測校正）
+        actual_build_time += calculate_actual_build_time(
+            level_data.build_time_base, mb_level, request.server_speed
+        )
         total_wood += level_data.cost_wood
         total_clay += level_data.cost_clay
         total_iron += level_data.cost_iron
@@ -249,11 +275,6 @@ async def calculate_building_upgrade(
     to_cp_daily = to_level_data.culture_points if to_level_data else 0
     total_culture_points = to_cp_daily  # 升級後該建築每日 CP
     culture_points_per_day = to_cp_daily - from_cp_daily
-
-    # 計算實際建造時間（含村莊大樓加成）
-    actual_build_time = calculate_actual_build_time(
-        total_build_time, request.main_building_level, request.server_speed
-    )
 
     total_cost = total_wood + total_clay + total_iron + total_crop
 
@@ -494,20 +515,34 @@ async def calculate_crop_balance(request: CropBalanceRequest) -> CropBalanceResp
 
     # 人口 = 累加該建築從 1 級到目前等級的 population 增量
     population_consumption = 0
-    for building_info in request.buildings:
+    for building_info in request.buildings if request.population is None else []:
         building_id = building_info.get("building_id")
         level = building_info.get("level", 1)
 
-        if not building_id or level <= 0:
+        if not building_id:
             continue
+        if not isinstance(level, int) or level < 1:
+            raise HTTPException(status_code=422, detail="建築等級要是 1 以上的整數")
 
         building = service.buildings.get_building(building_id)
         if not building:
-            continue
+            raise HTTPException(
+                status_code=422, detail=f"找不到這棟建築（{building_id}）"
+            )
+        top = max((lv.level for lv in building.levels), default=0)
+        if level > top:
+            raise HTTPException(
+                status_code=422,
+                detail=f"{building.name_zh}最高 {top} 級，沒有第 {level} 級",
+            )
         for lvl in range(1, level + 1):
             level_data = building.get_level(lvl)
             if level_data:
                 population_consumption += level_data.population
+
+    if request.population is not None:
+        # 遊戲裡 1 人口每小時吃 1 糧（同上面逐棟加總的算法）
+        population_consumption = request.population
 
     # 部隊糧耗（不含英雄；英雄另計）
     troop_only = 0

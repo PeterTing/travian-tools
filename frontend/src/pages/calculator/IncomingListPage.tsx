@@ -6,10 +6,38 @@ import { countdownText } from '@/components/home/IncomingCard'
 import { useAccountData } from '@/contexts/AccountDataContext'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { movementKindLabel } from '@/lib/pasteFormat'
+import { serverAndLocal } from '@/lib/serverTime'
 import { pasteApi, type Movement } from '@/services/pasteApi'
 import { villageApi } from '@/services/villageApi'
 
 const ALL_VILLAGES = ''
+
+/**
+ * 「攔截」連結：帶入到達時間（伺服器時間；世界還沒有時差就不帶，免得填錯時區）、
+ * 攻方座標、被攻擊的村莊座標（稽核 2026-10-10）
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export function interceptLink(
+  m: Pick<Movement, 'arrival_at' | 'coordinate_x' | 'coordinate_y'>,
+  target: { coordinate_x: number | null; coordinate_y: number | null } | undefined,
+  worldUtcOffset: number | null | undefined,
+): string {
+  const q = new URLSearchParams()
+  if (m.arrival_at && worldUtcOffset != null) {
+    const server = serverAndLocal(new Date(m.arrival_at), worldUtcOffset).server
+    if (server) q.set('arrival', server)
+  }
+  if (m.coordinate_x != null && m.coordinate_y != null) {
+    q.set('ax', String(m.coordinate_x))
+    q.set('ay', String(m.coordinate_y))
+  }
+  if (target?.coordinate_x != null && target?.coordinate_y != null) {
+    q.set('dx', String(target.coordinate_x))
+    q.set('dy', String(target.coordinate_y))
+  }
+  const qs = q.toString()
+  return `/calculator/interception${qs ? `?${qs}` : ''}`
+}
 
 function incomingVillageStorageKey(accountId: string, worldId?: string | null): string {
   return `tt:incomingVillage:${accountId}:${worldId || 'noworld'}`
@@ -147,6 +175,15 @@ export default function IncomingListPage() {
                   {m.needs_coords && (
                     <Link className="text-xs text-amber-700 underline" to={`/paste/movement/${m.movement_id}`}>
                       {t('home.incomingCard.needsCoords')}
+                    </Link>
+                  )}
+                  {!arrived && (
+                    <Link
+                      className="ml-2 inline-flex min-h-[44px] items-center text-xs text-primary underline"
+                      data-testid="incoming-intercept"
+                      to={interceptLink(m, villages.find((v) => v.village_id === m.village_id), world?.utc_offset)}
+                    >
+                      {t('home.incoming.intercept')}
                     </Link>
                   )}
                 </div>

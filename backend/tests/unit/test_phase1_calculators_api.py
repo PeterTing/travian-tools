@@ -2,7 +2,7 @@
 
 Covers:
 - POST /api/v1/advanced-calculator/village-builder
-- POST /api/v1/advanced-calculator/crop-scouter
+- POST /api/v1/advanced-calculator/crop-scouter（已移除，測它回 404）
 - POST /api/v1/advanced-calculator/ts-optimizer
 - POST /api/v1/advanced-calculator/fake-troops（已下架，確認回 404/405）
 """
@@ -41,23 +41,12 @@ class TestVillageBuilderAPI:
         assert r.status_code == 422
 
 
-class TestCropScouterAPI:
-    """Crop Scouter endpoint tests."""
+class TestCropScouterRetired:
+    """偵察產量反推田型的端點拿掉了（偵察報告沒有產量；改成前端「糧田判斷」）."""
 
-    def test_happy_path_15c_detection(self) -> None:
-        payload = {
-            "wood_production": 1000,
-            "clay_production": 1000,
-            "iron_production": 1000,
-            "crop_production": 9000,
-            "population": 600,
-            "server_speed": 1,
-        }
-        r = client.post("/api/v1/advanced-calculator/crop-scouter", json=payload)
-        assert r.status_code == 200
-        body = r.json()
-        assert body["dominant_resource"] == "crop"
-        assert body["matches"][0]["cropper_type"] == "15c"
+    def test_endpoint_gone(self) -> None:
+        r = client.post("/api/v1/advanced-calculator/crop-scouter", json={})
+        assert r.status_code in (404, 405)
 
 
 class TestTsOptimizerAPI:

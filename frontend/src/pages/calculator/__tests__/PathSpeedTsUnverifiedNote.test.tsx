@@ -67,7 +67,7 @@ describe('PathSpeedTsCalculatorPage unverified-units-note (P0-15)', () => {
     render(<PathSpeedTsCalculatorPage />)
     fillCoords()
     fireEvent.click(screen.getByRole('button', { name: '反推速度 + TS' }))
-    expect(await screen.findByText(/無匹配結果/)).toBeInTheDocument()
+    expect(await screen.findByText(/沒有對得上的兵種/)).toBeInTheDocument()
     expect(screen.queryByTestId('unverified-units-note')).toBeNull()
   })
 })
