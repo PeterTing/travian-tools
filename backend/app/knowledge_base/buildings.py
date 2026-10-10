@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import cast
 
 INGAME_NAMES_PATH = (
     Path(__file__).resolve().parents[2] / "data" / "static" / "ingame_names.json"
@@ -510,7 +511,8 @@ def get_building_info(building_name: str) -> dict | None:
     """取得建築物資訊：英文 id、遊戲內名稱或舊名都可以."""
     building_key = building_name.lower().replace(" ", "_").replace("'", "")
     for b in BUILDINGS_DATA.values():
-        if building_name in (b["name_zh"], *b.get("aliases_zh", [])):
+        aliases = cast(list[str], b.get("aliases_zh", []))
+        if building_name == b["name_zh"] or building_name in aliases:
             return b
     return BUILDINGS_DATA.get(building_key)
 
