@@ -1646,7 +1646,11 @@
           "carry": 0,
           "upkeep": 6,
           "train_time": 9000,
-          "ref": "asia_x1/help/spartans/8"
+          "ref": "asia_x1/help/spartans/8",
+          "train_time_rog_only": {
+            "community": 9900,
+            "community_ref": "https://siegewise.com/en/travian/units/spartans"
+          }
         },
         "carry": 0,
         "carry_source": "asia_x1",
@@ -1674,7 +1678,11 @@
           "carry": 0,
           "upkeep": 4,
           "train_time": 77550,
-          "ref": "asia_x1/help/spartans/9"
+          "ref": "asia_x1/help/spartans/9",
+          "train_time_rog_only": {
+            "community": 28800,
+            "community_ref": "https://siegewise.com/en/travian/units/spartans"
+          }
         },
         "carry": 0,
         "carry_source": "asia_x1",

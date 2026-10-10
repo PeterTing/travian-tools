@@ -172,6 +172,38 @@ FRONTEND_COST_VERIFIED = ROOT / "frontend/src/data/unitCostVerified.json"
 ASIA_X1_SPARTANS = ROOT / "scripts/game_data/evidence/asia_x1_manual_spartans_2026-10-11.json"
 
 
+# ASIA x1 是 Rise of Governors 年度特別世界：查一次官方 S187＋社群兩份（PM 規則：查一次就下結論），
+# 數字不同的欄位只當 RoG 世界的數字，一般世界保留待驗證
+CROSSCHECK = ROOT / "scripts/game_data/evidence/crosscheck_spartans_vikings_2026-10-11.json"
+
+
+def _crosscheck() -> dict:
+    return json.loads(CROSSCHECK.read_text(encoding="utf-8"))
+
+
+def spartan_rog_only() -> dict[str, dict]:
+    """be_id → 跟社群資料不一樣（只確定 RoG 世界成立）的欄位；重新比一次，結論要跟 evidence 寫的一樣."""
+    xc = _crosscheck()
+    asia = _asia_x1_spartans()
+    sw = xc["sources"]["siegewise_spartans"]["units"]
+    fd = xc["sources"]["fandom_spartans"]["units"]
+    found: dict[str, list[str]] = {}
+    for a in asia.values():
+        n = a["name_en"]
+        bad = [k for k in ("attack", "def_inf", "def_cav", "speed", "carry", "upkeep")
+               if sw[n][k] != a[k] or fd[n][k] != a[k]]
+        if fd[n]["cost"] != a["cost"] or sw[n]["total_cost"] != sum(a["cost"]):
+            bad.append("cost")
+        if sw[n]["train_time_s"] != a["train_time_s"]:
+            bad.append("train_time")
+        if bad:
+            found[n] = bad
+    rog = xc["conclusions"]["spartans"]["rog_only"]
+    en_to_id = {"Ballista": "ballista", "Ephor": "ephor"}
+    assert {en_to_id[n]: f for n, f in found.items()} == {k: [v["field"]] for k, v in rog.items()}, found
+    return rog
+
+
 def _asia_x1_spartans() -> dict[str, dict]:
     """ASIA x1 說明頁斯巴達 1..10（遊戲順序）→ 抄錄的數字."""
     return json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))["troops"]
@@ -772,6 +804,13 @@ def gen_unit_speeds() -> dict:
                 row["carry_source"] = "asia_x1"
                 row["carry_ref"] = asia_x1_ref(ref)
                 row["stats"] = _stats_row(a, asia_x1_ref(ref))
+                rog = spartan_rog_only().get(be_id)
+                if rog:
+                    assert rog["asia_x1_s"] == a["train_time_s"], be_id
+                    row["stats"]["train_time_rog_only"] = {
+                        "community": rog["community_s"],
+                        "community_ref": _crosscheck()["sources"][rog["community_source"]]["url"],
+                    }
                 rows.append(row)
                 continue
             if tribe in CARRY_EMPTY_TRIBES:
@@ -825,6 +864,7 @@ def gen_troops(current: dict, speeds: dict) -> dict:
                     rebuilt["speed_ref"] = r["ref"]
             rebuilt.pop("stats_source", None)
             rebuilt.pop("stats_ref", None)
+            rebuilt.pop("training_time_pending_normal_worlds", None)
             # 運載量全部照產生的那一份（前端讀同一份）
             rebuilt["carry_capacity"] = r["carry"]
             st = r.get("stats")
@@ -843,9 +883,13 @@ def gen_troops(current: dict, speeds: dict) -> dict:
                 )
                 rebuilt["stats_source"] = "asia_x1" if r["source"] == "asia_x1" else "ts11"
                 rebuilt["stats_ref"] = st["ref"]
+
             else:
                 rebuilt["stats_source"] = "pending"
                 rebuilt["stats_ref"] = None
+            if st and st.get("train_time_rog_only"):
+                # 只在 RoG 年度特別世界（ASIA x1）讀到；社群資料（一般世界）是另一個數字 → 一般世界待驗證
+                rebuilt["training_time_pending_normal_worlds"] = st["train_time_rog_only"]
             troops[r["troop_id"]] = rebuilt
     return out
 
@@ -880,6 +924,11 @@ def gen_cost_verified(speeds: dict) -> dict:
         "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在遊戲內說明頁讀到才是 true：5 族在 ts11（evidence/ts11_manual_2026-10-10.json），斯巴達在 ASIA x1（evidence/asia_x1_manual_spartans_2026-10-11.json）；維京照官方說明頁 S139 的兵種表（evidence/official_support_2026-10-10.json）是 true。",
         "tribes": {t: all(r["stats"] for r in speeds["tribes"][t]) for t in ["romans", "gauls", "teutons", "huns", "egyptians", "spartans"]}
         | {"vikings": len(_s139_units()) == 10},
+        "_rog_only_note": "ASIA x1 是 Rise of Governors 年度特別世界。下面這些兵種的訓練時間跟社群資料（一般世界）不一樣（evidence/crosscheck_spartans_vikings_2026-10-11.json）：數字照 ASIA x1，但一般世界待驗證。",
+        "train_time_rog_only": {
+            r["troop_id"]: {"asia_x1": r["stats"]["train_time"], **r["stats"]["train_time_rog_only"]}
+            for r in speeds["tribes"]["spartans"] if r["stats"].get("train_time_rog_only")
+        },
     }
 
 

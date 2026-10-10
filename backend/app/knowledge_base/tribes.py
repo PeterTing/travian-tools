@@ -810,7 +810,8 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "defense_cavalry": 10,
                 "upkeep": 6,
                 "cost": {"wood": 550, "clay": 1240, "iron": 825, "crop": 135},
-                "training_time": "2:30:00",
+                # RoG 限定：社群資料（一般世界）是 2:45:00（evidence/crosscheck_spartans_vikings_2026-10-11.json）
+                "training_time": "2:30:00（ASIA x1 年度特別世界實測；一般世界待驗證，社群資料 2:45:00）",
                 "role": "破壞建築物",
             },
             "ephor": {
@@ -821,7 +822,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "defense_cavalry": 40,
                 "upkeep": 4,
                 "cost": {"wood": 33450, "clay": 30665, "iron": 36240, "crop": 13935},
-                "training_time": "21:32:30",
+                "training_time": "21:32:30（ASIA x1 年度特別世界實測；一般世界待驗證，社群資料 8:00:00）",
                 "role": "降低敵方村莊忠誠度 20-25%",
             },
             "settler": {

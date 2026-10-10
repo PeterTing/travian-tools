@@ -1,4 +1,4 @@
-import { INGAME_BUILDINGS, ingameTribeName, ingameUnitNameByGameId } from '@/lib/ingameNames'
+import { INGAME_BUILDINGS, INGAME_UNITS, ingameTribeName, ingameUnitNameByGameId } from '@/lib/ingameNames'
 import { readPref } from '@/lib/localPrefs'
 
 /**
@@ -32,6 +32,7 @@ export interface DataUpdateItem {
 
 const smithy = INGAME_BUILDINGS.blacksmith!
 const tradeOffice = INGAME_BUILDINGS.trade_office!
+const ballista = INGAME_UNITS.ballista!
 
 /**
  * 資料更新卡（#33 + #34 合成一張，PM）：前 3 項直接顯示，「再看 3 項」展開後 3 項。
@@ -40,6 +41,11 @@ const tradeOffice = INGAME_BUILDINGS.trade_office!
 export const DATA_UPDATE_ITEMS: DataUpdateItem[] = [
   // 官方說明頁 S20：兵速 x2/x3/x5 ×2、x10 ×4（之前直接乘倍速）。x1、x2 沒變，只給 x3 以上的世界看；放第一項，收合時也看得到（PM）
   { label: 'x3 以上世界的行軍時間已修正（之前算得太短，請重新確認排好的攻擊）', minServerSpeed: 3 },
+  // #43 斯巴達（PM 順序：x3 那項之後的第 2、3 項；x1、x2 沒有 x3 那項，下面的往上補）。
+  // ASIA x1 遊戲內說明 asia_x1/help/spartans/8：2:30:00。RoG 年度特別世界，社群資料（一般世界）是 2:45:00 → 一般世界待驗證
+  { label: `${ingameTribeName('spartans')}${ballista.zh}訓練時間`, before: '9900', after: '9000 秒', note: '年度特別世界（ASIA x1）實測，一般世界還沒核對' },
+  // ASIA x1 遊戲內中文名；舊名從名稱表 aliases 取
+  { label: `${ingameTribeName('spartans')}兵種改用遊戲內正式名稱`, before: ballista.aliases[0]!, after: ballista.zh },
   // ts11 manual/troop/64
   { label: `${ingameUnitNameByGameId(64)}運載量`, before: '115', after: '75' },
   // 舊的後端兵種資料 5800 → ts11 manual/troop/10 開拓者花費 4600 木材

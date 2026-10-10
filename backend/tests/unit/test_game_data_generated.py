@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -728,7 +729,7 @@ def test_spartans_follow_asia_x1_in_game_help_everywhere() -> None:
             e["def_cav"],
         ), tid
         assert kb["upkeep"] == e["upkeep"], tid
-        assert kb["training_time"] == e["train_time_text"], tid
+        assert kb["training_time"].split("（")[0] == e["train_time_text"], tid
         assert kb["capacity"] == e["carry"], tid
     # 唯一跟舊資料不一樣的數字：賴達投石機（弩炮）訓練時間 9900 → 9000（2:30:00）
     assert troops["ballista"]["training_time_base"] == 9000
@@ -736,3 +737,85 @@ def test_spartans_follow_asia_x1_in_game_help_everywhere() -> None:
         (ROOT / "frontend/src/data/unitCostVerified.json").read_text(encoding="utf-8")
     )
     assert cv["tribes"]["spartans"] is True
+
+
+CROSSCHECK = (
+    ROOT / "scripts/game_data/evidence/crosscheck_spartans_vikings_2026-10-11.json"
+)
+
+
+def test_crosscheck_evidence_records_sources_and_rog_only_fields():
+    """RoG 世界風險：斯巴達跟官方 S187＋社群兩份比一次；只有投石機、五長官的訓練時間不一樣 → 一般世界待驗證."""
+    xc = json.loads(CROSSCHECK.read_text(encoding="utf-8"))
+    for key in (
+        "s187",
+        "s139",
+        "siegewise_spartans",
+        "siegewise_vikings",
+        "fandom_spartans",
+        "fandom_vikings",
+    ):
+        src = xc["sources"][key]
+        assert src["url"].startswith("https://") and len(src["sha256"]) == 64, key
+    for key in ("fandom_spartans", "fandom_vikings"):
+        src = xc["sources"][key]
+        assert hashlib.sha256(src["table_text"].encode()).hexdigest() == src["sha256"]
+    rog = xc["conclusions"]["spartans"]["rog_only"]
+    assert set(rog) == {"ballista", "ephor"}
+    assert {v["field"] for v in rog.values()} == {"train_time"}
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    flagged = {
+        tid for tid, t in troops.items() if "training_time_pending_normal_worlds" in t
+    }
+    assert flagged == {"ballista", "ephor"}
+    assert (
+        troops["ballista"]["training_time_pending_normal_worlds"]["community"] == 9900
+    )
+    assert troops["ballista"]["training_time_base"] == 9000
+    cv = json.loads(
+        (ROOT / "frontend/src/data/unitCostVerified.json").read_text(encoding="utf-8")
+    )
+    assert set(cv["train_time_rog_only"]) == {"ballista", "ephor"}
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    kb = TRIBES_DATA["spartans"]["troops"]
+    assert "一般世界待驗證" in kb["catapult"]["training_time"]
+    assert "一般世界待驗證" in kb["ephor"]["training_time"]
+    assert "（" not in kb["hoplite"]["training_time"]
+
+
+def test_crosscheck_vikings_keep_carry_pending():
+    """維京：官方 S139 跟社群一致的欄位本來就不標；運載量官方沒有 → 照舊留空待驗證."""
+    xc = json.loads(CROSSCHECK.read_text(encoding="utf-8"))
+    s139 = xc["sources"]["s139"]["vikings"]
+    sw = xc["sources"]["siegewise_vikings"]["units"]
+    assert len(s139) == 10
+    for n, o in s139.items():
+        key = n.replace(" (Scout)", "").replace(" (Administrator)", "")
+        w = sw[{"Heimdall’s Eye": "Heimdalls Eye"}.get(key, key)]
+        assert (
+            w["attack"],
+            w["def_inf"],
+            w["def_cav"],
+            w["speed"],
+            w["upkeep"],
+            w["total_cost"],
+            w["train_time_s"],
+        ) == (
+            o["attack"],
+            o["def_inf"],
+            o["def_cav"],
+            o["speed"],
+            o["upkeep"],
+            o["total_cost"],
+            o["train_time_s"],
+        ), n
+    assert xc["conclusions"]["vikings"]["carry"]["official"] is None
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    assert all(
+        t["carry_capacity"] is None for t in troops.values() if t["tribe"] == "vikings"
+    )

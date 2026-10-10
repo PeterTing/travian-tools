@@ -8,5 +8,18 @@
     "egyptians": true,
     "spartans": true,
     "vikings": true
+  },
+  "_rog_only_note": "ASIA x1 是 Rise of Governors 年度特別世界。下面這些兵種的訓練時間跟社群資料（一般世界）不一樣（evidence/crosscheck_spartans_vikings_2026-10-11.json）：數字照 ASIA x1，但一般世界待驗證。",
+  "train_time_rog_only": {
+    "ballista": {
+      "asia_x1": 9000,
+      "community": 9900,
+      "community_ref": "https://siegewise.com/en/travian/units/spartans"
+    },
+    "ephor": {
+      "asia_x1": 77550,
+      "community": 28800,
+      "community_ref": "https://siegewise.com/en/travian/units/spartans"
+    }
   }
 }

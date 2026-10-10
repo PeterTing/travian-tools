@@ -1968,7 +1968,11 @@
         "弩砲"
       ],
       "stats_source": "asia_x1",
-      "stats_ref": "asia_x1/help/spartans/8"
+      "stats_ref": "asia_x1/help/spartans/8",
+      "training_time_pending_normal_worlds": {
+        "community": 9900,
+        "community_ref": "https://siegewise.com/en/travian/units/spartans"
+      }
     },
     "ephor": {
       "troop_id": "ephor",
@@ -1997,7 +2001,11 @@
         "監察官"
       ],
       "stats_source": "asia_x1",
-      "stats_ref": "asia_x1/help/spartans/9"
+      "stats_ref": "asia_x1/help/spartans/9",
+      "training_time_pending_normal_worlds": {
+        "community": 28800,
+        "community_ref": "https://siegewise.com/en/travian/units/spartans"
+      }
     },
     "spartan_settler": {
       "troop_id": "spartan_settler",
