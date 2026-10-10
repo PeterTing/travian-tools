@@ -7,7 +7,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import i18n from '@/i18n/i18n'
 import type { AutoFillValue } from '@/components/autofill/AutoFillContext'
-import FarmingCalculator, { FARM_UNITS, farmingCalc } from '../FarmingCalculator'
+import FarmingCalculator, { FARM_UNITS, farmingCalc, parseFarmDistance } from '../FarmingCalculator'
 
 vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
   const mod = await importOriginal<typeof import('@/components/autofill/AutoFillContext')>()
@@ -74,6 +74,20 @@ describe('farmingCalc（重寫後的公式）', () => {
   })
 })
 
+describe('parseFarmDistance', () => {
+  it('empty / 0 / negative / text → null; integers and decimals OK', () => {
+    expect(parseFarmDistance('')).toBeNull()
+    expect(parseFarmDistance('  ')).toBeNull()
+    expect(parseFarmDistance('0')).toBeNull()
+    expect(parseFarmDistance('-3')).toBeNull()
+    expect(parseFarmDistance('1a')).toBeNull()
+    expect(parseFarmDistance('10')).toBe(10)
+    expect(parseFarmDistance('010')).toBe(10)
+    expect(parseFarmDistance('10.5')).toBe(10.5)
+    expect(parseFarmDistance('１２')).toBe(12)
+  })
+})
+
 describe('農場收益頁面', () => {
   beforeAll(async () => {
     await i18n.changeLanguage('zh-TW')
@@ -109,14 +123,59 @@ describe('農場收益頁面', () => {
     expect(screen.getByTestId('farming-guide-ref')).toHaveTextContent(/^攻略參考.*只供參考，不用在計算。$/)
   })
 
-  it('掠奪量清空 → 0 兵、每日 0；離開欄位維持空白（不補 0）', () => {
+  it('掠奪量清空 → 摘要「—」、不顯示「× 0 匹」；離開欄位維持空白（不補 0）；再填回來就恢復', () => {
     render(<MemoryRouter><FarmingCalculator /></MemoryRouter>)
     const loot = screen.getByLabelText('每次掠奪量估計') as HTMLInputElement
     fireEvent.focus(loot)
     fireEvent.change(loot, { target: { value: '' } })
     fireEvent.blur(loot)
     expect(loot.value).toBe('')
+    expect(screen.getByTestId('farming-composition')).toHaveTextContent(/^—$/)
+    expect(screen.getByTestId('calc-result-primary').textContent).not.toMatch(/×|匹/)
+    expect(screen.getByTestId('farming-need-inputs')).toHaveTextContent('填好距離和每次掠奪量後顯示')
+    expect(screen.queryByTestId('calc-result-toggle')).toBeNull()
+    fireEvent.focus(loot)
+    fireEvent.change(loot, { target: { value: '400' } })
+    expect(screen.getByTestId('farming-composition')).toHaveTextContent('5 組 × 6 匹 = 30 匹')
+  })
+
+  it('掠奪量填 0（不是空白）→ 照算 0 兵', () => {
+    render(<MemoryRouter><FarmingCalculator /></MemoryRouter>)
+    const loot = screen.getByLabelText('每次掠奪量估計') as HTMLInputElement
+    fireEvent.focus(loot)
+    fireEvent.change(loot, { target: { value: '0' } })
     expect(screen.getByTestId('farming-composition')).toHaveTextContent('5 組 × 0 匹 = 0 匹')
-    expect(screen.getByTestId('farming-daily-summary')).toHaveTextContent('每日收益 0')
+  })
+
+  it('距離清空 → 維持空白（不變 0）、不算，摘要「—」；離開欄位顯示紅字；填回來就恢復', () => {
+    render(<MemoryRouter><FarmingCalculator /></MemoryRouter>)
+    const dist = screen.getByLabelText('距離（格）') as HTMLInputElement
+    expect(dist.type).toBe('text')
+    expect(dist.value).toBe('10')
+    fireEvent.change(dist, { target: { value: '' } })
+    expect(dist.value).toBe('')
+    expect(screen.getByTestId('farming-composition')).toHaveTextContent(/^—$/)
+    expect(screen.getByTestId('farming-need-inputs')).toBeInTheDocument()
+    expect(screen.queryByTestId('farming-dist-error')).toBeNull()
+    fireEvent.blur(dist)
+    expect(dist.value).toBe('')
+    expect(screen.getByTestId('farming-dist-error')).toHaveTextContent('請輸入大於 0 的距離')
+    expect(dist).toHaveAttribute('aria-invalid', 'true')
+    fireEvent.change(dist, { target: { value: '10' } })
+    expect(screen.queryByTestId('farming-dist-error')).toBeNull()
+    expect(screen.getByTestId('farming-composition')).toHaveTextContent('5 組 × 6 匹 = 30 匹')
+  })
+
+  it('距離 0、負數、非數字 → 不算＋紅字；小數照算', () => {
+    render(<MemoryRouter><FarmingCalculator /></MemoryRouter>)
+    const dist = screen.getByLabelText('距離（格）') as HTMLInputElement
+    for (const v of ['0', '-5', 'abc']) {
+      fireEvent.change(dist, { target: { value: v } })
+      expect(screen.getByTestId('farming-composition'), v).toHaveTextContent(/^—$/)
+      expect(screen.getByTestId('farming-dist-error'), v).toBeInTheDocument()
+    }
+    fireEvent.change(dist, { target: { value: '10.5' } })
+    expect(screen.queryByTestId('farming-dist-error')).toBeNull()
+    expect(screen.getByTestId('farming-composition').textContent).toMatch(/組 × 6 匹/)
   })
 })

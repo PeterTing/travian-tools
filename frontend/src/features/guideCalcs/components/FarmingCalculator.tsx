@@ -100,10 +100,21 @@ export function farmingCalc(opts: { dist: number; unitSpeed: number; carry: numb
 
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 
+/** 距離欄：「10」「10.5」→ 數字；空白、0、負數、非數字 → null（不算，不當 0） */
+export function parseFarmDistance(text: string): number | null {
+  const t = text.replace(/[\uff10-\uff19]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xff10 + 0x30)).replace(/\uff0e/g, '.').trim();
+  if (!/^\d+(\.\d+)?$/.test(t)) return null;
+  const n = Number(t);
+  return n > 0 ? n : null;
+}
+
 /** units：預設是 FARM_UNITS（測試可以換成含斯巴達、維京的清單） */
 export default function FarmingCalculator({ units = FARM_UNITS }: { units?: UnitOpt[] } = {}) {
   const { lang } = useLang();
-  const [dist, setDist] = useState(10);
+  // 距離用文字存：清空就是空白，不變成 0；空白或不合格不算（跟座標框同一套）
+  const [distText, setDistText] = useState('10');
+  const [distTouched, setDistTouched] = useState(false);
+  const dist = parseFarmDistance(distText);
   const [unitId, setUnitId] = useState('steppe');
   const [freq, setFreq] = useState(15);
   const [loot, setLoot] = useState(400);
@@ -123,10 +134,15 @@ export default function FarmingCalculator({ units = FARM_UNITS }: { units?: Unit
   // 馬以外（棍棒兵）用「名」
   const noun = lang === 'en' ? '' : unit.id === 'club' ? ' 名' : ' 匹';
 
+  // 距離或掠奪量空白：不算（摘要顯示「—」）
+  const inputsReady = dist !== null && Number.isFinite(loot);
   const calc = useMemo(
-    () => farmingCalc({ dist, unitSpeed: unit.speed, carry: unit.carry, cost: unit.cost, freq, loot, serverSpeed, arena, boots: bootsOk ? boots : 0 }),
+    () => farmingCalc({ dist: dist ?? 0, unitSpeed: unit.speed, carry: unit.carry, cost: unit.cost, freq, loot, serverSpeed, arena, boots: bootsOk ? boots : 0 }),
     [dist, unit, freq, loot, serverSpeed, arena, boots, bootsOk],
   );
+  const distError = dist === null && (distTouched || distText.trim() !== '')
+    ? (lang === 'en' ? 'Enter a distance greater than 0' : '請輸入大於 0 的距離')
+    : null;
 
   const composition = calc.perGroup === null || calc.totalTroops === null
     ? ''
@@ -159,8 +175,21 @@ export default function FarmingCalculator({ units = FARM_UNITS }: { units?: Unit
             <NumberInput id="farming-loot" data-testid="farming-loot" value={loot} onChange={setLoot} />
           </div>
           <div className={s.field}>
-            <label>{lang === 'en' ? 'Distance (tiles)' : '距離（格）'}</label>
-            <input type="number" min={1} max={300} value={dist} onChange={e => setDist(+e.target.value)} />
+            <label htmlFor="farming-dist">{lang === 'en' ? 'Distance (tiles)' : '距離（格）'}</label>
+            <input
+              id="farming-dist"
+              data-testid="farming-dist"
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
+              value={distText}
+              aria-invalid={distError ? true : undefined}
+              aria-describedby={distError ? 'farming-dist-err' : undefined}
+              onChange={e => setDistText(e.target.value)}
+              onBlur={() => setDistTouched(true)}
+              className={distError ? 'border-red-600 outline-red-600' : undefined}
+            />
+            {distError && <p id="farming-dist-err" role="alert" className="mt-1 text-xs text-red-600" data-testid="farming-dist-error">{distError}</p>}
           </div>
           {/* 競技場、靴子只加快超過 20 格的路段（共用行軍公式，P0-22） */}
           <div className={s.field}>
@@ -213,6 +242,14 @@ export default function FarmingCalculator({ units = FARM_UNITS }: { units?: Unit
                 <PendingVerifyChip kinds={missingCarryKinds([{ tribe: unit.tribeId }])} />
               </PendingRow>
             }
+          />
+        ) : !inputsReady ? (
+          // 距離或每次掠奪量空白：不算，大數字「—」，第二行提示要填什麼（不顯示「× 0 匹」）
+          <CalcResultPanel
+            lang={lang}
+            title={lang === 'en' ? 'Troops to send' : '派兵組合'}
+            primary={<span data-testid="farming-composition">{'—'}</span>}
+            secondary={<span data-testid="farming-need-inputs">{lang === 'en' ? 'Enter the distance and loot per raid' : '填好距離和每次掠奪量後顯示'}</span>}
           />
         ) : (
           <CalcResultPanel
