@@ -424,9 +424,7 @@
       "academy_level_required": 5,
       "description_zh": "高盧的防禦騎兵，對步兵防禦強",
       "description_en": "Gaul defensive cavalry with strong infantry defense",
-      "aliases_zh": [
-        "德魯伊騎兵"
-      ],
+      "aliases_zh": [],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/25"
     },

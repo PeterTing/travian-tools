@@ -614,9 +614,7 @@
       "game_id": 25,
       "zh": "德魯伊騎兵",
       "ref": "manual/troop/25",
-      "aliases": [
-        "德魯伊騎兵"
-      ]
+      "aliases": []
     },
     "haeduan": {
       "tribe": "gauls",

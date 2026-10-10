@@ -79,304 +79,54 @@ STD = (1.16, 1875.0)  # (kt, b) for normal buildings
 # building_id: cost base, cost k, L1 time, CP base, source, verified, pending notes
 # time a is "L1 seconds + b" for normal buildings.
 PARAMS: dict[str, dict] = {
-    "main_building": {
-        "c": (70, 40, 60, 20),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 2,
-        "src": "ts11",
-        "verified": True,
-    },
-    "barracks": {
-        "c": (210, 140, 260, 120),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 1,
-        "src": "ts11",
-        "verified": True,
-    },
-    "rally_point": {
-        "c": (110, 160, 90, 70),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 1,
-        "src": "ts11",
-        "verified": True,
-    },
-    "warehouse": {
-        "c": (130, 160, 90, 40),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 1,
-        "src": "ts11",
-        "verified": True,
-    },
-    "granary": {
-        "c": (80, 100, 70, 20),
-        "k": 1.28,
-        "t1": 1600,
-        "cp": 1,
-        "src": "ts11",
-        "verified": True,
-    },
-    "marketplace": {
-        "c": (80, 70, 120, 70),
-        "k": 1.28,
-        "t1": 1800,
-        "cp": 3,
-        "src": "ts11",
-        "verified": True,
-    },
-    "stable": {
-        "c": (260, 140, 220, 100),
-        "k": 1.28,
-        "t1": 2200,
-        "cp": 2,
-        "src": "ingame",
-        "verified": False,
-    },
-    "academy": {
-        "c": (220, 160, 90, 40),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 4,
-        "src": "ingame",
-        "verified": False,
-    },
+    "main_building":     {"c": (70, 40, 60, 20), "k": 1.28, "t1": 2000, "cp": 2, "src": "ts11", "verified": True},
+    "barracks":          {"c": (210, 140, 260, 120), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11", "verified": True},
+    "rally_point":       {"c": (110, 160, 90, 70), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11", "verified": True},
+    "warehouse":         {"c": (130, 160, 90, 40), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11", "verified": True},
+    "granary":           {"c": (80, 100, 70, 20), "k": 1.28, "t1": 1600, "cp": 1, "src": "ts11", "verified": True},
+    "marketplace":       {"c": (80, 70, 120, 70), "k": 1.28, "t1": 1800, "cp": 3, "src": "ts11", "verified": True},
+    "stable":            {"c": (260, 140, 220, 100), "k": 1.28, "t1": 2200, "cp": 2, "src": "ingame", "verified": False},
+    "academy":           {"c": (220, 160, 90, 40), "k": 1.28, "t1": 2000, "cp": 4, "src": "ingame", "verified": False},
     # T4 smithy (attack + defence upgrades in one building)
-    "blacksmith": {
-        "c": (180, 250, 500, 160),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 2,
-        "src": "ingame",
-        "verified": False,
-    },
+    "blacksmith":        {"c": (180, 250, 500, 160), "k": 1.28, "t1": 2000, "cp": 2, "src": "ingame", "verified": False},
     # T3-only building kept for old data; T4 worlds do not have it
-    "cranny": {
-        "c": (40, 50, 30, 10),
-        "k": 1.28,
-        "t1": 300,
-        "cp": 1,
-        "src": "ts11",
-        "verified": True,
-    },
-    "workshop": {
-        "c": (460, 510, 600, 320),
-        "k": 1.28,
-        "t1": 3000,
-        "cp": 3,
-        "src": "ingame",
-        "verified": False,
-    },
-    "embassy": {
-        "c": (180, 130, 150, 80),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 4,
-        "src": "ts11",
-        "verified": True,
-    },
-    "town_hall": {
-        "c": (1250, 1110, 1260, 600),
-        "k": 1.28,
-        "t1": 12500,
-        "cp": 5,
-        "src": "ingame",
-        "verified": False,
-    },
-    "residence": {
-        "c": (580, 460, 350, 180),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 2,
-        "src": "ingame",
-        "verified": False,
-    },
-    "palace": {
-        "c": (550, 800, 750, 250),
-        "k": 1.28,
-        "t1": 5000,
-        "cp": 5,
-        "src": "ingame",
-        "verified": False,
-    },
-    "treasury": {
-        "c": (2880, 2740, 2580, 990),
-        "k": 1.26,
-        "t1": 8000,
-        "cp": 6,
-        "src": "ingame",
-        "verified": False,
-    },
+    "cranny":            {"c": (40, 50, 30, 10), "k": 1.28, "t1": 300, "cp": 1, "src": "ts11", "verified": True},
+    "workshop":          {"c": (460, 510, 600, 320), "k": 1.28, "t1": 3000, "cp": 3, "src": "ingame", "verified": False},
+    "embassy":           {"c": (180, 130, 150, 80), "k": 1.28, "t1": 2000, "cp": 4, "src": "ts11", "verified": True},
+    "town_hall":         {"c": (1250, 1110, 1260, 600), "k": 1.28, "t1": 12500, "cp": 5, "src": "ingame", "verified": False},
+    "residence":         {"c": (580, 460, 350, 180), "k": 1.28, "t1": 2000, "cp": 2, "src": "ingame", "verified": False},
+    "palace":            {"c": (550, 800, 750, 250), "k": 1.28, "t1": 5000, "cp": 5, "src": "ingame", "verified": False},
+    "treasury":          {"c": (2880, 2740, 2580, 990), "k": 1.26, "t1": 8000, "cp": 6, "src": "ingame", "verified": False},
     # L1 700/670/700/240, 2300 s read from ts11 manual/building/37 (P0-19); the old
     # 80/120/70/90 was the trapper's L1. Multiplier not measured -> still 待驗證.
-    "heros_mansion": {
-        "c": (700, 670, 700, 240),
-        "k": 1.33,
-        "t1": 2300,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-        "pending": ["cost", "time"],
-    },
-    "sawmill": {
-        "c": (520, 380, 290, 90),
-        "k": 1.80,
-        "t1": 3000,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-        "bonus": True,
-    },
-    "brickyard": {
-        "c": (440, 480, 320, 50),
-        "k": 1.80,
-        "t1": 2240,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-        "bonus": True,
-    },
-    "iron_foundry": {
-        "c": (200, 450, 510, 120),
-        "k": 1.80,
-        "t1": 4080,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-        "bonus": True,
-    },
-    "grain_mill": {
-        "c": (500, 440, 380, 1240),
-        "k": 1.80,
-        "t1": 1840,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-        "bonus": True,
-    },
-    "bakery": {
-        "c": (1200, 1480, 870, 1600),
-        "k": 1.80,
-        "t1": 3680,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-        "bonus": True,
-    },
-    "stonemasons_lodge": {
-        "c": (155, 130, 125, 70),
-        "k": 1.28,
-        "t1": 2200,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-    },
-    "trade_office": {
-        "c": (1400, 1330, 1200, 400),
-        "k": 1.28,
-        "t1": 3000,
-        "cp": 3,
-        "src": "ingame",
-        "verified": False,
-    },
-    "tournament_square": {
-        "c": (1750, 2250, 1530, 240),
-        "k": 1.28,
-        "t1": 3500,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-    },
-    "city_wall": {
-        "c": (70, 90, 170, 70),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-    },
-    "earth_wall": {
-        "c": (120, 200, 0, 80),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-    },
-    "palisade": {
-        "c": (160, 100, 80, 60),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 1,
-        "src": "ts11",
-        "verified": True,
-    },
-    "great_barracks": {
-        "c": (630, 420, 780, 360),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-    },
-    "great_stable": {
-        "c": (780, 420, 660, 300),
-        "k": 1.28,
-        "t1": 2200,
-        "cp": 2,
-        "src": "ingame",
-        "verified": False,
-    },
-    "trapper": {
-        "c": (80, 120, 70, 90),
-        "k": 1.28,
-        "t1": 2000,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-    },
-    "brewery": {
-        "c": (3210, 2050, 2750, 3830),
-        "k": 1.40,
-        "t1": 8000,
-        "cp": 4,
-        "src": "ingame",
-        "verified": False,
-    },
-    "horse_drinking_trough": {
-        "c": (780, 420, 660, 540),
-        "k": 1.28,
-        "t1": 2200,
-        "cp": 3,
-        "src": "ingame",
-        "verified": False,
-    },
-    "great_warehouse": {
-        "c": (650, 800, 450, 200),
-        "k": 1.28,
-        "t1": 9000,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-    },
-    "great_granary": {
-        "c": (400, 500, 350, 100),
-        "k": 1.28,
-        "t1": 7000,
-        "cp": 1,
-        "src": "ingame",
-        "verified": False,
-    },
+    "heros_mansion":     {"c": (700, 670, 700, 240), "k": 1.33, "t1": 2300, "cp": 1, "src": "ingame", "verified": False,
+                          "pending": ["cost", "time"]},
+    "sawmill":           {"c": (520, 380, 290, 90), "k": 1.80, "t1": 3000, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "brickyard":         {"c": (440, 480, 320, 50), "k": 1.80, "t1": 2240, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "iron_foundry":      {"c": (200, 450, 510, 120), "k": 1.80, "t1": 4080, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "grain_mill":        {"c": (500, 440, 380, 1240), "k": 1.80, "t1": 1840, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "bakery":            {"c": (1200, 1480, 870, 1600), "k": 1.80, "t1": 3680, "cp": 1, "src": "ingame", "verified": False, "bonus": True},
+    "stonemasons_lodge": {"c": (155, 130, 125, 70), "k": 1.28, "t1": 2200, "cp": 1, "src": "ingame", "verified": False},
+    "trade_office":      {"c": (1400, 1330, 1200, 400), "k": 1.28, "t1": 3000, "cp": 3, "src": "ingame", "verified": False},
+    "tournament_square": {"c": (1750, 2250, 1530, 240), "k": 1.28, "t1": 3500, "cp": 1, "src": "ingame", "verified": False},
+    "city_wall":         {"c": (70, 90, 170, 70), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
+    "earth_wall":        {"c": (120, 200, 0, 80), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
+    "palisade":          {"c": (160, 100, 80, 60), "k": 1.28, "t1": 2000, "cp": 1, "src": "ts11", "verified": True},
+    "great_barracks":    {"c": (630, 420, 780, 360), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
+    "great_stable":      {"c": (780, 420, 660, 300), "k": 1.28, "t1": 2200, "cp": 2, "src": "ingame", "verified": False},
+    "trapper":           {"c": (80, 120, 70, 90), "k": 1.28, "t1": 2000, "cp": 1, "src": "ingame", "verified": False},
+    "brewery":           {"c": (3210, 2050, 2750, 3830), "k": 1.40, "t1": 8000, "cp": 4, "src": "ingame", "verified": False},
+    "horse_drinking_trough": {"c": (780, 420, 660, 540), "k": 1.28, "t1": 2200, "cp": 3, "src": "ingame", "verified": False},
+    "great_warehouse":   {"c": (650, 800, 450, 200), "k": 1.28, "t1": 9000, "cp": 1, "src": "ingame", "verified": False},
+    "great_granary":     {"c": (400, 500, 350, 100), "k": 1.28, "t1": 7000, "cp": 1, "src": "ingame", "verified": False},
 }
 
 # Resource fields: cost k = 1.67, time a × 1.6^(L-1) − 1000/3. ts11 verified L1–L3.
 FIELDS: dict[str, dict] = {
     "woodcutter": {"res": "wood", "c": (40, 100, 50, 60), "a": 1780 / 3},
-    "clay_pit": {"res": "clay", "c": (80, 40, 80, 50), "a": 1660 / 3},
-    "iron_mine": {"res": "iron", "c": (100, 80, 30, 60), "a": 2350 / 3},
-    "cropland": {"res": "crop", "c": (70, 90, 70, 20), "a": 1450 / 3},
+    "clay_pit":   {"res": "clay", "c": (80, 40, 80, 50), "a": 1660 / 3},
+    "iron_mine":  {"res": "iron", "c": (100, 80, 30, 60), "a": 2350 / 3},
+    "cropland":   {"res": "crop", "c": (70, 90, 70, 20), "a": 1450 / 3},
 }
 FIELD_K = 1.67
 FIELD_B = 1000 / 3
@@ -384,26 +134,12 @@ FIELD_B = 1000 / 3
 # Celebrations (x1 cost). Small crop 1,340 matches the opening build-order sheet
 # (party step = 20,330 total) — not yet seen on a ts11 Town Hall -> 待驗證.
 CELEBRATIONS = {
-    "small": {
-        "cost": [6400, 6650, 5940, 1340],
-        "min_town_hall": 1,
-        "pending": ["cost_crop"],
-    },
-    "great": {
-        "cost": [29700, 33250, 32000, 6700],
-        "min_town_hall": 10,
-        "pending": ["cost"],
-    },
+    "small": {"cost": [6400, 6650, 5940, 1340], "min_town_hall": 1, "pending": ["cost_crop"]},
+    "great": {"cost": [29700, 33250, 32000, 6700], "min_town_hall": 10, "pending": ["cost"]},
 }
 # Official "Game Versions and Speed" table (support.travian.com/en/articles/20)
 SPEEDS = [1, 2, 3, 5, 10]
-CELEBRATION_CAP = {
-    1: (500, 2000),
-    2: (500, 2000),
-    3: (250, 1000),
-    5: (250, 1000),
-    10: (125, 500),
-}
+CELEBRATION_CAP = {1: (500, 2000), 2: (500, 2000), 3: (250, 1000), 5: (250, 1000), 10: (125, 500)}
 START_CP = {1: 500, 2: 250, 3: 167, 5: 100, 10: 50}
 MAX_VILLAGES = 50
 
@@ -414,9 +150,7 @@ MAX_VILLAGES = 50
 BACKEND_UNIT_SPEEDS = ROOT / "backend/data/static/unit_speeds.json"
 BACKEND_TROOPS = ROOT / "backend/data/static/troops.json"
 FRONTEND_UNIT_SPEEDS = ROOT / "frontend/src/data/unitSpeeds.gen.json"
-TS11_MANUAL_EVIDENCE = (
-    ROOT / "scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json"
-)
+TS11_MANUAL_EVIDENCE = ROOT / "scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json"
 # P0-18: 兵種花費／攻防／運載量／糧耗／訓練時間，ts11 遊戲內說明頁原文解析（2026-10-10 唯讀擷取）
 TS11_MANUAL_STATS = ROOT / "scripts/game_data/evidence/ts11_manual_2026-10-10.json"
 FRONTEND_COST_VERIFIED = ROOT / "frontend/src/data/unitCostVerified.json"
@@ -427,7 +161,6 @@ def _ts11_stats() -> dict[str, dict]:
     if not TS11_MANUAL_STATS.exists():
         return {}
     return json.loads(TS11_MANUAL_STATS.read_text(encoding="utf-8"))["troops"]
-
 
 UNIT_SPEED_SOURCES = {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-09 讀取",
@@ -445,14 +178,7 @@ UNIT_SPEEDS: dict[str, list[tuple]] = {
         ("praetorian", "praetorian", "praetorian", 5, "ts11", 2),
         ("imperian", "imperian", "imperian", 7, "ts11", 3),
         ("equites_legati", "equitesLegati", "equites_legati", 16, "ts11", 4),
-        (
-            "equites_imperatoris",
-            "equitesImperatoris",
-            "equites_imperatoris",
-            14,
-            "ts11",
-            5,
-        ),
+        ("equites_imperatoris", "equitesImperatoris", "equites_imperatoris", 14, "ts11", 5),
         ("equites_caesaris", "equitesCaesaris", "equites_caesaris", 10, "ts11", 6),
         ("roman_ram", "ram", "battering_ram", 4, "ts11", 7),
         ("fire_catapult", "fireCatapult", "fire_catapult", 3, "ts11", 8),
@@ -517,14 +243,7 @@ UNIT_SPEEDS: dict[str, list[tuple]] = {
         ("shieldsman", "shieldsman", "shieldsman", 8, "official_pending", "s187"),
         ("twinsteel_therion", "twinsteel", "twirler", 6, "official_pending", "s187"),
         ("elpida_rider", "elpida", "elpida_rider", 16, "official_pending", "s187"),
-        (
-            "corinthian_crusher",
-            "corinthian",
-            "corinthian_crusher",
-            9,
-            "official_pending",
-            "s187",
-        ),
+        ("corinthian_crusher", "corinthian", "corinthian_crusher", 9, "official_pending", "s187"),
         ("spartan_ram", "ram", "ram", None, "pending", None),
         ("ballista", "ballista", "catapult", None, "pending", None),
         ("ephor", "ephor", "ephor", None, "pending", None),
@@ -606,40 +325,14 @@ def _load(path: Path) -> dict:
 # (manual/building/<gid>, 2026-10-10). Only level 1 is shown there, so the
 # multipliers (k) stay unmeasured and "verified" keeps its old meaning.
 TS11_MANUAL_BUILDING_GID = {
-    "sawmill": 5,
-    "brickyard": 6,
-    "iron_foundry": 7,
-    "grain_mill": 8,
-    "bakery": 9,
-    "warehouse": 10,
-    "granary": 11,
-    "blacksmith": 13,
-    "tournament_square": 14,
-    "main_building": 15,
-    "rally_point": 16,
-    "marketplace": 17,
-    "embassy": 18,
-    "barracks": 19,
-    "stable": 20,
-    "workshop": 21,
-    "academy": 22,
-    "cranny": 23,
-    "town_hall": 24,
-    "residence": 25,
-    "palace": 26,
-    "treasury": 27,
-    "trade_office": 28,
-    "great_barracks": 29,
-    "great_stable": 30,
-    "city_wall": 31,
-    "earth_wall": 32,
-    "palisade": 33,
-    "stonemasons_lodge": 34,
-    "brewery": 35,
-    "trapper": 36,
-    "heros_mansion": 37,
-    "great_warehouse": 38,
-    "great_granary": 39,
+    "sawmill": 5, "brickyard": 6, "iron_foundry": 7, "grain_mill": 8, "bakery": 9,
+    "warehouse": 10, "granary": 11, "blacksmith": 13, "tournament_square": 14,
+    "main_building": 15, "rally_point": 16, "marketplace": 17, "embassy": 18,
+    "barracks": 19, "stable": 20, "workshop": 21, "academy": 22, "cranny": 23,
+    "town_hall": 24, "residence": 25, "palace": 26, "treasury": 27, "trade_office": 28,
+    "great_barracks": 29, "great_stable": 30, "city_wall": 31, "earth_wall": 32,
+    "palisade": 33, "stonemasons_lodge": 34, "brewery": 35, "trapper": 36,
+    "heros_mansion": 37, "great_warehouse": 38, "great_granary": 39,
     "horse_drinking_trough": 41,
 }
 
@@ -647,9 +340,7 @@ TS11_MANUAL_BUILDING_GID = {
 def _ts11_buildings() -> dict[str, dict]:
     if not TS11_MANUAL_STATS.exists():
         return {}
-    return json.loads(TS11_MANUAL_STATS.read_text(encoding="utf-8")).get(
-        "buildings", {}
-    )
+    return json.loads(TS11_MANUAL_STATS.read_text(encoding="utf-8")).get("buildings", {})
 
 
 def check_l1_against_manual() -> dict[str, int]:
@@ -665,12 +356,7 @@ def check_l1_against_manual() -> dict[str, int]:
         assert list(p["c"]) == m["cost_l1"], (bid, p["c"], m["cost_l1"])
         assert p["t1"] == m["time_l1_s"], (bid, p["t1"], m["time_l1_s"])
         pops[bid] = m["pop_l1"]
-    for fid, gid in (
-        ("woodcutter", 1),
-        ("clay_pit", 2),
-        ("iron_mine", 3),
-        ("cropland", 4),
-    ):
+    for fid, gid in (("woodcutter", 1), ("clay_pit", 2), ("iron_mine", 3), ("cropland", 4)):
         m = manual.get(str(gid))
         if m:
             assert list(FIELDS[fid]["c"]) == m["cost_l1"], fid
@@ -687,14 +373,8 @@ def gen_buildings(current: dict) -> dict:
             for lv in b["levels"]:
                 L = lv["level"]
                 w, c, i, cr = build_cost(f["c"], FIELD_K, L)
-                lv.update(
-                    cost_wood=w,
-                    cost_clay=c,
-                    cost_iron=i,
-                    cost_crop=cr,
-                    build_time_base=field_time(f["a"], L),
-                    culture_points=cp_at(1, L),
-                )
+                lv.update(cost_wood=w, cost_clay=c, cost_iron=i, cost_crop=cr,
+                          build_time_base=field_time(f["a"], L), culture_points=cp_at(1, L))
                 lv["cp_per_day"] = lv["culture_points"]
             continue
         if bid not in PARAMS:  # 遊戲裡沒有的建築（apply_ingame_names 會拿掉）
@@ -703,14 +383,9 @@ def gen_buildings(current: dict) -> dict:
         for lv in b["levels"]:
             L = lv["level"]
             w, c, i, cr = build_cost(p["c"], p["k"], L)
-            lv.update(
-                cost_wood=w,
-                cost_clay=c,
-                cost_iron=i,
-                cost_crop=cr,
-                build_time_base=build_time(p["t1"], L, p.get("bonus", False)),
-                culture_points=cp_at(p["cp"], L),
-            )
+            lv.update(cost_wood=w, cost_clay=c, cost_iron=i, cost_crop=cr,
+                      build_time_base=build_time(p["t1"], L, p.get("bonus", False)),
+                      culture_points=cp_at(p["cp"], L))
             lv["cp_per_day"] = lv["culture_points"]
             if L == 1 and bid in l1_pop:
                 lv["population"] = l1_pop[bid]
@@ -727,17 +402,13 @@ def gen_buildings(current: dict) -> dict:
     )
     cr = out["buildings"]["cranny"]
     if cr.get("description_en"):
-        cr["description_en"] = cr["description_en"].replace(
-            "Gauls have double", "Gauls get 1.5×"
-        )
+        cr["description_en"] = cr["description_en"].replace("Gauls have double", "Gauls get 1.5×")
     th = out["buildings"]["town_hall"]
     th["levels"][0]["effect_value"] = 500
     th["levels"][0]["effect_description"] = "小慶典 CP＝本村每日 CP 產量（x1 上限 500）"
     for lv in th["levels"][1:]:
         if lv["level"] >= 10:
-            lv["effect_description"] = (
-                "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）"
-            )
+            lv["effect_description"] = "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）"
     mk = out["buildings"]["marketplace"]
     if not any(pr["building_id"] == "granary" for pr in mk["prerequisites"]):
         mk["prerequisites"].append({"building_id": "granary", "level": 1})
@@ -754,14 +425,8 @@ def gen_resources(current: dict) -> dict:
             if L == 0:
                 continue
             w, c, i, cr = build_cost(f["c"], FIELD_K, L)
-            lv.update(
-                cost_wood=w,
-                cost_clay=c,
-                cost_iron=i,
-                cost_crop=cr,
-                build_time_base=field_time(f["a"], L),
-                culture_points=cp_at(1, L),
-            )
+            lv.update(cost_wood=w, cost_clay=c, cost_iron=i, cost_crop=cr,
+                      build_time_base=field_time(f["a"], L), culture_points=cp_at(1, L))
     return out
 
 
@@ -783,17 +448,13 @@ def gen_culture_points() -> dict:
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "source": "https://support.travian.com/en/articles/51-culture-points-cp (table checked 2026-10-10) ; "
-        "https://support.travian.com/en/articles/20-game-versions-and-speed ; "
-        "https://support.travian.com/en/articles/82-celebrations-and-town-hall",
-        "village_requirements": {
-            str(s): [village_cp(v, s) for v in range(1, MAX_VILLAGES + 1)]
-            for s in SPEEDS
-        },
+                  "https://support.travian.com/en/articles/20-game-versions-and-speed ; "
+                  "https://support.travian.com/en/articles/82-celebrations-and-town-hall",
+        "village_requirements": {str(s): [village_cp(v, s) for v in range(1, MAX_VILLAGES + 1)]
+                                 for s in SPEEDS},
         "start_cp": {str(s): START_CP[s] for s in SPEEDS},
-        "celebration_cap": {
-            str(s): {"small": CELEBRATION_CAP[s][0], "great": CELEBRATION_CAP[s][1]}
-            for s in SPEEDS
-        },
+        "celebration_cap": {str(s): {"small": CELEBRATION_CAP[s][0], "great": CELEBRATION_CAP[s][1]}
+                            for s in SPEEDS},
         "celebrations": CELEBRATIONS,
         # P0-19: the formula matches the official S51 table for every village 1–50
         # on every speed (checked in check_cp_against_official), so nothing is 待驗證.
@@ -812,28 +473,15 @@ def pending_fields(p: dict) -> list[str]:
 def gen_frontend(buildings: dict, cp: dict) -> dict:
     rows = {}
     for bid, b in buildings["buildings"].items():
-        rows[bid] = [
-            [
-                lv["cost_wood"],
-                lv["cost_clay"],
-                lv["cost_iron"],
-                lv["cost_crop"],
-                lv["build_time_base"],
-                lv["culture_points"],
-            ]
-            for lv in b["levels"]
-        ]
+        rows[bid] = [[lv["cost_wood"], lv["cost_clay"], lv["cost_iron"], lv["cost_crop"],
+                      lv["build_time_base"], lv["culture_points"]] for lv in b["levels"]]
     pending = {bid: pending_fields(p) for bid, p in PARAMS.items() if pending_fields(p)}
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "rowFormat": ["wood", "clay", "iron", "crop", "buildTimeBase", "cp"],
         "buildings": rows,
-        "names": {
-            bid: [b["name_zh"], b["name_en"]]
-            for bid, b in buildings["buildings"].items()
-        },
-        "cpBase": {bid: p["cp"] for bid, p in PARAMS.items()}
-        | dict.fromkeys(FIELDS, 1),
+        "names": {bid: [b["name_zh"], b["name_en"]] for bid, b in buildings["buildings"].items()},
+        "cpBase": {bid: p["cp"] for bid, p in PARAMS.items()} | {fid: 1 for fid in FIELDS},
         "pending": pending,
         "villageRequirements": cp["village_requirements"],
         "startCp": cp["start_cp"],
@@ -848,25 +496,15 @@ def gen_unit_speeds() -> dict:
     tribes = {}
     for tribe in TRIBE_ORDER:
         rows = []
-        for slot, (be_id, fe_id, kb_id, speed, src, ref) in enumerate(
-            UNIT_SPEEDS[tribe], start=1
-        ):
+        for slot, (be_id, fe_id, kb_id, speed, src, ref) in enumerate(UNIT_SPEEDS[tribe], start=1):
             if src == "ts11":
                 ref_text = f"manual/troop/{ref}"
             elif src in ("official", "official_pending"):
                 ref_text = UNIT_SPEED_SOURCES[ref]
             else:
                 ref_text = None
-            row = {
-                "slot": slot,
-                "troop_id": be_id,
-                "fe_id": fe_id,
-                "kb_id": kb_id,
-                "speed": speed,
-                "source": src,
-                "ref": ref_text,
-                "stats": None,
-            }
+            row = {"slot": slot, "troop_id": be_id, "fe_id": fe_id, "kb_id": kb_id,
+                   "speed": speed, "source": src, "ref": ref_text, "stats": None}
             st = stats.get(str(ref)) if src == "ts11" else None
             if st:
                 # 說明頁的速度要跟速度表一樣（速度表 2026-10-09 讀的，這次 10-10 再讀一次）
@@ -887,12 +525,10 @@ def gen_unit_speeds() -> dict:
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "unit": "fields/hour, x1, base speed (no Tournament Square / artefact / hero bonus)",
-        "sources": {
-            "ts11": UNIT_SPEED_SOURCES["ts11"],
-            "official": [UNIT_SPEED_SOURCES["s139"], UNIT_SPEED_SOURCES["s187"]],
-            "official_pending": "官方說明頁，數字標示取自第三方計算器（待驗證，不列入反推 TS）",
-            "pending": "沒有第一手出處，速度留空（待驗證）",
-        },
+        "sources": {"ts11": UNIT_SPEED_SOURCES["ts11"],
+                    "official": [UNIT_SPEED_SOURCES["s139"], UNIT_SPEED_SOURCES["s187"]],
+                    "official_pending": "官方說明頁，數字標示取自第三方計算器（待驗證，不列入反推 TS）",
+                    "pending": "沒有第一手出處，速度留空（待驗證）"},
         "tribes": tribes,
     }
 
@@ -946,22 +582,11 @@ def gen_cost_verified(speeds: dict) -> dict:
     """部族的 10 種兵都讀到 ts11 說明頁才算核對過（P0-18）；ts11 沒有斯巴達／維京 → false."""
     return {
         "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在 ts11 遊戲內說明頁讀到（evidence/ts11_manual_2026-10-10.json）才是 true；ts11 是 5 族伺服器，斯巴達、維京沒有第一手來源，維持 false（兵種詳情顯示「待驗證」）。",
-        "tribes": {
-            t: all(r["stats"] for r in speeds["tribes"][t])
-            for t in [
-                "romans",
-                "gauls",
-                "teutons",
-                "huns",
-                "egyptians",
-                "vikings",
-                "spartans",
-            ]
-        },
+        "tribes": {t: all(r["stats"] for r in speeds["tribes"][t]) for t in ["romans", "gauls", "teutons", "huns", "egyptians", "vikings", "spartans"]},
     }
 
 
-# ── 遊戲內名稱表（P0-17 / #33）──────────────────────────────────────────────
+# ── 遊戲內名稱表（#33）────────────────────────────────────────────────────
 # 建築、部族、兵種的中文名一律用 ts11 遊戲內說明頁的寫法（evidence/ts11_manual_2026-10-10.json
 # 裡的 name_zh / tribe_zh），前後端都讀這張表；以前用過的名字只留在 aliases 給搜尋用。
 BACKEND_INGAME_NAMES = ROOT / "backend/data/static/ingame_names.json"
@@ -969,105 +594,49 @@ FRONTEND_INGAME_NAMES = ROOT / "frontend/src/data/ingameNames.gen.json"
 
 # building_id → gid（資源田 + TS11_MANUAL_BUILDING_GID + app 沒有資料的遊戲內建築）
 INGAME_BUILDING_GID = {
-    "woodcutter": 1,
-    "clay_pit": 2,
-    "iron_mine": 3,
-    "cropland": 4,
+    "woodcutter": 1, "clay_pit": 2, "iron_mine": 3, "cropland": 4,
     **TS11_MANUAL_BUILDING_GID,
-    "wonder_of_the_world": 40,
-    "stone_wall": 42,
-    "makeshift_wall": 43,
-    "command_center": 44,
-    "waterworks": 45,
+    "wonder_of_the_world": 40, "stone_wall": 42, "makeshift_wall": 43,
+    "command_center": 44, "waterworks": 45,
 }
 
 # 舊名（站上以前用過、或常見的別稱）→ 只拿來搜尋，不顯示
 BUILDING_ALIASES = {
     "main_building": ["主建築"],
-    "clay_pit": ["黏土坑", "磚坑"],
-    "cropland": ["農田"],
-    "iron_foundry": ["鑄鐵廠", "鑄造廠"],
-    "grain_mill": ["穀物磨坊"],
-    "bakery": ["麵包坊"],
-    "granary": ["糧倉"],
-    "blacksmith": ["鐵匠鋪", "兵工廠"],
-    "tournament_square": ["比武場"],
-    "barracks": ["軍營"],
-    "workshop": ["工坊"],
-    "cranny": ["隱藏倉庫"],
-    "town_hall": ["市政廳"],
-    "treasury": ["寶庫"],
-    "trade_office": ["貿易公司", "商貿處"],
-    "great_barracks": ["大營房"],
-    "earth_wall": ["土圍"],
-    "palisade": ["柵欄", "木柵欄"],
-    "stonemasons_lodge": ["石匠小屋"],
-    "brewery": ["酒館"],
-    "heros_mansion": ["英雄宅邸"],
-    "great_granary": ["大糧倉"],
-    "horse_drinking_trough": ["馬飲水槽"],
-    "waterworks": ["水渠"],
+    "clay_pit": ["黏土坑", "磚坑"], "cropland": ["農田"], "iron_foundry": ["鑄鐵廠", "鑄造廠"],
+    "grain_mill": ["穀物磨坊"], "bakery": ["麵包坊"], "granary": ["糧倉"],
+    "blacksmith": ["鐵匠鋪", "兵工廠"], "tournament_square": ["比武場"],
+    "barracks": ["軍營"], "workshop": ["工坊"], "cranny": ["隱藏倉庫"],
+    "town_hall": ["市政廳"], "treasury": ["寶庫"], "trade_office": ["貿易公司", "商貿處"],
+    "great_barracks": ["大營房"], "earth_wall": ["土圍"], "palisade": ["柵欄", "木柵欄"],
+    "stonemasons_lodge": ["石匠小屋"], "brewery": ["酒館"], "heros_mansion": ["英雄宅邸"],
+    "great_granary": ["大糧倉"], "horse_drinking_trough": ["馬飲水槽"], "waterworks": ["水渠"],
 }
 
-TRIBE_MANUAL_REF = {
-    "romans": 1,
-    "teutons": 11,
-    "gauls": 21,
-    "egyptians": 51,
-    "huns": 61,
-}
-TRIBE_ALIASES = {
-    "romans": ["羅馬"],
-    "teutons": ["條頓", "條頓人", "日耳曼"],
-    "gauls": ["高盧"],
-    "egyptians": ["埃及"],
-    "huns": ["匈奴人"],
-}
+TRIBE_MANUAL_REF = {"romans": 1, "teutons": 11, "gauls": 21, "egyptians": 51, "huns": 61}
+TRIBE_ALIASES = {"romans": ["羅馬"], "teutons": ["條頓", "條頓人", "日耳曼"], "gauls": ["高盧"],
+                 "egyptians": ["埃及"], "huns": ["匈奴人"]}
 # ts11 是 5 族伺服器，沒有斯巴達、維京的遊戲內名稱
 TRIBE_NO_INGAME = {"spartans": "斯巴達人", "vikings": "維京人"}
 
 UNIT_ALIASES = {
-    "legionnaire": ["軍團兵"],
-    "equites_legati": ["使節騎兵", "使者騎兵"],
-    "equites_imperatoris": ["帝國騎兵"],
-    "equites_caesaris": ["凱撒騎兵"],
-    "roman_ram": ["攻城槌"],
-    "fire_catapult": ["火焰投石車"],
-    "senator": ["元老"],
-    "clubswinger": ["棍兵"],
-    "spearman": ["長矛兵"],
-    "teuton_scout": ["斥候", "偵查兵"],
-    "paladin": ["聖騎士"],
-    "teuton_ram": ["攻城槌"],
-    "teuton_catapult": ["投石車"],
-    "chief": ["領袖"],
-    "pathfinder": ["探路兵"],
-    "theutates_thunder": ["圖塔特雷"],
-    "druidrider": ["德魯伊騎兵"],
-    "haeduan": ["海頓騎兵"],
-    "gaul_ram": ["攻城槌"],
-    "trebuchet": ["投石車"],
-    "ash_warden": ["灰燼守衛"],
-    "khopesh_warrior": ["鐮刀劍戰士"],
-    "sopdu_explorer": ["索普度探險者"],
-    "anhur_guard": ["安胡爾守衛"],
-    "resheph_chariot": ["瑞謝夫戰車"],
-    "egyptian_ram": ["攻城槌"],
-    "stone_catapult": ["石頭投石車"],
-    "mercenary": ["傭兵"],
-    "spotter": ["斥候"],
-    "steppe_rider": ["草原騎兵"],
-    "hun_ram": ["攻城槌"],
-    "hun_catapult": ["投石車"],
-    "logades": ["領袖"],
+    "legionnaire": ["軍團兵"], "equites_legati": ["使節騎兵", "使者騎兵"],
+    "equites_imperatoris": ["帝國騎兵"], "equites_caesaris": ["凱撒騎兵"],
+    "roman_ram": ["攻城槌"], "fire_catapult": ["火焰投石車"], "senator": ["元老"],
+    "clubswinger": ["棍兵"], "spearman": ["長矛兵"], "teuton_scout": ["斥候", "偵查兵"],
+    "paladin": ["聖騎士"], "teuton_ram": ["攻城槌"], "teuton_catapult": ["投石車"], "chief": ["領袖"],
+    "pathfinder": ["探路兵"], "theutates_thunder": ["圖塔特雷"],
+    "haeduan": ["海頓騎兵"], "gaul_ram": ["攻城槌"], "trebuchet": ["投石車"],
+    "ash_warden": ["灰燼守衛"], "khopesh_warrior": ["鐮刀劍戰士"], "sopdu_explorer": ["索普度探險者"],
+    "anhur_guard": ["安胡爾守衛"], "resheph_chariot": ["瑞謝夫戰車"], "egyptian_ram": ["攻城槌"],
+    "stone_catapult": ["石頭投石車"], "mercenary": ["傭兵"], "spotter": ["斥候"],
+    "steppe_rider": ["草原騎兵"], "hun_ram": ["攻城槌"], "hun_catapult": ["投石車"], "logades": ["領袖"],
 }
 SETTLER_ALIASES = ["拓荒者", "移民", "定居者"]
 # 斯巴達、維京沒有遊戲內名稱；攻城武器、開拓者跟其他族同英文名的，比照遊戲內用詞
 NON_TS11_UNIT_NAMES = {
-    "viking_ram": ("破城槌", ["攻城槌"]),
-    "viking_catapult": ("弩炮", ["投石車"]),
-    "viking_settler": ("開拓者", SETTLER_ALIASES),
-    "spartan_ram": ("破城槌", ["攻城槌"]),
+    "viking_ram": ("破城槌", ["攻城槌"]), "viking_catapult": ("弩炮", ["投石車"]),
+    "viking_settler": ("開拓者", SETTLER_ALIASES), "spartan_ram": ("破城槌", ["攻城槌"]),
     "spartan_settler": ("開拓者", SETTLER_ALIASES),
 }
 
@@ -1077,19 +646,12 @@ def gen_ingame_names(speeds: dict) -> dict:
     mb, mt = ev["buildings"], ev["troops"]
     buildings = {}
     for bid, gid in sorted(INGAME_BUILDING_GID.items(), key=lambda kv: kv[1]):
-        buildings[bid] = {
-            "gid": gid,
-            "zh": mb[str(gid)]["name_zh"],
-            "ref": f"manual/building/{gid}",
-            "aliases": BUILDING_ALIASES.get(bid, []),
-        }
+        buildings[bid] = {"gid": gid, "zh": mb[str(gid)]["name_zh"],
+                          "ref": f"manual/building/{gid}", "aliases": BUILDING_ALIASES.get(bid, [])}
     tribes = {}
     for t, ref in TRIBE_MANUAL_REF.items():
-        tribes[t] = {
-            "zh": mt[str(ref)]["tribe_zh"],
-            "ref": f"manual/troop/{ref}",
-            "aliases": TRIBE_ALIASES.get(t, []),
-        }
+        tribes[t] = {"zh": mt[str(ref)]["tribe_zh"], "ref": f"manual/troop/{ref}",
+                     "aliases": TRIBE_ALIASES.get(t, [])}
     for t, zh in TRIBE_NO_INGAME.items():
         tribes[t] = {"zh": zh, "ref": None, "aliases": [zh.removesuffix("人")]}
     units = {}
@@ -1098,63 +660,38 @@ def gen_ingame_names(speeds: dict) -> dict:
             tid = r["troop_id"]
             if r["stats"]:
                 n = int(r["stats"]["ref"].rsplit("/", 1)[1])
-                al = (
-                    SETTLER_ALIASES
-                    if tid.endswith("settler")
-                    else UNIT_ALIASES.get(tid, [])
-                )
-                units[tid] = {
-                    "tribe": tribe,
-                    "fe_id": r["fe_id"],
-                    "game_id": n,
-                    "zh": r["stats"]["name_zh"],
-                    "ref": r["stats"]["ref"],
-                    "aliases": al,
-                }
+                zh = r["stats"]["name_zh"]
+                al = SETTLER_ALIASES if tid.endswith("settler") else UNIT_ALIASES.get(tid, [])
+                units[tid] = {"tribe": tribe, "fe_id": r["fe_id"], "game_id": n,
+                              "zh": zh, "ref": r["stats"]["ref"], "aliases": [a for a in al if a != zh]}
             elif tid in NON_TS11_UNIT_NAMES:
                 zh, al = NON_TS11_UNIT_NAMES[tid]
-                units[tid] = {
-                    "tribe": tribe,
-                    "fe_id": r["fe_id"],
-                    "game_id": None,
-                    "zh": zh,
-                    "ref": None,
-                    "aliases": al,
-                }
+                units[tid] = {"tribe": tribe, "fe_id": r["fe_id"], "game_id": None,
+                              "zh": zh, "ref": None, "aliases": al}
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "_source": "ts11 遊戲內說明頁（scripts/game_data/evidence/ts11_manual_2026-10-10.json）；"
-        "aliases 是以前用過的名字，只給搜尋用，不顯示",
-        "tribes": tribes,
-        "buildings": buildings,
-        "units": units,
+                   "aliases 是以前用過的名字，只給搜尋用，不顯示",
+        "tribes": tribes, "buildings": buildings, "units": units,
     }
 
 
 # 說明文字裡的舊名 → 遊戲內名稱（只換建築名、部族名、開拓者；兵種專有名詞在 name_zh）
-TEXT_FIXES = [
-    ("條頓人", "日耳曼人"),
-    ("可研發投石車", "可研發投石類攻城武器"),
-    ("移民", "開拓者"),
-    ("拓荒者", "開拓者"),
-]
+TEXT_FIXES = [("條頓人", "日耳曼人"), ("可研發投石車", "可研發投石類攻城武器"),
+              ("移民", "開拓者"), ("拓荒者", "開拓者")]
 
 
 def ingame_text(text: str, names: dict) -> str:
     for a, b in TEXT_FIXES:
         text = text.replace(a, b)
-    pairs = [
-        (al, row["zh"]) for row in names["buildings"].values() for al in row["aliases"]
-    ]
+    pairs = [(al, row["zh"]) for row in names["buildings"].values() for al in row["aliases"]]
     for al, zh in sorted(pairs, key=lambda p: -len(p[0])):
         if al not in zh:  # 舊名是新名的一部分時不換（避免重複套用）
             text = text.replace(al, zh)
     return text
 
 
-def apply_ingame_names(
-    buildings: dict, resources: dict, troops: dict, names: dict
-) -> None:
+def apply_ingame_names(buildings: dict, resources: dict, troops: dict, names: dict) -> None:
     """buildings.json / resources.json / troops.json 的 name_zh 改成遊戲內名稱，舊名放 aliases_zh."""
     nb = names["buildings"]
     for bid, b in list(buildings["buildings"].items()):
@@ -1168,12 +705,7 @@ def apply_ingame_names(
         for lv in b["levels"]:
             if lv.get("effect_description"):
                 lv["effect_description"] = ingame_text(lv["effect_description"], names)
-    field_bid = {
-        "wood": "woodcutter",
-        "clay": "clay_pit",
-        "iron": "iron_mine",
-        "crop": "cropland",
-    }
+    field_bid = {"wood": "woodcutter", "clay": "clay_pit", "iron": "iron_mine", "crop": "cropland"}
     for rtype, r in resources["resource_fields"].items():
         r["name_zh"] = nb[field_bid[rtype]]["zh"]
     for tid, t in troops["troops"].items():
