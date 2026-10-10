@@ -25,6 +25,7 @@ def _to_response(account: GameAccount) -> GameAccountResponse:
         server_name=account.server_name,
         server_speed=account.server_speed,
         tribe=account.tribe,
+        birth_tribe=account.birth_tribe or account.tribe,
         player_name=account.player_name,
         alliance_name=account.alliance_name,
         server_start_date=account.server_start_date,

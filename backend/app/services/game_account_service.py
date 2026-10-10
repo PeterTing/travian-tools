@@ -3,7 +3,11 @@
 from sqlalchemy.orm import Session
 
 from app.domain.schemas.game_account import GameAccountCreate, GameAccountUpdate
-from app.infrastructure.database.models.game_account import GameAccount, TimeDisplay
+from app.infrastructure.database.models.game_account import (
+    GameAccount,
+    TimeDisplay,
+    TribeType,
+)
 from app.services.game_world_service import GameWorldService
 from app.utils.world_url import describe_server_url
 
@@ -26,6 +30,7 @@ class GameAccountService:
             server_name=data.server_name,
             server_speed=data.server_speed or 1,
             tribe=data.tribe,
+            birth_tribe=data.tribe,
             player_name=data.player_name,
             alliance_name=data.alliance_name,
             server_start_date=data.server_start_date,
@@ -90,8 +95,11 @@ class GameAccountService:
                 update_data["server_speed"] = info.server_speed or 1
         if "server_speed" in update_data and update_data["server_speed"] is None:
             del update_data["server_speed"]
+        old_tribe = account.birth_tribe or account.tribe
         for field, value in update_data.items():
             setattr(account, field, value)
+        if "tribe" in update_data:
+            self._change_birth_tribe(account, old_tribe, update_data["tribe"])
         if "server_url" in update_data:
             # 換了世界就接到那個世界（沒有就建一筆）
             world = GameWorldService(self.db).get_or_create(user_id, account.server_url)
@@ -100,6 +108,24 @@ class GameAccountService:
         self.db.commit()
         self.db.refresh(account)
         return account
+
+    def _change_birth_tribe(
+        self,
+        account: GameAccount,
+        old_tribe: TribeType | None,
+        new_tribe: TribeType | None,
+    ) -> None:
+        """帳號的部族就是出生部族（P0-25）：兩個欄位一起改.
+
+        原本跟著出生部族的村莊（部族一樣或還沒設定）一起改成新的部族；
+        「征服保留部族」世界裡設成別的部族的村莊不動。
+        """
+        account.birth_tribe = new_tribe
+        if new_tribe == old_tribe:
+            return
+        for village in account.villages:
+            if village.tribe is None or village.tribe == old_tribe:
+                village.tribe = new_tribe
 
     def delete_account(self, account_id: str, user_id: str) -> bool:
         """刪除遊戲帳號."""

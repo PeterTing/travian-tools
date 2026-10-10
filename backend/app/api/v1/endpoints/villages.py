@@ -119,6 +119,7 @@ def get_village(
         village_type=village.village_type,
         is_capital=village.is_capital,
         role=village.role,
+        tribe=village.tribe,
         crop_net_per_hour=village.crop_net_per_hour,
         last_pasted_at=service.get_last_pasted_by_village(
             current_user.user_id, village.account_id

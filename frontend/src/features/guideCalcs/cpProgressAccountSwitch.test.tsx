@@ -25,6 +25,8 @@ const fillFor = (id: string | null): AutoFillValue => ({
   tribe: null,
   accountSpeed: 1,
   accountTribe: null,
+  birthTribe: null,
+  multiTribe: false,
   offsetHours: null,
   overrides: {},
   setOverride: () => undefined,

@@ -78,9 +78,17 @@ class GameAccount(Base):
     )
     server_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     server_speed: Mapped[int] = mapped_column(Integer, default=1)
+    # 帳號的部族 = 出生部族（註冊時選的）。和 birth_tribe 永遠一樣，留著給舊程式讀。
     tribe: Mapped[TribeType | None] = mapped_column(
         Enum(TribeType, values_callable=lambda x: [e.value for e in x]),
         nullable=True,
+    )
+    # 出生部族（P0-25）：英雄的部族能力永遠跟著它，就算之後控制別的部族的村莊。
+    # 每個村莊自己的部族存在 villages.tribe。
+    birth_tribe: Mapped[TribeType | None] = mapped_column(
+        Enum(TribeType, values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+        comment="出生部族（註冊時選的部族，英雄能力跟著它）",
     )
     player_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     alliance_name: Mapped[str | None] = mapped_column(String(50), nullable=True)

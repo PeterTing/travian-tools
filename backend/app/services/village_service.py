@@ -48,7 +48,15 @@ class VillageService:
 
     def create_village(self, user_id: str, data: VillageCreate) -> Village | None:
         """建立村莊."""
-        if not self._verify_account_ownership(data.account_id, user_id):
+        account = (
+            self.db.query(GameAccount)
+            .filter(
+                GameAccount.account_id == data.account_id,
+                GameAccount.user_id == user_id,
+            )
+            .first()
+        )
+        if account is None:
             return None
 
         village = Village(
@@ -60,6 +68,8 @@ class VillageService:
             village_type=data.village_type,
             is_capital=data.is_capital,
             role=data.role,
+            # 沒指定就跟帳號的出生部族一樣（P0-25）
+            tribe=data.tribe or account.birth_tribe or account.tribe,
         )
         self.db.add(village)
         self.db.commit()

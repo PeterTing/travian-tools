@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { useAccountData } from '@/contexts/AccountDataContext'
 import { displayOffsetHours } from '@/lib/serverTime'
+import { birthTribeOf, isMultiTribeWorld, villageTribeOf } from '@/lib/villageTribe'
 import type { GameAccount, TroopTribe, Village } from '@/types/game'
 
 export const AUTOFILL_SPEEDS = [1, 2, 3, 5, 10] as const
@@ -19,11 +20,18 @@ export interface AutoFillValue {
   villages: Village[]
   /** 伺服器速度：這頁改過就用改過的，不然帳號的 */
   speed: AutoFillSpeed
-  /** 部族：同上；帳號沒填是 null */
+  /**
+   * 部族（兵種、建築、商人用）：這頁改過就用改過的，不然是目前村莊的部族
+   * （一般伺服器 = 帳號的出生部族）；帳號沒填是 null
+   */
   tribe: TroopTribe | null
-  /** 帳號原本的值（「還原」用） */
+  /** 帳號原本的值（「還原」用）；accountTribe 是目前村莊的部族 */
   accountSpeed: AutoFillSpeed
   accountTribe: TroopTribe | null
+  /** 出生部族（註冊時選的）：英雄相關的計算用它，不跟著村莊換（P0-25） */
+  birthTribe: TroopTribe | null
+  /** 「征服保留部族」的世界：村莊可以是不同部族 */
+  multiTribe: boolean
   /** 時差（本地 − 伺服器，小時）；還沒貼過頁面是 null */
   offsetHours: number | null
   overrides: AutoFillOverrides
@@ -66,7 +74,8 @@ export function AutoFillProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AutoFillValue>(() => {
     const accountSpeed = toSpeed(currentAccount?.server_speed)
-    const accountTribe = currentAccount?.tribe ?? null
+    const birthTribe = birthTribeOf(currentAccount)
+    const accountTribe = villageTribeOf(selectedVillage, currentAccount, world)
     return {
       account: currentAccount,
       village: selectedVillage,
@@ -75,6 +84,8 @@ export function AutoFillProvider({ children }: { children: ReactNode }) {
       tribe: overrides.tribe ?? accountTribe,
       accountSpeed,
       accountTribe,
+      birthTribe,
+      multiTribe: isMultiTribeWorld(world),
       offsetHours: displayOffsetHours(world?.utc_offset),
       overrides,
       setOverride,
@@ -94,6 +105,8 @@ const FALLBACK: AutoFillValue = {
   tribe: null,
   accountSpeed: 1,
   accountTribe: null,
+  birthTribe: null,
+  multiTribe: false,
   offsetHours: null,
   overrides: {},
   setOverride: () => undefined,

@@ -48,11 +48,13 @@ class GameWorldService:
     def update_world(
         self, world_id: str, user_id: str, data: GameWorldUpdate
     ) -> GameWorld | None:
-        """手動修改世界設定（目前只有 UTC 時差）."""
+        """手動修改世界設定（UTC 時差、征服保留部族）."""
         world = self.get_world(world_id, user_id)
         if world is None:
             return None
         for field, value in data.model_dump(exclude_unset=True).items():
+            if field == "keep_tribe_on_conquest" and value is None:
+                continue  # 開關只有開或關，null 當作沒送
             setattr(world, field, value)
         self.db.commit()
         self.db.refresh(world)

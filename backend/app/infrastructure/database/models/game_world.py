@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     ForeignKey,
     Integer,
@@ -52,6 +53,15 @@ class GameWorld(Base):
         nullable=True,
         default=None,
         comment="伺服器時間的 UTC 時差（分鐘）；NULL = 不換算",
+    )
+    # 「征服保留部族」（Keep Tribe on Conquest）特殊伺服器（P0-25）：同一個帳號
+    # 可以有不同部族的村莊。False = 一般伺服器，整個帳號一個部族。
+    keep_tribe_on_conquest: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="0",
+        comment="征服保留部族的特殊伺服器（一個帳號多個部族）",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
