@@ -155,8 +155,8 @@ export default function FarmingCalculator() {
         <CalcResultPanel
           lang={lang}
           title={lang === 'en' ? 'Daily yield' : '每日收益'}
-          // 每日搶奪量受攜帶量限制（社群整理的數字）：灰標放標題旁，不放大數字旁
-          titlePending="unitCarry"
+          // 摘要一個灰標，依序列出：攜帶量（社群整理）→ 行軍速度（有競技場／靴子才有，P0-22）；不放大數字旁
+          titlePending={['unitCarry', ...speedKinds]}
           primary={<>{Math.round(calc.daily).toLocaleString()}</>}
           secondary={rec.msg}
         >
@@ -167,10 +167,11 @@ export default function FarmingCalculator() {
           <h4>{lang === 'en' ? 'Round-trip & haul' : '往返與搬運'}</h4>
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'One-way' : '單程'}{speedKinds.length > 0 && <> <PendingVerifyChip kinds={speedKinds} /></>}</span><span className={s.value} data-testid="farming-one-way">{fmtHms(calc.owSec)}</span></PendingRow>
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Carry cap (rec count)' : '搬運上限'} <PendingVerifyChip kind="unitCarry" /></span><span className={s.value}>{calc.carryCap.toLocaleString()}</span></PendingRow>
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Max raids /hr' : '每小時最多次數'}</span><span className={s.value}>{calc.maxRaidsHr.toFixed(2)}</span></div>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Daily yield' : '每日預估收益'} <PendingVerifyChip kind="unitCarry" /></span><span className={`${s.value} ${s.highlight}`}>{Math.round(calc.daily).toLocaleString()}</span></PendingRow>
+          {/* 每小時次數、每日收益、回本天數都用到單程時間：一列一個灰標，速度種類接在原本的後面（P0-22） */}
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Max raids /hr' : '每小時最多次數'}{speedKinds.length > 0 && <> <PendingVerifyChip kinds={speedKinds} /></>}</span><span className={s.value} data-testid="farming-raids-hr">{calc.maxRaidsHr.toFixed(2)}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Daily yield' : '每日預估收益'} <PendingVerifyChip kinds={['unitCarry', ...speedKinds]} /></span><span className={`${s.value} ${s.highlight}`}>{Math.round(calc.daily).toLocaleString()}</span></PendingRow>
           <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Initial troop cost' : '兵力初始成本'} <PendingVerifyChip kind="units" /></span><span className={s.value}>{calc.troopCost.toLocaleString()}</span></PendingRow>
-          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Payback' : '回本天數'} <PendingVerifyChip kind="units" /></span><span className={s.value}>{isFinite(calc.payback) ? `${calc.payback.toFixed(2)} ${lang === 'en' ? 'days' : '天'}` : '—'}</span></PendingRow>
+          <PendingRow className={s.row}><span className={s.label}>{lang === 'en' ? 'Payback' : '回本天數'} <PendingVerifyChip kinds={['units', ...speedKinds]} /></span><span className={s.value}>{isFinite(calc.payback) ? `${calc.payback.toFixed(2)} ${lang === 'en' ? 'days' : '天'}` : '—'}</span></PendingRow>
 
           <div className={s.note}>
             {lang === 'en'
