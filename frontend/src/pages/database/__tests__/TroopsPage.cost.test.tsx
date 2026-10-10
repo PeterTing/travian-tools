@@ -3,11 +3,18 @@ import { render, screen, within, fireEvent } from '@testing-library/react'
 import i18n from '@/i18n/i18n'
 import TroopsPage from '../TroopsPage'
 
+// 7 族花費目前都已核對（斯巴達 2026-10-11 在 ASIA x1 讀到）；灰標的畫法用「假裝某族沒核對」測
+const costState = vi.hoisted(() => ({ unverified: new Set<string>() }))
+vi.mock('@/data/unitCosts', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('@/data/unitCosts')>()
+  return { ...mod, isTribeCostVerified: (tribe: string) => !costState.unverified.has(tribe) && mod.isTribeCostVerified(tribe) }
+})
+
 type Row = { troop_id: string; name_zh: string; name_en: string; tribe: string; speed: number | null; speed_source: string; speed_ref: string | null }
 
 const rows: Row[] = [
   { troop_id: 'legionnaire', name_zh: '古羅馬步兵', name_en: 'Legionnaire', tribe: 'romans', speed: 6, speed_source: 'ts11', speed_ref: 'manual/troop/1' },
-  { troop_id: 'hoplite', name_zh: '重裝步兵', name_en: 'Hoplite', tribe: 'spartans', speed: 6, speed_source: 'official_pending', speed_ref: 'https://support.travian.com/en/articles/187' },
+  { troop_id: 'hoplite', name_zh: '裝甲步兵', name_en: 'Hoplite', tribe: 'spartans', speed: 6, speed_source: 'asia_x1', speed_ref: 'asia_x1/help/spartans/1' },
   { troop_id: 'berserker', name_zh: '狂戰士', name_en: 'Berserker', tribe: 'vikings', speed: 5, speed_source: 'ts11', speed_ref: 'manual/troop/63' },
 ]
 
@@ -29,9 +36,10 @@ vi.mock('@/services/gameApi', () => ({
 
 
 describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / training time (P0-17)', () => {
-  beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
+  beforeEach(async () => { await i18n.changeLanguage('zh-TW'); costState.unverified.clear() })
 
-  it.each([['重裝步兵（Hoplite）']])('%s: exactly one units chip, next to the 「訓練成本」 heading (Spartans: no first-hand source)', async (name) => {
+  it.each([['裝甲步兵']])('%s, tribe marked unverified (mocked): exactly one units chip, next to the 「訓練成本」 heading', async (name) => {
+    costState.unverified.add('spartans')
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText(name))
     const heading = await screen.findByTestId('troop-cost-heading')
@@ -46,6 +54,7 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
 
   it.each([
     ['古羅馬步兵', 'Roman costs read from the ts11 in-game help, P0-18'],
+    ['裝甲步兵', 'Spartan costs read from the ASIA x1 in-game help, 2026-10-11'],
     ['狂戰士（Berserker）', 'Viking costs / upkeep / training time from official S139, P0-23'],
   ])('%s: no units chip (%s)', async (name) => {
     render(<TroopsPage />)
@@ -57,8 +66,9 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
   })
 
   it('tap: the units copy opens below the heading and fills the whole section', async () => {
+    costState.unverified.add('spartans')
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('重裝步兵（Hoplite）'))
+    fireEvent.click(await screen.findByText('裝甲步兵'))
     const heading = await screen.findByTestId('troop-cost-heading')
     fireEvent.click(within(heading).getByTestId('pending-verify-chip'))
     const panel = screen.getByTestId('pending-note-panel')

@@ -1099,7 +1099,7 @@
     "thisPageOnly": "(changed on this page)",
     "offsetUnknown": "Time offset: set automatically once you paste a page",
     "offsetKnown": "Time offset {{hours}} h (read from a pasted page)",
-    "unitPending": "Spartan and Viking unit numbers unverified (incl. Spartan speeds)",
+    "unitPending": "Viking unit carry capacity unverified",
     "unitNameProvisional": ", Chinese unit names are provisional translations",
     "speed": "Server speed",
     "tribe": "Tribe",
@@ -1136,20 +1136,20 @@
       "source": "The current numbers are community-compiled and may be off."
     },
     "autofillUnits": {
-      "what": "Roman, Teuton, Gaul, Egyptian and Hun unit numbers are checked against the ts11 in-game help; Viking costs, upkeep, training times, attack and defence are checked against the official help page, but their carry capacity is unverified and not shown yet; ts11 has no Spartans, so their costs, upkeep and training times are still community-compiled, and their carry capacity is not shown yet.",
-      "source": "Spartan speeds come from the official help page (which says the numbers come from a third-party calculator); reverse TS leaves Spartan units out."
+      "what": "Roman, Teuton, Gaul, Egyptian and Hun unit numbers are checked against the ts11 in-game help; Spartan unit numbers, speeds and carry capacity are checked against the ASIA x1 in-game help; Viking costs, upkeep, training times, attack and defence are checked against the official help page, but their carry capacity is unverified and not shown yet.",
+      "source": "Viking numbers come from the official help page S139; ts11 has no Vikings and no current world offers them, so they can't be read in-game yet."
     },
-    "spartanSpeed": {
-      "what": "Spartan speeds haven't been checked in-game on ts11 yet; reverse TS leaves Spartan units out.",
-      "source": "Spartan speeds only come from the official help page, which says they come from a third-party calculator; ram, ballista, ephor and settler have no reliable source yet."
+    "reverseTsUnverified": {
+      "what": "Some unit speeds haven't been checked yet; reverse TS leaves those units out.",
+      "source": "Reverse TS only uses speeds from the in-game help or the official help pages; units without a first-hand source are left out."
     },
     "unitSpeedOfficialPending": {
-      "what": "Spartan speeds only come from the official help page, which says they come from a third-party calculator.",
-      "source": "Reverse TS leaves Spartan units out."
+      "what": "This unit's speed only comes from the official help page, which says it comes from a third-party calculator.",
+      "source": "Reverse TS leaves this unit out."
     },
     "unitSpeedNoSource": {
       "what": "This unit's speed has no reliable source yet, so it is left blank.",
-      "source": "Reverse TS leaves Spartan units out."
+      "source": "Reverse TS leaves this unit out."
     },
     "building": {
       "what": "Building numbers haven't been checked in-game on ts11 yet.",
@@ -1199,13 +1199,9 @@
       "what": "Viking carry capacity is unverified, so it is not shown yet",
       "source": "The official help page S139 has no carry capacity"
     },
-    "spartanCarry": {
-      "what": "Spartan carry capacity is unverified, so it is not shown yet",
-      "source": "The official help pages S10 and S187 have no carry capacity"
-    },
     "unitNameZhPending": {
       "what": "The Chinese name is a provisional translation, not yet verified",
-      "source": "The official help pages are English only; the name in brackets is the official English name (left out where they give none). ts11 has no such tribe, so there is no in-game Chinese name"
+      "source": "The official help pages are English only; the name in brackets is the official English name. ts11 has no Vikings and no current world offers them, so there is no in-game Chinese name"
     }
   },
   "verifiedNotes": {

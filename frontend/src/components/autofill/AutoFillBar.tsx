@@ -35,8 +35,9 @@ interface AutoFillBarProps {
  * 計算器最上面的「已帶入」列（IA v2.2）：
  *   已帶入：PeterT · ts11（x1・高盧）· 主村 (0|0)   更改
  *   時差 +6 小時（從貼上的頁面讀到）／時差：貼一頁就會自動設好
- *   〔待驗證〕斯巴達、維京的兵種數字待驗證（斯巴達含速度）[，兵種中文名為暫譯 ← 選斯巴達、維京時]
- *     ← 只在用到兵種資料的頁面，而且部族是斯巴達、維京（或兵種資料庫選「全部」）才顯示（P0-17 (k)）
+ *   〔待驗證〕維京的兵種運載量待驗證[，兵種中文名為暫譯 ← 選維京時]
+ *     ← 只在用到兵種資料的頁面，而且部族是維京（或兵種資料庫選「全部」、不知道部族）才顯示（P0-17 (k)）
+ *     斯巴達 2026-10-11 在 ASIA x1 遊戲內說明核對完，不再出現
  */
 export default function AutoFillBar({ usesVillage = true, unitData, assumption, unitTribe }: AutoFillBarProps) {
   const { t } = useTranslation()

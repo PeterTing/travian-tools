@@ -23,7 +23,7 @@ describe('unit speeds (P0-15 phase 1)', () => {
       const rows = tribeUnitSpeeds(tribe)
       expect(rows.map(r => r.slot)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
       for (const r of rows) {
-        expect(['ts11', 'official', 'official_pending', 'pending']).toContain(r.source)
+        expect(['ts11', 'asia_x1', 'official', 'official_pending', 'pending']).toContain(r.source)
         if (r.source === 'pending') {
           expect(r.speed).toBeNull()
         } else {
@@ -44,14 +44,15 @@ describe('unit speeds (P0-15 phase 1)', () => {
     expect(unitSpeed('gauls', 'phalanx')?.ref).toBe('manual/troop/21')
   })
 
-  it('uses the official Viking table and leaves unsourced Spartan units pending', () => {
+  it('uses the official Viking table and the ASIA x1 in-game help for Spartans (2026-10-11)', () => {
     expect(tribeUnitSpeeds('vikings').map(r => r.speed)).toEqual([7, 7, 5, 9, 12, 9, 4, 3, 5, 5])
-    expect(tribeUnitSpeeds('spartans').map(r => r.speed)).toEqual([6, 9, 8, 6, 16, 9, null, null, null, null])
-    expect(unitSpeedValue('spartans', 'ephor')).toBeNull()
-    expect(tribeUnitSpeeds('spartans').map(r => r.source)).toEqual([
-      ...Array(6).fill('official_pending'), ...Array(4).fill('pending'),
-    ])
-    expect(tribeUnitSpeeds('spartans').some(r => isSpeedVerified(r.source))).toBe(false)
+    expect(tribeUnitSpeeds('spartans').map(r => r.speed)).toEqual([6, 9, 8, 6, 16, 9, 4, 3, 4, 5])
+    expect(unitSpeedValue('spartans', 'ephor')).toBe(4)
+    expect(tribeUnitSpeeds('spartans').map(r => r.source)).toEqual(Array(10).fill('asia_x1'))
+    expect(tribeUnitSpeeds('spartans').map(r => r.ref)).toEqual(
+      Array.from({ length: 10 }, (_, i) => `asia_x1/help/spartans/${i + 1}`),
+    )
+    expect(tribeUnitSpeeds('spartans').every(r => isSpeedVerified(r.source))).toBe(true)
     expect(tribeUnitSpeeds('vikings').every(r => isSpeedVerified(r.source))).toBe(true)
   })
 

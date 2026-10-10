@@ -5,9 +5,13 @@
      frontend/src/data/unitSpeeds.gen.json
 - ts11 = ts11 in-game help (manual/troop/N); raw text in
   scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json
+- asia_x1 = ASIA x1 in-game help (Spartans; ts11 has no Spartans), 2026-10-11;
+  values + screenshot SHA-256 in
+  scripts/game_data/evidence/asia_x1_manual_spartans_2026-10-11.json
 - official = support.travian.com
 - official_pending = official page whose numbers say they come from a third-party
-  calculator (S187, Spartan t1..t6): value kept, shown 「待驗證」, not used by reverse TS
+  calculator (S187): value kept, shown 「待驗證」, not used by reverse TS (no unit uses
+  it since the Spartans were read on ASIA x1)
 - pending = no first-hand source (speed None)
 - in-game beats official when they disagree (Hun Mercenary: ts11 6, S187 7)
 """
@@ -37,6 +41,13 @@ EVIDENCE = (
     / "evidence"
     / "ts11_manual_troop_speed_2026-10-09.json"
 )
+ASIA_EVIDENCE = (
+    ROOT
+    / "scripts"
+    / "game_data"
+    / "evidence"
+    / "asia_x1_manual_spartans_2026-10-11.json"
+)
 
 TRIBES = ["romans", "teutons", "gauls", "egyptians", "huns", "spartans", "vikings"]
 OFFICIAL_PREFIX = "https://support.travian.com/"
@@ -64,8 +75,10 @@ TS11_PINNED = {
 OFFICIAL_PINNED = {
     # S139 Viking Units Overview
     "vikings": [7, 7, 5, 9, 12, 9, 4, 3, 5, 5],
-    # S187 (infantry + cavalry only); siege / Ephor / settler have no source yet
-    "spartans": [6, 9, 8, 6, 16, 9, None, None, None, None],
+}
+# Read on ASIA x1's in-game help on 2026-10-11 (t1..t10). Pinned on purpose.
+ASIA_X1_PINNED = {
+    "spartans": [6, 9, 8, 6, 16, 9, 4, 3, 4, 5],
 }
 
 client = TestClient(app)
@@ -95,7 +108,13 @@ def test_every_unit_of_every_tribe_has_a_speed_with_provenance():
         rows = data["tribes"][tribe]
         assert [r["slot"] for r in rows] == list(range(1, 11)), tribe
         for r in rows:
-            assert r["source"] in ("ts11", "official", "official_pending", "pending"), r
+            assert r["source"] in (
+                "ts11",
+                "asia_x1",
+                "official",
+                "official_pending",
+                "pending",
+            ), r
             if r["source"] == "pending":
                 assert r["speed"] is None and r["ref"] is None, r
             else:
@@ -105,6 +124,8 @@ def test_every_unit_of_every_tribe_has_a_speed_with_provenance():
                 assert r["ref"].startswith(OFFICIAL_PREFIX), r
             if r["source"] == "ts11":
                 assert r["ref"].startswith("manual/troop/"), r
+            if r["source"] == "asia_x1":
+                assert r["ref"] == f"asia_x1/help/spartans/{r['slot']}", r
 
 
 def test_no_external_player_site_is_cited():
@@ -144,7 +165,7 @@ def test_game_data_service_exposes_the_new_speeds():
     assert svc.get_troop("marksman").speed == 15  # old copied value was 16
     assert svc.get_troop("jarl").speed == 5  # old copied value was 4
     ballista = svc.get_troop("ballista")
-    assert ballista.speed is None and ballista.speed_source == "pending"
+    assert ballista.speed == 3 and ballista.speed_source == "asia_x1"
 
 
 def test_knowledge_base_tribes_use_the_same_speeds():
@@ -174,6 +195,18 @@ def test_ts11_values_are_pinned_and_match_the_captured_in_game_help(tribe: str):
 @pytest.mark.parametrize("tribe", list(OFFICIAL_PINNED))
 def test_official_values_are_pinned(tribe: str):
     assert [r["speed"] for r in _rows(tribe)] == OFFICIAL_PINNED[tribe]
+
+
+@pytest.mark.parametrize("tribe", list(ASIA_X1_PINNED))
+def test_asia_x1_values_are_pinned_and_match_the_evidence(tribe: str):
+    evidence = _load(ASIA_EVIDENCE)["troops"]
+    rows = _rows(tribe)
+    assert [r["speed"] for r in rows] == ASIA_X1_PINNED[tribe]
+    for r in rows:
+        assert r["source"] == "asia_x1"
+        e = evidence[str(r["slot"])]
+        assert e["speed"] == r["speed"], r["troop_id"]
+        assert e["speed_text"] == f"{r['speed']} fields/hour", r["troop_id"]
 
 
 def test_ts11_agrees_with_official_s187_except_known_difference():
@@ -212,7 +245,7 @@ def test_reverse_ts_reads_new_speeds_and_skips_pending_units():
     for m in body["possible_matches"]:
         if m["unit_speed"] == 16:
             assert "Marksman" not in m["possible_units"]
-    # all 10 Spartan units are left out (6 official_pending + 4 without a source)
+    # Spartans are read on ASIA x1 (2026-10-11): nothing is left out any more
     spartans = [
         "Hoplite",
         "Sentinel",
@@ -227,16 +260,11 @@ def test_reverse_ts_reads_new_speeds_and_skips_pending_units():
     ]
     names = {n for t, n in _names_by_tribe("spartans")}
     assert names == set(spartans)
-    assert sorted(body["unverified_units"]) == sorted(
-        f"{n} (spartans)" for n in spartans
-    )
-    for m in body["possible_matches"]:
-        for n in spartans:
-            assert f"{n} (spartans)" not in m["possible_units"]
+    assert body["unverified_units"] == []
 
 
-def test_reverse_ts_never_matches_a_spartan_unit():
-    # Hoplite / Twinsteel speed 6 over 6 fields = 1 h; only non-Spartan speed-6 units match
+def test_reverse_ts_matches_spartan_units_read_on_asia_x1():
+    # Hoplite / Twinsteel speed 6 over 6 fields = 1 h (ASIA x1 in-game help, 2026-10-11)
     res = client.post(
         "/api/v1/advanced-calculator/path-speed-ts",
         json={
@@ -255,8 +283,8 @@ def test_reverse_ts_never_matches_a_spartan_unit():
         if m["unit_speed"] == 6 and m["tournament_square_level"] == 0
     ]
     assert m6
-    assert "Hoplite" not in m6[0]["possible_units"]
-    assert "Twinsteel Therion" not in m6[0]["possible_units"]
+    assert "Hoplite" in m6[0]["possible_units"]
+    assert "Twinsteel Therion" in m6[0]["possible_units"]
     assert "Mercenary" in m6[0]["possible_units"]  # in-game 6 beats S187's 7
 
 
@@ -269,21 +297,19 @@ def test_troop_endpoints_return_speed_source():
     res = client.get("/api/v1/troops/spartans")
     assert res.status_code == 200
     items = {t["troop_id"]: t for t in res.json()["troops"]}
-    assert (
-        items["hoplite"]["speed"] == 6
-        and items["hoplite"]["speed_source"] == "official_pending"
-    )
-    assert (
-        items["ephor"]["speed"] is None and items["ephor"]["speed_source"] == "pending"
-    )
+    assert items["hoplite"]["speed"] == 6
+    assert items["hoplite"]["speed_source"] == "asia_x1"
+    assert items["ephor"]["speed"] == 4 and items["ephor"]["speed_source"] == "asia_x1"
     detail = client.get("/api/v1/troops/gauls/phalanx").json()
     assert detail["speed"] == 7 and detail["speed_source"] == "ts11"
     assert detail["speed_ref"] == "manual/troop/21"
     cmp_ = client.get("/api/v1/troops/compare?troop_ids=ephor,ballista").json()
-    assert cmp_["comparison_summary"]["best_speed"] == "待驗證"
+    assert cmp_["comparison_summary"]["best_speed"] == "五長官 (4)"
 
 
-def test_spartan_speeds_are_all_pending():
+def test_spartan_speeds_are_all_read_on_asia_x1():
     rows = _rows("spartans")
-    assert [r["source"] for r in rows] == ["official_pending"] * 6 + ["pending"] * 4
-    assert all("187" in r["ref"] for r in rows[:6])
+    assert [r["source"] for r in rows] == ["asia_x1"] * 10
+    # nothing uses the S187 third-party numbers any more
+    for tribe in TRIBES:
+        assert all(r["source"] != "official_pending" for r in _rows(tribe)), tribe

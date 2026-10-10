@@ -605,30 +605,134 @@ def test_carry_capacity_single_source_backend_and_frontend() -> None:
             assert troops[r["troop_id"]]["carry_capacity"] == r["carry"], r["troop_id"]
             kb = TRIBES_DATA[tribe]["troops"][r["kb_id"]]
             assert kb["capacity"] == r["carry"], r["troop_id"]
-            want = "pending" if tribe in ("spartans", "vikings") else "ts11"
+            want = {"vikings": "pending", "spartans": "asia_x1"}.get(tribe, "ts11")
             assert r["carry_source"] == want, r["troop_id"]
-            if want == "ts11":
+            if want != "pending":
                 assert isinstance(r["carry"], int)
                 assert r["stats"]["carry"] == r["carry"]
             else:
-                # PM 決定（P0-23）：斯巴達、維京運載量留空，不放社群整理或推估的數字
+                # PM 決定（P0-23）：維京運載量留空，不放社群整理或推估的數字
                 assert r["carry"] is None, r["troop_id"]
                 assert r["carry_ref"] is None
     assert n == len(troops) == 70
 
 
-def test_spartan_viking_carry_is_null_everywhere_in_backend() -> None:
-    """troops.json、knowledge_base、API 都是 null；API 附上原因，不回 0."""
+def test_viking_carry_is_null_everywhere_in_backend() -> None:
+    """維京：troops.json、knowledge_base、API 都是 null；API 附上原因，不回 0."""
     from app.knowledge_base.tribes import TRIBES_DATA
 
     troops = json.loads(
         (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
     )["troops"]
-    empty = [k for k, t in troops.items() if t["tribe"] in ("spartans", "vikings")]
-    assert len(empty) == 20
+    empty = [k for k, t in troops.items() if t["tribe"] == "vikings"]
+    assert len(empty) == 10
     assert all(troops[k]["carry_capacity"] is None for k in empty)
-    for tribe in ("spartans", "vikings"):
-        assert all(t["capacity"] is None for t in TRIBES_DATA[tribe]["troops"].values())
+    assert all(t["capacity"] is None for t in TRIBES_DATA["vikings"]["troops"].values())
+    # 斯巴達 2026-10-11 在 ASIA x1 讀到運載量，不再留空
+    sp = [t for t in troops.values() if t["tribe"] == "spartans"]
+    assert [t["carry_capacity"] for t in sp] == [60, 0, 40, 50, 110, 80, 0, 0, 0, 3000]
     gen_text = GEN.read_text(encoding="utf-8")
     assert "CARRY_PENDING" not in gen_text
     assert "community" not in gen_text.split("CARRY_SOURCES = {")[1].split("}")[0]
+
+
+# ── 斯巴達：ASIA x1 遊戲內說明實測（2026-10-11）──────────────────────────
+ASIA_X1_SPARTANS = (
+    ROOT / "scripts/game_data/evidence/asia_x1_manual_spartans_2026-10-11.json"
+)
+SPARTAN_IDS = [
+    "hoplite",
+    "sentinel",
+    "shieldsman",
+    "twinsteel_therion",
+    "elpida_rider",
+    "corinthian_crusher",
+    "spartan_ram",
+    "ballista",
+    "ephor",
+    "spartan_settler",
+]
+
+
+def test_asia_x1_spartan_evidence_records_source_and_screenshots() -> None:
+    import hashlib
+
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
+    assert ev["server"] == "rog.x1.asia.travian.com"
+    assert ev["url"] == "https://rog.x1.asia.travian.com"
+    assert "Spartans" in ev["path"]
+    rc = ev["read_conditions"]
+    assert "x1" in rc["server_speed"]
+    assert rc["read_at"].startswith("2026-10-11")
+    assert sorted(int(n) for n in ev["troops"]) == list(range(1, 11))
+    shots = [(ev["overview_screenshot"], ev["overview_screenshot_sha256"])]
+    shots += [
+        (t["screenshot"], t["screenshot_sha256"])
+        for t in ev["troops"].values()
+        if t["screenshot"]
+    ]
+    assert len(shots) == 5
+    ev_dir = ASIA_X1_SPARTANS.parent
+    for rel, sha in shots:
+        data = (ev_dir / rel).read_bytes()
+        assert hashlib.sha256(data).hexdigest() == sha, rel
+        assert rel.endswith(f"/{sha}.png"), rel
+    for n, t in ev["troops"].items():
+        h, m, s = (int(x) for x in t["train_time_text"].split(":"))
+        assert t["train_time_s"] == h * 3600 + m * 60 + s, n
+        assert len(t["cost"]) == 4, n
+    assert ev["overview_names_en"] == [
+        ev["troops"][str(i)]["name_en"] for i in range(1, 11)
+    ]
+
+
+def test_spartans_follow_asia_x1_in_game_help_everywhere() -> None:
+    """troops.json、unit_speeds.json、遊戲內名稱表、knowledge_base 的斯巴達 10 種兵都跟 ASIA x1 說明頁一樣."""
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))["troops"]
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    rows = json.loads(
+        (ROOT / "backend/data/static/unit_speeds.json").read_text(encoding="utf-8")
+    )["tribes"]["spartans"]
+    names = json.loads(
+        (ROOT / "backend/data/static/ingame_names.json").read_text(encoding="utf-8")
+    )["units"]
+    assert [r["troop_id"] for r in rows] == SPARTAN_IDS
+    for r in rows:
+        e, t, tid = ev[str(r["slot"])], troops[r["troop_id"]], r["troop_id"]
+        assert t["stats_source"] == "asia_x1", tid
+        assert t["speed_source"] == "asia_x1", tid
+        assert t["name_zh"] == e["name_zh"] and t["name_en"] == e["name_en"], tid
+        cost = [t[f"cost_{k}"] for k in ("wood", "clay", "iron", "crop")]
+        assert cost == e["cost"], tid
+        assert (t["attack"], t["defense_infantry"], t["defense_cavalry"]) == (
+            e["attack"],
+            e["def_inf"],
+            e["def_cav"],
+        ), tid
+        assert t["speed"] == e["speed"] and t["carry_capacity"] == e["carry"], tid
+        assert t["crop_consumption"] == e["upkeep"], tid
+        assert t["training_time_base"] == e["train_time_s"], tid
+        u = names[tid]
+        assert u["zh"] == e["name_zh"] and u["display_zh"] == e["name_zh"], tid
+        assert u["zh_pending"] is False and u["en"] is None, tid
+        kb = TRIBES_DATA["spartans"]["troops"][r["kb_id"]]
+        assert kb["name_zh"] == e["name_zh"], tid
+        assert [kb["cost"][k] for k in ("wood", "clay", "iron", "crop")] == e["cost"]
+        assert (kb["attack"], kb["defense_infantry"], kb["defense_cavalry"]) == (
+            e["attack"],
+            e["def_inf"],
+            e["def_cav"],
+        ), tid
+        assert kb["upkeep"] == e["upkeep"], tid
+        assert kb["training_time"] == e["train_time_text"], tid
+        assert kb["capacity"] == e["carry"], tid
+    # 唯一跟舊資料不一樣的數字：賴達投石機（弩炮）訓練時間 9900 → 9000（2:30:00）
+    assert troops["ballista"]["training_time_base"] == 9000
+    cv = json.loads(
+        (ROOT / "frontend/src/data/unitCostVerified.json").read_text(encoding="utf-8")
+    )
+    assert cv["tribes"]["spartans"] is True

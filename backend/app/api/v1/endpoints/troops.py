@@ -52,7 +52,7 @@ class TroopDetailResponse(BaseModel):
     speed: int | None
     speed_source: str
     speed_ref: str | None = None
-    # None＝斯巴達、維京運載量還沒核對（沒有官方或 ts11 數字），不提供；原因寫在 carry_capacity_note
+    # None＝維京運載量還沒核對（沒有官方或遊戲內數字），不提供；原因寫在 carry_capacity_note
     carry_capacity: int | None
     carry_capacity_note: str | None = None
     cost_wood: int

@@ -102,7 +102,7 @@ export type TroopCategory =
   | 'settler'
 
 /** 兵種速度出處：ts11 遊戲內說明／官方文章／官方頁但數字取自第三方計算器（待驗證）／待驗證 */
-export type TroopSpeedSource = 'ts11' | 'official' | 'official_pending' | 'pending'
+export type TroopSpeedSource = 'ts11' | 'asia_x1' | 'official' | 'official_pending' | 'pending'
 
 export interface TroopListItem {
   troop_id: string
@@ -138,7 +138,7 @@ export interface TroopDetail {
   speed_source: TroopSpeedSource
   /** manual/troop/N（ts11 遊戲內說明）或官方網址 */
   speed_ref: string | null
-  /** null＝還沒核對（斯巴達、維京，P0-23），畫面顯示「—」，不能當 0 */
+  /** null＝還沒核對（維京，P0-23），畫面顯示「—」，不能當 0 */
   carry_capacity: number | null
   carry_capacity_note?: string | null
   cost_wood: number

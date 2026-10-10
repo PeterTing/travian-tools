@@ -1,6 +1,6 @@
 {
   "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
-  "_source": "ts11 遊戲內說明頁（scripts/game_data/evidence/ts11_manual_2026-10-10.json）；aliases 是以前用過的名字，只給搜尋用，不顯示；斯巴達、維京 zh 是暫譯（zh_pending），en 是官方說明頁 S139／S187／S10 的英文名（en_ref；evidence/official_support_2026-10-10.json 的 unit_en_names），畫面顯示 display_zh。監察官 Ephor 取自官方 S10；S139 的 Heimdall’s Eye (Scout)、Jarl (Administrator) 拿掉括號裡的補充說明（兩項 PM 核准，#35）",
+  "_source": "ts11 遊戲內說明頁（scripts/game_data/evidence/ts11_manual_2026-10-10.json）；斯巴達是 ASIA x1 遊戲內說明頁（scripts/game_data/evidence/asia_x1_manual_spartans_2026-10-11.json）；aliases 是以前用過的名字，只給搜尋用，不顯示；維京 zh 是暫譯（zh_pending），en 是官方說明頁 S139 的英文名（en_ref；evidence/official_support_2026-10-10.json 的 unit_en_names），畫面顯示 display_zh。S139 的 Heimdall’s Eye (Scout)、Jarl (Administrator) 拿掉括號裡的補充說明（PM 核准，#35）",
   "tribes": {
     "romans": {
       "zh": "羅馬人",
@@ -1083,96 +1083,96 @@
       "tribe": "spartans",
       "fe_id": "hoplite",
       "game_id": null,
-      "zh": "重裝步兵",
-      "ref": null,
+      "zh": "裝甲步兵",
+      "ref": "asia_x1/help/spartans/1",
       "aliases": [
-        "裝甲步兵"
+        "重裝步兵"
       ],
-      "zh_pending": true,
-      "en": "Hoplite",
-      "en_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "display_zh": "重裝步兵（Hoplite）"
+      "zh_pending": false,
+      "en": null,
+      "en_ref": null,
+      "display_zh": "裝甲步兵"
     },
     "sentinel": {
       "tribe": "spartans",
       "fe_id": "sentinel",
       "game_id": null,
       "zh": "哨兵",
-      "ref": null,
+      "ref": "asia_x1/help/spartans/2",
       "aliases": [],
-      "zh_pending": true,
-      "en": "Sentinel",
-      "en_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "display_zh": "哨兵（Sentinel）"
+      "zh_pending": false,
+      "en": null,
+      "en_ref": null,
+      "display_zh": "哨兵"
     },
     "shieldsman": {
       "tribe": "spartans",
       "fe_id": "shieldsman",
       "game_id": null,
-      "zh": "盾兵",
-      "ref": null,
+      "zh": "盾牌手",
+      "ref": "asia_x1/help/spartans/3",
       "aliases": [
-        "盾牌手"
+        "盾兵"
       ],
-      "zh_pending": true,
-      "en": "Shieldsman",
-      "en_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "display_zh": "盾兵（Shieldsman）"
+      "zh_pending": false,
+      "en": null,
+      "en_ref": null,
+      "display_zh": "盾牌手"
     },
     "twinsteel_therion": {
       "tribe": "spartans",
       "fe_id": "twinsteel",
       "game_id": null,
-      "zh": "雙刃獸戰士",
-      "ref": null,
+      "zh": "雙鋼泰瑞恩",
+      "ref": "asia_x1/help/spartans/4",
       "aliases": [
-        "雙鋼泰瑞恩",
+        "雙刃獸戰士",
         "旋鏢兵"
       ],
-      "zh_pending": true,
-      "en": "Twinsteel Therion",
-      "en_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "display_zh": "雙刃獸戰士（Twinsteel Therion）"
+      "zh_pending": false,
+      "en": null,
+      "en_ref": null,
+      "display_zh": "雙鋼泰瑞恩"
     },
     "elpida_rider": {
       "tribe": "spartans",
       "fe_id": "elpida",
       "game_id": null,
-      "zh": "希望騎士",
-      "ref": null,
+      "zh": "爾必達騎士",
+      "ref": "asia_x1/help/spartans/5",
       "aliases": [
-        "爾必達騎士",
+        "希望騎士",
         "厄爾皮達騎兵"
       ],
-      "zh_pending": true,
-      "en": "Elpida Rider",
-      "en_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "display_zh": "希望騎士（Elpida Rider）"
+      "zh_pending": false,
+      "en": null,
+      "en_ref": null,
+      "display_zh": "爾必達騎士"
     },
     "corinthian_crusher": {
       "tribe": "spartans",
       "fe_id": "corinthian",
       "game_id": null,
-      "zh": "科林斯粉碎者",
-      "ref": null,
+      "zh": "科林斯破壞者",
+      "ref": "asia_x1/help/spartans/6",
       "aliases": [
-        "科林斯破壞者"
+        "科林斯粉碎者"
       ],
-      "zh_pending": true,
-      "en": "Corinthian Crusher",
-      "en_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "display_zh": "科林斯粉碎者（Corinthian Crusher）"
+      "zh_pending": false,
+      "en": null,
+      "en_ref": null,
+      "display_zh": "科林斯破壞者"
     },
     "spartan_ram": {
       "tribe": "spartans",
       "fe_id": "ram",
       "game_id": null,
       "zh": "破城槌",
-      "ref": null,
+      "ref": "asia_x1/help/spartans/7",
       "aliases": [
         "攻城槌"
       ],
-      "zh_pending": true,
+      "zh_pending": false,
       "en": null,
       "en_ref": null,
       "display_zh": "破城槌"
@@ -1181,43 +1181,43 @@
       "tribe": "spartans",
       "fe_id": "ballista",
       "game_id": null,
-      "zh": "弩炮",
-      "ref": null,
+      "zh": "賴達投石機",
+      "ref": "asia_x1/help/spartans/8",
       "aliases": [
-        "弩砲",
-        "賴達投石機"
+        "弩炮",
+        "弩砲"
       ],
-      "zh_pending": true,
+      "zh_pending": false,
       "en": null,
       "en_ref": null,
-      "display_zh": "弩炮"
+      "display_zh": "賴達投石機"
     },
     "ephor": {
       "tribe": "spartans",
       "fe_id": "ephor",
       "game_id": null,
-      "zh": "監察官",
-      "ref": null,
+      "zh": "五長官",
+      "ref": "asia_x1/help/spartans/9",
       "aliases": [
-        "五長官"
+        "監察官"
       ],
-      "zh_pending": true,
-      "en": "Ephor",
-      "en_ref": "https://support.travian.com/en/articles/10-the-spartans-and-their-advantages",
-      "display_zh": "監察官（Ephor）"
+      "zh_pending": false,
+      "en": null,
+      "en_ref": null,
+      "display_zh": "五長官"
     },
     "spartan_settler": {
       "tribe": "spartans",
       "fe_id": "settler",
       "game_id": null,
       "zh": "開拓者",
-      "ref": null,
+      "ref": "asia_x1/help/spartans/10",
       "aliases": [
         "拓荒者",
         "移民",
         "定居者"
       ],
-      "zh_pending": true,
+      "zh_pending": false,
       "en": null,
       "en_ref": null,
       "display_zh": "開拓者"

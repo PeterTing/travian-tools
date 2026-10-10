@@ -103,36 +103,38 @@ describe('遊戲內名稱表', () => {
     expect(guideHits).toBe(70)
   })
 
-  it('Spartan / Viking units: calculator names = troops page names (PM rule: S139/S187 have no zh page, keep the troops-page name)', () => {
+  it('Spartan / Viking units: calculator names = troops page names (Spartans: ASIA x1 in-game names; Vikings: PM rule, S139 has no zh page)', () => {
     const pairs: [string, string, string][] = [
-      ['vikings', 'thrall', '奴僕'], ['spartans', 'hoplite', '重裝步兵'],
-      ['spartans', 'elpida', '希望騎士'], ['vikings', 'huskarlRider', '侍衛騎士'],
+      ['vikings', 'thrall', '奴僕'], ['spartans', 'hoplite', '裝甲步兵'],
+      ['spartans', 'elpida', '爾必達騎士'], ['spartans', 'ballista', '賴達投石機'],
+      ['spartans', 'ephor', '五長官'], ['vikings', 'huskarlRider', '侍衛騎士'],
     ]
     for (const [tribe, id, zhName] of pairs) {
       expect(TRIBES[tribe as keyof typeof TRIBES].units.find(u => u.id === id)?.name.zh, id).toBe(zhName)
     }
   })
 
-  it('Spartan / Viking: 中文暫譯（官方英文名）, Chinese part pending; ts11 units are not pending (P0-23 follow-up)', () => {
+  it('Viking: 中文暫譯（官方英文名）, Chinese part pending; ts11 and Spartan (ASIA x1) units are not pending (P0-23 follow-up)', () => {
     const pending = Object.entries(INGAME_UNITS).filter(([, u]) => u.zh_pending)
-    expect(pending).toHaveLength(20)
+    expect(pending).toHaveLength(10)
     for (const [id, u] of Object.entries(INGAME_UNITS)) {
-      expect(u.zh_pending, id).toBe(u.tribe === 'spartans' || u.tribe === 'vikings')
+      expect(u.zh_pending, id).toBe(u.tribe === 'vikings')
       expect(u.display_zh, id).toBe(u.en ? `${u.zh}（${u.en}）` : u.zh)
-      if (u.en) expect(u.en_ref, id).toMatch(/^https:\/\/support\.travian\.com\/en\/articles\/(139|187|10)-/)
+      if (u.en) expect(u.en_ref, id).toMatch(/^https:\/\/support\.travian\.com\/en\/articles\/139-/)
       if (!u.zh_pending) expect([u.en, u.en_ref], id).toEqual([null, null])
     }
     expect(INGAME_UNITS.thrall?.display_zh).toBe('奴僕（Thrall）')
     expect(INGAME_UNITS.heimdalls_eye?.display_zh).toBe('海姆達爾之眼（Heimdall’s Eye）')
-    expect(INGAME_UNITS.hoplite?.display_zh).toBe('重裝步兵（Hoplite）')
-    expect(INGAME_UNITS.ephor?.display_zh).toBe('監察官（Ephor）')
-    // 官方說明頁沒寫英文名：只有中文
-    for (const id of ['spartan_ram', 'ballista', 'spartan_settler']) expect(INGAME_UNITS[id]?.en, id).toBeNull()
+    // 斯巴達：ASIA x1 遊戲內名稱（2026-10-11），不加英文括號
+    expect(INGAME_UNITS.hoplite?.display_zh).toBe('裝甲步兵')
+    expect(INGAME_UNITS.ephor?.display_zh).toBe('五長官')
+    expect(INGAME_UNITS.hoplite?.aliases).toContain('重裝步兵')
   })
 
   it('弩炮 is spelled like ts11 (manual/troop/18, 68); 弩砲 only survives as a search alias', () => {
     expect(ingameUnitNameByGameId(18)).toBe('弩炮')
-    expect(INGAME_UNITS.ballista?.zh).toBe('弩炮')
+    // 斯巴達 Ballista 的遊戲內名稱是「賴達投石機」（ASIA x1，2026-10-11）
+    expect(INGAME_UNITS.ballista?.zh).toBe('賴達投石機')
     expect(INGAME_UNITS.ballista?.aliases).toContain('弩砲')
     expect(Object.values(INGAME_UNITS).map(u => u.zh)).not.toContain('弩砲')
   })

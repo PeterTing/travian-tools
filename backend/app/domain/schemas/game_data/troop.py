@@ -59,21 +59,24 @@ class Troop(BaseModel):
     defense_cavalry: int = Field(..., ge=0, description="騎兵防禦")
 
     # 移動與運載
-    # 速度由 scripts/game_data/gen_game_data.py 產生（P0-15）：ts11 遊戲內說明／官方文章；
+    # 速度由 scripts/game_data/gen_game_data.py 產生（P0-15）：ts11 遊戲內說明／ASIA x1 遊戲內說明（斯巴達）／官方文章；
     # 沒有第一手出處的是 None（待驗證）
     speed: int | None = Field(
         ..., ge=1, description="速度（格/小時，x1）；None＝待驗證"
     )
-    speed_source: Literal["ts11", "official", "official_pending", "pending"] = Field(
+    speed_source: Literal[
+        "ts11", "asia_x1", "official", "official_pending", "pending"
+    ] = Field(
         ...,
         description=(
-            "速度出處：ts11 遊戲內說明／官方文章／官方頁但數字取自第三方計算器（待驗證）／待驗證"
+            "速度出處：ts11 遊戲內說明／ASIA x1 遊戲內說明（斯巴達）／官方文章／"
+            "官方頁但數字取自第三方計算器（待驗證）／待驗證"
         ),
     )
     speed_ref: str | None = Field(
         None, description="速度出處細節（manual/troop/N 或官方網址）"
     )
-    # 運載量由產生器帶入（P0-23）：斯巴達、維京沒有官方或 ts11 數字 → None（留空，不能當 0）
+    # 運載量由產生器帶入（P0-23）：維京沒有官方或遊戲內數字 → None（留空，不能當 0）
     carry_capacity: int | None = Field(
         ..., ge=0, description="運載量；None＝還沒核對、不提供"
     )

@@ -26,24 +26,24 @@ describe('carry capacity: frontend = backend troops.json for every unit', () => 
     })
   }
 
-  it('sources: 5 tribes ts11; Spartans and Vikings pending (empty) → 待驗證 chip', () => {
+  it('sources: 5 tribes ts11; Spartans ASIA x1 in-game help (2026-10-11); Vikings pending (empty) → 待驗證 chip', () => {
     for (const tribe of UNIT_SPEED_TRIBES) {
-      const want = tribe === 'spartans' || tribe === 'vikings' ? 'pending' : 'ts11'
+      const want = tribe === 'vikings' ? 'pending' : tribe === 'spartans' ? 'asia_x1' : 'ts11'
       for (const r of tribeUnitSpeeds(tribe)) {
         expect(r.carrySource).toBe(want)
-        expect(carryPendingTribe(r.troopId)).toBe(want === 'ts11' ? null : tribe)
+        expect(carryPendingTribe(r.troopId)).toBe(want === 'pending' ? tribe : null)
       }
     }
   })
 
-  it('PM decision: every Spartan and Viking unit has carry null (frontend, generated file, backend) — no community / estimated numbers', () => {
-    for (const tribe of ['spartans', 'vikings'] as const) {
-      expect(tribeUnitSpeeds(tribe).map((r) => r.carry)).toEqual(Array(10).fill(null))
-      expect(TRIBES[tribe].units.map((u) => u.carry)).toEqual(Array(10).fill(null))
-      for (const r of tribeUnitSpeeds(tribe)) expect(backend[r.troopId].carry_capacity, r.troopId).toBeNull()
-    }
-    for (const tribe of UNIT_SPEED_TRIBES.filter((t) => t !== 'spartans' && t !== 'vikings')) {
+  it('PM decision: every Viking unit has carry null (frontend, generated file, backend) — no community / estimated numbers', () => {
+    expect(tribeUnitSpeeds('vikings').map((r) => r.carry)).toEqual(Array(10).fill(null))
+    expect(TRIBES.vikings.units.map((u) => u.carry)).toEqual(Array(10).fill(null))
+    for (const r of tribeUnitSpeeds('vikings')) expect(backend[r.troopId].carry_capacity, r.troopId).toBeNull()
+    for (const tribe of UNIT_SPEED_TRIBES.filter((t) => t !== 'vikings')) {
       for (const r of tribeUnitSpeeds(tribe)) expect(typeof r.carry, r.troopId).toBe('number')
     }
+    // 斯巴達：ASIA x1 遊戲內說明（2026-10-11）
+    expect(tribeUnitSpeeds('spartans').map((r) => r.carry)).toEqual([60, 0, 40, 50, 110, 80, 0, 0, 0, 3000])
   })
 })

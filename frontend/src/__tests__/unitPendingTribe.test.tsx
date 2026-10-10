@@ -26,10 +26,11 @@ import CalcFrame, { CalcBar } from '@/components/autofill/CalcFrame'
 import FarmingCalculator, { FARM_UNITS } from '@/features/guideCalcs/components/FarmingCalculator'
 import { showUnitPendingLine } from '@/lib/unitPending'
 
-const LINE = /^斯巴達、維京的兵種數字待驗證（斯巴達含速度）$/
-// 選斯巴達、維京：同一行後面加「兵種中文名為暫譯」（P0-23 後續，PM）
-const LINE_PROVISIONAL = /^斯巴達、維京的兵種數字待驗證（斯巴達含速度），兵種中文名為暫譯$/
-const VERIFIED = ['romans', 'teutons', 'gauls', 'egyptians', 'huns']
+const LINE = /^維京的兵種運載量待驗證$/
+// 選維京：同一行後面加「兵種中文名為暫譯」（P0-23 後續，PM）
+const LINE_PROVISIONAL = /^維京的兵種運載量待驗證，兵種中文名為暫譯$/
+// 5 族 ts11 核對；斯巴達 2026-10-11 在 ASIA x1 遊戲內說明核對（數字、速度、運載量、中文名）
+const VERIFIED = ['romans', 'teutons', 'gauls', 'egyptians', 'huns', 'spartans']
 const line = () => screen.queryByTestId('autofill-unit-pending')
 
 describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
@@ -45,12 +46,11 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     fill.tribe = null
   })
 
-  it('only Spartans, Vikings, or 「全部」 need the line; unknown tribe shows it too; the 5 ts11-verified tribes do not', () => {
+  it('only Vikings or 「全部」 need the line; unknown tribe shows it too; the 5 ts11-verified tribes and Spartans do not', () => {
     for (const tr of VERIFIED) expect(showUnitPendingLine(tr), tr).toBe(false)
-    expect(showUnitPendingLine('spartans')).toBe(true)
     expect(showUnitPendingLine('vikings')).toBe(true)
     expect(showUnitPendingLine('all')).toBe(true)
-    // 不知道部族：可能是斯巴達、維京，所以顯示
+    // 不知道部族：可能是維京，所以顯示
     expect(showUnitPendingLine(null)).toBe(true)
     expect(showUnitPendingLine(undefined)).toBe(true)
   })
@@ -62,16 +62,14 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
       expect(line(), tr).not.toBeInTheDocument()
       unmount()
     }
-    for (const tr of ['spartans', 'vikings']) {
-      fill.tribe = tr
-      const { unmount } = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
-      expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE_PROVISIONAL)
-      unmount()
-    }
+    fill.tribe = 'vikings'
+    const { unmount } = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
+    expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE_PROVISIONAL)
+    unmount()
   })
 
   it('a page tribe selector wins over the account tribe (CalcBar tribe=…)', () => {
-    fill.tribe = 'spartans'
+    fill.tribe = 'vikings'
     const { unmount } = render(
       <MemoryRouter initialEntries={['/database/troops']}><CalcFrame usesVillage={false}><CalcBar tribe="gauls" /></CalcFrame></MemoryRouter>,
     )
@@ -82,17 +80,20 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE)
   })
 
-  it('Spartans / Vikings: the same line adds 「兵種中文名為暫譯」 (no extra chip); 「全部」 and unknown tribe do not', () => {
-    for (const tr of ['spartans', 'vikings']) {
-      fill.tribe = tr
-      const { unmount } = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
-      const row = screen.getByTestId('autofill-unit-pending')
-      expect(screen.getAllByTestId('autofill-unit-pending-text')).toHaveLength(1)
-      expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE_PROVISIONAL)
-      expect(row.querySelectorAll('[data-testid="pending-verify-chip"]')).toHaveLength(1)
-      unmount()
-    }
-    // 頁面選單選斯巴達也一樣（帳號是高盧）
+  it('Vikings: the same line adds 「兵種中文名為暫譯」 (no extra chip); Spartans no line; 「全部」 and unknown tribe no suffix', () => {
+    fill.tribe = 'vikings'
+    const v = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
+    const row = screen.getByTestId('autofill-unit-pending')
+    expect(screen.getAllByTestId('autofill-unit-pending-text')).toHaveLength(1)
+    expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE_PROVISIONAL)
+    expect(row.querySelectorAll('[data-testid="pending-verify-chip"]')).toHaveLength(1)
+    v.unmount()
+    // 斯巴達：2026-10-11 起是 ASIA x1 遊戲內名稱和數字，整行都不出現
+    fill.tribe = 'spartans'
+    const s = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
+    expect(line()).not.toBeInTheDocument()
+    s.unmount()
+    // 頁面選單選維京也一樣（帳號是高盧）
     fill.tribe = 'gauls'
     const a = render(<MemoryRouter initialEntries={['/database/troops']}><CalcFrame usesVillage={false}><CalcBar tribe="vikings" /></CalcFrame></MemoryRouter>)
     expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE_PROVISIONAL)
@@ -104,11 +105,11 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     b.unmount()
   })
 
-  it('one line only (no second Spartan-speed line)', () => {
-    fill.tribe = 'spartans'
+  it('one line only (no Spartan line any more)', () => {
+    fill.tribe = 'vikings'
     render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
     expect(screen.getAllByTestId('autofill-unit-pending-text')).toHaveLength(1)
-    expect(screen.queryByText('斯巴達速度待驗證')).not.toBeInTheDocument()
+    expect(screen.queryByText(/斯巴達/)).not.toBeInTheDocument()
   })
 
   it('農場收益 follows the picked unit’s tribe, not the account (all picks are ts11-verified → no line)', () => {

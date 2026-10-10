@@ -1739,7 +1739,7 @@
     },
     "hoplite": {
       "troop_id": "hoplite",
-      "name_zh": "重裝步兵",
+      "name_zh": "裝甲步兵",
       "name_en": "Hoplite",
       "tribe": "spartans",
       "category": "infantry",
@@ -1747,9 +1747,9 @@
       "defense_infantry": 35,
       "defense_cavalry": 30,
       "speed": 6,
-      "speed_source": "official_pending",
-      "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": null,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/1",
+      "carry_capacity": 60,
       "cost_wood": 110,
       "cost_clay": 185,
       "cost_iron": 110,
@@ -1761,10 +1761,10 @@
       "description_zh": "斯巴達的基礎步兵，攻擊力強",
       "description_en": "Spartan basic infantry with strong attack",
       "aliases_zh": [
-        "裝甲步兵"
+        "重裝步兵"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/1"
     },
     "sentinel": {
       "troop_id": "sentinel",
@@ -1776,9 +1776,9 @@
       "defense_infantry": 40,
       "defense_cavalry": 22,
       "speed": 9,
-      "speed_source": "official_pending",
-      "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": null,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/2",
+      "carry_capacity": 0,
       "cost_wood": 185,
       "cost_clay": 150,
       "cost_iron": 35,
@@ -1790,12 +1790,12 @@
       "description_zh": "斯巴達的偵查步兵，防禦值高",
       "description_en": "Spartan scout infantry with high defense",
       "aliases_zh": [],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/2"
     },
     "shieldsman": {
       "troop_id": "shieldsman",
-      "name_zh": "盾兵",
+      "name_zh": "盾牌手",
       "name_en": "Shieldsman",
       "tribe": "spartans",
       "category": "infantry",
@@ -1803,9 +1803,9 @@
       "defense_infantry": 85,
       "defense_cavalry": 45,
       "speed": 8,
-      "speed_source": "official_pending",
-      "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": null,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/3",
+      "carry_capacity": 40,
       "cost_wood": 145,
       "cost_clay": 95,
       "cost_iron": 245,
@@ -1817,14 +1817,14 @@
       "description_zh": "斯巴達的防禦步兵，最快的防禦步兵",
       "description_en": "Spartan defensive infantry, fastest defensive infantry",
       "aliases_zh": [
-        "盾牌手"
+        "盾兵"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/3"
     },
     "twinsteel_therion": {
       "troop_id": "twinsteel_therion",
-      "name_zh": "雙刃獸戰士",
+      "name_zh": "雙鋼泰瑞恩",
       "name_en": "Twinsteel Therion",
       "tribe": "spartans",
       "category": "infantry",
@@ -1832,9 +1832,9 @@
       "defense_infantry": 55,
       "defense_cavalry": 40,
       "speed": 6,
-      "speed_source": "official_pending",
-      "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": null,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/4",
+      "carry_capacity": 50,
       "cost_wood": 130,
       "cost_clay": 200,
       "cost_iron": 400,
@@ -1846,15 +1846,15 @@
       "description_zh": "斯巴達的強力攻擊步兵",
       "description_en": "Spartan powerful attack infantry",
       "aliases_zh": [
-        "雙鋼泰瑞恩",
+        "雙刃獸戰士",
         "旋鏢兵"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/4"
     },
     "elpida_rider": {
       "troop_id": "elpida_rider",
-      "name_zh": "希望騎士",
+      "name_zh": "爾必達騎士",
       "name_en": "Elpida Rider",
       "tribe": "spartans",
       "category": "cavalry",
@@ -1862,9 +1862,9 @@
       "defense_infantry": 120,
       "defense_cavalry": 90,
       "speed": 16,
-      "speed_source": "official_pending",
-      "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": null,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/5",
+      "carry_capacity": 110,
       "cost_wood": 555,
       "cost_clay": 445,
       "cost_iron": 330,
@@ -1876,15 +1876,15 @@
       "description_zh": "斯巴達的防禦騎兵",
       "description_en": "Spartan defensive cavalry",
       "aliases_zh": [
-        "爾必達騎士",
+        "希望騎士",
         "厄爾皮達騎兵"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/5"
     },
     "corinthian_crusher": {
       "troop_id": "corinthian_crusher",
-      "name_zh": "科林斯粉碎者",
+      "name_zh": "科林斯破壞者",
       "name_en": "Corinthian Crusher",
       "tribe": "spartans",
       "category": "cavalry",
@@ -1892,9 +1892,9 @@
       "defense_infantry": 80,
       "defense_cavalry": 75,
       "speed": 9,
-      "speed_source": "official_pending",
-      "speed_ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-      "carry_capacity": null,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/6",
+      "carry_capacity": 80,
       "cost_wood": 660,
       "cost_clay": 495,
       "cost_iron": 995,
@@ -1906,10 +1906,10 @@
       "description_zh": "斯巴達最強的重騎兵",
       "description_en": "Spartan most powerful heavy cavalry",
       "aliases_zh": [
-        "科林斯破壞者"
+        "科林斯粉碎者"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/6"
     },
     "spartan_ram": {
       "troop_id": "spartan_ram",
@@ -1920,10 +1920,10 @@
       "attack": 65,
       "defense_infantry": 30,
       "defense_cavalry": 80,
-      "speed": null,
-      "speed_source": "pending",
-      "speed_ref": null,
-      "carry_capacity": null,
+      "speed": 4,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/7",
+      "carry_capacity": 0,
       "cost_wood": 525,
       "cost_clay": 260,
       "cost_iron": 790,
@@ -1937,52 +1937,52 @@
       "aliases_zh": [
         "攻城槌"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/7"
     },
     "ballista": {
       "troop_id": "ballista",
-      "name_zh": "弩炮",
+      "name_zh": "賴達投石機",
       "name_en": "Ballista",
       "tribe": "spartans",
       "category": "siege",
       "attack": 50,
       "defense_infantry": 60,
       "defense_cavalry": 10,
-      "speed": null,
-      "speed_source": "pending",
-      "speed_ref": null,
-      "carry_capacity": null,
+      "speed": 3,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/8",
+      "carry_capacity": 0,
       "cost_wood": 550,
       "cost_clay": 1240,
       "cost_iron": 825,
       "cost_crop": 135,
       "crop_consumption": 6,
-      "training_time_base": 9900,
+      "training_time_base": 9000,
       "training_building": "workshop",
       "academy_level_required": 15,
       "description_zh": "斯巴達的攻城武器，用於破壞建築",
       "description_en": "Spartan siege weapon for destroying buildings",
       "aliases_zh": [
-        "弩砲",
-        "賴達投石機"
+        "弩炮",
+        "弩砲"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/8"
     },
     "ephor": {
       "troop_id": "ephor",
-      "name_zh": "監察官",
+      "name_zh": "五長官",
       "name_en": "Ephor",
       "tribe": "spartans",
       "category": "special",
       "attack": 40,
       "defense_infantry": 60,
       "defense_cavalry": 40,
-      "speed": null,
-      "speed_source": "pending",
-      "speed_ref": null,
-      "carry_capacity": null,
+      "speed": 4,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/9",
+      "carry_capacity": 0,
       "cost_wood": 33450,
       "cost_clay": 30665,
       "cost_iron": 36240,
@@ -1994,10 +1994,10 @@
       "description_zh": "斯巴達的征服者，降低敵方忠誠度",
       "description_en": "Spartan chief unit for conquering villages",
       "aliases_zh": [
-        "五長官"
+        "監察官"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/9"
     },
     "spartan_settler": {
       "troop_id": "spartan_settler",
@@ -2008,10 +2008,10 @@
       "attack": 10,
       "defense_infantry": 80,
       "defense_cavalry": 80,
-      "speed": null,
-      "speed_source": "pending",
-      "speed_ref": null,
-      "carry_capacity": null,
+      "speed": 5,
+      "speed_source": "asia_x1",
+      "speed_ref": "asia_x1/help/spartans/10",
+      "carry_capacity": 3000,
       "cost_wood": 5115,
       "cost_clay": 5580,
       "cost_iron": 6045,
@@ -2027,8 +2027,8 @@
         "移民",
         "定居者"
       ],
-      "stats_source": "pending",
-      "stats_ref": null
+      "stats_source": "asia_x1",
+      "stats_ref": "asia_x1/help/spartans/10"
     }
   }
 }

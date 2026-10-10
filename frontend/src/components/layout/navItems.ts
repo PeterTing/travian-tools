@@ -144,7 +144,7 @@ export const UNIT_DATA_ROUTES: readonly string[] = [
   ROUTES.DATABASE.TROOPS,
   ROUTES.CALCULATOR.CROP,
   '/calculator/technology',
-  // 反推 TS：用兵種速度表比對（斯巴達速度待驗證，未列入反推）
+  // 反推 TS：用兵種速度表比對（7 族都有第一手出處；斯巴達 2026-10-11 在 ASIA x1 核對）
   '/calculator/path-speed-ts',
   '/calculator/launch-sim',
   '/calculator/farming',

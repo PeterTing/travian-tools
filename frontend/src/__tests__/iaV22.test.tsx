@@ -166,13 +166,16 @@ describe('IA v2.2', () => {
       expect(screen.queryByTestId('autofill-unit-pending')).not.toBeInTheDocument()
     })
 
-    it('shows one 兵種待驗證 line for Spartans on pages that use unit data, e.g. 糧食平衡 (P0-17 (k))', () => {
-      renderBar('/calculator/crop', 'spartans')
+    it('shows one 兵種待驗證 line for Vikings on pages that use unit data, e.g. 糧食平衡 (P0-17 (k)); none for Spartans (ASIA x1, 2026-10-11)', () => {
+      const sp = renderBar('/calculator/crop', 'spartans')
+      expect(screen.queryByTestId('autofill-unit-pending')).not.toBeInTheDocument()
+      sp.unmount()
+      renderBar('/calculator/crop', 'vikings')
       const line = screen.getByTestId('autofill-unit-pending')
       // 一行、沒有分號；灰標在最前面，文字掛在灰標右邊
       expect(line).not.toHaveTextContent('；')
       const text = screen.getByTestId('autofill-unit-pending-text')
-      expect(text).toHaveTextContent(/^斯巴達、維京的兵種數字待驗證（斯巴達含速度），兵種中文名為暫譯$/)
+      expect(text).toHaveTextContent(/^維京的兵種運載量待驗證，兵種中文名為暫譯$/)
       expect(text.tagName).toBe('P')
       const chip = within(line).getByTestId('pending-verify-chip')
       expect(chip).toHaveTextContent('待驗證')
@@ -183,7 +186,7 @@ describe('IA v2.2', () => {
 
     it('pages where speed is typed by hand or that use merchant data do not show the unit line (P0-17 (a))', () => {
       for (const path of ['/calculator/path', '/calculator/interception', '/calculator/save-troops', '/calculator/attack-planner', '/calculator/trade-route']) {
-        const { unmount } = renderBar(path, 'spartans')
+        const { unmount } = renderBar(path, 'vikings')
         expect(screen.queryByTestId('autofill-unit-pending')).not.toBeInTheDocument()
         unmount()
       }
@@ -194,10 +197,10 @@ describe('IA v2.2', () => {
       const line = screen.getByTestId('autofill-unit-pending')
       fireEvent.click(within(line).getByTestId('pending-verify-chip'))
       expect(screen.getByTestId('pending-note-what')).toHaveTextContent(
-        /^羅馬人、日耳曼人、高盧人、埃及人、匈奴的兵種數字已在 ts11 遊戲內說明頁核對；維京的花費、糧耗、訓練時間、攻防已照官方說明頁核對，運載量還沒核對、先不顯示；ts11 沒有斯巴達，斯巴達的花費、糧耗、訓練時間還是社群整理的數字，運載量先不顯示。$/,
+        /^羅馬人、日耳曼人、高盧人、埃及人、匈奴的兵種數字已在 ts11 遊戲內說明頁核對；斯巴達的兵種數字、速度、運載量已在 ASIA x1 遊戲內說明頁核對；維京的花費、糧耗、訓練時間、攻防已照官方說明頁核對，運載量還沒核對、先不顯示。$/,
       )
       expect(screen.getByTestId('pending-note-source')).toHaveTextContent(
-        /^斯巴達速度取自官方說明頁（頁面標示數字來自第三方計算器），反推 TS 不會算斯巴達兵種。$/,
+        /^維京的數字取自官方說明頁 S139；ts11 沒有維京，現在也沒有可以選維京的世界，遊戲內還看不到。$/,
       )
     })
 
@@ -227,7 +230,7 @@ describe('IA v2.2', () => {
   })
 
   describe('首頁卡片', () => {
-    it('incoming card: count, big countdown, server time first with local time, one 待驗證 beside 反推 TS', () => {
+    it('incoming card: count, big countdown, server time first with local time, no 待驗證 beside 反推 TS (all unit speeds verified since 2026-10-11)', () => {
       const now = new Date()
       const list = [movement('a', 12), movement('b', 31), movement('c', 118), movement('d', 312)]
       render(
@@ -239,8 +242,8 @@ describe('IA v2.2', () => {
       expect(screen.getByTestId('incoming-countdown')).toHaveTextContent(/^00:1[12]:\d\d$/)
       expect(screen.getByTestId('incoming-time-server')).toHaveTextContent(/^伺服器 \d\d:\d\d:\d\d$/)
       expect(screen.getByTestId('incoming-time-local')).toHaveTextContent(/^本地 \d\d:\d\d:\d\d/)
-      expect(within(screen.getByTestId('incoming-ts-line')).getAllByTestId('pending-verify-chip')).toHaveLength(1)
-      expect(screen.getAllByTestId('pending-verify-chip')).toHaveLength(1)
+      expect(within(screen.getByTestId('incoming-ts-line')).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
+      expect(screen.queryAllByTestId('pending-verify-chip')).toHaveLength(0)
       expect(screen.getByTestId('incoming-rest-list')).toHaveTextContent('接下來 3 筆')
     })
 
