@@ -184,8 +184,23 @@ another invalid
 """
         result = service.parse_sql(content)
 
+        # 距離 ≤ 半徑（P0-22 改用環繞距離）：(-99,-99) 距離 1.41
         villages = service.get_villages_in_range(result, -100, -100, 1)
+        assert len(villages) == 1
+        villages = service.get_villages_in_range(result, -100, -100, 2)
         assert len(villages) == 2
+
+    def test_get_villages_in_range_wraps_map_edge(self, service: MapSqlService) -> None:
+        """跨地圖邊緣（401 環繞）：(200,0) 和 (-200,0) 只差 1 格（P0-22）."""
+        content = """
+-200,0,4,1,Edge,100,Player1,10,Alliance1,500,1
+-190,0,4,2,Far,100,Player1,10,Alliance1,300,0
+"""
+        result = service.parse_sql(content)
+        villages = service.get_villages_in_range(result, 200, 0, 2)
+        assert [v.village_name for v in villages] == ["Edge"]
+        villages = service.get_villages_in_range(result, 180, 10, 33)
+        assert len(villages) == 2  # (-190,0) 距離 32.57（PM 的跨邊界案例）
 
     def test_parse_line_optional_fields(self, service: MapSqlService) -> None:
         """測試可選欄位."""
@@ -203,3 +218,38 @@ another invalid
 
         # 無 village_id 的應該被過濾掉
         assert result.total_villages == 0
+
+
+def test_wrapped_range_splits_box_at_map_edge() -> None:
+    """快照查詢的粗篩方框跨地圖邊緣時拆成兩段（P0-22）."""
+    from sqlalchemy import (
+        Column,
+        Integer,
+        MetaData,
+        Table,
+        create_engine,
+        insert,
+        select,
+    )
+
+    from app.services.map_sql_service import _wrapped_range
+
+    md = MetaData()
+    t = Table("t", md, Column("x", Integer))
+    engine = create_engine("sqlite://")
+    md.create_all(engine)
+    with engine.begin() as conn:
+        conn.execute(
+            insert(t), [{"x": v} for v in (-200, -199, -150, 0, 150, 199, 200)]
+        )
+
+        def xs(center: int, radius: int) -> list[int]:
+            rows = conn.execute(
+                select(t.c.x).where(_wrapped_range(t.c.x, center, radius))
+            )
+            return sorted(r[0] for r in rows)
+
+        assert xs(200, 2) == [-200, -199, 199, 200]
+        assert xs(-200, 1) == [-200, -199, 200]
+        assert xs(0, 10) == [0]
+        assert xs(0, 300) == [-200, -199, -150, 0, 150, 199, 200]
