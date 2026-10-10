@@ -1,6 +1,6 @@
 {
   "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
-  "_source": "ts11 遊戲內說明頁（scripts/game_data/evidence/ts11_manual_2026-10-10.json）；aliases 是以前用過的名字，只給搜尋用，不顯示；斯巴達、維京 zh 是暫譯（zh_pending），en 是官方說明頁 S139／S187／S10 的英文名（en_ref；evidence/official_support_2026-10-10.json），畫面顯示 display_zh",
+  "_source": "ts11 遊戲內說明頁（scripts/game_data/evidence/ts11_manual_2026-10-10.json）；aliases 是以前用過的名字，只給搜尋用，不顯示；斯巴達、維京 zh 是暫譯（zh_pending），en 是官方說明頁 S139／S187／S10 的英文名（en_ref；evidence/official_support_2026-10-10.json 的 unit_en_names），畫面顯示 display_zh。監察官 Ephor 取自官方 S10；S139 的 Heimdall’s Eye (Scout)、Jarl (Administrator) 拿掉括號裡的補充說明（兩項 PM 核准，#35）",
   "tribes": {
     "romans": {
       "zh": "羅馬人",

@@ -31,21 +31,26 @@ function nameChips(el: HTMLElement) {
 describe('TroopsPage: Spartan / Viking names are 「中文暫譯（官方英文名）」 + 待驗證', () => {
   beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
 
-  it.each([['奴僕（Thrall）'], ['重裝步兵（Hoplite）'], ['弩炮']])('list: %s with one name chip right after the name', async (text) => {
+  it.each([['奴僕（Thrall）'], ['重裝步兵（Hoplite）'], ['弩炮']])('list: %s with a non-clickable 「待驗證」 label right after the name (no nested button, #35)', async (text) => {
     render(<TroopsPage />)
     const name = await screen.findByText(text)
     expect(name).toHaveAttribute('data-testid', 'troop-name')
-    const line = name.parentElement!
-    expect(nameChips(line)).toHaveLength(1)
-    expect(name.nextElementSibling).toBe(nameChips(line)[0])
+    const row = name.closest('[data-testid="troop-list-row"]') as HTMLElement
+    expect(row.querySelector('button')).toBeNull()
+    expect(nameChips(row)).toHaveLength(0)
+    const label = name.nextElementSibling as HTMLElement
+    expect(label).toHaveAttribute('data-testid', 'pending-verify-label')
+    expect(label).toHaveAttribute('aria-hidden', 'true')
+    expect(row.getAttribute('aria-label')).toContain(`${text}，中文名為暫譯`)
   })
 
-  it('detail heading: name + one chip; tap shows the two lines', async () => {
+  it('detail heading keeps the clickable chip; tap shows the two lines', async () => {
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText('奴僕（Thrall）'))
     const h2 = await screen.findByRole('heading', { level: 2, name: /奴僕（Thrall）/ })
     const chips = nameChips(h2)
     expect(chips).toHaveLength(1)
+    expect(chips[0]!.tagName).toBe('BUTTON')
     fireEvent.click(chips[0]!)
     expect(screen.getByTestId('pending-note-what')).toHaveTextContent('中文名稱是暫譯，還沒核對')
     expect(screen.getByTestId('pending-note-source')).toHaveTextContent('括號裡是官方英文名')
@@ -55,6 +60,7 @@ describe('TroopsPage: Spartan / Viking names are 「中文暫譯（官方英文�
     render(<TroopsPage />)
     const name = await screen.findByText('古羅馬步兵')
     expect(nameChips(name.parentElement!)).toHaveLength(0)
+    expect(within(name.parentElement!).queryByTestId('pending-verify-label')).toBeNull()
   })
 
   it('English UI: official English name only, no chip', async () => {

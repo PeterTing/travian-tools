@@ -42,10 +42,28 @@ function speedSourceLabel(t: Pick<TroopDetail, 'speed_source' | 'speed_ref'>): s
 }
 
 /**
- * 兵種名稱（中文）：斯巴達、維京顯示「中文暫譯（官方英文名）」＋待驗證灰標（中文是暫譯）；
- * 其他族是 ts11 遊戲內名稱。英文畫面只顯示英文名，不標
+ * 列表裡（整列可點）用的「待驗證」字樣：樣子跟灰標一樣，但不能點、aria-hidden（跟建築列表的 BuildingVerifyMark list 一樣）；
+ * 整列的 aria-label 另外寫哪些待驗證（troopRowLabel）。說明要點進詳情看標題旁可點的灰標（設計師，#35）
  */
-function TroopName({ troop, isZh }: { troop: Pick<TroopListItem, 'troop_id' | 'name_zh' | 'name_en'>; isZh: boolean }) {
+function PendingLabel() {
+  const { t } = useTranslation()
+  return (
+    <span
+      aria-hidden="true"
+      data-testid="pending-verify-label"
+      className="inline-flex items-center whitespace-nowrap rounded-full bg-gray-100 px-2 py-0.5 align-middle text-xs font-normal leading-4 text-gray-600"
+    >
+      {t('common.pendingVerify')}
+    </span>
+  )
+}
+
+/**
+ * 兵種名稱（中文）：斯巴達、維京顯示「中文暫譯（官方英文名）」＋待驗證（中文是暫譯）；
+ * 其他族是 ts11 遊戲內名稱。英文畫面只顯示英文名，不標。
+ * title：詳情標題旁可點的灰標；list：列表裡不能點的字樣
+ */
+function TroopName({ troop, isZh, variant }: { troop: Pick<TroopListItem, 'troop_id' | 'name_zh' | 'name_en'>; isZh: boolean; variant: 'list' | 'title' }) {
   if (!isZh) return <>{troop.name_en}</>
   const d = ingameUnitDisplay(troop.troop_id)
   return (
@@ -54,7 +72,7 @@ function TroopName({ troop, isZh }: { troop: Pick<TroopListItem, 'troop_id' | 'n
       {d?.zhPending && (
         <>
           {' '}
-          <PendingVerifyChip kind="unitNameZhPending" />
+          {variant === 'list' ? <PendingLabel /> : <PendingVerifyChip kind="unitNameZhPending" />}
         </>
       )}
     </>
@@ -64,6 +82,15 @@ function TroopName({ troop, isZh }: { troop: Pick<TroopListItem, 'troop_id' | 'n
 /** 速度沒有第一手出處（null 或官方頁標示取自第三方計算器）就標「待驗證」 */
 function isSpeedPending(t: Pick<TroopListItem, 'speed' | 'speed_source'>): boolean {
   return t.speed === null || t.speed_source === 'official_pending' || t.speed_source === 'pending'
+}
+
+/** 列表一列的 aria-label：名稱＋哪些待驗證（字樣本身 aria-hidden） */
+function troopRowLabel(troop: TroopListItem, isZh: boolean, t: (k: string) => string): string {
+  const d = ingameUnitDisplay(troop.troop_id)
+  const parts = [isZh ? d?.text ?? troop.name_zh : troop.name_en]
+  if (isZh && d?.zhPending) parts.push(t('common.nameProvisional'))
+  if (isSpeedPending(troop)) parts.push(t('common.speedPending'))
+  return parts.join(isZh ? '，' : ', ')
 }
 
 export default function TroopsPage() {
@@ -163,10 +190,13 @@ export default function TroopsPage() {
           <h2 className="text-lg font-semibold mb-4">
             兵種列表 ({troops.length})
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-2" role="list">
             {troops.map((troop) => (
               <div
                 key={troop.troop_id}
+                role="listitem"
+                aria-label={troopRowLabel(troop, isZh, t)}
+                data-testid="troop-list-row"
                 className={`p-3 rounded cursor-pointer transition-colors ${
                   selectedTroop?.troop_id === troop.troop_id
                     ? 'bg-primary text-primary-foreground'
@@ -175,7 +205,7 @@ export default function TroopsPage() {
                 onClick={() => handleSelectTroop(troop)}
               >
                 <p className="font-medium">
-                  <TroopName troop={troop} isZh={isZh} />
+                  <TroopName troop={troop} isZh={isZh} variant="list" />
                 </p>
                 <p className="text-sm opacity-70">
                   ATK: {troop.attack} | DEF: {troop.defense_infantry}/
@@ -183,8 +213,7 @@ export default function TroopsPage() {
                 </p>
                 {isSpeedPending(troop) && (
                   <p className="text-sm opacity-70" data-testid="troop-list-speed">
-                    速度 {troop.speed ?? '—'}{' '}
-                    <PendingVerifyChip kind={troop.speed === null ? 'unitSpeedNoSource' : 'unitSpeedOfficialPending'} />
+                    速度 {troop.speed ?? '—'} <PendingLabel />
                   </p>
                 )}
               </div>
@@ -197,7 +226,7 @@ export default function TroopsPage() {
           {selectedTroop ? (
             <>
               <h2 className="text-2xl font-bold mb-2">
-                <TroopName troop={selectedTroop} isZh={isZh} />
+                <TroopName troop={selectedTroop} isZh={isZh} variant="title" />
               </h2>
               <p className="text-muted-foreground mb-4">
                 {isZh

@@ -918,7 +918,8 @@ NON_TS11_UNIT_NAMES = {
 # 斯巴達、維京的中文名是暫譯（官方說明頁沒有中文版）→ 畫面顯示「中文暫譯（官方英文名）」，中文部分標待驗證。
 # 英文名只用官方說明頁上逐字出現的寫法（evidence/official_support_2026-10-10.json 的 text，生成時檢查）：
 # 維京＝S139「Viking Units Overview」表（Heimdall’s Eye、Jarl 拿掉表上補充說明的「(Scout)」「(Administrator)」，
-# 兩個名字本身都逐字出現在 S139）；斯巴達步兵、騎兵 6 種＝S187 表頭；監察官＝S10「Ephor」。
+# 兩個名字本身都逐字出現在 S139；PM 核准，#35）；斯巴達步兵、騎兵 6 種＝S187 表頭；
+# 監察官＝官方說明頁 S10「Ephor」（S187 沒有監察官；PM 核准，#35）。
 # 斯巴達破城槌、弩炮、開拓者：官方說明頁（S10、S187、S3）都沒有寫英文名 → None，只顯示中文暫譯＋待驗證。
 OFFICIAL_EN_NAMES = {
     "thrall": ("Thrall", "s139"), "shield_maiden": ("Shield Maiden", "s139"),
@@ -990,8 +991,9 @@ def gen_ingame_names(speeds: dict) -> dict:
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "_source": "ts11 遊戲內說明頁（scripts/game_data/evidence/ts11_manual_2026-10-10.json）；"
                    "aliases 是以前用過的名字，只給搜尋用，不顯示；斯巴達、維京 zh 是暫譯（zh_pending），"
-                   "en 是官方說明頁 S139／S187／S10 的英文名（en_ref；evidence/official_support_2026-10-10.json），"
-                   "畫面顯示 display_zh",
+                   "en 是官方說明頁 S139／S187／S10 的英文名（en_ref；evidence/official_support_2026-10-10.json 的 "
+                   "unit_en_names），畫面顯示 display_zh。監察官 Ephor 取自官方 S10；S139 的 Heimdall’s Eye (Scout)、"
+                   "Jarl (Administrator) 拿掉括號裡的補充說明（兩項 PM 核准，#35）",
         "tribes": tribes, "buildings": buildings, "units": units,
     }
 
