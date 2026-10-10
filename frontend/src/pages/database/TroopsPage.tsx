@@ -31,12 +31,13 @@ const CATEGORIES: { value: TroopCategory | 'all'; label: string }[] = [
   { value: 'settler', label: '開拓者' },
 ]
 
-/** 官方頁數字取自第三方計算器的出處說明（P0-15，斯巴達步兵、騎兵）：兩行（P0-23 PM） */
-const OFFICIAL_PENDING_SOURCE_LINES = ['斯巴達的數字還沒核對', '出處：官方說明頁 S187，頁面上註明數字取自第三方'] as const
+/** 官方頁數字取自第三方計算器的出處說明（P0-15）：兩行（P0-23 PM）。斯巴達 2026-10-11 改在 ASIA x1 核對後，目前沒有兵種用到 */
+const OFFICIAL_PENDING_SOURCE_LINES = ['這個兵種的速度還沒核對', '出處：官方說明頁 S187，頁面上註明數字取自第三方'] as const
 
 /** 速度出處說明（P0-15）：只給已核對的速度用（ts11 遊戲內說明／官方說明）；待驗證的看灰標 */
 function speedSourceLabel(t: Pick<TroopDetail, 'speed_source' | 'speed_ref'>): string {
   if (t.speed_source === 'ts11') return 'ts11 遊戲內說明'
+  if (t.speed_source === 'asia_x1') return 'ASIA x1 遊戲內說明實測'
   if (t.speed_source === 'official') return '官方說明'
   return ''
 }
@@ -59,8 +60,8 @@ function PendingLabel() {
 }
 
 /**
- * 兵種名稱（中文）：斯巴達、維京顯示「中文暫譯（官方英文名）」＋待驗證（中文是暫譯）；
- * 其他族是 ts11 遊戲內名稱。英文畫面只顯示英文名，不標。
+ * 兵種名稱（中文）：維京顯示「中文暫譯（官方英文名）」＋待驗證（中文是暫譯）；
+ * 其他族是遊戲內名稱（斯巴達是 ASIA x1 遊戲內名稱）。英文畫面只顯示英文名，不標。
  * title：詳情標題旁可點的灰標；list：列表裡不能點的字樣
  */
 function TroopName({ troop, isZh, variant }: { troop: Pick<TroopListItem, 'troop_id' | 'name_zh' | 'name_en'>; isZh: boolean; variant: 'list' | 'title' }) {
@@ -105,8 +106,8 @@ export default function TroopsPage() {
 
   const isZh = i18n.language.startsWith('zh')
   const carryPending = selectedTroop ? carryPendingTribe(selectedTroop.troop_id) : null
-  const spartanCarry = (carryPending ?? selectedTroop?.tribe) === 'spartans'
-  const carryKind: PendingKind = spartanCarry ? 'spartanCarry' : 'vikingCarry'
+  // 運載量留空的只有維京（斯巴達 2026-10-11 在 ASIA x1 核對過）
+  const carryKind: PendingKind = 'vikingCarry'
 
   useEffect(() => {
     const fetchTroops = async () => {
@@ -305,7 +306,7 @@ export default function TroopsPage() {
                         <td className="py-2 text-muted-foreground">類型</td>
                         <td className="py-2 text-right">{t(`database.troops.category.${selectedTroop.category}`, { defaultValue: selectedTroop.category })}</td>
                       </tr>
-                      {/* 斯巴達、維京運載量：官方說明頁沒有 → 留空（null，P0-23 PM）：顯示「—」、灰標緊跟在後；說明畫在這一列下面 */}
+                      {/* 維京運載量：官方說明頁沒有 → 留空（null，P0-23 PM）：顯示「—」、灰標緊跟在後；說明畫在這一列下面 */}
                       <PendingRow as="tr" className="border-b" tableColSpan={2} data-testid="troop-carry-row">
                         <td className="py-2 text-muted-foreground">運載量</td>
                         <td className="py-2 text-right" data-testid="troop-carry">

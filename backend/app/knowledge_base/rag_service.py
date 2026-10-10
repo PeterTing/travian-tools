@@ -36,7 +36,7 @@ _MARKDOWN_TOPICS: dict[str, str] = {
 
 
 def _carry_text(capacity: int | None) -> str:
-    """運載量文字；None（斯巴達、維京還沒核對）不寫數字也不寫 0."""
+    """運載量文字；None（維京還沒核對）不寫數字也不寫 0."""
     if capacity is None:
         return "還沒核對（官方說明頁沒有），先不提供"
     return str(capacity)

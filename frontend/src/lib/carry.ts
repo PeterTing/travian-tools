@@ -1,5 +1,5 @@
 /**
- * 運載量加總（P0-23 PM／設計師）：斯巴達、維京的運載量還沒核對，是 null（留空）。
+ * 運載量加總（P0-23 PM／設計師）：維京的運載量還沒核對，是 null（留空）；斯巴達 2026-10-11 在 ASIA x1 核對過。
  * 任何一個選到的兵種運載量是 null，總運載量和收益都「無法計算」——不算部分加總、不當 0。
  */
 import type { PendingKind } from '@/lib/pendingNotes'
@@ -8,7 +8,7 @@ export interface CarryPick {
   tribe: string
   /** 遊戲內中文名 */
   nameZh: string
-  /** null＝還沒核對（斯巴達、維京） */
+  /** null＝還沒核對（維京） */
   carry: number | null
   count: number
 }
@@ -23,7 +23,7 @@ export function totalCarry(picks: readonly CarryPick[]): CarryTotal {
   return { ok: true, total: picks.reduce((sum, p) => sum + (p.carry as number) * p.count, 0) }
 }
 
-/** 原因那一行用的部族短名（只有斯巴達、維京會是 null） */
+/** 原因那一行用的部族短名（目前只有維京會是 null；斯巴達留著，萬一又有留空的兵種） */
 const TRIBE_SHORT: Record<string, string> = { spartans: '斯巴達', vikings: '維京' }
 const tribeShort = (tribe: string) => TRIBE_SHORT[tribe] ?? tribe
 
@@ -41,9 +41,9 @@ export function missingCarryReason(missing: readonly { tribe: string; nameZh: st
 export function missingCarryKinds(missing: readonly { tribe: string }[]): PendingKind[] {
   const kinds: PendingKind[] = []
   for (const m of missing) {
-    const isSpartan = m.tribe === 'spartans'
-    const k: PendingKind = isSpartan ? 'spartanCarry' : 'vikingCarry'
-    if (!kinds.includes(k)) kinds.push(k)
+    // 斯巴達運載量 2026-10-11 在 ASIA x1 核對過，不會留空；留空的只有維京
+    const k: PendingKind = 'vikingCarry'
+    if (m.tribe === 'vikings' && !kinds.includes(k)) kinds.push(k)
   }
   return kinds
 }

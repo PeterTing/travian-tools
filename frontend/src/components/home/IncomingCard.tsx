@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { ROUTES } from '@/constants/routes'
 import { movementKindLabel } from '@/lib/pasteFormat'
 import { serverAndLocal } from '@/lib/serverTime'
@@ -99,11 +98,10 @@ export default function IncomingCard({ movements, villageName, utcOffset, now, b
           </>
         )}
       </p>
-      <PendingRow as="p" className="mt-1 text-sm text-amber-800" data-testid="incoming-ts-line">
+      {/* 反推 TS 用到兵種速度：斯巴達 2026-10-11 在 ASIA x1 核對後全部兵種速度都有第一手出處，不再放待驗證（TICKETS P0-15） */}
+      <p className="mt-1 text-sm text-amber-800" data-testid="incoming-ts-line">
         ⚠ {t('home.incomingCard.noLastSeen')}
-        {/* 反推 TS 用到兵種速度：只在這裡放一個待驗證（TICKETS P0-15） */}
-        <PendingVerifyChip className="ml-1" kind="spartanSpeed" />
-      </PendingRow>
+      </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
         <Link

@@ -2,8 +2,7 @@ import { useState } from 'react'
 import {
   DATA_UPDATE_PREF_KEY,
   DATA_UPDATE_TITLE,
-  DATA_UPDATE_VISIBLE,
-  dataUpdateItemsFor,
+  dataUpdateSections,
   shouldShowDataUpdate,
   type DataUpdateItem,
 } from '@/lib/dataUpdate'
@@ -44,7 +43,7 @@ function Item({ it }: { it: DataUpdateItem }) {
 }
 
 /**
- * 首頁資料更新卡：淺灰資訊卡，前 3 項直接看到，超過 3 項時「再看 N 項」展開其餘。
+ * 首頁資料更新卡：淺灰資訊卡，前 3 項直接看到，其餘（超過 3 項的、標 expandedOnly 的）按「再看 N 項」展開。
  * 卡片最高半個螢幕（內容多就卡片裡捲動），有來襲時來襲卡在上面。
  */
 /** serverSpeed：目前世界的倍速，決定 x3 以上才有的項目要不要顯示 */
@@ -52,9 +51,7 @@ export default function DataUpdateCard({ now, serverSpeed }: { now?: Date; serve
   const [show, setShow] = useState(() => shouldShowDataUpdate(now))
   const [expanded, setExpanded] = useState(false)
   if (!show) return null
-  const items = dataUpdateItemsFor(serverSpeed)
-  const first = items.slice(0, DATA_UPDATE_VISIBLE)
-  const rest = items.slice(DATA_UPDATE_VISIBLE)
+  const { first, rest } = dataUpdateSections(serverSpeed)
   return (
     <section
       className="max-h-[50vh] overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-800"

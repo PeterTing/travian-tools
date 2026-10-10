@@ -6,19 +6,21 @@
  *
  * 出處：
  * - ts11：在 ts11 遊戲內說明（兵種說明頁 manual/troop/N）讀到的數值
+ * - asia_x1：斯巴達（ts11 沒有），在 ASIA x1 遊戲內說明讀到的數值（2026-10-11，
+ *   scripts/game_data/evidence/asia_x1_manual_spartans_2026-10-11.json）
  * - official：support.travian.com 官方文章（ref 是網址）
- * - official_pending：官方說明頁，但頁面寫數字取自第三方計算器（斯巴達步兵、騎兵）；
- *   數字保留、畫面標「待驗證」、不列入反推 TS
+ * - official_pending：官方說明頁，但頁面寫數字取自第三方計算器；
+ *   數字保留、畫面標「待驗證」、不列入反推 TS（斯巴達改在 ASIA x1 核對後，目前沒有兵種用到）
  * - pending：還沒有第一手出處，速度是 null，畫面標「待驗證」
  * 遊戲內說明跟官方頁不一致時，以遊戲內為準（匈奴僱傭兵 6）。
  */
 import gen from './unitSpeeds.gen.json'
 
-export type UnitSpeedSource = 'ts11' | 'official' | 'official_pending' | 'pending'
+export type UnitSpeedSource = 'ts11' | 'asia_x1' | 'official' | 'official_pending' | 'pending'
 
-/** 有第一手出處（ts11 遊戲內說明或官方文章）；其餘畫面標「待驗證」 */
+/** 有第一手出處（ts11／ASIA x1 遊戲內說明或官方文章）；其餘畫面標「待驗證」 */
 export function isSpeedVerified(source: UnitSpeedSource): boolean {
-  return source === 'ts11' || source === 'official'
+  return source === 'ts11' || source === 'asia_x1' || source === 'official'
 }
 export type SpeedTribeId = 'romans' | 'teutons' | 'gauls' | 'egyptians' | 'huns' | 'spartans' | 'vikings'
 
@@ -34,16 +36,17 @@ export interface UnitSpeedRow {
   source: UnitSpeedSource
   /** manual/troop/N 或官方網址；pending 是 null */
   ref: string | null
-  /** ts11 遊戲內說明頁讀到的其他數字（P0-18）；沒讀到的兵種是 null（維持舊資料、顯示待驗證） */
+  /** 遊戲內說明頁讀到的其他數字（P0-18；斯巴達是 ASIA x1）；沒讀到的兵種是 null（維持舊資料、顯示待驗證） */
   stats: UnitTs11Stats | null
-  /** 運載量（唯一一份，後端 troops.json 同一次產生；P0-23）；null＝還沒核對（斯巴達、維京），不能當 0 */
+  /** 運載量（唯一一份，後端 troops.json 同一次產生；P0-23）；null＝還沒核對（維京），不能當 0 */
   carry: number | null
-  /** ts11＝遊戲內說明；pending＝沒有官方或 ts11 數字，留空 */
+  /** ts11／asia_x1＝遊戲內說明；pending＝沒有官方或遊戲內數字，留空 */
   carrySource: UnitCarrySource
   carryRef: string | null
 }
 
-export type UnitCarrySource = 'ts11' | 'pending'
+/** two_sources：官方沒寫、兩份互相獨立的社群來源數字一致（2026-10-11 幕僚長規則）；目前沒有兵種用到（維京退回待驗證） */
+export type UnitCarrySource = 'ts11' | 'asia_x1' | 'two_sources' | 'pending'
 
 export interface UnitTs11Stats {
   /** 遊戲內中文名稱 */
@@ -134,12 +137,23 @@ export function unitCarrySource(troopId: string): UnitCarrySource | undefined {
   return undefined
 }
 
-/** 運載量留空（斯巴達、維京，還沒核對）時回那一族，畫面標「待驗證」；ts11 或找不到回 null（P0-23） */
-export function carryPendingTribe(troopId: string): 'spartans' | 'vikings' | null {
-  for (const [tribe, rows] of Object.entries(TRIBES)) {
+/**
+ * 不會去搶資源的兵種（設計師，#43 第 4 輪）：開拓者（第 10 格）。它的運載量留空不影響「運載量待驗證」那句話。
+ * 偵察兵、攻城、行政長官的運載量都是 0 而且已核對，所以不用列。
+ */
+export const NON_RAIDING_SLOTS: readonly number[] = [10]
+
+/** 還有沒有「會搶資源」的維京兵種運載量留空（待驗證）；(k) 那一行的字、資料更新卡 (a) 照這個換。開拓者不算 */
+export function vikingCarryPending(rows: readonly { slot: number; carry_source: string }[] = TRIBES.vikings ?? []): boolean {
+  return rows.some((r) => r.carry_source === 'pending' && !NON_RAIDING_SLOTS.includes(r.slot))
+}
+
+/** 運載量留空（維京，還沒核對）時回那一族，畫面標「待驗證」；有遊戲內數字或找不到回 null（P0-23） */
+export function carryPendingTribe(troopId: string): 'vikings' | null {
+  for (const rows of Object.values(TRIBES)) {
     const r = rows.find((x) => x.troop_id === troopId)
-    if (!r || r.carry_source === 'ts11') continue
-    return tribe === 'spartans' ? 'spartans' : 'vikings'
+    if (!r || r.carry_source !== 'pending') continue
+    return 'vikings'
   }
   return null
 }

@@ -46,6 +46,10 @@ Unit speed provenance ("source" field in UNIT_SPEEDS):
   ts11     = read on our ts11 x1 server from the in-game help (Travian.Game.Manual,
              GET /api/v1/manual/troop/N); raw text kept in
              scripts/game_data/evidence/ts11_manual_troop_speed_2026-10-09.json
+  asia_x1  = read on the ASIA x1 server (rog.x1.asia.travian.com, a world that
+             offers Spartans) from the in-game help, 2026-10-11; values, read
+             conditions and screenshot SHA-256 in
+             scripts/game_data/evidence/asia_x1_manual_spartans_2026-10-11.json
   official = support.travian.com article (URL in UNIT_SPEED_SOURCES)
   official_pending = number from an official page that itself says its numbers
              come from a third-party calculator (S187) -> value kept, but shown
@@ -167,6 +171,45 @@ TS11_MANUAL_EVIDENCE = ROOT / "scripts/game_data/evidence/ts11_manual_troop_spee
 # P0-18: 兵種花費／攻防／運載量／糧耗／訓練時間，ts11 遊戲內說明頁原文解析（2026-10-10 唯讀擷取）
 TS11_MANUAL_STATS = ROOT / "scripts/game_data/evidence/ts11_manual_2026-10-10.json"
 FRONTEND_COST_VERIFIED = ROOT / "frontend/src/data/unitCostVerified.json"
+# ts11 沒有斯巴達：斯巴達 10 種兵改在可以選斯巴達的 ASIA x1 讀遊戲內說明（2026-10-11，有截圖 SHA-256）
+ASIA_X1_SPARTANS = ROOT / "scripts/game_data/evidence/asia_x1_manual_spartans_2026-10-11.json"
+
+
+# ASIA x1 是 Rise of Governors 年度特別世界：查一次官方 S187＋社群兩份（PM 規則：查一次就下結論），
+# 數字不同的欄位只當 RoG 世界的數字，一般世界保留待驗證
+CROSSCHECK = ROOT / "scripts/game_data/evidence/crosscheck_spartans_vikings_2026-10-11.json"
+
+
+def _crosscheck() -> dict:
+    return json.loads(CROSSCHECK.read_text(encoding="utf-8"))
+
+
+def spartan_rog_only() -> dict[str, dict]:
+    """be_id → 跟社群資料不一樣（只確定 RoG 世界成立）的欄位；重新比一次，結論要跟 evidence 寫的一樣."""
+    xc = _crosscheck()
+    asia = _asia_x1_spartans()
+    sw = xc["sources"]["siegewise_spartans"]["units"]
+    fd = xc["sources"]["fandom_spartans"]["units"]
+    found: dict[str, list[str]] = {}
+    for a in asia.values():
+        n = a["name_en"]
+        bad = [k for k in ("attack", "def_inf", "def_cav", "speed", "carry", "upkeep")
+               if sw[n][k] != a[k] or fd[n][k] != a[k]]
+        if fd[n]["cost"] != a["cost"] or sw[n]["total_cost"] != sum(a["cost"]):
+            bad.append("cost")
+        if sw[n]["train_time_s"] != a["train_time_s"]:
+            bad.append("train_time")
+        if bad:
+            found[n] = bad
+    rog = xc["conclusions"]["spartans"]["rog_only"]
+    en_to_id = {"Ballista": "ballista", "Ephor": "ephor"}
+    assert {en_to_id[n]: f for n, f in found.items()} == {k: [v["field"]] for k, v in rog.items()}, found
+    return rog
+
+
+def _asia_x1_spartans() -> dict[str, dict]:
+    """ASIA x1 說明頁斯巴達 1..10（遊戲順序）→ 抄錄的數字."""
+    return json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))["troops"]
 
 
 def _ts11_stats() -> dict[str, dict]:
@@ -177,23 +220,55 @@ def _ts11_stats() -> dict[str, dict]:
 
 UNIT_SPEED_SOURCES = {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-09 讀取",
+    "asia_x1": "ASIA x1 遊戲內說明實測（說明 → 建築與兵種 → 斯巴達），2026-10-11 讀取",
     "s139": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
     "s187": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
 }
 TRIBE_ORDER = ["romans", "teutons", "gauls", "egyptians", "huns", "spartans", "vikings"]
 
-# 運載量（唯一一份，前後端都從產生檔讀；P0-23）。5 族照 ts11 遊戲內說明頁（evidence/ts11_manual_2026-10-10.json）。
-# 斯巴達、維京沒有官方或 ts11 的運載量：官方說明頁 S10、S187（Capacity 是兵營／馬廄格數，不是運載量）、
-# S139 都沒有這一欄 → PM 決定（#34）：這兩族 10 種兵的運載量一律留空（null），不放社群整理或推估的數字；
-# 畫面顯示「—」＋「待驗證」，用到運載量的計算顯示「無法計算」，不能當 0。
+# 運載量（唯一一份，前後端都從產生檔讀；P0-23）。5 族照 ts11 遊戲內說明頁（evidence/ts11_manual_2026-10-10.json），
+# 斯巴達照 ASIA x1 遊戲內說明頁（evidence/asia_x1_manual_spartans_2026-10-11.json）。
+# 維京沒有官方或遊戲內的運載量：官方說明頁 S139 沒有這一欄，現在也沒有可以選維京的世界。以前（#34 PM）一律留空；
+# 2026-10-11 第 3 輪曾改用兩份一致的社群數字（two_sources）；第 5 輪幕僚長決定：出處不明，退回待驗證（又是一律留空）。
+# 留空（null）的寫法還在：畫面顯示「—」＋「待驗證」，用到運載量的計算顯示「無法計算」，不能當 0。
 CARRY_SOURCES = {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-10 讀取",
+    "asia_x1": "ASIA x1 遊戲內說明實測（說明 → 建築與兵種 → 斯巴達），2026-10-11 讀取",
+    "two_sources": "出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）",
 }
-CARRY_EMPTY_TRIBES = ("spartans", "vikings")
+# 維京運載量（2026-10-11 幕僚長）：官方沒寫；Fandom、Siegewise 沒辦法證明互相獨立（Siegewise 運載量出處不明）
+# → 出處不明，退回待驗證（evidence/crosscheck_spartans_vikings_2026-10-11.json viking_carry_independence.final_decision）。
+# two_sources 的寫法留著：以後真的有兩份獨立來源，再把維京放回 CARRY_TWO_SOURCE_TRIBES
+CARRY_EMPTY_TRIBES: tuple[str, ...] = ("vikings",)
+CARRY_TWO_SOURCE_TRIBES: tuple[str, ...] = ()
+# 第 4 輪（PM）：維京開拓者只有 Siegewise 有數字（Fandom 那列抄錯），不算兩份一致 → 留空、待驗證
+CARRY_PENDING_UNITS = ("viking_settler",)
+
+
+def viking_carry_two_sources() -> dict[str, int]:
+    """be_id → 運載量：Fandom、Siegewise 重新比一次（前 9 種；開拓者留空，見 CARRY_PENDING_UNITS）."""
+    xc = _crosscheck()
+    ind = xc["viking_carry_independence"]
+    assert ind["conclusion"] == "independent"
+    assert not ind["fandom"]["cites_siegewise"] and not ind["siegewise"]["cites_fandom"]
+    sw = xc["sources"]["siegewise_vikings"]["units"]
+    fd = xc["sources"]["fandom_vikings"]["units"]
+    sw_names = ["Thrall", "Shield Maiden", "Berserker", "Heimdalls Eye", "Huskarl Rider",
+                "Valkyrie’s Blessing", "Ram", "Catapult", "Jarl"]
+    fd_names = ["Thrall", "Shield Maiden", "Berserker", "Heimdall's Eye", "Huskall Rider",
+                "Valkyrie's Blessing", "Ram", "Catapult", "Jarl"]
+    out = {}
+    for be_id, a, b in zip(ind["agree"], sw_names, fd_names, strict=True):
+        assert sw[a]["carry"] == fd[b]["carry"] == ind["agree"][be_id], (be_id, sw[a]["carry"], fd[b]["carry"])
+        out[be_id] = sw[a]["carry"]
+    # 開拓者：只有 Siegewise 一份（3000），Fandom 那列是抄錯的衝撞車列 → 不放進來（CARRY_PENDING_UNITS）
+    assert sw["Settler"]["carry"] == ind["settler"]["siegewise"] == 3000
+    return out
 
 # One row per unit, game order t1..t10:
 #   (troops.json id, frontend id, knowledge_base/tribes.py key, speed, source, ref)
-# ref = in-game manual troop number for "ts11", UNIT_SPEED_SOURCES key for "official".
+# ref = in-game manual troop number for "ts11", Spartan slot 1..10 for "asia_x1",
+# UNIT_SPEED_SOURCES key for "official".
 UNIT_SPEEDS: dict[str, list[tuple]] = {
     "romans": [
         ("legionnaire", "legionnaire", "legionnaire", 6, "ts11", 1),
@@ -255,21 +330,20 @@ UNIT_SPEEDS: dict[str, list[tuple]] = {
         ("logades", "logades", "logades", 5, "ts11", 69),
         ("hun_settler", "settler", "settler", 5, "ts11", 70),
     ],
-    # ts11 has no Spartans. S187 lists infantry + cavalry only, and says its
-    # numbers come from a third-party calculator -> official_pending (value kept,
-    # 「待驗證」, not used by reverse TS). Siege, Ephor and settler have no
-    # official source yet -> null / 「待驗證」.
+    # ts11 has no Spartans: read on ASIA x1 in-game help (2026-10-11,
+    # evidence/asia_x1_manual_spartans_2026-10-11.json). t1..t6 equal the S187
+    # numbers we used before; siege, Ephor and settler had no source until now.
     "spartans": [
-        ("hoplite", "hoplite", "hoplite", 6, "official_pending", "s187"),
-        ("sentinel", "sentinel", "sentinel", 9, "official_pending", "s187"),
-        ("shieldsman", "shieldsman", "shieldsman", 8, "official_pending", "s187"),
-        ("twinsteel_therion", "twinsteel", "twirler", 6, "official_pending", "s187"),
-        ("elpida_rider", "elpida", "elpida_rider", 16, "official_pending", "s187"),
-        ("corinthian_crusher", "corinthian", "corinthian_crusher", 9, "official_pending", "s187"),
-        ("spartan_ram", "ram", "ram", None, "pending", None),
-        ("ballista", "ballista", "catapult", None, "pending", None),
-        ("ephor", "ephor", "ephor", None, "pending", None),
-        ("spartan_settler", "settler", "settler", None, "pending", None),
+        ("hoplite", "hoplite", "hoplite", 6, "asia_x1", 1),
+        ("sentinel", "sentinel", "sentinel", 9, "asia_x1", 2),
+        ("shieldsman", "shieldsman", "shieldsman", 8, "asia_x1", 3),
+        ("twinsteel_therion", "twinsteel", "twirler", 6, "asia_x1", 4),
+        ("elpida_rider", "elpida", "elpida_rider", 16, "asia_x1", 5),
+        ("corinthian_crusher", "corinthian", "corinthian_crusher", 9, "asia_x1", 6),
+        ("spartan_ram", "ram", "ram", 4, "asia_x1", 7),
+        ("ballista", "ballista", "catapult", 3, "asia_x1", 8),
+        ("ephor", "ephor", "ephor", 4, "asia_x1", 9),
+        ("spartan_settler", "settler", "settler", 5, "asia_x1", 10),
     ],
     # ts11 has no Vikings: official "Viking Units Overview" table (S139).
     "vikings": [
@@ -715,14 +789,35 @@ def gen_frontend(buildings: dict, cp: dict) -> dict:
     }
 
 
+def _stats_row(st: dict, ref: str) -> dict:
+    return {
+        "name_zh": st["name_zh"],
+        "cost": st["cost"],
+        "attack": st["attack"],
+        "def_inf": st["def_inf"],
+        "def_cav": st["def_cav"],
+        "carry": st["carry"],
+        "upkeep": st["upkeep"],
+        "train_time": st["train_time_s"],
+        "ref": ref,
+    }
+
+
+def asia_x1_ref(slot: int) -> str:
+    return f"asia_x1/help/spartans/{slot}"
+
+
 def gen_unit_speeds() -> dict:
     stats = _ts11_stats()
+    asia = _asia_x1_spartans()
     tribes = {}
     for tribe in TRIBE_ORDER:
         rows = []
         for slot, (be_id, fe_id, kb_id, speed, src, ref) in enumerate(UNIT_SPEEDS[tribe], start=1):
             if src == "ts11":
                 ref_text = f"manual/troop/{ref}"
+            elif src == "asia_x1":
+                ref_text = asia_x1_ref(ref)
             elif src in ("official", "official_pending"):
                 ref_text = UNIT_SPEED_SOURCES[ref]
             else:
@@ -730,7 +825,34 @@ def gen_unit_speeds() -> dict:
             row = {"slot": slot, "troop_id": be_id, "fe_id": fe_id, "kb_id": kb_id,
                    "speed": speed, "source": src, "ref": ref_text, "stats": None}
             st = stats.get(str(ref)) if src == "ts11" else None
-            if tribe in CARRY_EMPTY_TRIBES:
+            if src == "asia_x1":
+                a = asia[str(ref)]
+                # 說明頁的速度要跟速度表一樣；步兵、騎兵 6 種也要跟以前用的官方 S187 一樣
+                assert a["speed"] == speed, (tribe, be_id, a["speed"], speed)
+                if slot <= 6:
+                    assert S187_SPEED[tribe][slot - 1] == speed, (tribe, be_id)
+                row["carry"] = a["carry"]
+                row["carry_source"] = "asia_x1"
+                row["carry_ref"] = asia_x1_ref(ref)
+                row["stats"] = _stats_row(a, asia_x1_ref(ref))
+                rog = spartan_rog_only().get(be_id)
+                if rog:
+                    assert rog["asia_x1_s"] == a["train_time_s"], be_id
+                    row["stats"]["train_time_rog_only"] = {
+                        "community": rog["community_s"],
+                        "community_ref": _crosscheck()["sources"][rog["community_source"]]["url"],
+                    }
+                rows.append(row)
+                continue
+            if be_id in CARRY_PENDING_UNITS:
+                row["carry"] = None
+                row["carry_source"] = "pending"
+                row["carry_ref"] = None
+            elif tribe in CARRY_TWO_SOURCE_TRIBES:
+                row["carry"] = viking_carry_two_sources()[be_id]
+                row["carry_source"] = "two_sources"
+                row["carry_ref"] = "fandom+siegewise"
+            elif tribe in CARRY_EMPTY_TRIBES:
                 row["carry"] = None
                 row["carry_source"] = "pending"
                 row["carry_ref"] = None
@@ -742,35 +864,28 @@ def gen_unit_speeds() -> dict:
             if st:
                 # 說明頁的速度要跟速度表一樣（速度表 2026-10-09 讀的，這次 10-10 再讀一次）
                 assert st["speed"] == speed, (tribe, be_id, st["speed"], speed)
-                row["stats"] = {
-                    "name_zh": st["name_zh"],
-                    "cost": st["cost"],
-                    "attack": st["attack"],
-                    "def_inf": st["def_inf"],
-                    "def_cav": st["def_cav"],
-                    "carry": st["carry"],
-                    "upkeep": st["upkeep"],
-                    "train_time": st["train_time_s"],
-                    "ref": f"manual/troop/{ref}",
-                }
+                row["stats"] = _stats_row(st, f"manual/troop/{ref}")
             rows.append(row)
         tribes[tribe] = rows
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "unit": "fields/hour, x1, base speed (no Tournament Square / artefact / hero bonus)",
         "sources": {"ts11": UNIT_SPEED_SOURCES["ts11"],
+                    "asia_x1": UNIT_SPEED_SOURCES["asia_x1"],
                     "official": [UNIT_SPEED_SOURCES["s139"], UNIT_SPEED_SOURCES["s187"]],
                     "official_pending": "官方說明頁，數字標示取自第三方計算器（待驗證，不列入反推 TS）",
                     "pending": "沒有第一手出處，速度留空（待驗證）"},
         "carry_sources": {"ts11": CARRY_SOURCES["ts11"],
-                          "pending": "沒有官方或 ts11 的運載量，留空（null，待驗證）"},
+                          "asia_x1": CARRY_SOURCES["asia_x1"],
+                          **({"two_sources": CARRY_SOURCES["two_sources"]} if CARRY_TWO_SOURCE_TRIBES else {}),
+                          "pending": "沒有官方或遊戲內的運載量，留空（null，待驗證）"},
         "tribes": tribes,
     }
 
 
 def gen_troops(current: dict, speeds: dict) -> dict:
     """Rewrite speed / speed_source / speed_ref, and — for units read from the ts11
-    in-game help (P0-18) — name_zh, cost, attack/defence, carry, upkeep, training
+    in-game help (P0-18) or, for Spartans, the ASIA x1 in-game help — name_zh, cost, attack/defence, carry, upkeep, training
     time + stats_source / stats_ref. Units without ts11 stats keep their old numbers."""
     out = json.loads(json.dumps(current))
     troops = out["troops"]
@@ -789,6 +904,7 @@ def gen_troops(current: dict, speeds: dict) -> dict:
                     rebuilt["speed_ref"] = r["ref"]
             rebuilt.pop("stats_source", None)
             rebuilt.pop("stats_ref", None)
+            rebuilt.pop("training_time_pending_normal_worlds", None)
             # 運載量全部照產生的那一份（前端讀同一份）
             rebuilt["carry_capacity"] = r["carry"]
             st = r.get("stats")
@@ -805,11 +921,15 @@ def gen_troops(current: dict, speeds: dict) -> dict:
                     crop_consumption=st["upkeep"],
                     training_time_base=st["train_time"],
                 )
-                rebuilt["stats_source"] = "ts11"
+                rebuilt["stats_source"] = "asia_x1" if r["source"] == "asia_x1" else "ts11"
                 rebuilt["stats_ref"] = st["ref"]
+
             else:
                 rebuilt["stats_source"] = "pending"
                 rebuilt["stats_ref"] = None
+            if st and st.get("train_time_rog_only"):
+                # 只在 RoG 年度特別世界（ASIA x1）讀到；社群資料（一般世界）是另一個數字 → 一般世界待驗證
+                rebuilt["training_time_pending_normal_worlds"] = st["train_time_rog_only"]
             troops[r["troop_id"]] = rebuilt
     return out
 
@@ -839,11 +959,16 @@ def apply_s139_vikings(troops: dict, speeds: dict) -> None:
 
 
 def gen_cost_verified(speeds: dict) -> dict:
-    """部族的 10 種兵都讀到 ts11 說明頁才算核對過（P0-18）；ts11 沒有斯巴達／維京 → false."""
+    """部族的 10 種兵都讀到遊戲內說明頁才算核對過（P0-18）；斯巴達在 ASIA x1 讀，維京照官方 S139."""
     return {
-        "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在 ts11 遊戲內說明頁讀到（evidence/ts11_manual_2026-10-10.json）才是 true；ts11 是 5 族伺服器：維京照官方說明頁 S139 的兵種表（evidence/official_support_2026-10-10.json）是 true，斯巴達只有標示第三方計算器的 S187，維持 false（兵種詳情顯示「待驗證」）。",
+        "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在遊戲內說明頁讀到才是 true：5 族在 ts11（evidence/ts11_manual_2026-10-10.json），斯巴達在 ASIA x1（evidence/asia_x1_manual_spartans_2026-10-11.json）；維京照官方說明頁 S139 的兵種表（evidence/official_support_2026-10-10.json）是 true。",
         "tribes": {t: all(r["stats"] for r in speeds["tribes"][t]) for t in ["romans", "gauls", "teutons", "huns", "egyptians", "spartans"]}
         | {"vikings": len(_s139_units()) == 10},
+        "_rog_only_note": "ASIA x1 是 Rise of Governors 年度特別世界。下面這些兵種的訓練時間跟社群資料（一般世界）不一樣（evidence/crosscheck_spartans_vikings_2026-10-11.json）：數字照 ASIA x1，但一般世界待驗證。",
+        "train_time_rog_only": {
+            r["troop_id"]: {"asia_x1": r["stats"]["train_time"], **r["stats"]["train_time_rog_only"]}
+            for r in speeds["tribes"]["spartans"] if r["stats"].get("train_time_rog_only")
+        },
     }
 
 
@@ -879,9 +1004,14 @@ TRIBE_MANUAL_REF = {"romans": 1, "teutons": 11, "gauls": 21, "egyptians": 51, "h
 TRIBE_ALIASES = {"romans": ["羅馬"], "teutons": ["條頓", "條頓人", "日耳曼"], "gauls": ["高盧"],
                  "egyptians": ["埃及"], "huns": ["匈奴人"]}
 # ts11 是 5 族伺服器，沒有斯巴達、維京的遊戲內名稱
-TRIBE_NO_INGAME = {"spartans": "斯巴達人", "vikings": "維京人"}
+# 斯巴達人：ASIA x1 繁中說明頁讀到（evidence raw_zh.tribe_zh，2026-10-11）；維京沒有遊戲內名稱
+TRIBE_NO_INGAME = {"vikings": "維京人"}
 
 UNIT_ALIASES = {
+    # 斯巴達（ASIA x1 遊戲內名稱，2026-10-11）：以前的暫譯只留給搜尋
+    "hoplite": ["重裝步兵"], "shieldsman": ["盾兵"], "twinsteel_therion": ["雙刃獸戰士", "旋鏢兵"],
+    "elpida_rider": ["希望騎士", "厄爾皮達騎兵"], "corinthian_crusher": ["科林斯粉碎者"],
+    "spartan_ram": ["攻城槌"], "ballista": ["弩炮", "弩砲"], "ephor": ["監察官"],
     "legionnaire": ["軍團兵"], "equites_legati": ["使節騎兵", "使者騎兵"],
     "equites_imperatoris": ["帝國騎兵"], "equites_caesaris": ["凱撒騎兵"],
     "roman_ram": ["攻城槌"], "fire_catapult": ["火焰投石車"], "senator": ["元老"],
@@ -897,20 +1027,14 @@ UNIT_ALIASES = {
     "steppe_rider": ["草原騎兵"], "hun_ram": ["攻城槌"], "hun_catapult": ["投石車"], "logades": ["領袖", "洛加德"],
 }
 SETTLER_ALIASES = ["拓荒者", "移民", "定居者"]
-# 斯巴達、維京沒有遊戲內名稱（ts11 是 5 族伺服器）；攻城武器、開拓者跟其他族同英文名的，比照遊戲內用詞。
-# PM 規則（#34）：用官方說明頁 S139（維京）、S187（斯巴達）的繁體中文名；官方說明頁沒有中文版
+# 維京沒有遊戲內名稱（ts11 是 5 族伺服器，現在也沒有可以選維京的世界）；斯巴達改用 ASIA x1 遊戲內名稱（上面 UNIT_ALIASES 放舊暫譯）。
+# 攻城武器、開拓者跟其他族同英文名的，比照遊戲內用詞。
+# PM 規則（#34）：用官方說明頁 S139（維京）的繁體中文名；官方說明頁沒有中文版
 # （support.travian.com 只有 en/de/fr/es/it/pl/pt/ru/tr/cs/ar），所以其他兵種維持目前兵種資料庫的名稱，
 # 計算器、攻略以前用的另一個名字只放 aliases 給搜尋用。
 NON_TS11_UNIT_NAMES = {
     "viking_ram": ("破城槌", ["攻城槌"]), "viking_catapult": ("弩炮", ["投石車"]),
-    "viking_settler": ("開拓者", SETTLER_ALIASES), "spartan_ram": ("破城槌", ["攻城槌"]),
-    "spartan_settler": ("開拓者", SETTLER_ALIASES),
-    "hoplite": ("重裝步兵", ["裝甲步兵"]), "sentinel": ("哨兵", []),
-    "shieldsman": ("盾兵", ["盾牌手"]), "twinsteel_therion": ("雙刃獸戰士", ["雙鋼泰瑞恩", "旋鏢兵"]),
-    "elpida_rider": ("希望騎士", ["爾必達騎士", "厄爾皮達騎兵"]),
-    "corinthian_crusher": ("科林斯粉碎者", ["科林斯破壞者"]),
-    # 弩炮：照 ts11 的寫法（manual/troop/18、68 都寫「弩炮」；#34 PM 決定統一），「弩砲」只留給搜尋
-    "ballista": ("弩炮", ["弩砲", "賴達投石機"]), "ephor": ("監察官", ["五長官"]),
+    "viking_settler": ("開拓者", SETTLER_ALIASES),
     "thrall": ("奴僕", ["奴隸"]), "shield_maiden": ("盾女", ["鋼盾少女"]),
     "berserker": ("狂戰士", []), "heimdalls_eye": ("海姆達爾之眼", []),
     "huskarl_rider": ("侍衛騎士", ["禁衛軍騎士", "胡斯卡爾騎士"]),
@@ -918,23 +1042,18 @@ NON_TS11_UNIT_NAMES = {
     "jarl": ("領主", ["首領", "雅爾"]),
 }
 
-# 斯巴達、維京的中文名是暫譯（官方說明頁沒有中文版）→ 畫面顯示「中文暫譯（官方英文名）」，中文部分標待驗證。
+# 維京的中文名是暫譯（官方說明頁沒有中文版）→ 畫面顯示「中文暫譯（官方英文名）」，中文部分標待驗證。
+# 斯巴達 2026-10-11 起用 ASIA x1 遊戲內名稱，不是暫譯（下面斯巴達的英文名只剩對照用，不再顯示）。
 # 英文名只用官方說明頁上逐字出現的寫法（evidence/official_support_2026-10-10.json 的 text，生成時檢查）：
 # 維京＝S139「Viking Units Overview」表（Heimdall’s Eye、Jarl 拿掉表上補充說明的「(Scout)」「(Administrator)」，
-# 兩個名字本身都逐字出現在 S139；PM 核准，#35）；斯巴達步兵、騎兵 6 種＝S187 表頭；
-# 監察官＝官方說明頁 S10「Ephor」（S187 沒有監察官；PM 核准，#35）。
-# 斯巴達破城槌、弩炮、開拓者：官方說明頁（S10、S187、S3）都沒有寫英文名 → None，只顯示中文暫譯＋待驗證。
+# 兩個名字本身都逐字出現在 S139；PM 核准，#35）。
+# 斯巴達的英文名改照 ASIA x1 說明頁（check_spartan_names 生成時比對 troops.json 的 name_en）。
 OFFICIAL_EN_NAMES = {
     "thrall": ("Thrall", "s139"), "shield_maiden": ("Shield Maiden", "s139"),
     "berserker": ("Berserker", "s139"), "heimdalls_eye": ("Heimdall’s Eye", "s139"),
     "huskarl_rider": ("Huskarl Rider", "s139"), "valkyries_blessing": ("Valkyrie’s Blessing", "s139"),
     "viking_ram": ("Ram", "s139"), "viking_catapult": ("Catapult", "s139"),
     "jarl": ("Jarl", "s139"), "viking_settler": ("Settler", "s139"),
-    "hoplite": ("Hoplite", "s187"), "sentinel": ("Sentinel", "s187"),
-    "shieldsman": ("Shieldsman", "s187"), "twinsteel_therion": ("Twinsteel Therion", "s187"),
-    "elpida_rider": ("Elpida Rider", "s187"), "corinthian_crusher": ("Corinthian Crusher", "s187"),
-    "ephor": ("Ephor", "s10"),
-    "spartan_ram": None, "ballista": None, "spartan_settler": None,
 }
 OFFICIAL_ARTICLE_URL = {
     "s139": "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
@@ -969,6 +1088,9 @@ def gen_ingame_names(speeds: dict) -> dict:
     for t, ref in TRIBE_MANUAL_REF.items():
         tribes[t] = {"zh": mt[str(ref)]["tribe_zh"], "ref": f"manual/troop/{ref}",
                      "aliases": TRIBE_ALIASES.get(t, [])}
+    raw = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))["raw_zh"]
+    tribes["spartans"] = {"zh": raw["tribe_zh"], "ref": "asia_x1/help/spartans",
+                          "aliases": [raw["tribe_zh"].removesuffix("人")]}
     for t, zh in TRIBE_NO_INGAME.items():
         tribes[t] = {"zh": zh, "ref": None, "aliases": [zh.removesuffix("人")]}
     units = {}
@@ -976,7 +1098,8 @@ def gen_ingame_names(speeds: dict) -> dict:
         for r in rows:
             tid = r["troop_id"]
             if r["stats"]:
-                n = int(r["stats"]["ref"].rsplit("/", 1)[1])
+                # ts11 的 game_id＝說明頁 manual/troop/N；斯巴達在 ASIA x1 的說明選單讀，沒有看到編號 → None
+                n = int(r["stats"]["ref"].rsplit("/", 1)[1]) if r["source"] == "ts11" else None
                 zh = r["stats"]["name_zh"]
                 al = SETTLER_ALIASES if tid.endswith("settler") else UNIT_ALIASES.get(tid, [])
                 units[tid] = {"tribe": tribe, "fe_id": r["fe_id"], "game_id": n,
@@ -993,10 +1116,11 @@ def gen_ingame_names(speeds: dict) -> dict:
     return {
         "_generated_by": "scripts/game_data/gen_game_data.py — do not edit by hand",
         "_source": "ts11 遊戲內說明頁（scripts/game_data/evidence/ts11_manual_2026-10-10.json）；"
-                   "aliases 是以前用過的名字，只給搜尋用，不顯示；斯巴達、維京 zh 是暫譯（zh_pending），"
-                   "en 是官方說明頁 S139／S187／S10 的英文名（en_ref；evidence/official_support_2026-10-10.json 的 "
-                   "unit_en_names），畫面顯示 display_zh。監察官 Ephor 取自官方 S10；S139 的 Heimdall’s Eye (Scout)、"
-                   "Jarl (Administrator) 拿掉括號裡的補充說明（兩項 PM 核准，#35）",
+                   "斯巴達是 ASIA x1 遊戲內說明頁（scripts/game_data/evidence/asia_x1_manual_spartans_2026-10-11.json）；"
+                   "aliases 是以前用過的名字，只給搜尋用，不顯示；維京 zh 是暫譯（zh_pending），"
+                   "en 是官方說明頁 S139 的英文名（en_ref；evidence/official_support_2026-10-10.json 的 "
+                   "unit_en_names），畫面顯示 display_zh。S139 的 Heimdall’s Eye (Scout)、"
+                   "Jarl (Administrator) 拿掉括號裡的補充說明（PM 核准，#35）",
         "tribes": tribes, "buildings": buildings, "units": units,
     }
 
@@ -1046,6 +1170,57 @@ def apply_ingame_names(buildings: dict, resources: dict, troops: dict, names: di
             t["description_zh"] = ingame_text(t["description_zh"], names)
 
 
+def parse_asia_x1_raw_zh(text: str) -> dict:
+    """繁中說明頁原文（raw_zh.units[N].text）→ 名稱、部族、花費、攻防、速度、運載量、糧耗、訓練時間."""
+    import re
+
+    lines = text.split("\n")
+    assert lines[0] == "概況", lines[0]
+    m = re.fullmatch(r"(\S+) \1 \((\S+)\)", lines[1])
+    assert m and lines[2] == m.group(1), lines[1:3]
+    atk = re.fullmatch(r"攻擊力(\d+)\t步兵防禦力(\d+)\t騎兵防禦力(\d+)\t?", lines[7])
+    speed = re.fullmatch(r"速度：\t(\d+) 格（每小時）", lines[8])
+    carry = re.fullmatch(r"運載量：\t(\d+) 資源", lines[9])
+    assert atk and speed and carry and lines[10].startswith("維持：") and lines[12].startswith("訓練時間："), lines[7:13]
+    h, mi, se = (int(x) for x in lines[13].split(":"))
+    return {"name_zh": m.group(1), "tribe_zh": m.group(2), "cost": [int(x) for x in lines[3:7]],
+            "attack": int(atk.group(1)), "def_inf": int(atk.group(2)), "def_cav": int(atk.group(3)),
+            "speed": int(speed.group(1)), "carry": int(carry.group(1)), "upkeep": int(lines[11]),
+            "train_time_text": lines[13], "train_time_s": h * 3600 + mi * 60 + se}
+
+
+def check_asia_x1_raw_zh() -> None:
+    """繁中原文：SHA-256 對得上，解析出來的每個數字、中文名、部族名都跟抄錄的 troops 一樣."""
+    import hashlib
+
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
+    raw = ev["raw_zh"]
+    blocks = [raw["overview"], *raw["units"].values()]
+    for b in blocks:
+        assert hashlib.sha256(b["text"].encode("utf-8")).hexdigest() == b["text_sha256"], b["file"]
+    shot = ASIA_X1_SPARTANS.parent / raw["overview_screenshot"]
+    assert hashlib.sha256(shot.read_bytes()).hexdigest() == raw["overview_screenshot_sha256"] == shot.stem
+    ov = raw["overview"]["text"].split("\n")
+    assert raw["tribe_zh"] in ov
+    names = [ev["troops"][str(i)]["name_zh"] for i in range(1, 11)]
+    assert " " + " ".join(names) in ov, "總覽的 10 個中文名要跟 troops 一樣、同順序"
+    for i in range(1, 11):
+        got = parse_asia_x1_raw_zh(raw["units"][str(i)]["text"])
+        assert got.pop("tribe_zh") == raw["tribe_zh"], i
+        want = ev["troops"][str(i)]
+        assert got == {k: want[k] for k in got}, (i, got)
+
+
+def check_spartan_names(troops: dict, speeds: dict) -> None:
+    """斯巴達 10 種兵：ASIA x1 說明頁的英文名要跟 troops.json 的 name_en 一樣（總覽截圖上的 10 個名字）."""
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
+    rows = speeds["tribes"]["spartans"]
+    assert [r["troop_id"] for r in rows] and len(rows) == 10
+    assert ev["overview_names_en"] == [ev["troops"][str(i)]["name_en"] for i in range(1, 11)]
+    for i, r in enumerate(rows, start=1):
+        assert troops["troops"][r["troop_id"]]["name_en"] == ev["troops"][str(i)]["name_en"], r["troop_id"]
+
+
 def render(obj: dict, compact: bool = False) -> str:
     if compact:
         return json.dumps(obj, ensure_ascii=False, separators=(",", ":")) + "\n"
@@ -1059,6 +1234,8 @@ def outputs() -> dict[Path, str]:
     us = gen_unit_speeds()
     tr = gen_troops(_load(BACKEND_TROOPS), us)
     apply_s139_vikings(tr, us)
+    check_spartan_names(tr, us)
+    check_asia_x1_raw_zh()
     names = gen_ingame_names(us)
     apply_ingame_names(b, r, tr, names)
     return {

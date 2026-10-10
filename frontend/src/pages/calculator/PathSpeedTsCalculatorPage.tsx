@@ -314,8 +314,8 @@ export default function PathSpeedTsCalculatorPage() {
                   className="flex items-center gap-2 text-xs text-muted-foreground"
                   data-testid="unverified-units-note"
                 >
-                  <PendingVerifyChip kind="spartanSpeed" />
-                  <span>斯巴達兵種速度待驗證，未列入反推</span>
+                  <PendingVerifyChip kind="reverseTsUnverified" />
+                  <span>有兵種速度待驗證，未列入反推</span>
                 </PendingRow>
               )}
             </div>

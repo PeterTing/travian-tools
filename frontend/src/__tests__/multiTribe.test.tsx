@@ -156,10 +156,11 @@ describe('一個帳號多個部族（P0-25）', () => {
     })
 
     it('the (k) unit pending line follows the village tribe, not the birth tribe', async () => {
-      setup({ keep: true, secondTribe: 'spartans' })
+      // #43：斯巴達 ASIA x1 核對完不再有這一行，改用維京村（出生部族高盧沒有這一行）
+      setup({ keep: true, secondTribe: 'vikings' })
       renderAt('/calculator/technology')
-      await waitFor(() => expect(screen.getByTestId('autofill-village')).toHaveTextContent('斯巴達'))
-      expect(screen.getByTestId('autofill-unit-pending')).toBeInTheDocument()
+      await waitFor(() => expect(screen.getByTestId('autofill-village')).toHaveTextContent('維京'))
+      expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(/^維京的運載量待驗證，兵種中文名為暫譯$/)
     })
 
     it('hero pages add the grey birth-tribe line', async () => {

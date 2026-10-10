@@ -1,4 +1,4 @@
-// 運載量留空的兵種（斯巴達、維京，P0-23 PM）：農場收益不出數字，大數字換成灰字「無法計算」、第二行寫原因＋灰標、沒有「展開明細」；
+// 運載量留空的兵種（維京，P0-23 PM；2026-10-11 幕僚長：出處不明，退回待驗證；斯巴達 2026-10-11 在 ASIA x1 核對過，有數字）：農場收益不出數字，大數字換成灰字「無法計算」、第二行寫原因＋灰標、沒有「展開明細」；
 // 換回其他部族的兵馬上恢復。目前農場收益的清單沒有斯巴達、維京（FARM_UNITS 6 種都是 ts11 兵），這裡用 units 換清單測這條路徑。
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
@@ -37,8 +37,8 @@ describe('farming: unit with empty (null) carry', () => {
     expect(FARM_UNITS.every((u) => typeof u.carry === 'number')).toBe(true)
   })
 
-  it('Spartan / Viking farm units carry null', () => {
-    expect(elpida.carry).toBeNull()
+  it('Viking farm units carry null; Spartan units have the ASIA x1 number', () => {
+    expect(elpida.carry).toBe(110)
     expect(huskarl.carry).toBeNull()
   })
 
@@ -57,7 +57,6 @@ describe('farming: unit with empty (null) carry', () => {
   })
 
   it.each([
-    ['Spartan', elpida, '斯巴達運載量還沒核對', 'spartanCarry'],
     ['Viking', huskarl, '維京運載量還沒核對', 'vikingCarry'],
   ] as const)('page: %s unit selected → 「無法計算」 grey, same size; reason 12px grey + chip; no 展開明細; switching back restores the number', (_label, u, reason, kind) => {
     render(<MemoryRouter><FarmingCalculator units={[u, ...FARM_UNITS]} /></MemoryRouter>)

@@ -24,23 +24,27 @@ describe('totalCarry', () => {
     }
   })
 
-  it('mixed with Viking and Spartan units: every missing unit named, joined with 、', () => {
+  it('mixed with several Viking units: every missing unit named, joined with 、', () => {
     const r = totalCarry([unit('vikings', 'thrall'), unit('romans', 'legionnaire', 4), unit('spartans', 'hoplite'), unit('vikings', 'berserker')])
     expect(r.ok).toBe(false)
     if (!r.ok) {
-      const n = (t: 'vikings' | 'spartans', id: string) => unit(t, id).nameZh
-      expect(missingCarryReason(r.missing)).toBe(`維京：${n('vikings', 'thrall')}運載量還沒核對、斯巴達：${n('spartans', 'hoplite')}運載量還沒核對、維京：${n('vikings', 'berserker')}運載量還沒核對`)
-      expect(missingCarryKinds(r.missing)).toEqual(['vikingCarry', 'spartanCarry'])
+      const n = (id: string) => unit('vikings', id).nameZh
+      expect(missingCarryReason(r.missing)).toBe(`維京：${n('thrall')}運載量還沒核對、維京：${n('berserker')}運載量還沒核對`)
+      expect(missingCarryKinds(r.missing)).toEqual(['vikingCarry'])
     }
   })
 
+  it('Spartan units have carry from the ASIA x1 in-game help (2026-10-11): computable', () => {
+    expect(totalCarry([unit('spartans', 'hoplite', 10), unit('spartans', 'elpida', 2)])).toEqual({ ok: true, total: 60 * 10 + 110 * 2 })
+  })
+
   it('a null unit with count 0 is still not computable (never treated as 0)', () => {
-    expect(totalCarry([unit('spartans', 'elpida', 0)]).ok).toBe(false)
+    expect(totalCarry([unit('vikings', 'huskarlRider', 0)]).ok).toBe(false)
   })
 
   it('reason format with explicit names', () => {
     expect(missingCarryReason([{ tribe: 'vikings', nameZh: '奴僕' }])).toBe('維京：奴僕運載量還沒核對')
-    expect(missingCarryReason([{ tribe: 'vikings', nameZh: '奴僕' }, { tribe: 'spartans', nameZh: '重裝步兵' }])).toBe('維京：奴僕運載量還沒核對、斯巴達：重裝步兵運載量還沒核對')
+    expect(missingCarryReason([{ tribe: 'vikings', nameZh: '奴僕' }, { tribe: 'vikings', nameZh: '狂戰士' }])).toBe('維京：奴僕運載量還沒核對、維京：狂戰士運載量還沒核對')
   })
 
   it('single-unit reason', () => {

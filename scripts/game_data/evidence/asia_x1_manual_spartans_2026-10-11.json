@@ -1,0 +1,338 @@
+{
+ "_what": "ASIA x1 遊戲內說明（說明 → 建築與兵種 → 斯巴達分頁 → 點兵種）逐項抄錄斯巴達 10 種兵的花費、攻防、速度、運載量、糧耗、訓練時間，2026-10-11 由測試帳號（已去識別）的瀏覽器唯讀讀取。ts11 是 5 族伺服器、說明頁 71～80 號是異常錯誤（ts11_manual_troops_71_90_2026-10-10.json），所以斯巴達改在可以選斯巴達的 ASIA x1 讀。",
+ "server": "rog.x1.asia.travian.com",
+ "url": "https://rog.x1.asia.travian.com",
+ "path": "遊戲畫面 → 說明（Help menu）→ Instructions：Troops → Spartans 分頁 → 點兵種名稱（每個兵種一頁：花費、攻防、Velocity、Can carry、Upkeep、Duration of training）",
+ "read_conditions": {
+  "server_speed": "x1（rog.x1.asia.travian.com，Travian: Rise of Governors 2026 年度特別伺服器，可選斯巴達）",
+  "read_at": "2026-10-11 00:36–00:45（台北）",
+  "account": "測試帳號（已去識別）",
+  "help_times_are_base_times": "說明頁的訓練時間是 x1、建築 1 級的基本時間，不看村莊裡兵營／馬廄／工場的等級（ts11 說明頁同一套規則：ts11_manual_2026-10-10.json read_conditions.help_times_are_base_times）。存法跟 ts11 一樣：train_time_s＝說明頁的時間換成秒，不另外換算。",
+  "names": "name_en＝說明頁英文介面的兵種名（截圖）；name_zh、部族名「斯巴達人」＝繁體中文介面說明頁的名稱，原文存在 raw_zh（10 頁都有，另有繁中總覽截圖）",
+  "screenshots": "英文介面截圖 5 張：總覽（Spartans 分頁 10 個兵種英文名）＋裝甲步兵、哨兵、爾必達騎士、開拓者 4 個兵種頁；繁中介面總覽截圖 1 張（raw_zh.overview_screenshot）。10 個兵種頁的繁中原文都在 raw_zh.units。檔名就是檔案的 SHA-256。截圖已裁成中間的說明視窗（去識別：拿掉右上角帳號、村莊、座標和其他遊戲畫面，2026-10-11），SHA-256 是裁切後的檔案。"
+ },
+ "overview_screenshot": "asia_x1_spartans_2026-10-11/5339fcf59145ad8ff1d70e2859e721fa065f2425df0c66128953850d68d3bd64.png",
+ "overview_screenshot_sha256": "5339fcf59145ad8ff1d70e2859e721fa065f2425df0c66128953850d68d3bd64",
+ "overview_captured_at": "2026-10-11T00:36:15+08:00",
+ "overview_names_en": [
+  "Hoplite",
+  "Sentinel",
+  "Shieldsman",
+  "Twinsteel Therion",
+  "Elpida Rider",
+  "Corinthian Crusher",
+  "Ram",
+  "Ballista",
+  "Ephor",
+  "Settler"
+ ],
+ "troops": {
+  "1": {
+   "name_en": "Hoplite",
+   "name_zh": "裝甲步兵",
+   "cost": [
+    110,
+    185,
+    110,
+    35
+   ],
+   "attack": 50,
+   "def_inf": 35,
+   "def_cav": 30,
+   "speed_text": "6 fields/hour",
+   "speed": 6,
+   "carry_text": "60 resources",
+   "carry": 60,
+   "upkeep": 1,
+   "train_time_text": "0:28:20",
+   "train_time_s": 1700,
+   "screenshot": "asia_x1_spartans_2026-10-11/e8d3fb64c64883d3b4c27557625a8ecc72d49545c2680108c82f5529fa6a3d09.png",
+   "screenshot_sha256": "e8d3fb64c64883d3b4c27557625a8ecc72d49545c2680108c82f5529fa6a3d09",
+   "captured_at": "2026-10-11T00:36:23+08:00"
+  },
+  "2": {
+   "name_en": "Sentinel",
+   "name_zh": "哨兵",
+   "cost": [
+    185,
+    150,
+    35,
+    75
+   ],
+   "attack": 0,
+   "def_inf": 40,
+   "def_cav": 22,
+   "speed_text": "9 fields/hour",
+   "speed": 9,
+   "carry_text": "0 resources",
+   "carry": 0,
+   "upkeep": 1,
+   "train_time_text": "0:20:32",
+   "train_time_s": 1232,
+   "screenshot": "asia_x1_spartans_2026-10-11/824e66a8d0741a2f740628ff544f4765c72f537e5be403e803aa502af8605b6f.png",
+   "screenshot_sha256": "824e66a8d0741a2f740628ff544f4765c72f537e5be403e803aa502af8605b6f",
+   "captured_at": "2026-10-11T00:39:32+08:00"
+  },
+  "3": {
+   "name_en": "Shieldsman",
+   "name_zh": "盾牌手",
+   "cost": [
+    145,
+    95,
+    245,
+    45
+   ],
+   "attack": 40,
+   "def_inf": 85,
+   "def_cav": 45,
+   "speed_text": "8 fields/hour",
+   "speed": 8,
+   "carry_text": "40 resources",
+   "carry": 40,
+   "upkeep": 1,
+   "train_time_text": "0:32:16",
+   "train_time_s": 1936,
+   "screenshot": null,
+   "screenshot_sha256": null,
+   "captured_at": null
+  },
+  "4": {
+   "name_en": "Twinsteel Therion",
+   "name_zh": "雙鋼泰瑞恩",
+   "cost": [
+    130,
+    200,
+    400,
+    65
+   ],
+   "attack": 90,
+   "def_inf": 55,
+   "def_cav": 40,
+   "speed_text": "6 fields/hour",
+   "speed": 6,
+   "carry_text": "50 resources",
+   "carry": 50,
+   "upkeep": 1,
+   "train_time_text": "0:35:12",
+   "train_time_s": 2112,
+   "screenshot": null,
+   "screenshot_sha256": null,
+   "captured_at": null
+  },
+  "5": {
+   "name_en": "Elpida Rider",
+   "name_zh": "爾必達騎士",
+   "cost": [
+    555,
+    445,
+    330,
+    110
+   ],
+   "attack": 55,
+   "def_inf": 120,
+   "def_cav": 90,
+   "speed_text": "16 fields/hour",
+   "speed": 16,
+   "carry_text": "110 resources",
+   "carry": 110,
+   "upkeep": 2,
+   "train_time_text": "0:46:56",
+   "train_time_s": 2816,
+   "screenshot": "asia_x1_spartans_2026-10-11/6928ec8170fb6d7e17b731a7ab755595983bbabe38c51c283ca26d39b872fac4.png",
+   "screenshot_sha256": "6928ec8170fb6d7e17b731a7ab755595983bbabe38c51c283ca26d39b872fac4",
+   "captured_at": "2026-10-11T00:38:56+08:00"
+  },
+  "6": {
+   "name_en": "Corinthian Crusher",
+   "name_zh": "科林斯破壞者",
+   "cost": [
+    660,
+    495,
+    995,
+    165
+   ],
+   "attack": 195,
+   "def_inf": 80,
+   "def_cav": 75,
+   "speed_text": "9 fields/hour",
+   "speed": 9,
+   "carry_text": "80 resources",
+   "carry": 80,
+   "upkeep": 3,
+   "train_time_text": "0:57:12",
+   "train_time_s": 3432,
+   "screenshot": null,
+   "screenshot_sha256": null,
+   "captured_at": null
+  },
+  "7": {
+   "name_en": "Ram",
+   "name_zh": "破城槌",
+   "cost": [
+    525,
+    260,
+    790,
+    130
+   ],
+   "attack": 65,
+   "def_inf": 30,
+   "def_cav": 80,
+   "speed_text": "4 fields/hour",
+   "speed": 4,
+   "carry_text": "0 resources",
+   "carry": 0,
+   "upkeep": 3,
+   "train_time_text": "1:17:00",
+   "train_time_s": 4620,
+   "screenshot": null,
+   "screenshot_sha256": null,
+   "captured_at": null
+  },
+  "8": {
+   "name_en": "Ballista",
+   "name_zh": "賴達投石機",
+   "cost": [
+    550,
+    1240,
+    825,
+    135
+   ],
+   "attack": 50,
+   "def_inf": 60,
+   "def_cav": 10,
+   "speed_text": "3 fields/hour",
+   "speed": 3,
+   "carry_text": "0 resources",
+   "carry": 0,
+   "upkeep": 6,
+   "train_time_text": "2:30:00",
+   "train_time_s": 9000,
+   "screenshot": null,
+   "screenshot_sha256": null,
+   "captured_at": null
+  },
+  "9": {
+   "name_en": "Ephor",
+   "name_zh": "五長官",
+   "cost": [
+    33450,
+    30665,
+    36240,
+    13935
+   ],
+   "attack": 40,
+   "def_inf": 60,
+   "def_cav": 40,
+   "speed_text": "4 fields/hour",
+   "speed": 4,
+   "carry_text": "0 resources",
+   "carry": 0,
+   "upkeep": 4,
+   "train_time_text": "21:32:30",
+   "train_time_s": 77550,
+   "screenshot": null,
+   "screenshot_sha256": null,
+   "captured_at": null
+  },
+  "10": {
+   "name_en": "Settler",
+   "name_zh": "開拓者",
+   "cost": [
+    5115,
+    5580,
+    6045,
+    3255
+   ],
+   "attack": 10,
+   "def_inf": 80,
+   "def_cav": 80,
+   "speed_text": "5 fields/hour",
+   "speed": 5,
+   "carry_text": "3000 resources",
+   "carry": 3000,
+   "upkeep": 1,
+   "train_time_text": "9:28:20",
+   "train_time_s": 34100,
+   "screenshot": "asia_x1_spartans_2026-10-11/77122d9da98624e0ffdcddf8639abf4b6f58b9150ee1dbf9ee5ac39cc5b310b6.png",
+   "screenshot_sha256": "77122d9da98624e0ffdcddf8639abf4b6f58b9150ee1dbf9ee5ac39cc5b310b6",
+   "captured_at": "2026-10-11T00:40:53+08:00"
+  }
+ },
+ "raw_zh": {
+  "_what": "繁體中文介面的說明頁原文（每頁 Ctrl+A 複製到剪貼簿再存檔；瀏覽器「另存網頁」開不出存檔視窗，所以沒有 HTML）。只存「遊戲指南」到「幫助選單」之間的說明內容，去掉頁面其他部分（帳號、村莊、資源列、伺服器時間等）和「Privacy settings」連結字樣；text_sha256＝存下來的 text（UTF-8）的 SHA-256。產生器會重新解析 text，數字跟上面 troops 的每一欄都要一樣。",
+  "read_at": "2026-10-11 01:13–01:20（台北）；總覽約 01:14，兵種頁 01:15–01:19（saved_at 是剪貼簿存檔的時間）",
+  "server_clock_note": "遊戲內伺服器時間顯示 UTC+01:00",
+  "tribe_zh": "斯巴達人",
+  "overview": {
+   "file": "overview_zh.txt",
+   "saved_at": "2026-10-11T01:14:36+08:00",
+   "text": " 士兵\n羅馬人\n日耳曼人\n高盧人\n埃及人\n匈奴\n斯巴達人\n自然界\n賴達族\n 裝甲步兵 哨兵 盾牌手 雙鋼泰瑞恩 爾必達騎士 科林斯破壞者 破城槌 賴達投石機 五長官 開拓者\n建築物\n基礎\n軍事\n資源\n 倉庫 穀倉 村莊大樓 市場 大使館 山洞 城鎮廳 行宮 皇宮 寶物庫 交易所 石匠鋪 釀酒廠 大倉庫 大穀倉 放牧水槽 指揮中心 供水系統",
+   "text_sha256": "5637417b9ea514a8d00ad6e854567b63263084cf01a70e754940752aa52d64c5"
+  },
+  "overview_screenshot": "asia_x1_spartans_2026-10-11/c752766ca1cfee5c69597d0c85a94ac7db0fde085f185d8114b737daf103c87a.png",
+  "overview_screenshot_sha256": "c752766ca1cfee5c69597d0c85a94ac7db0fde085f185d8114b737daf103c87a",
+  "overview_screenshot_saved_at": "2026-10-11T01:19:46+08:00",
+  "units": {
+   "1": {
+    "file": "unit01.txt",
+    "saved_at": "2026-10-11T01:15:29+08:00",
+    "text": "概況\n裝甲步兵 裝甲步兵 (斯巴達人)\n裝甲步兵\n110\n185\n110\n35\n攻擊力50\t步兵防禦力35\t騎兵防禦力30\t\n速度：\t6 格（每小時）\n運載量：\t60 資源\n維持：\t\n1\n訓練時間：\t\n0:28:20\n裝甲步兵是希臘城邦中最常見的單位。由於他們的普遍訓練和對體能的關注，因此攻擊能力適中，可以攜帶很多資源。裝甲步兵也有一般的防禦力，無論是對步兵還是騎兵。由於需要全方位訓練，他們的訓練時間不是最快的。\n條件：\n兵營 等級 1\n知識庫",
+    "text_sha256": "ca4e9bf94eba363a1fa2b4e3e785a0a2a3f60428783819dd25cc959ff47cf5e8"
+   },
+   "2": {
+    "file": "unit02.txt",
+    "saved_at": "2026-10-11T01:15:48+08:00",
+    "text": "概況\n哨兵 哨兵 (斯巴達人)\n哨兵\n185\n150\n35\n75\n攻擊力0\t步兵防禦力40\t騎兵防禦力22\t\n速度：\t9 格（每小時）\n運載量：\t0 資源\n維持：\t\n1\n訓練時間：\t\n0:20:32\n哨兵們獻身尋找其他種族可能隱藏的祕密。他們通常徒步旅行，並進行偽裝，這使他們能夠潛入高度安全的避難所而不會被注意到。就像所有的斯巴達人一樣，他們接受了出色的訓練，這使他們不僅是不知疲倦的跑者，也是優秀的防禦家。在防禦方面，哨兵彼此並肩作戰，且戰鬥至死方休！\n條件：\n研究院 等級 1, 盔甲廠 等級 1\n知識庫",
+    "text_sha256": "fb397352424bbac8de08d8b54c5b5a46d37420a80675fee7fec8c0ef68fc88c5"
+   },
+   "3": {
+    "file": "unit03.txt",
+    "saved_at": "2026-10-11T01:16:04+08:00",
+    "text": "概況\n盾牌手 盾牌手 (斯巴達人)\n盾牌手\n145\n95\n245\n45\n攻擊力40\t步兵防禦力85\t騎兵防禦力45\t\n速度：\t8 格（每小時）\n運載量：\t40 資源\n維持：\t\n1\n訓練時間：\t\n0:32:16\n盾牌手是菁英防禦者，是世界上有史以來最優秀的。他們從童年開始就接受了高水準的訓練。由於他們的投入，儘管穿戴了厚重的盔甲和巨大的盾牌，但移動速度極快。因此，他們在對抗敵方步兵的戰鬥中表現出色，創造出牢不可破的鐵壁，比磚頭搭的房子還要堅固。\n條件：\n研究院 等級 5, 盔甲廠 等級 1\n知識庫",
+    "text_sha256": "aa7faf07bb16a68c02a6c16e0c74cc4e66c4f095003194c99f7c1a030c9a2554"
+   },
+   "4": {
+    "file": "unit04.txt",
+    "saved_at": "2026-10-11T01:16:22+08:00",
+    "text": "概況\n雙鋼泰瑞恩 雙鋼泰瑞恩 (斯巴達人)\n雙鋼泰瑞恩\n130\n200\n400\n65\n攻擊力90\t步兵防禦力55\t騎兵防禦力40\t\n速度：\t6 格（每小時）\n運載量：\t50 資源\n維持：\t\n1\n訓練時間：\t\n0:35:12\n參見絕對的野獸吧！這些無所畏懼、經驗豐富的攻擊者會讓聽到他們戰吼聲的人打從心裡發顫。由於他們有兩把刀，雙鋼泰瑞恩可以在攻擊中永遠保持主動。他們可以像熱刀子穿過奶油一樣輕鬆突破任何防禦。他們的訓練可能很昂貴，而且需要很多時間，但一切是值得的。\n條件：\n研究院 等級 10, 盔甲廠 等級 5\n知識庫",
+    "text_sha256": "6fefa95048077b49e3e294af316af18bc0f83dd7c97df876f716deb07a5666ee"
+   },
+   "5": {
+    "file": "unit05.txt",
+    "saved_at": "2026-10-11T01:16:40+08:00",
+    "text": "概況\n爾必達騎士 爾必達騎士 (斯巴達人)\n爾必達騎士\n555\n445\n330\n110\n攻擊力55\t步兵防禦力120\t騎兵防禦力90\t\n速度：\t16 格（每小時）\n運載量：\t110 資源\n維持：\t\n2\n訓練時間：\t\n0:46:56\n爾必達的意思是「希望」，這些勇敢的騎士帶給遭受攻擊的村莊的正是希望。他們速度快又無情，會在騎著親切的馬匹時趕來幫助你。他們訓練有素，可以抵抗騎兵和步兵，也是斯巴達軍隊中速度最快的單位。遺憾的是，他們的攻擊力相對較弱。\n條件：\n馬廄 等級 1, 研究院 等級 5\n知識庫",
+    "text_sha256": "503e610c075fe07741a78a479bb23abb19eab2b3d1d920718061fc2f5bb241c5"
+   },
+   "6": {
+    "file": "unit06.txt",
+    "saved_at": "2026-10-11T01:17:42+08:00",
+    "text": "概況\n科林斯破壞者 科林斯破壞者 (斯巴達人)\n科林斯破壞者\n660\n495\n995\n165\n攻擊力195\t步兵防禦力80\t騎兵防禦力75\t\n速度：\t9 格（每小時）\n運載量：\t80 資源\n維持：\t\n3\n訓練時間：\t\n0:57:12\n科林斯破壞者是斯巴達軍隊中一支精銳的攻擊型騎兵。戴著青銅科林斯頭盔、堅實而有紀律的騎士，他們是真正的傳奇。這些單位需要空間來展現他們的價值。因此，比起防禦，他們更適合攻擊。他們可能不是最快的騎士，但當他們到達戰場時，敵人就會渾身顫抖！\n條件：\n馬廄 等級 10, 研究院 等級 5\n知識庫",
+    "text_sha256": "2d23f42fa6e7447fdc5083bec4de33be98a680eb2b3745377dd8063f247724dc"
+   },
+   "7": {
+    "file": "unit07.txt",
+    "saved_at": "2026-10-11T01:18:15+08:00",
+    "text": "概況\n破城槌 破城槌 (斯巴達人)\n破城槌\n525\n260\n790\n130\n攻擊力65\t步兵防禦力30\t騎兵防禦力80\t\n速度：\t4 格（每小時）\n運載量：\t0 資源\n維持：\t\n3\n訓練時間：\t\n1:17:00\n破城槌是步兵和騎兵部隊的一種重型輔助武器。它的任務是摧毀敵人的城牆，並增大您的軍隊攻佔敵人防禦工事的機率。\n條件：\n研究院 等級 10, 工場 等級 1\n知識庫",
+    "text_sha256": "5d041090449cb0c081dd50d10cd924d3949683539ba70747a181cef200aae919"
+   },
+   "8": {
+    "file": "unit08.txt",
+    "saved_at": "2026-10-11T01:18:33+08:00",
+    "text": "概況\n賴達投石機 賴達投石機 (斯巴達人)\n賴達投石機\n550\n1240\n825\n135\n攻擊力50\t步兵防禦力60\t騎兵防禦力10\t\n速度：\t3 格（每小時）\n運載量：\t0 資源\n維持：\t\n6\n訓練時間：\t\n2:30:00\n賴達投石機發射的鐵彈威力很大，眨眼間就能壓垮任何建築物。但不要單獨派出此單位！如果沒有合理的援軍，又沒有保護措施，那麼賴達投石機在面對騎兵的攻擊時就特別脆弱。\n條件：\n工場 等級 10, 研究院 等級 15\n知識庫",
+    "text_sha256": "3fa9ea4a7f62025028b0e0a5b38cdc153fd0b2e303264c004d2ffc43b45d17c9"
+   },
+   "9": {
+    "file": "unit09.txt",
+    "saved_at": "2026-10-11T01:18:52+08:00",
+    "text": "概況\n五長官 五長官 (斯巴達人)\n五長官\n33450\n30665\n36240\n13935\n攻擊力40\t步兵防禦力60\t騎兵防禦力40\t\n速度：\t4 格（每小時）\n運載量：\t0 資源\n維持：\t\n4\n訓練時間：\t\n21:32:30\n正直和忠誠是使五長官成為偉大領袖的特徵。堅強但不失尊重，善良但不軟弱，他們可以說服任何人做他們認為正確的事情。\n每當他們進入敵人的村莊，他們強力的存在感就會降低敵人的忠誠度，直到他們決定投降。\n條件：\n集結點 等級 10, 研究院 等級 20\n知識庫",
+    "text_sha256": "c4f87298c95cd71a93eaf12fd31b247b693461166fd752aa4648bd1e1bd81665"
+   },
+   "10": {
+    "file": "unit10.txt",
+    "saved_at": "2026-10-11T01:19:14+08:00",
+    "text": "概況\n開拓者 開拓者 (斯巴達人)\n開拓者\n5115\n5580\n6045\n3255\n攻擊力10\t步兵防禦力80\t騎兵防禦力80\t\n速度：\t5 格（每小時）\n運載量：\t3000 資源\n維持：\t\n1\n訓練時間：\t\n9:28:20\n開拓者是勇敢的市民，爲了您的榮譽，他們歷經各種訓練後走出村莊，建立新的村莊。\n旅程和新村莊的建立都非常困難，因此三名開拓者必須齊心協力，時刻在一起。他們每個資源需要 750 單位的基本供應。\n條件：\n行宮 等級 10 或 皇宮 等級 10\n知識庫",
+    "text_sha256": "af52caf986721579527921a20adf95ac17fa066d3d60052611adc72235a0192b"
+   }
+  }
+ }
+}

@@ -3,6 +3,7 @@
   "unit": "fields/hour, x1, base speed (no Tournament Square / artefact / hero bonus)",
   "sources": {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-09 讀取",
+    "asia_x1": "ASIA x1 遊戲內說明實測（說明 → 建築與兵種 → 斯巴達），2026-10-11 讀取",
     "official": [
       "https://support.travian.com/en/articles/139-vikings-in-travian-legends",
       "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table"
@@ -12,7 +13,8 @@
   },
   "carry_sources": {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-10 讀取",
-    "pending": "沒有官方或 ts11 的運載量，留空（null，待驗證）"
+    "asia_x1": "ASIA x1 遊戲內說明實測（說明 → 建築與兵種 → 斯巴達），2026-10-11 讀取",
+    "pending": "沒有官方或遊戲內的運載量，留空（null，待驗證）"
   },
   "tribes": {
     "romans": [
@@ -1432,12 +1434,27 @@
         "fe_id": "hoplite",
         "kb_id": "hoplite",
         "speed": 6,
-        "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/1",
+        "stats": {
+          "name_zh": "裝甲步兵",
+          "cost": [
+            110,
+            185,
+            110,
+            35
+          ],
+          "attack": 50,
+          "def_inf": 35,
+          "def_cav": 30,
+          "carry": 60,
+          "upkeep": 1,
+          "train_time": 1700,
+          "ref": "asia_x1/help/spartans/1"
+        },
+        "carry": 60,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/1"
       },
       {
         "slot": 2,
@@ -1445,12 +1462,27 @@
         "fe_id": "sentinel",
         "kb_id": "sentinel",
         "speed": 9,
-        "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/2",
+        "stats": {
+          "name_zh": "哨兵",
+          "cost": [
+            185,
+            150,
+            35,
+            75
+          ],
+          "attack": 0,
+          "def_inf": 40,
+          "def_cav": 22,
+          "carry": 0,
+          "upkeep": 1,
+          "train_time": 1232,
+          "ref": "asia_x1/help/spartans/2"
+        },
+        "carry": 0,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/2"
       },
       {
         "slot": 3,
@@ -1458,12 +1490,27 @@
         "fe_id": "shieldsman",
         "kb_id": "shieldsman",
         "speed": 8,
-        "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/3",
+        "stats": {
+          "name_zh": "盾牌手",
+          "cost": [
+            145,
+            95,
+            245,
+            45
+          ],
+          "attack": 40,
+          "def_inf": 85,
+          "def_cav": 45,
+          "carry": 40,
+          "upkeep": 1,
+          "train_time": 1936,
+          "ref": "asia_x1/help/spartans/3"
+        },
+        "carry": 40,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/3"
       },
       {
         "slot": 4,
@@ -1471,12 +1518,27 @@
         "fe_id": "twinsteel",
         "kb_id": "twirler",
         "speed": 6,
-        "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/4",
+        "stats": {
+          "name_zh": "雙鋼泰瑞恩",
+          "cost": [
+            130,
+            200,
+            400,
+            65
+          ],
+          "attack": 90,
+          "def_inf": 55,
+          "def_cav": 40,
+          "carry": 50,
+          "upkeep": 1,
+          "train_time": 2112,
+          "ref": "asia_x1/help/spartans/4"
+        },
+        "carry": 50,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/4"
       },
       {
         "slot": 5,
@@ -1484,12 +1546,27 @@
         "fe_id": "elpida",
         "kb_id": "elpida_rider",
         "speed": 16,
-        "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/5",
+        "stats": {
+          "name_zh": "爾必達騎士",
+          "cost": [
+            555,
+            445,
+            330,
+            110
+          ],
+          "attack": 55,
+          "def_inf": 120,
+          "def_cav": 90,
+          "carry": 110,
+          "upkeep": 2,
+          "train_time": 2816,
+          "ref": "asia_x1/help/spartans/5"
+        },
+        "carry": 110,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/5"
       },
       {
         "slot": 6,
@@ -1497,64 +1574,147 @@
         "fe_id": "corinthian",
         "kb_id": "corinthian_crusher",
         "speed": 9,
-        "source": "official_pending",
-        "ref": "https://support.travian.com/en/articles/187-infantry-and-cavalry-units-comparison-table",
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/6",
+        "stats": {
+          "name_zh": "科林斯破壞者",
+          "cost": [
+            660,
+            495,
+            995,
+            165
+          ],
+          "attack": 195,
+          "def_inf": 80,
+          "def_cav": 75,
+          "carry": 80,
+          "upkeep": 3,
+          "train_time": 3432,
+          "ref": "asia_x1/help/spartans/6"
+        },
+        "carry": 80,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/6"
       },
       {
         "slot": 7,
         "troop_id": "spartan_ram",
         "fe_id": "ram",
         "kb_id": "ram",
-        "speed": null,
-        "source": "pending",
-        "ref": null,
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "speed": 4,
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/7",
+        "stats": {
+          "name_zh": "破城槌",
+          "cost": [
+            525,
+            260,
+            790,
+            130
+          ],
+          "attack": 65,
+          "def_inf": 30,
+          "def_cav": 80,
+          "carry": 0,
+          "upkeep": 3,
+          "train_time": 4620,
+          "ref": "asia_x1/help/spartans/7"
+        },
+        "carry": 0,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/7"
       },
       {
         "slot": 8,
         "troop_id": "ballista",
         "fe_id": "ballista",
         "kb_id": "catapult",
-        "speed": null,
-        "source": "pending",
-        "ref": null,
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "speed": 3,
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/8",
+        "stats": {
+          "name_zh": "賴達投石機",
+          "cost": [
+            550,
+            1240,
+            825,
+            135
+          ],
+          "attack": 50,
+          "def_inf": 60,
+          "def_cav": 10,
+          "carry": 0,
+          "upkeep": 6,
+          "train_time": 9000,
+          "ref": "asia_x1/help/spartans/8",
+          "train_time_rog_only": {
+            "community": 9900,
+            "community_ref": "https://siegewise.com/en/travian/units/spartans"
+          }
+        },
+        "carry": 0,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/8"
       },
       {
         "slot": 9,
         "troop_id": "ephor",
         "fe_id": "ephor",
         "kb_id": "ephor",
-        "speed": null,
-        "source": "pending",
-        "ref": null,
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "speed": 4,
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/9",
+        "stats": {
+          "name_zh": "五長官",
+          "cost": [
+            33450,
+            30665,
+            36240,
+            13935
+          ],
+          "attack": 40,
+          "def_inf": 60,
+          "def_cav": 40,
+          "carry": 0,
+          "upkeep": 4,
+          "train_time": 77550,
+          "ref": "asia_x1/help/spartans/9",
+          "train_time_rog_only": {
+            "community": 28800,
+            "community_ref": "https://siegewise.com/en/travian/units/spartans"
+          }
+        },
+        "carry": 0,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/9"
       },
       {
         "slot": 10,
         "troop_id": "spartan_settler",
         "fe_id": "settler",
         "kb_id": "settler",
-        "speed": null,
-        "source": "pending",
-        "ref": null,
-        "stats": null,
-        "carry": null,
-        "carry_source": "pending",
-        "carry_ref": null
+        "speed": 5,
+        "source": "asia_x1",
+        "ref": "asia_x1/help/spartans/10",
+        "stats": {
+          "name_zh": "開拓者",
+          "cost": [
+            5115,
+            5580,
+            6045,
+            3255
+          ],
+          "attack": 10,
+          "def_inf": 80,
+          "def_cav": 80,
+          "carry": 3000,
+          "upkeep": 1,
+          "train_time": 34100,
+          "ref": "asia_x1/help/spartans/10"
+        },
+        "carry": 3000,
+        "carry_source": "asia_x1",
+        "carry_ref": "asia_x1/help/spartans/10"
       }
     ],
     "vikings": [

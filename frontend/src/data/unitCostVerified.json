@@ -1,12 +1,25 @@
 {
-  "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在 ts11 遊戲內說明頁讀到（evidence/ts11_manual_2026-10-10.json）才是 true；ts11 是 5 族伺服器：維京照官方說明頁 S139 的兵種表（evidence/official_support_2026-10-10.json）是 true，斯巴達只有標示第三方計算器的 S187，維持 false（兵種詳情顯示「待驗證」）。",
+  "_note": "產生檔（scripts/game_data/gen_game_data.py），不要手改。部族的 10 種兵花費、糧耗、訓練時間都在遊戲內說明頁讀到才是 true：5 族在 ts11（evidence/ts11_manual_2026-10-10.json），斯巴達在 ASIA x1（evidence/asia_x1_manual_spartans_2026-10-11.json）；維京照官方說明頁 S139 的兵種表（evidence/official_support_2026-10-10.json）是 true。",
   "tribes": {
     "romans": true,
     "gauls": true,
     "teutons": true,
     "huns": true,
     "egyptians": true,
-    "spartans": false,
+    "spartans": true,
     "vikings": true
+  },
+  "_rog_only_note": "ASIA x1 是 Rise of Governors 年度特別世界。下面這些兵種的訓練時間跟社群資料（一般世界）不一樣（evidence/crosscheck_spartans_vikings_2026-10-11.json）：數字照 ASIA x1，但一般世界待驗證。",
+  "train_time_rog_only": {
+    "ballista": {
+      "asia_x1": 9000,
+      "community": 9900,
+      "community_ref": "https://siegewise.com/en/travian/units/spartans"
+    },
+    "ephor": {
+      "asia_x1": 77550,
+      "community": 28800,
+      "community_ref": "https://siegewise.com/en/travian/units/spartans"
+    }
   }
 }

@@ -8,10 +8,10 @@
  *       (scripts/game_data/gen_game_data.py, evidence/ts11_manual_2026-10-10.json).
  *   - Vikings:
  *       https://support.travian.com/en/articles/139-vikings-in-travian-legends
- *   - Spartans: no first-hand source yet (ts11 has no Spartans) -> verified=false,
- *       the UI shows 「待驗證」.
+ *   - Spartans: ASIA x1 in-game help (ts11 has no Spartans), read 2026-10-11
+ *       (evidence/asia_x1_manual_spartans_2026-10-11.json), also via unitSpeeds.gen.json.
  *
- * Speed comes from the same generated file; null = no first-hand source (Spartans).
+ * Speed comes from the same generated file; null = no first-hand source.
  */
 import type { TribeId } from '../travian';
 import { unitSpeed, unitSpeedValue } from '@/data/unitSpeeds';
@@ -22,7 +22,7 @@ export interface SettlerCombatStats {
   defCav: number;
   /** Fields per hour (base travel speed); null = 待驗證. Generated, see header. */
   speed: number | null;
-  /** Carry capacity (resources per settler); null = not verified (Spartans, Vikings), never 0. */
+  /** Carry capacity (resources per settler); null = not verified (Vikings), never 0. */
   carry: number | null;
   /** Upkeep in crop per hour. */
   upkeep: number;
@@ -58,11 +58,11 @@ const EGYPTIAN_COMBAT: Omit<SettlerCombatStats, 'speed'> = {
 };
 
 function settlerCombat(tribe: TribeId, base: Omit<SettlerCombatStats, 'speed'>): SettlerCombatStats {
-  // 運載量照產生檔（斯巴達、維京是 null：還沒核對，P0-23）
+  // 運載量照產生檔（維京是 null：還沒核對，P0-23）
   return { ...base, carry: unitSpeed(tribe, 'settler')?.carry ?? null, speed: unitSpeedValue(tribe, 'settler') };
 }
 
-/** ts11 說明頁讀到的開拓者（產生檔）；沒讀到就用 fallback（不應該發生，測試會擋） */
+/** 遊戲內說明頁讀到的開拓者（產生檔；5 族 ts11、斯巴達 ASIA x1）；沒讀到就用 fallback（不應該發生，測試會擋） */
 function ts11Settler(tribe: TribeId, fallback: SettlerCost): SettlerCost {
   const st = unitSpeed(tribe, 'settler')?.stats;
   if (!st) return fallback;
@@ -72,7 +72,9 @@ function ts11Settler(tribe: TribeId, fallback: SettlerCost): SettlerCost {
     trainingSeconds: st.trainTime,
     combat: { attack: st.attack, defInf: st.defInf, defCav: st.defCav, carry: st.carry, upkeep: st.upkeep, speed: unitSpeedValue(tribe, 'settler') },
     verified: true,
-    source: `ts11 遊戲內說明 ${st.ref}（2026-10-10）`,
+    source: st.ref.startsWith('asia_x1/')
+      ? `ASIA x1 遊戲內說明實測 ${st.ref}（2026-10-11）`
+      : `ts11 遊戲內說明 ${st.ref}（2026-10-10）`,
   };
 }
 
@@ -121,11 +123,11 @@ export const TRIBE_SETTLER_COST: Record<TribeId, SettlerCost> = {
     verified: false,
     source: UNVERIFIED,
   }),
-  spartans: {
+  spartans: ts11Settler('spartans', {
     wood: 5115, clay: 5580, iron: 6045, crop: 3255, total: 19995,
     trainingSeconds: 34100,
     combat: settlerCombat('spartans', STANDARD_COMBAT),
     verified: false,
-    source: '沒有第一手來源（ts11 沒有斯巴達）：數字待驗證',
-  },
+    source: UNVERIFIED,
+  }),
 };

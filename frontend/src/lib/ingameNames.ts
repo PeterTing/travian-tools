@@ -8,7 +8,7 @@ interface UnitRow extends NameRow {
   tribe: string
   fe_id: string
   game_id: number | null
-  /** 中文是暫譯（斯巴達、維京；官方說明頁沒有中文版） */
+  /** 中文是暫譯（維京；官方說明頁沒有中文版。斯巴達 2026-10-11 起是 ASIA x1 遊戲內名稱） */
   zh_pending: boolean
   /** 官方說明頁的英文名（S139／S187／S10）；ts11 的兵種、官方沒寫的是 null */
   en: string | null
@@ -66,8 +66,8 @@ export function matchesIngameName(row: { zh: string; aliases: string[] }, q: str
 }
 
 /**
- * 兵種在畫面上的中文顯示名（P0-23 後續）：ts11 有的就是遊戲內名稱；斯巴達、維京是「中文暫譯（官方英文名）」
- * （官方說明頁沒寫英文名的只有中文），zhPending＝中文是暫譯，名稱旁要標待驗證（unitNameZhPending）
+ * 兵種在畫面上的中文顯示名（P0-23 後續）：ts11／ASIA x1（斯巴達）有的就是遊戲內名稱；維京是「中文暫譯（官方英文名）」，
+ * zhPending＝中文是暫譯，名稱旁要標待驗證（unitNameZhPending）
  */
 export function ingameUnitDisplay(troopId: string): { text: string; zhPending: boolean } | undefined {
   const u = INGAME_UNITS[troopId]

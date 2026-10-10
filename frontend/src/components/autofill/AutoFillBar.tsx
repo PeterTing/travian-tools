@@ -5,7 +5,8 @@ import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerify
 import { usesHero, usesUnitData } from '@/components/layout/navItems'
 import { ROUTES } from '@/constants/routes'
 import { formatOffsetHours } from '@/lib/serverTime'
-import { showUnitPendingLine, unitNameProvisional } from '@/lib/unitPending'
+import { showUnitPendingLine, unitPendingLineKey } from '@/lib/unitPending'
+import { vikingCarryPending } from '@/data/unitSpeeds'
 import type { TroopTribe, Village } from '@/types/game'
 import { AUTOFILL_SPEEDS, useAutoFill, type AutoFillSpeed } from './AutoFillContext'
 
@@ -35,8 +36,9 @@ interface AutoFillBarProps {
  * 計算器最上面的「已帶入」列（IA v2.2）：
  *   已帶入：PeterT · ts11（x1・高盧）· 主村 (0|0)   更改
  *   時差 +6 小時（從貼上的頁面讀到）／時差：貼一頁就會自動設好
- *   〔待驗證〕斯巴達、維京的兵種數字待驗證（斯巴達含速度）[，兵種中文名為暫譯 ← 選斯巴達、維京時]
- *     ← 只在用到兵種資料的頁面，而且部族是斯巴達、維京（或兵種資料庫選「全部」）才顯示（P0-17 (k)）
+ *   〔待驗證〕兵種中文名為暫譯 ← 選維京時（維京運載量 2026-10-11 起 ✓；改回待驗證時是「維京的運載量待驗證，兵種中文名為暫譯」）
+ *     ← 只在用到兵種資料的頁面，而且部族是維京（或兵種資料庫選「全部」、不知道部族）才顯示（P0-17 (k)）
+ *     斯巴達 2026-10-11 在 ASIA x1 遊戲內說明核對完，不再出現
  *
  * 征服保留部族的世界（一個帳號多個部族，P0-25）：
  *   已帶入：PeterT · ts11（x1）· 01 (33|-4)・高盧人   更改
@@ -121,7 +123,7 @@ export default function AutoFillBar({ usesVillage = true, unitData, assumption, 
         // 一行，對齊灰標右邊的文字起點（懸掛縮排），折行也不折到灰標底下
         <PendingRow className="flex items-baseline gap-1 text-xs text-muted-foreground" data-testid="autofill-unit-pending">
           <PendingVerifyChip className="shrink-0" kind="autofillUnits" />
-          <p className="min-w-0" data-testid="autofill-unit-pending-text">{t('autofill.unitPending')}{unitNameProvisional(lineTribe) && t('autofill.unitNameProvisional')}</p>
+          <p className="min-w-0" data-testid="autofill-unit-pending-text">{t(unitPendingLineKey(lineTribe, vikingCarryPending()))}</p>
         </PendingRow>
       )}
 

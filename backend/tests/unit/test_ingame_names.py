@@ -244,17 +244,23 @@ def test_knowledge_base_old_names_still_find_things():
     kb = rag_service.TravianKnowledgeBase()
     titles = [r["title"] for r in kb.retrieve("長矛兵")]
     assert "矛兵詳細資料" in titles
-    titles = [r["title"] for r in kb.retrieve("爾必達騎士")]
-    assert "希望騎士詳細資料" in titles
+    # 斯巴達改用 ASIA x1 遊戲內名稱（2026-10-11）；以前的暫譯還找得到
+    titles = [r["title"] for r in kb.retrieve("希望騎士")]
+    assert "爾必達騎士詳細資料" in titles
 
 
 def test_spartan_viking_names_follow_pm_rule():
-    """斯巴達、維京：官方說明頁 S139／S187 沒有繁體中文版，維持兵種資料庫的名稱；計算器以前的名字只當 aliases."""
+    """斯巴達：ASIA x1 遊戲內名稱（2026-10-11），以前的暫譯只當 aliases；
+    維京：官方說明頁 S139 沒有繁體中文版，維持兵種資料庫的名稱；計算器以前的名字只當 aliases."""
     units = NAMES["units"]
     expect = {
-        "hoplite": ("重裝步兵", "裝甲步兵"),
-        "shieldsman": ("盾兵", "盾牌手"),
-        "elpida_rider": ("希望騎士", "爾必達騎士"),
+        "hoplite": ("裝甲步兵", "重裝步兵"),
+        "shieldsman": ("盾牌手", "盾兵"),
+        "twinsteel_therion": ("雙鋼泰瑞恩", "雙刃獸戰士"),
+        "elpida_rider": ("爾必達騎士", "希望騎士"),
+        "corinthian_crusher": ("科林斯破壞者", "科林斯粉碎者"),
+        "ballista": ("賴達投石機", "弩炮"),
+        "ephor": ("五長官", "監察官"),
         "thrall": ("奴僕", "奴隸"),
         "huskarl_rider": ("侍衛騎士", "禁衛軍騎士"),
         "jarl": ("領主", "首領"),
@@ -266,7 +272,8 @@ def test_spartan_viking_names_follow_pm_rule():
         assert sum(1 for u in units.values() if u["tribe"] == tribe) == 10
 
 
-# P0-23 後續：斯巴達、維京顯示「中文暫譯（官方英文名）」，英文名照官方說明頁；name.en 不能有中文
+# P0-23 後續：維京顯示「中文暫譯（官方英文名）」，英文名照官方說明頁；name.en 不能有中文
+# （斯巴達 2026-10-11 起是 ASIA x1 遊戲內名稱，不是暫譯）
 CJK = re.compile(r"[\u3000-\u303f\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff00-\uffef]")
 SUPPORT = json.loads(
     (ROOT / "scripts/game_data/evidence/official_support_2026-10-10.json").read_text(
@@ -275,11 +282,11 @@ SUPPORT = json.loads(
 )["articles"]
 
 
-def test_spartan_viking_names_are_provisional_with_official_english():
+def test_viking_names_are_provisional_with_official_english():
     troops = _load("troops.json")["troops"]
     pending = {tid: u for tid, u in NAMES["units"].items() if u["zh_pending"]}
-    assert {u["tribe"] for u in pending.values()} == {"spartans", "vikings"}
-    assert len(pending) == 20
+    assert {u["tribe"] for u in pending.values()} == {"vikings"}
+    assert len(pending) == 10
     by_url = {a["url"]: a for a in SUPPORT.values()}
     for tid, u in NAMES["units"].items():
         assert u["display_zh"] == (f"{u['zh']}（{u['en']}）" if u["en"] else u["zh"]), (
@@ -293,7 +300,8 @@ def test_spartan_viking_names_are_provisional_with_official_english():
             assert u["en"] in by_url[u["en_ref"]]["text"], tid
             assert troops[tid]["name_en"] == u["en"], tid
     assert NAMES["units"]["thrall"]["display_zh"] == "奴僕（Thrall）"
-    assert NAMES["units"]["ballista"]["en"] is None  # 官方說明頁沒寫
+    assert NAMES["units"]["hoplite"]["display_zh"] == "裝甲步兵"  # 不加英文括號
+    assert NAMES["units"]["ballista"]["en"] is None
 
 
 def test_catapult_spelling_follows_ts11():
@@ -301,8 +309,9 @@ def test_catapult_spelling_follows_ts11():
     assert MANUAL["troops"]["18"]["name_zh"] == "弩炮"
     zh = [u["zh"] for u in NAMES["units"].values()]
     assert "弩砲" not in zh
-    assert NAMES["units"]["ballista"]["zh"] == "弩炮"
-    assert "弩砲" in NAMES["units"]["ballista"]["aliases"]
+    # 斯巴達 Ballista 的遊戲內名稱是「賴達投石機」（ASIA x1，2026-10-11）；弩炮／弩砲只給搜尋
+    assert NAMES["units"]["ballista"]["zh"] == "賴達投石機"
+    assert {"弩炮", "弩砲"} <= set(NAMES["units"]["ballista"]["aliases"])
 
 
 def test_no_chinese_in_english_names():
@@ -339,8 +348,10 @@ def test_ts11_manual_71_90_and_knowledge_base_evidence():
         "buildings/:gid",
         "items",
     ]
-    # 所以斯巴達、維京運載量維持留空
+    # 所以維京運載量維持留空；斯巴達改在 ASIA x1 讀（asia_x1_manual_spartans_2026-10-11.json）
     troops = _load("troops.json")["troops"]
     for tid, u in NAMES["units"].items():
-        if u["tribe"] in ("spartans", "vikings"):
+        if u["tribe"] == "vikings":
             assert troops[tid]["carry_capacity"] is None, tid
+        if u["tribe"] == "spartans":
+            assert isinstance(troops[tid]["carry_capacity"], int), tid

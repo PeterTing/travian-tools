@@ -21,10 +21,10 @@ const fillCoords = () => {
   }
 }
 
-const SPARTANS = [
-  'Hoplite', 'Sentinel', 'Shieldsman', 'Twinsteel Therion', 'Elpida Rider',
-  'Corinthian Crusher', 'Ram', 'Ballista', 'Ephor', 'Settler',
-].map(n => `${n} (spartans)`)
+// 2026-10-11 起斯巴達在 ASIA x1 核對過，後端目前回空清單；這裡用假資料測「有待驗證兵種」的那條路徑
+const UNVERIFIED = ['Hoplite', 'Ephor'].map(n => `${n} (spartans)`)
+
+const chips0Kind = (el: HTMLElement) => within(el).getAllByTestId('pending-verify-chip')[0]?.getAttribute('data-kind')
 
 describe('PathSpeedTsCalculatorPage unverified-units-note (P0-15)', () => {
   beforeEach(async () => {
@@ -32,7 +32,7 @@ describe('PathSpeedTsCalculatorPage unverified-units-note (P0-15)', () => {
     await i18n.changeLanguage('zh-TW')
   })
 
-  it('shows ONE line: grey 待驗證 chip + 斯巴達兵種速度待驗證，未列入反推', async () => {
+  it('shows ONE line: grey 待驗證 chip + 有兵種速度待驗證，未列入反推', async () => {
     mockedApi.calculatePathSpeedTs.mockResolvedValueOnce({
       distance: 6,
       possible_matches: [{
@@ -42,7 +42,7 @@ describe('PathSpeedTsCalculatorPage unverified-units-note (P0-15)', () => {
         calculated_travel_time_seconds: 3600,
         calculated_travel_time_formatted: '1:00:00',
       }],
-      unverified_units: SPARTANS,
+      unverified_units: UNVERIFIED,
     })
     render(<PathSpeedTsCalculatorPage />)
     fillCoords()
@@ -51,7 +51,8 @@ describe('PathSpeedTsCalculatorPage unverified-units-note (P0-15)', () => {
     const notes = await screen.findAllByTestId('unverified-units-note')
     expect(notes).toHaveLength(1)
     const note = notes[0]
-    expect(note).toHaveTextContent('斯巴達兵種速度待驗證，未列入反推')
+    expect(note).toHaveTextContent('有兵種速度待驗證，未列入反推')
+    expect(chips0Kind(note)).toBe('reverseTsUnverified')
     expect(note.className).toContain('text-xs')
     const chips = within(note).getAllByTestId('pending-verify-chip')
     expect(chips).toHaveLength(1)

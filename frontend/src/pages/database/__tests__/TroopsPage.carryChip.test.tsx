@@ -3,11 +3,11 @@ import { render, screen, fireEvent, within } from '@testing-library/react'
 import i18n from '@/i18n/i18n'
 import TroopsPage from '../TroopsPage'
 
-// 斯巴達、維京運載量（P0-23 PM 決定留空）：運載量那格「—」（aria-label 未提供）＋緊跟一個「待驗證」，說明畫在那一列下面
+// 維京運載量（P0-23 PM 決定留空；斯巴達 2026-10-11 已在 ASIA x1 讀到）：運載量那格「—」（aria-label 未提供）＋緊跟一個「待驗證」，說明畫在那一列下面
 const base = { category: 'infantry', attack: 45, defense_infantry: 22, defense_cavalry: 5, crop_consumption: 1, speed: 7, speed_source: 'official', speed_ref: 'S139' }
 const rows = [
   { ...base, troop_id: 'thrall', name_zh: '奴僕', name_en: 'Thrall', tribe: 'vikings', carry_capacity: null },
-  { ...base, troop_id: 'hoplite', name_zh: '重裝步兵', name_en: 'Hoplite', tribe: 'spartans', speed_source: 'official_pending', carry_capacity: null },
+  { ...base, troop_id: 'hoplite', name_zh: '裝甲步兵', name_en: 'Hoplite', tribe: 'spartans', speed: 6, speed_source: 'asia_x1', speed_ref: 'asia_x1/help/spartans/1', carry_capacity: 60, carry_source: 'asia_x1' },
   { ...base, troop_id: 'legionnaire', name_zh: '古羅馬步兵', name_en: 'Legionnaire', tribe: 'romans', speed_source: 'ts11', speed_ref: 'manual/troop/1', carry_capacity: 50 },
 ]
 
@@ -22,12 +22,11 @@ vi.mock('@/services/gameApi', () => ({
   },
 }))
 
-describe('TroopsPage: Spartan / Viking carry capacity is 待驗證', () => {
+describe('TroopsPage: Viking carry capacity is 待驗證', () => {
   beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
 
   it.each([
     ['奴僕（Thrall）', 'vikingCarry', '維京運載量還沒核對，先不顯示', '官方說明頁 S139 沒有運載量'],
-    ['重裝步兵（Hoplite）', 'spartanCarry', '斯巴達運載量還沒核對，先不顯示', '官方說明頁 S10、S187 沒有運載量'],
   ])('%s: carry shows 「—」 (aria-label 未提供, right-aligned), one %s chip right after; tap shows two lines under the row', async (name, kind, what, source) => {
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText(name))
@@ -49,10 +48,11 @@ describe('TroopsPage: Spartan / Viking carry capacity is 待驗證', () => {
     expect(within(row).getByTestId('pending-note-source')).toHaveTextContent(source)
   })
 
-  it('ts11 tribes: no carry chip', async () => {
+  it.each([['古羅馬步兵', '50'], ['裝甲步兵', '60']])('%s (ts11 / ASIA x1): carry number, no carry chip', async (name, carry) => {
     render(<TroopsPage />)
-    fireEvent.click(await screen.findByText('古羅馬步兵'))
+    fireEvent.click(await screen.findByText(name))
     const cell = await screen.findByTestId('troop-carry')
+    expect(cell).toHaveTextContent(carry)
     expect(within(cell).queryByTestId('pending-verify-chip')).toBeNull()
   })
 })

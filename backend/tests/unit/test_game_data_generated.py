@@ -8,8 +8,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -605,33 +607,308 @@ def test_carry_capacity_single_source_backend_and_frontend() -> None:
             assert troops[r["troop_id"]]["carry_capacity"] == r["carry"], r["troop_id"]
             kb = TRIBES_DATA[tribe]["troops"][r["kb_id"]]
             assert kb["capacity"] == r["carry"], r["troop_id"]
-            want = "pending" if tribe in ("spartans", "vikings") else "ts11"
+            want = {"vikings": "pending", "spartans": "asia_x1"}.get(tribe, "ts11")
             assert r["carry_source"] == want, r["troop_id"]
-            if want == "ts11":
+            if want != "pending":
                 assert isinstance(r["carry"], int)
                 assert r["stats"]["carry"] == r["carry"]
             else:
-                # PM 決定（P0-23）：斯巴達、維京運載量留空，不放社群整理或推估的數字
+                # PM 決定（P0-23）：維京運載量留空，不放社群整理或推估的數字
                 assert r["carry"] is None, r["troop_id"]
                 assert r["carry_ref"] is None
     assert n == len(troops) == 70
 
 
-def test_spartan_viking_carry_is_null_everywhere_in_backend() -> None:
-    """troops.json、knowledge_base、API 都是 null；API 附上原因，不回 0."""
+def test_viking_carry_is_null_everywhere_in_backend() -> None:
+    """維京：troops.json、knowledge_base、API 都是 null；API 附上原因，不回 0."""
     from app.knowledge_base.tribes import TRIBES_DATA
 
     troops = json.loads(
         (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
     )["troops"]
-    empty = [k for k, t in troops.items() if t["tribe"] in ("spartans", "vikings")]
-    assert len(empty) == 20
+    empty = [k for k, t in troops.items() if t["tribe"] == "vikings"]
+    assert len(empty) == 10
     assert all(troops[k]["carry_capacity"] is None for k in empty)
-    for tribe in ("spartans", "vikings"):
-        assert all(t["capacity"] is None for t in TRIBES_DATA[tribe]["troops"].values())
+    assert all(t["capacity"] is None for t in TRIBES_DATA["vikings"]["troops"].values())
+    # 斯巴達 2026-10-11 在 ASIA x1 讀到運載量，不再留空
+    sp = [t for t in troops.values() if t["tribe"] == "spartans"]
+    assert [t["carry_capacity"] for t in sp] == [60, 0, 40, 50, 110, 80, 0, 0, 0, 3000]
     gen_text = GEN.read_text(encoding="utf-8")
-    assert "CARRY_PENDING" not in gen_text
+    # 單一兵種留空的名單只有維京開拓者（PM 第 4 輪；現在維京整族都留空，這條是備用）
+    assert re.findall(r"^CARRY_PENDING\w* = .*$", gen_text, re.M) == [
+        'CARRY_PENDING_UNITS = ("viking_settler",)'
+    ]
     assert "community" not in gen_text.split("CARRY_SOURCES = {")[1].split("}")[0]
+
+
+# ── 斯巴達：ASIA x1 遊戲內說明實測（2026-10-11）──────────────────────────
+ASIA_X1_SPARTANS = (
+    ROOT / "scripts/game_data/evidence/asia_x1_manual_spartans_2026-10-11.json"
+)
+SPARTAN_IDS = [
+    "hoplite",
+    "sentinel",
+    "shieldsman",
+    "twinsteel_therion",
+    "elpida_rider",
+    "corinthian_crusher",
+    "spartan_ram",
+    "ballista",
+    "ephor",
+    "spartan_settler",
+]
+
+
+def test_asia_x1_spartan_evidence_records_source_and_screenshots() -> None:
+    import hashlib
+
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
+    assert ev["server"] == "rog.x1.asia.travian.com"
+    assert ev["url"] == "https://rog.x1.asia.travian.com"
+    assert "Spartans" in ev["path"]
+    rc = ev["read_conditions"]
+    assert "x1" in rc["server_speed"]
+    assert rc["read_at"].startswith("2026-10-11")
+    assert sorted(int(n) for n in ev["troops"]) == list(range(1, 11))
+    shots = [(ev["overview_screenshot"], ev["overview_screenshot_sha256"])]
+    shots += [
+        (t["screenshot"], t["screenshot_sha256"])
+        for t in ev["troops"].values()
+        if t["screenshot"]
+    ]
+    assert len(shots) == 5
+    ev_dir = ASIA_X1_SPARTANS.parent
+    for rel, sha in shots:
+        data = (ev_dir / rel).read_bytes()
+        assert hashlib.sha256(data).hexdigest() == sha, rel
+        assert rel.endswith(f"/{sha}.png"), rel
+    for n, t in ev["troops"].items():
+        h, m, s = (int(x) for x in t["train_time_text"].split(":"))
+        assert t["train_time_s"] == h * 3600 + m * 60 + s, n
+        assert len(t["cost"]) == 4, n
+    assert ev["overview_names_en"] == [
+        ev["troops"][str(i)]["name_en"] for i in range(1, 11)
+    ]
+
+
+def test_asia_x1_evidence_is_de_identified() -> None:
+    """公開 repo（第 6 輪）：帳號、大廳帳號、村莊寫「測試帳號（已去識別）」；截圖只留中間的說明視窗."""
+    import struct
+
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
+    assert ev["read_conditions"]["account"] == "測試帳號（已去識別）"
+    assert "測試帳號（已去識別）" in ev["_what"]
+    shots = [ev["overview_screenshot"], ev["raw_zh"]["overview_screenshot"]]
+    shots += [t["screenshot"] for t in ev["troops"].values() if t["screenshot"]]
+    assert len(set(shots)) == 6
+    for rel in set(shots):
+        head = (ASIA_X1_SPARTANS.parent / rel).read_bytes()[:24]
+        assert head[:8] == b"\x89PNG\r\n\x1a\n", rel
+        # 原圖 1024×594 整個遊戲畫面；裁切後只剩說明視窗（右上角的帳號、村莊、座標都在 x ≥ 730）
+        assert struct.unpack(">II", head[16:24]) == (269, 362), rel
+
+
+def test_asia_x1_raw_zh_text_is_stored_and_matches_every_value() -> None:
+    """繁中原文 10 頁＋總覽：只存說明內容（沒有帳號、村莊等頁面內容），SHA-256 對得上，解析出來跟 troops 一樣."""
+    gen = _gen_module()
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))
+    raw = ev["raw_zh"]
+    assert raw["read_at"].startswith("2026-10-11 01:")
+    assert raw["tribe_zh"] == "斯巴達人"
+    assert sorted(int(n) for n in raw["units"]) == list(range(1, 11))
+    for b in [raw["overview"], *raw["units"].values()]:
+        assert hashlib.sha256(b["text"].encode("utf-8")).hexdigest() == b["text_sha256"]
+        assert b["saved_at"].startswith("2026-10-11T01:") and b["saved_at"].endswith(
+            "+08:00"
+        )
+        for chrome in (
+            "`s village",
+            "伺服器標準時間",
+            "幫助選單",
+            "Privacy settings",
+            "ROG Survey",
+        ):
+            assert chrome not in b["text"], (b["file"], chrome)
+    shot = ASIA_X1_SPARTANS.parent / raw["overview_screenshot"]
+    assert (
+        hashlib.sha256(shot.read_bytes()).hexdigest()
+        == raw["overview_screenshot_sha256"]
+    )
+    for n, b in raw["units"].items():
+        got = gen.parse_asia_x1_raw_zh(b["text"])
+        assert got.pop("tribe_zh") == "斯巴達人"
+        assert got == {k: ev["troops"][n][k] for k in got}, n
+    # 賴達投石機：U+8CF4 U+9054 U+6295 U+77F3 U+6A5F
+    assert ev["troops"]["8"]["name_zh"] == "\u8cf4\u9054\u6295\u77f3\u6a5f"
+    gen.check_asia_x1_raw_zh()
+    names = json.loads(
+        (ROOT / "backend/data/static/ingame_names.json").read_text(encoding="utf-8")
+    )
+    assert names["tribes"]["spartans"] == {
+        "zh": "斯巴達人",
+        "ref": "asia_x1/help/spartans",
+        "aliases": ["斯巴達"],
+    }
+    assert names["tribes"]["vikings"]["ref"] is None
+
+
+def test_spartans_follow_asia_x1_in_game_help_everywhere() -> None:
+    """troops.json、unit_speeds.json、遊戲內名稱表、knowledge_base 的斯巴達 10 種兵都跟 ASIA x1 說明頁一樣."""
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    ev = json.loads(ASIA_X1_SPARTANS.read_text(encoding="utf-8"))["troops"]
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    rows = json.loads(
+        (ROOT / "backend/data/static/unit_speeds.json").read_text(encoding="utf-8")
+    )["tribes"]["spartans"]
+    names = json.loads(
+        (ROOT / "backend/data/static/ingame_names.json").read_text(encoding="utf-8")
+    )["units"]
+    assert [r["troop_id"] for r in rows] == SPARTAN_IDS
+    for r in rows:
+        e, t, tid = ev[str(r["slot"])], troops[r["troop_id"]], r["troop_id"]
+        assert t["stats_source"] == "asia_x1", tid
+        assert t["speed_source"] == "asia_x1", tid
+        assert t["name_zh"] == e["name_zh"] and t["name_en"] == e["name_en"], tid
+        cost = [t[f"cost_{k}"] for k in ("wood", "clay", "iron", "crop")]
+        assert cost == e["cost"], tid
+        assert (t["attack"], t["defense_infantry"], t["defense_cavalry"]) == (
+            e["attack"],
+            e["def_inf"],
+            e["def_cav"],
+        ), tid
+        assert t["speed"] == e["speed"] and t["carry_capacity"] == e["carry"], tid
+        assert t["crop_consumption"] == e["upkeep"], tid
+        assert t["training_time_base"] == e["train_time_s"], tid
+        u = names[tid]
+        assert u["zh"] == e["name_zh"] and u["display_zh"] == e["name_zh"], tid
+        assert u["zh_pending"] is False and u["en"] is None, tid
+        kb = TRIBES_DATA["spartans"]["troops"][r["kb_id"]]
+        assert kb["name_zh"] == e["name_zh"], tid
+        assert [kb["cost"][k] for k in ("wood", "clay", "iron", "crop")] == e["cost"]
+        assert (kb["attack"], kb["defense_infantry"], kb["defense_cavalry"]) == (
+            e["attack"],
+            e["def_inf"],
+            e["def_cav"],
+        ), tid
+        assert kb["upkeep"] == e["upkeep"], tid
+        assert kb["training_time"].split("（")[0] == e["train_time_text"], tid
+        assert kb["capacity"] == e["carry"], tid
+    # 唯一跟舊資料不一樣的數字：賴達投石機（弩炮）訓練時間 9900 → 9000（2:30:00）
+    assert troops["ballista"]["training_time_base"] == 9000
+    cv = json.loads(
+        (ROOT / "frontend/src/data/unitCostVerified.json").read_text(encoding="utf-8")
+    )
+    assert cv["tribes"]["spartans"] is True
+
+
+CROSSCHECK = (
+    ROOT / "scripts/game_data/evidence/crosscheck_spartans_vikings_2026-10-11.json"
+)
+
+
+def test_crosscheck_evidence_records_sources_and_rog_only_fields():
+    """RoG 世界風險：斯巴達跟官方 S187＋社群兩份比一次；只有投石機、五長官的訓練時間不一樣 → 一般世界待驗證."""
+    xc = json.loads(CROSSCHECK.read_text(encoding="utf-8"))
+    for key in (
+        "s187",
+        "s139",
+        "siegewise_spartans",
+        "siegewise_vikings",
+        "fandom_spartans",
+        "fandom_vikings",
+    ):
+        src = xc["sources"][key]
+        assert src["url"].startswith("https://") and len(src["sha256"]) == 64, key
+    for key in ("fandom_spartans", "fandom_vikings"):
+        src = xc["sources"][key]
+        assert hashlib.sha256(src["table_text"].encode()).hexdigest() == src["sha256"]
+    rog = xc["conclusions"]["spartans"]["rog_only"]
+    assert set(rog) == {"ballista", "ephor"}
+    assert {v["field"] for v in rog.values()} == {"train_time"}
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    flagged = {
+        tid for tid, t in troops.items() if "training_time_pending_normal_worlds" in t
+    }
+    assert flagged == {"ballista", "ephor"}
+    assert (
+        troops["ballista"]["training_time_pending_normal_worlds"]["community"] == 9900
+    )
+    assert troops["ballista"]["training_time_base"] == 9000
+    cv = json.loads(
+        (ROOT / "frontend/src/data/unitCostVerified.json").read_text(encoding="utf-8")
+    )
+    assert set(cv["train_time_rog_only"]) == {"ballista", "ephor"}
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    kb = TRIBES_DATA["spartans"]["troops"]
+    assert "一般世界待驗證" in kb["catapult"]["training_time"]
+    assert "一般世界待驗證" in kb["ephor"]["training_time"]
+    assert "（" not in kb["hoplite"]["training_time"]
+
+
+def test_crosscheck_vikings_carry_back_to_pending():
+    """維京：官方 S139 跟社群一致；運載量官方沒有，Siegewise 運載量出處不明 → 幕僚長：出處不明，退回待驗證."""
+    xc = json.loads(CROSSCHECK.read_text(encoding="utf-8"))
+    s139 = xc["sources"]["s139"]["vikings"]
+    sw = xc["sources"]["siegewise_vikings"]["units"]
+    assert len(s139) == 10
+    for n, o in s139.items():
+        key = n.replace(" (Scout)", "").replace(" (Administrator)", "")
+        w = sw[{"Heimdall’s Eye": "Heimdalls Eye"}.get(key, key)]
+        assert (
+            w["attack"],
+            w["def_inf"],
+            w["def_cav"],
+            w["speed"],
+            w["upkeep"],
+            w["total_cost"],
+            w["train_time_s"],
+        ) == (
+            o["attack"],
+            o["def_inf"],
+            o["def_cav"],
+            o["speed"],
+            o["upkeep"],
+            o["total_cost"],
+            o["train_time_s"],
+        ), n
+    assert xc["conclusions"]["vikings"]["carry"]["official"] is None
+    ind = xc["viking_carry_independence"]
+    assert ind["conclusion"] == "出處不明，退回待驗證"
+    fd = ind["final_decision"]
+    assert (fd["by"], fd["date"], fd["conclusion"]) == (
+        "幕僚長",
+        "2026-10-11",
+        "出處不明，退回待驗證",
+    )
+    # 第 3、4 輪的調查留著
+    assert ind["conclusion_round3"] == "independent"
+    assert ind["fandom"]["cites_siegewise"] is False
+    assert ind["siegewise"]["cites_fandom"] is False
+    assert ind["fandom"]["carry_added_revision"]["revid"] == 18687
+    assert ind["fandom"]["carry_added_revision"]["timestamp"] == "2026-07-10T13:28:23Z"
+    assert "2026-08-31" in ind["siegewise"]["page_date"]
+    assert ind["settler"]["siegewise"] == 3000 and ind["settler"]["fandom"] is None
+    troops = json.loads(
+        (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
+    )["troops"]
+    vk = [t for t in troops.values() if t["tribe"] == "vikings"]
+    assert [t["carry_capacity"] for t in vk] == [None] * 10
+    # 第 4 輪：Siegewise 運載量從哪來，查一次（幕僚長）
+    tr = ind["siegewise_source_trace"]
+    assert tr["finding"] == "Siegewise 運載量出處不明"
+    assert len(tr["checked"]) >= 5
+    assert "沒有證據" in tr["uses_fandom_2024_video"]
+    assert "沒有證據" in tr["same_sheet_as_fandom"]
+    assert "改回留空" in ind["settler"]["decision"]
+    gen_text = GEN.read_text(encoding="utf-8")
+    assert 'CARRY_EMPTY_TRIBES: tuple[str, ...] = ("vikings",)' in gen_text
+    assert "CARRY_TWO_SOURCE_TRIBES: tuple[str, ...] = ()" in gen_text
 
 
 def test_multitribe_support_pages_sha256_and_quotes() -> None:

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { TRIBE_SETTLER_COST } from './tribe-cost';
 
-describe('TRIBE_SETTLER_COST (5 tribes from the ts11 in-game help, Vikings from S139, Spartans 待驗證)', () => {
+describe('TRIBE_SETTLER_COST (5 tribes from the ts11 in-game help, Spartans from the ASIA x1 in-game help, Vikings from S139)', () => {
   it('Roman = 4600/4200/5800/4400 = 19000, training 26900s', () => {
     const c = TRIBE_SETTLER_COST.romans;
     expect([c.wood, c.clay, c.iron, c.crop]).toEqual([4600, 4200, 5800, 4400]);
@@ -57,13 +57,13 @@ describe('TRIBE_SETTLER_COST (5 tribes from the ts11 in-game help, Vikings from 
     });
   });
 
-  it('6 tribes verified from first-hand sources (ts11 in-game help / official S139); Spartans have none', () => {
-    const tribes = ['romans', 'teutons', 'gauls', 'vikings', 'egyptians', 'huns'] as const;
+  it('all 7 tribes verified from first-hand sources (ts11 / ASIA x1 in-game help, official S139)', () => {
+    const tribes = ['romans', 'teutons', 'gauls', 'vikings', 'egyptians', 'huns', 'spartans'] as const;
     tribes.forEach((id) => {
       expect(TRIBE_SETTLER_COST[id].verified, `${id} verified`).toBe(true);
       expect(TRIBE_SETTLER_COST[id].source.length, `${id} source non-empty`).toBeGreaterThan(0);
     });
-    expect(TRIBE_SETTLER_COST.spartans.verified).toBe(false);
+    expect(TRIBE_SETTLER_COST.spartans.source).toBe('ASIA x1 遊戲內說明實測 asia_x1/help/spartans/10（2026-10-11）');
     for (const id of ['romans', 'teutons', 'gauls', 'egyptians', 'huns'] as const) {
       expect(TRIBE_SETTLER_COST[id].source, id).toMatch(/ts11/);
     }
@@ -74,19 +74,18 @@ describe('TRIBE_SETTLER_COST (5 tribes from the ts11 in-game help, Vikings from 
     for (const id of ['romans', 'gauls', 'egyptians'] as const) expect(TRIBE_SETTLER_COST[id].combat.attack, `${id} attack`).toBe(0);
   });
 
-  it('all tribes share defInf=80, defCav=80, upkeep=1; carry 3000 for the 5 ts11 tribes, null (not verified) for Spartans and Vikings', () => {
+  it('all tribes share defInf=80, defCav=80, upkeep=1; carry 3000 for the 5 ts11 tribes and Spartans, null (not verified) for Vikings', () => {
     Object.entries(TRIBE_SETTLER_COST).forEach(([id, c]) => {
       expect(c.combat.defInf).toBe(80);
       expect(c.combat.defCav).toBe(80);
-      expect(c.combat.carry, id).toBe(id === 'spartans' || id === 'vikings' ? null : 3000);
+      expect(c.combat.carry, id).toBe(id === 'vikings' ? null : 3000);
       expect(c.combat.upkeep).toBe(1);
     });
   });
 
-  it('settler speed comes from the generated unit speeds (P0-15): 5, Spartans 待驗證', () => {
-    (['romans', 'teutons', 'gauls', 'vikings', 'egyptians', 'huns'] as const).forEach((id) => {
+  it('settler speed comes from the generated unit speeds (P0-15): 5 for every tribe (Spartans: ASIA x1)', () => {
+    (['romans', 'teutons', 'gauls', 'vikings', 'egyptians', 'huns', 'spartans'] as const).forEach((id) => {
       expect(TRIBE_SETTLER_COST[id].combat.speed, `${id} speed`).toBe(5);
     });
-    expect(TRIBE_SETTLER_COST.spartans.combat.speed).toBeNull();
   });
 });

@@ -16,9 +16,9 @@ import { getTribe } from '../data/tribes';
 import type { TribeId } from '../data/tribes-types';
 
 // 速度、運載量、花費都來自產生檔（P0-18：ts11 遊戲內說明頁；scripts/game_data/gen_game_data.py），這裡不寫數字
-// carry：null＝還沒核對（斯巴達、維京；P0-23 PM 決定留空）→ 結果「無法計算」，不當 0
+// carry：null＝還沒核對（維京；P0-23 PM 決定留空）→ 結果「無法計算」，不當 0
 export interface UnitOpt { id: string; tribeId: TribeId; nameZh: string; nameEn: string; tribeZh: string; tribeEn: string; carry: number | null; speed: number; cost: number; verified: boolean }
-// 目前 6 種都是 ts11 核對過的兵；斯巴達、維京的兵沒有列在這裡（運載量 null 的路徑由測試 farmingNullCarry 覆蓋）
+// 目前 6 種都是 ts11 核對過的兵；維京的兵沒有列在這裡（運載量 null 的路徑由測試 farmingNullCarry 覆蓋）
 export const UNIT_PICKS: [string, TribeId, string][] = [
   ['tt', 'gauls', 'theutatesThunder'],
   ['ei', 'romans', 'equitesImperatoris'],
@@ -230,7 +230,7 @@ export default function FarmingCalculator({ units = FARM_UNITS }: { units?: Unit
         </div>
 
         {calc.daily === null ? (
-          // 運載量還沒核對（斯巴達、維京）：大數字換成同樣大小的灰字「無法計算」，第二行 12px 灰字寫原因＋灰標，不給明細
+          // 運載量還沒核對（維京）：大數字換成同樣大小的灰字「無法計算」，第二行 12px 灰字寫原因＋灰標，不給明細
           <CalcResultPanel
             lang={lang}
             title={lang === 'en' ? 'Troops to send' : '派兵組合'}

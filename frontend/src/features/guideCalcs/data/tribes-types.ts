@@ -34,7 +34,7 @@ export interface Unit {
   speed: number | null; // fields/hour at 1x; null = no first-hand source yet (待驗證)
   speedSource: UnitSpeedSource;
   speedRef: string | null;
-  /** carry capacity — generated (unitSpeeds.gen.json), same as backend troops.json; null = not verified (Spartans, Vikings), never treat as 0 */
+  /** carry capacity — generated (unitSpeeds.gen.json), same as backend troops.json; null = not verified (Vikings), never treat as 0 */
   carry: number | null;
   upkeep: number;       // crop per hour
   cost: UnitCost;
@@ -98,7 +98,7 @@ export function withUnitSpeeds(tribe: TribeData): Tribe {
         : {};
       // 中文名一律讀名稱表（斯巴達、維京也是；#34），表裡沒有才用檔案裡的
       const zhName = ingameUnitName(tribe.id, u.id);
-      // 英文名：斯巴達、維京照官方說明頁（S139／S187／S10），表裡沒有才用檔案裡的
+      // 英文名：維京照官方說明頁（S139），表裡沒有才用檔案裡的（斯巴達用檔案裡的，跟 ASIA x1 說明頁一樣）
       const enName = ingameUnitEn(tribe.id, u.id) ?? u.name.en;
       const named = zhName ? { name: { ...u.name, zh: zhName, en: enName } } : {};
       // 運載量一律用產生檔（跟後端 troops.json 同一份；P0-23）
