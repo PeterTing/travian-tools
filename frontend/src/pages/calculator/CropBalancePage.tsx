@@ -12,6 +12,7 @@ import type {
   BattleUnit,
 } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import NumberInput from '@/components/common/NumberInput'
 
 interface BuildingEntry {
   building_id: string
@@ -40,7 +41,7 @@ export default function CropBalancePage() {
   const [heroCropConsumption, setHeroCropConsumption] = useState(6)
   // 人口：預設直接填（遊戲村莊頁看得到），要細算再改逐棟輸入（稽核 2026-10-10）
   const [popMode, setPopMode] = useState<'direct' | 'buildings'>('direct')
-  const [population, setPopulation] = useState('')
+  const [population, setPopulation] = useState<number>(NaN)
   const [popError, setPopError] = useState<string | null>(null)
   const [levelError, setLevelError] = useState<string | null>(null)
   // 伺服器速度跟「已帶入」列（含這頁的「更改」）
@@ -52,7 +53,7 @@ export default function CropBalancePage() {
   }, [fill.speed])
   const fillPop = fill.village?.population
   useEffect(() => {
-    if (fillPop != null && fillPop > 0) setPopulation(String(fillPop))
+    if (fillPop != null && fillPop > 0) setPopulation(fillPop)
   }, [fillPop])
 
   // Result state
@@ -84,8 +85,8 @@ export default function CropBalancePage() {
     const validBuildings = selectedBuildings.filter((b) => b.building_id)
     let pop: number | undefined
     if (popMode === 'direct') {
-      pop = Number(population)
-      if (population.trim() === '' || !Number.isInteger(pop) || pop < 0) {
+      pop = population
+      if (!Number.isInteger(pop) || pop < 0) {
         setPopError('請填村莊人口（0 以上的整數）')
         return
       }
@@ -334,13 +335,11 @@ export default function CropBalancePage() {
             {popMode === 'direct' ? (
               <label className="block text-sm font-medium">
                 <span className="mb-2 block">{t('calculator.crop.populationInput')}</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
+                <NumberInput
                   value={population}
                   aria-invalid={popError ? true : undefined}
-                  onChange={(e) => {
-                    setPopulation(e.target.value.replace(/[^0-9]/g, ''))
+                  onChange={(n) => {
+                    setPopulation(n)
                     setPopError(null)
                   }}
                   className="w-full p-2 border rounded bg-background"
