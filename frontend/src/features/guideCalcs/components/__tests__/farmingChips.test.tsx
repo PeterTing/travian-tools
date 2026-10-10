@@ -21,7 +21,7 @@ const titleChips = () => {
   return within(panel).queryAllByTestId('pending-verify-chip').filter((c) => !c.closest('[data-testid="calc-result-details"]'))
 }
 const row = (label: string) => within(screen.getByTestId('calc-result-details')).getByText(label).closest('div')!
-const setArena = (v: number) => fireEvent.change(within(screen.getByRole('group', { name: '競技場等級' })).getByRole('spinbutton'), { target: { value: String(v) } })
+const setArena = (v: number) => fireEvent.change(screen.getByRole('combobox', { name: '競技場等級' }), { target: { value: String(v) } })
 
 describe('農場收益：行軍速度灰標（P0-22）', () => {
   beforeAll(async () => {

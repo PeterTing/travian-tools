@@ -5,7 +5,7 @@ import s from './calc.module.css';
 import CalcResultPanel from './CalcResultPanel';
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import { CalcBar } from '@/components/autofill/CalcFrame'
-import Stepper from '@/components/common/Stepper'
+import LevelSelect from '@/components/common/LevelSelect'
 import { ingameTribeName } from '@/lib/ingameNames';
 
 const fmtInt = (n: number) => isFinite(n) ? Math.round(n).toLocaleString('en-US') : '—';
@@ -89,7 +89,7 @@ export default function TraderouteCalculator() {
           </div>
 
           <div className="mb-3.5">
-            <Stepper label={lang === 'en' ? 'Trade Office level (0–20)' : '交易所等級 (0–20)'} value={office} onChange={setOffice} min={0} max={20} />
+            <LevelSelect lang={lang} label={lang === 'en' ? 'Trade Office level (0–20)' : '交易所等級 (0–20)'} buildingId="trade_office" value={office} onChange={setOffice} min={0} max={20} testId="traderoute-office" />
           </div>
 
           <div className={s.field}>

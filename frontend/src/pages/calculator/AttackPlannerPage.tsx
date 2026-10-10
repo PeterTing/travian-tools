@@ -4,6 +4,7 @@ import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNu
 import CoordPair from '@/components/common/CoordPair'
 import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
 import { useMapRadius } from '@/lib/mapRadius'
+import LevelSelect from '@/components/common/LevelSelect'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type {
   AttackerProfile,
@@ -253,19 +254,17 @@ function TsOptimizerForm() {
                 ))}
               </select>
             </label>
-            <label className="min-w-0 text-xs text-muted-foreground">
-              <span className="sm:sr-only">競技場等級</span>
-              <select
-                data-testid="attacker-ts"
-                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-base text-foreground sm:mt-0"
-                value={a.ts_level}
-                onChange={(e) => updateAttacker(i, 'ts_level', Number(e.target.value))}
-              >
-                {Array.from({ length: 21 }, (_, n) => (
-                  <option key={n} value={n}>{`競技場 ${n} 級`}</option>
-                ))}
-              </select>
-            </label>
+            <LevelSelect
+              className="min-w-0"
+              labelClassName="text-xs text-muted-foreground sm:sr-only"
+              label="競技場等級"
+              buildingId="tournament_square"
+              min={0}
+              max={20}
+              value={a.ts_level}
+              onChange={(v) => updateAttacker(i, 'ts_level', v)}
+              testId="attacker-ts"
+            />
             {/* 靴子跟競技場相加、只算超過 20 格（P0-21） */}
             <RangeNumberField
               className="min-w-0 text-xs text-muted-foreground"

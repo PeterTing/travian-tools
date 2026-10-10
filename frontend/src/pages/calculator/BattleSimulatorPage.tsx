@@ -8,6 +8,12 @@ import type {
   BattleSimulateResponse,
   TroopTribe,
 } from '@/types/game'
+import LevelSelect from '@/components/common/LevelSelect'
+
+/** 防守方城牆（圖示用）：羅馬城牆、日耳曼土牆、高盧木牆、埃及石墻、匈奴臨時的墻 */
+const WALL_BY_TRIBE: Partial<Record<TroopTribe, string>> = {
+  romans: 'city_wall', teutons: 'earth_wall', gauls: 'palisade', egyptians: 'stone_wall', huns: 'makeshift_wall',
+}
 
 interface TroopUnit {
   troop_id: string
@@ -180,14 +186,16 @@ export default function BattleSimulatorPage() {
 
       {side === 'defender' && (
         <div className="mt-4 pt-4 border-t">
-          <label className="block text-sm font-medium mb-2">{t('calculator.battle.wallLevel')}</label>
-          <input
-            type="number"
+          {/* 圖示照防守方部族的城牆；斯巴達、維京的城牆資料裡沒有，先用城牆圖示 */}
+          <LevelSelect
+            labelStyle="form"
+            label={t('calculator.battle.wallLevel')}
+            buildingId={WALL_BY_TRIBE[tribe] ?? 'city_wall'}
             min={0}
             max={20}
             value={wallLevel}
-            onChange={(e) => setWallLevel(Number(e.target.value))}
-            className="w-full p-2 border rounded bg-background"
+            onChange={setWallLevel}
+            testId="battle-wall-level"
           />
           <p className="text-xs text-muted-foreground mt-1">
             {t('calculator.battle.wallNote')}

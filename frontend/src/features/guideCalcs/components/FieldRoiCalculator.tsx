@@ -6,12 +6,15 @@ import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import type { PendingKind } from '@/lib/pendingNotes';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import BuildingIcon from '@/components/common/BuildingIcon'
+import LevelSelect from '@/components/common/LevelSelect'
 
+// 圖示改用自己畫的資源田圖示（BuildingIcon），不再用 emoji
 const TYPE_LABELS: Record<ResourceType, { zh: string; en: string }> = {
-  wood: { zh: '🪵 木材', en: '🪵 Wood' },
-  clay: { zh: '🧱 黏土', en: '🧱 Clay' },
-  iron: { zh: '⛏️ 鐵礦', en: '⛏️ Iron' },
-  crop: { zh: '🌾 糧食', en: '🌾 Crop' },
+  wood: { zh: '木材', en: 'Wood' },
+  clay: { zh: '黏土', en: 'Clay' },
+  iron: { zh: '鐵礦', en: 'Iron' },
+  crop: { zh: '糧食', en: 'Crop' },
 };
 
 const fmt = (n: number) => isFinite(n)
@@ -70,12 +73,16 @@ export default function FieldRoiCalculator() {
           <h4>{lang === 'en' ? 'Inputs' : '輸入'}</h4>
 
           <div className={s.field}>
-            <label>{lang === 'en' ? 'Resource type' : '資源類型'}</label>
-            <select value={type} onChange={e => setType(e.target.value as ResourceType)}>
-              {(['wood', 'clay', 'iron', 'crop'] as ResourceType[]).map(rt => (
-                <option key={rt} value={rt}>{t(TYPE_LABELS[rt])}</option>
-              ))}
-            </select>
+            <label htmlFor="field-roi-type">{lang === 'en' ? 'Resource type' : '資源類型'}</label>
+            {/* 圖示在選單左邊，跟著選的資源田換 */}
+            <div className="flex min-w-0 items-center gap-2">
+              <BuildingIcon id={type} size={20} />
+              <select id="field-roi-type" className="h-11 text-base" value={type} onChange={e => setType(e.target.value as ResourceType)}>
+                {(['wood', 'clay', 'iron', 'crop'] as ResourceType[]).map(rt => (
+                  <option key={rt} value={rt}>{t(TYPE_LABELS[rt])}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className={s.field}>
@@ -90,13 +97,18 @@ export default function FieldRoiCalculator() {
             </select>
           </div>
 
-          <div className={s.field}>
-            <label>{lang === 'en' ? 'Target level' : '目標等級'}</label>
-            <select data-testid="field-roi-level" value={level} onChange={e => setLevel(+e.target.value)}>
-              {Array.from({ length: maxLevel }, (_, i) => i + 1).map(L => (
-                <option key={L} value={L}>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</option>
-              ))}
-            </select>
+          <div className="mb-3.5">
+            {/* 一般村最高 10 級、主村 20 級（稽核 2026-10-10） */}
+            <LevelSelect
+              lang={lang}
+              label={lang === 'en' ? 'Target level' : '目標等級'}
+              buildingId={type}
+              min={1}
+              max={maxLevel}
+              value={level}
+              onChange={setLevel}
+              testId="field-roi-level"
+            />
           </div>
 
           <div className={s.field}>
@@ -167,7 +179,7 @@ export default function FieldRoiCalculator() {
             <tbody>
               {compareRows.map(({ t: t2, r, best }) => (
                 <tr key={t2} className={`h-11 ${best ? s.tableRowHi : ''}`}>
-                  <td>{t(TYPE_LABELS[t2])}</td>
+                  <td><span className="inline-flex items-center gap-2"><BuildingIcon id={t2} size={20} />{t(TYPE_LABELS[t2])}</span></td>
                   <td>{fmt(r.cost)}</td>
                   <td>{fmt(r.productionGainPerDay)}</td>
                   <td>{r.roiDays.toFixed(2)}</td>

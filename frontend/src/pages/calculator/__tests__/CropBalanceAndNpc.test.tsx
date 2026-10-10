@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import i18n from '@/i18n/i18n'
 
 const calcApi = vi.hoisted(() => ({
@@ -123,17 +123,18 @@ describe('糧食平衡：直接填人口（稽核 2026-10-10）', () => {
     expect(await screen.findByTestId('crop-status-note')).toHaveTextContent('本站自訂')
   })
 
-  it('by-buildings mode: level 99 → error under the list, not sent', async () => {
+  it('by-buildings mode: level is a 1–20 dropdown, so 99 cannot be picked (#36 LevelSelect)', async () => {
     buildingsApi.getBuildings.mockResolvedValueOnce({ buildings: [{ building_id: 'main_building', name_zh: '村莊大樓' }] })
     render(<CropBalancePage />)
     fireEvent.click(await screen.findByTestId('crop-pop-mode-buildings'))
     const pick = document.querySelector<HTMLSelectElement>('select:not([data-testid])')!
     fireEvent.change(pick, { target: { value: 'main_building' } })
-    const level = document.querySelector<HTMLInputElement>('input[type="number"][max="20"]')!
-    fireEvent.change(level, { target: { value: '99' } })
-    fireEvent.click(screen.getByRole('button', { name: /計算糧食平衡/ }))
-    expect(screen.getByTestId('crop-level-error')).toHaveTextContent('1–20')
-    expect(calcApi.calculateCropBalance).not.toHaveBeenCalled()
+    const level = within(screen.getByTestId('crop-building-level')).getByRole('combobox') as HTMLSelectElement
+    const values = Array.from(level.options).map((o) => Number(o.value))
+    expect(values[0]).toBe(1)
+    expect(values[values.length - 1]).toBe(20)
+    expect(values).not.toContain(99)
+    expect(screen.queryByTestId('crop-level-error')).toBeNull()
   })
 })
 

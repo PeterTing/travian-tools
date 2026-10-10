@@ -10,7 +10,8 @@ import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip';
 import type { PendingKind } from '@/lib/pendingNotes';
 import { CalcBar } from '@/components/autofill/CalcFrame'
-import Stepper from '@/components/common/Stepper'
+import LevelSelect from '@/components/common/LevelSelect'
+import BuildingIcon from '@/components/common/BuildingIcon'
 import { ingameBuildingName } from '@/lib/ingameNames';
 
 export type BB = 'sawmill' | 'brickyard' | 'ironFoundry' | 'grainMill' | 'bakery';
@@ -25,6 +26,11 @@ const BB_ZH: Record<BB, string> = {
   sawmill: ingameBuildingName('sawmill')!, brickyard: ingameBuildingName('brickyard')!,
   ironFoundry: ingameBuildingName('iron_foundry')!, grainMill: ingameBuildingName('grain_mill')!,
   bakery: ingameBuildingName('bakery')!,
+};
+
+/** 加成建築 → buildings.json 的 id（圖示用） */
+const BB_ID: Record<BB, string> = {
+  sawmill: 'sawmill', brickyard: 'brickyard', ironFoundry: 'iron_foundry', grainMill: 'grain_mill', bakery: 'bakery',
 };
 
 // 前置條件＝backend/data/static/buildings.json 的 prerequisites（測試逐項核對）：
@@ -220,26 +226,26 @@ export default function BuildOrderCalculator() {
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Current field levels' : '現況：田地等級'}</h4>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Wood' : FIELD_ZH.wood} value={start.wood} onChange={v => setStart(p => ({ ...p, wood: v }))} min={0} max={20} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Clay' : FIELD_ZH.clay} value={start.clay} onChange={v => setStart(p => ({ ...p, clay: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Wood' : FIELD_ZH.wood} buildingId="woodcutter" capital={isCap} value={start.wood} onChange={v => setStart(p => ({ ...p, wood: v }))} testId="build-order-wood" /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Clay' : FIELD_ZH.clay} buildingId="clay_pit" capital={isCap} value={start.clay} onChange={v => setStart(p => ({ ...p, clay: v }))} testId="build-order-clay" /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Iron' : FIELD_ZH.iron} value={start.iron} onChange={v => setStart(p => ({ ...p, iron: v }))} min={0} max={20} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Crop' : FIELD_ZH.crop} value={start.crop} onChange={v => setStart(p => ({ ...p, crop: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Iron' : FIELD_ZH.iron} buildingId="iron_mine" capital={isCap} value={start.iron} onChange={v => setStart(p => ({ ...p, iron: v }))} testId="build-order-iron" /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Crop' : FIELD_ZH.crop} buildingId="cropland" capital={isCap} value={start.crop} onChange={v => setStart(p => ({ ...p, crop: v }))} testId="build-order-crop" /></div>
           </div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Bonus building levels' : '加成建築等級'}</h4>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Sawmill' : BB_ZH.sawmill} value={bonus.sawmill} onChange={v => setBonus(p => ({ ...p, sawmill: v }))} min={0} max={5} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Brickyard' : BB_ZH.brickyard} value={bonus.brickyard} onChange={v => setBonus(p => ({ ...p, brickyard: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Sawmill' : BB_ZH.sawmill} buildingId="sawmill" value={bonus.sawmill} onChange={v => setBonus(p => ({ ...p, sawmill: v }))} min={0} max={5} testId="build-order-sawmill" /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Brickyard' : BB_ZH.brickyard} buildingId="brickyard" value={bonus.brickyard} onChange={v => setBonus(p => ({ ...p, brickyard: v }))} min={0} max={5} testId="build-order-brickyard" /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Iron Foundry' : BB_ZH.ironFoundry} value={bonus.ironFoundry} onChange={v => setBonus(p => ({ ...p, ironFoundry: v }))} min={0} max={5} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Grain Mill' : BB_ZH.grainMill} value={bonus.grainMill} onChange={v => setBonus(p => ({ ...p, grainMill: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Iron Foundry' : BB_ZH.ironFoundry} buildingId="iron_foundry" value={bonus.ironFoundry} onChange={v => setBonus(p => ({ ...p, ironFoundry: v }))} min={0} max={5} testId="build-order-iron_foundry" /></div>
+            <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Grain Mill' : BB_ZH.grainMill} buildingId="grain_mill" value={bonus.grainMill} onChange={v => setBonus(p => ({ ...p, grainMill: v }))} min={0} max={5} testId="build-order-grain_mill" /></div>
           </div>
-          <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Bakery' : BB_ZH.bakery} value={bonus.bakery} onChange={v => setBonus(p => ({ ...p, bakery: v }))} min={0} max={5} /></div>
+          <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Bakery' : BB_ZH.bakery} buildingId="bakery" value={bonus.bakery} onChange={v => setBonus(p => ({ ...p, bakery: v }))} min={0} max={5} testId="build-order-bakery" /></div>
 
-          <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Main Building Lv' : '村莊大樓等級'} value={mb} onChange={setMb} min={1} max={20} /></div>
+          <div className="mb-3.5 min-w-0"><LevelSelect lang={lang} label={lang === 'en' ? 'Main Building Lv' : '村莊大樓等級'} buildingId="main_building" value={mb} onChange={setMb} min={1} max={20} testId="build-order-mb" /></div>
           <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> {lang === 'en' ? 'Plus +25% (gold)' : 'Plus 產量 +25%（金幣）'}</label>
         </div>
 
@@ -268,7 +274,7 @@ export default function BuildOrderCalculator() {
             {plan.steps.map((st, i) => (
               <li key={i}>
                 <span className={s.stepNum}>#{i + 1}</span>
-                <span>{lang === 'en' ? st.label : st.labelZh}</span>
+                <span className="inline-flex min-w-0 items-center gap-2"><BuildingIcon id={st.kind === 'field' ? st.type : BB_ID[st.bb!]} size={20} /><span className="min-w-0">{lang === 'en' ? st.label : st.labelZh}</span></span>
                 <span className={s.stepCost}>{st.cost.toLocaleString()}</span>
                 <span className={s.stepTime}>{st.time > 0 ? formatDuration(st.time) : '—'}</span>
               </li>

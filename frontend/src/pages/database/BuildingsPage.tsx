@@ -7,6 +7,7 @@ import BuildingVerifyMark, { BuildingVerifyLegend } from '@/components/common/Bu
 import { buildingRowLabel } from '@/lib/buildingVerify'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { isBuildingEffectVerified } from '@/data/gameData'
+import BuildingIcon from '@/components/common/BuildingIcon'
 
 const CATEGORY_VALUES: (BuildingCategory | 'all')[] = [
   'all',
@@ -136,6 +137,8 @@ export default function BuildingsPage() {
               >
                 {/* 名稱這一行至少 44px、垂直置中：灰標的 44px 點擊範圍不會蓋到下一行（點下一行是選這棟建築） */}
                 <p className="flex min-h-11 flex-wrap items-center font-medium" data-testid="building-list-name">
+                  {/* 圖示 20px、在名稱左邊隔 8px（設計師） */}
+                  <BuildingIcon id={building.building_id} size={20} className="mr-2" />
                   {isZh ? building.name_zh : building.name_en}
                   <BuildingVerifyMark buildingId={building.building_id} variant="list" onDark={selectedBuilding?.building_id === building.building_id} />
                 </p>
@@ -151,7 +154,9 @@ export default function BuildingsPage() {
         <div className="md:col-span-2 border rounded-lg p-4">
           {selectedBuilding ? (
             <>
-              <h2 className="text-2xl font-bold mb-2" data-testid="building-detail-name">
+              <h2 className="text-2xl font-bold mb-2 flex flex-wrap items-center" data-testid="building-detail-name">
+                {/* 詳情標題的圖示 32px */}
+                <BuildingIcon id={selectedBuilding.building_id} size={32} className="mr-2" />
                 {isZh ? selectedBuilding.name_zh : selectedBuilding.name_en}
                 <BuildingVerifyMark buildingId={selectedBuilding.building_id} />
               </h2>
@@ -178,8 +183,9 @@ export default function BuildingsPage() {
                       return (
                         <span
                           key={prereq.building_id}
-                          className="px-2 py-1 bg-muted rounded text-sm"
+                          className="inline-flex items-center gap-2 px-2 py-1 bg-muted rounded text-sm"
                         >
+                          <BuildingIcon id={prereq.building_id} size={20} />
                           {prereqName} {t('common.level')}{prereq.level}
                         </span>
                       )
