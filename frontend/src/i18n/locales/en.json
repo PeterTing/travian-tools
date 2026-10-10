@@ -27,6 +27,7 @@
     "error": "Error",
     "success": "Success",
     "pendingVerify": "Unverified",
+    "effectPending": "effect not verified",
     "pendingVerifyNote": "Not yet confirmed in the game",
     "buildingVerifyLegend": "Except buildings marked “✓ Verified”, these numbers have not been checked",
     "verifiedTs11": "Checked (tap for the source)",

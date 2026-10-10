@@ -3,6 +3,7 @@ import { render, screen, within, fireEvent } from '@testing-library/react'
 import i18n from '@/i18n/i18n'
 import BuildingsPage from '../BuildingsPage'
 import * as gameData from '@/data/gameData'
+import { isBuildingFullyVerified } from '@/lib/buildingVerify'
 
 const list = [
   { building_id: 'main_building', name_zh: '村莊大樓', name_en: 'Main Building', category: 'infrastructure', max_level: 20 },
@@ -125,21 +126,63 @@ describe('BuildingsPage effect column (official knowledge base, P0-23)', () => {
     for (const id of ['main_building', 'warehouse', 'great_warehouse', 'stonemasons_lodge', 'horse_drinking_trough', 'trade_office', 'woodcutter']) expect(gameData.isBuildingEffectVerified(id), id).toBe(true)
   })
 
-  it('effect not verified: ONE chip by the 效果 heading, note under the header row; verified building: no chip', async () => {
+  it('effect not verified: chip by the 效果 heading (note under the header row) and chip by the title, same two lines', async () => {
     render(<BuildingsPage />)
     fireEvent.click(await screen.findByText('集結點'))
     const heading = await screen.findByTestId('building-effect-heading')
     const chip = within(heading).getByTestId('pending-verify-chip')
     expect(chip).toHaveAttribute('data-kind', 'buildingEffect')
-    expect(screen.getAllByTestId('pending-verify-chip').filter((c) => c.getAttribute('data-kind') === 'buildingEffect')).toHaveLength(1)
+    // 效果欄一個、標題旁一個（#34 設計師）
+    const effectChips = screen.getAllByTestId('pending-verify-chip').filter((c) => c.getAttribute('data-kind') === 'buildingEffect')
+    expect(effectChips).toHaveLength(2)
     fireEvent.click(chip)
     const row = screen.getByTestId('pending-note-row')
     expect(row.querySelector('td')).toHaveAttribute('colspan', '9')
     expect(within(row).getByTestId('pending-note-what')).toHaveTextContent('這棟建築的效果還沒核對。')
     expect(within(row).getByTestId('pending-note-source')).toHaveTextContent('官方知識庫沒有可以對照的效果數字；目前的文字來源還在查。')
-    // ✓ 第一行不寫「效果」
-    fireEvent.click(within((screen.getAllByText('集結點')[0]!).closest('p')!).getByTestId('verified-mark'))
-    expect(screen.getAllByTestId('pending-note-what').some((w) => w.textContent === '花費、時間、人口、CP已核對。')).toBe(true)
+    fireEvent.click(chip)
+    // 標題旁的灰標：點得開，兩行跟效果欄一模一樣
+    const title = screen.getByTestId('building-detail-name')
+    const titleChip = within(title).getByTestId('pending-verify-chip')
+    expect(titleChip.tagName).toBe('BUTTON')
+    fireEvent.click(titleChip)
+    expect(screen.getByTestId('pending-note-what')).toHaveTextContent('這棟建築的效果還沒核對。')
+    expect(screen.getByTestId('pending-note-source')).toHaveTextContent('官方知識庫沒有可以對照的效果數字；目前的文字來源還在查。')
+  })
+
+  // #34 幕僚長／PM：效果待驗證的 5 棟（研究院、盔甲廠、大使館、集結點、寶物庫）不能有 ✓
+  it('effect not verified: no ✓ anywhere (list or title); list shows a non-clickable 待驗證 label, row aria-label says 效果待驗證', async () => {
+    render(<BuildingsPage />)
+    const name = (await screen.findByText('集結點')).closest('p')!
+    expect(within(name).queryByTestId('verified-mark')).toBeNull()
+    expect(name.textContent).not.toContain('✓')
+    const label = within(name).getByTestId('pending-verify-label')
+    expect(label).toHaveTextContent('待驗證')
+    expect(label.tagName).toBe('SPAN')
+    expect(label).toHaveAttribute('aria-hidden', 'true')
+    expect(label).toHaveClass('rounded-full', 'bg-gray-100', 'text-xs', 'text-gray-600')
+    expect(within(name).queryByRole('button')).toBeNull()
+    const row = name.closest('[data-testid=building-list-row]')!
+    expect(row).toHaveAttribute('role', 'listitem')
+    expect(row).toHaveAttribute('aria-label', '集結點，效果待驗證')
+    // 點字樣＝點這一列（選到這棟建築），不會打開說明
+    fireEvent.click(label)
+    const title = await screen.findByTestId('building-detail-name')
+    expect(title.textContent).not.toContain('✓')
+    expect(within(title).queryByTestId('verified-mark')).toBeNull()
+    // 數字和效果都核對過的建築，列表照舊是 ✓、aria-label 只有名稱
+    const mb = screen.getByText('村莊大樓').closest('[data-testid=building-list-row]')!
+    expect(mb).toHaveAttribute('aria-label', '村莊大樓')
+    expect(within(mb as HTMLElement).getByTestId('verified-mark')).toBeInTheDocument()
+  })
+
+  it('real data: none of the 5 effect-pending buildings is fully verified', () => {
+    vi.restoreAllMocks()
+    for (const id of ['academy', 'blacksmith', 'embassy', 'rally_point', 'treasury']) {
+      expect(isBuildingFullyVerified(id), id).toBe(false)
+      expect(gameData.isBuildingVerified(id), id).toBe(true)
+    }
+    expect(isBuildingFullyVerified('main_building')).toBe(true)
   })
 
   it('verified effect (main building): no chip by the 效果 heading', async () => {

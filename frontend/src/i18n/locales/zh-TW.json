@@ -27,6 +27,7 @@
     "error": "錯誤",
     "success": "成功",
     "pendingVerify": "待驗證",
+    "effectPending": "效果待驗證",
     "pendingVerifyNote": "這個數值還沒在遊戲裡實測確認",
     "buildingVerifyLegend": "除標「✓ 已核對」的建築外，數值皆未核對",
     "verifiedTs11": "已核對（點開看出處）",

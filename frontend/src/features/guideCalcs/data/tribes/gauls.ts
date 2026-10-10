@@ -15,7 +15,7 @@ export const gauls = withUnitSpeeds({
     en: 'Fastest cavalry · Rock-solid defense',
   },
   summary: {
-    zh: '速度與防禦並重：Theutates Thunder 是全遊戲最快的騎兵（速度 19），山洞容量 ×1.5，陷阱可以抓敵軍。防守首選，同時也能快速支援友軍。',
+    zh: '速度與防禦並重：雷法師是全遊戲最快的騎兵（速度 19），山洞容量 ×1.5，陷阱可以抓敵軍。防守首選，同時也能快速支援友軍。',
     en: 'Speed and defense. Theutates Thunder is the fastest cavalry in the game (speed 19). Crannies hold 1.5× more, and traps can catch attackers. Top defensive pick and still able to reinforce allies quickly.',
   },
 
@@ -31,14 +31,14 @@ export const gauls = withUnitSpeeds({
   ],
 
   strengths: [
-    { zh: '最快的騎兵（TT 19、海頓聖騎 13）', en: 'Fastest cavalry (TT 19, 海頓聖騎 13)' },
+    { zh: '最快的騎兵（TT 19、海頓聖騎 13）', en: 'Fastest cavalry (TT 19, Haeduan 13)' },
     { zh: '最便宜的 settler，開村最快', en: 'Cheapest settlers, fastest expansion' },
     { zh: '陷阱 + 1.5× cranny 讓早期極難被掠奪', en: 'Trapper + 1.5× cranny makes early raiding nearly useless against Gauls' },
   ],
 
   weaknesses: [
     { zh: '方陣兵攻擊值僅 15，是最弱的攻擊步兵', en: 'Phalanx attack = 15, weakest attacking infantry' },
-    { zh: '攻城器較貴（Trebuchet）', en: 'Siege weapons are expensive (Trebuchet)' },
+    { zh: '攻城器較貴（投石機）', en: 'Siege weapons are expensive (Trebuchet)' },
   ],
 
   wallType: { name: { zh: '木牆 (Palisade)', en: 'Palisade' }, bonusPerLevel: 0.025 },
@@ -72,7 +72,7 @@ export const gauls = withUnitSpeeds({
       cost: { wood: 360, clay: 330, iron: 280, crop: 120 }, trainTime: 3200,
       role: { zh: '高機動防禦騎兵', en: 'Mobile defensive cavalry' } },
     { id: 'haeduan', category: 'cavalry',
-      name: { zh: '海頓聖騎', en: '海頓聖騎' },
+      name: { zh: '海頓聖騎', en: 'Haeduan' },
       attack: 140, defInfantry: 60, defCavalry: 165, upkeep: 3,
       cost: { wood: 500, clay: 620, iron: 675, crop: 170 }, trainTime: 3900,
       role: { zh: '高盧人主力攻擊騎兵', en: 'Main Gaul offensive cavalry' } },
@@ -99,7 +99,7 @@ export const gauls = withUnitSpeeds({
   ],
 
   offTips: [
-    { zh: '錘子主力：海頓聖騎 + 劍士', en: 'Hammer core: 海頓聖騎 + Swordsman' },
+    { zh: '錘子主力：海頓聖騎 + 劍士', en: 'Hammer core: Haeduan + Swordsman' },
     { zh: '早期 TT 農場效率超群（速度 19 + 75 搬運）', en: 'Early raiding is incredible with TTs (speed 19, 75 carry)' },
   ],
   defTips: [

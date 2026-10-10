@@ -25,7 +25,7 @@ class TroopCategory(StrEnum):
     CAVALRY = "cavalry"  # 騎兵
     SIEGE = "siege"  # 攻城器械
     SCOUT = "scout"  # 偵察兵
-    SPECIAL = "special"  # 特殊兵種（如元首、酋長）
+    SPECIAL = "special"  # 特殊兵種（如參議員、司令官、族長）
     SETTLER = "settler"  # 開拓者
 
 

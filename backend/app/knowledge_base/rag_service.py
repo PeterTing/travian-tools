@@ -53,14 +53,16 @@ def _speed_text(speed: object, unit: str = "", source: object = None) -> str:
 class TravianKnowledgeBase:
     """Travian 知識庫檢索服務."""
 
-    # 關鍵字到主題的映射
+    # 關鍵字到主題的映射（使用者問句的關鍵字，不會輸出；舊名留著給還在用舊名問的人，
+    # 遊戲內名稱也要有，#34 PM）
     TOPIC_KEYWORDS = {
         "tribe": [
             "部族",
             "種族",  # 使用者可能還是這樣問，保留當搜尋同義詞
             "羅馬",
             "高盧",
-            "條頓",
+            "條頓",  # 舊名，只給查詢用
+            "日耳曼",
             "埃及",
             "匈奴",
             "斯巴達",
@@ -85,11 +87,13 @@ class TravianKnowledgeBase:
             "投石車",
             "攻城槌",
             "偵察",
+            "開拓者",
             "拓荒者",
             "防禦兵",
             "攻擊兵",
             "棍棒兵",
             "方陣兵",
+            "古羅馬步兵",
             "軍團兵",
             "禁衛兵",
             "狂戰士",
@@ -99,6 +103,7 @@ class TravianKnowledgeBase:
         "buildings": [
             "建築",
             "升級",
+            "村莊大樓",
             "主建築",
             "兵營",
             "馬廄",
@@ -107,9 +112,11 @@ class TravianKnowledgeBase:
             "行宮",
             "皇宮",
             "倉庫",
+            "穀倉",
             "糧倉",
             "資源田",
             "伐木場",
+            "農場",
             "農田",
             "building",
             "construct",
@@ -233,7 +240,11 @@ class TravianKnowledgeBase:
             "忠誠",
             "征服",
             "酋長",
+            "司令官",
+            "參議員",
+            "族長",
             "貴族",
+            "開拓者",
             "拓荒者",
             "chief",
             "senator",
@@ -345,6 +356,15 @@ class TravianKnowledgeBase:
                         detected_topics.append(topic)
                     break
 
+        # 問到某個兵種（遊戲內名稱或舊名）也算兵種主題
+        if "troops" not in detected_topics and any(
+            n and n in query
+            for tribe_data in self.tribes.values()
+            for troop in tribe_data.get("troops", {}).values()
+            for n in (troop.get("name_zh"), *troop.get("aliases_zh", []))
+        ):
+            detected_topics.append("troops")
+
         return detected_topics
 
     def _detect_tribe(self, query: str) -> str | None:
@@ -356,7 +376,8 @@ class TravianKnowledgeBase:
             "高盧": "gauls",
             "gauls": "gauls",
             "gaul": "gauls",
-            "條頓": "teutons",
+            "條頓": "teutons",  # 舊名，只給查詢用
+            "日耳曼": "teutons",
             "teutons": "teutons",
             "teuton": "teutons",
             "埃及": "egyptians",
@@ -495,31 +516,21 @@ class TravianKnowledgeBase:
         """檢索兵種資訊."""
         results = []
 
-        # 搜尋特定兵種
-        troop_keywords = [
-            "棍棒兵",
-            "方陣兵",
-            "軍團兵",
-            "禁衛兵",
-            "狂戰士",
-            "雷神騎兵",
-            "長矛兵",
-            "斧頭兵",
-        ]
-        for keyword in troop_keywords:
-            if keyword in query:
-                # 找到這個兵種的資訊
-                for _tribe_key, tribe_data in self.tribes.items():
-                    for _troop_key, troop_data in tribe_data.get("troops", {}).items():
-                        if troop_data.get("name_zh") == keyword:
-                            results.append(
-                                {
-                                    "title": f"{keyword}詳細資料",
-                                    "content": self._format_troop_details(troop_data),
-                                    "relevance": "high",
-                                }
-                            )
-                            break
+        # 搜尋特定兵種：遊戲內名稱或舊名（aliases_zh）都認得，輸出一律用遊戲內名稱
+        for _tribe_key, tribe_data in self.tribes.items():
+            for _troop_key, troop_data in tribe_data.get("troops", {}).items():
+                zh = troop_data.get("name_zh")
+                if zh in ("破城槌", "開拓者", "弩炮", "衝撞車"):
+                    continue  # 好幾族同名，只靠部族一覽
+                names = [zh, *troop_data.get("aliases_zh", [])]
+                if any(n and n in query for n in names):
+                    results.append(
+                        {
+                            "title": f"{zh}詳細資料",
+                            "content": self._format_troop_details(troop_data),
+                            "relevance": "high",
+                        }
+                    )
 
         # 如果有指定部族，列出該部族的兵種
         if tribe and tribe in self.tribes:
@@ -847,13 +858,13 @@ class TravianKnowledgeBase:
 - 高盧: 防禦強，開局安全
 
 **進攻型玩家:**
-- 條頓: 早期掠奪之王，棍棒兵成本最低
+- 日耳曼人: 早期掠奪之王，棍棒兵成本最低
 - 匈奴: 騎兵快速掠奪
 - 維京: 狂戰士獨特能力
 
 **防禦型玩家:**
 - 埃及: 經濟最強，防禦穩定
-- 高盧: 快速增援，1.5倍密藏室
+- 高盧: 快速增援，1.5倍山洞
 
 **後期發展:**
 - 斯巴達: 最強單位，神殿可恢復60%部隊"""
@@ -905,17 +916,17 @@ class TravianKnowledgeBase:
         """格式化建築順序建議."""
         return """**早期建築優先順序:**
 
-1. 主建築 → 10級（縮短建造時間，可拆除建築）
+1. 村莊大樓 → 10級（縮短建造時間，可拆除建築）
 2. 所有資源田 → 2級
 3. 集結點 → 1級
-4. 倉庫/糧倉 → 適當等級
+4. 倉庫/穀倉 → 適當等級
 5. 資源田 → 5級
 6. 研究院 → 10級（開城鎮廳必需）
 7. 城鎮廳 → 1級以上（舉辦慶典）
-8. 行宮 → 10級（訓練拓荒者）
+8. 行宮 → 10級（訓練開拓者）
 
 **資源村建議:**
-- 主建築 14-20級
+- 村莊大樓 14-20級
 - 所有資源田 8-10級
 - 最小化其他建築"""
 

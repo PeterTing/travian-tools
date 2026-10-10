@@ -15,7 +15,7 @@ export const teutons = withUnitSpeeds({
     en: 'Cheapest troops · Brutal raiding',
   },
   summary: {
-    zh: '進攻型代表：Clubswinger 是全遊戲最便宜最快訓練的單位，Teutonic Knight 攻擊力 150，商人載重 1000。但防禦差、牆最弱，容易被反擊。',
+    zh: '進攻型代表：棍棒兵是全遊戲最便宜最快訓練的單位，條頓騎士攻擊力 150，商人載重 1000。但防禦差、牆最弱，容易被反擊。',
     en: 'Signature aggressive tribe. Clubswingers are the cheapest and fastest-trained unit in the game. Teutonic Knights hit for 150 attack. Merchants carry 1000 each. But defense is weak and Earth Walls crumble under rams.',
   },
 
@@ -31,14 +31,14 @@ export const teutons = withUnitSpeeds({
   ],
 
   strengths: [
-    { zh: 'Clubswinger 便宜、訓練最快，早期掠奪無人能敵', en: 'Cheap, fast-training Clubswingers dominate early raiding' },
+    { zh: '棍棒兵便宜、訓練最快，早期掠奪無人能敵', en: 'Cheap, fast-training Clubswingers dominate early raiding' },
     { zh: '英雄被動讓早期掠奪收入遠超他族', en: 'Hero passive makes early plunder income significantly higher' },
     { zh: '釀酒廠 (Brewery) + TK 組合是後期純 OFF 王者', en: 'Brewery + Teutonic Knight late-game is a top pure-offense combo' },
   ],
 
   weaknesses: [
     { zh: 'Earth Wall 被 ram 輕易摧毀，鐵砧難顧', en: 'Earth Wall breaks easily under rams, anvils are vulnerable' },
-    { zh: '沒有高效防禦步兵（Spearman 較差）', en: 'No strong defensive infantry (Spearman is mediocre)' },
+    { zh: '沒有高效防禦步兵（矛兵較差）', en: 'No strong defensive infantry (Spearman is mediocre)' },
   ],
 
   wallType: { name: { zh: '土牆 (Earth Wall)', en: 'Earth Wall' }, bonusPerLevel: 0.02 },
@@ -90,7 +90,7 @@ export const teutons = withUnitSpeeds({
       name: { zh: '司令官', en: 'Chief' },
       attack: 40, defInfantry: 60, defCavalry: 40, upkeep: 4,
       cost: { wood: 35500, clay: 26600, iron: 25000, crop: 27200 }, trainTime: 70500,
-      role: { zh: '日耳曼人 Chief 訓練最快', en: 'Teuton Chief trains fastest of any tribe' } },
+      role: { zh: '日耳曼人司令官訓練最快', en: 'Teuton Chief trains fastest of any tribe' } },
     { id: 'settler', category: 'settler',
       name: { zh: '開拓者', en: 'Settler' },
       attack: 10, defInfantry: 80, defCavalry: 80, upkeep: 1,

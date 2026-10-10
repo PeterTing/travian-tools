@@ -167,7 +167,7 @@ const branchSteps: BuildStep[] = [
   },
   {
     step: 57,
-    building: { zh: '研發古羅馬步兵（Research Legionnaire）', en: 'Research Legionnaire' },
+    building: { zh: '研發古羅馬步兵', en: 'Research Legionnaire' },
     targetLevel: null,
     tier: null,
     cost: null,

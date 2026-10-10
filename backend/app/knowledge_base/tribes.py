@@ -14,6 +14,10 @@ from typing import Any
 UNIT_SPEEDS_PATH = (
     Path(__file__).resolve().parents[2] / "data" / "static" / "unit_speeds.json"
 )
+# 部族、兵種中文名一律讀遊戲內名稱表（#34 PM）：這個檔案裡寫的名字只是佔位，載入時蓋掉
+INGAME_NAMES_PATH = (
+    Path(__file__).resolve().parents[2] / "data" / "static" / "ingame_names.json"
+)
 
 TRIBES_DATA: dict[str, dict[str, Any]] = {
     "romans": {
@@ -24,25 +28,25 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
         "strengths": [
             "可同時建造建築物和資源田（雙建）",
             "步兵防禦力極強（禁衛兵是最佳反步兵單位）",
-            "騎兵攻擊力高（帝國騎兵攻擊力最高）",
+            "騎兵攻擊力高（帝國騎士攻擊力最高）",
             "英雄每點力量+100（其他部族+80）",
         ],
         "weaknesses": [
             "部隊訓練成本高、時間長",
-            "掠奪效率差（軍團兵速度慢、載重小）",
+            "掠奪效率差（古羅馬步兵速度慢、載重小）",
             "禁衛兵對騎兵防禦力弱",
             "禁衛兵移動速度慢，不適合遠距離支援",
         ],
         "special_building": {
-            "name": "馬飲水槽 (Horse Drinking Trough)",
+            "name": "放牧水槽 (Horse Drinking Trough)",
             "effect": "每升一級減少騎兵1%的糧食消耗，最高減少20%",
         },
         "merchant": {"capacity": 500, "speed": 16},
         "hero_bonus": "每點力量屬性+100（而非標準的+80）",
-        "recommended_defense_ratio": "70% 禁衛兵 / 30% 軍團兵",
+        "recommended_defense_ratio": "70% 禁衛兵 / 30% 古羅馬步兵",
         "troops": {
             "legionnaire": {
-                "name_zh": "軍團兵",
+                "name_zh": "古羅馬步兵",
                 "type": "infantry",
                 "attack": 40,
                 "defense_infantry": 35,
@@ -75,7 +79,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "主力攻擊步兵",
             },
             "equites_legati": {
-                "name_zh": "使節騎兵",
+                "name_zh": "使者騎士",
                 "type": "cavalry",
                 "attack": 0,
                 "defense_infantry": 20,
@@ -86,7 +90,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "偵察兵",
             },
             "equites_imperatoris": {
-                "name_zh": "帝國騎兵",
+                "name_zh": "帝國騎士",
                 "type": "cavalry",
                 "attack": 120,
                 "defense_infantry": 65,
@@ -97,7 +101,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "輕騎兵，適合掠奪",
             },
             "equites_caesaris": {
-                "name_zh": "凱撒騎兵",
+                "name_zh": "將軍騎士",
                 "type": "cavalry",
                 "attack": 180,
                 "defense_infantry": 80,
@@ -108,7 +112,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "重騎兵，最強攻擊力但糧食消耗高",
             },
             "battering_ram": {
-                "name_zh": "攻城槌",
+                "name_zh": "衝撞車／破城槌",
                 "type": "siege",
                 "attack": 60,
                 "defense_infantry": 30,
@@ -119,7 +123,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞城牆",
             },
             "fire_catapult": {
-                "name_zh": "火焰投石車",
+                "name_zh": "火焰投石機",
                 "type": "siege",
                 "attack": 75,
                 "defense_infantry": 60,
@@ -130,7 +134,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞建築物",
             },
             "senator": {
-                "name_zh": "元老",
+                "name_zh": "參議員",
                 "type": "special",
                 "attack": 50,
                 "defense_infantry": 40,
@@ -141,7 +145,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "降低敵方村莊忠誠度 20-30%",
             },
             "settler": {
-                "name_zh": "拓荒者",
+                "name_zh": "開拓者",
                 "type": "special",
                 "attack": 0,
                 "defense_infantry": 80,
@@ -159,13 +163,13 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
         "description": "擁有遊戲中最快的部隊，防禦能力強，適合防守或快速突襲",
         "playstyle": "適合新手，防禦為主但也可攻擊",
         "strengths": [
-            "擁有遊戲中最快的單位（德魯伊騎兵、探路者、雷神騎兵）",
-            "密藏室容量是其他部族的1.5倍",
+            "擁有遊戲中最快的單位（德魯伊騎兵、探路者、雷法師）",
+            "山洞容量是其他部族的1.5倍",
             "方陣兵是最佳的全能防禦步兵",
             "商人速度快（24格/小時）",
         ],
         "weaknesses": [
-            "攻城槌是所有部族中最弱的",
+            "破城槌是所有部族中最弱的",
             "不適合建造世界奇觀攻擊部隊",
             "攻擊力相對較弱",
         ],
@@ -211,7 +215,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "偵察兵，速度極快",
             },
             "theutates_thunder": {
-                "name_zh": "雷神騎兵",
+                "name_zh": "雷法師",
                 "type": "cavalry",
                 "attack": 90,
                 "defense_infantry": 25,
@@ -233,7 +237,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "快速防禦騎兵，最佳反步兵防禦騎兵",
             },
             "haeduan": {
-                "name_zh": "海頓騎兵",
+                "name_zh": "海頓聖騎",
                 "type": "cavalry",
                 "attack": 140,
                 "defense_infantry": 60,
@@ -244,7 +248,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "重騎兵，高攻擊力且對騎兵防禦強",
             },
             "ram": {
-                "name_zh": "攻城槌",
+                "name_zh": "衝撞車／破城槌",
                 "type": "siege",
                 "attack": 50,
                 "defense_infantry": 30,
@@ -255,7 +259,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞城牆（所有部族中最弱）",
             },
             "trebuchet": {
-                "name_zh": "投石車",
+                "name_zh": "投石類攻城武器",
                 "type": "siege",
                 "attack": 70,
                 "defense_infantry": 45,
@@ -277,7 +281,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "降低敵方村莊忠誠度 20-25%",
             },
             "settler": {
-                "name_zh": "拓荒者",
+                "name_zh": "開拓者",
                 "type": "special",
                 "attack": 0,
                 "defense_infantry": 80,
@@ -290,7 +294,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
         },
     },
     "teutons": {
-        "name_zh": "條頓",
+        "name_zh": "日耳曼人",
         "name_en": "Teutons",
         "description": "最具侵略性的部族，部隊便宜且訓練快速，商人載重量最大",
         "playstyle": "適合積極掠奪的玩家",
@@ -298,7 +302,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
             "棍棒兵是最便宜、訓練最快的單位，早期掠奪之王",
             "商人載重量最大（1000資源）",
             "偵察兵在兵營訓練（不需要馬廄），可快速獲得",
-            "長矛兵是最佳反騎兵防禦單位",
+            "矛兵是最佳反騎兵防禦單位",
         ],
         "weaknesses": [
             "整體部隊移動速度較慢",
@@ -310,8 +314,8 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
             "effect": "提升攻擊力，但會減少農作物產量",
         },
         "merchant": {"capacity": 1000, "speed": 12},
-        "hero_bonus": "帶領的軍隊在掠奪時有20%的密藏室穿透（可掠奪藏在密藏室的資源）",
-        "recommended_defense_ratio": "75% 長矛兵 / 25% 聖騎士",
+        "hero_bonus": "帶領的軍隊在掠奪時有20%的山洞穿透（可掠奪藏在山洞的資源）",
+        "recommended_defense_ratio": "75% 矛兵 / 25% 遊俠",
         "troops": {
             "clubswinger": {
                 "name_zh": "棍棒兵",
@@ -325,7 +329,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "最強早期掠奪單位，成本最低訓練最快",
             },
             "spearman": {
-                "name_zh": "長矛兵",
+                "name_zh": "矛兵",
                 "type": "infantry",
                 "attack": 10,
                 "defense_infantry": 35,
@@ -358,7 +362,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "偵察（在兵營訓練，不需馬廄）",
             },
             "paladin": {
-                "name_zh": "聖騎士",
+                "name_zh": "遊俠",
                 "type": "cavalry",
                 "attack": 55,
                 "defense_infantry": 100,
@@ -380,7 +384,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "重騎兵，中後期掠奪主力",
             },
             "ram": {
-                "name_zh": "攻城槌",
+                "name_zh": "衝撞車／破城槌",
                 "type": "siege",
                 "attack": 65,
                 "defense_infantry": 30,
@@ -391,7 +395,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞城牆",
             },
             "catapult": {
-                "name_zh": "投石車",
+                "name_zh": "投石類攻城武器",
                 "type": "siege",
                 "attack": 50,
                 "defense_infantry": 60,
@@ -402,7 +406,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞建築物",
             },
             "chief": {
-                "name_zh": "酋長",
+                "name_zh": "司令官",
                 "type": "special",
                 "attack": 40,
                 "defense_infantry": 60,
@@ -413,7 +417,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "降低敵方村莊忠誠度 20-25%",
             },
             "settler": {
-                "name_zh": "拓荒者",
+                "name_zh": "開拓者",
                 "type": "special",
                 "attack": 10,
                 "defense_infantry": 80,
@@ -432,7 +436,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
         "playstyle": "適合喜歡發展經濟和防禦的玩家",
         "strengths": [
             "英雄資源產出加成最高",
-            "水利工程可增加綠洲加成",
+            "供水系統可增加綠洲加成",
             "基礎單位便宜且訓練快速",
             "防禦部隊強大，石牆耐久度高",
         ],
@@ -441,7 +445,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
             "缺乏強力攻擊單位",
         ],
         "special_building": {
-            "name": "水利工程 (Waterworks)",
+            "name": "供水系統 (Waterworks)",
             "effect": "增加綠洲對村莊的資源加成",
         },
         "merchant": {"capacity": 750, "speed": 16},
@@ -460,7 +464,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "最便宜的防禦單位，但糧食效率低",
             },
             "ash_warden": {
-                "name_zh": "灰燼守衛",
+                "name_zh": "看守人艾什",
                 "type": "infantry",
                 "attack": 20,
                 "defense_infantry": 55,
@@ -471,7 +475,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "主力防禦步兵",
             },
             "khopesh_warrior": {
-                "name_zh": "彎刀戰士",
+                "name_zh": "斧刀勇士",
                 "type": "infantry",
                 "attack": 65,
                 "defense_infantry": 50,
@@ -482,7 +486,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "攻擊步兵",
             },
             "sopdu_explorer": {
-                "name_zh": "索普杜探索者",
+                "name_zh": "探險者索普杜",
                 "type": "cavalry",
                 "attack": 0,
                 "defense_infantry": 20,
@@ -493,7 +497,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "偵察兵",
             },
             "anhur_guard": {
-                "name_zh": "安赫爾守衛",
+                "name_zh": "守衛安赫",
                 "type": "cavalry",
                 "attack": 50,
                 "defense_infantry": 110,
@@ -504,7 +508,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "防禦騎兵",
             },
             "resheph_chariot": {
-                "name_zh": "雷謝夫戰車",
+                "name_zh": "瑞舍夫戰車",
                 "type": "cavalry",
                 "attack": 110,
                 "defense_infantry": 120,
@@ -515,7 +519,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "重型單位，攻防兼備",
             },
             "ram": {
-                "name_zh": "攻城槌",
+                "name_zh": "衝撞車／破城槌",
                 "type": "siege",
                 "attack": 60,
                 "defense_infantry": 30,
@@ -526,7 +530,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞城牆",
             },
             "stone_catapult": {
-                "name_zh": "投石車",
+                "name_zh": "投石類攻城武器",
                 "type": "siege",
                 "attack": 55,
                 "defense_infantry": 65,
@@ -537,7 +541,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞建築物",
             },
             "nomarch": {
-                "name_zh": "諾馬克",
+                "name_zh": "州長",
                 "type": "special",
                 "attack": 50,
                 "defense_infantry": 50,
@@ -548,7 +552,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "降低敵方村莊忠誠度 20-25%",
             },
             "settler": {
-                "name_zh": "拓荒者",
+                "name_zh": "開拓者",
                 "type": "special",
                 "attack": 0,
                 "defense_infantry": 80,
@@ -566,7 +570,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
         "description": "以騎兵為主的兇猛部落，速度快但防禦弱",
         "playstyle": "適合有經驗的進攻型玩家",
         "strengths": [
-            "擁有最快的偵察兵（觀察者）",
+            "擁有最快的偵察兵（探子）",
             "騎兵強大且速度快",
             "商人速度最快（20格/小時）",
             "英雄騎乘時讓騎兵軍隊+3速度",
@@ -585,7 +589,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
         "recommended_defense_ratio": "依賴聯盟支援",
         "troops": {
             "mercenary": {
-                "name_zh": "傭兵",
+                "name_zh": "僱傭兵",
                 "type": "infantry",
                 "attack": 35,
                 "defense_infantry": 40,
@@ -607,7 +611,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "遠程攻擊步兵",
             },
             "spotter": {
-                "name_zh": "觀察者",
+                "name_zh": "探子",
                 "type": "cavalry",
                 "attack": 0,
                 "defense_infantry": 20,
@@ -618,7 +622,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "最快的偵察兵",
             },
             "steppe_rider": {
-                "name_zh": "草原騎兵",
+                "name_zh": "草原騎士",
                 "type": "cavalry",
                 "attack": 100,
                 "defense_infantry": 40,
@@ -651,7 +655,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "重騎兵",
             },
             "ram": {
-                "name_zh": "攻城槌",
+                "name_zh": "衝撞車／破城槌",
                 "type": "siege",
                 "attack": 70,
                 "defense_infantry": 30,
@@ -662,7 +666,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞城牆",
             },
             "catapult": {
-                "name_zh": "投石車",
+                "name_zh": "投石類攻城武器",
                 "type": "siege",
                 "attack": 55,
                 "defense_infantry": 50,
@@ -673,7 +677,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞建築物",
             },
             "logades": {
-                "name_zh": "洛加德",
+                "name_zh": "重步兵",
                 "type": "special",
                 "attack": 60,
                 "defense_infantry": 40,
@@ -684,7 +688,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "降低敵方村莊忠誠度 15-30%",
             },
             "settler": {
-                "name_zh": "拓荒者",
+                "name_zh": "開拓者",
                 "type": "special",
                 "attack": 10,
                 "defense_infantry": 80,
@@ -754,7 +758,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "防禦步兵",
             },
             "twirler": {
-                "name_zh": "旋鏢兵",
+                "name_zh": "雙刃獸戰士",
                 "type": "infantry",
                 "attack": 100,
                 "defense_infantry": 30,
@@ -765,7 +769,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "強力攻擊步兵",
             },
             "elpida_rider": {
-                "name_zh": "厄爾皮達騎兵",
+                "name_zh": "希望騎士",
                 "type": "cavalry",
                 "attack": 55,
                 "defense_infantry": 100,
@@ -787,7 +791,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "重騎兵",
             },
             "ram": {
-                "name_zh": "攻城槌",
+                "name_zh": "衝撞車／破城槌",
                 "type": "siege",
                 "attack": 55,
                 "defense_infantry": 30,
@@ -798,7 +802,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞城牆",
             },
             "catapult": {
-                "name_zh": "投石車",
+                "name_zh": "投石類攻城武器",
                 "type": "siege",
                 "attack": 65,
                 "defense_infantry": 55,
@@ -820,7 +824,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "降低敵方村莊忠誠度 20-25%",
             },
             "settler": {
-                "name_zh": "拓荒者",
+                "name_zh": "開拓者",
                 "type": "special",
                 "attack": 0,
                 "defense_infantry": 80,
@@ -853,10 +857,10 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
         },
         "merchant": {"capacity": 750, "speed": 18},
         "hero_bonus": "攻擊和掠奪時可降低敵方村莊5%忠誠度",
-        "recommended_defense_ratio": "以胡斯卡爾騎士為主",
+        "recommended_defense_ratio": "以侍衛騎士為主",
         "troops": {
             "thrall": {
-                "name_zh": "奴隸",
+                "name_zh": "奴僕",
                 "type": "infantry",
                 "attack": 45,
                 "defense_infantry": 22,
@@ -900,7 +904,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "偵察兵",
             },
             "huskarl_rider": {
-                "name_zh": "胡斯卡爾騎士",
+                "name_zh": "侍衛騎士",
                 "type": "cavalry",
                 "attack": 45,
                 "defense_infantry": 95,
@@ -911,7 +915,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "全能防禦騎兵",
             },
             "valkyrjas_blessing": {
-                "name_zh": "瓦爾基麗的祝福",
+                "name_zh": "女武神之賜",
                 "type": "cavalry",
                 "attack": 160,
                 "defense_infantry": 50,
@@ -922,7 +926,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "攻擊騎兵",
             },
             "ram": {
-                "name_zh": "攻城槌",
+                "name_zh": "衝撞車／破城槌",
                 "type": "siege",
                 "attack": 65,
                 "defense_infantry": 30,
@@ -933,7 +937,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞城牆",
             },
             "catapult": {
-                "name_zh": "投石車",
+                "name_zh": "投石類攻城武器",
                 "type": "siege",
                 "attack": 50,
                 "defense_infantry": 60,
@@ -944,7 +948,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "破壞建築物",
             },
             "jarl": {
-                "name_zh": "雅爾",
+                "name_zh": "領主",
                 "type": "special",
                 "attack": 40,
                 "defense_infantry": 40,
@@ -955,7 +959,7 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
                 "role": "降低敵方村莊忠誠度 15-30%",
             },
             "settler": {
-                "name_zh": "拓荒者",
+                "name_zh": "開拓者",
                 "type": "special",
                 "attack": 10,
                 "defense_infantry": 80,
@@ -971,12 +975,20 @@ TRIBES_DATA: dict[str, dict[str, Any]] = {
 
 
 def _apply_unit_speeds() -> None:
-    """把產生器的兵種速度、運載量與出處帶入 TRIBES_DATA（唯一一份速度／運載量資料）."""
+    """把產生器的兵種速度、運載量與出處帶入 TRIBES_DATA（唯一一份速度／運載量資料）.
+
+    部族名、兵種名也照遊戲內名稱表（ingame_names.json）；舊名放 aliases_zh，只給搜尋用。
+    """
     data = json.loads(UNIT_SPEEDS_PATH.read_text(encoding="utf-8"))
+    names = json.loads(INGAME_NAMES_PATH.read_text(encoding="utf-8"))
     for tribe, rows in data["tribes"].items():
+        TRIBES_DATA[tribe]["name_zh"] = names["tribes"][tribe]["zh"]
         troops = TRIBES_DATA[tribe]["troops"]
         for row in rows:
             troop = troops[row["kb_id"]]
+            unit = names["units"][row["troop_id"]]
+            troop["name_zh"] = unit["zh"]
+            troop["aliases_zh"] = unit["aliases"]
             troop["speed"] = row["speed"]
             troop["speed_source"] = row["source"]
             # 運載量也照產生檔（P0-23：前端、troops.json 同一份）
@@ -994,7 +1006,9 @@ def get_tribe_info(tribe_name: str) -> dict | None:
     name_mapping = {
         "羅馬": "romans",
         "高盧": "gauls",
-        "條頓": "teutons",
+        "條頓": "teutons",  # 舊名，只給查詢用（輸出一律是遊戲內名稱）
+        "日耳曼": "teutons",
+        "日耳曼人": "teutons",
         "埃及": "egyptians",
         "匈奴": "huns",
         "斯巴達": "spartans",

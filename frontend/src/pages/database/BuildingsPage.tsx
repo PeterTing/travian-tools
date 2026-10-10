@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { buildingsApi } from '@/services/gameApi'
 import type { BuildingListItem, BuildingDetail, BuildingCategory } from '@/types/game'
 import BuildingVerifyMark, { BuildingVerifyLegend } from '@/components/common/BuildingVerifyMark'
+import { buildingRowLabel } from '@/lib/buildingVerify'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { isBuildingEffectVerified } from '@/data/gameData'
 
@@ -119,10 +120,13 @@ export default function BuildingsPage() {
           <h2 className="text-lg font-semibold mb-4">
             {t('database.buildings.list')} ({buildings.length})
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-2" role="list">
             {buildings.map((building) => (
               <div
                 key={building.building_id}
+                role="listitem"
+                aria-label={buildingRowLabel(isZh ? building.name_zh : building.name_en, building.building_id, t('common.effectPending'))}
+                data-testid="building-list-row"
                 className={`p-3 rounded cursor-pointer transition-colors ${
                   selectedBuilding?.building_id === building.building_id
                     ? 'bg-primary text-primary-foreground'
@@ -133,7 +137,7 @@ export default function BuildingsPage() {
                 {/* 名稱這一行至少 44px、垂直置中：灰標的 44px 點擊範圍不會蓋到下一行（點下一行是選這棟建築） */}
                 <p className="flex min-h-11 flex-wrap items-center font-medium" data-testid="building-list-name">
                   {isZh ? building.name_zh : building.name_en}
-                  <BuildingVerifyMark buildingId={building.building_id} onDark={selectedBuilding?.building_id === building.building_id} />
+                  <BuildingVerifyMark buildingId={building.building_id} variant="list" onDark={selectedBuilding?.building_id === building.building_id} />
                 </p>
                 <p className="text-sm opacity-70">
                   {t('common.level')}1-{building.max_level} {t('common.separator')} {t(`categories.${building.category}`)}

@@ -100,7 +100,7 @@ export const romans = withUnitSpeeds({
 
   offTips: [
     { zh: '首都建議不放 OFF — 羅馬人 cap 以發展為主，錘子放次級城（Palace/CC 村）', en: 'Keep OFF out of the capital — Roman cap should focus on production; hammer in a secondary village' },
-    { zh: '錘子主力：帝國兵 + 將軍騎士（Imperian + EC）', en: 'Hammer core: Imperian + Equites Caesaris' },
+    { zh: '錘子主力：帝國兵 + 將軍騎士', en: 'Hammer core: Imperian + Equites Caesaris' },
   ],
   defTips: [
     { zh: '鐵砧：禁衛兵為主幹，搭配少量使者騎士作反偵察', en: 'Anvil: Praetorians as core + a few Legati for counter-scouting' },

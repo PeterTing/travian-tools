@@ -1,5 +1,12 @@
 """Travian 建築物資料庫."""
 
+import json
+from pathlib import Path
+
+INGAME_NAMES_PATH = (
+    Path(__file__).resolve().parents[2] / "data" / "static" / "ingame_names.json"
+)
+
 BUILDINGS_DATA = {
     # 資源田
     "woodcutter": {
@@ -12,7 +19,7 @@ BUILDINGS_DATA = {
         "cp_per_level": [0, 1, 1, 2, 2, 2, 3, 4, 4, 5, 6, 7, 9, 10, 12, 15, 18, 22, 27],
     },
     "clay_pit": {
-        "name_zh": "採土場",
+        "name_zh": "泥坑",
         "name_en": "Clay Pit",
         "category": "resource",
         "max_level": 18,
@@ -30,7 +37,7 @@ BUILDINGS_DATA = {
         "cp_per_level": [0, 1, 1, 2, 2, 2, 3, 4, 4, 5, 6, 7, 9, 10, 12, 15, 18, 22, 27],
     },
     "cropland": {
-        "name_zh": "農田",
+        "name_zh": "農場",
         "name_en": "Cropland",
         "category": "resource",
         "max_level": 18,
@@ -45,7 +52,7 @@ BUILDINGS_DATA = {
         "category": "resource_bonus",
         "max_level": 5,
         "description": "增加木材產量5%每級，最高25%",
-        "requirements": ["伐木場 10級", "主建築 5級"],
+        "requirements": ["伐木場 10級", "村莊大樓 5級"],
         "bonus_per_level": "5%",
     },
     "brickyard": {
@@ -54,25 +61,25 @@ BUILDINGS_DATA = {
         "category": "resource_bonus",
         "max_level": 5,
         "description": "增加磚塊產量5%每級，最高25%",
-        "requirements": ["採土場 10級", "主建築 5級"],
+        "requirements": ["泥坑 10級", "村莊大樓 5級"],
         "bonus_per_level": "5%",
     },
     "iron_foundry": {
-        "name_zh": "鍛造廠",
+        "name_zh": "鋼鐵鑄造廠",
         "name_en": "Iron Foundry",
         "category": "resource_bonus",
         "max_level": 5,
         "description": "增加鐵礦產量5%每級，最高25%",
-        "requirements": ["鐵礦場 10級", "主建築 5級"],
+        "requirements": ["鐵礦場 10級", "村莊大樓 5級"],
         "bonus_per_level": "5%",
     },
     "grain_mill": {
-        "name_zh": "磨坊",
+        "name_zh": "麵粉廠",
         "name_en": "Grain Mill",
         "category": "resource_bonus",
         "max_level": 5,
         "description": "增加糧食產量5%每級，最高25%",
-        "requirements": ["農田 5級", "主建築 5級"],
+        "requirements": ["農場 5級", "村莊大樓 5級"],
         "bonus_per_level": "5%",
     },
     "bakery": {
@@ -80,8 +87,8 @@ BUILDINGS_DATA = {
         "name_en": "Bakery",
         "category": "resource_bonus",
         "max_level": 5,
-        "description": "增加糧食產量5%每級，最高25%（與磨坊疊加）",
-        "requirements": ["農田 10級", "主建築 5級", "磨坊 5級"],
+        "description": "增加糧食產量5%每級，最高25%（與麵粉廠疊加）",
+        "requirements": ["農場 10級", "村莊大樓 5級", "麵粉廠 5級"],
         "bonus_per_level": "5%",
     },
     # 儲存建築
@@ -116,7 +123,7 @@ BUILDINGS_DATA = {
         ],
     },
     "granary": {
-        "name_zh": "糧倉",
+        "name_zh": "穀倉",
         "name_en": "Granary",
         "category": "storage",
         "max_level": 20,
@@ -154,11 +161,11 @@ BUILDINGS_DATA = {
         "requirements": ["世界奇蹟村"],
     },
     "great_granary": {
-        "name_zh": "大糧倉",
+        "name_zh": "大穀倉",
         "name_en": "Great Granary",
         "category": "storage",
         "max_level": 20,
-        "description": "只能建在世界奇蹟村，容量約糧倉的2.5倍",
+        "description": "只能建在世界奇蹟村，容量約穀倉的2.5倍",
         "requirements": ["世界奇蹟村"],
     },
     # 軍事建築
@@ -168,7 +175,7 @@ BUILDINGS_DATA = {
         "category": "military",
         "max_level": 20,
         "description": "訓練步兵單位，每級減少10%訓練時間",
-        "requirements": ["主建築 3級", "集結點 1級"],
+        "requirements": ["村莊大樓 3級", "集結點 1級"],
         "training_reduction": "每級-10%（20級時為0.9^19 ≈ 0.135倍）",
     },
     "stable": {
@@ -177,7 +184,7 @@ BUILDINGS_DATA = {
         "category": "military",
         "max_level": 20,
         "description": "訓練騎兵單位，每級減少10%訓練時間",
-        "requirements": ["研究院 5級", "鐵匠舖 3級"],
+        "requirements": ["研究院 5級", "盔甲廠 3級"],
         "training_reduction": "每級-10%",
     },
     "workshop": {
@@ -185,8 +192,8 @@ BUILDINGS_DATA = {
         "name_en": "Workshop",
         "category": "military",
         "max_level": 20,
-        "description": "建造攻城器械（攻城槌、投石車）",
-        "requirements": ["研究院 10級", "主建築 5級"],
+        "description": "建造攻城器械（衝撞車／破城槌、投石類攻城武器）",
+        "requirements": ["研究院 10級", "村莊大樓 5級"],
     },
     "great_barracks": {
         "name_zh": "大兵營",
@@ -210,30 +217,21 @@ BUILDINGS_DATA = {
         "category": "military",
         "max_level": 20,
         "description": "研究新兵種，解鎖高階單位",
-        "requirements": ["主建築 3級", "兵營 3級"],
+        "requirements": ["村莊大樓 3級", "兵營 3級"],
         "key_levels": {
             10: "解鎖城鎮廳（開第二村必需）",
             15: "解鎖工場",
             20: "解鎖所有兵種研究",
         },
     },
-    "smithy": {
-        "name_zh": "鐵匠舖",
+    # T4 只有一棟盔甲廠（gid 13），同時升級攻擊和防禦（T3 的兩棟舊建築已合併）
+    "blacksmith": {
+        "name_zh": "盔甲廠",
         "name_en": "Smithy",
         "category": "military",
         "max_level": 20,
-        "description": "升級部隊攻擊力",
-        "requirements": ["主建築 3級", "研究院 1級"],
-        "upgrade_bonus": "每級增加1.5%攻擊力",
-    },
-    "armoury": {
-        "name_zh": "盔甲匠舖",
-        "name_en": "Armoury",
-        "category": "military",
-        "max_level": 20,
-        "description": "升級部隊防禦力",
-        "requirements": ["主建築 3級", "研究院 1級"],
-        "upgrade_bonus": "每級增加1.5%防禦力",
+        "description": "升級部隊的攻擊力和防禦力",
+        "requirements": ["村莊大樓 3級", "研究院 1級"],
     },
     # 防禦建築
     "city_wall": {
@@ -247,7 +245,7 @@ BUILDINGS_DATA = {
         "max_defense_bonus": "81%（20級）",
     },
     "earth_wall": {
-        "name_zh": "土牆（條頓）",
+        "name_zh": "土牆（日耳曼人）",
         "name_en": "Earth Wall",
         "category": "defense",
         "max_level": 20,
@@ -257,7 +255,7 @@ BUILDINGS_DATA = {
         "durability": "高",
     },
     "palisade": {
-        "name_zh": "柵欄（高盧）",
+        "name_zh": "木牆（高盧）",
         "name_en": "Palisade",
         "category": "defense",
         "max_level": 20,
@@ -272,11 +270,11 @@ BUILDINGS_DATA = {
         "max_level": 20,
         "tribe": "gauls",
         "description": "製造陷阱捕捉敵方部隊",
-        "max_traps": "200（英雄大廈20級時400）",
+        "max_traps": "200（英雄宅20級時400）",
     },
     # 行政建築
     "main_building": {
-        "name_zh": "主建築",
+        "name_zh": "村莊大樓",
         "name_en": "Main Building",
         "category": "infrastructure",
         "max_level": 20,
@@ -310,7 +308,7 @@ BUILDINGS_DATA = {
         "cp_production": "每日產出較多 CP",
     },
     "trade_office": {
-        "name_zh": "貿易所",
+        "name_zh": "交易所",
         "name_en": "Trade Office",
         "category": "infrastructure",
         "max_level": 20,
@@ -335,7 +333,7 @@ BUILDINGS_DATA = {
         "category": "infrastructure",
         "max_level": 20,
         "description": "舉辦慶典獲得 CP",
-        "requirements": ["主建築 10級", "研究院 10級"],
+        "requirements": ["村莊大樓 10級", "研究院 10級"],
         "celebrations": {
             # CP＝每日 CP 產量（小：本村；大：全帳號），cp 欄是 x1 上限
             "small": {
@@ -357,10 +355,10 @@ BUILDINGS_DATA = {
         "name_en": "Residence",
         "category": "expansion",
         "max_level": 20,
-        "description": "訓練拓荒者，提供忠誠度保護",
-        "requirements": ["主建築 5級"],
+        "description": "訓練開拓者，提供忠誠度保護",
+        "requirements": ["村莊大樓 5級"],
         "key_levels": {
-            10: "可訓練3個拓荒者",
+            10: "可訓練3個開拓者",
             20: "最大忠誠度保護",
         },
         "note": "不能與皇宮同時存在",
@@ -370,8 +368,8 @@ BUILDINGS_DATA = {
         "name_en": "Palace",
         "category": "expansion",
         "max_level": 20,
-        "description": "可設定首都，訓練3個拓荒者",
-        "requirements": ["主建築 5級", "大使館 1級"],
+        "description": "可設定首都，訓練3個開拓者",
+        "requirements": ["村莊大樓 5級", "大使館 1級"],
         "features": [
             "整個帳號只能有一個皇宮",
             "皇宮所在村莊成為首都",
@@ -384,16 +382,16 @@ BUILDINGS_DATA = {
         "category": "expansion",
         "max_level": 20,
         "description": "存放神器",
-        "requirements": ["主建築 10級"],
+        "requirements": ["村莊大樓 10級"],
         "cp_production": "高 CP 產出（230點/最高級）",
     },
     "heros_mansion": {
-        "name_zh": "英雄大廈",
+        "name_zh": "英雄宅",
         "name_en": "Hero's Mansion",
         "category": "hero",
         "max_level": 20,
         "description": "管理英雄和佔領綠洲",
-        "requirements": ["主建築 3級", "集結點 1級"],
+        "requirements": ["村莊大樓 3級", "集結點 1級"],
         "oasis_slots": {
             10: "1個綠洲",
             15: "2個綠洲",
@@ -410,7 +408,7 @@ BUILDINGS_DATA = {
         "speed_bonus": "每級+20%速度（僅超過20格的距離加速；S71）",
     },
     "cranny": {
-        "name_zh": "密藏室",
+        "name_zh": "山洞",
         "name_en": "Cranny",
         "category": "defense",
         "max_level": 10,
@@ -419,11 +417,11 @@ BUILDINGS_DATA = {
             "normal": "每級保護100-200資源",
             "gauls": "高盧容量1.5倍",
         },
-        "note": "條頓英雄可穿透20%密藏室",
+        "note": "日耳曼人英雄可穿透20%山洞",
     },
     # 部族特殊建築
     "brewery": {
-        "name_zh": "釀酒廠（條頓）",
+        "name_zh": "釀酒廠（日耳曼人）",
         "name_en": "Brewery",
         "category": "special",
         "tribe": "teutons",
@@ -432,7 +430,7 @@ BUILDINGS_DATA = {
         "requirements": ["集結點 20級", "穀倉 20級"],
     },
     "horse_drinking_trough": {
-        "name_zh": "馬飲水槽（羅馬）",
+        "name_zh": "放牧水槽（羅馬）",
         "name_en": "Horse Drinking Trough",
         "category": "special",
         "tribe": "romans",
@@ -441,7 +439,7 @@ BUILDINGS_DATA = {
         "bonus": "每級減少1%騎兵糧食消耗，最高20%",
     },
     "waterworks": {
-        "name_zh": "水利工程（埃及）",
+        "name_zh": "供水系統（埃及）",
         "name_en": "Waterworks",
         "category": "special",
         "tribe": "egyptians",
@@ -495,43 +493,25 @@ BUILDINGS_DATA = {
 }
 
 
+def _apply_ingame_names() -> None:
+    """建築中文名照遊戲內名稱表（ingame_names.json，#34 PM）；舊名放 aliases_zh，只給查詢用."""
+    names = json.loads(INGAME_NAMES_PATH.read_text(encoding="utf-8"))["buildings"]
+    for bid, b in BUILDINGS_DATA.items():
+        row = names.get(bid)
+        if row:
+            b["name_zh"] = row["zh"]
+            b["aliases_zh"] = row["aliases"]
+
+
+_apply_ingame_names()
+
+
 def get_building_info(building_name: str) -> dict | None:
-    """取得建築物資訊."""
+    """取得建築物資訊：英文 id、遊戲內名稱或舊名都可以."""
     building_key = building_name.lower().replace(" ", "_").replace("'", "")
-
-    # 中文名稱映射
-    name_mapping = {
-        "伐木場": "woodcutter",
-        "採土場": "clay_pit",
-        "鐵礦場": "iron_mine",
-        "農田": "cropland",
-        "鋸木廠": "sawmill",
-        "磚廠": "brickyard",
-        "鍛造廠": "iron_foundry",
-        "磨坊": "grain_mill",
-        "麵包店": "bakery",
-        "倉庫": "warehouse",
-        "糧倉": "granary",
-        "兵營": "barracks",
-        "馬廄": "stable",
-        "工場": "workshop",
-        "研究院": "academy",
-        "鐵匠舖": "smithy",
-        "盔甲匠舖": "armoury",
-        "主建築": "main_building",
-        "集結點": "rally_point",
-        "市場": "marketplace",
-        "城鎮廳": "town_hall",
-        "行宮": "residence",
-        "皇宮": "palace",
-        "英雄大廈": "heros_mansion",
-        "密藏室": "cranny",
-        "世界奇蹟": "world_wonder",
-    }
-
-    if building_key in name_mapping:
-        building_key = name_mapping[building_key]
-
+    for b in BUILDINGS_DATA.values():
+        if building_name in (b["name_zh"], *b.get("aliases_zh", [])):
+            return b
     return BUILDINGS_DATA.get(building_key)
 
 

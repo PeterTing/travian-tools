@@ -794,7 +794,6 @@ def gen_troops(current: dict, speeds: dict) -> dict:
                     attack=st["attack"],
                     defense_infantry=st["def_inf"],
                     defense_cavalry=st["def_cav"],
-                    carry_capacity=st["carry"],
                     cost_wood=st["cost"][0],
                     cost_clay=st["cost"][1],
                     cost_iron=st["cost"][2],
@@ -812,7 +811,7 @@ def gen_troops(current: dict, speeds: dict) -> dict:
 
 
 # P0-23：維京沒有 ts11 來源，花費、糧耗、訓練時間、攻防照官方 S139「Viking Units Overview」表
-# （evidence/official_support_2026-10-10.json）；S139 沒有運載量 → 運載量維持舊值、待驗證
+# （evidence/official_support_2026-10-10.json）；S139 沒有運載量 → 運載量留空（null，PM 決定），畫面顯示「—」／「無法計算」
 OFFICIAL_SUPPORT = ROOT / "scripts/game_data/evidence/official_support_2026-10-10.json"
 
 
@@ -861,14 +860,15 @@ INGAME_BUILDING_GID = {
 # 舊名（站上以前用過、或常見的別稱）→ 只拿來搜尋，不顯示
 BUILDING_ALIASES = {
     "main_building": ["主建築"],
-    "clay_pit": ["黏土坑", "磚坑"], "cropland": ["農田"], "iron_foundry": ["鑄鐵廠", "鑄造廠"],
-    "grain_mill": ["穀物磨坊"], "bakery": ["麵包坊"], "granary": ["糧倉"],
-    "blacksmith": ["鐵匠鋪", "兵工廠"], "tournament_square": ["比武場"],
-    "barracks": ["軍營"], "workshop": ["工坊"], "cranny": ["隱藏倉庫"],
-    "town_hall": ["市政廳"], "treasury": ["寶庫"], "trade_office": ["貿易公司", "商貿處"],
+    "clay_pit": ["黏土坑", "磚坑", "採土場"], "cropland": ["農田"],
+    "iron_foundry": ["鑄鐵廠", "鑄造廠", "鍛造廠"],
+    "grain_mill": ["穀物磨坊", "磨坊"], "bakery": ["麵包坊"], "granary": ["糧倉"],
+    "blacksmith": ["鐵匠鋪", "兵工廠", "鐵匠舖", "盔甲匠舖"], "tournament_square": ["比武場"],
+    "barracks": ["軍營"], "workshop": ["工坊"], "cranny": ["隱藏倉庫", "密藏室"],
+    "town_hall": ["市政廳"], "treasury": ["寶庫"], "trade_office": ["貿易公司", "商貿處", "貿易所"],
     "great_barracks": ["大營房"], "earth_wall": ["土圍"], "palisade": ["柵欄", "木柵欄"],
-    "stonemasons_lodge": ["石匠小屋"], "brewery": ["酒館"], "heros_mansion": ["英雄宅邸"],
-    "great_granary": ["大糧倉"], "horse_drinking_trough": ["馬飲水槽"], "waterworks": ["水渠"],
+    "stonemasons_lodge": ["石匠小屋"], "brewery": ["酒館"], "heros_mansion": ["英雄宅邸", "英雄大廈"],
+    "great_granary": ["大糧倉"], "horse_drinking_trough": ["馬飲水槽"], "waterworks": ["水渠", "水利工程"],
 }
 
 TRIBE_MANUAL_REF = {"romans": 1, "teutons": 11, "gauls": 21, "egyptians": 51, "huns": 61}
@@ -882,20 +882,35 @@ UNIT_ALIASES = {
     "equites_imperatoris": ["帝國騎兵"], "equites_caesaris": ["凱撒騎兵"],
     "roman_ram": ["攻城槌"], "fire_catapult": ["火焰投石車"], "senator": ["元老"],
     "clubswinger": ["棍兵"], "spearman": ["長矛兵"], "teuton_scout": ["斥候", "偵查兵"],
-    "paladin": ["聖騎士"], "teuton_ram": ["攻城槌"], "teuton_catapult": ["投石車"], "chief": ["領袖"],
-    "pathfinder": ["探路兵"], "theutates_thunder": ["圖塔特雷"],
+    "paladin": ["聖騎士"], "teuton_ram": ["攻城槌"], "teuton_catapult": ["投石車"], "chief": ["領袖", "酋長"],
+    "pathfinder": ["探路兵"], "theutates_thunder": ["圖塔特雷", "雷神騎兵"],
     "haeduan": ["海頓騎兵"], "gaul_ram": ["攻城槌"], "trebuchet": ["投石車"],
-    "ash_warden": ["灰燼守衛"], "khopesh_warrior": ["鐮刀劍戰士"], "sopdu_explorer": ["索普度探險者"],
-    "anhur_guard": ["安胡爾守衛"], "resheph_chariot": ["瑞謝夫戰車"], "egyptian_ram": ["攻城槌"],
-    "stone_catapult": ["石頭投石車"], "mercenary": ["傭兵"], "spotter": ["斥候"],
-    "steppe_rider": ["草原騎兵"], "hun_ram": ["攻城槌"], "hun_catapult": ["投石車"], "logades": ["領袖"],
+    "ash_warden": ["灰燼守衛"], "khopesh_warrior": ["鐮刀劍戰士", "彎刀戰士"],
+    "sopdu_explorer": ["索普度探險者", "索普杜探索者"],
+    "anhur_guard": ["安胡爾守衛", "安赫爾守衛"], "resheph_chariot": ["瑞謝夫戰車", "雷謝夫戰車"], "egyptian_ram": ["攻城槌"],
+    "stone_catapult": ["石頭投石車"], "nomarch": ["諾馬克"], "mercenary": ["傭兵"],
+    "spotter": ["斥候", "觀察者"],
+    "steppe_rider": ["草原騎兵"], "hun_ram": ["攻城槌"], "hun_catapult": ["投石車"], "logades": ["領袖", "洛加德"],
 }
 SETTLER_ALIASES = ["拓荒者", "移民", "定居者"]
-# 斯巴達、維京沒有遊戲內名稱；攻城武器、開拓者跟其他族同英文名的，比照遊戲內用詞
+# 斯巴達、維京沒有遊戲內名稱（ts11 是 5 族伺服器）；攻城武器、開拓者跟其他族同英文名的，比照遊戲內用詞。
+# PM 規則（#34）：用官方說明頁 S139（維京）、S187（斯巴達）的繁體中文名；官方說明頁沒有中文版
+# （support.travian.com 只有 en/de/fr/es/it/pl/pt/ru/tr/cs/ar），所以其他兵種維持目前兵種資料庫的名稱，
+# 計算器、攻略以前用的另一個名字只放 aliases 給搜尋用。
 NON_TS11_UNIT_NAMES = {
     "viking_ram": ("破城槌", ["攻城槌"]), "viking_catapult": ("弩炮", ["投石車"]),
     "viking_settler": ("開拓者", SETTLER_ALIASES), "spartan_ram": ("破城槌", ["攻城槌"]),
     "spartan_settler": ("開拓者", SETTLER_ALIASES),
+    "hoplite": ("重裝步兵", ["裝甲步兵"]), "sentinel": ("哨兵", []),
+    "shieldsman": ("盾兵", ["盾牌手"]), "twinsteel_therion": ("雙刃獸戰士", ["雙鋼泰瑞恩", "旋鏢兵"]),
+    "elpida_rider": ("希望騎士", ["爾必達騎士", "厄爾皮達騎兵"]),
+    "corinthian_crusher": ("科林斯粉碎者", ["科林斯破壞者"]),
+    "ballista": ("弩砲", ["賴達投石機"]), "ephor": ("監察官", ["五長官"]),
+    "thrall": ("奴僕", ["奴隸"]), "shield_maiden": ("盾女", ["鋼盾少女"]),
+    "berserker": ("狂戰士", []), "heimdalls_eye": ("海姆達爾之眼", []),
+    "huskarl_rider": ("侍衛騎士", ["禁衛軍騎士", "胡斯卡爾騎士"]),
+    "valkyries_blessing": ("女武神之賜", ["女武神的祝福", "瓦爾基麗的祝福"]),
+    "jarl": ("領主", ["首領", "雅爾"]),
 }
 
 

@@ -21,11 +21,11 @@ export const vikings = withUnitSpeeds({
   color: 'var(--tribe-vikings)',
   icon: '⚔️',
   tagline: {
-    zh: '深水 24 格/小時 · Berserker 死前反擊',
+    zh: '深水 24 格/小時 · 狂戰士死前反擊',
     en: 'Deep water 24 fields/hr · Berserker death-retaliation',
   },
   summary: {
-    zh: '兩棲民族：深水移動比其他族快（24 格/小時 vs 18），適合跨水域作戰。Berserker 吃雙倍糧，攻擊 / 被攻擊時陣亡後還會「死前反擊」一次殺一名敵軍（忽略牆與瞭望塔加成）。Jarl 降忠誠 15–30%。',
+    zh: '兩棲民族：深水移動比其他族快（24 格/小時 vs 18），適合跨水域作戰。狂戰士吃雙倍糧，攻擊 / 被攻擊時陣亡後還會「死前反擊」一次殺一名敵軍（忽略牆與瞭望塔加成）。領主降忠誠 15–30%。',
     en: 'Amphibious tribe. Over-water movement 24 fields/hr (others 18), great for cross-map operations. Berserker costs 2× crop upkeep but each fallen Berserker kills one enemy via a "damage on death" ability that ignores wall/watchtower bonuses. Jarl reduces loyalty 15–30%.',
   },
 
@@ -42,26 +42,26 @@ export const vikings = withUnitSpeeds({
 
   strengths: [
     { zh: '跨水域戰場機動性無敵', en: 'Unmatched mobility on water-heavy maps' },
-    { zh: 'Berserker 死前反擊讓進攻方吃虧', en: 'Berserker damage-on-death punishes attackers hitting defensive stacks' },
+    { zh: '狂戰士死前反擊讓進攻方吃虧', en: 'Berserker damage-on-death punishes attackers hitting defensive stacks' },
   ],
 
   weaknesses: [
     { zh: '陸地上優勢較小', en: 'Fewer advantages on purely land maps' },
-    { zh: '主力攻擊步兵（Berserker）速度僅 5 格/小時', en: 'Main offensive infantry (Berserker) only 5 fields/hr' },
+    { zh: '主力攻擊步兵（狂戰士）速度僅 5 格/小時', en: 'Main offensive infantry (Berserker) only 5 fields/hr' },
   ],
 
   wallType: { name: { zh: '障礙物 (Barricade)', en: 'Barricade' }, bonusPerLevel: 0.015 },
   merchant: { capacity: 750, speed: 18 },
-  defenseMix: { zh: 'Shield Maiden + Huskarl Rider 為主', en: 'Shield Maiden + Huskarl Rider focus' },
+  defenseMix: { zh: '盾女 + 侍衛騎士為主', en: 'Shield Maiden + Huskarl Rider focus' },
 
   units: [
     { id: 'thrall', category: 'infantry',
-      name: { zh: '奴隸', en: 'Thrall' },
+      name: { zh: '奴僕', en: 'Thrall' },
       attack: 45, defInfantry: 22, defCavalry: 5, upkeep: 1,
       cost: { wood: 95, clay: 80, iron: 50, crop: 40 }, trainTime: 800,
       role: { zh: '基礎快訓練掠奪步兵', en: 'Cheap fast-trained raiding infantry' } },
     { id: 'shieldMaiden', category: 'infantry',
-      name: { zh: '鋼盾少女', en: 'Shield Maiden' },
+      name: { zh: '盾女', en: 'Shield Maiden' },
       attack: 20, defInfantry: 50, defCavalry: 30, upkeep: 1,
       cost: { wood: 125, clay: 70, iron: 85, crop: 40 }, trainTime: 1080,
       role: { zh: '防禦步兵', en: 'Defensive infantry' } },
@@ -76,12 +76,12 @@ export const vikings = withUnitSpeeds({
       cost: { wood: 155, clay: 95, iron: 50, crop: 50 }, trainTime: 1120,
       role: { zh: '偵察單位', en: 'Scout unit' } },
     { id: 'huskarlRider', category: 'cavalry',
-      name: { zh: '禁衛軍騎士', en: 'Huskarl Rider' },
+      name: { zh: '侍衛騎士', en: 'Huskarl Rider' },
       attack: 45, defInfantry: 95, defCavalry: 100, upkeep: 2,
       cost: { wood: 385, clay: 295, iron: 290, crop: 85 }, trainTime: 2650,
       role: { zh: '全能防禦騎兵', en: 'All-round defensive cavalry' } },
     { id: 'valkyrie', category: 'cavalry',
-      name: { zh: "女武神的祝福", en: "Valkyrie's Blessing" },
+      name: { zh: "女武神之賜", en: "Valkyrie's Blessing" },
       attack: 160, defInfantry: 50, defCavalry: 75, upkeep: 2,
       cost: { wood: 475, clay: 535, iron: 515, crop: 100 }, trainTime: 3060,
       role: { zh: 'OFF 重騎（upkeep 2 比其他重騎便宜）', en: 'Offensive heavy cavalry (upkeep 2 = cheaper than other heavies)' } },
@@ -96,7 +96,7 @@ export const vikings = withUnitSpeeds({
       cost: { wood: 850, clay: 1225, iron: 625, crop: 60 }, trainTime: 9000,
       role: { zh: '摧毀建築', en: 'Destroys buildings' } },
     { id: 'jarl', category: 'chief',
-      name: { zh: '首領', en: 'Jarl' },
+      name: { zh: '領主', en: 'Jarl' },
       attack: 40, defInfantry: 40, defCavalry: 60, upkeep: 4,
       cost: { wood: 35500, clay: 26600, iron: 25000, crop: 27200 }, trainTime: 70500,
       role: { zh: '降忠誠 15–30% / 征服', en: 'Reduces loyalty 15–30%, conquers' } },
@@ -108,11 +108,11 @@ export const vikings = withUnitSpeeds({
   ],
 
   offTips: [
-    { zh: '錘子主力：Berserker + Valkyrie\'s Blessing，配合 Thrall 當便宜增補', en: "Hammer: Berserker + Valkyrie's Blessing, with Thralls as cheap filler" },
+    { zh: '錘子主力：狂戰士 + 女武神之賜，配合奴僕當便宜增補', en: "Hammer: Berserker + Valkyrie's Blessing, with Thralls as cheap filler" },
     { zh: '跨海 OP 優勢大（水上 24/小時 vs 他族 18）', en: 'Cross-water ops have a big speed edge (24/hr vs 18)' },
   ],
   defTips: [
-    { zh: '鐵砧：Shield Maiden + Huskarl Rider', en: 'Anvil: Shield Maiden + Huskarl Rider' },
-    { zh: 'Berserker 也可當 def — 雖然 def 值低，但死前反擊會折損進攻方', en: "Berserkers can also join def — low def values but death-retaliation erodes the attacker" },
+    { zh: '鐵砧：盾女 + 侍衛騎士', en: 'Anvil: Shield Maiden + Huskarl Rider' },
+    { zh: '狂戰士也可當 def — 雖然 def 值低，但死前反擊會折損進攻方', en: "Berserkers can also join def — low def values but death-retaliation erodes the attacker" },
   ],
 });

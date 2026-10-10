@@ -396,7 +396,8 @@
       "description_zh": "高盧最快的攻擊騎兵",
       "description_en": "Gaul fastest attack cavalry",
       "aliases_zh": [
-        "圖塔特雷"
+        "圖塔特雷",
+        "雷神騎兵"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/24"
@@ -826,7 +827,8 @@
       "description_zh": "日耳曼的征服者，降低敵方忠誠度",
       "description_en": "Teuton chief unit for conquering villages",
       "aliases_zh": [
-        "領袖"
+        "領袖",
+        "酋長"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/19"
@@ -942,7 +944,8 @@
       "description_zh": "匈奴的偵查騎兵，遊戲中最快的偵查單位",
       "description_en": "Hun scout cavalry, fastest scout in the game",
       "aliases_zh": [
-        "斥候"
+        "斥候",
+        "觀察者"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/63"
@@ -1112,7 +1115,8 @@
       "description_zh": "匈奴的征服者，降低敵方忠誠度 15-30%",
       "description_en": "Hun chief unit for conquering villages, reduces loyalty by 15-30%",
       "aliases_zh": [
-        "領袖"
+        "領袖",
+        "洛加德"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/69"
@@ -1228,7 +1232,8 @@
       "description_zh": "埃及的攻擊步兵",
       "description_en": "Egyptian attack infantry",
       "aliases_zh": [
-        "鐮刀劍戰士"
+        "鐮刀劍戰士",
+        "彎刀戰士"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/53"
@@ -1257,7 +1262,8 @@
       "description_zh": "埃及的偵查騎兵",
       "description_en": "Egyptian scout cavalry",
       "aliases_zh": [
-        "索普度探險者"
+        "索普度探險者",
+        "索普杜探索者"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/54"
@@ -1286,7 +1292,8 @@
       "description_zh": "埃及的防禦騎兵",
       "description_en": "Egyptian defensive cavalry",
       "aliases_zh": [
-        "安胡爾守衛"
+        "安胡爾守衛",
+        "安赫爾守衛"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/55"
@@ -1315,7 +1322,8 @@
       "description_zh": "埃及的重騎兵，防禦極強",
       "description_en": "Egyptian heavy cavalry with very strong defense",
       "aliases_zh": [
-        "瑞謝夫戰車"
+        "瑞謝夫戰車",
+        "雷謝夫戰車"
       ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/56"
@@ -1401,7 +1409,9 @@
       "academy_level_required": 20,
       "description_zh": "埃及的征服者，降低敵方忠誠度 20-25%",
       "description_en": "Egyptian chief unit for conquering villages, reduces loyalty by 20-25%",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "諾馬克"
+      ],
       "stats_source": "ts11",
       "stats_ref": "manual/troop/59"
     },
@@ -1459,7 +1469,9 @@
       "academy_level_required": 0,
       "description_zh": "維京的基礎攻擊步兵",
       "description_en": "Viking basic attack infantry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "奴隸"
+      ],
       "stats_source": "official",
       "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
@@ -1486,7 +1498,9 @@
       "academy_level_required": 1,
       "description_zh": "維京的防禦步兵",
       "description_en": "Viking defensive infantry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "鋼盾少女"
+      ],
       "stats_source": "official",
       "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
@@ -1567,7 +1581,10 @@
       "academy_level_required": 5,
       "description_zh": "維京的防禦騎兵，均衡防禦",
       "description_en": "Viking defensive cavalry with balanced defense",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "禁衛軍騎士",
+        "胡斯卡爾騎士"
+      ],
       "stats_source": "official",
       "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
@@ -1594,7 +1611,10 @@
       "academy_level_required": 15,
       "description_zh": "維京的重騎兵，糧耗效率高",
       "description_en": "Viking heavy cavalry with efficient crop consumption",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "女武神的祝福",
+        "瓦爾基麗的祝福"
+      ],
       "stats_source": "official",
       "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
@@ -1679,7 +1699,10 @@
       "academy_level_required": 20,
       "description_zh": "維京的征服者，降低敵方忠誠度 15-30%",
       "description_en": "Viking chief unit for conquering villages, reduces loyalty by 15-30%",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "首領",
+        "雅爾"
+      ],
       "stats_source": "official",
       "stats_ref": "https://support.travian.com/en/articles/139-vikings-in-travian-legends"
     },
@@ -1737,7 +1760,9 @@
       "academy_level_required": 0,
       "description_zh": "斯巴達的基礎步兵，攻擊力強",
       "description_en": "Spartan basic infantry with strong attack",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "裝甲步兵"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1791,7 +1816,9 @@
       "academy_level_required": 3,
       "description_zh": "斯巴達的防禦步兵，最快的防禦步兵",
       "description_en": "Spartan defensive infantry, fastest defensive infantry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "盾牌手"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1818,7 +1845,10 @@
       "academy_level_required": 5,
       "description_zh": "斯巴達的強力攻擊步兵",
       "description_en": "Spartan powerful attack infantry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "雙鋼泰瑞恩",
+        "旋鏢兵"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1845,7 +1875,10 @@
       "academy_level_required": 5,
       "description_zh": "斯巴達的防禦騎兵",
       "description_en": "Spartan defensive cavalry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "爾必達騎士",
+        "厄爾皮達騎兵"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1872,7 +1905,9 @@
       "academy_level_required": 15,
       "description_zh": "斯巴達最強的重騎兵",
       "description_en": "Spartan most powerful heavy cavalry",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "科林斯破壞者"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1928,7 +1963,9 @@
       "academy_level_required": 15,
       "description_zh": "斯巴達的攻城武器，用於破壞建築",
       "description_en": "Spartan siege weapon for destroying buildings",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "賴達投石機"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },
@@ -1955,7 +1992,9 @@
       "academy_level_required": 20,
       "description_zh": "斯巴達的征服者，降低敵方忠誠度",
       "description_en": "Spartan chief unit for conquering villages",
-      "aliases_zh": [],
+      "aliases_zh": [
+        "五長官"
+      ],
       "stats_source": "pending",
       "stats_ref": null
     },

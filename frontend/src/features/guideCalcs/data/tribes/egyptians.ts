@@ -26,13 +26,13 @@ export const egyptians = withUnitSpeeds({
 
   specials: [
     { zh: '供水系統（Waterworks）：每級 +5% 糧綠洲加成（Lv20 = +100%）', en: 'Waterworks: +5% crop-oasis bonus per level (Lv20 = +100%)' },
-    { zh: '奴隸民兵（Slave Militia）：全遊戲最便宜單位（無法訓練 off）', en: 'Slave Militia: cheapest unit in the game (cannot train in standard Off)' },
+    { zh: '奴隸民兵：全遊戲最便宜單位（無法訓練 off）', en: 'Slave Militia: cheapest unit in the game (cannot train in standard Off)' },
     { zh: '石牆（Stone Wall）：血量最高 + 2.5%/級防禦', en: 'Stone Wall: highest HP + 2.5%/lv defense' },
   ],
 
   strengths: [
     { zh: '供水系統 + 糧綠洲 = 首都糧食產量超群', en: 'Waterworks + crop oasis = unmatched capital crop production' },
-    { zh: '看守人艾什 是高 CP / 價格比的防禦步兵', en: '看守人艾什 is a high CP/value defensive infantry' },
+    { zh: '看守人艾什是高 CP / 價格比的防禦步兵', en: 'Ash Warden is a high CP/value defensive infantry' },
     { zh: 'Stone Wall 的血量讓 cata 打得很慢', en: 'Stone Wall HP slows cata progress significantly' },
   ],
 
@@ -43,7 +43,7 @@ export const egyptians = withUnitSpeeds({
 
   wallType: { name: { zh: '石墻 (Stone Wall)', en: 'Stone Wall' }, bonusPerLevel: 0.025 },
   merchant: { capacity: 750, speed: 16 },
-  defenseMix: { zh: '50% 看守人艾什 / 50% 守衛安赫', en: '50% 看守人艾什 / 50% 守衛安赫' },
+  defenseMix: { zh: '50% 看守人艾什 / 50% 守衛安赫', en: '50% Ash Warden / 50% Anhur Guard' },
 
   units: [
     { id: 'slaveMilitia', category: 'infantry',
@@ -52,7 +52,7 @@ export const egyptians = withUnitSpeeds({
       cost: { wood: 45, clay: 60, iron: 30, crop: 15 }, trainTime: 530,
       role: { zh: '全遊戲最便宜兵，當英雄肉盾', en: 'Cheapest unit in the game; hero-adventure shield' } },
     { id: 'ashWarden', category: 'infantry',
-      name: { zh: '看守人艾什', en: '看守人艾什' },
+      name: { zh: '看守人艾什', en: 'Ash Warden' },
       attack: 30, defInfantry: 55, defCavalry: 40, upkeep: 1,
       cost: { wood: 115, clay: 100, iron: 145, crop: 60 }, trainTime: 1320,
       role: { zh: '全能防守步兵', en: 'All-round defensive infantry' } },
@@ -62,12 +62,12 @@ export const egyptians = withUnitSpeeds({
       cost: { wood: 170, clay: 180, iron: 220, crop: 80 }, trainTime: 1440,
       role: { zh: '攻擊步兵', en: 'Attacking infantry' } },
     { id: 'sopdu', category: 'scout',
-      name: { zh: '探險者索普杜', en: '探險者索普杜' },
+      name: { zh: '探險者索普杜', en: 'Sopdu Explorer' },
       attack: 0, defInfantry: 20, defCavalry: 10, upkeep: 2,
       cost: { wood: 170, clay: 150, iron: 20, crop: 40 }, trainTime: 1360,
       role: { zh: '偵察騎兵', en: 'Scout cavalry' } },
     { id: 'anhur', category: 'cavalry',
-      name: { zh: '守衛安赫', en: '守衛安赫' },
+      name: { zh: '守衛安赫', en: 'Anhur Guard' },
       attack: 50, defInfantry: 110, defCavalry: 50, upkeep: 2,
       cost: { wood: 360, clay: 330, iron: 280, crop: 120 }, trainTime: 2560,
       role: { zh: '高防禦騎兵', en: 'Heavy defensive cavalry' } },
@@ -87,7 +87,7 @@ export const egyptians = withUnitSpeeds({
       cost: { wood: 980, clay: 1510, iron: 660, crop: 100 }, trainTime: 9000,
       role: { zh: '摧毀建築', en: 'Destroys buildings' } },
     { id: 'nomarch', category: 'chief',
-      name: { zh: '州長', en: '州長' },
+      name: { zh: '州長', en: 'Nomarch' },
       attack: 40, defInfantry: 50, defCavalry: 50, upkeep: 4,
       cost: { wood: 34000, clay: 50000, iron: 34000, crop: 42000 }, trainTime: 90700,
       role: { zh: '降忠誠 / 征服', en: 'Reduces loyalty, conquers' } },
@@ -103,7 +103,7 @@ export const egyptians = withUnitSpeeds({
     { zh: '供水系統 Lv20 + 糧綠洲 → 首都糧產超出其他族 20%+', en: 'Waterworks Lv20 + crop oases → capital crop production beats other tribes by 20%+' },
   ],
   defTips: [
-    { zh: '鐵砧：看守人艾什 + 守衛安赫', en: 'Anvil: 看守人艾什 + 守衛安赫' },
+    { zh: '鐵砧：看守人艾什 + 守衛安赫', en: 'Anvil: Ash Warden + Anhur Guard' },
     { zh: 'Stone Wall 在 OP 中能爭取到多幾秒防守時間', en: 'Stone Wall buys extra seconds during an OP' },
   ],
 });

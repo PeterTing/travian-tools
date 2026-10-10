@@ -154,3 +154,113 @@ def test_no_old_name_in_backend_text():
         if hits:
             bad.append(f"{p.relative_to(ROOT)}: {hits}")
     assert bad == []
+
+
+# ── knowledge_base（策略、建築、部族、AI 檢索文字）也只用遊戲內名稱（#34 PM）────────
+
+
+def _strings(o, path=""):
+    """dict／list 裡所有字串值（不含 key、不含 aliases_zh：舊名只給查詢用）."""
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if k != "aliases_zh":
+                yield from _strings(v, f"{path}.{k}")
+    elif isinstance(o, list | tuple):
+        for i, v in enumerate(o):
+            yield from _strings(v, f"{path}[{i}]")
+    elif isinstance(o, str):
+        yield path, o
+
+
+KB_QUERIES = [
+    "部族", "羅馬 兵種", "高盧 兵種", "日耳曼 兵種", "條頓 兵種", "埃及 兵種", "匈奴 兵種",
+    "斯巴達 兵種", "維京 兵種", "長矛兵", "矛兵", "雷法師", "建築", "大使館", "早期",
+    "中期", "後期", "首都", "掠奪", "防守", "攻擊", "英雄", "世界奇觀", "文化點",
+    "日耳曼 掠奪", "匈奴 防守", "綠洲", "npc 村", "征服", "投石", "奴僕", "希望騎士",
+]  # fmt: skip
+
+
+def _kb_output_texts() -> list[tuple[str, str]]:
+    from app.knowledge_base import buildings, rag_service, strategies, tribes
+
+    texts: list[tuple[str, str]] = []
+    for mod in (tribes, buildings, strategies):
+        for name, v in vars(mod).items():
+            if name.isupper() and isinstance(v, dict | list):
+                short = mod.__name__.rsplit(".", 1)[-1]
+                texts += [(f"{short}.{name}{p}", t) for p, t in _strings(v)]
+    kb = rag_service.TravianKnowledgeBase()
+    for q in KB_QUERIES:
+        out = rag_service.format_knowledge_for_prompt(kb.retrieve(q))
+        texts.append((f"retrieve({q})", out))
+    texts.append(("_format_tribe_comparison", kb._format_tribe_comparison()))
+    texts.append(("_format_building_order", kb._format_building_order()))
+    return texts
+
+
+def test_no_old_name_in_knowledge_base_output_text():
+    """策略、建築、部族資料和 AI 檢索輸出的文字：舊名表（aliases + 條頓）一個都不能出現.
+
+    knowledge_base 原始碼裡的舊名只剩查詢用的關鍵字表（TOPIC_KEYWORDS、部族對照），不會輸出。
+    """
+    ingame = {
+        r["zh"] for sec in ("buildings", "units", "tribes") for r in NAMES[sec].values()
+    }
+    old = _old_names()
+    bad = []
+    for where, text in _kb_output_texts():
+        hits = _old_names_in(text, ingame, old)
+        if hits:
+            bad.append(f"{where}: {hits}")
+    assert bad == []
+
+
+def test_knowledge_base_names_come_from_the_table():
+    from app.knowledge_base.buildings import BUILDINGS_DATA
+    from app.knowledge_base.tribes import TRIBES_DATA
+
+    speeds = _load("unit_speeds.json")["tribes"]
+    for tribe, rows in speeds.items():
+        assert TRIBES_DATA[tribe]["name_zh"] == NAMES["tribes"][tribe]["zh"], tribe
+        for r in rows:
+            got = TRIBES_DATA[tribe]["troops"][r["kb_id"]]["name_zh"]
+            assert got == NAMES["units"][r["troop_id"]]["zh"], r["troop_id"]
+    for bid, b in BUILDINGS_DATA.items():
+        if bid in NAMES["buildings"]:
+            assert b["name_zh"] == NAMES["buildings"][bid]["zh"], bid
+    assert TRIBES_DATA["teutons"]["name_zh"] == "日耳曼人"
+    assert TRIBES_DATA["vikings"]["troops"]["thrall"]["name_zh"] == "奴僕"
+
+
+def test_knowledge_base_old_names_still_find_things():
+    from app.knowledge_base import rag_service
+    from app.knowledge_base.buildings import get_building_info
+    from app.knowledge_base.tribes import get_tribe_info
+
+    assert get_building_info("鐵匠舖")["name_zh"] == "盔甲廠"
+    assert get_building_info("主建築")["name_zh"] == "村莊大樓"
+    assert get_tribe_info("條頓")["name_zh"] == "日耳曼人"
+    assert get_tribe_info("日耳曼")["name_zh"] == "日耳曼人"
+    kb = rag_service.TravianKnowledgeBase()
+    titles = [r["title"] for r in kb.retrieve("長矛兵")]
+    assert "矛兵詳細資料" in titles
+    titles = [r["title"] for r in kb.retrieve("爾必達騎士")]
+    assert "希望騎士詳細資料" in titles
+
+
+def test_spartan_viking_names_follow_pm_rule():
+    """斯巴達、維京：官方說明頁 S139／S187 沒有繁體中文版，維持兵種資料庫的名稱；計算器以前的名字只當 aliases."""
+    units = NAMES["units"]
+    expect = {
+        "hoplite": ("重裝步兵", "裝甲步兵"),
+        "shieldsman": ("盾兵", "盾牌手"),
+        "elpida_rider": ("希望騎士", "爾必達騎士"),
+        "thrall": ("奴僕", "奴隸"),
+        "huskarl_rider": ("侍衛騎士", "禁衛軍騎士"),
+        "jarl": ("領主", "首領"),
+    }
+    for tid, (zh, alias) in expect.items():
+        assert units[tid]["zh"] == zh
+        assert alias in units[tid]["aliases"]
+    for tribe in ("spartans", "vikings"):
+        assert sum(1 for u in units.values() if u["tribe"] == tribe) == 10

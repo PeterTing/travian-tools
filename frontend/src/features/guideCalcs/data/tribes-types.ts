@@ -11,6 +11,7 @@
 
 import type { TribeId } from './travian';
 import { unitSpeed, type UnitSpeedSource } from '@/data/unitSpeeds';
+import { ingameUnitName } from '@/lib/ingameNames';
 
 export type { TribeId };
 
@@ -95,8 +96,11 @@ export function withUnitSpeeds(tribe: TribeData): Tribe {
             cost: { wood: st.cost[0], clay: st.cost[1], iron: st.cost[2], crop: st.cost[3] },
           }
         : {};
+      // 中文名一律讀名稱表（斯巴達、維京也是；#34），表裡沒有才用檔案裡的
+      const zhName = ingameUnitName(tribe.id, u.id);
+      const named = zhName ? { name: { ...u.name, zh: zhName } } : {};
       // 運載量一律用產生檔（跟後端 troops.json 同一份；P0-23）
-      return { ...u, ...fromTs11, carry: s.carry, speed: s.speed, speedSource: s.source, speedRef: s.ref, statsVerified: !!st };
+      return { ...u, ...fromTs11, ...named, carry: s.carry, speed: s.speed, speedSource: s.source, speedRef: s.ref, statsVerified: !!st };
     }),
   };
 }

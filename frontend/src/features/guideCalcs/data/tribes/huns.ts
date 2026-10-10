@@ -15,7 +15,7 @@ export const huns = withUnitSpeeds({
     en: 'Cavalry nation · Command Center replaces Residence',
   },
   summary: {
-    zh: '游牧騎兵族：Steppe Rider 速度 16 + 攻擊 120，Marauder 攻擊 180 是高遊速 OFF 騎兵；指揮中心（Command Center）取代行宮 / 皇宮，專為遠距離作戰設計。早期騎兵 farm 超強。',
+    zh: '游牧騎兵族：草原騎士速度 16 + 攻擊 120，掠奪者攻擊 180 是高遊速 OFF 騎兵；指揮中心（Command Center）取代行宮 / 皇宮，專為遠距離作戰設計。早期騎兵 farm 超強。',
     en: 'Nomadic cavalry tribe. Steppe Rider: speed 16 + atk 120. Marauder: atk 180 fast offensive cavalry. Command Center replaces Residence/Palace, purpose-built for long-range operations. Early cavalry farming dominates.',
   },
 
@@ -31,8 +31,8 @@ export const huns = withUnitSpeeds({
   ],
 
   strengths: [
-    { zh: 'Steppe Rider 早期 farm 速度 16 + 45 carry 最高效', en: 'Steppe Rider early farming at speed 16 is extremely efficient' },
-    { zh: 'Marauder 180 攻擊 + 速度 14 = 快速 OP 突破', en: 'Marauder: 180 atk + speed 14 = fast OP breakthroughs' },
+    { zh: '草原騎士早期搶資源最有效率（速度 16、運載 75）', en: 'Steppe Rider is the most efficient early raider (speed 16, carry 75)' },
+    { zh: '掠奪者 180 攻擊 + 速度 14 = 快速 OP 突破', en: 'Marauder: 180 atk + speed 14 = fast OP breakthroughs' },
     { zh: '指揮中心使遠征更有效率（移動速度加成）', en: 'Command Center boosts long-distance operations' },
   ],
 
@@ -44,7 +44,7 @@ export const huns = withUnitSpeeds({
 
   wallType: { name: { zh: '臨時的墻 (Makeshift Wall)', en: 'Makeshift Wall' }, bonusPerLevel: 0.015 },
   merchant: { capacity: 500, speed: 20 },
-  defenseMix: { zh: '50% Mercenary / 50% Marksman', en: '50% Mercenary / 50% Marksman' },
+  defenseMix: { zh: '50% 僱傭兵 / 50% 神射手', en: '50% Mercenary / 50% Marksman' },
 
   units: [
     { id: 'mercenary', category: 'infantry',
@@ -88,7 +88,7 @@ export const huns = withUnitSpeeds({
       cost: { wood: 950, clay: 1280, iron: 620, crop: 60 }, trainTime: 9000,
       role: { zh: '摧毀建築', en: 'Destroys buildings' } },
     { id: 'logades', category: 'chief',
-      name: { zh: '重步兵', en: '重步兵' },
+      name: { zh: '重步兵', en: 'Logades' },
       attack: 50, defInfantry: 40, defCavalry: 30, upkeep: 4,
       cost: { wood: 37200, clay: 27600, iron: 25200, crop: 27600 }, trainTime: 90700,
       role: { zh: '降忠誠 / 征服', en: 'Reduces loyalty, conquers' } },
@@ -100,11 +100,11 @@ export const huns = withUnitSpeeds({
   ],
 
   offTips: [
-    { zh: '早期錘子：純 Steppe Rider 或混 Marksman（速度相同）', en: 'Early hammer: pure Steppe Rider or mix with Marksman (same speed 16)' },
-    { zh: '主力錘子 Day 70+：Marauder + ram + cata', en: 'Late hammer: Marauder + rams + catas' },
+    { zh: '早期錘子：純草原騎士或混神射手（速度相同）', en: 'Early hammer: pure Steppe Rider or mix with Marksman (same speed 16)' },
+    { zh: '主力錘子 Day 70+：掠奪者 + ram + cata', en: 'Late hammer: Marauder + rams + catas' },
   ],
   defTips: [
-    { zh: '鐵砧：Mercenary + Marksman（均衡）', en: 'Anvil: Mercenary + Marksman (balanced)' },
+    { zh: '鐵砧：僱傭兵 + 神射手（均衡）', en: 'Anvil: Mercenary + Marksman (balanced)' },
     { zh: 'Makeshift Wall 最弱，依賴 Command Center + 部隊 def', en: 'Rely on Command Center + troop def; Makeshift Wall is weakest' },
   ],
 });

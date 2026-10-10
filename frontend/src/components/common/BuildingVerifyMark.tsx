@@ -1,13 +1,20 @@
 import { useId, useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import PendingVerifyChip, { PendingNotePanel } from './PendingVerifyChip'
-import { buildingSource, isBuildingEffectVerified, isBuildingVerified } from '@/data/gameData'
+import { buildingSource, isBuildingVerified } from '@/data/gameData'
+import { isBuildingFullyVerified } from '@/lib/buildingVerify'
 
 interface BuildingVerifyMarkProps {
   buildingId: string
   className?: string
   /** 放在深色底（列表選中的那一列 bg-primary）上：字改淺綠，對比 ≥ 4.5:1（TICKETS P0-17 (u)） */
   onDark?: boolean
+  /**
+   * list：建築列表的名稱旁（整列可點）。只有效果待驗證時放不能點的「待驗證」字樣（樣子跟灰標一樣、aria-hidden；
+   * 整列的 aria-label 另外加「效果待驗證」，見 buildingRowLabel）。
+   * title（預設）：詳情標題旁，效果待驗證時放可點的灰標，說明跟效果欄的灰標一樣兩行。
+   */
+  variant?: 'list' | 'title'
 }
 
 /**
@@ -15,12 +22,12 @@ interface BuildingVerifyMarkProps {
  * 「ts11 遊戲內說明」／「官方知識庫」，P0-23）；其他給一個「待驗證」小灰標（不逐格標）。
  * 點擊範圍用透明延伸補到 44×44，外觀不變；只靠點，不靠 hover。
  */
-export default function BuildingVerifyMark({ buildingId, className = '', onDark = false }: BuildingVerifyMarkProps) {
+export default function BuildingVerifyMark({ buildingId, className = '', onDark = false, variant = 'title' }: BuildingVerifyMarkProps) {
   const { t } = useTranslation()
   const id = useId()
   const panelId = `verified-note-${id.replace(/:/g, '')}`
   const [open, setOpen] = useState(false)
-  if (isBuildingVerified(buildingId)) {
+  if (isBuildingFullyVerified(buildingId)) {
     const source = buildingSource(buildingId) ?? 'ts11L1Kb'
     const onClick = (e: MouseEvent<HTMLButtonElement>) => {
       // 在可點的列表項目裡：只開說明，不要順便選到那一棟
@@ -43,10 +50,25 @@ export default function BuildingVerifyMark({ buildingId, className = '', onDark 
         >
           {t('common.verifiedShort')}
         </button>
-        {/* 效果也照官方知識庫核對過：第一行加「效果」（P0-23）；沒核對的效果在詳情的效果欄另標待驗證 */}
-        {open && <PendingNotePanel fill id={panelId} kinds={[source]} ns="verifiedNotes" whatKeys={[isBuildingEffectVerified(buildingId) ? 'verifiedNotes.whatWithEffect' : undefined]} />}
+        {/* 數字和效果都照官方知識庫核對過（P0-23）：第一行寫「花費、時間、人口、CP、效果已核對」 */}
+        {open && <PendingNotePanel fill id={panelId} kinds={[source]} ns="verifiedNotes" whatKeys={['verifiedNotes.whatWithEffect']} />}
       </>
     )
+  }
+  if (isBuildingVerified(buildingId)) {
+    // 數字核對過、效果還沒（研究院、盔甲廠、大使館、集結點、寶物庫）：沒有 ✓
+    if (variant === 'list') {
+      return (
+        <span
+          aria-hidden="true"
+          data-testid="pending-verify-label"
+          className={`ml-1 inline-flex items-center whitespace-nowrap rounded-full bg-gray-100 px-2 py-0.5 align-middle text-xs font-normal leading-4 text-gray-600 ${className}`}
+        >
+          {t('common.pendingVerify')}
+        </span>
+      )
+    }
+    return <PendingVerifyChip className={`ml-1 ${className}`} kind="buildingEffect" />
   }
   return <PendingVerifyChip className={`ml-1 ${className}`} kind="building" />
 }
