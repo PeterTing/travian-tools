@@ -5,6 +5,7 @@ import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import type { PendingKind } from '@/lib/pendingNotes'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
 
@@ -19,7 +20,9 @@ const fmtHr = (h: number) => {
 
 export default function TraderouteCalculator() {
   const { lang } = useLang();
-  const [tribe, setTribe] = useState<TribeId>('gauls');
+  // 部族預設跟「已帶入」列的帳號
+  const { tribe: accountTribe } = useAutoFill();
+  const [tribe, setTribe] = useState<TribeId>(() => (accountTribe && accountTribe in MERCHANTS ? accountTribe as TribeId : 'gauls'));
   const [office, setOffice] = useState(10);
   const [dist, setDist] = useState(30);
   const [surplus, setSurplus] = useState({ wood: 5000, clay: 5000, iron: 5000, crop: 2000 });
@@ -73,12 +76,12 @@ export default function TraderouteCalculator() {
             <select id="traderoute-tribe" value={tribe} onChange={e => setTribe(e.target.value as TribeId)}>
               {Object.entries(MERCHANTS).map(([id, m]) => {
                 const zhNames: Record<string, string> = {
-                  romans: '羅馬人', gauls: '高盧人', teutons: '日耳曼人',
-                  egyptians: '埃及人', huns: '匈奴', spartans: '斯巴達人', vikings: '維京人',
+                  romans: '羅馬', gauls: '高盧', teutons: '條頓',
+                  egyptians: '埃及', huns: '匈奴', spartans: '斯巴達', vikings: '維京',
                 };
                 const display = lang === 'en'
                   ? `${id.charAt(0).toUpperCase() + id.slice(1)} (${m.capacity}/${m.speed})`
-                  : `${zhNames[id]} (${m.capacity}/${m.speed})`;
+                  : `${zhNames[id]}（容量 ${m.capacity}、速度 ${m.speed}）`;
                 return <option key={id} value={id}>{display}</option>;
               })}
             </select>
@@ -95,12 +98,12 @@ export default function TraderouteCalculator() {
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Hourly surplus to ship' : '每小時送出量'}</h4>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Wood</label><input type="number" min={0} value={surplus.wood} onChange={e => setSurplus(p => ({ ...p, wood: +e.target.value }))} /></div>
-            <div className={s.field}><label>Clay</label><input type="number" min={0} value={surplus.clay} onChange={e => setSurplus(p => ({ ...p, clay: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Wood' : '木材'}</label><input type="number" min={0} value={surplus.wood} onChange={e => setSurplus(p => ({ ...p, wood: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Clay' : '黏土'}</label><input type="number" min={0} value={surplus.clay} onChange={e => setSurplus(p => ({ ...p, clay: +e.target.value }))} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Iron</label><input type="number" min={0} value={surplus.iron} onChange={e => setSurplus(p => ({ ...p, iron: +e.target.value }))} /></div>
-            <div className={s.field}><label>Crop</label><input type="number" min={0} value={surplus.crop} onChange={e => setSurplus(p => ({ ...p, crop: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Iron' : '鐵礦'}</label><input type="number" min={0} value={surplus.iron} onChange={e => setSurplus(p => ({ ...p, iron: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Crop' : '糧食'}</label><input type="number" min={0} value={surplus.crop} onChange={e => setSurplus(p => ({ ...p, crop: +e.target.value }))} /></div>
           </div>
         </div>
 

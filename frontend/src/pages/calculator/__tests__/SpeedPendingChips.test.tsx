@@ -77,7 +77,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
   it('TS optimizer: boots field per attacker; one chip per result card / row on its title (village), none on the travel row', async () => {
     api.calculateTsOptimizer.mockResolvedValue({
       target_arrival: '2030-01-01T12:00:00+00:00',
-      results: [{ village_label: 'Hammer-1', recommended_ts_level: 0, send_time: '2030-01-01T06:26:40+00:00', travel_time_formatted: '5:33:20', distance: 50 }],
+      results: [{ attacker_id: 'x', village_label: '攻擊者 1', recommended_ts_level: 0, send_time: '2030-01-01T06:26:40+00:00', travel_time_formatted: '5:33:20', distance: 50 }],
       warnings: [],
     })
     render(<AttackPlannerPage />)
@@ -86,11 +86,44 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     fireEvent.click(screen.getByTestId('ts-submit'))
     const title = await screen.findByTestId('ts-card-title')
     expect(api.calculateTsOptimizer).toHaveBeenCalledWith(expect.objectContaining({ attackers: [expect.objectContaining({ hero_bonus: 25, ts_level: 0 })] }))
-    expect(title).toHaveTextContent('Hammer-1')
+    expect(title).toHaveTextContent('攻擊者 1')
     expect(chipKinds(title)).toEqual(['heroBootsSpeed'])
     expect(chipKinds(screen.getByTestId('ts-row-title'))).toEqual(['heroBootsSpeed'])
     expect(chipKinds(screen.getByTestId('ts-travel-card'))).toEqual([])
     expect(chipKinds(screen.getByTestId('ts-travel'))).toEqual([])
+  })
+
+  it('TS optimizer: two attackers with the same name — each result maps back by attacker_id, not by name (P0-17 i)', async () => {
+    api.calculateTsOptimizer.mockImplementation(async (req) => {
+      const [a, b] = req.attackers
+      // 伺服器回傳的順序和輸入相反，名稱一樣：只能靠 attacker_id 對回去
+      return {
+        target_arrival: '2030-01-01T12:00:00+00:00',
+        results: [
+          { attacker_id: b!.attacker_id, village_label: '01', recommended_ts_level: 0, send_time: '2030-01-01T07:00:00+00:00', travel_time_formatted: '5:00:00', distance: 30 },
+          { attacker_id: a!.attacker_id, village_label: '01', recommended_ts_level: 0, send_time: '2030-01-01T08:00:00+00:00', travel_time_formatted: '4:00:00', distance: 10 },
+        ],
+        warnings: [],
+      }
+    })
+    render(<AttackPlannerPage />)
+    fireEvent.click(screen.getByRole('button', { name: /加攻擊者/ }))
+    const rows = screen.getAllByTestId('attacker-row')
+    expect(rows).toHaveLength(2)
+    for (const r of rows) fireEvent.change(within(r).getAllByRole('textbox')[0]!, { target: { value: '01' } })
+    // 只有第二個攻擊者有靴子
+    fireEvent.change(within(rows[1]!).getByTestId('attacker-boots'), { target: { value: '25' } })
+    fireEvent.click(screen.getByTestId('ts-submit'))
+    const titles = await screen.findAllByTestId('ts-card-title')
+    const sent = api.calculateTsOptimizer.mock.calls[0]![0].attackers
+    expect(sent.map((a) => a.village_label)).toEqual(['01', '01'])
+    expect(new Set(sent.map((a) => a.attacker_id)).size).toBe(2)
+    // 第一張卡是第二個攻擊者（有靴子）→ 靴子灰標；第二張卡是第一個攻擊者 → 沒有
+    expect(chipKinds(titles[0]!)).toEqual(['heroBootsSpeed'])
+    expect(chipKinds(titles[1]!)).toEqual([])
+    const rowTitles = screen.getAllByTestId('ts-row-title')
+    expect(chipKinds(rowTitles[0]!)).toEqual(['heroBootsSpeed'])
+    expect(chipKinds(rowTitles[1]!)).toEqual([])
   })
 
   it('reverse TS: boots field is sent; each match row gets the chip for its own arena level (none for TS 0 without boots)', async () => {

@@ -135,6 +135,8 @@ export interface PathSpeedTsRequest {
 export interface SpeedTsMatch {
   unit_speed: number
   possible_units: string[]
+  /** 中文名（含部族），跟 possible_units 同順序（P0-17 (h)） */
+  possible_units_zh?: string[]
   tournament_square_level: number
   calculated_travel_time_seconds: number
   calculated_travel_time_formatted: string
@@ -209,6 +211,8 @@ export interface CropScouterResponse {
 // ============ Attack TS Optimizer ============
 
 export interface AttackerProfile {
+  /** 前端給每個攻擊者的穩定 id，後端原樣回傳（兩個攻擊者同名也對得回去，P0-17 (i)） */
+  attacker_id?: string
   village_label: string
   x: number
   y: number
@@ -229,6 +233,7 @@ export interface TsOptimizerRequest {
 }
 
 export interface TsOptimizerResult {
+  attacker_id?: string | null
   village_label: string
   recommended_ts_level: number
   send_time: string

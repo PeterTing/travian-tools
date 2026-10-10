@@ -139,7 +139,7 @@ export default function BattleSimulatorPage() {
               onChange={(e) =>
                 handleTroopChange(side, index, 'troop_id', e.target.value)
               }
-              className="flex-1 p-2 border rounded bg-background text-sm"
+              className="flex-1 p-2 border rounded bg-background text-base"
             >
               <option value="">{t('calculator.battle.selectTroop')}</option>
               {getFilteredTroops(tribe).map((trpItem) => (

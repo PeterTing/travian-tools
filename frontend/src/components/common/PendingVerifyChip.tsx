@@ -12,7 +12,7 @@ type PendingVerifyChipProps = {
    * 同一行有好幾個數字用到不同的待驗證資料（設計師）：一行只放一個灰標，
    * 點開依數字在這一行出現的順序列出每一種說明，每種兩行，種類之間隔 8px
    */
-  | { kinds: readonly PendingKind[]; kind?: never }
+  | { kinds: readonly PendingKind[]; kind?: never; labels?: readonly string[] }
 )
 
 /** 開關狀態：有 Provider 用整頁共用的（一次只開一個），沒有就自己記 */
@@ -42,9 +42,15 @@ function useOpenState(id: string) {
  * - 一行只放一個灰標：同一行有好幾種待驗證資料時傳 kinds，點開依數字在這一行出現的順序
  *   列出每一種（每種兩行，種類之間隔 8px）
  */
-export default function PendingVerifyChip({ kind, kinds: kindList, className = '' }: PendingVerifyChipProps) {
+export default function PendingVerifyChip(props: PendingVerifyChipProps) {
+  const { kind, kinds: kindList, className = '' } = props
+  // labels：每一種說明前面加的字（例如攔截發送卡「攻方：」「攔截方：」），跟 kinds 一一對應；
+  // 有 labels 時同一種可以出現兩次（兩方都列出來）
+  const labelList = 'labels' in props ? props.labels : undefined
   const kinds = useMemo<readonly PendingKind[]>(() => kindList ?? (kind ? [kind] : []), [kind, kindList])
+  const labels = useMemo<readonly string[] | undefined>(() => labelList, [labelList])
   const kindsKey = kinds.join(' ')
+  const labelsKey = labels?.join('\u0000') ?? ''
   const { t } = useTranslation()
   const id = useId()
   const panelId = `pending-note-${id.replace(/:/g, '')}`
@@ -54,9 +60,9 @@ export default function PendingVerifyChip({ kind, kinds: kindList, className = '
 
   useEffect(() => {
     if (!row) return
-    row.register({ id: panelId, kinds, open })
+    row.register({ id: panelId, kinds, labels, open })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [row, panelId, kindsKey, open])
+  }, [row, panelId, kindsKey, labelsKey, open])
   useEffect(() => {
     if (!row) return
     return () => row.register(null)
@@ -88,7 +94,7 @@ export default function PendingVerifyChip({ kind, kinds: kindList, className = '
         </span>
       </button>
       {/* 不在「一行」裡（例如表格格子、標題）：面板直接接在灰標後面，自成一塊 */}
-      {!row && open && <PendingNotePanel fill={fillDefault} id={panelId} kinds={kinds} />}
+      {!row && open && <PendingNotePanel fill={fillDefault} id={panelId} kinds={kinds} labels={labels} />}
     </>
   )
 }
@@ -109,7 +115,7 @@ function clauses(text: string): ReactNode {
 }
 
 /** 展開的灰色說明：第一行哪個數字還沒核對，第二行現在的數字從哪裡來 */
-export function PendingNotePanel({ id, kinds, fill = false }: { id: string; kinds: readonly PendingKind[]; fill?: boolean }) {
+export function PendingNotePanel({ id, kinds, labels, fill = false }: { id: string; kinds: readonly PendingKind[]; labels?: readonly string[]; fill?: boolean }) {
   const { t } = useTranslation()
   const ref = useRef<HTMLSpanElement>(null)
   // 文字行：左邊對齊灰標；灰標太靠右放不下時往左移，整塊不超出這一行。fill：撐滿、從容器內容左緣開始
@@ -145,8 +151,11 @@ export function PendingNotePanel({ id, kinds, fill = false }: { id: string; kind
         const keys = pendingNoteKeys(k)
         // 好幾種：依數字在那一行出現的順序，每種兩行，種類之間隔 8px
         return (
-          <span key={k} className={`block ${i > 0 ? 'mt-2' : ''}`} data-testid="pending-note-entry" data-kind={k}>
-            <span className="block" data-testid="pending-note-what">{clauses(t(keys.what))}</span>
+          <span key={`${i}-${k}`} className={`block ${i > 0 ? 'mt-2' : ''}`} data-testid="pending-note-entry" data-kind={k}>
+            <span className="block" data-testid="pending-note-what">
+              {labels?.[i] && <span className="font-medium" data-testid="pending-note-label">{labels[i]}</span>}
+              {clauses(t(keys.what))}
+            </span>
             <span className="block" data-testid="pending-note-source">{clauses(t(keys.source))}</span>
           </span>
         )
@@ -173,7 +182,7 @@ export function PendingRow({
   tableColSpan?: number
   children: ReactNode
 } & HTMLAttributes<HTMLElement>) {
-  const [chip, setChip] = useState<{ id: string; kinds: readonly string[]; open: boolean } | null>(null)
+  const [chip, setChip] = useState<{ id: string; kinds: readonly string[]; labels?: readonly string[]; open: boolean } | null>(null)
   const slot = useMemo(() => ({ register: setChip }), [])
   const open = chip?.open ?? false
   // 在結果面板裡：沒指定就撐滿面板內容寬度
@@ -187,11 +196,11 @@ export function PendingRow({
       {open && chip && (tableColSpan ? (
         <tr data-testid="pending-note-row">
           <td colSpan={tableColSpan}>
-            <PendingNotePanel fill id={chip.id} kinds={chip.kinds as readonly PendingKind[]} />
+            <PendingNotePanel fill id={chip.id} kinds={chip.kinds as readonly PendingKind[]} labels={chip.labels} />
           </td>
         </tr>
       ) : (
-        <PendingNotePanel fill={fillPanel} id={chip.id} kinds={chip.kinds as readonly PendingKind[]} />
+        <PendingNotePanel fill={fillPanel} id={chip.id} kinds={chip.kinds as readonly PendingKind[]} labels={chip.labels} />
       ))}
     </>
   )

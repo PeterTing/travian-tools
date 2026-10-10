@@ -357,6 +357,12 @@ export function fieldBuildTime(type: ResourceType, level: number, mbLevel = 1): 
   return baseSec * mbMultiplier(mbLevel);
 }
 
+/** 加成建築（鋸木廠等）升到 level 的建造秒數（產生檔的基礎秒數 × 村莊大樓加速，x1） */
+export function bbBuildTime(bb: keyof typeof BONUS_BUILDINGS, level: number, mbLevel = 1): number {
+  const row = buildingRows(BB_ID[bb])[level - 1];
+  return row ? row.buildTimeBase * mbMultiplier(mbLevel) : 0;
+}
+
 export function formatDuration(sec: number): string {
   if (!isFinite(sec) || sec <= 0) return '—';
   const d = Math.floor(sec / 86400);

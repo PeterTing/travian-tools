@@ -276,7 +276,7 @@ export function ParseConfirmPanel({
                   </span>
                 ) : (
                   <select
-                    className="w-full min-w-0 max-w-full rounded-md border bg-background px-2 py-1.5 text-sm"
+                    className="w-full min-w-0 max-w-full rounded-md border bg-background px-2 py-1.5 text-base"
                     value={villageId || ''}
                     onChange={(e) => onVillageIdChange(e.target.value || null)}
                     data-testid="village-select"

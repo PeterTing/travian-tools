@@ -96,7 +96,7 @@ export default function CropSimCalculator() {
 
       <div className={s.wrapper}>
         <div className={s.inputs}>
-          <h4>{lang === 'en' ? 'Layout & level' : '佈局 & 等級'}</h4>
+          <h4>{lang === 'en' ? 'Layout & level' : '佈局與等級'}</h4>
           <div className={s.field}>
             <label>{lang === 'en' ? 'Layout' : '佈局'}</label>
             <select value={layoutId} onChange={e => setLayoutId(e.target.value as CropperId)}>
@@ -106,35 +106,35 @@ export default function CropSimCalculator() {
           <div className={s.field}>
             <label>{lang === 'en' ? 'Field level' : '田地等級'}</label>
             <select value={flv} onChange={e => setFlv(+e.target.value)}>
-              {Array.from({ length: 21 }, (_, i) => i + 1).map(L => <option key={L} value={L}>Lv {L}</option>)}
+              {Array.from({ length: 21 }, (_, i) => i + 1).map(L => <option key={L} value={L}>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</option>)}
             </select>
           </div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Bonus buildings' : '加成建築'}</h4>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Sawmill</label><input type="number" min={0} max={5} value={bonus.saw} onChange={e => setBonus(p => ({ ...p, saw: +e.target.value }))} /></div>
-            <div className={s.field}><label>Brickyard</label><input type="number" min={0} max={5} value={bonus.bri} onChange={e => setBonus(p => ({ ...p, bri: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Sawmill' : '鋸木廠'}</label><input type="number" min={0} max={5} value={bonus.saw} onChange={e => setBonus(p => ({ ...p, saw: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Brickyard' : '磚廠'}</label><input type="number" min={0} max={5} value={bonus.bri} onChange={e => setBonus(p => ({ ...p, bri: +e.target.value }))} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Iron Foundry</label><input type="number" min={0} max={5} value={bonus.fnd} onChange={e => setBonus(p => ({ ...p, fnd: +e.target.value }))} /></div>
-            <div className={s.field}><label>Grain Mill</label><input type="number" min={0} max={5} value={bonus.mil} onChange={e => setBonus(p => ({ ...p, mil: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Iron Foundry' : '鑄鐵廠'}</label><input type="number" min={0} max={5} value={bonus.fnd} onChange={e => setBonus(p => ({ ...p, fnd: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Grain Mill' : '麵粉廠'}</label><input type="number" min={0} max={5} value={bonus.mil} onChange={e => setBonus(p => ({ ...p, mil: +e.target.value }))} /></div>
           </div>
-          <div className={s.field}><label>Bakery</label><input type="number" min={0} max={5} value={bonus.bak} onChange={e => setBonus(p => ({ ...p, bak: +e.target.value }))} /></div>
+          <div className={s.field}><label>{lang === 'en' ? 'Bakery' : '麵包店'}</label><input type="number" min={0} max={5} value={bonus.bak} onChange={e => setBonus(p => ({ ...p, bak: +e.target.value }))} /></div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Oasis bonuses (%)' : '綠洲加成 (%)'}</h4>
-          <p style={{ fontSize: 11, color: 'var(--text-2)', margin: '0 0 8px' }}>
+          <p className={s.muted} style={{ margin: '0 0 8px' }}>
             {lang === 'en' ? 'Per-village cap: 75% non-crop, 150% crop (up to 3 oases at Hero\'s Mansion 20)' : '每村上限：木／土／鐵 75%、糧 150%（英雄宅 20 級最多 3 塊綠洲）'}
           </p>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Wood (max 75)</label><input type="number" min={0} max={75} value={oasis.wood} onChange={e => setOasis(p => ({ ...p, wood: +e.target.value }))} /></div>
-            <div className={s.field}><label>Clay (max 75)</label><input type="number" min={0} max={75} value={oasis.clay} onChange={e => setOasis(p => ({ ...p, clay: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Wood (max 75)' : '木材（最多 75）'}</label><input type="number" min={0} max={75} value={oasis.wood} onChange={e => setOasis(p => ({ ...p, wood: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Clay (max 75)' : '黏土（最多 75）'}</label><input type="number" min={0} max={75} value={oasis.clay} onChange={e => setOasis(p => ({ ...p, clay: +e.target.value }))} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>Iron (max 75)</label><input type="number" min={0} max={75} value={oasis.iron} onChange={e => setOasis(p => ({ ...p, iron: +e.target.value }))} /></div>
-            <div className={s.field}><label>Crop (max 150)</label><input type="number" min={0} max={150} value={oasis.crop} onChange={e => setOasis(p => ({ ...p, crop: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Iron (max 75)' : '鐵礦（最多 75）'}</label><input type="number" min={0} max={75} value={oasis.iron} onChange={e => setOasis(p => ({ ...p, iron: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Crop (max 150)' : '糧食（最多 150）'}</label><input type="number" min={0} max={150} value={oasis.crop} onChange={e => setOasis(p => ({ ...p, crop: +e.target.value }))} /></div>
           </div>
 
-          <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> Plus +25% gold</label>
+          <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> {lang === 'en' ? 'Plus +25% (gold)' : 'Plus 產量 +25%（金幣）'}</label>
           <div className="mb-3.5">
             <Stepper
               label={lang === 'en' ? 'Egyptian Waterworks level (0 = not Egyptian)' : '埃及供水系統等級（不是埃及填 0）'}
@@ -176,7 +176,7 @@ export default function CropSimCalculator() {
             <thead>
               {/* 欄位標題不換行（390 剛好放得下，「加成%」不會被切成「加／成%」） */}
               <tr className="h-11 whitespace-nowrap">
-                <th>{lang === 'en' ? 'Resource' : '資源'}</th>
+                <th><span className="sr-only sm:not-sr-only">{lang === 'en' ? 'Resource' : '資源'}</span></th>
                 <th>{lang === 'en' ? 'Fields' : '田數'}</th>
                 <th>{lang === 'en' ? 'Base' : '基礎'}</th>
                 <th>{lang === 'en' ? 'Bonus%' : '加成%'}</th>
@@ -186,12 +186,14 @@ export default function CropSimCalculator() {
             </thead>
             <tbody>
               {result.rows.map(r => {
-                const labels: Record<string, string> = lang === 'en'
-                  ? { wood: '🪵 Wood', clay: '🧱 Clay', iron: '⛏️ Iron', crop: '🌾 Crop' }
-                  : { wood: '🪵 木材', clay: '🧱 黏土', iron: '⛏️ 鐵礦', crop: '🌾 糧食' };
+                const icons: Record<string, string> = { wood: '🪵', clay: '🧱', iron: '⛏️', crop: '🌾' };
+                const names: Record<string, string> = lang === 'en'
+                  ? { wood: 'Wood', clay: 'Clay', iron: 'Iron', crop: 'Crop' }
+                  : { wood: '木材', clay: '黏土', iron: '鐵礦', crop: '糧食' };
                 return (
                   <tr key={r.t} className="h-11">
-                    <td>{labels[r.t]}</td>
+                    {/* 390 寬第一欄只放圖示（名稱給螢幕閱讀器），≥640 才顯示名稱（P0-17 (d)） */}
+                    <td className="whitespace-nowrap"><span aria-hidden="true">{icons[r.t]}</span><span className="sr-only sm:not-sr-only"> {names[r.t]}</span></td>
                     <td>{r.n} × {r.base}</td>
                     <td>{(r.n * r.base).toLocaleString()}</td>
                     <td>+{(r.bb * 100).toFixed(0)}%</td>

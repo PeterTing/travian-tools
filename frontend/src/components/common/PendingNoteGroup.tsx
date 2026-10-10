@@ -25,7 +25,7 @@ export function usePendingNoteGroup(): PendingNoteGroupValue | null {
 
 /** 灰標所在的那一行：說明面板畫在這一行的正下方（在版面裡，不浮在內容上） */
 export interface PendingRowSlot {
-  register: (chip: { id: string; kinds: readonly string[]; open: boolean } | null) => void
+  register: (chip: { id: string; kinds: readonly string[]; labels?: readonly string[]; open: boolean } | null) => void
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

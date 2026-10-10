@@ -149,6 +149,7 @@ export default function BuildingCalculatorPage() {
           {/* Main building level */}
           <div className="mb-4">
             <Stepper
+              labelStyle="form"
               label={t('calculator.building.mainBuildingLevel')}
               value={mainBuildingLevel}
               onChange={setMainBuildingLevel}

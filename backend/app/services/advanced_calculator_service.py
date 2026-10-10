@@ -90,6 +90,18 @@ def _calculate_travel_time(
     return seconds / 3600.0
 
 
+# 部族中文名（跟前端 i18n tribes.* 同一套）
+_TRIBE_ZH = {
+    "romans": "羅馬",
+    "teutons": "條頓",
+    "gauls": "高盧",
+    "egyptians": "埃及",
+    "huns": "匈奴",
+    "vikings": "維京",
+    "spartans": "斯巴達",
+}
+
+
 def _load_troops_data() -> dict:
     """載入兵種資料."""
     data_path = Path(__file__).parent.parent.parent / "data" / "static" / "troops.json"
@@ -394,6 +406,7 @@ class AdvancedCalculatorService:
         # 只用有第一手出處的速度（ts11 遊戲內說明／官方文章）；待驗證的兵種
         # （目前是斯巴達 10 種）不列入比對，另外回傳名單。
         speed_to_units: dict[int, list[str]] = {}
+        speed_to_units_zh: dict[int, list[str]] = {}
         unverified_units: list[str] = []
         for troop in troops_data.values():
             spd = troop.get("speed")
@@ -401,6 +414,10 @@ class AdvancedCalculatorService:
                 unverified_units.append(f"{troop['name_en']} ({troop['tribe']})")
                 continue
             speed_to_units.setdefault(int(spd), []).append(troop["name_en"])
+            tribe_zh = _TRIBE_ZH.get(troop["tribe"], troop["tribe"])
+            speed_to_units_zh.setdefault(int(spd), []).append(
+                f"{troop.get('name_zh') or troop['name_en']}（{tribe_zh}）"
+            )
 
         all_speeds = sorted(speed_to_units.keys())
         possible_matches: list[SpeedTsMatch] = []
@@ -424,6 +441,7 @@ class AdvancedCalculatorService:
                         SpeedTsMatch(
                             unit_speed=speed,
                             possible_units=speed_to_units[speed],
+                            possible_units_zh=speed_to_units_zh[speed],
                             tournament_square_level=ts_level,
                             calculated_travel_time_seconds=calc_seconds,
                             calculated_travel_time_formatted=_format_travel_time(
@@ -757,6 +775,7 @@ class AdvancedCalculatorService:
 
             results.append(
                 TsOptimizerResult(
+                    attacker_id=atk.attacker_id,
                     village_label=atk.village_label,
                     recommended_ts_level=ts_level,
                     send_time=send_dt.isoformat(timespec="seconds"),

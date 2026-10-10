@@ -138,18 +138,16 @@ export const MORE_GROUPS: NavGroup[] = [
 ]
 
 /** 用到兵種資料（速度、花費、糧耗）的頁面：「已帶入」列多一行「待驗證」（TICKETS P0-15） */
+// 只列真的讀兵種資料表的頁面（P0-17 (a)）：
+// 行軍時間、攔截、躲兵、OP 規劃的速度都是使用者自己填；貿易路線用的是商人資料，不是兵種
 export const UNIT_DATA_ROUTES: readonly string[] = [
   ROUTES.DATABASE.TROOPS,
   ROUTES.CALCULATOR.CROP,
   '/calculator/technology',
+  // 反推 TS：用兵種速度表比對（斯巴達速度待驗證，未列入反推）
   '/calculator/path-speed-ts',
   '/calculator/launch-sim',
-  '/calculator/trade-route',
   '/calculator/farming',
-  '/calculator/path',
-  '/calculator/interception',
-  '/calculator/save-troops',
-  '/calculator/attack-planner',
 ]
 
 const startsWithSegment = (pathname: string, prefix: string) =>

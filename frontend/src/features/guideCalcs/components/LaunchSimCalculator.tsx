@@ -9,6 +9,7 @@ import s from './calc.module.css';
 import CalcResultPanel, { SummaryPending } from './CalcResultPanel';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 
 const TRIBE_ORDER: TribeId[] = ['romans', 'teutons', 'gauls', 'egyptians', 'huns', 'vikings', 'spartans'];
@@ -69,7 +70,9 @@ export function simulate(
 export default function LaunchSimCalculator() {
   const { lang } = useLang();
   const [strategyId, setStrategyId] = useState<StrategyId>('4p-sim');
-  const [tribe, setTribe] = useState<TribeId>('romans');
+  // 部族預設跟「已帶入」列的帳號（沒有帳號才用羅馬）
+  const { tribe: accountTribe } = useAutoFill();
+  const [tribe, setTribe] = useState<TribeId>(() => (accountTribe && accountTribe in TRIBES ? accountTribe as TribeId : 'romans'));
   const [prodPerHour, setProdPerHour] = useState<number>(2000);
 
   const settlerCost = TRIBE_SETTLER_COST[tribe].total * 3;
@@ -107,7 +110,7 @@ export default function LaunchSimCalculator() {
           </div>
 
           <div className={s.field}>
-            <label>{lang === 'en' ? 'Tribe (settler cost)' : '族群（影響 Settler 成本）'}</label>
+            <label>{lang === 'en' ? 'Tribe (settler cost reference only)' : '部族（只影響下面的拓荒者成本參考）'}</label>
             <select value={tribe} onChange={(e) => setTribe(e.target.value as TribeId)}>
               {TRIBE_ORDER.map((id) => (
                 <option key={id} value={id}>
@@ -119,7 +122,7 @@ export default function LaunchSimCalculator() {
 
           <div className={s.field}>
             <label>
-              {lang === 'en' ? 'Production + farming (res/hr)' : '產量 + Farming（res/hr）'}
+              {lang === 'en' ? 'Production + farming (res/hr)' : '每小時產量＋掠奪收入（四種資源合計／小時）'}
             </label>
             <input
               type="number"
@@ -133,7 +136,7 @@ export default function LaunchSimCalculator() {
           <div className={s.note}>
             {lang === 'en'
               ? 'Task rewards and culture-point timing are not included, so real settle is often a bit faster. Assumes 1× server speed. A party (small celebration) only gives this village\'s daily CP — about a dozen CP early on, capped at 500 on x1 — so check the CP countdown in the Culture Points calculator before planning on parties.'
-              : '尚未計入任務獎勵與文明點節奏，實際結帳通常會再快一些。數字以 1 倍速伺服器為準。派對（小慶典）拿到的 CP＝本村每日 CP 產量，開局只有十幾點、x1 上限 500，不是固定 500；開村時間請到「CP 與開村」計算器看開村倒數。'}
+              : '還沒計入任務獎勵與 CP 節奏，實際結帳通常會再快一些。數字以 1 倍速伺服器為準。派對（小慶典）拿到的 CP＝本村每日 CP 產量，開局只有十幾點、x1 上限 500，不是固定 500；開村時間請到「CP 與開村」計算器看開村倒數。'}
           </div>
         </div>
 
@@ -144,10 +147,11 @@ export default function LaunchSimCalculator() {
           secondary={
             // 一行一個灰標，依數字出現順序：「第 X 天」＝試算表每一步花費加總÷產量（launchSim）、
             // 「拓荒者」花費（社群整理的兵種數字，units）。上面的時數用同一份資料，標題不另外放
-            <SummaryPending kinds={['launchSim', 'units']} testId="launch-sim-summary-settlers">
+            // 拓荒者花費沒有用在計算裡，摘要不放（P0-17 (b)）；明細最後一列仍列出，給玩家參考
+            <SummaryPending kinds={['launchSim']} testId="launch-sim-summary-settlers">
               {lang === 'en'
-                ? `Day ${(result.totalHours / 24).toFixed(1)} · settlers ${settlerCost.toLocaleString()}`
-                : `第 ${(result.totalHours / 24).toFixed(1)} 天 · 拓荒者 ${settlerCost.toLocaleString()}`}
+                ? `Day ${(result.totalHours / 24).toFixed(1)}`
+                : `第 ${(result.totalHours / 24).toFixed(1)} 天`}
             </SummaryPending>
           }
         >
@@ -164,7 +168,7 @@ export default function LaunchSimCalculator() {
             </span>
           </PendingRow>
           <PendingRow className={s.row}>
-            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x)' : '拓荒者成本（3 名）'} <PendingVerifyChip kind="units" /></span>
+            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x, reference only)' : '拓荒者成本（3 名，參考，不算在時間裡）'} <PendingVerifyChip kind="units" /></span>
             <span className={s.value}>{settlerCost.toLocaleString()}</span>
           </PendingRow>
 

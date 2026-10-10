@@ -196,7 +196,7 @@ export default function OpeningChecklistPage() {
           <select
             value={tribe}
             onChange={(e) => setTribe(e.target.value as TroopTribe)}
-            className="min-h-[36px] rounded-full border border-border bg-white px-3 text-sm"
+            className="min-h-[36px] rounded-full border border-border bg-white px-3 text-base"
           >
             {OPENING_TRIBES.map((tr) => (
               <option key={tr} value={tr}>

@@ -80,7 +80,7 @@ export default function FieldRoiCalculator() {
             <label>{lang === 'en' ? 'Target level' : '目標等級'}</label>
             <select value={level} onChange={e => setLevel(+e.target.value)}>
               {Array.from({ length: 20 }, (_, i) => i + 1).map(L => (
-                <option key={L} value={L}>Lv {L}</option>
+                <option key={L} value={L}>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</option>
               ))}
             </select>
           </div>
@@ -88,14 +88,14 @@ export default function FieldRoiCalculator() {
           <div className={s.field}>
             <label>{lang === 'en' ? 'Bonus building % (0–25, crop up to 50)' : '加成建築 %（0–25，糧食 0–50）'}</label>
             <select value={bonus} onChange={e => setBonus(+e.target.value)}>
-              <option value={0}>0% (none)</option>
-              <option value={0.05}>+5% (Lv 1)</option>
-              <option value={0.10}>+10% (Lv 2)</option>
-              <option value={0.15}>+15% (Lv 3)</option>
-              <option value={0.20}>+20% (Lv 4)</option>
-              <option value={0.25}>+25% (Lv 5)</option>
-              <option value={0.35}>+35% (crop: Mill 5 + Bakery 2)</option>
-              <option value={0.50}>+50% (crop: Mill 5 + Bakery 5)</option>
+              <option value={0}>{lang === 'en' ? '0% (none)' : '0%（沒有）'}</option>
+              <option value={0.05}>{lang === 'en' ? '+5% (Lv 1)' : '+5%（1 級）'}</option>
+              <option value={0.10}>{lang === 'en' ? '+10% (Lv 2)' : '+10%（2 級）'}</option>
+              <option value={0.15}>{lang === 'en' ? '+15% (Lv 3)' : '+15%（3 級）'}</option>
+              <option value={0.20}>{lang === 'en' ? '+20% (Lv 4)' : '+20%（4 級）'}</option>
+              <option value={0.25}>{lang === 'en' ? '+25% (Lv 5)' : '+25%（5 級）'}</option>
+              <option value={0.35}>{lang === 'en' ? '+35% (crop: Mill 5 + Bakery 2)' : '+35%（糧：麵粉廠 5＋麵包店 2）'}</option>
+              <option value={0.50}>{lang === 'en' ? '+50% (crop: Mill 5 + Bakery 5)' : '+50%（糧：麵粉廠 5＋麵包店 5）'}</option>
             </select>
           </div>
 
@@ -105,15 +105,15 @@ export default function FieldRoiCalculator() {
               <option value={0}>0%</option>
               <option value={0.25}>+25%</option>
               <option value={0.50}>+50%</option>
-              <option value={0.75}>+75% (3×25)</option>
-              <option value={1.00}>+100% (2×50)</option>
-              <option value={1.50}>+150% (3×50, crop only)</option>
+              <option value={0.75}>{lang === 'en' ? '+75% (3×25)' : '+75%（3 塊 25%）'}</option>
+              <option value={1.00}>{lang === 'en' ? '+100% (2×50)' : '+100%（2 塊 50%）'}</option>
+              <option value={1.50}>{lang === 'en' ? '+150% (3×50, crop only)' : '+150%（3 塊 50%，只有糧）'}</option>
             </select>
           </div>
 
           <label className={s.check}>
             <input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} />
-            {lang === 'en' ? 'Plus +25% gold production bonus' : 'Plus +25% 金幣產量加成'}
+            {lang === 'en' ? 'Plus +25% gold production bonus' : 'Plus 產量 +25%（金幣）'}
           </label>
         </div>
 

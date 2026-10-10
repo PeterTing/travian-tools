@@ -119,7 +119,7 @@ const branchSteps: BuildStep[] = [
     cost: null,
     phase: 'pre-party-1',
     notes: {
-      zh: '重要提醒：日耳曼人（TT）和埃及人重步兵（EI）可以單獨派去清空綠洲！',
+      zh: '重要提醒：高盧雷法師（TT）和羅馬帝國騎士（EI）可以單獨派去打沒有動物的綠洲！',
       en: 'Important reminder: TT & EI can be sent solo to an empty oasis!',
     },
   },
@@ -647,7 +647,7 @@ const branchSteps: BuildStep[] = [
 
 export const strategy3pFarming: Strategy = {
   id: '3p-farming',
-  name: { zh: '3 派對 · Farming', en: '3P Farming' },
+  name: { zh: '3 派對 · 掠奪（Farming）', en: '3P Farming' },
   tagline: {
     zh: '真正 farmer 路線：基礎好、早期掠奪收益最高',
     en: "For real farmers: strong base + max early farming income.",

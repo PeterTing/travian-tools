@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
 import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
@@ -35,6 +36,8 @@ export default function SaveTroopsCalculatorPage() {
   }
 
   const handleCalculate = async () => {
+    // 超出 0–75 的欄位：欄位下方已經寫「請輸入 0–75」，捲過去、不送出（P0-17 (j)）
+    if (focusFirstInvalid(document.querySelector('main'))) return
     try {
       setLoading(true)
       setError(null)
@@ -113,6 +116,7 @@ export default function SaveTroopsCalculatorPage() {
 
           <div className="mb-4">
             <Stepper
+              labelStyle="form"
               label="競技場等級"
               value={form.tournament_square_level ?? 0}
               onChange={(v) => handleChange('tournament_square_level', v)}
@@ -122,18 +126,15 @@ export default function SaveTroopsCalculatorPage() {
           </div>
 
           {/* 靴子跟競技場相加、只算超過 20 格（P0-21） */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">英雄靴子速度加成（%）</label>
-            <input
-              type="number"
-              min={0}
-              max={75}
-              data-testid="save-boots"
-              value={form.hero_bonus ?? 0}
-              onChange={(e) => handleChange('hero_bonus', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
-            />
-          </div>
+          <RangeNumberField
+            className="mb-4"
+            label="英雄靴子速度加成（%）"
+            min={0}
+            max={75}
+            testId="save-boots"
+            value={form.hero_bonus ?? 0}
+            onChange={(v) => handleChange('hero_bonus', v)}
+          />
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">伺服器速度</label>
