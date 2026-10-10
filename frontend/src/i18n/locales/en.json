@@ -29,7 +29,7 @@
     "pendingVerify": "Unverified",
     "pendingVerifyNote": "Not yet confirmed in the game",
     "buildingVerifyLegend": "Except buildings marked ✓, these numbers have not been checked",
-    "verifiedTs11": "Checked (ts11 in-game help, official knowledge base)",
+    "verifiedTs11": "Checked (tap for the source)",
     "cancel": "Cancel",
     "decrease": "Decrease",
     "increase": "Increase",
@@ -1180,6 +1180,24 @@
     "smithyFormula": {
       "what": "Smithy-upgraded attack/defence values have not been checked in-game on ts11.",
       "source": "The formula was checked against the level-20 values in the official unit comparison table; it differs from that table by at most 0.2."
+    },
+    "fieldLevelZero": {
+      "what": "Level-0 resource field production is unverified.",
+      "source": "The official knowledge base starts at level 1; we use 3/hr, so level 1 adds only 4."
+    }
+  },
+  "verifiedNotes": {
+    "ts11L1Kb": {
+      "what": "Cost, time, population and culture points are checked.",
+      "source": "Level 1 from the ts11 in-game help, level 2 and up from the official knowledge base."
+    },
+    "mainTs11": {
+      "what": "Cost, time, population and culture points are checked.",
+      "source": "Cost and population: level 1 from the ts11 in-game help, level 2 and up from the official knowledge base; build time from the ts11 in-game help (the official knowledge base level-1 time differs from the game), within 10 seconds of the official knowledge base from level 2."
+    },
+    "kb": {
+      "what": "Cost, time, population and culture points are checked.",
+      "source": "From the official knowledge base."
     }
   }
 }

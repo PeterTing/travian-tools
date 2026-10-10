@@ -69,4 +69,35 @@ describe('BuildingsPage ts11 verification marks', () => {
     const table = screen.getByRole('table')
     expect(within(table).queryByTestId('pending-verify-chip')).toBeNull()
   })
+
+  it('tap ✓: two lines, the source named per building (stable: ts11 in-game help + official knowledge base)', async () => {
+    render(<BuildingsPage />)
+    const mb = (await screen.findByText('村莊大樓')).closest('p')!
+    const mark = within(mb).getByTestId('verified-mark')
+    expect(mark.tagName).toBe('BUTTON')
+    expect(mark).toHaveAttribute('data-source', 'mainTs11')
+    fireEvent.click(mark)
+    expect(mark).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByTestId('pending-note-what')).toHaveTextContent('花費、時間、人口、文化點已核對。')
+    expect(screen.getByTestId('pending-note-source')).toHaveTextContent(/建造時間取自 ts11 遊戲內說明（官方知識庫 1 級的時間跟遊戲內不同）/)
+    fireEvent.click(mark)
+    expect(screen.queryByTestId('pending-note-panel')).toBeNull()
+  })
 })
+
+describe('BuildingsPage ✓ source notes (real data, P0-23)', () => {
+  beforeEach(async () => { await i18n.changeLanguage('zh-TW') })
+  it('every building names its source; only the main building uses ts11 build times', () => {
+    expect(gameData.buildingSource('main_building')).toBe('mainTs11')
+    expect(gameData.buildingSource('stable')).toBe('ts11L1Kb')
+    expect(gameData.buildingSource('heros_mansion')).toBe('ts11L1Kb')
+  })
+  it('stable ✓ opens 「1 級取自 ts11 遊戲內說明，2 級以上取自官方知識庫。」 and does not select the building', async () => {
+    render(<BuildingsPage />)
+    const st = (await screen.findByText('馬廄')).closest('p')!
+    fireEvent.click(within(st).getByTestId('verified-mark'))
+    expect(screen.getByTestId('pending-note-source')).toHaveTextContent('1 級取自 ts11 遊戲內說明，2 級以上取自官方知識庫。')
+    expect(screen.queryByTestId('building-detail-name')).toBeNull()
+  })
+})
+

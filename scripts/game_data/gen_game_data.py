@@ -544,6 +544,15 @@ def pending_fields(bid: str, p: dict) -> list[str]:
     return fields
 
 
+def building_source(bid: str) -> str | None:
+    if bid not in KB_VERIFIED:
+        return None
+    if bid == "main_building":
+        return "mainTs11"
+    in_ts11 = bid in TS11_MANUAL_BUILDING_GID or bid in FIELDS
+    return "ts11L1Kb" if in_ts11 else "kb"
+
+
 def gen_frontend(buildings: dict, cp: dict) -> dict:
     rows = {}
     for bid, b in buildings["buildings"].items():
@@ -557,6 +566,9 @@ def gen_frontend(buildings: dict, cp: dict) -> dict:
         "names": {bid: [b["name_zh"], b["name_en"]] for bid, b in buildings["buildings"].items()},
         "cpBase": {bid: p["cp"] for bid, p in PARAMS.items()} | {fid: 1 for fid in FIELDS},
         "pending": pending,
+        # P0-23：✓ 點開寫出處——ts11L1Kb＝1 級 ts11 遊戲內說明、2 級以上官方知識庫；
+        # mainTs11＝村莊大樓（知識庫 1 級時間跟 ts11 不同，時間照 ts11）；kb＝只有知識庫
+        "buildingSources": {bid: building_source(bid) for bid in buildings["buildings"] if building_source(bid)},
         "villageRequirements": cp["village_requirements"],
         "startCp": cp["start_cp"],
         "celebrationCap": cp["celebration_cap"],

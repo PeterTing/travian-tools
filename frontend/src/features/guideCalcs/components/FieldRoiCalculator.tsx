@@ -34,7 +34,9 @@ export default function FieldRoiCalculator() {
   // 資源田 1–20 級花費、時間、產量：官方知識庫；Plus 乘在總產量上：官方 S129（P0-23）。
   // 加成建築（鋸木廠等）的資料哪天又標待驗證，這裡會自動帶回灰標
   const costKinds: PendingKind[] = [];
+  // 目標 1 級：增加量 = 1 級 − 0 級，0 級產量官方資料沒有（fieldLevelZero）
   const prodKinds: PendingKind[] = [
+    ...(level === 1 ? ['fieldLevelZero' as const] : []),
     ...(bonus > 0 && !BONUS_BUILDINGS_VERIFIED ? ['building' as const] : []),
   ];
   // 一行一個灰標，依數字在這一行出現的順序：先「成本」、再「每天 +」（同一種只列一次）

@@ -162,12 +162,12 @@ describe('首都產量模擬、綠洲、田地回本、建造順序：任何等�
     cleanup()
   })
 
-  it('field ROI: every target level 1–20, Plus on and off -> no chip', async () => {
+  it('field ROI: target levels 2–20, Plus on and off -> no chip (level 1 uses level 0, see below)', async () => {
     const { default: FieldRoi } = await import('./components/FieldRoiCalculator')
     render(<MemoryRouter><FieldRoi /></MemoryRouter>)
     fireEvent.click(screen.getByTestId('calc-result-toggle'))
     let cur = 7
-    for (const lv of [1, 2, 3, 4, 10, 20]) {
+    for (const lv of [2, 3, 4, 10, 20]) {
       setSelect(`${cur} 級`, lv)
       cur = lv
       noChip()
@@ -265,5 +265,40 @@ describe('#27 follow-up chips', () => {
     fireEvent.change(ts, { target: { value: '0' } })
     expect(within(panel).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
     cleanup()
+  })
+})
+
+/** 0 級產量（3／小時）官方資料沒有：用到它的地方標 fieldLevelZero（P0-23） */
+describe('fieldLevelZero: level-0 field production is unverified', () => {
+  const setSelect = (from: string, to: number) => fireEvent.change(screen.getByDisplayValue(from), { target: { value: String(to) } })
+  const kindOf = (el: Element | null) => el?.querySelector('[data-testid="pending-verify-chip"]')?.getAttribute('data-kind') ?? null
+
+  it('field ROI: target level 1 -> summary, both production rows and the compare header; level 2 -> none; the cost row never', async () => {
+    const { default: FieldRoi } = await import('./components/FieldRoiCalculator')
+    render(<MemoryRouter><FieldRoi /></MemoryRouter>)
+    setSelect('7 級', 1)
+    expect(kindOf(screen.getByTestId('calc-result-secondary'))).toBe('fieldLevelZero')
+    fireEvent.click(screen.getByTestId('calc-result-toggle'))
+    const d = screen.getByTestId('calc-result-details')
+    expect(kindOf(within(d).getByText('每小時產量增加'))).toBe('fieldLevelZero')
+    expect(kindOf(within(d).getByText('每天產量增加'))).toBe('fieldLevelZero')
+    expect(kindOf(within(d).getByText('升級成本（合計）'))).toBeNull()
+    expect(kindOf(within(d).getByTestId('field-roi-compare').querySelector('thead'))).toBe('fieldLevelZero')
+    fireEvent.click(within(screen.getByTestId('calc-result-secondary')).getByTestId('pending-verify-chip'))
+    expect(screen.getByTestId('pending-note-what')).toHaveTextContent('資源田 0 級的產量待驗證。')
+    expect(screen.getByTestId('pending-note-source')).toHaveTextContent('官方知識庫從 1 級開始，沒有 0 級；目前用 3／小時，所以 1 級只增加 4。')
+    setSelect('1 級', 2)
+    expect(screen.queryAllByTestId('pending-verify-chip')).toHaveLength(0)
+    cleanup()
+  })
+
+  it('build order: a field going 0 -> 1 adds fieldLevelZero; starting at 1 does not', async () => {
+    const { planGreedy } = await import('./components/BuildOrderCalculator')
+    const base = { cropperId: '15c' as const, isCap: false, bonus: { sawmill: 0, brickyard: 0, ironFoundry: 0, grainMill: 0, bakery: 0 }, mb: 10, gold: true }
+    const from0 = (lv: number) => planGreedy({ ...base, start: { wood: lv, clay: lv, iron: lv, crop: lv } }).steps.some((x) => x.kind === 'field' && x.from === 0)
+    expect(from0(0)).toBe(true)
+    expect(from0(1)).toBe(false)
+    const src = Object.entries(sources).find(([f]) => f.endsWith('/BuildOrderCalculator.tsx'))![1]
+    expect(src).toMatch(/x\.kind === 'field' && x\.from === 0\) \? \['fieldLevelZero' as const\]/)
   })
 })

@@ -129,7 +129,7 @@ export default function BuildingsPage() {
                 onClick={() => handleSelectBuilding(building.building_id)}
               >
                 {/* 名稱這一行至少 44px、垂直置中：灰標的 44px 點擊範圍不會蓋到下一行（點下一行是選這棟建築） */}
-                <p className="flex min-h-11 items-center font-medium" data-testid="building-list-name">
+                <p className="flex min-h-11 flex-wrap items-center font-medium" data-testid="building-list-name">
                   {isZh ? building.name_zh : building.name_en}
                   <BuildingVerifyMark buildingId={building.building_id} />
                 </p>

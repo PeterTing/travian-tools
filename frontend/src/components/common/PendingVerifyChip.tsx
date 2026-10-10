@@ -115,7 +115,7 @@ function clauses(text: string): ReactNode {
 }
 
 /** 展開的灰色說明：第一行哪個數字還沒核對，第二行現在的數字從哪裡來 */
-export function PendingNotePanel({ id, kinds, labels, fill = false }: { id: string; kinds: readonly PendingKind[]; labels?: readonly string[]; fill?: boolean }) {
+export function PendingNotePanel({ id, kinds, labels, fill = false, ns = 'pendingNotes' }: { id: string; kinds: readonly string[]; labels?: readonly string[]; fill?: boolean; ns?: 'pendingNotes' | 'verifiedNotes' }) {
   const { t } = useTranslation()
   const ref = useRef<HTMLSpanElement>(null)
   // 文字行：左邊對齊灰標；灰標太靠右放不下時往左移，整塊不超出這一行。fill：撐滿、從容器內容左緣開始
@@ -148,7 +148,7 @@ export function PendingNotePanel({ id, kinds, labels, fill = false }: { id: stri
       className={`mt-1 block ${fill ? 'w-full' : 'w-fit max-w-full'} rounded-md bg-gray-100 px-2 py-1.5 text-left text-xs font-normal leading-5 text-gray-700`}
     >
       {kinds.map((k, i) => {
-        const keys = pendingNoteKeys(k)
+        const keys = ns === 'pendingNotes' ? pendingNoteKeys(k as PendingKind) : { what: `${ns}.${k}.what`, source: `${ns}.${k}.source` }
         // 好幾種：依數字在那一行出現的順序，每種兩行，種類之間隔 8px
         return (
           <span key={`${i}-${k}`} className={`block ${i > 0 ? 'mt-2' : ''}`} data-testid="pending-note-entry" data-kind={k}>

@@ -57,6 +57,13 @@ export function isPending(buildingId: string, field: 'cost' | 'time'): boolean {
 }
 
 /** ts11 實測過（花費、時間都沒有待驗證）的建築；不認得的 id 一律當成未實測 */
+export type BuildingSource = 'ts11L1Kb' | 'mainTs11' | 'kb'
+
+/** 核對過的建築數字從哪裡來（P0-23，✓ 點開的說明）；沒核對過回 null */
+export function buildingSource(buildingId: string): BuildingSource | null {
+  return ((gen as { buildingSources?: Record<string, string> }).buildingSources?.[buildingId] as BuildingSource | undefined) ?? null
+}
+
 export function isBuildingVerified(buildingId: string): boolean {
   return buildingId in gen.buildings && (PENDING[buildingId] ?? []).length === 0
 }
