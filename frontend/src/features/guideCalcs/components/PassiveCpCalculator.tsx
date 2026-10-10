@@ -5,7 +5,7 @@ import {
   isVillageCpVerified, isBuildingVerified, buildingName, type ServerSpeed, type CelebrationKind,
 } from '../../../data/gameData'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
-import Stepper from '@/components/common/Stepper'
+import LevelSelect from '@/components/common/LevelSelect'
 import AutoFillBar, { AutoFillHint } from '@/components/autofill/AutoFillBar'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import { readCpProgress, writeCpProgress } from '@/lib/cpProgress'
@@ -270,9 +270,12 @@ export default function PassiveCpCalculator() {
           <h4>{en ? 'Building levels' : '建築等級'}</h4>
           <div className="grid grid-cols-2 gap-x-3 gap-y-3" data-testid="cp-levels">
             {FIELDS.map(f => (
-              <Stepper
+              <LevelSelect
                 key={f.id}
+                lang={en ? 'en' : 'zh'}
                 label={fieldLabel(f, en)}
+                buildingId={f.ids[0]}
+                min={0}
                 value={levels[f.id] ?? 0}
                 onChange={v => set(f.id, v)}
                 testId={`cp-level-${f.id}`}

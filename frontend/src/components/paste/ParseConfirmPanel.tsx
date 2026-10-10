@@ -32,6 +32,7 @@ import {
   setFieldConfirmed,
 } from '@/lib/ocrFields'
 import type { OcrMeta } from '@/services/ocrApi'
+import BuildingIcon from '@/components/common/BuildingIcon'
 
 export interface ConfirmState {
   pageType: string
@@ -606,10 +607,13 @@ export function ParseConfirmPanel({
                           key={`${b.position ?? i}-${b.building_id}`}
                           className="px-2 py-1.5 flex justify-between gap-2"
                         >
-                          <span className="min-w-0 truncate">
-                            {t(`buildingNames.${b.building_id}`, {
-                              defaultValue: b.building_id,
-                            })}
+                          <span className="flex min-w-0 items-center gap-2">
+                            <BuildingIcon id={b.building_id} size={20} />
+                            <span className="min-w-0 truncate">
+                              {t(`buildingNames.${b.building_id}`, {
+                                defaultValue: b.building_id,
+                              })}
+                            </span>
                           </span>
                           <span className="font-mono shrink-0 text-muted-foreground">
                             {t('paste.buildingLevel', { level: Number(b.level || 0) })}

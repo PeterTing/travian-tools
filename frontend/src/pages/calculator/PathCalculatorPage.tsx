@@ -14,9 +14,9 @@ import CalcResultPanel, { RESULT_PANEL_SPACE_CLASS, SummaryPending } from '@/fea
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { speedPendingKinds } from '@/lib/pendingNotes'
 import { CalcBar } from '@/components/autofill/CalcFrame'
-import Stepper from '@/components/common/Stepper'
 import ServerSpeedSelect from '@/components/common/ServerSpeedSelect'
 import UnitSpeedSelect from '@/components/common/UnitSpeedSelect'
+import LevelSelect from '@/components/common/LevelSelect'
 
 type Artifact = 'none' | 'account_1_5x' | 'unique_2x' | 'village_2x'
 // 神器（官方 S102）：大型（帳號）1.5×、獨特 2×、小型（村莊）2×
@@ -136,7 +136,7 @@ export default function PathCalculatorPage() {
           />
 
           <div className="mb-3">
-            <Stepper label={t('pathCalc.tsLevel')} value={tsLevel} onChange={setTsLevel} min={0} max={20} testId="path-ts-level" />
+            <LevelSelect label={t('pathCalc.tsLevel')} buildingId="tournament_square" value={tsLevel} onChange={setTsLevel} min={0} max={20} testId="path-ts-level" />
           </div>
 
           <RangeNumberField

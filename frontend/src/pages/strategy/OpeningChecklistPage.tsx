@@ -17,6 +17,8 @@ import {
 } from '@/lib/openingChecklist'
 import { openingChecklistApi } from '@/services/openingChecklistApi'
 import type { TroopTribe } from '@/types/game'
+import BuildingIcon from '@/components/common/BuildingIcon'
+import { resolveBuildingIconIdFromText } from '@/components/common/icons/buildingIcons'
 import type {
   OpeningChecklistData,
   OpeningSection,
@@ -394,6 +396,8 @@ function StepRow({
           aria-label={t('opening.checkStep', { name: title })}
           className="mt-0.5 h-5 w-5 shrink-0 accent-orange-500"
         />
+        {/* 蓋建築、升田的步驟：名稱左邊放建築圖示（任務、派對、練兵沒有） */}
+        {step.kind === 'build' && <BuildingIcon id={resolveBuildingIconIdFromText(step.building)} size={20} className="mt-0.5" />}
         <span className="min-w-0 flex-1">
           <span className={`block text-sm ${checked ? 'text-muted-foreground line-through' : 'font-medium'}`}>
             {checked ? <s>{title}</s> : title}

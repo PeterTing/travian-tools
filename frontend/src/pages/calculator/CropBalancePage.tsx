@@ -13,6 +13,8 @@ import type {
 } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import NumberInput from '@/components/common/NumberInput'
+import BuildingIcon from '@/components/common/BuildingIcon'
+import LevelSelect from '@/components/common/LevelSelect'
 
 interface BuildingEntry {
   building_id: string
@@ -363,13 +365,16 @@ export default function CropBalancePage() {
 
             <div className="space-y-3">
               {selectedBuildings.map((building, index) => (
-                <div key={index} className="flex items-center gap-3">
+                <div key={index} className="flex min-w-0 items-center gap-2" data-testid="crop-building-row">
+                  {/* 圖示在選單左邊，跟著選的建築換；還沒選就不放 */}
+                  <BuildingIcon id={building.building_id} size={20} />
                   <select
+                    aria-label={t('calculator.crop.selectBuilding')}
                     value={building.building_id}
                     onChange={(e) =>
                       updateBuilding(index, 'building_id', e.target.value)
                     }
-                    className="flex-1 p-2 border rounded bg-background"
+                    className="h-11 min-w-0 flex-1 px-2 border rounded bg-background text-base"
                   >
                     <option value="">{t('calculator.crop.selectBuilding')}</option>
                     {buildings.map((b) => (
@@ -378,17 +383,19 @@ export default function CropBalancePage() {
                       </option>
                     ))}
                   </select>
-                  <input
-                    type="number"
+                  <LevelSelect
+                    className="w-24 shrink-0"
+                    labelStyle="hidden"
+                    noIcon
+                    label="建築等級"
                     min={1}
-                    max={20}
+                    max={buildings.find((b) => b.building_id === building.building_id)?.max_level || 20}
                     value={building.level}
-                    aria-invalid={levelError && (building.level < 1 || building.level > 20) ? true : undefined}
-                    onChange={(e) => {
-                      updateBuilding(index, 'level', Number(e.target.value))
+                    onChange={(v) => {
+                      updateBuilding(index, 'level', v)
                       setLevelError(null)
                     }}
-                    className="w-20 p-2 border rounded bg-background text-center"
+                    testId="crop-building-level"
                   />
                   <Button
                     variant="ghost"

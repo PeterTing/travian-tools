@@ -1,6 +1,6 @@
 // 稽核 2026-10-10：被動 CP、開村時間模擬、商人路線、綠洲回本、主村產量、建造順序、資源田回本
 import { beforeAll, describe, expect, it } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import i18n from '@/i18n/i18n'
 import PassiveCpCalculator, { villageDailyCp, villageCountdown, parseFieldLevels, PRESET_LUMI_CP } from './components/PassiveCpCalculator'
@@ -143,13 +143,13 @@ describe('資源田回本：一般村 10 級、金幣產量加成', () => {
   it('normal village offers 1–10 only; capital up to 20; gold bonus off by default, not called Plus', async () => {
     const { default: FieldRoi } = await import('./components/FieldRoiCalculator')
     render(<MemoryRouter><FieldRoi /></MemoryRouter>)
-    const levels = () => Array.from((screen.getByTestId('field-roi-level') as HTMLSelectElement).options).map((o) => Number(o.value))
+    const levels = () => Array.from((within(screen.getByTestId('field-roi-level')).getByRole('combobox') as HTMLSelectElement).options).map((o) => Number(o.value))
     expect(Math.max(...levels())).toBe(10)
     fireEvent.change(screen.getByTestId('field-roi-village'), { target: { value: 'capital' } })
     expect(Math.max(...levels())).toBe(20)
-    fireEvent.change(screen.getByTestId('field-roi-level'), { target: { value: '15' } })
+    fireEvent.change(within(screen.getByTestId('field-roi-level')).getByRole('combobox'), { target: { value: '15' } })
     fireEvent.change(screen.getByTestId('field-roi-village'), { target: { value: 'normal' } })
-    expect((screen.getByTestId('field-roi-level') as HTMLSelectElement).value).toBe('10')
+    expect((within(screen.getByTestId('field-roi-level')).getByRole('combobox') as HTMLSelectElement).value).toBe('10')
     expect(screen.getByTestId('field-roi-gold')).not.toBeChecked()
     expect(document.body.textContent).not.toMatch(/Plus/)
   })
@@ -169,7 +169,7 @@ describe('主村產量模擬：拿掉 21 級、加成建築 0–5、綠洲只能
     const { default: CropSim } = await import('./components/CropSimCalculator')
     render(<MemoryRouter><CropSim /></MemoryRouter>)
     for (const k of ['saw', 'bri', 'fnd', 'mil', 'bak']) {
-      const el = screen.getByTestId(`cropsim-bonus-${k}`) as HTMLSelectElement
+      const el = within(screen.getByTestId(`cropsim-bonus-${k}`)).getByRole('combobox') as HTMLSelectElement
       expect(el.tagName).toBe('SELECT')
       expect(Array.from(el.options).map((o) => Number(o.value))).toEqual([0, 1, 2, 3, 4, 5])
     }

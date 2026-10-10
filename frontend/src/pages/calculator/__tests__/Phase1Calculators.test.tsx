@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import i18n from '@/i18n/i18n'
 import CropScouterPage from '../CropScouterPage'
 import AttackPlannerPage from '../AttackPlannerPage'
@@ -78,7 +78,7 @@ describe('AttackPlannerPage', () => {
     render(<AttackPlannerPage />)
     const unit = screen.getByTestId('attacker-unit') as HTMLSelectElement
     expect(unit.tagName).toBe('SELECT')
-    expect(screen.getByTestId('attacker-ts').tagName).toBe('SELECT')
+    expect(within(screen.getByTestId('attacker-ts')).getByRole('combobox').tagName).toBe('SELECT')
     // 羅馬（預設部族）帝國騎士 equites_imperatoris 速度 14
     const option = Array.from(unit.options).find((o) => /14 格\/時/.test(o.text))!
     fireEvent.change(unit, { target: { value: option.value } })

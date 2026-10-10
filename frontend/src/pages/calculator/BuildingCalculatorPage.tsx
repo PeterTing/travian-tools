@@ -12,7 +12,8 @@ import type {
   BuildingUpgradeResponse,
 } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
-import Stepper from '@/components/common/Stepper'
+import LevelSelect from '@/components/common/LevelSelect'
+import BuildingIcon from '@/components/common/BuildingIcon'
 
 function formatTime(seconds: number): string {
   if (seconds < 60) return `${seconds}s`
@@ -101,57 +102,58 @@ export default function BuildingCalculatorPage() {
 
           {/* Building selection */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">
+            <label htmlFor="building-calc-select" className="block text-sm font-medium mb-2">
               {t('calculator.building.selectBuilding')}
             </label>
-            <select
-              value={selectedBuilding}
-              onChange={(e) => setSelectedBuilding(e.target.value)}
-              className="w-full p-2 border rounded bg-background"
-            >
-              {buildings.map((building) => (
-                <option key={building.building_id} value={building.building_id}>
-                  {isZh ? building.name_zh : building.name_en}{isBuildingFullyVerified(building.building_id) ? ` ${t('common.verifiedShort')}` : ''}
-                </option>
-              ))}
-            </select>
+            {/* 選單項目放不了圖示：圖示放在選單左邊，跟著目前選的建築換（設計師） */}
+            <div className="flex min-w-0 items-center gap-2">
+              <BuildingIcon id={selectedBuilding} size={20} />
+              <select
+                id="building-calc-select"
+                data-testid="building-calc-select"
+                value={selectedBuilding}
+                onChange={(e) => setSelectedBuilding(e.target.value)}
+                className="h-11 w-full min-w-0 px-2 border rounded bg-background text-base"
+              >
+                {buildings.map((building) => (
+                  <option key={building.building_id} value={building.building_id}>
+                    {isZh ? building.name_zh : building.name_en}{isBuildingFullyVerified(building.building_id) ? ` ${t('common.verifiedShort')}` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Level range */}
+          {/* Level range：下拉選單，範圍照這棟建築的最高等級 */}
           <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {t('calculator.building.fromLevel')}
-              </label>
-              <input
-                type="number"
-                min={0}
-                max={selectedBuildingData?.max_level || 20}
-                value={fromLevel}
-                onChange={(e) => setFromLevel(Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {t('calculator.building.toLevel')}
-              </label>
-              <input
-                type="number"
-                min={1}
-                max={selectedBuildingData?.max_level || 20}
-                value={toLevel}
-                onChange={(e) => setToLevel(Number(e.target.value))}
-                className="w-full p-2 border rounded bg-background"
-              />
-            </div>
+            <LevelSelect
+              labelStyle="form"
+              label={t('calculator.building.fromLevel')}
+              buildingId={selectedBuilding || null}
+              min={0}
+              max={selectedBuildingData?.max_level || 20}
+              value={fromLevel}
+              onChange={setFromLevel}
+              testId="building-from-level"
+            />
+            <LevelSelect
+              labelStyle="form"
+              label={t('calculator.building.toLevel')}
+              buildingId={selectedBuilding || null}
+              min={1}
+              max={selectedBuildingData?.max_level || 20}
+              value={toLevel}
+              onChange={setToLevel}
+              testId="building-to-level"
+            />
           </div>
 
           {/* Main building level */}
           <div className="mb-4">
-            <Stepper
+            <LevelSelect
               labelStyle="form"
               label={t('calculator.building.mainBuildingLevel')}
+              buildingId="main_building"
               value={mainBuildingLevel}
               onChange={setMainBuildingLevel}
               min={0}
@@ -206,7 +208,8 @@ export default function BuildingCalculatorPage() {
             <div className="space-y-4">
               {/* Building info */}
               <div className="p-4 bg-muted rounded">
-                <h3 className="font-semibold" data-testid="calc-building-name">
+                <h3 className="font-semibold flex flex-wrap items-center" data-testid="calc-building-name">
+                  <BuildingIcon id={result.building_id} size={20} className="mr-2" />
                   {isZh ? result.building_name_zh : result.building_name_en}
                   <BuildingVerifyMark buildingId={result.building_id} />
                 </h3>

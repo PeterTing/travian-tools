@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { SaveTroopsRequest, SaveTroopsResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
-import Stepper from '@/components/common/Stepper'
+import LevelSelect from '@/components/common/LevelSelect'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { speedPendingKinds } from '@/lib/pendingNotes'
 
@@ -105,8 +105,10 @@ export default function SaveTroopsCalculatorPage() {
           </label>
 
           <div className="mb-4">
-            <Stepper
+            <LevelSelect
               labelStyle="form"
+              buildingId="tournament_square"
+              testId="save-ts-level"
               label="競技場等級"
               value={form.tournament_square_level ?? 0}
               onChange={(v) => handleChange('tournament_square_level', v)}

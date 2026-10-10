@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { InterceptionRequest, InterceptionResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
-import Stepper from '@/components/common/Stepper'
+import LevelSelect from '@/components/common/LevelSelect'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { speedPendingKinds } from '@/lib/pendingNotes'
 
@@ -182,8 +182,10 @@ export default function InterceptionCalculatorPage() {
 
           {/* 攻擊方回程也照共用行軍公式：競技場、靴子只加快超過 20 格的路段（P0-21） */}
           <div>
-            <Stepper
+            <LevelSelect
               labelStyle="form"
+              buildingId="tournament_square"
+              testId="attacker-ts-level"
               label="攻方競技場等級"
               value={form.attacker_ts_level ?? 0}
               onChange={(v) => handleChange('attacker_ts_level', v)}
@@ -214,8 +216,10 @@ export default function InterceptionCalculatorPage() {
           <UnitSpeedSelect label="攔截兵種（最慢的那種）" testId="catcher-unit" defaultTribe={fill.tribe} onChange={(v) => handleChange('catcher_speed', v)} />
 
           <div>
-            <Stepper
+            <LevelSelect
               labelStyle="form"
+              buildingId="tournament_square"
+              testId="catcher-ts-level"
               label="攔截方競技場等級"
               value={form.catcher_ts_level ?? 0}
               onChange={(v) => handleChange('catcher_ts_level', v)}

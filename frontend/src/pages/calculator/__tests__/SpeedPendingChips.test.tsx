@@ -33,9 +33,9 @@ const fillCoords = () => {
   if (arrival && arrival.value === '') fireEvent.change(arrival, { target: { value: '12:00:00' } })
 }
 const chipKinds = (el: HTMLElement) => within(el).queryAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind'))
+// 競技場等級是下拉選單（Peter 10/10：等級一律用下拉選單）
 const setStepper = (label: string, v: number) => {
-  const input = within(screen.getByRole('group', { name: label })).getByRole('spinbutton')
-  fireEvent.change(input, { target: { value: String(v) } })
+  fireEvent.change(screen.getByRole('combobox', { name: label }), { target: { value: String(v) } })
 }
 
 describe('speedPendingKinds（P0-21：全站共用，同行軍時間頁）', () => {
@@ -72,7 +72,7 @@ describe('行軍速度灰標：攔截、OP 規劃、反推 TS、躲兵（P0-21�
     expect(screen.getAllByTestId('pending-verify-chip')).toHaveLength(3)
     // 欄位名稱寫明是哪一方（設計師）
     for (const l of ['攻方英雄靴子速度加成（%）', '攔截方英雄靴子速度加成（%）']) expect(screen.getByText(l)).toBeInTheDocument()
-    for (const l of ['攻方競技場等級', '攔截方競技場等級']) expect(screen.getByRole('group', { name: l })).toBeInTheDocument()
+    for (const l of ['攻方競技場等級', '攔截方競技場等級']) expect((screen.getByRole('combobox', { name: l }) as HTMLElement).tagName).toBe('SELECT')
   })
 
   it('interception: all zero → no chip', async () => {
