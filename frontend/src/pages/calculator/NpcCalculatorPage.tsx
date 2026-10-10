@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { NpcCalculatorRequest, NpcCalculatorResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
+import { apiFieldErrors } from '@/lib/apiFieldErrors'
 
 const RESOURCE_KEYS = ['wood', 'clay', 'iron', 'crop'] as const
 type ResourceKey = (typeof RESOURCE_KEYS)[number]
@@ -29,6 +30,8 @@ export default function NpcCalculatorPage() {
   const [result, setResult] = useState<NpcCalculatorResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // 欄位錯誤：顯示在欄位正下方（key：wood…crop、ratio-wood…、ratios）
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const handleResourceChange = (field: ResourceKey, value: number) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -42,13 +45,27 @@ export default function NpcCalculatorPage() {
   }
 
   const handleCalculate = async () => {
+    // 負數、全部 0 不送出（以前負比例會算出負資源，稽核 2026-10-10）
+    const errs: Record<string, string> = {}
+    for (const k of RESOURCE_KEYS) {
+      if (!(form[k] >= 0)) errs[k] = t('calculator.npc.errNegativeResource')
+      const r = form.desired_ratios[k] ?? 0
+      if (!(r >= 0)) errs[`ratio-${k}`] = t('calculator.npc.errNegativeRatio')
+    }
+    if (!Object.keys(errs).some((k) => k.startsWith('ratio-')) && RESOURCE_KEYS.every((k) => (form.desired_ratios[k] ?? 0) === 0)) {
+      errs.ratios = t('calculator.npc.errAllZero')
+    }
+    setFieldErrors(errs)
+    if (Object.keys(errs).length) return
     try {
       setLoading(true)
       setError(null)
       const res = await advancedCalculatorApi.calculateNpc(form)
       setResult(res)
-    } catch {
-      setError(t('calculator.npc.calcError'))
+    } catch (err) {
+      const fe = apiFieldErrors(err)
+      if (fe.desired_ratios) setFieldErrors({ ratios: fe.desired_ratios })
+      else setError(t('calculator.npc.calcError'))
     } finally {
       setLoading(false)
     }
@@ -73,16 +90,21 @@ export default function NpcCalculatorPage() {
                   type="number"
                   min={0}
                   value={form[key]}
+                  aria-invalid={fieldErrors[key] ? true : undefined}
                   onChange={(e) => handleResourceChange(key, Number(e.target.value))}
                   className="w-full p-2 border rounded bg-background"
                   data-testid={`npc-${key}`}
                 />
+                {fieldErrors[key] && (
+                  <p role="alert" className="mt-1 text-xs text-red-600" data-testid={`npc-${key}-error`}>{fieldErrors[key]}</p>
+                )}
               </div>
             ))}
           </div>
 
-          <h2 className="text-xl font-semibold mb-4">{t('calculator.npc.desiredRatio')}</h2>
-          <div className="grid grid-cols-4 gap-4 mb-6">
+          <h2 className="text-xl font-semibold mb-2">{t('calculator.npc.desiredRatio')}</h2>
+          <p className="text-xs text-muted-foreground mb-3" data-testid="npc-ratio-hint">{t('calculator.npc.ratioHint')}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-1">
             {RESOURCE_KEYS.map((key) => (
               <div key={key}>
                 <label className="block text-sm font-medium mb-2">
@@ -91,15 +113,22 @@ export default function NpcCalculatorPage() {
                 <input
                   type="number"
                   min={0}
-                  max={10}
                   value={form.desired_ratios[key] ?? 1}
+                  aria-invalid={fieldErrors[`ratio-${key}`] || fieldErrors.ratios ? true : undefined}
                   onChange={(e) => handleRatioChange(key, Number(e.target.value))}
                   className="w-full p-2 border rounded bg-background"
                   data-testid={`npc-ratio-${key}`}
                 />
+                {fieldErrors[`ratio-${key}`] && (
+                  <p role="alert" className="mt-1 text-xs text-red-600" data-testid={`npc-ratio-${key}-error`}>{fieldErrors[`ratio-${key}`]}</p>
+                )}
               </div>
             ))}
           </div>
+          {fieldErrors.ratios && (
+            <p role="alert" className="text-xs text-red-600" data-testid="npc-ratios-error">{fieldErrors.ratios}</p>
+          )}
+          <div className="mb-6" />
 
           <h2 className="text-xl font-semibold mb-4">{t('calculator.npc.capacityOptional')}</h2>
           <p className="text-xs text-muted-foreground mb-3">{t('calculator.npc.capacityHint')}</p>

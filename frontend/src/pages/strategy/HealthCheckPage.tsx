@@ -27,7 +27,7 @@ export default function HealthCheckPage() {
   const [healthData, setHealthData] = useState<HealthCheckResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [protectionDays, setProtectionDays] = useState(5)
+  const [protectionDays, setProtectionDays] = useState<number | undefined>(undefined)
 
   // 載入帳號列表
   useEffect(() => {
@@ -174,16 +174,21 @@ export default function HealthCheckPage() {
               <label className="text-sm whitespace-nowrap" htmlFor="protection-days">
                 {t('health.protectionDays')}
               </label>
-              <input
+              <select
                 id="protection-days"
-                type="number"
-                min={1}
-                max={30}
-                value={protectionDays}
-                onChange={(e) => setProtectionDays(Number(e.target.value) || 5)}
-                className="w-16 p-2 border rounded bg-background text-center"
+                data-testid="protection-days"
+                value={protectionDays ?? ''}
+                onChange={(e) => setProtectionDays(e.target.value === '' ? undefined : Number(e.target.value))}
+                className="min-h-[44px] p-2 border rounded bg-background"
                 title={t('health.protectionDaysHint')}
-              />
+              >
+                <option value="">{t('health.protectionAuto')}</option>
+                {Array.from({ length: 8 }, (_, i) => i + 1).map((d) => (
+                  <option key={d} value={d}>
+                    {t('health.protectionDaysN', { count: d })}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>

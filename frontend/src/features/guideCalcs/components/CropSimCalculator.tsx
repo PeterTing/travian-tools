@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { CROPPER_LAYOUTS, FIELD_PRODUCTION, BONUS_BUILDINGS_VERIFIED, type CropperId, type ResourceType } from '../data/travian';
+import { CROPPER_LAYOUTS, FIELD_PRODUCTION, BONUS_BUILDINGS_VERIFIED, OASIS_TYPES, type CropperId, type ResourceType } from '../data/travian';
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip';
 import type { PendingKind } from '@/lib/pendingNotes';
 import { useLang } from '../i18n/LangContext';
@@ -54,12 +54,31 @@ export function cropSim(input: CropSimInput) {
   return { rows, totals };
 }
 
+/** 一村最多 3 塊綠洲（官方 S48）；木／土／鐵 +50% 只在納塔區（灰色區）才有 */
+export const OASIS_SLOTS = 3;
+const NATAR_ONLY = new Set(['single50_wood', 'single50_clay', 'single50_iron']);
+
+/** 3 個綠洲格 → 每種資源的加成 %（只能是官方 S48 的綠洲組合，不能自己打 250%） */
+export function oasisPercent(slotIds: string[]): Record<ResourceType, number> {
+  const out: Record<ResourceType, number> = { wood: 0, clay: 0, iron: 0, crop: 0 };
+  for (const id of slotIds.slice(0, OASIS_SLOTS)) {
+    const o = OASIS_TYPES.find(x => x.id === id);
+    if (!o) continue;
+    for (const [k, v] of Object.entries(o.bonuses)) out[k as ResourceType] += Math.round((v ?? 0) * 100);
+  }
+  return out;
+}
+
+const BONUS_LEVELS = [0, 1, 2, 3, 4, 5];
+
 export default function CropSimCalculator() {
   const { lang } = useLang();
   const [layoutId, setLayoutId] = useState<CropperId>('15c');
   const [flv, setFlv] = useState(18);
   const [bonus, setBonus] = useState({ saw: 5, bri: 5, fnd: 5, mil: 5, bak: 5 });
-  const [oasis, setOasis] = useState({ wood: 0, clay: 0, iron: 0, crop: 150 });
+  // 3 個綠洲格（預設 3 塊糧 +50%＝參考表 150% 那一欄）
+  const [slots, setSlots] = useState<string[]>(['single50_crop', 'single50_crop', 'single50_crop']);
+  const oasis = useMemo(() => oasisPercent(slots), [slots]);
   const [gold, setGold] = useState(true);
   const [waterworks, setWaterworks] = useState(0);
   // 資源田產量、供水系統 +5%/級：官方知識庫；Plus ×1.25 乘在總產量上：官方 S129（P0-23）。
@@ -88,8 +107,8 @@ export default function CropSimCalculator() {
         {/* Table 1 reference numbers — see calculators.regression.test.ts */}
         <h2>{lang === 'en' ? 'Capital production' : '首都產量模擬'}</h2>
         <p>{lang === 'en'
-          ? 'Estimates total capital production per hour (wood, clay, iron, and crop) with all bonuses. Compare 15c / 9c / 7c / 6c layouts. Plus +25% is multiplied on top of fields × (1 + bonus buildings + oasis).'
-          : '估算首都每小時總產量（木、土、鐵、糧），可比較 15c／9c／7c／6c。算法：田產量 ×（1＋加成建築＋綠洲），有勾 Plus 再 ×1.25。'}</p>
+          ? 'Estimates total capital production per hour (wood, clay, iron, and crop) with all bonuses. Compare 15c / 9c / 7c / 6c layouts. The gold production bonus (+25%) is multiplied on top of fields × (1 + bonus buildings + oasis).'
+          : '估算首都每小時總產量（木、土、鐵、糧），可比較 15c／9c／7c／6c。算法：田產量 ×（1＋加成建築＋綠洲），有勾金幣產量加成再 ×1.25。'}</p>
       </div>
       <CalcBar />
 
@@ -105,35 +124,46 @@ export default function CropSimCalculator() {
           <div className={s.field}>
             <label>{lang === 'en' ? 'Field level' : '田地等級'}</label>
             <select value={flv} onChange={e => setFlv(+e.target.value)}>
-              {Array.from({ length: 21 }, (_, i) => i + 1).map(L => <option key={L} value={L}>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</option>)}
+              {Array.from({ length: 20 }, (_, i) => i + 1).map(L => <option key={L} value={L}>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</option>)}
             </select>
           </div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Bonus buildings' : '加成建築'}</h4>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>{lang === 'en' ? 'Sawmill' : ingameBuildingName('sawmill')}</label><input type="number" min={0} max={5} value={bonus.saw} onChange={e => setBonus(p => ({ ...p, saw: +e.target.value }))} /></div>
-            <div className={s.field}><label>{lang === 'en' ? 'Brickyard' : ingameBuildingName('brickyard')}</label><input type="number" min={0} max={5} value={bonus.bri} onChange={e => setBonus(p => ({ ...p, bri: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Sawmill (0–5)' : `${ingameBuildingName('sawmill')}（0–5 級）`}</label><select data-testid="cropsim-bonus-saw" value={bonus.saw} onChange={e => setBonus(p => ({ ...p, saw: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Brickyard (0–5)' : `${ingameBuildingName('brickyard')}（0–5 級）`}</label><select data-testid="cropsim-bonus-bri" value={bonus.bri} onChange={e => setBonus(p => ({ ...p, bri: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
           </div>
           <div className={s.fieldRow}>
-            <div className={s.field}><label>{lang === 'en' ? 'Iron Foundry' : ingameBuildingName('iron_foundry')}</label><input type="number" min={0} max={5} value={bonus.fnd} onChange={e => setBonus(p => ({ ...p, fnd: +e.target.value }))} /></div>
-            <div className={s.field}><label>{lang === 'en' ? 'Grain Mill' : ingameBuildingName('grain_mill')}</label><input type="number" min={0} max={5} value={bonus.mil} onChange={e => setBonus(p => ({ ...p, mil: +e.target.value }))} /></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Iron Foundry (0–5)' : `${ingameBuildingName('iron_foundry')}（0–5 級）`}</label><select data-testid="cropsim-bonus-fnd" value={bonus.fnd} onChange={e => setBonus(p => ({ ...p, fnd: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
+            <div className={s.field}><label>{lang === 'en' ? 'Grain Mill (0–5)' : `${ingameBuildingName('grain_mill')}（0–5 級）`}</label><select data-testid="cropsim-bonus-mil" value={bonus.mil} onChange={e => setBonus(p => ({ ...p, mil: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
           </div>
-          <div className={s.field}><label>{lang === 'en' ? 'Bakery' : ingameBuildingName('bakery')}</label><input type="number" min={0} max={5} value={bonus.bak} onChange={e => setBonus(p => ({ ...p, bak: +e.target.value }))} /></div>
+          <div className={s.field}><label>{lang === 'en' ? 'Bakery (0–5)' : `${ingameBuildingName('bakery')}（0–5 級）`}</label><select data-testid="cropsim-bonus-bak" value={bonus.bak} onChange={e => setBonus(p => ({ ...p, bak: +e.target.value }))}>{BONUS_LEVELS.map(n => <option key={n} value={n}>{n}</option>)}</select></div>
 
-          <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Oasis bonuses (%)' : '綠洲加成 (%)'}</h4>
+          <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Oases (up to 3)' : '綠洲（最多 3 塊）'}</h4>
           <p className={s.muted} style={{ margin: '0 0 8px' }}>
-            {lang === 'en' ? 'Per-village cap: 75% non-crop, 150% crop (up to 3 oases at Hero\'s Mansion 20)' : '每村上限：木／土／鐵 75%、糧 150%（英雄宅 20 級最多 3 塊綠洲）'}
+            {lang === 'en'
+              ? "Pick the oases this village holds (official S48). Hero's Mansion 10 / 15 / 20 holds 1 / 2 / 3. Wood / clay / iron +50% only exist in the grey Natarian area."
+              : '選這村佔的綠洲（官方 S48）。英雄宅 10／15／20 級可佔 1／2／3 塊。木／土／鐵 +50% 只有納塔區（灰色區）才有。'}
           </p>
-          <div className={s.fieldRow}>
-            <div className={s.field}><label>{lang === 'en' ? 'Wood (max 75)' : '木材（最多 75）'}</label><input type="number" min={0} max={75} value={oasis.wood} onChange={e => setOasis(p => ({ ...p, wood: +e.target.value }))} /></div>
-            <div className={s.field}><label>{lang === 'en' ? 'Clay (max 75)' : '黏土（最多 75）'}</label><input type="number" min={0} max={75} value={oasis.clay} onChange={e => setOasis(p => ({ ...p, clay: +e.target.value }))} /></div>
-          </div>
-          <div className={s.fieldRow}>
-            <div className={s.field}><label>{lang === 'en' ? 'Iron (max 75)' : '鐵礦（最多 75）'}</label><input type="number" min={0} max={75} value={oasis.iron} onChange={e => setOasis(p => ({ ...p, iron: +e.target.value }))} /></div>
-            <div className={s.field}><label>{lang === 'en' ? 'Crop (max 150)' : '糧食（最多 150）'}</label><input type="number" min={0} max={150} value={oasis.crop} onChange={e => setOasis(p => ({ ...p, crop: +e.target.value }))} /></div>
-          </div>
+          {Array.from({ length: OASIS_SLOTS }, (_, i) => (
+            <div className={s.field} key={i}>
+              <label>{lang === 'en' ? `Oasis ${i + 1}` : `綠洲 ${i + 1}`}</label>
+              <select data-testid={`cropsim-oasis-${i + 1}`} value={slots[i] ?? ''} onChange={e => setSlots(p => p.map((v, k) => (k === i ? e.target.value : v)))}>
+                <option value="">{lang === 'en' ? 'None' : '沒有'}</option>
+                {OASIS_TYPES.map(o => (
+                  <option key={o.id} value={o.id}>
+                    {o.label[lang === 'en' ? 'en' : 'zh']}{NATAR_ONLY.has(o.id) ? (lang === 'en' ? ' (Natarian area)' : '（納塔區）') : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+          <p className={s.muted} data-testid="cropsim-oasis-total" style={{ margin: '0 0 8px' }}>
+            {lang === 'en' ? 'Total: ' : '合計：'}
+            {(['wood', 'clay', 'iron', 'crop'] as ResourceType[]).filter(k => oasis[k] > 0).map(k => `${{ wood: lang === 'en' ? 'wood' : '木', clay: lang === 'en' ? 'clay' : '土', iron: lang === 'en' ? 'iron' : '鐵', crop: lang === 'en' ? 'crop' : '糧' }[k]} +${oasis[k]}%`).join('、') || '0%'}
+          </p>
 
-          <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> {lang === 'en' ? 'Plus +25% (gold)' : 'Plus 產量 +25%（金幣）'}</label>
+          <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> {lang === 'en' ? 'Gold production bonus +25%' : '金幣產量加成 +25%'}</label>
           <div className="mb-3.5">
             <Stepper
               label={lang === 'en' ? 'Egyptian Waterworks level (0 = not Egyptian)' : '埃及供水系統等級（不是埃及填 0）'}
@@ -221,8 +251,8 @@ export default function CropSimCalculator() {
           </table>
           <div className={s.note}>
             {lang === 'en'
-              ? 'From the small travian guide, Table 1 — NOT Egyptian. Total production of all four resources per hour (x1): Lv 18 fields, all bonus buildings Lv 5, Plus ×1.25 multiplied last. Columns = crop-oasis bonus (150% = three 50% crop oases). * The guide prints 105,000 / 94,500 for these two cells; recomputing every cell with the same formula gives 115,500 / 105,000, so we show the recomputed value. Set layout + crop oasis % above to reproduce any cell.'
-              : '出自 small travian guide 表 1，不是埃及。數字是四種資源合計的每小時總產量（x1）：田 18 級、加成建築全 5 級、Plus ×1.25 乘在最後。欄位＝糧綠洲加成（150%＝3 塊 50% 糧綠洲）。* 這兩格原表寫 105,000／94,500，用同一套公式逐格重算應為 115,500／105,000，這裡顯示重算值。在上面選配置、填糧綠洲％就能重現任一格。'}
+              ? 'From the small travian guide, Table 1 — NOT Egyptian. Total production of all four resources per hour (x1): Lv 18 fields, all bonus buildings Lv 5, gold production bonus ×1.25 multiplied last. Columns = crop-oasis bonus (150% = three 50% crop oases). * The guide prints 105,000 / 94,500 for these two cells; recomputing every cell with the same formula gives 115,500 / 105,000, so we show the recomputed value. Pick the layout and crop oases above to reproduce any cell.'
+              : '出自 small travian guide 表 1，不是埃及。數字是四種資源合計的每小時總產量（x1）：田 18 級、加成建築全 5 級、金幣產量加成 ×1.25 乘在最後。欄位＝糧綠洲加成（150%＝3 塊 50% 糧綠洲）。* 這兩格原表寫 105,000／94,500，用同一套公式逐格重算應為 115,500／105,000，這裡顯示重算值。在上面選配置和糧綠洲就能重現任一格。'}
           </div>
         </CalcResultPanel>
       </div>

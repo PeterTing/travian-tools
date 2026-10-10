@@ -40,7 +40,7 @@ describe('OasisRoiCalculator: everything is checked against official data, so no
     expect(screen.queryAllByTestId('pending-verify-chip')).toHaveLength(0)
     const table = screen.getByTestId('oasis-hm-compare')
     for (const tr of table.querySelectorAll('thead > tr, tbody > tr')) expect(tr).toHaveClass('h-11')
-    fireEvent.click(screen.getByRole('checkbox', { name: /Plus/ }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /金幣產量加成/ }))
     expect(screen.queryAllByTestId('pending-verify-chip')).toHaveLength(0)
   })
 })

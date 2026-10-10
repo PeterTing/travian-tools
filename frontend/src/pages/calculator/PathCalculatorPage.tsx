@@ -15,6 +15,12 @@ import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerify
 import { speedPendingKinds } from '@/lib/pendingNotes'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
+import ServerSpeedSelect from '@/components/common/ServerSpeedSelect'
+import UnitSpeedSelect from '@/components/common/UnitSpeedSelect'
+
+type Artifact = 'none' | 'account_1_5x' | 'unique_2x' | 'village_2x'
+// 神器（官方 S102）：大型（帳號）1.5×、獨特 2×、小型（村莊）2×
+const ARTIFACT_MULTIPLIER: Record<Artifact, number> = { none: 1, account_1_5x: 1.5, unique_2x: 2, village_2x: 2 }
 
 /**
  * 行軍時間（路徑）計算器 — 前端即時結果（共用行軍公式 calculateTravelSeconds，跟後端同一套案例，P0-21）。
@@ -30,7 +36,7 @@ export default function PathCalculatorPage() {
   const [unitSpeed, setUnitSpeed] = useState(7)
   const [tsLevel, setTsLevel] = useState(0)
   const [heroBonus, setHeroBonus] = useState(0)
-  const [artifact, setArtifact] = useState<'none' | 'unique_2x' | 'village_2x'>('none')
+  const [artifact, setArtifact] = useState<Artifact>('none')
   const [serverSpeed, setServerSpeed] = useState(1)
 
   // 「已帶入」：伺服器速度跟帳號（或這頁的「更改」），出發座標用帶入的村莊
@@ -53,7 +59,7 @@ export default function PathCalculatorPage() {
   const result = useMemo(() => {
     if (sx == null || sy == null || tx == null || ty == null) return null
     const distance = distanceOnMap(sx, sy, tx, ty)
-    const artifactMultiplier = artifact === 'none' ? 1 : 2
+    const artifactMultiplier = ARTIFACT_MULTIPLIER[artifact]
     const travelSeconds = calculateTravelSeconds({
       distance,
       unitSpeed,
@@ -119,16 +125,15 @@ export default function PathCalculatorPage() {
             onChange={setTarget}
           />
 
-          <label className="mb-3 block text-xs text-muted-foreground">
-            {t('pathCalc.unitSpeed')}
-            <input
-              type="number"
-              min={1}
-              value={unitSpeed}
-              onChange={(e) => setUnitSpeed(Number(e.target.value))}
-              className={`${inputCls} mt-1`}
-            />
-          </label>
+          {/* 兵種從下拉選，速度從兵種資料來（不能打數字，也就不會空白算成 0） */}
+          <UnitSpeedSelect
+            className="mb-3 block text-xs text-muted-foreground"
+            selectClassName={inputCls}
+            label={t('pathCalc.unit')}
+            defaultTribe={fill.tribe}
+            testId="path-unit"
+            onChange={setUnitSpeed}
+          />
 
           <div className="mb-3">
             <Stepper label={t('pathCalc.tsLevel')} value={tsLevel} onChange={setTsLevel} min={0} max={20} testId="path-ts-level" />
@@ -149,28 +154,25 @@ export default function PathCalculatorPage() {
             {t('pathCalc.artifact')}
             <select
               value={artifact}
-              onChange={(e) =>
-                setArtifact(e.target.value as 'none' | 'unique_2x' | 'village_2x')
-              }
+              onChange={(e) => setArtifact(e.target.value as Artifact)}
               className={`${inputCls} mt-1`}
             >
               <option value="none">{t('pathCalc.artifactNone')}</option>
+              <option value="account_1_5x">{t('pathCalc.artifactAccount15x')}</option>
               <option value="unique_2x">{t('pathCalc.artifactUnique2x')}</option>
               <option value="village_2x">{t('pathCalc.artifactVillage2x')}</option>
             </select>
           </label>
 
-          <label className="block text-xs text-muted-foreground">
-            {t('pathCalc.serverSpeed')}
-            <input
-              type="number"
-              min={1}
-              step={0.5}
-              value={serverSpeed}
-              onChange={(e) => setServerSpeed(Number(e.target.value))}
-              className={`${inputCls} mt-1`}
-            />
-          </label>
+          <ServerSpeedSelect
+            className="block text-xs text-muted-foreground"
+            labelClassName="mb-1 block"
+            selectClassName={inputCls}
+            label={t('pathCalc.serverSpeed')}
+            testId="path-server-speed"
+            value={serverSpeed}
+            onChange={setServerSpeed}
+          />
         </div>
 
         {!result ? (

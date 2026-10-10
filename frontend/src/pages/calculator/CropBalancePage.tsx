@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
+import { apiErrorMessage } from '@/lib/apiFieldErrors'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { calculatorApi, buildingsApi, troopsApi } from '@/services/gameApi'
@@ -35,15 +36,24 @@ export default function CropBalancePage() {
   const [cropFieldsProduction, setCropFieldsProduction] = useState(1000)
   const [oasisBonus, setOasisBonus] = useState(0)
   const [heroCropProduction, setHeroCropProduction] = useState(0)
-  const [heroCropConsumption, setHeroCropConsumption] = useState(0)
-  const { currentAccount } = useCurrentAccount()
-  const [serverSpeed, setServerSpeed] = useState(1)
+  // 英雄在村每小時吃 6 糧（官方 S75，ts11 實測 28+36+6−8−6=56）；沒有英雄或英雄不在村就改 0
+  const [heroCropConsumption, setHeroCropConsumption] = useState(6)
+  // 人口：預設直接填（遊戲村莊頁看得到），要細算再改逐棟輸入（稽核 2026-10-10）
+  const [popMode, setPopMode] = useState<'direct' | 'buildings'>('direct')
+  const [population, setPopulation] = useState('')
+  const [popError, setPopError] = useState<string | null>(null)
+  const [levelError, setLevelError] = useState<string | null>(null)
+  // 伺服器速度跟「已帶入」列（含這頁的「更改」）
+  const fill = useAutoFill()
+  const [serverSpeed, setServerSpeed] = useState<number>(fill.speed)
 
   useEffect(() => {
-    if (currentAccount?.server_speed) {
-      setServerSpeed(currentAccount.server_speed)
-    }
-  }, [currentAccount])
+    setServerSpeed(fill.speed)
+  }, [fill.speed])
+  const fillPop = fill.village?.population
+  useEffect(() => {
+    if (fillPop != null && fillPop > 0) setPopulation(String(fillPop))
+  }, [fillPop])
 
   // Result state
   const [result, setResult] = useState<CropBalanceResponse | null>(null)
@@ -70,16 +80,33 @@ export default function CropBalancePage() {
   }, [t])
 
   const handleCalculate = async () => {
+    // 欄位錯誤寫在欄位正下方，不送出
+    const validBuildings = selectedBuildings.filter((b) => b.building_id)
+    let pop: number | undefined
+    if (popMode === 'direct') {
+      pop = Number(population)
+      if (population.trim() === '' || !Number.isInteger(pop) || pop < 0) {
+        setPopError('請填村莊人口（0 以上的整數）')
+        return
+      }
+    } else {
+      const bad = validBuildings.find((b) => !Number.isInteger(b.level) || b.level < 1 || b.level > 20)
+      if (bad) {
+        setLevelError('等級要在 1–20 之間')
+        return
+      }
+    }
+    setPopError(null)
+    setLevelError(null)
     try {
       setLoading(true)
       setError(null)
 
-      // Filter out empty entries
-      const validBuildings = selectedBuildings.filter((b) => b.building_id)
       const validTroops = selectedTroops.filter((t) => t.troop_id && t.count > 0)
 
       const request: CropBalanceRequest = {
-        buildings: validBuildings,
+        buildings: popMode === 'direct' ? [] : validBuildings,
+        population: pop,
         troops: validTroops.length > 0 ? validTroops : undefined,
         crop_fields_production: cropFieldsProduction,
         oasis_bonus: oasisBonus > 0 ? oasisBonus : undefined,
@@ -90,8 +117,8 @@ export default function CropBalancePage() {
 
       const response = await calculatorApi.calculateCropBalance(request)
       setResult(response)
-    } catch {
-      setError(t('calculator.crop.calcError'))
+    } catch (err) {
+      setError(apiErrorMessage(err) ?? t('calculator.crop.calcError'))
     } finally {
       setLoading(false)
     }
@@ -284,12 +311,52 @@ export default function CropBalancePage() {
             </div>
           </div>
 
-          {/* Buildings */}
+          {/* 人口：直接填（預設）或逐棟建築 */}
           <div className="border rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-3">{t('calculator.crop.population')}</h2>
+            <div className="mb-4 flex gap-2" role="radiogroup" aria-label={t('calculator.crop.population')}>
+              {(['direct', 'buildings'] as const).map((m) => (
+                <Button
+                  key={m}
+                  type="button"
+                  size="sm"
+                  role="radio"
+                  aria-checked={popMode === m}
+                  variant={popMode === m ? 'default' : 'outline'}
+                  onClick={() => setPopMode(m)}
+                  data-testid={`crop-pop-mode-${m}`}
+                >
+                  {m === 'direct' ? t('calculator.crop.popDirect') : t('calculator.crop.popByBuildings')}
+                </Button>
+              ))}
+            </div>
+
+            {popMode === 'direct' ? (
+              <label className="block text-sm font-medium">
+                <span className="mb-2 block">{t('calculator.crop.populationInput')}</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={population}
+                  aria-invalid={popError ? true : undefined}
+                  onChange={(e) => {
+                    setPopulation(e.target.value.replace(/[^0-9]/g, ''))
+                    setPopError(null)
+                  }}
+                  className="w-full p-2 border rounded bg-background"
+                  data-testid="crop-population"
+                />
+                {popError && (
+                  <span className="mt-1 block text-xs text-red-600" data-testid="crop-population-error">{popError}</span>
+                )}
+                <span className="mt-1 block text-xs text-muted-foreground">{t('calculator.crop.populationHint')}</span>
+              </label>
+            ) : (
+            <>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">
+              <h3 className="font-semibold">
                 {t('calculator.crop.buildings')}
-              </h2>
+              </h3>
               <Button variant="outline" size="sm" onClick={addBuilding}>
                 {t('common.plusSymbol')} {t('calculator.crop.addBuilding')}
               </Button>
@@ -317,9 +384,11 @@ export default function CropBalancePage() {
                     min={1}
                     max={20}
                     value={building.level}
-                    onChange={(e) =>
+                    aria-invalid={levelError && (building.level < 1 || building.level > 20) ? true : undefined}
+                    onChange={(e) => {
                       updateBuilding(index, 'level', Number(e.target.value))
-                    }
+                      setLevelError(null)
+                    }}
                     className="w-20 p-2 border rounded bg-background text-center"
                   />
                   <Button
@@ -333,6 +402,11 @@ export default function CropBalancePage() {
                 </div>
               ))}
             </div>
+            {levelError && (
+              <p className="mt-1 text-xs text-red-600" data-testid="crop-level-error">{levelError}</p>
+            )}
+            </>
+            )}
           </div>
 
           {/* Troops */}
@@ -412,6 +486,9 @@ export default function CropBalancePage() {
                 </h3>
                 <p className="text-2xl font-bold">
                   {getStatusLabel(result.status)}
+                </p>
+                <p className="mt-1 text-xs opacity-80" data-testid="crop-status-note">
+                  {t('calculator.crop.statusNote')}
                 </p>
               </div>
 

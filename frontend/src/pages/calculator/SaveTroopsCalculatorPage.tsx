@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
-import CoordPair from '@/components/common/CoordPair'
-import { EMPTY_COORD, coordPairValue, type CoordText } from '@/lib/coords'
-import { useMapRadius } from '@/lib/mapRadius'
-import { useCurrentAccount } from '@/contexts/CurrentAccountContext'
+import { useAutoFill } from '@/components/autofill/AutoFillContext'
+import ServerSpeedSelect from '@/components/common/ServerSpeedSelect'
+import UnitSpeedSelect from '@/components/common/UnitSpeedSelect'
 import { Button } from '@/components/ui/button'
 import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { SaveTroopsRequest, SaveTroopsResponse } from '@/services/advancedCalculatorApi'
@@ -12,13 +11,22 @@ import Stepper from '@/components/common/Stepper'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { speedPendingKinds } from '@/lib/pendingNotes'
 
-// 座標另外用文字存（預設空白、可打負號），按「計算」時才換成數字
+// 躲兵只看兵種速度和離線時間，村莊座標用不到（稽核 2026-10-10：之前有欄位但沒用）
 type SaveTroopsForm = Omit<SaveTroopsRequest, 'village_x' | 'village_y'>
 
+/** 離線時間選項（小時）：12 小時內每半小時，之後每小時到 48 */
+// eslint-disable-next-line react-refresh/only-export-components
+export const OFFLINE_HOUR_OPTIONS: number[] = [
+  ...Array.from({ length: 24 }, (_, i) => (i + 1) / 2),
+  ...Array.from({ length: 36 }, (_, i) => i + 13),
+]
+
+function hoursLabel(h: number): string {
+  const whole = Math.floor(h)
+  return h % 1 ? (whole ? `${whole} 小時 30 分` : '30 分') : `${h} 小時`
+}
+
 export default function SaveTroopsCalculatorPage() {
-  const radius = useMapRadius()
-  const [villageCoord, setVillageCoord] = useState<CoordText>(EMPTY_COORD)
-  const [showCoordErrors, setShowCoordErrors] = useState(false)
   const [form, setForm] = useState<SaveTroopsForm>({
     unit_speed: 7,
     offline_hours: 8,
@@ -26,12 +34,11 @@ export default function SaveTroopsCalculatorPage() {
     tournament_square_level: 0,
     hero_bonus: 0,
   })
-  const { currentAccount } = useCurrentAccount()
+  // 伺服器速度跟「已帶入」列（含這頁的「更改」）
+  const fill = useAutoFill()
   useEffect(() => {
-    if (currentAccount?.server_speed) {
-      setForm((prev) => ({ ...prev, server_speed: currentAccount.server_speed }))
-    }
-  }, [currentAccount])
+    setForm((prev) => ({ ...prev, server_speed: fill.speed }))
+  }, [fill.speed])
   const [result, setResult] = useState<SaveTroopsResponse | null>(null)
   // 結果是用哪一組輸入算的（灰標看這組）
   const [used, setUsed] = useState<SaveTroopsRequest | null>(null)
@@ -44,15 +51,8 @@ export default function SaveTroopsCalculatorPage() {
 
   const handleCalculate = async () => {
     // 超出 0–75 的欄位：欄位下方已經寫「請輸入 0–75」，捲過去、不送出（P0-17 (j)）
-    // 座標空白或超出範圍：欄位下方標紅字、捲過去，不送出（不會拿 0 去算）
-    const xy = coordPairValue(villageCoord, radius)
-    if (!xy) {
-      setShowCoordErrors(true)
-      setTimeout(() => focusFirstInvalid(document.querySelector('main')), 0)
-      return
-    }
     if (focusFirstInvalid(document.querySelector('main'))) return
-    const req: SaveTroopsRequest = { ...form, village_x: xy.x, village_y: xy.y }
+    const req: SaveTroopsRequest = { ...form }
     try {
       setLoading(true)
       setError(null)
@@ -72,7 +72,7 @@ export default function SaveTroopsCalculatorPage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">躲兵</h1>
       <p className="text-muted-foreground mb-6">
-        計算部隊應派往多遠的距離，確保離線期間部隊在外安全。部隊會在離線期間往返，剛好在你上線時回來。
+        離線期間讓部隊在路上：算出要派到多遠，去程加回程剛好等於離線時間。
       </p>
       <CalcBar />
 
@@ -81,39 +81,28 @@ export default function SaveTroopsCalculatorPage() {
         <div className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">參數設定</h2>
 
-          <CoordPair
-            className="grid grid-cols-2 gap-4 mb-4"
-            labelX="村莊 X"
-            labelY="村莊 Y"
-            testId="village"
-            radius={radius}
-            showErrors={showCoordErrors}
-            value={villageCoord}
-            onChange={setVillageCoord}
+          {/* 兵種從下拉選，速度從兵種資料來（不用自己打） */}
+          <UnitSpeedSelect
+            className="mb-4 block text-sm font-medium"
+            label="兵種（最慢的那種）"
+            testId="save-unit"
+            defaultTribe={fill.tribe}
+            onChange={(v) => handleChange('unit_speed', v)}
           />
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">部隊速度（格/小時）</label>
-            <input
-              type="number"
-              min={1}
-              value={form.unit_speed}
-              onChange={(e) => handleChange('unit_speed', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">離線時間（小時）</label>
-            <input
-              type="number"
-              min={0.5}
-              step={0.5}
+          <label className="mb-4 block text-sm font-medium">
+            <span className="mb-2 block">離線時間</span>
+            <select
+              data-testid="save-offline-hours"
               value={form.offline_hours}
               onChange={(e) => handleChange('offline_hours', Number(e.target.value))}
               className="w-full p-2 border rounded bg-background"
-            />
-          </div>
+            >
+              {OFFLINE_HOUR_OPTIONS.map((h) => (
+                <option key={h} value={h}>{hoursLabel(h)}</option>
+              ))}
+            </select>
+          </label>
 
           <div className="mb-4">
             <Stepper
@@ -138,16 +127,7 @@ export default function SaveTroopsCalculatorPage() {
           />
 
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">伺服器速度</label>
-            <select
-              value={form.server_speed}
-              onChange={(e) => handleChange('server_speed', Number(e.target.value))}
-              className="w-full p-2 border rounded bg-background"
-            >
-              <option value={1}>1x</option>
-              <option value={2}>2x</option>
-              <option value={3}>3x</option>
-            </select>
+            <ServerSpeedSelect value={form.server_speed ?? 1} onChange={(v) => handleChange('server_speed', v)} testId="save-server-speed" />
           </div>
 
           <Button onClick={handleCalculate} disabled={loading} className="w-full">
@@ -177,22 +157,27 @@ export default function SaveTroopsCalculatorPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-muted rounded text-center">
-                  <span className="text-sm text-muted-foreground">單程時間</span>
+                  <span className="text-sm text-muted-foreground">去程時間</span>
                   <p className="text-xl font-bold">{result.send_time_formatted}</p>
                 </div>
                 <div className="p-4 bg-muted rounded text-center">
-                  <span className="text-sm text-muted-foreground">來回時間</span>
+                  <span className="text-sm text-muted-foreground">去回總共</span>
                   <p className="text-xl font-bold">{result.return_time_formatted}</p>
                 </div>
               </div>
+              {/* 只寫算得出來的數字：去程、去回總共。派什麼任務、部隊會不會自己回來，沒有官方出處，不寫（稽核 2026-10-10，PM） */}
               <p className="text-sm text-muted-foreground" data-testid="save-distance-line">
-                找一個距離約 {result.ideal_distance} 格的空地或綠洲，向它發送偵察或增援，
-                部隊就會在 {result.return_time_formatted} 後返回。
+                目標離你約 {result.ideal_distance} 格：去程 {result.send_time_formatted}，去回總共 {result.return_time_formatted}。
               </p>
+              {result.exceeds_map && (
+                <p role="alert" className="text-sm text-red-600" data-testid="save-exceeds-map">
+                  地圖上最遠只有約 {result.max_map_distance} 格，走不了這麼遠；請把離線時間分段，或換慢一點的兵種。
+                </p>
+              )}
             </div>
           ) : (
             <div className="text-center text-muted-foreground py-8">
-              輸入部隊速度和離線時間後按「計算」
+              選好兵種和離線時間後按「計算」
             </div>
           )}
         </div>

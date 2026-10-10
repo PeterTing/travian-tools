@@ -329,6 +329,8 @@ export interface BattleSimulateResponse {
 
 export interface CropBalanceRequest {
   buildings: Array<{ building_id: string; level: number }>
+  /** 村莊人口（遊戲裡直接看得到）；有填就不看 buildings */
+  population?: number
   troops?: BattleUnit[]
   crop_fields_production?: number
   oasis_bonus?: number

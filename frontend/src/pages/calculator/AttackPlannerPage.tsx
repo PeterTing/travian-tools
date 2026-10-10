@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import RangeNumberField, { focusFirstInvalid } from '@/components/common/RangeNumberField'
 import CoordPair from '@/components/common/CoordPair'
@@ -14,6 +14,8 @@ import { CalcBar } from '@/components/autofill/CalcFrame'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
 import { speedPendingKinds } from '@/lib/pendingNotes'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
+import { UNIT_SPEED_TRIBES, tribeUnitSpeeds, type SpeedTribeId } from '@/data/unitSpeeds'
+import { ingameUnitName } from '@/lib/ingameNames'
 import { formatLocalMonthDayTime, parseLocalDateTimeInput, toLocalDateTimeInput, localZoneLabel } from '@/lib/serverTime'
 
 // 舊的「佯攻兵量」（目標人口 5% 的自編算法）已下架；
@@ -23,7 +25,8 @@ export default function AttackPlannerPage() {
     <div className="mx-auto w-full max-w-5xl min-w-0 px-4 py-4">
       <h1 className="mb-2 text-xl font-bold">OP 規劃</h1>
       <p className="text-muted-foreground mb-6">
-        TS 優化器：同步多個攻擊者對同一目標的抵達時間。
+        多個村莊打同一個目標：照你排的順序，第 1 波準時到，之後每波晚「間隔」秒到。
+        發兵時間已經過了的村莊，會找出最低要幾級競技場才趕得上。
       </p>
       <CalcBar />
 
@@ -34,10 +37,17 @@ export default function AttackPlannerPage() {
 
 // ─── TS Optimizer Form ───────────────────────────────────────────
 
+/** 需要的競技場：目前等級來得及就是目前等級；來不及寫「要升到 N 級」；20 級也不行寫「20 級也來不及」 */
+function tsLevelText(r: TsOptimizerResponse['results'][number]): string {
+  if (r.unreachable) return '20 級也來不及'
+  if (r.ts_level_changed) return `要升到 ${r.recommended_ts_level} 級`
+  return `${r.recommended_ts_level} 級`
+}
+
 // 每個攻擊者一個穩定 id（React key、結果對回攻擊者都用它；兩個攻擊者同名也不會對錯人，P0-17 (i)）
 // 座標用文字存（預設空白、可打負號），送出時才換成數字
 type AttackerFields = Omit<AttackerProfile, 'x' | 'y'>
-type AttackerRow = AttackerFields & { attacker_id: string; coord: CoordText }
+type AttackerRow = AttackerFields & { attacker_id: string; coord: CoordText; unit_id: string }
 let nextAttackerId = 1
 const newAttackerId = () => `atk-${nextAttackerId++}`
 
@@ -50,18 +60,26 @@ function defaultArrival(): string {
 }
 
 function TsOptimizerForm() {
-  const { speed } = useAutoFill()
+  const { speed, tribe } = useAutoFill()
+  // 兵種從下拉選（同帳號的部族），速度從兵種資料來，不用自己打數字
+  const speedTribe: SpeedTribeId = tribe && (UNIT_SPEED_TRIBES as string[]).includes(tribe) ? (tribe as SpeedTribeId) : 'romans'
+  const units = useMemo(() => tribeUnitSpeeds(speedTribe).filter((u) => u.speed != null), [speedTribe])
+  const unitLabel = (feId: string) => ingameUnitName(speedTribe, feId) ?? units.find((u) => u.feId === feId)?.stats?.nameZh ?? feId
+  const defaultUnit = units[0]
   const radius = useMapRadius()
   const [target, setTarget] = useState<CoordText>(EMPTY_COORD)
   // 按過「計算」：空白的座標格也標紅
   const [showCoordErrors, setShowCoordErrors] = useState(false)
   const [arrival, setArrival] = useState(defaultArrival)
+  // 波次間隔（秒）：第 n 波比第 1 波晚 n×間隔 到
+  const [spacing, setSpacing] = useState(1)
   const [attackers, setAttackers] = useState<AttackerRow[]>(() => [
     {
       attacker_id: newAttackerId(),
       village_label: '攻擊者 1',
       coord: EMPTY_COORD,
-      unit_speed: 6,
+      unit_id: defaultUnit?.feId ?? '',
+      unit_speed: defaultUnit?.speed ?? 6,
       ts_level: 0,
       hero_bonus: 0,
       allow_ts_adjustment: true,
@@ -80,14 +98,15 @@ function TsOptimizerForm() {
         attacker_id: newAttackerId(),
         village_label: `攻擊者 ${attackers.length + 1}`,
         coord: EMPTY_COORD,
-        unit_speed: 6,
+        unit_id: defaultUnit?.feId ?? '',
+        unit_speed: defaultUnit?.speed ?? 6,
         ts_level: 0,
         hero_bonus: 0,
         allow_ts_adjustment: true,
       },
     ])
 
-  const updateAttacker = <K extends keyof AttackerFields | 'coord'>(
+  const updateAttacker = <K extends Exclude<keyof AttackerRow, 'attacker_id'>>(
     idx: number,
     field: K,
     value: AttackerRow[K],
@@ -134,7 +153,7 @@ function TsOptimizerForm() {
           hero_bonus: a.hero_bonus,
           allow_ts_adjustment: a.allow_ts_adjustment,
         })),
-        wave_spacing_seconds: 1,
+        wave_spacing_seconds: spacing,
         // 伺服器速度跟「已帶入」列一致（原本寫死 x1）
         server_speed: speed,
       }
@@ -178,7 +197,21 @@ function TsOptimizerForm() {
         </div>
       </div>
 
-      <h3 className="font-bold mb-2">攻擊者</h3>
+      <label className="mb-4 block max-w-xs text-sm font-medium">
+        <span className="mb-2 block">波次間隔</span>
+        <select
+          data-testid="wave-spacing"
+          value={spacing}
+          onChange={(e) => setSpacing(Number(e.target.value))}
+          className="w-full p-2 border rounded bg-background"
+        >
+          {[0, 1, 2, 3, 5, 10].map((n) => (
+            <option key={n} value={n}>{n === 0 ? '同一秒' : `${n} 秒`}</option>
+          ))}
+        </select>
+      </label>
+
+      <h3 className="font-bold mb-2">攻擊者（由上到下＝第 1、2、3… 波）</h3>
       <div className="space-y-2 mb-3">
         {attackers.map((a, i) => (
           // 390 寬：每個攻擊者一張小卡、兩欄並附欄名；≥640 才排成一列七格
@@ -186,7 +219,7 @@ function TsOptimizerForm() {
             <label className="col-span-2 min-w-0 text-xs text-muted-foreground sm:col-span-1">
               <span className="sm:sr-only">村莊名稱</span>
               <input
-                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
+                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-base text-foreground sm:mt-0"
                 placeholder="村莊名稱"
                 value={a.village_label}
                 onChange={(e) => updateAttacker(i, 'village_label', e.target.value)}
@@ -203,26 +236,35 @@ function TsOptimizerForm() {
               onChange={(v) => updateAttacker(i, 'coord', v)}
             />
             <label className="min-w-0 text-xs text-muted-foreground">
-              <span className="sm:sr-only">最慢兵種速度（格／小時）</span>
-              <input
-                type="number"
-                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
-                placeholder="速度"
-                value={a.unit_speed}
-                onChange={(e) => updateAttacker(i, 'unit_speed', Number(e.target.value))}
-              />
+              <span className="sm:sr-only">最慢的兵種</span>
+              <select
+                data-testid="attacker-unit"
+                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-base text-foreground sm:mt-0"
+                value={units.some((u) => u.feId === a.unit_id) ? a.unit_id : (defaultUnit?.feId ?? '')}
+                onChange={(e) => {
+                  const u = units.find((x) => x.feId === e.target.value)
+                  if (!u || u.speed == null) return
+                  updateAttacker(i, 'unit_id', u.feId)
+                  updateAttacker(i, 'unit_speed', u.speed)
+                }}
+              >
+                {units.map((u) => (
+                  <option key={u.feId} value={u.feId}>{`${unitLabel(u.feId)}（${u.speed} 格/時）`}</option>
+                ))}
+              </select>
             </label>
             <label className="min-w-0 text-xs text-muted-foreground">
               <span className="sm:sr-only">競技場等級</span>
-              <input
-                type="number"
-                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm text-foreground sm:mt-0"
-                placeholder="競技場等級"
-                min={0}
-                max={20}
+              <select
+                data-testid="attacker-ts"
+                className="mt-1 w-full min-w-0 rounded border bg-background p-2 text-base text-foreground sm:mt-0"
                 value={a.ts_level}
                 onChange={(e) => updateAttacker(i, 'ts_level', Number(e.target.value))}
-              />
+              >
+                {Array.from({ length: 21 }, (_, n) => (
+                  <option key={n} value={n}>{`競技場 ${n} 級`}</option>
+                ))}
+              </select>
             </label>
             {/* 靴子跟競技場相加、只算超過 20 格（P0-21） */}
             <RangeNumberField
@@ -282,8 +324,9 @@ function TsOptimizerForm() {
               <tr className="bg-muted">
                 <th className="border p-2 text-left">村莊</th>
                 <th className="border p-2 text-left">距離</th>
-                <th className="border p-2 text-left">競技場</th>
+                <th className="border p-2 text-left">需要的競技場</th>
                 <th className="border p-2 text-left">發兵時間（{localZoneLabel('zh') || '本地'}）</th>
+                <th className="border p-2 text-left">抵達</th>
                 <th className="border p-2 text-left">行進時間</th>
               </tr>
             </thead>
@@ -294,15 +337,16 @@ function TsOptimizerForm() {
                 const kinds = speedPendingKinds(atk?.ts_level ?? r.recommended_ts_level, atk?.hero_bonus ?? 0)
                 return (
                   // 列高 ≥ 44（p-3）：上下兩列灰標的點擊範圍（44×44）才不會疊在一起
-                  <PendingRow as="tr" tableColSpan={5} key={r.attacker_id ?? `${idx}`}>
+                  <PendingRow as="tr" tableColSpan={6} key={r.attacker_id ?? `${idx}`}>
                     {/* 一列一個灰標，放在列的標題（村莊）格：涵蓋建議 TS、發兵時間、行進時間 */}
                     <td className="border p-3" data-testid="ts-row-title">
                       {r.village_label}
                       {kinds.length > 0 && <> <PendingVerifyChip kinds={kinds} /></>}
                     </td>
                     <td className="border p-3">{r.distance}</td>
-                    <td className="border p-3">{r.recommended_ts_level}</td>
+                    <td className="border p-3" data-testid="ts-level">{tsLevelText(r)}</td>
                     <td className="border p-3 tabular-nums" data-testid="ts-send">{formatLocalMonthDayTime(new Date(r.send_time))}</td>
+                    <td className="border p-3 tabular-nums" data-testid="ts-arrival">{r.arrival_time ? formatLocalMonthDayTime(new Date(r.arrival_time)) : '—'}</td>
                     <td className="border p-3" data-testid="ts-travel">{r.travel_time_formatted}</td>
                   </PendingRow>
                 )
@@ -321,8 +365,9 @@ function TsOptimizerForm() {
                     {r.village_label}
                     {kinds.length > 0 && <> <PendingVerifyChip kinds={kinds} /></>}
                   </PendingRow>
-                  <p className="text-muted-foreground">距離 {r.distance} 格 · 競技場 {r.recommended_ts_level} 級</p>
+                  <p className="text-muted-foreground">距離 {r.distance} 格 · 競技場 <span data-testid="ts-level-card">{tsLevelText(r)}</span></p>
                   <p className="mt-1 tabular-nums" data-testid="ts-send-card">發兵 {formatLocalMonthDayTime(new Date(r.send_time))}（{localZoneLabel('zh') || '本地'}）</p>
+                  {r.arrival_time && <p className="mt-1 tabular-nums" data-testid="ts-arrival-card">抵達 {formatLocalMonthDayTime(new Date(r.arrival_time))}</p>}
                   <p className="mt-1" data-testid="ts-travel-card">行進 {r.travel_time_formatted}</p>
                 </div>
               )

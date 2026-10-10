@@ -127,7 +127,11 @@ class CropBalanceRequest(BaseModel):
     """糧食平衡計算請求."""
 
     buildings: list[dict] = Field(
-        ..., description="建築列表，每項包含 building_id 和 level"
+        default_factory=list, description="建築列表，每項包含 building_id 和 level"
+    )
+    # 遊戲裡村莊人口直接看得到：有填就用這個，不用逐棟輸入建築（稽核 2026-10-10）
+    population: int | None = Field(
+        None, ge=0, description="村莊人口（有填就不看 buildings）"
     )
     troops: list[BattleUnit] = Field(default_factory=list, description="部隊列表")
     crop_fields_production: int = Field(
@@ -511,20 +515,34 @@ async def calculate_crop_balance(request: CropBalanceRequest) -> CropBalanceResp
 
     # 人口 = 累加該建築從 1 級到目前等級的 population 增量
     population_consumption = 0
-    for building_info in request.buildings:
+    for building_info in request.buildings if request.population is None else []:
         building_id = building_info.get("building_id")
         level = building_info.get("level", 1)
 
-        if not building_id or level <= 0:
+        if not building_id:
             continue
+        if not isinstance(level, int) or level < 1:
+            raise HTTPException(status_code=422, detail="建築等級要是 1 以上的整數")
 
         building = service.buildings.get_building(building_id)
         if not building:
-            continue
+            raise HTTPException(
+                status_code=422, detail=f"找不到這棟建築（{building_id}）"
+            )
+        top = max((lv.level for lv in building.levels), default=0)
+        if level > top:
+            raise HTTPException(
+                status_code=422,
+                detail=f"{building.name_zh}最高 {top} 級，沒有第 {level} 級",
+            )
         for lvl in range(1, level + 1):
             level_data = building.get_level(lvl)
             if level_data:
                 population_consumption += level_data.population
+
+    if request.population is not None:
+        # 遊戲裡 1 人口每小時吃 1 糧（同上面逐棟加總的算法）
+        population_consumption = request.population
 
     # 部隊糧耗（不含英雄；英雄另計）
     troop_only = 0

@@ -25,7 +25,16 @@ export default function OasisRoiCalculator() {
   const [fieldLv, setFieldLv] = useState(10);
   const [oasisId, setOasisId] = useState('single50_crop');
   const [hm, setHm] = useState(10);
-  const [gold, setGold] = useState(true);
+  // 英雄宅現在幾級：只算「從現在升到目標」的增量花費（稽核 2026-10-10：以前用 1 級起的累積花費，回本天數高估）
+  const [hmNow, setHmNow] = useState(0);
+  // 清綠洲動物的兵損，折成資源（選填）
+  const [clearText, setClearText] = useState('');
+  const clearCost = Math.max(0, Number(clearText) || 0);
+  // 金幣產量加成預設不勾（不是每個人都開，官方 S129）
+  const [gold, setGold] = useState(false);
+  const from = Math.min(hmNow, hm);
+  const hmCost = hmCumulativeCost(hm) - hmCumulativeCost(from);
+  const totalCost = hmCost + clearCost;
 
   const layout = CROPPER_LAYOUTS.find(l => l.id === cropper)!;
 
@@ -41,7 +50,7 @@ export default function OasisRoiCalculator() {
     return total * 24 * (gold ? 1.25 : 1);
   }, [layout, fieldLv, oasisId, gold]);
 
-  const roi = useMemo(() => hmCumulativeCost(hm) / dailyGain, [hm, dailyGain]);
+  const roi = useMemo(() => totalCost / dailyGain, [totalCost, dailyGain]);
 
   return (
     <>
@@ -87,16 +96,31 @@ export default function OasisRoiCalculator() {
 
           <div className={s.field}>
             <label>{lang === 'en' ? "Hero's Mansion target" : '英雄宅目標等級'}</label>
-            <select value={hm} onChange={e => setHm(+e.target.value)}>
+            <select value={hm} data-testid="oasis-hm-target" onChange={e => { const v = +e.target.value; setHm(v); setHmNow(v === 10 ? 0 : v - 5); }}>
               <option value={10}>{lang === 'en' ? 'Lv 10 (+1 oasis)' : '10 級（可佔 1 塊綠洲）'}</option>
               <option value={15}>{lang === 'en' ? 'Lv 15 (+2 oases)' : '15 級（可佔 2 塊綠洲）'}</option>
               <option value={20}>{lang === 'en' ? 'Lv 20 (+3 oases)' : '20 級（可佔 3 塊綠洲）'}</option>
             </select>
           </div>
 
+          <div className={s.field}>
+            <label>{lang === 'en' ? "Hero's Mansion now" : '英雄宅現在幾級'}</label>
+            <select value={hmNow} data-testid="oasis-hm-now" onChange={e => setHmNow(+e.target.value)}>
+              {Array.from({ length: hm }, (_, i) => i).map(L => (
+                <option key={L} value={L}>{lang === 'en' ? (L === 0 ? 'Not built' : `Lv ${L}`) : (L === 0 ? '還沒蓋' : `${L} 級`)}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className={s.field}>
+            <label>{lang === 'en' ? 'Clearing losses (resources, optional)' : '清綠洲動物的兵損（換算資源，選填）'}</label>
+            <input type="number" min={0} value={clearText} data-testid="oasis-clear-cost"
+                   onChange={e => setClearText(e.target.value.replace(/[^0-9]/g, ''))} />
+          </div>
+
           <label className={s.check}>
-            <input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} />
-            {lang === 'en' ? 'Plus +25% (gold)' : 'Plus 產量 +25%（金幣）'}
+            <input type="checkbox" checked={gold} data-testid="oasis-gold" onChange={e => setGold(e.target.checked)} />
+            {lang === 'en' ? 'Gold production bonus +25%' : '金幣產量加成 +25%'}
           </label>
 
           <div className={s.note}>
@@ -113,15 +137,18 @@ export default function OasisRoiCalculator() {
           secondary={
             // 資源田產量、英雄宅花費：官方知識庫；Plus 乘在總產量上：官方說明頁 S129（P0-23）
             lang === 'en'
-              ? `+${fmt(dailyGain)}/day · mansion cost ${fmt(hmCumulativeCost(hm))}`
-              : `每天 +${fmt(dailyGain)} · 英雄宅成本 ${fmt(hmCumulativeCost(hm))}`
+              ? `+${fmt(dailyGain)}/day · mansion cost ${fmt(hmCost)}${clearCost > 0 ? ` · clearing ${fmt(clearCost)}` : ''}`
+              : `每天 +${fmt(dailyGain)} · 英雄宅成本 ${fmt(hmCost)}${clearCost > 0 ? ` · 清怪 ${fmt(clearCost)}` : ''}`
           }
         >
-          <div className={s.row}><span className={s.label}>{lang === 'en' ? 'HM cumulative cost' : '英雄宅累積成本'}</span><span className={s.value}>{fmt(hmCumulativeCost(hm))}</span></div>
+          <div className={s.row}><span className={s.label}>{lang === 'en' ? `Mansion ${from} → ${hm}` : `英雄宅 ${from} → ${hm} 級`}</span><span className={s.value} data-testid="oasis-hm-cost">{fmt(hmCost)}</span></div>
+          {clearCost > 0 && (
+            <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Clearing losses' : '清綠洲兵損'}</span><span className={s.value}>{fmt(clearCost)}</span></div>
+          )}
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /hr from this oasis' : '此綠洲每小時產量'}</span><span className={s.value}>+{fmt(dailyGain / 24)}</span></div>
           <div className={s.row}><span className={s.label}>{lang === 'en' ? 'Gain /day' : '每天'}</span><span className={s.value}>+{fmt(dailyGain)}</span></div>
 
-          <h4>{lang === 'en' ? 'Compare 3 mansion levels' : '比較三種英雄宅等級'}</h4>
+          <h4>{lang === 'en' ? 'Each extra oasis slot (from the previous slot)' : '每多一格綠洲（從上一格升上來）'}</h4>
           {/* 每列 44px、垂直置中，點擊範圍不重疊 */}
           <table className={`${s.table} ${s.tapRows}`} data-testid="oasis-hm-compare">
             <thead>
@@ -134,11 +161,12 @@ export default function OasisRoiCalculator() {
             </thead>
             <tbody>
               {[10, 15, 20].map(L => {
-                const c = hmCumulativeCost(L);
+                // 10 級從 0 開始；15 級從 10 級、20 級從 15 級升上來（增量）
+                const c = hmCumulativeCost(L) - hmCumulativeCost(L === 10 ? 0 : L - 5) + clearCost;
                 const r = c / dailyGain;
                 return (
                   <tr key={L} className={`h-11 ${L === hm ? s.tableRowHi : ''}`}>
-                    <td>{lang === 'en' ? `Lv ${L}` : `${L} 級`}</td>
+                    <td>{lang === 'en' ? `Lv ${L === 10 ? 0 : L - 5} → ${L}` : `${L === 10 ? 0 : L - 5} → ${L} 級`}</td>
                     <td>{fmt(c)}</td>
                     <td>{r.toFixed(2)}</td>
                     <td>{verdict(r, lang)}</td>

@@ -346,3 +346,46 @@ def test_phase_uses_speed() -> None:
     # x10 第 2 天：保護期 1 天已過；換算 x1 第 20 天 → 中期擴張，不是「早期發展」
     assert s._determine_phase(2, 1, 10).value == s._determine_phase(20, 5, 1).value
     assert s._determine_phase(1, 1, 10).value == s._determine_phase(1, 5, 1).value
+
+
+# ---- 糧食平衡：直接填人口、等級檢查 ----
+def test_crop_balance_population_direct_overrides_buildings():
+    c = client
+    r = c.post(
+        "/api/v1/calculator/crop/balance",
+        json={
+            "population": 250,
+            "buildings": [{"building_id": "main_building", "level": 20}],
+            "crop_fields_production": 400,
+            "hero_crop_consumption": 6,
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["population_consumption"] == 250
+    assert body["total_consumption"] == 256
+    assert body["balance"] == 400 - 256
+
+
+def test_crop_balance_rejects_bad_levels():
+    c = client
+    for lvl in (0, -5, 99):
+        r = c.post(
+            "/api/v1/calculator/crop/balance",
+            json={"buildings": [{"building_id": "main_building", "level": lvl}]},
+        )
+        assert r.status_code == 422, lvl
+        assert "級" in r.json()["detail"]
+
+
+def test_opening_checklist_uses_official_slave_militia_spelling() -> None:
+    """開局清單的埃及打野兵英文名用官方拼法（troops.json），不是 Excel 的 Malitia。"""
+    import json
+    from pathlib import Path
+
+    static = Path(__file__).resolve().parents[2] / "data" / "static"
+    text = (static / "opening_checklist.json").read_text(encoding="utf-8")
+    assert "Malitia" not in text
+    troops = json.loads((static / "troops.json").read_text(encoding="utf-8"))
+    names = json.dumps(troops, ensure_ascii=False)
+    assert '"name_en": "Slave Militia"' in names

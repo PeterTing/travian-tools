@@ -62,6 +62,15 @@ FARM_UNIT_BY_TRIBE = {
     "egyptians": "Slave Malitia",
     "huns": "Steppe Rider",
 }
+# Excel 原文拼錯的兵種英文名 → 官方拼法（backend/data/static/troops.json name_en）。
+# Excel 裡的查表（unit_cost）還是用原文當 key，只有輸出給網站的英文改成官方拼法。
+OFFICIAL_UNIT_EN = {"Slave Malitia": "Slave Militia"}
+
+
+def unit_en(unit: str) -> str:
+    return OFFICIAL_UNIT_EN.get(unit, unit)
+
+
 UNIT_ZH = {
     "Equites Imperatoris": "帝國騎士",
     "Legionnaire": "古羅馬步兵",
@@ -593,7 +602,7 @@ class Converter:
                 cost = self.other["research_cost"].get(unit)
                 by_tribe[tribe] = {
                     "building": f"研究{UNIT_ZH[unit]}",
-                    "building_en": f"Research {unit}",
+                    "building_en": f"Research {unit_en(unit)}",
                     "cost": cost,
                     "target": None if cost else "基本兵種，不用研究",
                     "skip": not cost,
@@ -621,7 +630,7 @@ class Converter:
                     continue
                 by_tribe[tribe] = {
                     "building": f"打野兵（{UNIT_ZH[unit]}）",
-                    "building_en": f"Farm units ({unit})",
+                    "building_en": f"Farm units ({unit_en(unit)})",
                     "cost": num(self.other["unit_cost"][unit] * count),
                 }
             if count == 0:
@@ -967,7 +976,7 @@ class Converter:
                 "farm_unit": {
                     t: (
                         {
-                            "en": FARM_UNIT_BY_TRIBE[t],
+                            "en": unit_en(FARM_UNIT_BY_TRIBE[t]),
                             "zh": UNIT_ZH[FARM_UNIT_BY_TRIBE[t]],
                             "cost": self.other["unit_cost"][FARM_UNIT_BY_TRIBE[t]],
                         }

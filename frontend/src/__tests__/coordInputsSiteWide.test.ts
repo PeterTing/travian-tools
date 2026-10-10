@@ -8,7 +8,6 @@ const PAGES = [
   'pages/calculator/InterceptionCalculatorPage.tsx',
   'pages/calculator/PathCalculatorPage.tsx',
   'pages/calculator/PathSpeedTsCalculatorPage.tsx',
-  'pages/calculator/SaveTroopsCalculatorPage.tsx',
   'pages/map/MapSqlPage.tsx',
   'pages/statistics/InactiveSearchPage.tsx',
   'pages/villages/VillageForm.tsx',
@@ -17,6 +16,11 @@ const PAGES = [
 const src = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf-8')
 
 describe('coordinate inputs site-wide', () => {
+  // 躲兵頁不需要村莊座標（只看距離），稽核 2026-10-10 拿掉了
+  it('save troops has no coordinate inputs at all', () => {
+    expect(src('pages/calculator/SaveTroopsCalculatorPage.tsx')).not.toContain('CoordPair')
+  })
+
   it.each(PAGES)('%s uses CoordPair and has no number-typed coordinate input or 0 default', (p) => {
     const s = src(p)
     expect(s).toContain("from '@/components/common/CoordPair'")
