@@ -443,6 +443,7 @@
 - ✅ T6（#45 一起做）S93 全文＋sha256 放進證據檔、產生器檢查引句；「靴子只在 20 格以外生效」改 ✓（S93＋S71，寫法不同、互不引用），只有靴子時不再放 heroBootsSpeed 灰標；「競技場＋靴子相加」仍待驗證（arenaBootsSpeed），要實測才改
 - ⬜ T7 研究院之後補一篇官方 S 系列說明頁當出處（現在是遊戲內說明＋各族兵種的研究院需求）
 - ⬜ T8 下一輪檢查匈奴／維京城牆「每級 +1.5%」有沒有標待驗證（`frontend/src/features/guideCalcs/data/tribes/huns.ts` 等）
+- ⬜ T9（#45 合併後，幕僚長）外部 fork 開的 PR 拿不到 CI secret `TT_ID_DENYLIST`，`test_evidence_has_no_denylisted_names` 在 CI 會失敗：之後決定怎麼處理（例如 fork PR 改成略過＋要求維護者重跑、或改用 `pull_request_target` 的另一個 job），先記下來
 
 ## P1：聯盟防守
 
