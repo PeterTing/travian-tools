@@ -8,7 +8,7 @@ Source: Travian Support [Troops Speed Increase & Tournament Square](https://supp
 - Prerequisites: **Rally Point Lv 15**.
 - Max level: 20.
 - Speeds up troops traveling **beyond a fixed distance threshold**. Does not affect short-range travel.
-- **Hero boots** (speed bonus %) work the same way: only the stretch beyond 20 fields, and the boots % is **added** to the Tournament Square bonus (not multiplied). Source: same official help page (S71).
+- **Hero boots** (speed bonus %) work the same way: only the stretch beyond 20 fields, and the boots % is **added** to the Tournament Square bonus (not multiplied). Source: same official help page (S71) — **待驗證**: S71 is the only source (see the 2026-10-11 section below).
 
 ## Speed Formula
 
@@ -83,15 +83,22 @@ Consistency cases shared by the frontend and backend tests: `docs/knowledge/trav
 
 Not yet modelled in the shared formula: whole-trip multipliers — pennants/standards (官方說明頁: multiply the whole trip) and artefacts (only the march time page has an artefact field today) — TICKETS P1-24 「整趟倍率：旗幟和神器」.
 
-Verified 2026-10-11 (`scripts/game_data/evidence/pending_crosscheck_2026-10-11.json`), so results that use arena or boots
-no longer show a 「待驗證」 chip (`ARENA_BOOTS_VERIFIED = true` in `frontend/src/lib/pendingNotes.ts`; set it back to
-`false` and the `arenaSpeed` / `heroBootsSpeed` / `arenaBootsSpeed` chips return):
+Checked 2026-10-11 (`scripts/game_data/evidence/pending_crosscheck_2026-10-11.json`). Only the **arena alone** is verified
+(`ARENA_SPEED_VERIFIED = true` in `frontend/src/lib/pendingNotes.ts`: arena-only results have no 「待驗證」 chip; set it back to
+`false` and the `arenaSpeed` chip returns). Boots stay pending (`BOOTS_SPEED_VERIFIED = false`): whenever boots > 0 the
+`heroBootsSpeed` / `arenaBootsSpeed` chips show.
 
-- **20-field threshold**: in-game help on EU12 (`manual/building/14`: "the faster your troops are beyond a minimum
-  distance of 20 squares") and ts11 (same text in Chinese), plus S71.
-- **+20% per level, linear (+400% at level 20)**: official knowledge base table (the page the in-game help links to), plus S71.
-- **Boots only beyond 20 fields, added to the arena bonus (not multiplied)**: S71 ("The first 20 fields are always traveled
-  without this bonus"; "Boots and Tournament Square bonuses add together, but only apply after 20 fields"). S71's own example
-  has two arithmetic slips (it says "+500%" at level 20 and "5.65×" where its own formula gives 7.8×); the rule itself is
-  stated plainly and the formula in the example, `× (1 + 0.25 + 2)`, is the additive one.
+- **20-field threshold** (✓): in-game help on EU12 (`manual/building/14`: "the faster your troops are beyond a minimum
+  distance of 20 squares") and ts11 (same text in Chinese). They are the same in-game help, so they count as one source.
+- **+20% per level, linear (+400% at level 20)** (✓): official knowledge base table (the page the in-game help links to).
+  S71 is only a side reference here: it says "+500%" at level 20 and calls each level "multiplicative", which disagrees with the table.
+- **Boots only beyond 20 fields, added to the arena bonus (not multiplied)** — **待驗證 (single source)**: only S71 says this
+  ("The first 20 fields are always traveled without this bonus"; "Boots and Tournament Square bonuses add together, but only
+  apply after 20 fields"), and S71 contradicts itself elsewhere. The code uses additive.
+  - S71's worked example is arena **level 10** (+200%), boots +25%, artefact ×2, standard ×1.2:
+    2 × 1.2 × (1 + 0.25 + 2) = **7.8×**, which S71 prints as "5.65×". 7.8× is that example, not level 20.
+  - At level 20 with 75% boots: additive 1 + 4 + 0.75 = **5.75×**; multiplicative 5 × 1.75 = **8.75×**.
+  - One quick pass for a second independent source found none: the old Freshdesk copy is the same article, S93 (hero
+    armour) gives only +25/50/75% beyond 20 fields, S45 just links to S71, the in-game Tournament Square help doesn't mention
+    boots, and the knowledge base only uses the same `troopSpeed` field for both (inference, not a statement).
 - Not measured in-game: the test avatars have no Tournament Square (needs Rally Point 15) and no boots.

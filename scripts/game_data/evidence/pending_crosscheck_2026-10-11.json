@@ -108,24 +108,25 @@
       "sources": [
         "eu12_ingame.manual_building_14（遊戲內說明：超過 20 格才加速）",
         "ts11 遊戲內說明（evidence/ingame_manual_ts11_*，同一句）",
-        "官方知識庫 building14 表（每級 +20%，線性，20 級 +400%；遊戲內說明直接連到這頁）",
-        "official_articles.s71"
+        "官方知識庫 building14 表（每級 +20%，線性，20 級 +400%；遊戲內說明直接連到這頁）"
       ],
-      "note": "遊戲內說明＋官方說明頁，都是官方出處；沒有實際派兵量時間"
+      "note": "遊戲內說明（EU12、ts11 算同一個出處）＋官方知識庫表；S71 只當參考（它寫 20 級 +500%，跟表的 +400% 不合）"
     },
     "heroBootsSpeed": {
-      "result": "verified",
-      "sources": [
+      "result": "pending",
+      "reason": "「靴子只在 20 格以外生效」只有官方 S71 一個出處（官方知識庫只有 +25/50/75%，沒寫 20 格），而且 S71 自己前後矛盾（#45 幕僚長擋件）",
+      "sources_seen": [
         "official_articles.s71（靴子只在 20 格以外生效，寫了兩次）",
         "官方知識庫 items（+25/50/75%，troopSpeed）"
       ]
     },
     "arenaBootsSpeed": {
-      "result": "verified",
-      "sources": [
+      "result": "pending",
+      "reason": "「競技場＋靴子相加」只有官方 S71 一個出處，S71 範例算術有錯、每級寫成 multiplicative 又跟表不合（#45 幕僚長擋件）。程式照相加算",
+      "sources_seen": [
         "official_articles.s71：'Boots and Tournament Square bonuses add together'，範例公式 (1+0.25+2) 是相加"
       ],
-      "caveat": "S71 範例算術有錯（20 級寫成 +500%、5.65× 應為 7.8×）；採用的是它明寫的『相加』規則，不是範例數字",
+      "s71_example": "S71 範例：競技場 10 級（+200%）、靴子 +25%、神器 ×2、軍旗 ×1.2 → 2×1.2×(1+0.25+2)=7.8×，S71 寫成 5.65×。20 級＋靴子 75%：相加 1+4+0.75=5.75×、相乘 5×1.75=8.75×",
       "second_source_pass_2026-10-11": {
         "status": "沒有找到第二份獨立出處（狀態先不改）",
         "checked": [

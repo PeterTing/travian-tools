@@ -406,12 +406,47 @@ def test_pending_crosscheck_evidence_hashes_recompute() -> None:
         )
 
 
+# 測試帳號名、村莊名、大廳信箱：只放 (長度, sha256(casefold))，repo 裡不留原字串
+_IDENTIFIER_SHA256: tuple[tuple[int, str], ...] = (
+    (4, "c5a47ae38bb43935e4ab0385c87dc6b57dbccf104a6549ddde6911459df8b128"),
+    (8, "c9f219dd3aea6d38fd96f085d257a3fffb03a3dd8199ee2ddacddbc9cc639afe"),
+    (9, "40b63d209532ce08ab88e0b181bf9cd0a1d89330eadb43149aeec44306a5794d"),
+    (14, "b54712f23e8000d38a5b60c09086be4dcf327eb0873a238c3c6f09926f7ed8d7"),
+    (18, "3e40510c6ba13df2e8411a3166e44bcabd3279a832f74dae82bd06ef262494e7"),
+    (24, "a7f283d58f085769e3408184b6c972e77271c5983bf7e87c47f920a2242551c1"),
+)
+
+
+def _normalize_for_id_scan(text: str) -> str:
+    """遊戲頁面的數字常夾 U+202D/U+202C（方向控制字元），負號是 U+2212：先拿掉／換成 '-' 再比."""
+    return text.replace("\u202d", "").replace("\u202c", "").replace("\u2212", "-")
+
+
 def test_pending_crosscheck_evidence_has_no_account_identifiers() -> None:
-    text = PENDING_EV.read_text(encoding="utf-8")
-    # 公開 repo：不能有 email、密碼、村莊座標
+    text = _normalize_for_id_scan(PENDING_EV.read_text(encoding="utf-8"))
+    # 公開 repo：不能有 email、密碼、村莊座標、帶村莊／座標的網址參數、大廳帳號 ID
     assert not re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", text)
     assert "password" not in text.lower()
     assert not re.search(r"\(\s*-?\d+\s*\|\s*-?\d+\s*\)", text)
+    assert not re.search(r"[?&;](x|y)=-?\d", text)
+    assert not re.search(r"newdid", text, re.I)
+    assert not re.search(r"[?&;]did=", text)
+    assert not re.search(r"\bh\d{6,}", text)
+    # 帳號名、村莊名、信箱：每個長度開一個視窗滑過去比 sha256
+    folded = text.casefold()
+    for n, digest in _IDENTIFIER_SHA256:
+        for i in range(len(folded) - n + 1):
+            assert (
+                hashlib.sha256(folded[i : i + n].encode("utf-8")).hexdigest() != digest
+            ), (n, i)
+
+
+def test_identifier_scan_normalization() -> None:
+    raw = "\u202d\u2212154\u202c|\u202d42\u202c"
+    assert _normalize_for_id_scan(raw) == "-154|42"
+    assert re.search(
+        r"\(\s*-?\d+\s*\|\s*-?\d+\s*\)", _normalize_for_id_scan("(" + raw + ")")
+    )
 
 
 @pytest.mark.parametrize(

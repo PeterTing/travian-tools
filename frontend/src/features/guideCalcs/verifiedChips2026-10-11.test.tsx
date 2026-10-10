@@ -3,11 +3,12 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom'
 import i18n from '@/i18n/i18n'
 import type { AutoFillValue } from '@/components/autofill/AutoFillContext'
-import { ARENA_BOOTS_VERIFIED, FIELD_LEVEL_ZERO_VERIFIED } from '@/lib/pendingNotes'
+import { ARENA_SPEED_VERIFIED, BOOTS_SPEED_VERIFIED, FIELD_LEVEL_ZERO_VERIFIED } from '@/lib/pendingNotes'
 
 /**
  * 2026-10-11 待驗證清單（evidence/pending_crosscheck_2026-10-11.json）：真實資料、不 mock pendingNotes。
- * - 競技場、英雄靴子：遊戲內說明（20 格）＋官方知識庫（每級 +20%）＋官方 S71（靴子只加 20 格外、跟競技場相加）→ 不放灰標
+ * - 競技場單獨：遊戲內說明（20 格）＋官方知識庫（每級 +20%）→ 不放灰標
+ * - 英雄靴子（只加 20 格外、跟競技場相加）：只有 S71 一個出處、而且 S71 自己矛盾（#45 幕僚長）→ 靴子 > 0 時照舊放灰標
  * - 資源田 0 級 3／小時：EU12 遊戲內資源田頁 → 不放灰標
  */
 vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
@@ -20,7 +21,7 @@ vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
   return { ...mod, useAutoFill: () => value }
 })
 
-describe('2026-10-11 verified: arena / boots and level-0 fields carry no 待驗證 chip', () => {
+describe('2026-10-11: arena alone and level-0 fields carry no 待驗證 chip; boots still do', () => {
   beforeAll(async () => {
     await i18n.changeLanguage('zh-TW')
     window.matchMedia = ((query: string) => ({
@@ -31,24 +32,46 @@ describe('2026-10-11 verified: arena / boots and level-0 fields carry no 待驗�
   })
 
   it('flags are on', () => {
-    expect(ARENA_BOOTS_VERIFIED).toBe(true)
+    expect(ARENA_SPEED_VERIFIED).toBe(true)
+    expect(BOOTS_SPEED_VERIFIED).toBe(false)
     expect(FIELD_LEVEL_ZERO_VERIFIED).toBe(true)
   })
 
-  it('march time: arena 20 + boots 25 -> no chip in the summary or the details', async () => {
+  const renderPath = async (arena: string, boots: string) => {
     const { default: Path } = await import('@/pages/calculator/PathCalculatorPage')
     render(<MemoryRouter><Path /></MemoryRouter>)
     for (const id of ['path-start-x', 'path-start-y', 'path-target-x']) fireEvent.change(screen.getByTestId(id), { target: { value: '0' } })
     fireEvent.change(screen.getByTestId('path-target-y'), { target: { value: '60' } })
-    fireEvent.change(within(screen.getByTestId('path-ts-level')).getByRole('combobox'), { target: { value: '20' } })
-    fireEvent.change(screen.getByLabelText(i18n.t('pathCalc.heroBonus')), { target: { value: '25' } })
+    fireEvent.change(within(screen.getByTestId('path-ts-level')).getByRole('combobox'), { target: { value: arena } })
+    fireEvent.change(screen.getByLabelText(i18n.t('pathCalc.heroBonus')), { target: { value: boots } })
     const panel = screen.getByTestId('calc-result-panel')
     fireEvent.click(within(panel).getByTestId('calc-result-toggle'))
+    return panel
+  }
+
+  it('march time: arena 20 alone -> no chip in the summary or the details', async () => {
+    const panel = await renderPath('20', '0')
     expect(within(panel).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
     cleanup()
   })
 
-  it('farming: arena 5 + boots 25 -> no chip', async () => {
+  it('march time: arena 20 + boots 25 -> arenaBootsSpeed chip (boots rest on S71 alone)', async () => {
+    const panel = await renderPath('20', '25')
+    const kinds = within(panel).queryAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind'))
+    expect(kinds.length).toBeGreaterThan(0)
+    expect(new Set(kinds)).toEqual(new Set(['arenaBootsSpeed']))
+    cleanup()
+  })
+
+  it('march time: boots 25 alone -> heroBootsSpeed chip', async () => {
+    const panel = await renderPath('0', '25')
+    const kinds = within(panel).queryAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind'))
+    expect(kinds.length).toBeGreaterThan(0)
+    expect(new Set(kinds)).toEqual(new Set(['heroBootsSpeed']))
+    cleanup()
+  })
+
+  it('farming: arena 5 (no boots) -> no speed chip', async () => {
     const { default: Farming } = await import('./components/FarmingCalculator')
     render(<MemoryRouter><Farming /></MemoryRouter>)
     fireEvent.change(screen.getByLabelText(/競技場/), { target: { value: '5' } })
