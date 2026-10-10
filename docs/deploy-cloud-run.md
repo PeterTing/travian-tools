@@ -175,9 +175,22 @@ curl -s -o /dev/null -w '%{http_code}\n' https://tt-web-138672009807.asia-east1.
     和 `DATABASE_URL` 這一個 secret 的 `secretAccessor`。
   - `travian-tools-scheduler`（Scheduler 呼叫身分）：只有 `tt-mapsql-fetch` 這個 job 的 `roles/run.invoker`。
 
-前置：這個功能依賴 P0-25（#39，migration `0009_multi_tribe`），要等 #39 先合併。合併進 main 之後，先 `scripts/deploy_cloud_run.sh build`（產生新的 backend image）和
-`scripts/deploy_cloud_run.sh migrate`（`0010_mapsql_content_sha256`：`map_snapshots.content_sha256` 欄位＋索引；
-舊版 tt-api 不讀這個欄位，不受影響）。下面的 `TAG` 是那次 build 的 short SHA。
+**真正的開關是「建立 Cloud Scheduler」**：job 不讀 `MAP_SQL_DAILY_FETCH_ENABLED`；tt-api 的
+`MAP_SQL_DAILY_FETCH_ENABLED` 永遠維持 `false`（不要打開，否則 tt-api 程序內也會抓）。沒有 Scheduler，job 只會在手動 execute 時跑。
+
+前置：這個功能依賴 P0-25（#39，migration `0009_multi_tribe`），要等 #39 先合併。
+
+**上線順序（幕僚長 2026-10-11 定）**：
+
+1. 依序合併 #38 → #42 → #39 → #36 → #40
+2. Cloud SQL 備份（`gcloud sql backups create --instance travian-tools-db --project artogo-travian-tools`）
+3. `scripts/deploy_cloud_run.sh build`（產生新的 backend image；下面的 `TAG` 是這次 build 的 short SHA）
+4. `scripts/deploy_cloud_run.sh migrate`（跑 `0009_multi_tribe`＋`0010_mapsql_content_sha256`；
+   0010 是 `map_snapshots.content_sha256` 欄位＋索引，舊版 tt-api 不讀這個欄位）
+5. `scripts/deploy_cloud_run.sh deploy`
+6. 下一節「Cloud SQL 硬碟：auto-increase＋兩條警報」——**一定要在建立 Scheduler 之前做完**
+7. 本節指令 0)–5)：啟用 Cloud Scheduler API、service accounts、Cloud Run Job、手動跑一次確認、invoker 權限
+8. 本節指令 6)：**最後才建立 Scheduler**
 
 ```bash
 export CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools
@@ -265,39 +278,47 @@ gcloud services disable cloudscheduler.googleapis.com --project ${PROJECT}
 
 **快照全部保留，不自動刪除（Peter 決定，2026-10-11）。** 估算每月約 0.4 GB（兩個世界每天各換一次內容），
 最壞每月約 2.4 GB（每 4 小時都換）；Cloud SQL 只有 10 GB 且沒開 storage auto-increase。
-PM＋幕僚長決定兩個都做，見下一節「Cloud SQL 硬碟：auto-increase＋70% 警報」。
+PM＋幕僚長決定：開 auto-increase（上限 30 GB）＋兩條警報，見下一節「Cloud SQL 硬碟：auto-increase＋兩條警報」。
 
 資料：job 寫進的是現有的 `map_snapshots`／`map_villages`／`map_players`／`map_alliances`（＋差異表）。
 要清掉這兩個世界的快照要另外核准，刪 `map_snapshots` 會連帶刪掉子表（FK `ON DELETE CASCADE`）。
 欄位本身可用 `alembic downgrade 0009_multi_tribe` 拿掉（要先部署不含這個欄位的 tt-api）。
 
-## Cloud SQL 硬碟：auto-increase＋70% 警報（待幕僚長核准後執行）
+## Cloud SQL 硬碟：auto-increase＋兩條警報（待幕僚長核准後執行；要在建立 map.sql Scheduler 之前）
 
 map.sql 快照全部保留，所以：
 
 1. **storage auto-increase，上限 30 GB**。改這個設定不用重啟 instance。硬碟只會變大、**不能縮回**。
-2. **Cloud Monitoring 警報**：`cloudsql.googleapis.com/database/disk/utilization` 5 分鐘平均 > 70% 就寄信
-   （`deploy/monitoring/cloudsql-disk-70.yaml`）。通知管道只有一個 email，是專案 Owner 的 Google 帳號；
-   不用群組、不用第三方。Owner 有兩位（2026-10-11 讀 IAM）：`dainy@artogo.co`、`peter_ting@artogo.co`，
-   由幕僚長選定後填進 `<OWNER_EMAIL>`。
+2. **兩條 Cloud Monitoring 警報**（5 分鐘平均，超過就寄信）：
+   - `cloudsql.googleapis.com/database/disk/utilization` > **0.7**（目前配置硬碟的 70%）：`deploy/monitoring/cloudsql-disk-70.yaml`
+   - `cloudsql.googleapis.com/database/disk/bytes_used` > **21 GiB = 21 × 1024³ = 22,548,578,304 bytes**（30 GB 上限的 70%；
+     auto-increase 會一直把硬碟加大，utilization 可能永遠不到 70%，這條才會在接近上限前提醒）：
+     `deploy/monitoring/cloudsql-disk-bytes-21gib.yaml`
+   - 通知管道只有一個 email，是專案 Owner 的 Google 帳號；不用群組、不用第三方。Owner 有兩位
+     （2026-10-11 唯讀 `gcloud projects get-iam-policy`）：`dainy@artogo.co`、`peter_ting@artogo.co`，
+     由幕僚長選定後填進 `<OWNER_EMAIL>`。
 
 ```bash
 export CLOUDSDK_ACTIVE_CONFIG_NAME=travian-tools
 PROJECT=artogo-travian-tools
 OWNER_EMAIL=<OWNER_EMAIL>   # dainy@artogo.co 或 peter_ting@artogo.co，由幕僚長選
 
-# 1) auto-increase（上限 30 GB）
-gcloud sql instances patch travian-tools-db --project ${PROJECT} \
-  --storage-auto-increase --storage-auto-increase-limit=30
+# 1) auto-increase（上限 30 GB）。會跳確認，不加 --quiet
+gcloud sql instances patch travian-tools-db --project artogo-travian-tools --storage-auto-increase --storage-auto-increase-limit=30
 
-# 2) email 通知管道＋警報（gcloud alpha 元件）
+# 2) email 通知管道（gcloud alpha 元件）
 gcloud alpha monitoring channels create --project ${PROJECT} \
   --display-name "travian-tools owner email" --type email \
   --channel-labels email_address=${OWNER_EMAIL}
 CHANNEL=$(gcloud alpha monitoring channels list --project ${PROJECT} \
   --filter "type=\"email\" AND labels.email_address=\"${OWNER_EMAIL}\"" --format 'value(name)')
+
+# 3) 兩條警報，都只通知這個 email
 gcloud alpha monitoring policies create --project ${PROJECT} \
   --policy-from-file deploy/monitoring/cloudsql-disk-70.yaml \
+  --notification-channels ${CHANNEL}
+gcloud alpha monitoring policies create --project ${PROJECT} \
+  --policy-from-file deploy/monitoring/cloudsql-disk-bytes-21gib.yaml \
   --notification-channels ${CHANNEL}
 ```
 
@@ -306,23 +327,26 @@ gcloud alpha monitoring policies create --project ${PROJECT} \
 ```bash
 gcloud sql instances describe travian-tools-db --project ${PROJECT} \
   --format='value(settings.storageAutoResize,settings.storageAutoResizeLimit,settings.dataDiskSizeGb)'
-gcloud alpha monitoring policies list --project ${PROJECT} --format='value(name,displayName,enabled)'
+gcloud alpha monitoring policies list --project ${PROJECT} \
+  --format='value(name,displayName,enabled,notificationChannels)'
 ```
 
 回復：
 
 ```bash
 # 關 auto-increase（已經長大的硬碟不會縮回）
-gcloud sql instances patch travian-tools-db --project ${PROJECT} --no-storage-auto-increase
-# 刪警報與通知管道
-POLICY=$(gcloud alpha monitoring policies list --project ${PROJECT} \
-  --filter 'displayName="travian-tools-db disk > 70%"' --format 'value(name)')
-gcloud alpha monitoring policies delete ${POLICY} --project ${PROJECT} --quiet
-gcloud alpha monitoring channels delete ${CHANNEL} --project ${PROJECT} --quiet
+gcloud sql instances patch travian-tools-db --project artogo-travian-tools --no-storage-auto-increase
+# 刪兩條警報與通知管道
+for NAME in "travian-tools-db disk > 70%" "travian-tools-db disk bytes_used > 21 GiB"; do
+  POLICY=$(gcloud alpha monitoring policies list --project ${PROJECT} \
+    --filter "displayName=\"${NAME}\"" --format 'value(name)')
+  gcloud alpha monitoring policies delete ${POLICY} --project ${PROJECT}
+done
+gcloud alpha monitoring channels delete ${CHANNEL} --project ${PROJECT}
 ```
 
-費用：警報目前不收費（Google 公告最早 2027-09-01 起收：每個 metric reference $0.35／月＋每百萬個回傳點 $0.50；
-這條每 30 秒 1 點，約 86,400 點／月 → 約 $0.39／月）；email 通知不收費。auto-increase 只有硬碟真的長大才多付，
+費用：兩條警報目前 $0（Google 公告最早 2027-09-01 起收：每個 metric reference $0.35／月＋每百萬回傳點 $0.50；
+每條每 30 秒 1 點、約 86,400 點／月 → 每條約 $0.39、兩條約 $0.78／月）；email 通知 $0。auto-increase 只有硬碟真的長大才多付，
 SSD 約 $0.17–0.19／GB／月，長到上限 30 GB 時最多多約 $3.4–3.8／月。
 
 ## 已知限制

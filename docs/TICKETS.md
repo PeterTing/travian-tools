@@ -434,7 +434,7 @@
 | P1-06 | 戰鬥模擬器重寫 | 4 到 6 天 | 照公式自己寫，數值只拿 kirilloid 比對 |
 | P1-07 | 偵查找田照 Friso 的規則重做 | 1.5 到 2 天 | |
 | P1-08 | 知識庫 | 約 1 天校對 | 以 travian-guide 為主體，舊內容逐條照公式與官方說明校對（外部網站只拿來比對） |
-| P1-09 | 每日 map.sql 改由 Cloud Scheduler 觸發（Cloud Run） | 0.5 到 1 天 | 正式環境現在 `MAP_SQL_DAILY_FETCH_ENABLED=false`：min-instances 0 時程序內排程不會可靠執行，兩個 instance 也可能各抓一次。做法：Cloud Scheduler 每天打一個只收 OIDC（Scheduler 專用 service account）的內部端點，同世界同一天只抓一次；合規測試的 map.sql 白名單照舊 |
+| P1-09 | 定時 map.sql 改由 Cloud Scheduler 觸發（Cloud Run）🔄 [#40](https://github.com/PeterTing/travian-tools/pull/40) | 0.5 到 1 天 | 改成 Cloud Run Job `tt-mapsql-fetch`＋Cloud Scheduler 每 4 小時（Asia - x1、Europe 12），SHA-256 相同不寫 DB，快照全部保留。#40 幕僚長不擋項：① 補一個測試，確認抓取請求永遠不帶 cookie（含 client 有 cookie jar 時）；② `MAP_SQL_DAILY_FETCH_ENABLED` job 不讀，tt-api 永遠維持 `false`，真正的開關是「建立 Cloud Scheduler」（已寫進 `docs/deploy-cloud-run.md`） |
 | P1-10 | 首頁：新使用者還沒有遊戲帳號時，「新增遊戲帳號」改成卡片最上方的主按鈕 | 0.5 天 | 設計師建議；現在是橘色文字連結（`frontend/src/pages/HomePage.tsx` 約 341–349 行） |
 | P1-11 | 截圖辨識拿掉「測試版」：第一次有真實來襲時，補集結點來襲截圖（手機＋桌機）當測試素材，重算「確定」欄位讀錯率 | 0.5 天 | PM 條件：P0-07 先上但入口標「測試版」（首頁「📷 上傳截圖」、補座標頁相機按鈕，元件 `OcrBetaTag`）。ts11 新手保護期間沒有真實來襲，現有來襲案例是真實頁面骨架＋假資料。觸發：ts11 第一次收到來襲。完成條件：真實截圖進 fixture、讀錯率重算寫進 PR、讀錯率 0 才拿掉標籤 |
 | P1-12 | 截圖辨識：低信心欄位的確認改用伺服器簽章 token | 1 天 | 幕僚長 #21 審核建議（之後開票）。現在 `/paste/confirm`（source=ocr）是依前端送回的欄位狀態判斷「低信心已確認」。改成 `/ocr/rally` 回一個簽章 token（含每個低信心欄位的位置與原值），confirm 時驗簽，不再信任前端送回的狀態 |
