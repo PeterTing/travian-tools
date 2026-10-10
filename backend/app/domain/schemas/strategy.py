@@ -31,11 +31,11 @@ class PhaseDetectionRequest(BaseModel):
     """遊戲階段判斷請求."""
 
     account_id: str = Field(..., description="遊戲帳號 ID")
-    beginner_protection_days: int = Field(
-        5,
+    beginner_protection_days: int | None = Field(
+        None,
         ge=1,
         le=30,
-        description="新手保護天數（依世界；x1=5、可延長）",  # S12
+        description="新手保護天數；不填就照官方 S20 依世界倍速（x1 5、x2/x3 3、x5 2、x10 1 天）",
     )
 
 
@@ -71,11 +71,11 @@ class HealthCheckRequest(BaseModel):
     """帳號健康檢查請求."""
 
     account_id: str = Field(..., description="遊戲帳號 ID")
-    beginner_protection_days: int = Field(
-        5,
+    beginner_protection_days: int | None = Field(
+        None,
         ge=1,
         le=30,
-        description="新手保護天數（依世界；x1=5）",  # S12
+        description="新手保護天數；不填就照官方 S20 依世界倍速（x1 5、x2/x3 3、x5 2、x10 1 天）",
     )
 
 

@@ -266,6 +266,8 @@ class TestNewFieldsEmptyMeansSameAsBefore:
             "send_time": "16:38:34",
             "travel_time_formatted": "2h 30m 0s",
             "distance_to_attacker": 30.0,
+            "return_day_offset": 0,
+            "send_day_offset": 0,
         }
 
     def test_ts_optimizer(self) -> None:
@@ -284,7 +286,8 @@ class TestNewFieldsEmptyMeansSameAsBefore:
         res = r.results[0]
         assert (res.send_time, res.travel_time_formatted, res.distance) == (
             "2030-01-01T06:10:00+00:00",
-            "5:50:00",
+            # 跟其他行軍工具同一種寫法（稽核 2026-10-10：時間格式統一）
+            "5h 50m 0s",
             50.0,
         )
 
@@ -318,6 +321,8 @@ class TestNewFieldsEmptyMeansSameAsBefore:
             "ideal_distance": 36.0,
             "send_time_formatted": "4h 0m 0s",
             "return_time_formatted": "8h 0m 0s",
+            "max_map_distance": 282.84,
+            "exceeds_map": False,
         }
 
     def test_new_fields_default_to_zero(self) -> None:

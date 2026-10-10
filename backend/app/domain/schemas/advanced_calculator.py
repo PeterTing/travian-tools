@@ -1,6 +1,14 @@
 """進階計算器 Request/Response schemas."""
 
-from pydantic import BaseModel, Field
+import re
+from typing import Annotated, Literal
+
+from pydantic import BaseModel, Field, field_validator
+
+# 神器（官方 S102）：大型（帳號）1.5×、獨特 2×、小型（村莊）2×；其他字串直接 422，不默默當成沒有
+ArtifactBonus = Literal["none", "account_1_5x", "unique_2x", "village_2x"]
+
+_HMS = re.compile(r"^([01]?\d|2[0-3]):([0-5]\d):([0-5]\d)$")
 
 # ============ Path Calculator (路徑計算器) ============
 
@@ -20,7 +28,7 @@ class PathCalculatorRequest(BaseModel):
         le=75,
         description="英雄靴子速度加成百分比（只算超過 20 格的路段，跟競技場相加）",
     )
-    artifact_bonus: str = Field(
+    artifact_bonus: ArtifactBonus = Field(
         "none",
         description="神器加成：none, account_1_5x, unique_2x, village_2x",
     )
@@ -69,12 +77,24 @@ class InterceptionRequest(BaseModel):
         description="攻擊方英雄靴子速度加成百分比（回程用，P0-21）",
     )
 
+    @field_validator("attack_arrival_time")
+    @classmethod
+    def _check_hms(cls, v: str) -> str:
+        """時間格式錯（25:99、空白）→ 422，訊息顯示在欄位下方（不是 500）."""
+        v = v.strip()
+        if not _HMS.match(v):
+            raise ValueError("請輸入 時:分:秒，例如 23:05:00（時 0–23，分、秒 0–59）")
+        return v
+
 
 class InterceptionResponse(BaseModel):
     """攔截計算器回應."""
 
     attacker_return_time: str  # 攻擊者回程到家時間
     send_time: str  # 攔截者應發送時間
+    # 跟攻擊到達那天比差幾天：1 = 明天、-1 = 前一天（跨午夜時畫面標「（明天）」）
+    return_day_offset: int = 0
+    send_day_offset: int = 0
     travel_time_formatted: str  # 攔截者行進時間
     distance_to_attacker: float  # 攔截者到攻擊者的距離
 
@@ -116,8 +136,10 @@ class TechnologyRequest(BaseModel):
         ...,
         description="部族：romans, teutons, gauls, huns, egyptians, vikings, spartans",
     )
-    research_levels: list[int] = Field(
-        default=[0, 5, 10, 15, 20], description="要比較的研究等級"
+    research_levels: list[Annotated[int, Field(ge=0, le=20)]] = Field(
+        default=[0, 5, 10, 15, 20],
+        min_length=1,
+        description="要比較的研究等級（0–20）",
     )
 
 
@@ -160,6 +182,19 @@ class NpcCalculatorRequest(BaseModel):
     )
     granary_capacity: int | None = Field(None, ge=0, description="穀倉容量上限（穀）")
 
+    @field_validator("desired_ratios")
+    @classmethod
+    def _check_ratios(cls, v: dict[str, int]) -> dict[str, int]:
+        """比例不能是負的，也不能全部是 0（之前負比例會算出負資源、全 0 默默變 1:1:1:1）."""
+        unknown = set(v) - {"wood", "clay", "iron", "crop"}
+        if unknown:
+            raise ValueError(f"不認得的資源：{', '.join(sorted(unknown))}")
+        if any(r < 0 for r in v.values()):
+            raise ValueError("比例不能是負數")
+        if sum(v.values()) <= 0:
+            raise ValueError("比例至少要有一個大於 0")
+        return v
+
 
 class NpcCalculatorResponse(BaseModel):
     """NPC 計算器回應."""
@@ -178,8 +213,13 @@ class NpcCalculatorResponse(BaseModel):
 class SaveTroopsRequest(BaseModel):
     """避兵計算器請求."""
 
-    village_x: int = Field(..., ge=-200, le=200, description="村莊 X 座標")
-    village_y: int = Field(..., ge=-200, le=200, description="村莊 Y 座標")
+    # 躲兵只看速度和離線時間，村莊座標用不到（留著相容舊的前端，可省略）
+    village_x: int | None = Field(
+        None, ge=-200, le=200, description="村莊 X 座標（沒用到）"
+    )
+    village_y: int | None = Field(
+        None, ge=-200, le=200, description="村莊 Y 座標（沒用到）"
+    )
     unit_speed: int = Field(..., gt=0, description="部隊速度")
     offline_hours: float = Field(..., gt=0, description="離線時間（小時）")
     server_speed: int = Field(1, ge=1, le=10, description="伺服器速度倍率")
@@ -198,6 +238,9 @@ class SaveTroopsResponse(BaseModel):
     ideal_distance: float
     send_time_formatted: str  # 單程時間
     return_time_formatted: str  # 來回時間
+    # 地圖上最遠能走多遠（401×401 環繞：√(200²+200²) ≈ 282.84 格）；超過就提醒
+    max_map_distance: float = 282.84
+    exceeds_map: bool = False
 
 
 # ============ Path-Speed-TS Reverse Calculator (TS 反推計算器) ============
@@ -217,6 +260,13 @@ class PathSpeedTsRequest(BaseModel):
         ge=0,
         le=75,
         description="攻擊方英雄靴子速度加成百分比（只算超過 20 格，跟競技場相加）",
+    )
+    artifact_bonus: ArtifactBonus = Field(
+        "none",
+        description="攻擊方神器（官方 S102），none／account_1_5x／unique_2x／village_2x",
+    )
+    tolerance_seconds: int = Field(
+        30, ge=0, le=600, description="容許誤差（秒），預設 ±30（本站自訂）"
     )
 
 
@@ -239,6 +289,8 @@ class PathSpeedTsResponse(BaseModel):
     possible_matches: list[SpeedTsMatch]
     # 速度還沒有第一手出處（待驗證）的兵種，沒有列入比對
     unverified_units: list[str] = []
+    # 距離 ≤ 20 格時競技場不影響行軍時間（S71），每個速度只回一筆（競技場等級填 0）
+    ts_irrelevant: bool = False
 
 
 # ============ Village Builder (最佳建造順序) ============
@@ -301,38 +353,6 @@ class VillageBuilderResponse(BaseModel):
     estimated_days: float = Field(..., description="以 x1 速度粗估完成天數")
 
 
-# ============ Crop Scouter (反推對手首都類型) ============
-
-
-class CropScouterRequest(BaseModel):
-    """Crop Scouter 請求 — 偵查結果反推對手首都類型."""
-
-    wood_production: int = Field(..., ge=0, description="木材產量 (per hour)")
-    clay_production: int = Field(..., ge=0, description="磚塊產量")
-    iron_production: int = Field(..., ge=0, description="鐵礦產量")
-    crop_production: int = Field(..., ge=0, description="穀物產量")
-    population: int = Field(..., ge=0, description="人口數")
-    server_speed: int = Field(1, ge=1, le=10, description="伺服器速度倍率")
-
-
-class CropperMatch(BaseModel):
-    """反推的可能首都類型."""
-
-    cropper_type: str
-    likelihood: float = Field(..., ge=0.0, le=1.0)
-    reasoning: str
-
-
-class CropScouterResponse(BaseModel):
-    """Crop Scouter 回應 — 可能性排序的候選首都類型."""
-
-    matches: list[CropperMatch]
-    dominant_resource: str = Field(
-        ..., description="主要產出資源：'wood', 'clay', 'iron', 'crop'"
-    )
-    wood_to_crop_ratio: float
-
-
 # ============ Attack TS Optimizer (攻擊 TS 優化器) ============
 
 
@@ -356,7 +376,8 @@ class AttackerProfile(BaseModel):
         description="英雄靴子速度加成百分比（只算超過 20 格，跟競技場相加）",
     )
     allow_ts_adjustment: bool = Field(
-        True, description="是否允許發送前微調 TS 等級以命中時間窗"
+        True,
+        description="來不及（發送時間已過）時，找最低的競技場等級讓發送時間還在現在之後",
     )
 
 
@@ -373,7 +394,10 @@ class TsOptimizerRequest(BaseModel):
         ..., min_length=1, description="所有參與攻擊者"
     )
     wave_spacing_seconds: float = Field(
-        1.0, ge=0.0, le=10.0, description="波次間距（秒）"
+        1.0,
+        ge=0.0,
+        le=10.0,
+        description="波次間距（秒）：照 attackers 的順序，第 n 波比第一波晚 n×間距 到",
     )
     server_speed: int = Field(1, ge=1, le=10)
 
@@ -384,7 +408,13 @@ class TsOptimizerResult(BaseModel):
     attacker_id: str | None = None
     village_label: str
     recommended_ts_level: int
+    # 建議等級跟目前不同（目前等級來不及，要升到這級才趕得上）
+    ts_level_changed: bool = False
+    # 升到 20 級也來不及
+    unreachable: bool = False
     send_time: str  # ISO 8601
+    arrival_time: str = ""  # ISO 8601：這一波實際抵達時間（目標時間 + 波次 × 間距）
+    wave: int = 0  # 第幾波（0 起算，照輸入順序）
     travel_time_formatted: str
     distance: float
 

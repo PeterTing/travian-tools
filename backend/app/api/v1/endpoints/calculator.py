@@ -1,7 +1,7 @@
 """計算器相關 API 端點."""
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.services.game_data_service import get_game_data_service
 
@@ -20,7 +20,17 @@ class BuildingUpgradeRequest(BaseModel):
     main_building_level: int = Field(
         1, ge=1, le=20, description="村莊大樓等級（計算時間用）"
     )
-    server_speed: float = Field(1.0, gt=0, description="伺服器速度倍率")
+    server_speed: float = Field(
+        1.0, description="伺服器速度倍率（1、2、3、5、10，官方 S20）"
+    )
+
+    @field_validator("server_speed")
+    @classmethod
+    def _check_speed(cls, v: float) -> float:
+        # 之前 0.0001 也收；官方只有 x1／x2／x3／x5／x10（S20）
+        if v not in (1, 2, 3, 5, 10):
+            raise ValueError("伺服器速度只能是 1、2、3、5、10")
+        return v
 
 
 class BuildingUpgradeResponse(BaseModel):
@@ -203,16 +213,14 @@ async def calculate_building_upgrade(
     支援村莊大樓等級加成和伺服器速度倍率。
     """
     if request.from_level >= request.to_level:
-        raise HTTPException(
-            status_code=400, detail="from_level must be less than to_level"
-        )
+        raise HTTPException(status_code=400, detail="目標等級要比目前等級高")
 
     service = get_game_data_service()
     building = service.buildings.get_building(request.building_id)
 
     if not building:
         raise HTTPException(
-            status_code=404, detail=f"Building '{request.building_id}' not found"
+            status_code=404, detail=f"找不到這棟建築（{request.building_id}）"
         )
 
     # 計算總成本
@@ -223,13 +231,27 @@ async def calculate_building_upgrade(
     total_build_time = 0
     total_population = 0
     total_culture_points = 0
+    actual_build_time = 0
+    # 升村莊大樓本身時，每升一級大樓就變快：蓋第 lvl 級時大樓是 lvl−1 級（之前整段都用起始等級，高估）
+    is_main_building = request.building_id == "main_building"
 
     for lvl in range(request.from_level + 1, request.to_level + 1):
         level_data = building.get_level(lvl)
         if not level_data:
+            max_level = max((lv.level for lv in building.levels), default=0)
             raise HTTPException(
-                status_code=400, detail=f"Level {lvl} data not available"
+                status_code=400,
+                detail=f"{building.name_zh}最高 {max_level} 級，沒有第 {lvl} 級",
             )
+        mb_level = (
+            max(request.main_building_level, lvl - 1)
+            if is_main_building
+            else request.main_building_level
+        )
+        # 遊戲每一級各自四捨五入到 10 秒（公式經 ts11 實測校正）
+        actual_build_time += calculate_actual_build_time(
+            level_data.build_time_base, mb_level, request.server_speed
+        )
         total_wood += level_data.cost_wood
         total_clay += level_data.cost_clay
         total_iron += level_data.cost_iron
@@ -249,11 +271,6 @@ async def calculate_building_upgrade(
     to_cp_daily = to_level_data.culture_points if to_level_data else 0
     total_culture_points = to_cp_daily  # 升級後該建築每日 CP
     culture_points_per_day = to_cp_daily - from_cp_daily
-
-    # 計算實際建造時間（含村莊大樓加成）
-    actual_build_time = calculate_actual_build_time(
-        total_build_time, request.main_building_level, request.server_speed
-    )
 
     total_cost = total_wood + total_clay + total_iron + total_crop
 

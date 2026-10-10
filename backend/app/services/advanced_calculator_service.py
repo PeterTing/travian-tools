@@ -5,10 +5,8 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from app.domain.schemas.advanced_calculator import (
+    AttackerProfile,
     BuildStep,
-    CropperMatch,
-    CropScouterRequest,
-    CropScouterResponse,
     CulturePointsRequest,
     CulturePointsResponse,
     CulturePointsVillage,
@@ -34,6 +32,7 @@ from app.domain.schemas.advanced_calculator import (
 )
 from app.utils.culture_points import village_requirements
 from app.utils.travian_formulas import (
+    TS_THRESHOLD_FIELDS,
     calculate_travel_seconds,
     distance_for_travel_hours,
     distance_on_map,
@@ -164,7 +163,7 @@ class AdvancedCalculatorService:
             ),
         )
 
-        # 3. 攻擊到達時間 → 回到家的時間
+        # 3. 攻擊到達時間 → 回到家的時間（格式在 schema 驗過；跨午夜要記是哪一天）
         attack_arrival = datetime.strptime(request.attack_arrival_time, "%H:%M:%S")
         return_time = attack_arrival + timedelta(seconds=t_return_seconds)
 
@@ -191,9 +190,12 @@ class AdvancedCalculatorService:
         # 6. 發送時間 = 回到家時間 - 攔截者行進時間
         send_time = return_time - timedelta(seconds=t_catch_seconds)
 
+        base_day = attack_arrival.date()
         return InterceptionResponse(
             attacker_return_time=return_time.strftime("%H:%M:%S"),
             send_time=send_time.strftime("%H:%M:%S"),
+            return_day_offset=(return_time.date() - base_day).days,
+            send_day_offset=(send_time.date() - base_day).days,
             travel_time_formatted=_format_travel_time(t_catch_seconds),
             distance_to_attacker=round(d2, 2),
         )
@@ -302,12 +304,9 @@ class AdvancedCalculatorService:
         """
         total = request.wood + request.clay + request.iron + request.crop
 
+        # 比例在 schema 驗過：不能負、不能全 0（稽核 2026-10-10）
         ratio_sum = sum(request.desired_ratios.values())
-        if ratio_sum == 0:
-            ratio_sum = 4
-            ratios: dict[str, int] = {"wood": 1, "clay": 1, "iron": 1, "crop": 1}
-        else:
-            ratios = request.desired_ratios
+        ratios: dict[str, int] = request.desired_ratios
 
         warehouse = request.warehouse_capacity
         granary = request.granary_capacity
@@ -387,8 +386,11 @@ class AdvancedCalculatorService:
         one_way_seconds = max(1, int(round(one_way_hours * 3600)))
         round_trip_seconds = max(1, int(round(request.offline_hours * 3600)))
 
+        max_map = round(_calculate_distance(0, 0, MAP_SIZE // 2, MAP_SIZE // 2), 2)
         return SaveTroopsResponse(
             ideal_distance=round(ideal_distance, 2),
+            max_map_distance=max_map,
+            exceeds_map=ideal_distance > max_map,
             send_time_formatted=_format_travel_time(one_way_seconds),
             return_time_formatted=_format_travel_time(round_trip_seconds),
         )
@@ -425,10 +427,13 @@ class AdvancedCalculatorService:
 
         all_speeds = sorted(speed_to_units.keys())
         possible_matches: list[SpeedTsMatch] = []
-        tolerance = 30  # ±30 秒容差
+        tolerance = request.tolerance_seconds  # 預設 ±30 秒（本站自訂）
+        # 20 格以內競技場不影響（S71）：每個速度只算一次，不回 21 筆一樣的
+        ts_irrelevant = distance <= TS_THRESHOLD_FIELDS
+        ts_levels = range(1) if ts_irrelevant else range(21)
 
         for speed in all_speeds:
-            for ts_level in range(21):  # 0-20
+            for ts_level in ts_levels:
                 calc_seconds = max(
                     1,
                     calculate_travel_seconds(
@@ -437,6 +442,9 @@ class AdvancedCalculatorService:
                         server_speed=request.server_speed,
                         tournament_square_level=ts_level,
                         hero_bonus_percent=request.hero_bonus,
+                        artifact_multiplier=_artifact_multiplier(
+                            request.artifact_bonus
+                        ),
                     ),
                 )
 
@@ -458,6 +466,7 @@ class AdvancedCalculatorService:
             distance=round(distance, 2),
             possible_matches=possible_matches,
             unverified_units=unverified_units,
+            ts_irrelevant=ts_irrelevant,
         )
 
     # ─── Village Builder (Lumi-style build order) ─────────────────
@@ -522,6 +531,19 @@ class AdvancedCalculatorService:
                 from_level=5,
                 to_level=10,
                 reason="Cropland priority — Lv 10 unlocks Bakery",
+            )
+        )
+        step_num += 1
+
+        # 前置條件（docs/knowledge/building-requirements.md）：麵包店、鋸木廠、磚廠、鋼鐵鑄造廠都要村莊大樓 5 級
+        steps.append(
+            BuildStep(
+                step=step_num,
+                action="upgrade_building",
+                target="main_building",
+                from_level=1,
+                to_level=5,
+                reason="Bakery / Sawmill / Brickyard / Iron Foundry need Main Building Lv 5",
             )
         )
         step_num += 1
@@ -610,111 +632,6 @@ class AdvancedCalculatorService:
             estimated_days=round(estimated_days, 1),
         )
 
-    # ─── Crop Scouter (反推對手首都類型) ───────────────────────────
-
-    def calculate_crop_scouter(
-        self, request: CropScouterRequest
-    ) -> CropScouterResponse:
-        """Estimate cropper type from scouted production values.
-
-        Heuristic based on community farming practice:
-          - crop / avg(other) ≥ 3.0  → 15c (strong crop dominance)
-          - 2.0 – 3.0                → 9c
-          - 1.5 – 2.0                → 7c
-          - 1.2 – 1.5                → 6c
-          - < 1.2                    → 4-4-4-6 or 3-3-4-7 (non-cropper)
-        """
-        resources = {
-            "wood": request.wood_production,
-            "clay": request.clay_production,
-            "iron": request.iron_production,
-            "crop": request.crop_production,
-        }
-        dominant = max(resources, key=lambda k: resources[k])
-
-        avg_others = (
-            request.wood_production + request.clay_production + request.iron_production
-        ) / 3
-        crop_ratio = request.crop_production / avg_others if avg_others > 0 else 0
-        wood_to_crop = (
-            request.wood_production / request.crop_production
-            if request.crop_production > 0
-            else 0
-        )
-
-        matches: list[CropperMatch] = []
-
-        if crop_ratio >= 3.0:
-            matches.append(
-                CropperMatch(
-                    cropper_type="15c",
-                    likelihood=min(crop_ratio / 4.5, 1.0),
-                    reasoning=(
-                        f"Crop production is {crop_ratio:.1f}× average of other "
-                        "resources — strongly suggests 15-cropper"
-                    ),
-                )
-            )
-            matches.append(
-                CropperMatch(
-                    cropper_type="9c",
-                    likelihood=0.2,
-                    reasoning="Secondary candidate (9c can also show high crop ratio)",
-                )
-            )
-        elif 2.0 <= crop_ratio < 3.0:
-            matches.append(
-                CropperMatch(
-                    cropper_type="9c",
-                    likelihood=0.75,
-                    reasoning=f"Crop:avg ≈ {crop_ratio:.1f}×, typical of 9c",
-                )
-            )
-            matches.append(
-                CropperMatch(
-                    cropper_type="15c",
-                    likelihood=0.15,
-                    reasoning="15c possible but crop production not yet maxed",
-                )
-            )
-        elif 1.5 <= crop_ratio < 2.0:
-            matches.append(
-                CropperMatch(
-                    cropper_type="7c",
-                    likelihood=0.7,
-                    reasoning=f"Crop:avg ≈ {crop_ratio:.1f}×, common for 7c",
-                )
-            )
-        elif 1.2 <= crop_ratio < 1.5:
-            matches.append(
-                CropperMatch(
-                    cropper_type="6c",
-                    likelihood=0.65,
-                    reasoning=f"Crop:avg ≈ {crop_ratio:.1f}×, common for 6c",
-                )
-            )
-        else:
-            matches.append(
-                CropperMatch(
-                    cropper_type="4446",
-                    likelihood=0.6,
-                    reasoning="Balanced resources — non-cropper capital (4-4-4-6)",
-                )
-            )
-            matches.append(
-                CropperMatch(
-                    cropper_type="3347",
-                    likelihood=0.3,
-                    reasoning="Secondary 3-3-4-7 candidate",
-                )
-            )
-
-        return CropScouterResponse(
-            matches=matches,
-            dominant_resource=dominant,
-            wood_to_crop_ratio=round(wood_to_crop, 3),
-        )
-
     # ─── Attack TS Optimizer (多攻擊者同步到達) ────────────────────
 
     def calculate_ts_optimizer(
@@ -735,54 +652,76 @@ class AdvancedCalculatorService:
                 f"Invalid target_arrival: {request.target_arrival}; expected ISO 8601"
             ) from exc
 
-        # Prepare attacker distances, sort farthest first so that
-        # wave index lines up with send-time ordering
-        prepared = []
-        for atk in request.attackers:
-            # 共用距離函式（含地圖環繞），跟其他工具一樣（P0-21）
-            distance = _calculate_distance(
-                atk.x, atk.y, request.target_x, request.target_y
-            )
-            prepared.append((distance, atk))
-        prepared.sort(key=lambda p: -p[0])
-
+        # 波次照使用者輸入的順序（清兵波、主攻波誰先由使用者決定）：
+        # 第 n 波抵達 = 目標時間 + n × 間距
         results: list[TsOptimizerResult] = []
         warnings: list[str] = []
         now = datetime.now(UTC)
 
-        for wave_idx, (distance, atk) in enumerate(prepared):
+        def _travel(distance: float, atk: AttackerProfile, ts_level: int) -> int:
+            return calculate_travel_seconds(
+                distance=distance,
+                unit_speed=atk.unit_speed,
+                server_speed=request.server_speed,
+                tournament_square_level=ts_level,
+                hero_bonus_percent=atk.hero_bonus,
+            )
+
+        for wave_idx, atk in enumerate(request.attackers):
+            # 共用距離函式（含地圖環繞），跟其他工具一樣（P0-21）
+            distance = _calculate_distance(
+                atk.x, atk.y, request.target_x, request.target_y
+            )
+            arrival_dt = target_dt + timedelta(
+                seconds=wave_idx * request.wave_spacing_seconds
+            )
             ts_level = atk.ts_level
-            travel_sec = float(
-                calculate_travel_seconds(
-                    distance=distance,
-                    unit_speed=atk.unit_speed,
-                    server_speed=request.server_speed,
-                    tournament_square_level=ts_level,
-                    hero_bonus_percent=atk.hero_bonus,
-                )
-            )
+            travel_sec = _travel(distance, atk, ts_level)
+            send_dt = arrival_dt - timedelta(seconds=travel_sec)
+            unreachable = False
 
-            send_dt = target_dt - timedelta(
-                seconds=travel_sec + wave_idx * request.wave_spacing_seconds
-            )
-
+            # 真的優化：發送時間已經過了 → 找「最低」的競技場等級，讓發送時間還在現在之後
+            # （S71：競技場只加快超過 20 格的路段；20 格以內升級沒用）
+            if send_dt <= now and atk.allow_ts_adjustment:
+                found = False
+                for level in range(atk.ts_level + 1, 21):
+                    t = _travel(distance, atk, level)
+                    if arrival_dt - timedelta(seconds=t) > now:
+                        ts_level, travel_sec = level, t
+                        send_dt = arrival_dt - timedelta(seconds=t)
+                        found = True
+                        break
+                if not found:
+                    unreachable = True
             if send_dt <= now:
+                if unreachable or not atk.allow_ts_adjustment:
+                    warnings.append(
+                        f"{atk.village_label}：發送時間已經過了，競技場升到 20 級也趕不上，"
+                        "請改抵達時間或換更快的兵"
+                    )
+                else:
+                    warnings.append(f"{atk.village_label}：發送時間已經過了")
+            elif ts_level != atk.ts_level:
                 warnings.append(
-                    f"{atk.village_label}: send time already in the past — "
-                    "raise TS level or reduce troops"
+                    f"{atk.village_label}：目前競技場 {atk.ts_level} 級來不及，"
+                    f"要 {ts_level} 級才趕得上"
                 )
 
             hours = int(travel_sec // 3600)
             minutes = int((travel_sec % 3600) // 60)
             secs = int(travel_sec % 60)
-            travel_fmt = f"{hours}:{minutes:02d}:{secs:02d}"
+            travel_fmt = f"{hours}h {minutes}m {secs}s"
 
             results.append(
                 TsOptimizerResult(
                     attacker_id=atk.attacker_id,
                     village_label=atk.village_label,
                     recommended_ts_level=ts_level,
+                    ts_level_changed=ts_level != atk.ts_level,
+                    unreachable=unreachable,
                     send_time=send_dt.isoformat(timespec="seconds"),
+                    arrival_time=arrival_dt.isoformat(timespec="seconds"),
+                    wave=wave_idx,
                     travel_time_formatted=travel_fmt,
                     distance=round(distance, 2),
                 )
