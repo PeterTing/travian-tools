@@ -83,5 +83,15 @@ Consistency cases shared by the frontend and backend tests: `docs/knowledge/trav
 
 Not yet modelled in the shared formula: whole-trip multipliers — pennants/standards (官方說明頁: multiply the whole trip) and artefacts (only the march time page has an artefact field today) — TICKETS P1-24 「整趟倍率：旗幟和神器」.
 
-Every result that uses arena or boots shows the 「待驗證」 chip (`arenaSpeed` / `heroBootsSpeed` / `arenaBootsSpeed`):
-not yet checked in-game on ts11.
+Verified 2026-10-11 (`scripts/game_data/evidence/pending_crosscheck_2026-10-11.json`), so results that use arena or boots
+no longer show a 「待驗證」 chip (`ARENA_BOOTS_VERIFIED = true` in `frontend/src/lib/pendingNotes.ts`; set it back to
+`false` and the `arenaSpeed` / `heroBootsSpeed` / `arenaBootsSpeed` chips return):
+
+- **20-field threshold**: in-game help on EU12 (`manual/building/14`: "the faster your troops are beyond a minimum
+  distance of 20 squares") and ts11 (same text in Chinese), plus S71.
+- **+20% per level, linear (+400% at level 20)**: official knowledge base table (the page the in-game help links to), plus S71.
+- **Boots only beyond 20 fields, added to the arena bonus (not multiplied)**: S71 ("The first 20 fields are always traveled
+  without this bonus"; "Boots and Tournament Square bonuses add together, but only apply after 20 fields"). S71's own example
+  has two arithmetic slips (it says "+500%" at level 20 and "5.65×" where its own formula gives 7.8×); the rule itself is
+  stated plainly and the formula in the example, `× (1 + 0.25 + 2)`, is the additive one.
+- Not measured in-game: the test avatars have no Tournament Square (needs Rally Point 15) and no boots.
