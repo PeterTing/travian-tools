@@ -884,9 +884,68 @@
           null
         ],
         "official": null,
-        "decision": "官方 S139、S187 都沒有運載量（S187 的 Capacity 列其實是糧耗），沒有「官方＋社群兩份一致」→ 運載量照舊留空、待驗證。"
+        "decision": "（第 1 輪結論，已被 viking_carry_independence 取代）官方 S139、S187 都沒有運載量。"
       },
       "names": "官方沒有維京中文名 → 維持「中文暫譯（官方英文名）」＋待驗證。"
     }
+  },
+  "viking_carry_independence": {
+    "_what": "幕僚長規則（2026-10-11）：維京運載量官方沒寫；Fandom、Siegewise 兩份互不引用、也沒有共同出處 → ✓；有引用或同一出處 → 待驗證。只查一次。",
+    "checked_at": "2026-10-11 01:31–01:45（台北）",
+    "fandom": {
+      "url": "https://travian.fandom.com/wiki/Vikings",
+      "history_api": "https://travian.fandom.com/api.php?action=query&prop=revisions&titles=Vikings&rvlimit=50&rvprop=ids|timestamp|user|comment|size",
+      "carry_added_revision": {
+        "revid": 18687,
+        "timestamp": "2026-07-10T13:28:23Z",
+        "timestamp_taipei": "2026-07-10 21:28:23",
+        "user": "NthnH",
+        "note": "頁面 18684（2026-07-10 12:56Z 建立）的兵種表是註解掉的佔位數字（註明「目前沒有維京伺服器」）；18687 換成現在的數字（含運載量 55/40/75/0/110/80/0/0/0），之後 18688、18689、18712（2026-07-14）只改格式／其他段落，運載量沒變"
+      },
+      "latest_revision": {
+        "revid": 18712,
+        "timestamp": "2026-07-14T09:27:17Z"
+      },
+      "cites": [
+        "頁面隱藏註解：「The troop information could be incorrect, source was from a 2024 video https://www.youtube.com/watch?v=hL4pmbkl_YE」",
+        "外部連結：官方 Vikings - Executive Summary、support.travian.com 4、139、143（都沒有運載量）"
+      ],
+      "cites_siegewise": false,
+      "settler_row": "Settler 那列是 Ram 那列的複製（65/30/80、950/325/375/70、速度 3、運載量 0、糧耗 3），頁面錯誤；Fandom 沒有維京開拓者的運載量"
+    },
+    "siegewise": {
+      "url": "https://siegewise.com/en/travian/units/vikings",
+      "unit_page_example": "https://siegewise.com/en/travian/units/vikings/thrall",
+      "page_date": "頁面寫「verified against T4.6 · checked 2026-08-31 · confidence sheet-only」（網站沒有逐頁修改紀錄）",
+      "confidence_meaning": "About 頁：sheet-only＝「taken from the original spreadsheet and self-consistent, but not independently confirmed」（作者自己多年整理的試算表）",
+      "cites": [
+        "Credits 頁：「Unit statistics are transcribed from the official Travian support site and checked against in-game values」（官方 S139 沒有運載量）",
+        "沒有引用 Fandom、YouTube 或其他社群頁面"
+      ],
+      "cites_fandom": false
+    },
+    "common_source": "沒有找到：Fandom 寫出處是 2024 年的 YouTube 影片；Siegewise 是作者自己的試算表（sheet-only）、沒有寫運載量的出處；兩邊都沒有引用對方",
+    "agree": {
+      "thrall": 55,
+      "shield_maiden": 40,
+      "berserker": 75,
+      "heimdalls_eye": 0,
+      "huskarl_rider": 110,
+      "valkyries_blessing": 80,
+      "viking_ram": 0,
+      "viking_catapult": 0,
+      "jarl": 0
+    },
+    "settler": {
+      "siegewise": 3000,
+      "fandom": null,
+      "decision": "Fandom 沒有開拓者的數字（那列是錯的），開拓者 3000 只有 Siegewise 一份；但 7 族開拓者運載量都是 3000，其他 6 族在遊戲內讀到的都是 3000（ts11 5 族＋ASIA x1 斯巴達），所以照 3000 標 ✓。這一點是判斷，PR 說明有寫"
+    },
+    "conclusion": "independent",
+    "decision": "兩份互不引用、沒有共同出處 → 維京運載量 ✓：55/40/75/0/110/80/0/0/0/3000，出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）",
+    "caveats": [
+      "Fandom 自己註明數字可能不對（出處是 2024 年影片）",
+      "Siegewise 把這些數字標 sheet-only（沒有獨立確認）"
+    ]
   }
 }

@@ -1,7 +1,7 @@
 /**
  * 「已帶入」列的兵種待驗證那一行要不要顯示（P0-17 (k)）。
  * 羅馬人、日耳曼人、高盧人、埃及人、匈奴的兵種數字已在 ts11 遊戲內說明頁核對，斯巴達在 ASIA x1 遊戲內說明頁核對
- * （2026-10-11）；維京照官方說明頁，運載量和中文名還是待驗證（現在沒有可以選維京的世界）。
+ * （2026-10-11）；維京照官方說明頁，運載量用 Fandom、Siegewise 兩份一致的數字，中文名還是暫譯（現在沒有可以選維京的世界）。
  * - 頁面有部族選單：看選單（兵種資料庫選「全部」也會列出維京，所以要顯示）
  * - 沒有：看帳號的部族；不知道部族（還沒有帳號、帳號沒填）也顯示，因為可能是維京
  */
@@ -19,4 +19,14 @@ export function showUnitPendingLine(tribe: string | null | undefined): boolean {
  */
 export function unitNameProvisional(tribe: string | null | undefined): boolean {
   return !!tribe && UNVERIFIED_UNIT_TRIBES.includes(tribe)
+}
+
+/**
+ * (k) 那一行的字（設計師，#43）：斯巴達不顯示這一行（showUnitPendingLine）。
+ * - 選維京：運載量還待驗證 →「維京的運載量待驗證，兵種中文名為暫譯」；運載量 ✓ →「兵種中文名為暫譯」
+ * - 全部／不知道部族：運載量還待驗證 →「維京的兵種運載量待驗證」；運載量 ✓ →「維京的兵種中文名為暫譯」
+ */
+export function unitPendingLineKey(tribe: string | null | undefined, carryPending: boolean): string {
+  if (unitNameProvisional(tribe)) return carryPending ? 'autofill.unitPendingVikings' : 'autofill.unitNamesVikings'
+  return carryPending ? 'autofill.unitPending' : 'autofill.unitNamesAll'
 }

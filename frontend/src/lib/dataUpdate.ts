@@ -1,4 +1,4 @@
-import { INGAME_BUILDINGS, INGAME_UNITS, ingameTribeName, ingameUnitNameByGameId } from '@/lib/ingameNames'
+import { INGAME_BUILDINGS, ingameTribeName, ingameUnitNameByGameId } from '@/lib/ingameNames'
 import { readPref } from '@/lib/localPrefs'
 
 /**
@@ -32,7 +32,6 @@ export interface DataUpdateItem {
 
 const smithy = INGAME_BUILDINGS.blacksmith!
 const tradeOffice = INGAME_BUILDINGS.trade_office!
-const ballista = INGAME_UNITS.ballista!
 
 /**
  * 資料更新卡（#33 + #34 合成一張，PM）：前 3 項直接顯示，「再看 3 項」展開後 3 項。
@@ -52,17 +51,6 @@ export const DATA_UPDATE_ITEMS: DataUpdateItem[] = [
   // 官方說明頁 S129：Plus 乘在總產量上
   { label: '田地回本、建造順序的 Plus', before: '加總', after: '相乘', note: '田地回本會變短' },
   { label: '建築名稱', before: smithy.aliases[0]!, after: smithy.zh },
-]
-
-/**
- * #43 斯巴達的更新項目：不放進這一批（PM：#43 之後另外上線，有自己的一張卡）。
- * #43 上線那天：DATA_UPDATE_ITEMS 換成這一批（x3 那項之後依序放）、DATA_UPDATE_RELEASE_DATE 改成上線日。
- */
-export const SPARTAN_DATA_UPDATE_ITEMS: DataUpdateItem[] = [
-  // ASIA x1 遊戲內說明 asia_x1/help/spartans/8：2:30:00。RoG 年度特別世界，社群資料（一般世界）是 2:45:00 → 一般世界待驗證
-  { label: `${ingameTribeName('spartans')}${ballista.zh}訓練時間`, before: '9900', after: '9000 秒', note: '年度特別世界（ASIA x1）實測，一般世界還沒核對' },
-  // ASIA x1 遊戲內中文名；舊名從名稱表 aliases 取
-  { label: `${ingameTribeName('spartans')}兵種改用遊戲內正式名稱`, before: ballista.aliases[0]!, after: ballista.zh },
 ]
 
 /** 這個世界要顯示的項目（倍速不夠的項目拿掉；不知道倍速就當 x1） */

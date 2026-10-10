@@ -606,32 +606,42 @@ def test_carry_capacity_single_source_backend_and_frontend() -> None:
             assert troops[r["troop_id"]]["carry_capacity"] == r["carry"], r["troop_id"]
             kb = TRIBES_DATA[tribe]["troops"][r["kb_id"]]
             assert kb["capacity"] == r["carry"], r["troop_id"]
-            want = {"vikings": "pending", "spartans": "asia_x1"}.get(tribe, "ts11")
+            want = {"vikings": "two_sources", "spartans": "asia_x1"}.get(tribe, "ts11")
             assert r["carry_source"] == want, r["troop_id"]
-            if want != "pending":
-                assert isinstance(r["carry"], int)
-                assert r["stats"]["carry"] == r["carry"]
+            assert isinstance(r["carry"], int)
+            if want == "two_sources":
+                # 維京（2026-10-11 幕僚長規則）：官方沒寫，Fandom、Siegewise 互不引用且一致
+                assert r["carry_ref"] == "fandom+siegewise"
+                assert r["stats"] is None
             else:
-                # PM 決定（P0-23）：維京運載量留空，不放社群整理或推估的數字
-                assert r["carry"] is None, r["troop_id"]
-                assert r["carry_ref"] is None
+                assert r["stats"]["carry"] == r["carry"]
     assert n == len(troops) == 70
 
 
-def test_viking_carry_is_null_everywhere_in_backend() -> None:
-    """維京：troops.json、knowledge_base、API 都是 null；API 附上原因，不回 0."""
+def test_viking_carry_two_sources_everywhere_in_backend() -> None:
+    """維京運載量：Fandom、Siegewise 兩份一致（官方未寫）→ troops.json、knowledge_base 都是數字."""
     from app.knowledge_base.tribes import TRIBES_DATA
 
     troops = json.loads(
         (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
     )["troops"]
-    empty = [k for k, t in troops.items() if t["tribe"] == "vikings"]
-    assert len(empty) == 10
-    assert all(troops[k]["carry_capacity"] is None for k in empty)
-    assert all(t["capacity"] is None for t in TRIBES_DATA["vikings"]["troops"].values())
-    # 斯巴達 2026-10-11 在 ASIA x1 讀到運載量，不再留空
+    vk = [t for t in troops.values() if t["tribe"] == "vikings"]
+    assert [t["carry_capacity"] for t in vk] == [55, 40, 75, 0, 110, 80, 0, 0, 0, 3000]
+    assert [t["capacity"] for t in TRIBES_DATA["vikings"]["troops"].values()] == [
+        55,
+        40,
+        75,
+        0,
+        110,
+        80,
+        0,
+        0,
+        0,
+        3000,
+    ]
     sp = [t for t in troops.values() if t["tribe"] == "spartans"]
     assert [t["carry_capacity"] for t in sp] == [60, 0, 40, 50, 110, 80, 0, 0, 0, 3000]
+    assert all(t["carry_capacity"] is not None for t in troops.values())
     gen_text = GEN.read_text(encoding="utf-8")
     assert "CARRY_PENDING" not in gen_text
     assert "community" not in gen_text.split("CARRY_SOURCES = {")[1].split("}")[0]
@@ -830,8 +840,8 @@ def test_crosscheck_evidence_records_sources_and_rog_only_fields():
     assert "（" not in kb["hoplite"]["training_time"]
 
 
-def test_crosscheck_vikings_keep_carry_pending():
-    """維京：官方 S139 跟社群一致的欄位本來就不標；運載量官方沒有 → 照舊留空待驗證."""
+def test_crosscheck_vikings_and_carry_independence():
+    """維京：官方 S139 跟社群一致；運載量官方沒有，Fandom、Siegewise 互不引用、沒有共同出處 → ✓."""
     xc = json.loads(CROSSCHECK.read_text(encoding="utf-8"))
     s139 = xc["sources"]["s139"]["vikings"]
     sw = xc["sources"]["siegewise_vikings"]["units"]
@@ -857,9 +867,16 @@ def test_crosscheck_vikings_keep_carry_pending():
             o["train_time_s"],
         ), n
     assert xc["conclusions"]["vikings"]["carry"]["official"] is None
+    ind = xc["viking_carry_independence"]
+    assert ind["conclusion"] == "independent"
+    assert ind["fandom"]["cites_siegewise"] is False
+    assert ind["siegewise"]["cites_fandom"] is False
+    assert ind["fandom"]["carry_added_revision"]["revid"] == 18687
+    assert ind["fandom"]["carry_added_revision"]["timestamp"] == "2026-07-10T13:28:23Z"
+    assert "2026-08-31" in ind["siegewise"]["page_date"]
+    assert ind["settler"]["siegewise"] == 3000 and ind["settler"]["fandom"] is None
     troops = json.loads(
         (ROOT / "backend/data/static/troops.json").read_text(encoding="utf-8")
     )["troops"]
-    assert all(
-        t["carry_capacity"] is None for t in troops.values() if t["tribe"] == "vikings"
-    )
+    vk = [t for t in troops.values() if t["tribe"] == "vikings"]
+    assert [t["carry_capacity"] for t in vk] == [*ind["agree"].values(), 3000]

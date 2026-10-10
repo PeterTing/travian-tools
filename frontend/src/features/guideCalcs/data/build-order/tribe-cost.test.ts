@@ -74,11 +74,11 @@ describe('TRIBE_SETTLER_COST (5 tribes from the ts11 in-game help, Spartans from
     for (const id of ['romans', 'gauls', 'egyptians'] as const) expect(TRIBE_SETTLER_COST[id].combat.attack, `${id} attack`).toBe(0);
   });
 
-  it('all tribes share defInf=80, defCav=80, upkeep=1; carry 3000 for the 5 ts11 tribes and Spartans, null (not verified) for Vikings', () => {
+  it('all tribes share defInf=80, defCav=80, upkeep=1; carry 3000 for every tribe (Vikings: Siegewise; all six in-game tribes read 3000)', () => {
     Object.entries(TRIBE_SETTLER_COST).forEach(([id, c]) => {
       expect(c.combat.defInf).toBe(80);
       expect(c.combat.defCav).toBe(80);
-      expect(c.combat.carry, id).toBe(id === 'vikings' ? null : 3000);
+      expect(c.combat.carry, id).toBe(3000);
       expect(c.combat.upkeep).toBe(1);
     });
   });

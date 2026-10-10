@@ -348,10 +348,9 @@ def test_ts11_manual_71_90_and_knowledge_base_evidence():
         "buildings/:gid",
         "items",
     ]
-    # 所以維京運載量維持留空；斯巴達改在 ASIA x1 讀（asia_x1_manual_spartans_2026-10-11.json）
+    # 所以維京運載量不是從遊戲內讀的：2026-10-11 起用 Fandom、Siegewise 兩份一致的數字
+    # （crosscheck_spartans_vikings_2026-10-11.json）；斯巴達在 ASIA x1 讀
     troops = _load("troops.json")["troops"]
     for tid, u in NAMES["units"].items():
-        if u["tribe"] == "vikings":
-            assert troops[tid]["carry_capacity"] is None, tid
-        if u["tribe"] == "spartans":
+        if u["tribe"] in ("vikings", "spartans"):
             assert isinstance(troops[tid]["carry_capacity"], int), tid

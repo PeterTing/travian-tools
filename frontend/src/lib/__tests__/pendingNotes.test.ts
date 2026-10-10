@@ -86,13 +86,14 @@ describe('「待驗證」說明文字表（lib/pendingNotes.ts）', () => {
     }
   })
 
-  it('the 已帶入 chip uses autofillUnits, whose one line covers Viking carry (Spartans verified on ASIA x1, 2026-10-11)', () => {
+  it('the 已帶入 chip uses autofillUnits, whose one line covers Viking carry (Spartans verified on ASIA x1; Viking carry from two matching sources, 2026-10-11)', () => {
     const bar = Object.entries(sources).find(([f]) => f.endsWith('/components/autofill/AutoFillBar.tsx'))?.[1] ?? ''
     expect(bar).toMatch(/<PendingVerifyChip[^>]*kind="autofillUnits"/)
     expect(bar).not.toMatch(/kind="units"/)
     const n = (zh as unknown as { pendingNotes: Notes }).pendingNotes.autofillUnits
     expect(n?.what).toContain('花費、糧耗、訓練時間')
-    expect(n?.what).toContain('維京的花費、糧耗、訓練時間、攻防已照官方說明頁核對，運載量還沒核對、先不顯示')
+    expect(n?.what).toContain('維京的花費、糧耗、訓練時間、攻防已照官方說明頁核對，運載量照 Fandom、Siegewise 兩份一致的數字')
+    expect(n?.source).toContain('運載量官方沒寫，取自 Fandom、Siegewise（兩份互不引用、數字一致）')
     expect(n?.what).toContain('斯巴達的兵種數字、速度、運載量已在 ASIA x1 遊戲內說明頁核對')
     expect(n?.what).not.toContain('社群整理')
     expect(n?.source).toContain('官方說明頁 S139')

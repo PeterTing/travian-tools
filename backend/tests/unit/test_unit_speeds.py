@@ -129,15 +129,28 @@ def test_every_unit_of_every_tribe_has_a_speed_with_provenance():
 
 
 def test_no_external_player_site_is_cited():
+    # 速度不引用玩家網站；維京運載量（幕僚長規則 2026-10-11）例外：Fandom、Siegewise 兩份一致
+    allowed = (
+        "出處：fandom、siegewise 兩份來源一致（官方未寫運載量）",
+        "fandom+siegewise",
+    )
     text = (
         BE_SPEEDS.read_text(encoding="utf-8") + FE_SPEEDS.read_text(encoding="utf-8")
     ).lower()
+    for a in allowed:
+        text = text.replace(a, "")
     for bad in FORBIDDEN:
         assert bad not in text, bad
     gen_text = GEN.read_text(encoding="utf-8").lower()
-    table = gen_text[
-        gen_text.index("unit_speed_sources = {") : gen_text.index("def round5")
-    ]
+    # 速度表（UNIT_SPEED_SOURCES、UNIT_SPEEDS）：運載量那一段（CARRY_SOURCES 到 UNIT_SPEEDS 前）不算
+    table = (
+        gen_text[
+            gen_text.index("unit_speed_sources = {") : gen_text.index(
+                "carry_sources = {"
+            )
+        ]
+        + gen_text[gen_text.index("unit_speeds: dict") : gen_text.index("def round5")]
+    )
     for bad in FORBIDDEN:
         assert bad not in table, bad
 

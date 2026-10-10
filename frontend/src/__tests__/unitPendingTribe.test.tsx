@@ -24,11 +24,14 @@ vi.mock('@/components/autofill/AutoFillContext', async (importOriginal) => {
 import AutoFillBar from '@/components/autofill/AutoFillBar'
 import CalcFrame, { CalcBar } from '@/components/autofill/CalcFrame'
 import FarmingCalculator, { FARM_UNITS } from '@/features/guideCalcs/components/FarmingCalculator'
-import { showUnitPendingLine } from '@/lib/unitPending'
+import { showUnitPendingLine, unitPendingLineKey } from '@/lib/unitPending'
+import { vikingCarryPending } from '@/data/unitSpeeds'
 
-const LINE = /^維京的兵種運載量待驗證$/
-// 選維京：同一行後面加「兵種中文名為暫譯」（P0-23 後續，PM）
-const LINE_PROVISIONAL = /^維京的兵種運載量待驗證，兵種中文名為暫譯$/
+// 維京運載量 2026-10-11 起 ✓（Fandom、Siegewise 兩份一致），這一行只剩中文名暫譯
+// 「全部」／不知道部族
+const LINE = /^維京的兵種中文名為暫譯$/
+// 選維京（設計師）：只寫「兵種中文名為暫譯」
+const LINE_PROVISIONAL = /^兵種中文名為暫譯$/
 // 5 族 ts11 核對；斯巴達 2026-10-11 在 ASIA x1 遊戲內說明核對（數字、速度、運載量、中文名）
 const VERIFIED = ['romans', 'teutons', 'gauls', 'egyptians', 'huns', 'spartans']
 const line = () => screen.queryByTestId('autofill-unit-pending')
@@ -80,7 +83,7 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE)
   })
 
-  it('Vikings: the same line adds 「兵種中文名為暫譯」 (no extra chip); Spartans no line; 「全部」 and unknown tribe no suffix', () => {
+  it('Vikings: only 「兵種中文名為暫譯」 (one chip); Spartans no line; 「全部」 and unknown tribe 「維京的兵種中文名為暫譯」', () => {
     fill.tribe = 'vikings'
     const v = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
     const row = screen.getByTestId('autofill-unit-pending')
@@ -98,11 +101,23 @@ describe('兵種待驗證那一行看部族（P0-17 (k)）', () => {
     const a = render(<MemoryRouter initialEntries={['/database/troops']}><CalcFrame usesVillage={false}><CalcBar tribe="vikings" /></CalcFrame></MemoryRouter>)
     expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE_PROVISIONAL)
     a.unmount()
-    // 不知道部族：只有原本那句
+    // 不知道部族
     fill.tribe = null
     const b = render(<MemoryRouter initialEntries={['/calculator/crop']}><AutoFillBar /></MemoryRouter>)
     expect(screen.getByTestId('autofill-unit-pending-text')).toHaveTextContent(LINE)
     b.unmount()
+  })
+
+  it('wording follows Viking carry: ✓ now; if it went back to 待驗證 the exact designer strings come back', () => {
+    expect(vikingCarryPending()).toBe(false)
+    const zh = (tribe: string | null, pending: boolean) => i18n.t(unitPendingLineKey(tribe, pending))
+    expect(zh('vikings', false)).toBe('兵種中文名為暫譯')
+    expect(zh('all', false)).toBe('維京的兵種中文名為暫譯')
+    expect(zh(null, false)).toBe('維京的兵種中文名為暫譯')
+    // 運載量待驗證時（設計師，一字不差）
+    expect(zh('vikings', true)).toBe('維京的運載量待驗證，兵種中文名為暫譯')
+    expect(zh('all', true)).toBe('維京的兵種運載量待驗證')
+    expect(zh(null, true)).toBe('維京的兵種運載量待驗證')
   })
 
   it('one line only (no Spartan line any more)', () => {

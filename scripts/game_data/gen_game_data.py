@@ -225,14 +225,39 @@ TRIBE_ORDER = ["romans", "teutons", "gauls", "egyptians", "huns", "spartans", "v
 
 # 運載量（唯一一份，前後端都從產生檔讀；P0-23）。5 族照 ts11 遊戲內說明頁（evidence/ts11_manual_2026-10-10.json），
 # 斯巴達照 ASIA x1 遊戲內說明頁（evidence/asia_x1_manual_spartans_2026-10-11.json）。
-# 維京沒有官方或遊戲內的運載量：官方說明頁 S139 沒有這一欄，現在也沒有可以選維京的世界 → PM 決定（#34）：
-# 維京 10 種兵的運載量一律留空（null），不放社群整理或推估的數字；
-# 畫面顯示「—」＋「待驗證」，用到運載量的計算顯示「無法計算」，不能當 0。
+# 維京沒有官方或遊戲內的運載量：官方說明頁 S139 沒有這一欄，現在也沒有可以選維京的世界。以前（#34 PM）一律留空；
+# 2026-10-11 起改用兩份一致的社群數字（two_sources，✓ 已核對；見下方 CARRY_TWO_SOURCE_TRIBES）。
+# 留空（null）的寫法還在：畫面顯示「—」＋「待驗證」，用到運載量的計算顯示「無法計算」，不能當 0。
 CARRY_SOURCES = {
     "ts11": "ts11 遊戲內說明（兵種說明頁 manual/troop/N），2026-10-10 讀取",
     "asia_x1": "ASIA x1 遊戲內說明實測（說明 → 建築與兵種 → 斯巴達），2026-10-11 讀取",
+    "two_sources": "出處：Fandom、Siegewise 兩份來源一致（官方未寫運載量）",
 }
-CARRY_EMPTY_TRIBES = ("vikings",)
+# 維京運載量（2026-10-11 幕僚長規則）：官方沒寫；Fandom、Siegewise 互不引用、沒有共同出處 → 兩份一致就 ✓
+# （evidence/crosscheck_spartans_vikings_2026-10-11.json viking_carry_independence）。不獨立就改回 ("vikings",)
+CARRY_EMPTY_TRIBES: tuple[str, ...] = ()
+CARRY_TWO_SOURCE_TRIBES = ("vikings",)
+
+
+def viking_carry_two_sources() -> dict[str, int]:
+    """be_id → 運載量：Fandom、Siegewise 重新比一次（開拓者 Fandom 那列是錯的，照 evidence 的判斷用 3000）."""
+    xc = _crosscheck()
+    ind = xc["viking_carry_independence"]
+    assert ind["conclusion"] == "independent"
+    assert not ind["fandom"]["cites_siegewise"] and not ind["siegewise"]["cites_fandom"]
+    sw = xc["sources"]["siegewise_vikings"]["units"]
+    fd = xc["sources"]["fandom_vikings"]["units"]
+    sw_names = ["Thrall", "Shield Maiden", "Berserker", "Heimdalls Eye", "Huskarl Rider",
+                "Valkyrie’s Blessing", "Ram", "Catapult", "Jarl"]
+    fd_names = ["Thrall", "Shield Maiden", "Berserker", "Heimdall's Eye", "Huskall Rider",
+                "Valkyrie's Blessing", "Ram", "Catapult", "Jarl"]
+    out = {}
+    for be_id, a, b in zip(ind["agree"], sw_names, fd_names, strict=True):
+        assert sw[a]["carry"] == fd[b]["carry"] == ind["agree"][be_id], (be_id, sw[a]["carry"], fd[b]["carry"])
+        out[be_id] = sw[a]["carry"]
+    assert sw["Settler"]["carry"] == ind["settler"]["siegewise"] == 3000
+    out["viking_settler"] = 3000
+    return out
 
 # One row per unit, game order t1..t10:
 #   (troops.json id, frontend id, knowledge_base/tribes.py key, speed, source, ref)
@@ -813,7 +838,11 @@ def gen_unit_speeds() -> dict:
                     }
                 rows.append(row)
                 continue
-            if tribe in CARRY_EMPTY_TRIBES:
+            if tribe in CARRY_TWO_SOURCE_TRIBES:
+                row["carry"] = viking_carry_two_sources()[be_id]
+                row["carry_source"] = "two_sources"
+                row["carry_ref"] = "fandom+siegewise"
+            elif tribe in CARRY_EMPTY_TRIBES:
                 row["carry"] = None
                 row["carry_source"] = "pending"
                 row["carry_ref"] = None
@@ -838,6 +867,7 @@ def gen_unit_speeds() -> dict:
                     "pending": "沒有第一手出處，速度留空（待驗證）"},
         "carry_sources": {"ts11": CARRY_SOURCES["ts11"],
                           "asia_x1": CARRY_SOURCES["asia_x1"],
+                          "two_sources": CARRY_SOURCES["two_sources"],
                           "pending": "沒有官方或遊戲內的運載量，留空（null，待驗證）"},
         "tribes": tribes,
     }

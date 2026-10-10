@@ -7,6 +7,8 @@ const unit = (tribe: keyof typeof TRIBES, id: string, count = 1) => {
   const u = TRIBES[tribe].units.find((x) => x.id === id)!
   return { tribe, nameZh: u.name.zh, carry: u.carry, count }
 }
+// 維京 2026-10-11 起有運載量（Fandom、Siegewise 兩份一致）；留空（null）那條路還在，這裡用維京兵種名但 carry 設成 null 來測
+const pending = (id: string, count = 1) => ({ ...unit('vikings', id, count), carry: null })
 
 describe('totalCarry', () => {
   it('all known: sum of carry × count', () => {
@@ -14,8 +16,8 @@ describe('totalCarry', () => {
     expect(r).toEqual({ ok: true, total: 75 * 10 + 60 * 5 })
   })
 
-  it('mixed with one Viking unit: not computable, no partial sum', () => {
-    const r = totalCarry([unit('gauls', 'theutatesThunder', 10), unit('vikings', 'thrall', 3)])
+  it('mixed with one unit whose carry is empty (null): not computable, no partial sum', () => {
+    const r = totalCarry([unit('gauls', 'theutatesThunder', 10), pending('thrall', 3)])
     expect(r.ok).toBe(false)
     expect('total' in r).toBe(false)
     if (!r.ok) {
@@ -24,8 +26,8 @@ describe('totalCarry', () => {
     }
   })
 
-  it('mixed with several Viking units: every missing unit named, joined with 、', () => {
-    const r = totalCarry([unit('vikings', 'thrall'), unit('romans', 'legionnaire', 4), unit('spartans', 'hoplite'), unit('vikings', 'berserker')])
+  it('mixed with several empty-carry units: every missing unit named, joined with 、', () => {
+    const r = totalCarry([pending('thrall'), unit('romans', 'legionnaire', 4), unit('spartans', 'hoplite'), pending('berserker')])
     expect(r.ok).toBe(false)
     if (!r.ok) {
       const n = (id: string) => unit('vikings', id).nameZh
@@ -38,8 +40,12 @@ describe('totalCarry', () => {
     expect(totalCarry([unit('spartans', 'hoplite', 10), unit('spartans', 'elpida', 2)])).toEqual({ ok: true, total: 60 * 10 + 110 * 2 })
   })
 
+  it('Viking units have carry from two matching sources (Fandom + Siegewise, 2026-10-11): computable', () => {
+    expect(totalCarry([unit('vikings', 'thrall', 10), unit('vikings', 'huskarlRider', 2), unit('gauls', 'theutatesThunder', 1)])).toEqual({ ok: true, total: 55 * 10 + 110 * 2 + 75 })
+  })
+
   it('a null unit with count 0 is still not computable (never treated as 0)', () => {
-    expect(totalCarry([unit('vikings', 'huskarlRider', 0)]).ok).toBe(false)
+    expect(totalCarry([pending('huskarlRider', 0)]).ok).toBe(false)
   })
 
   it('reason format with explicit names', () => {

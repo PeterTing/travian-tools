@@ -45,7 +45,8 @@ export interface UnitSpeedRow {
   carryRef: string | null
 }
 
-export type UnitCarrySource = 'ts11' | 'asia_x1' | 'pending'
+/** two_sources：維京（官方沒寫）Fandom、Siegewise 兩份互不引用、數字一致（2026-10-11 幕僚長規則） */
+export type UnitCarrySource = 'ts11' | 'asia_x1' | 'two_sources' | 'pending'
 
 export interface UnitTs11Stats {
   /** 遊戲內中文名稱 */
@@ -134,6 +135,11 @@ export function unitCarrySource(troopId: string): UnitCarrySource | undefined {
     if (r) return r.carry_source as UnitCarrySource
   }
   return undefined
+}
+
+/** 還有沒有維京兵種的運載量留空（待驗證）；(k) 那一行的字照這個換 */
+export function vikingCarryPending(): boolean {
+  return (TRIBES.vikings ?? []).some((r) => r.carry_source === 'pending')
 }
 
 /** 運載量留空（維京，還沒核對）時回那一族，畫面標「待驗證」；有遊戲內數字或找不到回 null（P0-23） */
