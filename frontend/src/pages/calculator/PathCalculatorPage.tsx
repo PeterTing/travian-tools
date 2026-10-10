@@ -8,12 +8,12 @@ import {
 } from '@/lib/travianFormulas'
 import CalcResultPanel, { RESULT_PANEL_SPACE_CLASS, SummaryPending } from '@/features/guideCalcs/components/CalcResultPanel'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
-import type { PendingKind } from '@/lib/pendingNotes'
+import { speedPendingKinds } from '@/lib/pendingNotes'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
 
 /**
- * 行軍時間（路徑）計算器 — 前端即時結果（S71 競技場公式與後端共用）。
+ * 行軍時間（路徑）計算器 — 前端即時結果（共用行軍公式 calculateTravelSeconds，跟後端同一套案例，P0-21）。
  * 版型：上方輸入、下方 sticky 結果；≥1024px 左右欄。
  */
 export default function PathCalculatorPage() {
@@ -65,8 +65,8 @@ export default function PathCalculatorPage() {
   }, [startX, startY, targetX, targetY, unitSpeed, tsLevel, heroBonus, artifact, serverSpeed])
 
   // 待驗證：競技場 > 0 級或英雄靴子 > 0% 時，移動時間和速度用了官方說明頁 S71 的公式（還沒在 ts11 遊戲內核對）；
-  // 一行一個灰標，依用到的加成選一種說明（只有競技場／只有靴子／兩個都有）；兩個都 0 不標
-  const arenaKinds: PendingKind[] = tsLevel > 0 && heroBonus > 0 ? ['arenaBootsSpeed' as const] : tsLevel > 0 ? ['arenaSpeed' as const] : heroBonus > 0 ? ['heroBootsSpeed' as const] : []
+  // 一行一個灰標，依用到的加成選一種說明（只有競技場／只有靴子／兩個都有）；兩個都 0 不標（全站共用 speedPendingKinds，P0-21）
+  const arenaKinds = speedPendingKinds(tsLevel, heroBonus)
   const arenaChip = arenaKinds.length ? <> <PendingVerifyChip kinds={arenaKinds} /></> : null
 
   const inputCls =

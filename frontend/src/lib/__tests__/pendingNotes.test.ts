@@ -5,11 +5,13 @@ import { PENDING_KINDS, PENDING_KIND_USAGE } from '../pendingNotes'
 
 // 掃全部原始碼，找出每個 <PendingVerifyChip kind=...> 用到的 kind
 const sources = import.meta.glob('/src/**/*.tsx', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
+// lib 裡選 kind 的小函式（例如 speedPendingKinds，P0-21）也算
+const libSources = import.meta.glob('/src/lib/*.ts', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
 
 function usedKinds(): Set<string> {
   const used = new Set<string>()
-  for (const [file, text] of Object.entries(sources)) {
-    if (file.includes('__tests__') || file.endsWith('.test.tsx')) continue
+  for (const [file, text] of Object.entries({ ...sources, ...libSources })) {
+    if (file.includes('__tests__') || /\.test\.tsx?$/.test(file)) continue
     // <PendingVerifyChip kind="x" | kinds={[...]}>、<SummaryPending kind(s)=...>、titlePending=...
     for (const m of text.matchAll(/(?:<(?:PendingVerifyChip|SummaryPending)[^>]*\bkinds?|\btitlePending)=(?:"([a-zA-Z]+)"|\{([^}]*)\})/g)) {
       if (m[1]) used.add(m[1])

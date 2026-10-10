@@ -5,6 +5,8 @@ import { advancedCalculatorApi } from '@/services/advancedCalculatorApi'
 import type { SaveTroopsRequest, SaveTroopsResponse } from '@/services/advancedCalculatorApi'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
+import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import { speedPendingKinds } from '@/lib/pendingNotes'
 
 export default function SaveTroopsCalculatorPage() {
   const [form, setForm] = useState<SaveTroopsRequest>({
@@ -14,6 +16,7 @@ export default function SaveTroopsCalculatorPage() {
     offline_hours: 8,
     server_speed: 1,
     tournament_square_level: 0,
+    hero_bonus: 0,
   })
   const { currentAccount } = useCurrentAccount()
   useEffect(() => {
@@ -22,6 +25,8 @@ export default function SaveTroopsCalculatorPage() {
     }
   }, [currentAccount])
   const [result, setResult] = useState<SaveTroopsResponse | null>(null)
+  // 結果是用哪一組輸入算的（灰標看這組）
+  const [used, setUsed] = useState<SaveTroopsRequest | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,12 +40,15 @@ export default function SaveTroopsCalculatorPage() {
       setError(null)
       const res = await advancedCalculatorApi.calculateSaveTroops(form)
       setResult(res)
+      setUsed(form)
     } catch {
       setError('計算失敗，請檢查輸入')
     } finally {
       setLoading(false)
     }
   }
+
+  const saveKinds = used ? speedPendingKinds(used.tournament_square_level ?? 0, used.hero_bonus ?? 0) : []
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -113,6 +121,20 @@ export default function SaveTroopsCalculatorPage() {
             />
           </div>
 
+          {/* 靴子跟競技場相加、只算超過 20 格（P0-21） */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">英雄靴子速度加成（%）</label>
+            <input
+              type="number"
+              min={0}
+              max={75}
+              data-testid="save-boots"
+              value={form.hero_bonus ?? 0}
+              onChange={(e) => handleChange('hero_bonus', Number(e.target.value))}
+              className="w-full p-2 border rounded bg-background"
+            />
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">伺服器速度</label>
             <select
@@ -135,7 +157,13 @@ export default function SaveTroopsCalculatorPage() {
 
         {/* Result */}
         <div className="border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">計算結果</h2>
+          {/* 整區的數字（距離、時間、說明那句）都是同一份說明：一個灰標放在「計算結果」標題旁，說明在標題下面（P0-21 設計師） */}
+          <div className="mb-4">
+            <PendingRow fill data-testid="save-result-title">
+              <h2 className="inline text-xl font-semibold">計算結果</h2>
+              {saveKinds.length > 0 && <> <PendingVerifyChip kinds={saveKinds} /></>}
+            </PendingRow>
+          </div>
 
           {result ? (
             <div className="space-y-4">
@@ -155,7 +183,7 @@ export default function SaveTroopsCalculatorPage() {
                   <p className="text-xl font-bold">{result.return_time_formatted}</p>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground" data-testid="save-distance-line">
                 找一個距離約 {result.ideal_distance} 格的空地或綠洲，向它發送偵察或增援，
                 部隊就會在 {result.return_time_formatted} 後返回。
               </p>
