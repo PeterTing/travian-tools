@@ -1183,10 +1183,6 @@
       "what": "Village CP thresholds haven't been checked in-game on ts11 yet.",
       "source": "Calculated with a formula for now; they may be off."
     },
-    "celebration": {
-      "what": "The small celebration's crop and the great celebration's cost haven't been confirmed on a ts11 Town Hall yet.",
-      "source": "The small celebration's crop comes from the opening build-order sheet; the source of the great celebration's cost is still being checked."
-    },
     "unitCarry": {
       "what": "Unit carry capacity hasn't been checked in-game on ts11 yet.",
       "source": "We currently use community-compiled numbers; they may be off."
@@ -1245,7 +1241,11 @@
       "what": "Cost, time, population and CP are checked.",
       "source": "From the official knowledge base."
     },
-    "whatWithEffect": "Cost, time, population, CP and effect are checked."
+    "whatWithEffect": "Cost, time, population, CP and effect are checked.",
+    "celebration": {
+      "what": "Small and great celebration costs (wood, clay, iron, crop) are checked.",
+      "source": "Source: Travian Answers (official, 2021 snapshot) and Travian Wiki agree."
+    }
   },
   "cropFieldsCalc": {
     "title": "Crop field check",

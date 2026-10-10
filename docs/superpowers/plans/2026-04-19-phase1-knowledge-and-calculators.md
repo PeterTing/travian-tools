@@ -640,7 +640,7 @@ Running 24/7 Great Celebration chain from Town Hall Lv 10:
 - 2000 CP / 60 h = 33.33 CP/hour
 - 800 CP/day sustained
 
-Combined with passive CP from buildings (Main Building 20 + Market 20 + Academy 20 + Embassy 20 = ~529 CP/day baseline), a single village can produce 1300+ CP/day.
+Combined with passive CP from buildings (Main Building 20 + Market 20 + Academy 20 + Embassy 20 + Town Hall 10 = 529 CP/day baseline; without Town Hall 10 it is 498), a single village can produce 1300+ CP/day.
 
 By contrast, a village with NO Town Hall tops out around 600 CP/day from passives alone.
 

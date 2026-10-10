@@ -1,4 +1,4 @@
-// 首頁資料更新卡（#33 + #34 合成一張；標題、key、自動隱藏都跟著上線日常數）
+// 首頁資料更新卡（#38～#41 這一批：x3 行軍時間＋慶典已核對兩項；標題、key、自動隱藏都跟著上線日常數）
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
@@ -61,7 +61,7 @@ describe('首頁資料更新卡', () => {
     vi.useRealTimers()
   })
 
-  it('light grey info card: title from the release date, first 3 items, 知道了 44px, text ≥ 12px, max half the screen', () => {
+  it('light grey info card: title from the release date, x1 shows only the celebration item, 知道了 44px, text ≥ 12px, max half the screen', () => {
     render(<DataUpdateCard />)
     const card = screen.getByTestId('data-update-card')
     expect(card.className).toContain('bg-slate-50')
@@ -70,47 +70,28 @@ describe('首頁資料更新卡', () => {
     const [, m, d] = DATA_UPDATE_RELEASE_DATE.split('-').map(Number)
     expect(DATA_UPDATE_TITLE).toBe(`${m}/${d} 資料更新`)
     expect(within(card).getByRole('heading', { name: DATA_UPDATE_TITLE })).toBeInTheDocument()
-    expect(card).toHaveTextContent('數值已對照 ts11 遊戲內說明和官方說明頁更正')
+    expect(card).toHaveTextContent('依官方說明頁和社群資料核對')
     const items = within(screen.getByTestId('data-update-items')).getAllByRole('listitem')
     expect(items.map((li) => li.textContent?.replace(/改成/g, ''))).toEqual([
-      '草原騎士運載量115 → 75',
-      '羅馬人開拓者木材花費5800 → 4600',
-      '匈奴商人容量750 → 500',
+      '小慶典的糧、大慶典的花費待驗證 → 已核對',
     ])
     // 舊值刪除線、新值粗體
-    const change = within(items[2]!).getByTestId('data-update-change')
-    expect(change.querySelector('.line-through')).toHaveTextContent('750')
-    expect(change.querySelector('.font-semibold')).toHaveTextContent('500')
-    expect(DATA_UPDATE_ITEMS).toHaveLength(7)
-    expect(dataUpdateItemsFor(1)).toHaveLength(6)
+    const change = within(items[0]!).getByTestId('data-update-change')
+    expect(change.querySelector('.line-through')).toHaveTextContent('待驗證')
+    expect(change.querySelector('.font-semibold')).toHaveTextContent('已核對')
+    // 這一批只有兩項；x1 只看得到慶典那一項，不用別的項目補
+    expect(DATA_UPDATE_ITEMS).toHaveLength(2)
+    expect(dataUpdateItemsFor(1)).toHaveLength(1)
+    expect(screen.queryByTestId('data-update-more')).toBeNull()
     const btn = within(card).getByRole('button', { name: '知道了' })
     expect(btn.className).toContain('min-h-[44px]')
     // 字級：卡片裡沒有 text-xs 以下
     expect(card.innerHTML).not.toMatch(/text-(xs|\[1[01]px\]|\[[0-9]px\])/)
   })
 
-  it('再看 3 項 (44px) shows the other three: trade office with an indented Roman line, Plus 加總 → 相乘 with a grey note, building rename', () => {
-    render(<DataUpdateCard />)
-    const more = screen.getByRole('button', { name: '再看 3 項' })
-    expect(more.className).toContain('min-h-[44px]')
-    expect(more).toHaveAttribute('aria-expanded', 'false')
-    fireEvent.click(more)
-    expect(more).toHaveAttribute('aria-expanded', 'true')
-    const items = within(screen.getByTestId('data-update-items')).getAllByRole('listitem')
-    expect(items).toHaveLength(6)
-    expect(items[3]!.textContent?.replace(/改成/g, '')).toBe('交易所每級10% → 20%羅馬人20% → 40%')
-    const sub = within(items[3]!).getByTestId('data-update-sub')
-    expect(sub.className).toContain('pl-4')
-    // 「加總 → 相乘」不斷行（整段 nowrap）；下面一行灰色小字
-    const plus = within(items[4]!).getByTestId('data-update-change')
-    expect(plus.className).toContain('whitespace-nowrap')
-    expect(plus.textContent?.replace('改成', '')).toBe('加總 → 相乘')
-    expect(items[4]!).toHaveTextContent('田地回本、建造順序的 Plus')
-    const note = within(items[4]!).getByTestId('data-update-note')
-    expect(note).toHaveTextContent('田地回本會變短')
-    expect(note.className).toContain('text-[12px]')
-    expect(note.className).toContain('text-slate-500')
-    expect(items[5]!.textContent?.replace(/改成/g, '')).toBe('建築名稱鐵匠鋪 → 盔甲廠')
+  it('this batch has no Spartan items (they go out with #43)', () => {
+    const text = DATA_UPDATE_ITEMS.map((it) => [it.label, it.before, it.after, it.note, it.sub?.label].join(' ')).join(' ')
+    expect(text).not.toMatch(/斯巴達|投石機|弩炮|9900|9000/)
   })
 
   it('dismissal key and auto-hide follow the release date constant', () => {
@@ -157,17 +138,20 @@ describe('首頁資料更新卡', () => {
 
   describe('x3 以上世界的行軍時間修正（官方 S20：兵速 x3/x5 ×2、x10 ×4；PM：只給 x3 以上看）', () => {
     const TEXT = 'x3 以上世界的行軍時間已修正（之前算得太短，請重新確認排好的攻擊）'
-    it.each([3, 5, 10])('x%i: first item, visible without expanding, plain sentence (no 舊 → 新)', (speed) => {
+    it.each([3, 5, 10])('x%i: first item, plain sentence (no 舊 → 新); celebration second; both visible without expanding', (speed) => {
       render(<DataUpdateCard serverSpeed={speed} />)
       const items = within(screen.getByTestId('data-update-items')).getAllByRole('listitem')
+      expect(items).toHaveLength(2)
       expect(items[0]!.textContent).toBe(TEXT)
       expect(within(items[0]!).queryByTestId('data-update-change')).toBeNull()
-      expect(screen.getByRole('button', { name: '再看 4 項' })).toBeInTheDocument()
+      expect(items[1]!).toHaveTextContent('小慶典的糧、大慶典的花費')
+      expect(screen.queryByTestId('data-update-more')).toBeNull()
     })
-    it.each([1, 2, undefined, null])('x%s: not shown', (speed) => {
+    it.each([1, 2, undefined, null])('x%s: not shown; only the celebration item', (speed) => {
       render(<DataUpdateCard serverSpeed={speed} />)
       expect(screen.getByTestId('data-update-card')).not.toHaveTextContent('行軍時間')
-      expect(screen.getByRole('button', { name: '再看 3 項' })).toBeInTheDocument()
+      expect(within(screen.getByTestId('data-update-items')).getAllByRole('listitem')).toHaveLength(1)
+      expect(screen.queryByTestId('data-update-more')).toBeNull()
     })
     it('home page passes the current world speed', async () => {
       world.speed = 5

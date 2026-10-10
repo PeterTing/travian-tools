@@ -141,11 +141,14 @@ FIELDS: dict[str, dict] = {
 FIELD_K = 1.67
 FIELD_B = 1000 / 3
 
-# Celebrations (x1 cost). Small crop 1,340 matches the opening build-order sheet
-# (party step = 20,330 total) — not yet seen on a ts11 Town Hall -> 待驗證.
+# Celebrations (x1 cost). ✓ 已核對 (2026-10-11, PM two-source rule): official Travian
+# Answers "Town Hall" (Wayback snapshot 2021-12-06) and the Travian Wiki (fandom) give the
+# same four numbers for both celebrations; the wiki cites no source and has its own typos,
+# so it was transcribed separately. Evidence: evidence/celebration_sources_2026-10-11.json.
+# 出處：Travian Answers（官方，2021 年快照）、Travian Wiki 兩份來源一致
 CELEBRATIONS = {
-    "small": {"cost": [6400, 6650, 5940, 1340], "min_town_hall": 1, "pending": ["cost_crop"]},
-    "great": {"cost": [29700, 33250, 32000, 6700], "min_town_hall": 10, "pending": ["cost"]},
+    "small": {"cost": [6400, 6650, 5940, 1340], "min_town_hall": 1, "pending": []},
+    "great": {"cost": [29700, 33250, 32000, 6700], "min_town_hall": 10, "pending": []},
 }
 # Official "Game Versions and Speed" table (support.travian.com/en/articles/20)
 SPEEDS = [1, 2, 3, 5, 10]

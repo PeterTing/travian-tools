@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cpAtLevel, type CpBuilding } from '../data/travian'
 import {
   SERVER_SPEEDS, villageRequirements, startCp, celebrationCap, celebrationCp, celebration,
   isVillageCpVerified, isBuildingVerified, buildingName, type ServerSpeed, type CelebrationKind,
 } from '../../../data/gameData'
-import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import PendingVerifyChip, { PendingNotePanel, PendingRow } from '@/components/common/PendingVerifyChip'
 import LevelSelect from '@/components/common/LevelSelect'
 import AutoFillBar, { AutoFillHint } from '@/components/autofill/AutoFillBar'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
@@ -244,6 +245,9 @@ export default function PassiveCpCalculator() {
     writeCpProgress(accountId, { currentCp, dailyCp: cd.accountCp, speed })
   }, [accountId, currentCp, cd.accountCp, speed])
 
+  const { t } = useTranslation()
+  const celNoteId = `celebration-note-${useId().replace(/:/g, '')}`
+  const [celNoteOpen, setCelNoteOpen] = useState(false)
   const small = celebration('small')
   const great = celebration('great')
   const capSmall = celebrationCap('small', speed)
@@ -409,7 +413,23 @@ export default function PassiveCpCalculator() {
             </tbody>
           </table>
 
-          <h4>{en ? 'Celebration cost (x1)' : '慶典花費（x1）'}</h4>
+          {/* 慶典花費兩份來源一致（2026-10-11 PM 規則）：標題旁「✓ 已核對」，點開兩行說明（第二行出處） */}
+          <h4>
+            {en ? 'Celebration cost (x1)' : '慶典花費（x1）'}
+            <button
+              type="button"
+              id={`${celNoteId}-chip`}
+              data-testid="celebration-verified-mark"
+              aria-label={t('common.verifiedTs11')}
+              aria-expanded={celNoteOpen}
+              aria-controls={celNoteOpen ? celNoteId : undefined}
+              onClick={() => setCelNoteOpen(v => !v)}
+              className="relative ml-1 whitespace-nowrap align-middle text-[12px] font-normal text-green-700 before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
+            >
+              {t('common.verifiedShort')}
+            </button>
+          </h4>
+          {celNoteOpen && <PendingNotePanel fill id={celNoteId} kinds={['celebration']} ns="verifiedNotes" />}
           <table className={`${s.table} ${s.tapRows}`} data-testid="cp-celebration-cost">
             <thead>
               <tr><th>{en ? 'Type' : '種類'}</th><th>{en ? 'Wood / Clay / Iron' : '木／泥／鐵'}</th><th>{en ? 'Crop' : '糧'}</th></tr>
@@ -418,10 +438,10 @@ export default function PassiveCpCalculator() {
               <PendingRow as="tr" className="h-11" tableColSpan={3}>
                 <td>{en ? 'Small' : '小慶典'}</td>
                 <td>{small.cost.slice(0, 3).map(n => n.toLocaleString()).join(' / ')}</td>
-                <td>{small.cost[3].toLocaleString()}{small.pending.length > 0 && <> <PendingVerifyChip kind="celebration" /></>}</td>
+                <td>{small.cost[3].toLocaleString()}</td>
               </PendingRow>
               <PendingRow as="tr" className="h-11" tableColSpan={3}>
-                <td>{en ? 'Great' : '大慶典'}{great.pending.includes('cost') && <> <PendingVerifyChip kind="celebration" /></>}</td>
+                <td>{en ? 'Great' : '大慶典'}</td>
                 <td>{great.cost.slice(0, 3).map(n => n.toLocaleString()).join(' / ')}</td>
                 <td>{great.cost[3].toLocaleString()}</td>
               </PendingRow>

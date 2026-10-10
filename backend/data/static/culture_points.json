@@ -301,9 +301,7 @@
         1340
       ],
       "min_town_hall": 1,
-      "pending": [
-        "cost_crop"
-      ]
+      "pending": []
     },
     "great": {
       "cost": [
@@ -313,9 +311,7 @@
         6700
       ],
       "min_town_hall": 10,
-      "pending": [
-        "cost"
-      ]
+      "pending": []
     }
   },
   "verified": {

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import i18n from '@/i18n/i18n'
 import gen from '../../data/gameData.gen.json'
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import PassiveCpCalculator, { villageCountdown } from './components/PassiveCpCalculator'
 import { cropSim } from './components/CropSimCalculator'
@@ -147,11 +147,18 @@ describe('PassiveCpCalculator UI', () => {
     const calcCss = readFileSync('src/features/guideCalcs/components/calc.module.css', 'utf8')
     expect(calcCss).toMatch(/\.tapRows td,\s*\.tapRows th \{\s*vertical-align: middle;/)
   })
-  it('shows small-celebration crop cost with 待驗證', () => {
+  it('celebration cost is ✓ 已核對 (two sources agree, 2026-10-11) and the note names both sources', () => {
     render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
     const cost = screen.getByTestId('cp-celebration-cost')
     expect(within(cost).getByText(/1,340/)).toBeInTheDocument()
-    expect(within(cost).getAllByTestId('pending-verify-chip').length).toBeGreaterThan(0)
+    expect(within(cost).getByText('29,700 / 33,250 / 32,000')).toBeInTheDocument()
+    expect(within(cost).queryAllByTestId('pending-verify-chip')).toHaveLength(0)
+    const mark = screen.getByTestId('celebration-verified-mark')
+    expect(mark).toHaveTextContent(/^✓ 已核對$/)
+    fireEvent.click(mark)
+    const panel = screen.getByTestId('pending-note-panel')
+    expect(within(panel).getByTestId('pending-note-what')).toHaveTextContent('小慶典、大慶典的花費（木、泥、鐵、糧）已核對。')
+    expect(within(panel).getByTestId('pending-note-source')).toHaveTextContent('出處：Travian Answers（官方，2021 年快照）、Travian Wiki 兩份來源一致')
   })
   it('title is CP 與開村 and the body says CP, not 文明點', () => {
     render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)

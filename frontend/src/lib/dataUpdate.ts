@@ -1,11 +1,10 @@
-import { INGAME_BUILDINGS, ingameTribeName, ingameUnitNameByGameId } from '@/lib/ingameNames'
 import { readPref } from '@/lib/localPrefs'
 
 /**
- * 資料更新卡的上線日（台北時間，YYYY-MM-DD）。#33、#34 一起在第 ③ 階段上線：deploy 當天改這一行就好——
+ * 資料更新卡的上線日（台北時間，YYYY-MM-DD）。#38～#41 這一批一起上線：deploy 當天改這一行就好——
  * 卡片標題（M/D 資料更新）、「知道了」記住的 key、14 天後自動不顯示的時間都從這裡算。
  */
-export const DATA_UPDATE_RELEASE_DATE = '2026-10-10'
+export const DATA_UPDATE_RELEASE_DATE = '2026-10-11'
 
 const [, releaseMonth, releaseDay] = DATA_UPDATE_RELEASE_DATE.split('-').map(Number)
 
@@ -30,27 +29,15 @@ export interface DataUpdateItem {
   note?: string
 }
 
-const smithy = INGAME_BUILDINGS.blacksmith!
-const tradeOffice = INGAME_BUILDINGS.trade_office!
-
 /**
- * 資料更新卡（#33 + #34 合成一張，PM）：前 3 項直接顯示，「再看 3 項」展開後 3 項。
- * 每一項的出處寫在 PR 說明。名稱一律讀遊戲內名稱表；舊名從表的 aliases 取（站上其他地方不顯示舊名）。
+ * 資料更新卡（#38～#41 這一批，PM＋幕僚長）：只放這兩項，斯巴達的項目跟 #43 一起上。
+ * x1、x2 世界看不到行軍時間那項，只剩慶典一項；不拿別的項目補。每一項的出處寫在 PR 說明。
  */
 export const DATA_UPDATE_ITEMS: DataUpdateItem[] = [
-  // 官方說明頁 S20：兵速 x2/x3/x5 ×2、x10 ×4（之前直接乘倍速）。x1、x2 沒變，只給 x3 以上的世界看；放第一項，收合時也看得到（PM）
+  // #38 官方說明頁 S20：兵速 x2/x3/x5 ×2、x10 ×4（之前直接乘倍速）。x1、x2 沒變，只給 x3 以上的世界看；放第一項（PM）
   { label: 'x3 以上世界的行軍時間已修正（之前算得太短，請重新確認排好的攻擊）', minServerSpeed: 3 },
-  // ts11 manual/troop/64
-  { label: `${ingameUnitNameByGameId(64)}運載量`, before: '115', after: '75' },
-  // 舊的後端兵種資料 5800 → ts11 manual/troop/10 開拓者花費 4600 木材
-  { label: `${ingameTribeName('romans')}${ingameUnitNameByGameId(10)}木材花費`, before: '5800', after: '4600' },
-  // 官方說明頁 S3
-  { label: `${ingameTribeName('huns')}商人容量`, before: '750', after: '500' },
-  // 官方知識庫交易所效果欄（+20%／+40% 每級）、官方說明頁 S213
-  { label: `${tradeOffice.zh}每級`, before: '10%', after: '20%', sub: { label: ingameTribeName('romans'), before: '20%', after: '40%' } },
-  // 官方說明頁 S129：Plus 乘在總產量上
-  { label: '田地回本、建造順序的 Plus', before: '加總', after: '相乘', note: '田地回本會變短' },
-  { label: '建築名稱', before: smithy.aliases[0]!, after: smithy.zh },
+  // #41 Travian Answers（官方）＋Travian Wiki 兩份一致：小慶典的糧、大慶典全部花費
+  { label: '小慶典的糧、大慶典的花費', before: '待驗證', after: '已核對' },
 ]
 
 /** 這個世界要顯示的項目（倍速不夠的項目拿掉；不知道倍速就當 x1） */
