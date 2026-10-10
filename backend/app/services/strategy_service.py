@@ -324,7 +324,7 @@ class StrategyService:
             recommendations.append("持續訓練防禦部隊，強化鐵砧村")
             recommendations.append("升級城牆，提升防禦加成")
             if progress_status == ProgressStatus.BEHIND:
-                recommendations.append("優先訓練長矛兵/方陣兵等防禦單位")
+                recommendations.append("優先訓練矛兵/方陣兵等防禦單位")
             elif progress_status == ProgressStatus.AHEAD:
                 recommendations.append("協助聯盟成員防禦")
         elif role == PlayerRole.FARMER:

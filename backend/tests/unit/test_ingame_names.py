@@ -115,17 +115,30 @@ def _old_names() -> list[str]:
     return sorted((al | {"條頓"}) - ingame)
 
 
+def _old_names_in(text: str, ingame: set[str], old: list[str]) -> list[str]:
+    """由左往右找名稱，同一個位置先比長的：「長矛兵」算舊名，不會先被「矛兵」遮掉；「大倉庫」是現名，不算「倉庫」."""
+    names = sorted(ingame | set(old), key=len, reverse=True)
+    pattern = re.compile("|".join(re.escape(n) for n in names))
+    return sorted(
+        {m.group(0) for m in pattern.finditer(text) if m.group(0) not in ingame}
+    )
+
+
+def test_old_name_scan_matches_longer_names_first():
+    ingame = {
+        r["zh"] for sec in ("buildings", "units", "tribes") for r in NAMES[sec].values()
+    }
+    old = _old_names()
+    assert _old_names_in("優先訓練長矛兵", ingame, old) == ["長矛兵"]
+    assert _old_names_in("英雄宅邸、隱藏倉庫", ingame, old) == ["英雄宅邸", "隱藏倉庫"]
+    assert _old_names_in("矛兵、英雄宅、山洞、大倉庫、倉庫", ingame, old) == []
+
+
 def test_no_old_name_in_backend_text():
     """舊名只能出現在 aliases_zh；遊戲文字解析器（parsers/）要認得舊譯名，不算；knowledge_base 沒有接到 API（P0-23 移除）."""
-    ingame = sorted(
-        {
-            r["zh"]
-            for sec in ("buildings", "units", "tribes")
-            for r in NAMES[sec].values()
-        },
-        key=len,
-        reverse=True,
-    )
+    ingame = {
+        r["zh"] for sec in ("buildings", "units", "tribes") for r in NAMES[sec].values()
+    }
     old = _old_names()
     files = [
         p
@@ -137,9 +150,7 @@ def test_no_old_name_in_backend_text():
     for p in files:
         text = p.read_text(encoding="utf-8")
         text = re.sub(r'"aliases_zh": \[[^\]]*\]', "", text)
-        for n in ingame:
-            text = text.replace(n, "＿")
-        hits = [a for a in old if a in text]
+        hits = _old_names_in(text, ingame, old)
         if hits:
             bad.append(f"{p.relative_to(ROOT)}: {hits}")
     assert bad == []

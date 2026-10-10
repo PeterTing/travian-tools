@@ -32,14 +32,25 @@ const ALIASES = [...new Set([
   '條頓',
 ])].filter(a => !INGAME.has(a))
 
-/** 先把遊戲內名稱拿掉（避免「大倉庫」裡的「倉庫」這種誤判），剩下的不能有舊名 */
+/**
+ * 由左往右找名稱，同一個位置先比長的：「長矛兵」算舊名（不會先被「矛兵」遮掉），
+ * 「大倉庫」是遊戲內名稱，不會被當成「倉庫」
+ */
+const NAME_RE = new RegExp(
+  [...INGAME, ...ALIASES].sort((a, b) => b.length - a.length).map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
+  'g',
+)
 function oldNamesIn(text: string): string[] {
-  let s = text
-  for (const n of [...INGAME].sort((a, b) => b.length - a.length)) s = s.split(n).join('＿')
-  return ALIASES.filter(a => s.includes(a))
+  return [...new Set([...text.matchAll(NAME_RE)].map(m => m[0]).filter(n => !INGAME.has(n)))]
 }
 
 describe('遊戲內名稱表', () => {
+  it('old-name scan matches longer names first (長矛兵／英雄宅邸／隱藏倉庫 are caught, 大倉庫 is not 倉庫)', () => {
+    expect(oldNamesIn('優先訓練長矛兵')).toEqual(['長矛兵'])
+    expect(oldNamesIn('英雄宅邸、隱藏倉庫')).toEqual(['英雄宅邸', '隱藏倉庫'])
+    expect(oldNamesIn('矛兵、英雄宅、山洞、大倉庫、倉庫')).toEqual([])
+  })
+
   it('table = ts11 manual: gid 13 盔甲廠, 7 鋼鐵鑄造廠, 2 泥坑, 4 農場, 41 放牧水槽; no gid 12', () => {
     expect(ingameBuildingNameByGid(13)).toBe('盔甲廠')
     expect(ingameBuildingNameByGid(7)).toBe('鋼鐵鑄造廠')
