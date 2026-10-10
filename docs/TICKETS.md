@@ -433,6 +433,7 @@
 - ⬜ `frontend/src/components/autofill/AutoFillBar.tsx` 開頭註解的 (k) 那一行要更新：維京運載量 2026-10-11 已退回待驗證，選維京時是「維京的運載量待驗證，兵種中文名為暫譯」，「全部」或不知道部族是「維京的兵種運載量待驗證」
 - ⬜ #43 的 PR 說明要跟最後的狀態一致：第 3、4 輪「維京運載量 ✓」相關的句子只能當歷史紀錄，不能寫成現況（第 6 輪已先更新一次，上線前再對一次）
 - ⬜ 舊名掃描（找「弩炮」這類舊名稱）要分得出是哪一族：ts11 的弩炮（game_id 18）不變，只有斯巴達的 Ballista 改成「賴達投石機」；掃描結果要標部族，不能只比字串
+- ⬜（#43 部署審查，幕僚長）`scripts/deploy_cloud_run.sh` 拿掉 `--quiet`（`G=(--project "${PROJECT}" --quiet)`）：確認提示要照常出現、由人看過再答。#43 的 `deploy-43.md` 因此改成把 build／deploy 指令展開、不呼叫腳本；拿掉之後再改回用腳本
 
 ### #45（待驗證交叉比對 2026-10-11）幕僚長審查後續 ⬜（不擋 #45）
 - ⬜ T1 `docs/knowledge/tournament-square-speed.md` 競技場「+400%（20 級）」不能拿 S71 當出處（S71 寫 +500%，跟表不合）：只引官方知識庫表。#45 已改寫這一段，上線前再對一次
@@ -442,6 +443,7 @@
 - ✅ T6（#45 一起做）S93 全文＋sha256 放進證據檔、產生器檢查引句；「靴子只在 20 格以外生效」改 ✓（S93＋S71，寫法不同、互不引用），只有靴子時不再放 heroBootsSpeed 灰標；「競技場＋靴子相加」仍待驗證（arenaBootsSpeed），要實測才改
 - ⬜ T7 研究院之後補一篇官方 S 系列說明頁當出處（現在是遊戲內說明＋各族兵種的研究院需求）
 - ⬜ T8 下一輪檢查匈奴／維京城牆「每級 +1.5%」有沒有標待驗證（`frontend/src/features/guideCalcs/data/tribes/huns.ts` 等）
+- ⬜ T9（#45 合併後，幕僚長）外部 fork 開的 PR 拿不到 CI secret `TT_ID_DENYLIST`，`test_evidence_has_no_denylisted_names` 在 CI 會失敗：之後決定怎麼處理（例如 fork PR 改成略過＋要求維護者重跑、或改用 `pull_request_target` 的另一個 job），先記下來
 
 ## P1：聯盟防守
 
