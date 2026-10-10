@@ -270,6 +270,9 @@
           "effect_description": "建造時間 50%",
           "cp_per_day": 77
         }
+      ],
+      "aliases_zh": [
+        "主建築"
       ]
     },
     "barracks": {
@@ -551,6 +554,9 @@
           "effect_description": "訓練時間 14%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "軍營"
       ]
     },
     "rally_point": {
@@ -823,7 +829,8 @@
           "effect_description": "解鎖集結假攻",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "warehouse": {
       "building_id": "warehouse",
@@ -1100,15 +1107,16 @@
           "effect_description": "儲存容量 80,000",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "granary": {
       "building_id": "granary",
-      "name_zh": "糧倉",
+      "name_zh": "穀倉",
       "name_en": "Granary",
       "category": "storage",
       "max_level": 20,
-      "description_zh": "儲存糧食的建築。1 級可儲存 1,200 糧食，滿級可儲存 80,000 糧食。可建造多個糧倉來增加總儲存量。",
+      "description_zh": "儲存糧食的建築。1 級可儲存 1,200 糧食，滿級可儲存 80,000 糧食。可建造多個穀倉來增加總儲存量。",
       "description_en": "Stores crop. Level 1 stores 1,200 crop, max level stores 80,000. Multiple granaries can be built to increase total capacity.",
       "prerequisites": [
         {
@@ -1377,6 +1385,9 @@
           "effect_description": "儲存容量 80,000",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "糧倉"
       ]
     },
     "marketplace": {
@@ -1662,7 +1673,8 @@
           "effect_description": "商人數量 20",
           "cp_per_day": 115
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "stable": {
       "building_id": "stable",
@@ -1947,7 +1959,8 @@
           "effect_description": "訓練時間 14%",
           "cp_per_day": 77
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "academy": {
       "building_id": "academy",
@@ -2160,7 +2173,7 @@
           "population": 3,
           "culture_points": 62,
           "effect_value": 15,
-          "effect_description": "可研發投石車",
+          "effect_description": "可研發投石類攻城武器",
           "cp_per_day": 62
         },
         {
@@ -2228,11 +2241,12 @@
           "effect_description": "可研發所有兵種",
           "cp_per_day": 153
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "blacksmith": {
       "building_id": "blacksmith",
-      "name_zh": "鐵匠鋪",
+      "name_zh": "盔甲廠",
       "name_en": "Blacksmith",
       "category": "military_upgrade",
       "max_level": 20,
@@ -2509,6 +2523,10 @@
           "effect_description": "攻擊力 +30%",
           "cp_per_day": 77
         }
+      ],
+      "aliases_zh": [
+        "鐵匠鋪",
+        "兵工廠"
       ]
     },
     "cranny": {
@@ -2651,6 +2669,9 @@
           "effect_description": "隱藏容量 2000（高盧 ×1.5 → 3000）",
           "cp_per_day": 6
         }
+      ],
+      "aliases_zh": [
+        "隱藏倉庫"
       ]
     },
     "workshop": {
@@ -2932,287 +2953,9 @@
           "effect_description": "訓練時間 12%",
           "cp_per_day": 115
         }
-      ]
-    },
-    "armoury": {
-      "building_id": "armoury",
-      "name_zh": "防具工坊",
-      "name_en": "Armoury",
-      "category": "military_upgrade",
-      "max_level": 20,
-      "description_zh": "研究提升兵種防禦力的建築。每升一級所有已研究兵種的防禦力 +1.5%，滿級時防禦力 +30%。",
-      "description_en": "Building for improving troop defense. Each level adds +1.5% defense to all researched troops, max level provides +30% defense.",
-      "prerequisites": [
-        {
-          "building_id": "main_building",
-          "level": 3
-        },
-        {
-          "building_id": "academy",
-          "level": 1
-        }
       ],
-      "levels": [
-        {
-          "level": 1,
-          "cost_wood": 130,
-          "cost_clay": 210,
-          "cost_iron": 410,
-          "cost_crop": 130,
-          "build_time_base": 2000,
-          "population": 4,
-          "culture_points": 2,
-          "effect_value": 1.5,
-          "effect_description": "防禦力 +1.5%",
-          "cp_per_day": 2
-        },
-        {
-          "level": 2,
-          "cost_wood": 165,
-          "cost_clay": 270,
-          "cost_iron": 525,
-          "cost_crop": 165,
-          "build_time_base": 2620,
-          "population": 2,
-          "culture_points": 3,
-          "effect_value": 3.0,
-          "effect_description": "防禦力 +3%",
-          "cp_per_day": 3
-        },
-        {
-          "level": 3,
-          "cost_wood": 215,
-          "cost_clay": 345,
-          "cost_iron": 670,
-          "cost_crop": 215,
-          "build_time_base": 3339,
-          "population": 2,
-          "culture_points": 3,
-          "effect_value": 4.5,
-          "effect_description": "防禦力 +4.5%",
-          "cp_per_day": 3
-        },
-        {
-          "level": 4,
-          "cost_wood": 275,
-          "cost_clay": 440,
-          "cost_iron": 860,
-          "cost_crop": 275,
-          "build_time_base": 4173,
-          "population": 2,
-          "culture_points": 4,
-          "effect_value": 6.0,
-          "effect_description": "防禦力 +6%",
-          "cp_per_day": 4
-        },
-        {
-          "level": 5,
-          "cost_wood": 350,
-          "cost_clay": 565,
-          "cost_iron": 1100,
-          "cost_crop": 350,
-          "build_time_base": 5141,
-          "population": 2,
-          "culture_points": 5,
-          "effect_value": 7.5,
-          "effect_description": "防禦力 +7.5%",
-          "cp_per_day": 5
-        },
-        {
-          "level": 6,
-          "cost_wood": 445,
-          "cost_clay": 720,
-          "cost_iron": 1410,
-          "cost_crop": 445,
-          "build_time_base": 6264,
-          "population": 3,
-          "culture_points": 6,
-          "effect_value": 9.0,
-          "effect_description": "防禦力 +9%",
-          "cp_per_day": 6
-        },
-        {
-          "level": 7,
-          "cost_wood": 570,
-          "cost_clay": 925,
-          "cost_iron": 1805,
-          "cost_crop": 570,
-          "build_time_base": 7566,
-          "population": 3,
-          "culture_points": 7,
-          "effect_value": 10.5,
-          "effect_description": "防禦力 +10.5%",
-          "cp_per_day": 7
-        },
-        {
-          "level": 8,
-          "cost_wood": 730,
-          "cost_clay": 1180,
-          "cost_iron": 2310,
-          "cost_crop": 730,
-          "build_time_base": 9077,
-          "population": 3,
-          "culture_points": 9,
-          "effect_value": 12.0,
-          "effect_description": "防禦力 +12%",
-          "cp_per_day": 9
-        },
-        {
-          "level": 9,
-          "cost_wood": 935,
-          "cost_clay": 1515,
-          "cost_iron": 2955,
-          "cost_crop": 935,
-          "build_time_base": 10829,
-          "population": 3,
-          "culture_points": 10,
-          "effect_value": 13.5,
-          "effect_description": "防禦力 +13.5%",
-          "cp_per_day": 10
-        },
-        {
-          "level": 10,
-          "cost_wood": 1200,
-          "cost_clay": 1935,
-          "cost_iron": 3780,
-          "cost_crop": 1200,
-          "build_time_base": 12861,
-          "population": 3,
-          "culture_points": 12,
-          "effect_value": 15.0,
-          "effect_description": "防禦力 +15%",
-          "cp_per_day": 12
-        },
-        {
-          "level": 11,
-          "cost_wood": 1535,
-          "cost_clay": 2480,
-          "cost_iron": 4840,
-          "cost_crop": 1535,
-          "build_time_base": 15219,
-          "population": 3,
-          "culture_points": 15,
-          "effect_value": 16.5,
-          "effect_description": "防禦力 +16.5%",
-          "cp_per_day": 15
-        },
-        {
-          "level": 12,
-          "cost_wood": 1965,
-          "cost_clay": 3175,
-          "cost_iron": 6195,
-          "cost_crop": 1965,
-          "build_time_base": 17954,
-          "population": 3,
-          "culture_points": 18,
-          "effect_value": 18.0,
-          "effect_description": "防禦力 +18%",
-          "cp_per_day": 18
-        },
-        {
-          "level": 13,
-          "cost_wood": 2515,
-          "cost_clay": 4060,
-          "cost_iron": 7930,
-          "cost_crop": 2515,
-          "build_time_base": 21127,
-          "population": 3,
-          "culture_points": 21,
-          "effect_value": 19.5,
-          "effect_description": "防禦力 +19.5%",
-          "cp_per_day": 21
-        },
-        {
-          "level": 14,
-          "cost_wood": 3220,
-          "cost_clay": 5200,
-          "cost_iron": 10150,
-          "cost_crop": 3220,
-          "build_time_base": 24807,
-          "population": 3,
-          "culture_points": 26,
-          "effect_value": 21.0,
-          "effect_description": "防禦力 +21%",
-          "cp_per_day": 26
-        },
-        {
-          "level": 15,
-          "cost_wood": 4120,
-          "cost_clay": 6655,
-          "cost_iron": 12995,
-          "cost_crop": 4120,
-          "build_time_base": 29077,
-          "population": 3,
-          "culture_points": 31,
-          "effect_value": 22.5,
-          "effect_description": "防禦力 +22.5%",
-          "cp_per_day": 31
-        },
-        {
-          "level": 16,
-          "cost_wood": 5275,
-          "cost_clay": 8520,
-          "cost_iron": 16630,
-          "cost_crop": 5275,
-          "build_time_base": 34029,
-          "population": 4,
-          "culture_points": 37,
-          "effect_value": 24.0,
-          "effect_description": "防禦力 +24%",
-          "cp_per_day": 37
-        },
-        {
-          "level": 17,
-          "cost_wood": 6750,
-          "cost_clay": 10905,
-          "cost_iron": 21290,
-          "cost_crop": 6750,
-          "build_time_base": 39774,
-          "population": 4,
-          "culture_points": 44,
-          "effect_value": 25.5,
-          "effect_description": "防禦力 +25.5%",
-          "cp_per_day": 44
-        },
-        {
-          "level": 18,
-          "cost_wood": 8640,
-          "cost_clay": 13955,
-          "cost_iron": 27250,
-          "cost_crop": 8640,
-          "build_time_base": 46437,
-          "population": 4,
-          "culture_points": 53,
-          "effect_value": 27.0,
-          "effect_description": "防禦力 +27%",
-          "cp_per_day": 53
-        },
-        {
-          "level": 19,
-          "cost_wood": 11060,
-          "cost_clay": 17865,
-          "cost_iron": 34880,
-          "cost_crop": 11060,
-          "build_time_base": 54167,
-          "population": 4,
-          "culture_points": 64,
-          "effect_value": 28.5,
-          "effect_description": "防禦力 +28.5%",
-          "cp_per_day": 64
-        },
-        {
-          "level": 20,
-          "cost_wood": 14155,
-          "cost_clay": 22865,
-          "cost_iron": 44645,
-          "cost_crop": 14155,
-          "build_time_base": 63134,
-          "population": 4,
-          "culture_points": 77,
-          "effect_value": 30.0,
-          "effect_description": "防禦力 +30%",
-          "cp_per_day": 77
-        }
+      "aliases_zh": [
+        "工坊"
       ]
     },
     "embassy": {
@@ -3490,7 +3233,8 @@
           "effect_description": "聯盟 60 名成員",
           "cp_per_day": 153
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "town_hall": {
       "building_id": "town_hall",
@@ -3771,6 +3515,9 @@
           "effect_description": "可辦大慶典：CP＝全帳號每日 CP 產量（x1 上限 2000）",
           "cp_per_day": 192
         }
+      ],
+      "aliases_zh": [
+        "市政廳"
       ]
     },
     "residence": {
@@ -4048,7 +3795,8 @@
           "effect_description": "可訓練第3名開拓者",
           "cp_per_day": 77
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "palace": {
       "building_id": "palace",
@@ -4329,7 +4077,8 @@
           "effect_description": "可訓練第3名開拓者",
           "cp_per_day": 192
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "treasury": {
       "building_id": "treasury",
@@ -4606,6 +4355,9 @@
           "effect_description": "可存放獨特神器",
           "cp_per_day": 230
         }
+      ],
+      "aliases_zh": [
+        "寶庫"
       ]
     },
     "heros_mansion": {
@@ -4887,6 +4639,9 @@
           "effect_description": "可佔領 3 個綠洲",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "英雄宅邸"
       ]
     },
     "sawmill": {
@@ -4973,7 +4728,8 @@
           "effect_description": "木材 +25%",
           "cp_per_day": 2
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "brickyard": {
       "building_id": "brickyard",
@@ -5059,11 +4815,12 @@
           "effect_description": "磚塊 +25%",
           "cp_per_day": 2
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "iron_foundry": {
       "building_id": "iron_foundry",
-      "name_zh": "鑄鐵廠",
+      "name_zh": "鋼鐵鑄造廠",
       "name_en": "Iron Foundry",
       "category": "resource_boost",
       "max_level": 5,
@@ -5145,6 +4902,10 @@
           "effect_description": "鐵礦 +25%",
           "cp_per_day": 2
         }
+      ],
+      "aliases_zh": [
+        "鑄鐵廠",
+        "鑄造廠"
       ]
     },
     "grain_mill": {
@@ -5231,6 +4992,9 @@
           "effect_description": "糧食 +25%",
           "cp_per_day": 2
         }
+      ],
+      "aliases_zh": [
+        "穀物磨坊"
       ]
     },
     "bakery": {
@@ -5321,11 +5085,14 @@
           "effect_description": "糧食額外 +25%",
           "cp_per_day": 2
         }
+      ],
+      "aliases_zh": [
+        "麵包坊"
       ]
     },
     "stonemasons_lodge": {
       "building_id": "stonemasons_lodge",
-      "name_zh": "石匠小屋",
+      "name_zh": "石匠鋪",
       "name_en": "Stonemason's Lodge",
       "category": "infrastructure",
       "max_level": 20,
@@ -5602,11 +5369,14 @@
           "effect_description": "建築耐久 +40%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "石匠小屋"
       ]
     },
     "trade_office": {
       "building_id": "trade_office",
-      "name_zh": "貿易公司",
+      "name_zh": "交易所",
       "name_en": "Trade Office",
       "category": "trade",
       "max_level": 20,
@@ -5887,6 +5657,10 @@
           "effect_description": "商人攜帶量 +400%",
           "cp_per_day": 115
         }
+      ],
+      "aliases_zh": [
+        "貿易公司",
+        "商貿處"
       ]
     },
     "tournament_square": {
@@ -6164,6 +5938,9 @@
           "effect_description": "超過20格速度 +400%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "比武場"
       ]
     },
     "city_wall": {
@@ -6437,7 +6214,8 @@
           "effect_description": "防禦 +81%",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "earth_wall": {
       "building_id": "earth_wall",
@@ -6445,7 +6223,7 @@
       "name_en": "Earth Wall",
       "category": "defense",
       "max_level": 20,
-      "description_zh": "條頓人專屬防禦建築",
+      "description_zh": "日耳曼人專屬防禦建築",
       "description_en": "Teuton-only defensive structure",
       "prerequisites": [],
       "tribe_specific": "teutons",
@@ -6710,6 +6488,9 @@
           "effect_description": "防禦 +63%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "土圍"
       ]
     },
     "palisade": {
@@ -6983,6 +6764,10 @@
           "effect_description": "防禦 +63.86%（另每級 +8 基礎防禦）",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "柵欄",
+        "木柵欄"
       ]
     },
     "great_barracks": {
@@ -7264,6 +7049,9 @@
           "effect_description": "訓練時間 14%",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "大營房"
       ]
     },
     "great_stable": {
@@ -7545,7 +7333,8 @@
           "effect_description": "訓練時間 14%",
           "cp_per_day": 77
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "trapper": {
       "building_id": "trapper",
@@ -7823,15 +7612,16 @@
           "effect_description": "陷阱數量 400",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "brewery": {
       "building_id": "brewery",
-      "name_zh": "酒館",
+      "name_zh": "釀酒廠",
       "name_en": "Brewery",
       "category": "military_upgrade",
       "max_level": 20,
-      "description_zh": "條頓人專屬，提升攻擊力",
+      "description_zh": "日耳曼人專屬，提升攻擊力",
       "description_en": "Teuton-only, increase attack power",
       "prerequisites": [
         {
@@ -8105,11 +7895,14 @@
           "effect_description": "攻擊力 +20%",
           "cp_per_day": 153
         }
+      ],
+      "aliases_zh": [
+        "酒館"
       ]
     },
     "horse_drinking_trough": {
       "building_id": "horse_drinking_trough",
-      "name_zh": "馬飲水槽",
+      "name_zh": "放牧水槽",
       "name_en": "Horse Drinking Trough",
       "category": "military_upgrade",
       "max_level": 20,
@@ -8391,6 +8184,9 @@
           "effect_description": "騎兵糧耗 -20%",
           "cp_per_day": 115
         }
+      ],
+      "aliases_zh": [
+        "馬飲水槽"
       ]
     },
     "great_warehouse": {
@@ -8668,11 +8464,12 @@
           "effect_description": "儲存容量 800,000",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "great_granary": {
       "building_id": "great_granary",
-      "name_zh": "大糧倉",
+      "name_zh": "大穀倉",
       "name_en": "Great Granary",
       "category": "storage",
       "max_level": 20,
@@ -8695,7 +8492,7 @@
           "population": 1,
           "culture_points": 1,
           "effect_value": 12000,
-          "effect_description": "糧倉容量 12,000",
+          "effect_description": "穀倉容量 12,000",
           "cp_per_day": 1
         },
         {
@@ -8708,7 +8505,7 @@
           "population": 1,
           "culture_points": 1,
           "effect_value": 17000,
-          "effect_description": "糧倉容量 17,000",
+          "effect_description": "穀倉容量 17,000",
           "cp_per_day": 1
         },
         {
@@ -8721,7 +8518,7 @@
           "population": 1,
           "culture_points": 2,
           "effect_value": 23000,
-          "effect_description": "糧倉容量 23,000",
+          "effect_description": "穀倉容量 23,000",
           "cp_per_day": 2
         },
         {
@@ -8734,7 +8531,7 @@
           "population": 1,
           "culture_points": 2,
           "effect_value": 31000,
-          "effect_description": "糧倉容量 31,000",
+          "effect_description": "穀倉容量 31,000",
           "cp_per_day": 2
         },
         {
@@ -8747,7 +8544,7 @@
           "population": 1,
           "culture_points": 2,
           "effect_value": 40000,
-          "effect_description": "糧倉容量 40,000",
+          "effect_description": "穀倉容量 40,000",
           "cp_per_day": 2
         },
         {
@@ -8760,7 +8557,7 @@
           "population": 1,
           "culture_points": 3,
           "effect_value": 50000,
-          "effect_description": "糧倉容量 50,000",
+          "effect_description": "穀倉容量 50,000",
           "cp_per_day": 3
         },
         {
@@ -8773,7 +8570,7 @@
           "population": 1,
           "culture_points": 4,
           "effect_value": 63000,
-          "effect_description": "糧倉容量 63,000",
+          "effect_description": "穀倉容量 63,000",
           "cp_per_day": 4
         },
         {
@@ -8786,7 +8583,7 @@
           "population": 1,
           "culture_points": 4,
           "effect_value": 78000,
-          "effect_description": "糧倉容量 78,000",
+          "effect_description": "穀倉容量 78,000",
           "cp_per_day": 4
         },
         {
@@ -8799,7 +8596,7 @@
           "population": 1,
           "culture_points": 5,
           "effect_value": 96000,
-          "effect_description": "糧倉容量 96,000",
+          "effect_description": "穀倉容量 96,000",
           "cp_per_day": 5
         },
         {
@@ -8812,7 +8609,7 @@
           "population": 1,
           "culture_points": 6,
           "effect_value": 118000,
-          "effect_description": "糧倉容量 118,000",
+          "effect_description": "穀倉容量 118,000",
           "cp_per_day": 6
         },
         {
@@ -8825,7 +8622,7 @@
           "population": 1,
           "culture_points": 7,
           "effect_value": 144000,
-          "effect_description": "糧倉容量 144,000",
+          "effect_description": "穀倉容量 144,000",
           "cp_per_day": 7
         },
         {
@@ -8838,7 +8635,7 @@
           "population": 1,
           "culture_points": 9,
           "effect_value": 176000,
-          "effect_description": "糧倉容量 176,000",
+          "effect_description": "穀倉容量 176,000",
           "cp_per_day": 9
         },
         {
@@ -8851,7 +8648,7 @@
           "population": 1,
           "culture_points": 11,
           "effect_value": 214000,
-          "effect_description": "糧倉容量 214,000",
+          "effect_description": "穀倉容量 214,000",
           "cp_per_day": 11
         },
         {
@@ -8864,7 +8661,7 @@
           "population": 1,
           "culture_points": 13,
           "effect_value": 259000,
-          "effect_description": "糧倉容量 259,000",
+          "effect_description": "穀倉容量 259,000",
           "cp_per_day": 13
         },
         {
@@ -8877,7 +8674,7 @@
           "population": 1,
           "culture_points": 15,
           "effect_value": 313000,
-          "effect_description": "糧倉容量 313,000",
+          "effect_description": "穀倉容量 313,000",
           "cp_per_day": 15
         },
         {
@@ -8890,7 +8687,7 @@
           "population": 2,
           "culture_points": 18,
           "effect_value": 379000,
-          "effect_description": "糧倉容量 379,000",
+          "effect_description": "穀倉容量 379,000",
           "cp_per_day": 18
         },
         {
@@ -8903,7 +8700,7 @@
           "population": 2,
           "culture_points": 22,
           "effect_value": 457000,
-          "effect_description": "糧倉容量 457,000",
+          "effect_description": "穀倉容量 457,000",
           "cp_per_day": 22
         },
         {
@@ -8916,7 +8713,7 @@
           "population": 2,
           "culture_points": 27,
           "effect_value": 551000,
-          "effect_description": "糧倉容量 551,000",
+          "effect_description": "穀倉容量 551,000",
           "cp_per_day": 27
         },
         {
@@ -8929,7 +8726,7 @@
           "population": 2,
           "culture_points": 32,
           "effect_value": 664000,
-          "effect_description": "糧倉容量 664,000",
+          "effect_description": "穀倉容量 664,000",
           "cp_per_day": 32
         },
         {
@@ -8942,9 +8739,12 @@
           "population": 2,
           "culture_points": 38,
           "effect_value": 800000,
-          "effect_description": "糧倉容量 800,000",
+          "effect_description": "穀倉容量 800,000",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "大糧倉"
       ]
     },
     "woodcutter": {
@@ -9217,11 +9017,12 @@
           "effect_description": "每小時 +2450 木材",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "clay_pit": {
       "building_id": "clay_pit",
-      "name_zh": "磚坑",
+      "name_zh": "泥坑",
       "name_en": "Clay Pit",
       "category": "resource",
       "max_level": 20,
@@ -9489,6 +9290,10 @@
           "effect_description": "每小時 +2450 磚塊",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "黏土坑",
+        "磚坑"
       ]
     },
     "iron_mine": {
@@ -9761,7 +9566,8 @@
           "effect_description": "每小時 +2450 鐵礦",
           "cp_per_day": 38
         }
-      ]
+      ],
+      "aliases_zh": []
     },
     "cropland": {
       "building_id": "cropland",
@@ -10033,6 +9839,9 @@
           "effect_description": "每小時 +2450 糧食",
           "cp_per_day": 38
         }
+      ],
+      "aliases_zh": [
+        "農田"
       ]
     }
   }

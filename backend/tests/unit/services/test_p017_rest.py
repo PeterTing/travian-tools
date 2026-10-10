@@ -45,4 +45,4 @@ def test_path_speed_ts_has_chinese_unit_names() -> None:
     )
     assert len(match.possible_units_zh) == len(match.possible_units)
     assert all("（" in name for name in match.possible_units_zh)
-    assert "方陣兵（高盧）" in match.possible_units_zh
+    assert "方陣兵（高盧人）" in match.possible_units_zh

@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button'
 import PendingVerifyChip from '@/components/common/PendingVerifyChip'
 import { resourcesApi } from '@/services/gameApi'
 import type { ResourceFieldListItem, ResourceFieldDetail, ResourceType } from '@/types/game'
+import { ingameBuildingName } from '@/lib/ingameNames'
 
 const RESOURCE_TYPES: { value: ResourceType; label: string; color: string }[] = [
-  { value: 'wood', label: '伐木場', color: 'bg-amber-100 text-amber-800' },
-  { value: 'clay', label: '黏土坑', color: 'bg-orange-100 text-orange-800' },
-  { value: 'iron', label: '鐵礦場', color: 'bg-slate-100 text-slate-800' },
-  { value: 'crop', label: '農場', color: 'bg-green-100 text-green-800' },
+  { value: 'wood', label: ingameBuildingName('woodcutter')!, color: 'bg-amber-100 text-amber-800' },
+  { value: 'clay', label: ingameBuildingName('clay_pit')!, color: 'bg-orange-100 text-orange-800' },
+  { value: 'iron', label: ingameBuildingName('iron_mine')!, color: 'bg-slate-100 text-slate-800' },
+  { value: 'crop', label: ingameBuildingName('cropland')!, color: 'bg-green-100 text-green-800' },
 ]
 
 export default function ResourcesPage() {

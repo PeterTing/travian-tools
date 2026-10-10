@@ -6,16 +6,17 @@ import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerify
 import type { TroopListItem, TroopDetail, TroopTribe, TroopCategory } from '@/types/game'
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import { isTribeCostVerified } from '@/data/unitCosts'
+import { ingameTribeName } from '@/lib/ingameNames'
 
 const TRIBES: { value: TroopTribe | 'all'; label: string }[] = [
   { value: 'all', label: '全部' },
-  { value: 'romans', label: '羅馬' },
-  { value: 'gauls', label: '高盧' },
-  { value: 'teutons', label: '條頓' },
-  { value: 'huns', label: '匈奴' },
-  { value: 'egyptians', label: '埃及' },
-  { value: 'vikings', label: '維京' },
-  { value: 'spartans', label: '斯巴達' },
+  { value: 'romans', label: ingameTribeName('romans') },
+  { value: 'gauls', label: ingameTribeName('gauls') },
+  { value: 'teutons', label: ingameTribeName('teutons') },
+  { value: 'huns', label: ingameTribeName('huns') },
+  { value: 'egyptians', label: ingameTribeName('egyptians') },
+  { value: 'vikings', label: ingameTribeName('vikings') },
+  { value: 'spartans', label: ingameTribeName('spartans') },
 ]
 
 const CATEGORIES: { value: TroopCategory | 'all'; label: string }[] = [
@@ -25,7 +26,7 @@ const CATEGORIES: { value: TroopCategory | 'all'; label: string }[] = [
   { value: 'siege', label: '攻城' },
   { value: 'scout', label: '偵查' },
   { value: 'special', label: '特殊' },
-  { value: 'settler', label: '移民' },
+  { value: 'settler', label: '開拓者' },
 ]
 
 /** 官方頁數字取自第三方計算器的出處說明（P0-15，斯巴達步兵、騎兵） */

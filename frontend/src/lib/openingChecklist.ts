@@ -19,12 +19,12 @@ export const OPENING_TRIBES: TroopTribe[] = [
 export const FALLBACK_TRIBE: TroopTribe = 'gauls'
 
 export interface ResolvedStep extends OpeningStep {
-  /** Excel 沒有這個部族的資料（維京、斯巴達的拓荒者花費、打野兵） */
+  /** Excel 沒有這個部族的資料（維京、斯巴達的開拓者花費、打野兵） */
   missing?: OpeningStepTribeOverride['missing']
 }
 
 /**
- * 把跟部族有關的欄位（拓荒者花費、打野兵）套上去；步驟本身不變。
+ * 把跟部族有關的欄位（開拓者花費、打野兵）套上去；步驟本身不變。
  */
 export function resolveStep(step: OpeningStep, tribe: TroopTribe): ResolvedStep {
   const override = step.by_tribe?.[tribe]

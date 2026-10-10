@@ -62,7 +62,7 @@ class TestResourcesAPI:
         types = ["wood", "clay", "iron", "crop"]
         expected_names = {
             "wood": ("伐木場", "Woodcutter"),
-            "clay": ("黏土坑", "Clay Pit"),
+            "clay": ("泥坑", "Clay Pit"),
             "iron": ("鐵礦場", "Iron Mine"),
             "crop": ("農場", "Cropland"),
         }

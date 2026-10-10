@@ -23,7 +23,7 @@
   "farm_unit": {
    "romans": {
     "en": "Equites Imperatoris",
-    "zh": "帝國騎兵",
+    "zh": "帝國騎士",
     "cost": 1410
    },
    "gauls": {
@@ -43,7 +43,7 @@
    },
    "huns": {
     "en": "Steppe Rider",
-    "zh": "草原騎兵",
+    "zh": "草原騎士",
     "cost": 895
    },
    "vikings": null,
@@ -106,7 +106,7 @@
        "id": "r005",
        "row": 5,
        "kind": "build",
-       "building": "農田",
+       "building": "農場",
        "building_en": "Croplands",
        "tier": 1,
        "target": "一塊升到 2",
@@ -299,7 +299,7 @@
        "id": "r016",
        "row": 16,
        "kind": "build",
-       "building": "所有農田",
+       "building": "所有農場",
        "building_en": "All croplands",
        "tier": 1,
        "target": "全部升到 2",
@@ -531,7 +531,7 @@
        "id": "r030",
        "row": 30,
        "kind": "build",
-       "building": "農田",
+       "building": "農場",
        "building_en": "Croplands",
        "tier": 2,
        "target": "一塊升到 4",
@@ -684,7 +684,7 @@
        "id": "r039",
        "row": 39,
        "kind": "build",
-       "building": "一塊農田",
+       "building": "一塊農場",
        "building_en": "One cropland",
        "tier": null,
        "target": "升到 3",
@@ -700,7 +700,7 @@
        "id": "r040",
        "row": 40,
        "kind": "build",
-       "building": "鐵匠鋪",
+       "building": "盔甲廠",
        "building_en": "Smithy",
        "tier": 1,
        "target": "升到 1",
@@ -752,7 +752,7 @@
        "id": "r043",
        "row": 43,
        "kind": "build",
-       "building": "所有農田",
+       "building": "所有農場",
        "building_en": "All croplands",
        "tier": 2,
        "target": "全部升到 3",
@@ -873,7 +873,7 @@
        "id": "r050",
        "row": 50,
        "kind": "build",
-       "building": "一塊農田",
+       "building": "一塊農場",
        "building_en": "One cropland",
        "tier": null,
        "target": "一塊升到 4",
@@ -889,7 +889,7 @@
        "id": "r051",
        "row": 51,
        "kind": "build",
-       "building": "鐵匠鋪",
+       "building": "盔甲廠",
        "building_en": "Smithy",
        "tier": null,
        "target": "升到 3",
@@ -937,7 +937,7 @@
        "id": "r054",
        "row": 54,
        "kind": "build",
-       "building": "一塊農田",
+       "building": "一塊農場",
        "building_en": "One cropland",
        "tier": null,
        "target": "一塊升到 4",
@@ -1012,7 +1012,7 @@
        "kind": "farm_unit_only",
        "building": "倉庫",
        "building_en": "Warehouse",
-       "target": "升到 5（只有帝國騎兵需要）",
+       "target": "升到 5（只有帝國騎士需要）",
        "target_en": "to 5 (only applicable for EI)",
        "tier": null,
        "cost": null,
@@ -1022,7 +1022,7 @@
        "reward_res": null,
        "reward_exp": null,
        "why": {
-        "zh": "重要提醒：雷法師、帝國騎兵和草原騎兵可以單獨派去沒有動物的綠洲！",
+        "zh": "重要提醒：雷法師、帝國騎士和草原騎士可以單獨派去沒有動物的綠洲！",
         "en": "Important reminder: TT, EI & SR can be sent solo to an empty oasis!",
         "source": "manual"
        },
@@ -1054,7 +1054,7 @@
        "why": null,
        "by_tribe": {
         "romans": {
-         "building": "研究帝國騎兵",
+         "building": "研究帝國騎士",
          "building_en": "Research Equites Imperatoris",
          "cost": 8780,
          "target": null,
@@ -1082,7 +1082,7 @@
          "skip": true
         },
         "huns": {
-         "building": "研究草原騎兵",
+         "building": "研究草原騎士",
          "building_en": "Research Steppe Rider",
          "cost": 5570,
          "target": null,
@@ -1114,7 +1114,7 @@
        "why": null,
        "by_tribe": {
         "romans": {
-         "building": "打野兵（帝國騎兵）",
+         "building": "打野兵（帝國騎士）",
          "building_en": "Farm units (Equites Imperatoris)",
          "cost": 11280
         },
@@ -1134,7 +1134,7 @@
          "cost": 1200
         },
         "huns": {
-         "building": "打野兵（草原騎兵）",
+         "building": "打野兵（草原騎士）",
          "building_en": "Farm units (Steppe Rider)",
          "cost": 7160
         },
@@ -1170,7 +1170,7 @@
        "id": "r062",
        "row": 62,
        "kind": "build",
-       "building": "所有農田",
+       "building": "所有農場",
        "building_en": "All croplands",
        "tier": 3,
        "target": "全部升到 5",
@@ -1357,13 +1357,13 @@
        "reward_exp": null,
        "count": 0,
        "why": {
-        "zh": "這裡依 ROI 決定要升哪些資源田，或是多投資打野兵；別忘了你已經在打野，資源收入比較多。也許更該把重點放在文明點產量，因為要在 4 場派對內拓荒，文明點產量本來就得升。5 級資源田的 ROI：\n伐木場 67.4 小時\n泥坑 67.7 小時\n鐵礦場 82.5 小時\n農田 76.7 小時\nROI 以英雄 6 級領到的獎勵計算。不建議升鐵礦場，埃及人尤其不要。",
+        "zh": "這裡依 ROI 決定要升哪些資源田，或是多投資打野兵；別忘了你已經在打野，資源收入比較多。也許更該把重點放在文明點產量，因為要在 4 場派對內拓荒，文明點產量本來就得升。5 級資源田的 ROI：\n伐木場 67.4 小時\n泥坑 67.7 小時\n鐵礦場 82.5 小時\n農場 76.7 小時\nROI 以英雄 6 級領到的獎勵計算。不建議升鐵礦場，埃及人尤其不要。",
         "en": "Check here which fields you want to upgrade based on ROI or invest more in farm units, bare in mind you already farm and have more resc income. Might be better to focus more on CP production, since that needs to be upgraded anyway to make it in 4 parties. Nonetheless ROI for the fields 5 are:\nWood - 67,4h\nClay - 67,7h\nIron - 82,5h\nCrop - 76,7h\nROI is calculated with the reward cashed with hero level 6. Iron mines are not recommended to do, especially for Egyptians a no-go.",
         "source": "manual"
        },
        "by_tribe": {
         "romans": {
-         "building": "打野兵（帝國騎兵）",
+         "building": "打野兵（帝國騎士）",
          "building_en": "Farm units (Equites Imperatoris)",
          "cost": 0
         },
@@ -1383,7 +1383,7 @@
          "cost": 0
         },
         "huns": {
-         "building": "打野兵（草原騎兵）",
+         "building": "打野兵（草原騎士）",
          "building_en": "Farm units (Steppe Rider)",
          "cost": 0
         },
@@ -1575,7 +1575,7 @@
        "id": "r084",
        "row": 84,
        "kind": "settlers",
-       "building": "拓荒者",
+       "building": "開拓者",
        "building_en": "Train settler(s)",
        "target": "訓練 1 個",
        "target_en": "1",
@@ -1631,7 +1631,7 @@
        "id": "r086",
        "row": 86,
        "kind": "settlers",
-       "building": "拓荒者",
+       "building": "開拓者",
        "building_en": "Train settler(s)",
        "target": "訓練 2 個",
        "target_en": "2",
@@ -2033,7 +2033,7 @@
        "id": "r005",
        "row": 5,
        "kind": "build",
-       "building": "農田",
+       "building": "農場",
        "building_en": "Croplands",
        "tier": 1,
        "target": "一塊升到 2",
@@ -2226,7 +2226,7 @@
        "id": "r016",
        "row": 16,
        "kind": "build",
-       "building": "所有農田",
+       "building": "所有農場",
        "building_en": "All croplands",
        "tier": 1,
        "target": "全部升到 2",
@@ -2458,7 +2458,7 @@
        "id": "r030",
        "row": 30,
        "kind": "build",
-       "building": "農田",
+       "building": "農場",
        "building_en": "Croplands",
        "tier": 2,
        "target": "一塊升到 4",
@@ -2611,7 +2611,7 @@
        "id": "r039",
        "row": 39,
        "kind": "build",
-       "building": "一塊農田",
+       "building": "一塊農場",
        "building_en": "One cropland",
        "tier": null,
        "target": "升到 3",
@@ -2627,7 +2627,7 @@
        "id": "r040",
        "row": 40,
        "kind": "build",
-       "building": "鐵匠鋪",
+       "building": "盔甲廠",
        "building_en": "Smithy",
        "tier": 1,
        "target": "升到 1",
@@ -2675,7 +2675,7 @@
        "id": "r043",
        "row": 43,
        "kind": "build",
-       "building": "所有農田",
+       "building": "所有農場",
        "building_en": "All croplands",
        "tier": 2,
        "target": "全部升到 3",
@@ -2831,7 +2831,7 @@
        "reward_res": 3000,
        "reward_exp": 50,
        "why": {
-        "zh": "建議：農田升到 6 級，因為每塊會多 1 點文明點產量。之後文明點的花費會越來越高，可以把一塊農田看成 1250 資源的文明點投資，這樣農田本身只算 2000，ROI 大約 66 小時，加上文明點換算的成本低，很划算。",
+        "zh": "建議：農場升到 6 級，因為每塊會多 1 點文明點產量。之後文明點的花費會越來越高，可以把一塊農場看成 1250 資源的文明點投資，這樣農場本身只算 2000，ROI 大約 66 小時，加上文明點換算的成本低，很划算。",
         "en": "ADVICED: Lv6 crop fields are done due to the 1 CP prod it gives. Since CP costs rise later on, consider 1 crop to be a 1250 resc investment in CP. That makes the costs only 2000, ROI for the fields would then be 66 hours, which is reasonable beside the low CP per resc cost of the field itself.",
         "source": "manual"
        }
@@ -2952,7 +2952,7 @@
        "id": "r059",
        "row": 59,
        "kind": "build",
-       "building": "所有農田",
+       "building": "所有農場",
        "building_en": "All croplands",
        "tier": 3,
        "target": "全部升到 5",
@@ -2963,7 +2963,7 @@
        "reward_res": 2700,
        "reward_exp": 45,
        "why": {
-        "zh": "選做：穀物磨坊 1 級也是一個選項，搭配 6 級農田、算進任務獎勵的 ROI 是 63 小時。不過要拆掉一個山洞才有空地。",
+        "zh": "選做：麵粉廠 1 級也是一個選項，搭配 6 級農場、算進任務獎勵的 ROI 是 63 小時。不過要拆掉一個山洞才有空地。",
         "en": "OPTIONAL: Grain mill 1 is an option as with lv6 fields it has a ROI of 63h included the task reward. However it will require to demolish a cranny.",
         "source": "manual"
        }
@@ -3020,7 +3020,7 @@
        "id": "r063",
        "row": 63,
        "kind": "build",
-       "building": "所有農田",
+       "building": "所有農場",
        "building_en": "All croplands",
        "tier": null,
        "target": "全部升到 6",
@@ -3040,7 +3040,7 @@
        "id": "r064",
        "row": 64,
        "kind": "build",
-       "building": "穀物磨坊",
+       "building": "麵粉廠",
        "building_en": "Grain mill",
        "tier": 1,
        "target": "升到 1",
@@ -3300,7 +3300,7 @@
        "id": "r080",
        "row": 80,
        "kind": "settlers",
-       "building": "拓荒者",
+       "building": "開拓者",
        "building_en": "Train settler",
        "target": "訓練 1 個",
        "target_en": "1",
@@ -3312,7 +3312,7 @@
        "reward_exp": null,
        "count": 1,
        "why": {
-        "zh": "拓荒者的花費依部族不同，請在上方選部族。",
+        "zh": "開拓者的花費依部族不同，請在上方選部族。",
         "en": "For accurate settler costs select tribe above!",
         "source": "manual"
        },
@@ -3360,7 +3360,7 @@
        "id": "r082",
        "row": 82,
        "kind": "settlers",
-       "building": "拓荒者",
+       "building": "開拓者",
        "building_en": "Train settlers",
        "target": "訓練 2 個",
        "target_en": "2",
@@ -3820,28 +3820,28 @@
       "title": "資源",
       "rows": [
        {
-        "task": "農田",
+        "task": "農場",
         "tier": 1,
         "target": "升到 2",
         "reward_res": 600,
         "reward_exp": 10
        },
        {
-        "task": "農田",
+        "task": "農場",
         "tier": 2,
         "target": "升到 4",
         "reward_res": 1200,
         "reward_exp": 20
        },
        {
-        "task": "農田",
+        "task": "農場",
         "tier": 3,
         "target": "升到 7",
         "reward_res": 1800,
         "reward_exp": 30
        },
        {
-        "task": "農田",
+        "task": "農場",
         "tier": 4,
         "target": "升到 10",
         "reward_res": 2400,
@@ -3932,35 +3932,35 @@
         "reward_exp": 40
        },
        {
-        "task": "所有農田",
+        "task": "所有農場",
         "tier": 1,
         "target": "升到 2",
         "reward_res": 900,
         "reward_exp": 15
        },
        {
-        "task": "所有農田",
+        "task": "所有農場",
         "tier": 2,
         "target": "升到 3",
         "reward_res": 1800,
         "reward_exp": 30
        },
        {
-        "task": "所有農田",
+        "task": "所有農場",
         "tier": 3,
         "target": "升到 5",
         "reward_res": 2700,
         "reward_exp": 45
        },
        {
-        "task": "所有農田",
+        "task": "所有農場",
         "tier": 4,
         "target": "升到 8",
         "reward_res": 3600,
         "reward_exp": 60
        },
        {
-        "task": "所有農田",
+        "task": "所有農場",
         "tier": 5,
         "target": "升到 10",
         "reward_res": 4500,
@@ -4308,21 +4308,21 @@
         "reward_exp": 30
        },
        {
-        "task": "鐵匠鋪",
+        "task": "盔甲廠",
         "tier": 1,
         "target": "升到 1",
         "reward_res": 600,
         "reward_exp": 10
        },
        {
-        "task": "鐵匠鋪",
+        "task": "盔甲廠",
         "tier": 2,
         "target": "升到 10",
         "reward_res": 1200,
         "reward_exp": 20
        },
        {
-        "task": "鐵匠鋪",
+        "task": "盔甲廠",
         "tier": 3,
         "target": "升到 20",
         "reward_res": 1800,
@@ -4581,42 +4581,42 @@
         "reward_exp": 20
        },
        {
-        "task": "鑄造廠",
+        "task": "鋼鐵鑄造廠",
         "tier": 1,
         "target": "升到 1",
         "reward_res": 600,
         "reward_exp": 10
        },
        {
-        "task": "鑄造廠",
+        "task": "鋼鐵鑄造廠",
         "tier": 2,
         "target": "升到 5",
         "reward_res": 1200,
         "reward_exp": 20
        },
        {
-        "task": "穀物磨坊",
+        "task": "麵粉廠",
         "tier": 1,
         "target": "升到 1",
         "reward_res": 600,
         "reward_exp": 10
        },
        {
-        "task": "穀物磨坊",
+        "task": "麵粉廠",
         "tier": 2,
         "target": "升到 5",
         "reward_res": 1200,
         "reward_exp": 20
        },
        {
-        "task": "麵包坊",
+        "task": "麵包店",
         "tier": 1,
         "target": "升到 1",
         "reward_res": 600,
         "reward_exp": 10
        },
        {
-        "task": "麵包坊",
+        "task": "麵包店",
         "tier": 2,
         "target": "升到 5",
         "reward_res": 1200,

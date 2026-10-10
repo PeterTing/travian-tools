@@ -63,7 +63,7 @@ def test_sections_follow_task_tier(data: dict, strategy: str) -> None:
 
 def test_numbers_match_the_excel(data: dict) -> None:
     farm = _steps(data, "4p-farm")
-    assert farm["r016"]["building"] == "所有農田"
+    assert farm["r016"]["building"] == "所有農場"
     assert farm["r016"]["cost"] == 3325  # =665*5
     assert farm["r016"]["reward_res"] == 900
     assert farm["r076"]["cost"] == 16655  # =9155+7500
@@ -81,7 +81,7 @@ def test_tribe_dependent_fields(data: dict) -> None:
     assert settlers["by_tribe"]["vikings"] == {"missing": "settler_cost"}
     stable = farm["r056"]
     assert (stable["target"], stable["cost"]) == ("升到 3", 2105)
-    assert stable["by_tribe"]["romans"]["cost"] == 5550  # 帝國騎兵：馬廄升到 5
+    assert stable["by_tribe"]["romans"]["cost"] == 5550  # 帝國騎士：馬廄升到 5
     assert farm["r058"]["skip"] is True
     assert farm["r058"]["by_tribe"]["romans"]["skip"] is False
     assert data["tribe_data"]["settler_cost"]["huns"] == 20900
@@ -108,8 +108,8 @@ def test_uses_taiwan_terms(data: dict) -> None:
         for sec in s["sections"]
         for st in sec["steps"]
     }
-    assert {"村莊大樓", "伐木場", "泥坑", "鐵礦場", "農田", "集結點"} <= buildings
-    assert "拓荒者" in buildings
+    assert {"村莊大樓", "伐木場", "泥坑", "鐵礦場", "農場", "集結點"} <= buildings
+    assert "開拓者" in buildings
 
 
 def test_file_is_valid_json() -> None:

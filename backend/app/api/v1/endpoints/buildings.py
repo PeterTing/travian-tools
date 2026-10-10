@@ -87,6 +87,7 @@ async def get_buildings(
             b
             for b in buildings
             if search_lower in b.name_zh.lower()
+            or any(search_lower in a.lower() for a in b.aliases_zh)
             or search_lower in b.name_en.lower()
             or search_lower in b.building_id.lower()
         ]

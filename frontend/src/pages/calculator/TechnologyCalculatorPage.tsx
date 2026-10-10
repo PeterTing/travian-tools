@@ -5,15 +5,16 @@ import type { TechnologyRequest, TechnologyResponse } from '@/services/advancedC
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import { useAutoFill } from '@/components/autofill/AutoFillContext'
 import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerifyChip'
+import { ingameTribeName } from '@/lib/ingameNames'
 
 const TRIBES = [
-  { value: 'romans', label: '羅馬' },
-  { value: 'teutons', label: '條頓' },
-  { value: 'gauls', label: '高盧' },
-  { value: 'huns', label: '匈奴' },
-  { value: 'egyptians', label: '埃及' },
-  { value: 'vikings', label: '維京' },
-  { value: 'spartans', label: '斯巴達' },
+  { value: 'romans', label: ingameTribeName('romans') },
+  { value: 'teutons', label: ingameTribeName('teutons') },
+  { value: 'gauls', label: ingameTribeName('gauls') },
+  { value: 'huns', label: ingameTribeName('huns') },
+  { value: 'egyptians', label: ingameTribeName('egyptians') },
+  { value: 'vikings', label: ingameTribeName('vikings') },
+  { value: 'spartans', label: ingameTribeName('spartans') },
 ]
 
 export default function TechnologyCalculatorPage() {
@@ -47,9 +48,9 @@ export default function TechnologyCalculatorPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">鐵匠升級</h1>
+      <h1 className="text-3xl font-bold mb-6">盔甲廠升級</h1>
       <p className="text-muted-foreground mb-6">
-        查看鐵匠鋪升級後兵種的攻擊、防禦。升級後數值＝原本數值＋（原本數值＋300×糧耗÷7）×（1.007 的等級次方 − 1），四捨五入到小數 1 位。
+        查看盔甲廠升級後兵種的攻擊、防禦。升級後數值＝原本數值＋（原本數值＋300×糧耗÷7）×（1.007 的等級次方 − 1），四捨五入到小數 1 位。
       </p>
       <CalcBar />
 

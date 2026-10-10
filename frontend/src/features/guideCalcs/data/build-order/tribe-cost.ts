@@ -61,7 +61,7 @@ function settlerCombat(tribe: TribeId, base: Omit<SettlerCombatStats, 'speed'>):
   return { ...base, speed: unitSpeedValue(tribe, 'settler') };
 }
 
-/** ts11 說明頁讀到的拓荒者（產生檔）；沒讀到就用 fallback（不應該發生，測試會擋） */
+/** ts11 說明頁讀到的開拓者（產生檔）；沒讀到就用 fallback（不應該發生，測試會擋） */
 function ts11Settler(tribe: TribeId, fallback: SettlerCost): SettlerCost {
   const st = unitSpeed(tribe, 'settler')?.stats;
   if (!st) return fallback;

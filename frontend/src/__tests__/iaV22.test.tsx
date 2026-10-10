@@ -196,7 +196,7 @@ describe('IA v2.2', () => {
       const line = screen.getByTestId('autofill-unit-pending')
       fireEvent.click(within(line).getByTestId('pending-verify-chip'))
       expect(screen.getByTestId('pending-note-what')).toHaveTextContent(
-        /^羅馬、條頓、高盧、埃及、匈奴的兵種數字已在 ts11 遊戲內說明頁核對；ts11 沒有斯巴達、維京，這兩族的花費、糧耗、訓練時間還是社群整理的數字。$/,
+        /^羅馬人、日耳曼人、高盧人、埃及人、匈奴的兵種數字已在 ts11 遊戲內說明頁核對；ts11 沒有斯巴達、維京，這兩族的花費、糧耗、訓練時間還是社群整理的數字。$/,
       )
       expect(screen.getByTestId('pending-note-source')).toHaveTextContent(
         /^斯巴達速度取自官方說明頁（頁面標示數字來自第三方計算器），反推 TS 不會算斯巴達兵種。$/,

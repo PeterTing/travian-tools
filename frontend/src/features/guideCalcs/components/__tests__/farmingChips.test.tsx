@@ -37,40 +37,36 @@ describe('農場收益：行軍速度灰標（P0-22）', () => {
     fireEvent.click(screen.getByTestId('calc-result-toggle'))
   })
 
-  it('arena 5: summary keeps ONE chip listing unitCarry then arenaSpeed; the open note shows the two entries in that order, 8px apart', () => {
+  // P0-18 之後列出的 6 種兵都在 ts11 核對過：unitCarry／units 不再出現，只剩行軍速度
+  it('arena 5: summary keeps ONE chip; units are ts11-verified (P0-18) so it lists only arenaSpeed', () => {
     setArena(5)
     const chips = titleChips()
     expect(chips).toHaveLength(1)
-    expect(chips[0]).toHaveAttribute('data-kind', 'unitCarry arenaSpeed')
+    expect(chips[0]).toHaveAttribute('data-kind', 'arenaSpeed')
     fireEvent.click(chips[0]!)
     const panel = document.getElementById(chips[0]!.getAttribute('aria-controls')!)!
-    const entries = within(panel).getAllByTestId('pending-note-entry')
-    expect(entries.map((e) => e.getAttribute('data-kind'))).toEqual(['unitCarry', 'arenaSpeed'])
-    expect(entries[0]).not.toHaveClass('mt-2')
-    expect(entries[1]).toHaveClass('mt-2')
+    expect(within(panel).getAllByTestId('pending-note-entry').map((e) => e.getAttribute('data-kind'))).toEqual(['arenaSpeed'])
   })
 
   it('arena 5: daily yield, raids per hour and payback each have exactly one chip that includes the speed', () => {
     setArena(5)
     expect(kindsOf(row('每小時最多次數'))).toEqual(['arenaSpeed'])
-    expect(kindsOf(row('每日預估收益'))).toEqual(['unitCarry arenaSpeed'])
-    expect(kindsOf(row('回本天數'))).toEqual(['units arenaSpeed'])
+    expect(kindsOf(row('每日預估收益'))).toEqual(['arenaSpeed'])
+    expect(kindsOf(row('回本天數'))).toEqual(['arenaSpeed'])
   })
 
   it('arena 5 + boots 25: the combined arenaBootsSpeed kind is used', () => {
     setArena(5)
     fireEvent.change(screen.getByLabelText('英雄靴子速度加成（%）'), { target: { value: '25' } })
-    expect(titleChips()[0]).toHaveAttribute('data-kind', 'unitCarry arenaBootsSpeed')
+    expect(titleChips()[0]).toHaveAttribute('data-kind', 'arenaBootsSpeed')
     expect(kindsOf(row('每小時最多次數'))).toEqual(['arenaBootsSpeed'])
   })
 
-  it('arena 0 and boots 0: summary lists only unitCarry and no detail row has a speed chip', () => {
-    const chips = titleChips()
-    expect(chips).toHaveLength(1)
-    expect(chips[0]).toHaveAttribute('data-kind', 'unitCarry')
+  it('arena 0 and boots 0: no speed chip anywhere (and no unit chip: ts11-verified)', () => {
+    expect(titleChips()).toHaveLength(0)
     expect(kindsOf(row('每小時最多次數'))).toEqual([])
-    expect(kindsOf(row('每日預估收益'))).toEqual(['unitCarry'])
-    expect(kindsOf(row('回本天數'))).toEqual(['units'])
+    expect(kindsOf(row('每日預估收益'))).toEqual([])
+    expect(kindsOf(row('回本天數'))).toEqual([])
     const all = within(screen.getByTestId('calc-result-panel')).queryAllByTestId('pending-verify-chip').map((c) => c.getAttribute('data-kind') ?? '')
     expect(all.some((k) => /Speed/.test(k))).toBe(false)
   })

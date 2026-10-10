@@ -349,7 +349,7 @@ def test_every_building_not_measured_in_ts11_is_pending() -> None:
         (ROOT / "frontend/src/data/gameData.gen.json").read_text(encoding="utf-8")
     )
     not_measured = sorted(bid for bid, p in mod.PARAMS.items() if p["src"] != "ts11")
-    assert len(not_measured) == 27  # 22 + hero mansion + 4 kept-L1-time buildings
+    assert len(not_measured) == 26  # 21 + hero mansion + 4 kept-L1-time buildings (T3 armoury removed, #33)
     for bid in not_measured:
         assert not mod.PARAMS[bid]["verified"], bid
         assert {"cost", "time"} <= set(fe["pending"][bid]), bid

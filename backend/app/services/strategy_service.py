@@ -67,7 +67,7 @@ PHASE_STANDARDS: dict[GamePhase, dict] = {
             key_objectives=[
                 "完成所有新手任務",
                 "升級資源田至 Lv2-3",
-                "建造基礎建築（倉庫、糧倉、本部）",
+                "建造基礎建築（倉庫、穀倉、村莊大樓）",
                 "訓練少量兵力開始農場",
             ],
         ),
@@ -510,7 +510,7 @@ class StrategyService:
                 status="good",
                 score=80,
                 message=f"人口 {total_population}，糧食平衡正常",
-                suggestions=["注意持續升級農田"],
+                suggestions=["注意持續升級農場"],
             )
         else:
             return HealthCheckItem(
@@ -518,7 +518,7 @@ class StrategyService:
                 status="warning",
                 score=60,
                 message=f"人口 {total_population}，需注意糧食供給",
-                suggestions=["優先升級農田", "考慮佔領糧食綠洲"],
+                suggestions=["優先升級農場", "考慮佔領糧食綠洲"],
             )
 
     def _check_culture_points(self, account: GameAccount) -> HealthCheckItem:
@@ -544,7 +544,7 @@ class StrategyService:
                 status="warning",
                 score=65,
                 message=f"村莊數 {village_count}，文化點產出略低",
-                suggestions=["升級市政廳加速文化點", "考慮舉辦慶典"],
+                suggestions=["升級城鎮廳加速文化點", "考慮舉辦慶典"],
             )
         else:
             return HealthCheckItem(
@@ -552,7 +552,7 @@ class StrategyService:
                 status="critical",
                 score=40,
                 message=f"村莊數 {village_count}，發展速度落後",
-                suggestions=["優先建造/升級市政廳", "儘快舉辦慶典", "加快資源田發展"],
+                suggestions=["優先建造/升級城鎮廳", "儘快舉辦慶典", "加快資源田發展"],
             )
 
     def _check_village_configuration(self, account: GameAccount) -> HealthCheckItem:

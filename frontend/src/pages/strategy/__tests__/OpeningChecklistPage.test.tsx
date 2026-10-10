@@ -211,7 +211,7 @@ describe('起手式清單 (P0-10)', () => {
     db.progress['acc-ts3/4p-farm'] = ['r003', 'r004']
     renderPage()
     await waitFor(() => expect(progressText()).toHaveTextContent('2 / 5 步'))
-    const settlers = () => screen.getByRole('checkbox', { name: '完成：拓荒者 ×1' }).closest('li')!
+    const settlers = () => screen.getByRole('checkbox', { name: '完成：開拓者 ×1' }).closest('li')!
     expect(settlers()).toHaveTextContent('花費 18,100')
     const warehouse = () => screen.getByRole('checkbox', { name: '完成：倉庫 升到 5' }).closest('li')!
     expect(warehouse()).toHaveTextContent('這個部族不用做，可以直接勾掉')
@@ -222,7 +222,7 @@ describe('起手式清單 (P0-10)', () => {
     expect(warehouse()).toHaveTextContent('花費 2,010')
     expect(warehouse()).not.toHaveTextContent('不用做')
     fireEvent.change(screen.getByRole('combobox', { name: '部族' }), { target: { value: 'vikings' } })
-    expect(settlers()).toHaveTextContent('Excel 沒有這個部族的拓荒者花費')
+    expect(settlers()).toHaveTextContent('Excel 沒有這個部族的開拓者花費')
     // 步驟數不變
     expect(progressText()).toHaveTextContent('2 / 5 步')
   })
@@ -233,7 +233,7 @@ describe('起手式清單 (P0-10)', () => {
     await loaded()
     fireEvent.click(screen.getByRole('button', { name: '目前世界：ts3' }))
     const sheet = screen.getByRole('dialog', { name: '切換帳號和世界' })
-    fireEvent.click(within(sheet).getByText(/^條頓/))
+    fireEvent.click(within(sheet).getByText(/^日耳曼人/))
     await waitFor(() => expect(progressText()).toHaveTextContent('1 / 5 步'))
     expect(openingChecklistApi.getProgress).toHaveBeenLastCalledWith('acc-ts5', '4p-farm')
     expect(screen.getByRole('combobox', { name: '部族' })).toHaveValue('teutons')

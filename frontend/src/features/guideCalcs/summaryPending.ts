@@ -53,6 +53,6 @@ export const SUMMARY_PENDING: Record<string, SummaryPendingDecl> = {
   },
   'features/guideCalcs/components/LaunchSimCalculator.tsx': {
     chips: [['launchSim']],
-    note: '第二行一個灰標：「第 X 天」＝試算表每一步加總（launchSim）；時數用同一份資料，標題不重複放。拓荒者花費沒有用在計算裡，P0-17 (b) 從摘要拿掉（明細最後一列仍列出，旁邊有 units 灰標）',
+    note: '第二行一個灰標：「第 X 天」＝試算表每一步加總（launchSim）；時數用同一份資料，標題不重複放。開拓者花費沒有用在計算裡，P0-17 (b) 從摘要拿掉（明細最後一列仍列出，旁邊有 units 灰標）',
   },
 }

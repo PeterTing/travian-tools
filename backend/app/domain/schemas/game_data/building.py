@@ -35,7 +35,9 @@ class BuildingLevel(BaseModel):
     cost_clay: int = Field(..., ge=0, description="磚塊成本")
     cost_iron: int = Field(..., ge=0, description="鐵礦成本")
     cost_crop: int = Field(..., ge=0, description="糧食成本")
-    build_time_base: int = Field(..., ge=0, description="基礎建造時間（秒，本部 Lv1）")
+    build_time_base: int = Field(
+        ..., ge=0, description="基礎建造時間（秒，村莊大樓 Lv1）"
+    )
     population: int = Field(..., ge=0, description="人口增加")
     culture_points: int = Field(..., ge=0, description="文化點（升級時獲得）")
     cp_per_day: int = Field(0, ge=0, description="每日文化點產出")
@@ -53,6 +55,9 @@ class Building(BaseModel):
 
     building_id: str = Field(..., description="建築 ID")
     name_zh: str = Field(..., description="中文名稱")
+    aliases_zh: list[str] = Field(
+        default_factory=list, description="舊名／別稱（只給搜尋用，不顯示）"
+    )
     name_en: str = Field(..., description="英文名稱")
     category: BuildingCategory = Field(..., description="建築類別")
     max_level: int = Field(20, ge=1, le=20, description="最高等級")

@@ -26,7 +26,7 @@ const FIELDS: FieldDef[] = [
   { id: 'cr', key: 'cranny',           label: 'Cranny',            ids: ['cranny'] },
   { id: 'wh', key: 'warehouse',        label: 'Warehouse',         ids: ['warehouse'] },
   { id: 'gr', key: 'granary',          label: 'Granary',           ids: ['granary'] },
-  { id: 'sm', key: 'smithy',           label: 'Smithy / Armoury',  ids: ['blacksmith', 'armoury'] },
+  { id: 'sm', key: 'smithy',           label: 'Smithy',            ids: ['blacksmith'] },
   { id: 'ba', key: 'barracks',         label: 'Barracks',          ids: ['barracks'] },
   { id: 'st', key: 'stable',           label: 'Stable',            ids: ['stable'] },
   { id: 'ts', key: 'tournamentSquare', label: 'Tournament Sq.',    ids: ['tournament_square'] },

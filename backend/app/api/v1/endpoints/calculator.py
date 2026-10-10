@@ -18,7 +18,7 @@ class BuildingUpgradeRequest(BaseModel):
     from_level: int = Field(..., ge=0, le=19, description="起始等級")
     to_level: int = Field(..., ge=1, le=20, description="目標等級")
     main_building_level: int = Field(
-        1, ge=1, le=20, description="本部等級（計算時間用）"
+        1, ge=1, le=20, description="村莊大樓等級（計算時間用）"
     )
     server_speed: float = Field(1.0, gt=0, description="伺服器速度倍率")
 
@@ -34,7 +34,7 @@ class BuildingUpgradeResponse(BaseModel):
     cost: dict[str, int]
     total_cost: int
     build_time_base: int  # 基礎建造時間（秒）
-    build_time_actual: int  # 實際建造時間（秒，含本部加成）
+    build_time_actual: int  # 實際建造時間（秒，含村莊大樓加成）
     build_time_formatted: str  # 格式化的建造時間
     population_increase: int
     culture_points: int  # 累積獲得的文化點
@@ -121,7 +121,7 @@ class CropBalanceRequest(BaseModel):
     )
     troops: list[BattleUnit] = Field(default_factory=list, description="部隊列表")
     crop_fields_production: int = Field(
-        0, ge=0, description="農田總產量/小時（不含英雄）"
+        0, ge=0, description="農場總產量/小時（不含英雄）"
     )
     oasis_bonus: float = Field(0, ge=0, description="糧食綠洲加成百分比")
     # Hero crop numbers: S75 / S141
@@ -200,7 +200,7 @@ async def calculate_building_upgrade(
 ) -> BuildingUpgradeResponse:
     """計算建築升級所需資源和時間.
 
-    支援本部等級加成和伺服器速度倍率。
+    支援村莊大樓等級加成和伺服器速度倍率。
     """
     if request.from_level >= request.to_level:
         raise HTTPException(
@@ -250,7 +250,7 @@ async def calculate_building_upgrade(
     total_culture_points = to_cp_daily  # 升級後該建築每日 CP
     culture_points_per_day = to_cp_daily - from_cp_daily
 
-    # 計算實際建造時間（含本部加成）
+    # 計算實際建造時間（含村莊大樓加成）
     actual_build_time = calculate_actual_build_time(
         total_build_time, request.main_building_level, request.server_speed
     )
@@ -548,7 +548,7 @@ async def calculate_crop_balance(request: CropBalanceRequest) -> CropBalanceResp
         suggestions.append("佔領糧食綠洲")
         if troop_consumption > 0:
             suggestions.append("考慮將部分部隊駐紮到其他村莊")
-        suggestions.append("建造麵粉坊/麵包坊提高糧食效率")
+        suggestions.append("建造麵粉廠／麵包店提高糧食效率")
 
     return CropBalanceResponse(
         population_consumption=population_consumption,

@@ -89,7 +89,7 @@ export default function LaunchSimCalculator() {
         <p>
           {lang === 'en'
             ? 'Estimate how long until you can settle, based on production and opening style. Shows milestones for parties, settler training, and the final step.'
-            : '依產量與開局風格，估算多久可以結帳開新村。會標出派對、訓練拓荒者與最後一步等里程碑時間。'}
+            : '依產量與開局風格，估算多久可以結帳開新村。會標出派對、訓練開拓者與最後一步等里程碑時間。'}
         </p>
       </div>
       <CalcBar />
@@ -110,7 +110,7 @@ export default function LaunchSimCalculator() {
           </div>
 
           <div className={s.field}>
-            <label>{lang === 'en' ? 'Tribe (settler cost reference only)' : '部族（只影響下面的拓荒者成本參考）'}</label>
+            <label>{lang === 'en' ? 'Tribe (settler cost reference only)' : '部族（只影響下面的開拓者成本參考）'}</label>
             <select value={tribe} onChange={(e) => setTribe(e.target.value as TribeId)}>
               {TRIBE_ORDER.map((id) => (
                 <option key={id} value={id}>
@@ -146,8 +146,8 @@ export default function LaunchSimCalculator() {
           primary={<>{result.totalHours.toFixed(1)} h</>}
           secondary={
             // 一行一個灰標，依數字出現順序：「第 X 天」＝試算表每一步花費加總÷產量（launchSim）、
-            // 「拓荒者」花費（社群整理的兵種數字，units）。上面的時數用同一份資料，標題不另外放
-            // 拓荒者花費沒有用在計算裡，摘要不放（P0-17 (b)）；明細最後一列仍列出，給玩家參考
+            // 「開拓者」花費（社群整理的兵種數字，units）。上面的時數用同一份資料，標題不另外放
+            // 開拓者花費沒有用在計算裡，摘要不放（P0-17 (b)）；明細最後一列仍列出，給玩家參考
             <SummaryPending kinds={['launchSim']} testId="launch-sim-summary-settlers">
               {lang === 'en'
                 ? `Day ${(result.totalHours / 24).toFixed(1)}`
@@ -168,7 +168,7 @@ export default function LaunchSimCalculator() {
             </span>
           </PendingRow>
           <PendingRow className={s.row}>
-            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x, reference only)' : '拓荒者成本（3 名，參考，不算在時間裡）'}{!TRIBE_SETTLER_COST[tribe].verified && <> <PendingVerifyChip kind="units" /></>}</span>
+            <span className={s.label}>{lang === 'en' ? 'Settler cost (3x, reference only)' : '開拓者成本（3 名，參考，不算在時間裡）'}{!TRIBE_SETTLER_COST[tribe].verified && <> <PendingVerifyChip kind="units" /></>}</span>
             <span className={s.value}>{settlerCost.toLocaleString()}</span>
           </PendingRow>
 

@@ -28,7 +28,7 @@ export const FARM_UNITS: UnitOpt[] = UNIT_PICKS.map(([id, tribeId, unitId]) => {
   const u = tribe.units.find(x => x.id === unitId);
   if (!u || u.speed === null) throw new Error(`no unit data for ${tribeId}.${unitId}`);
   return {
-    id, nameZh: u.name.zh, nameEn: u.name.en, tribeZh: tribe.name.zh.replace(/人$/, ''), tribeEn: tribe.name.en,
+    id, nameZh: u.name.zh, nameEn: u.name.en, tribeZh: tribe.name.zh, tribeEn: tribe.name.en,
     carry: u.carry, speed: u.speed, cost: u.cost.wood + u.cost.clay + u.cost.iron + u.cost.crop, verified: u.statsVerified,
   };
 });

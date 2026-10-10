@@ -24,9 +24,9 @@ class TroopCategory(StrEnum):
     INFANTRY = "infantry"  # 步兵
     CAVALRY = "cavalry"  # 騎兵
     SIEGE = "siege"  # 攻城器械
-    SCOUT = "scout"  # 偵查兵
+    SCOUT = "scout"  # 偵察兵
     SPECIAL = "special"  # 特殊兵種（如元首、酋長）
-    SETTLER = "settler"  # 移民
+    SETTLER = "settler"  # 開拓者
 
 
 class TrainingBuilding(StrEnum):
@@ -34,7 +34,7 @@ class TrainingBuilding(StrEnum):
 
     BARRACKS = "barracks"  # 兵營
     STABLE = "stable"  # 馬廄
-    WORKSHOP = "workshop"  # 工坊
+    WORKSHOP = "workshop"  # 工場
     GREAT_BARRACKS = "great_barracks"  # 大兵營
     GREAT_STABLE = "great_stable"  # 大馬廄
     RESIDENCE = "residence"  # 行宮
@@ -46,6 +46,9 @@ class Troop(BaseModel):
 
     troop_id: str = Field(..., description="兵種 ID")
     name_zh: str = Field(..., description="中文名稱")
+    aliases_zh: list[str] = Field(
+        default_factory=list, description="舊名／別稱（只給搜尋用，不顯示）"
+    )
     name_en: str = Field(..., description="英文名稱")
     tribe: TroopTribe = Field(..., description="所屬部族")
     category: TroopCategory = Field(..., description="兵種類型")

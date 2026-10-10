@@ -69,7 +69,7 @@ describe('TroopsPage: one 「待驗證」 chip for unit costs / upkeep / trainin
     render(<TroopsPage />)
     fireEvent.click(await screen.findByText('狂戰士'))
     await screen.findByTestId('troop-cost-heading')
-    for (const zh of ['維京', '步兵', '兵營']) expect(screen.getByText(zh, { selector: 'td' })).toBeInTheDocument()
+    for (const zh of ['維京人', '步兵', '兵營']) expect(screen.getByText(zh, { selector: 'td' })).toBeInTheDocument()
     for (const en of ['vikings', 'infantry', 'barracks']) expect(screen.queryByText(en, { selector: 'td' })).toBeNull()
   })
 })

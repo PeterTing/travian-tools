@@ -11,12 +11,21 @@ import PendingVerifyChip, { PendingRow } from '@/components/common/PendingVerify
 import type { PendingKind } from '@/lib/pendingNotes';
 import { CalcBar } from '@/components/autofill/CalcFrame'
 import Stepper from '@/components/common/Stepper'
+import { ingameBuildingName } from '@/lib/ingameNames';
 
 export type BB = 'sawmill' | 'brickyard' | 'ironFoundry' | 'grainMill' | 'bakery';
 
-const FIELD_ZH: Record<ResourceType, string> = { wood: '伐木場', clay: '磚坑', iron: '鐵礦場', crop: '農場' };
+// 建築名一律讀遊戲內名稱表
+const FIELD_ZH: Record<ResourceType, string> = {
+  wood: ingameBuildingName('woodcutter')!, clay: ingameBuildingName('clay_pit')!,
+  iron: ingameBuildingName('iron_mine')!, crop: ingameBuildingName('cropland')!,
+};
 const RES_ZH: Record<ResourceType, string> = { wood: '木材', clay: '黏土', iron: '鐵礦', crop: '糧食' };
-const BB_ZH: Record<BB, string> = { sawmill: '鋸木廠', brickyard: '磚廠', ironFoundry: '鑄鐵廠', grainMill: '麵粉廠', bakery: '麵包店' };
+const BB_ZH: Record<BB, string> = {
+  sawmill: ingameBuildingName('sawmill')!, brickyard: ingameBuildingName('brickyard')!,
+  ironFoundry: ingameBuildingName('iron_foundry')!, grainMill: ingameBuildingName('grain_mill')!,
+  bakery: ingameBuildingName('bakery')!,
+};
 
 export const BB_REQ: Record<BB, { res: ResourceType; field: number; alsoMill?: number }> = {
   sawmill:     { res: 'wood', field: 10 },
@@ -198,24 +207,24 @@ export default function BuildOrderCalculator() {
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Current field levels' : '現況：田地等級'}</h4>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Wood' : '伐木場'} value={start.wood} onChange={v => setStart(p => ({ ...p, wood: v }))} min={0} max={20} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Clay' : '磚坑'} value={start.clay} onChange={v => setStart(p => ({ ...p, clay: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Wood' : FIELD_ZH.wood} value={start.wood} onChange={v => setStart(p => ({ ...p, wood: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Clay' : FIELD_ZH.clay} value={start.clay} onChange={v => setStart(p => ({ ...p, clay: v }))} min={0} max={20} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Iron' : '鐵礦場'} value={start.iron} onChange={v => setStart(p => ({ ...p, iron: v }))} min={0} max={20} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Crop' : '農場'} value={start.crop} onChange={v => setStart(p => ({ ...p, crop: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Iron' : FIELD_ZH.iron} value={start.iron} onChange={v => setStart(p => ({ ...p, iron: v }))} min={0} max={20} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Crop' : FIELD_ZH.crop} value={start.crop} onChange={v => setStart(p => ({ ...p, crop: v }))} min={0} max={20} /></div>
           </div>
 
           <h4 style={{ marginTop: 16 }}>{lang === 'en' ? 'Bonus building levels' : '加成建築等級'}</h4>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Sawmill' : '鋸木廠'} value={bonus.sawmill} onChange={v => setBonus(p => ({ ...p, sawmill: v }))} min={0} max={5} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Brickyard' : '磚廠'} value={bonus.brickyard} onChange={v => setBonus(p => ({ ...p, brickyard: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Sawmill' : BB_ZH.sawmill} value={bonus.sawmill} onChange={v => setBonus(p => ({ ...p, sawmill: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Brickyard' : BB_ZH.brickyard} value={bonus.brickyard} onChange={v => setBonus(p => ({ ...p, brickyard: v }))} min={0} max={5} /></div>
           </div>
           <div className={s.fieldRow}>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Iron Foundry' : '鑄鐵廠'} value={bonus.ironFoundry} onChange={v => setBonus(p => ({ ...p, ironFoundry: v }))} min={0} max={5} /></div>
-            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Grain Mill' : '麵粉廠'} value={bonus.grainMill} onChange={v => setBonus(p => ({ ...p, grainMill: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Iron Foundry' : BB_ZH.ironFoundry} value={bonus.ironFoundry} onChange={v => setBonus(p => ({ ...p, ironFoundry: v }))} min={0} max={5} /></div>
+            <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Grain Mill' : BB_ZH.grainMill} value={bonus.grainMill} onChange={v => setBonus(p => ({ ...p, grainMill: v }))} min={0} max={5} /></div>
           </div>
-          <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Bakery' : '麵包店'} value={bonus.bakery} onChange={v => setBonus(p => ({ ...p, bakery: v }))} min={0} max={5} /></div>
+          <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Bakery' : BB_ZH.bakery} value={bonus.bakery} onChange={v => setBonus(p => ({ ...p, bakery: v }))} min={0} max={5} /></div>
 
           <div className="mb-3.5 min-w-0"><Stepper label={lang === 'en' ? 'Main Building Lv' : '村莊大樓等級'} value={mb} onChange={setMb} min={1} max={20} /></div>
           <label className={s.check}><input type="checkbox" checked={gold} onChange={e => setGold(e.target.checked)} /> {lang === 'en' ? 'Plus +25% (gold)' : 'Plus 產量 +25%（金幣）'}</label>

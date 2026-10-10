@@ -96,7 +96,7 @@
         },
         {
           "effect_type": "great_granary",
-          "effect_description_zh": "大糧倉可建造",
+          "effect_description_zh": "大穀倉可建造",
           "effect_description_en": "Great Granary can be built",
           "effect_value": 1,
           "effect_unit": "multiplier"
@@ -104,7 +104,7 @@
       ],
       "spawn_day": 100,
       "spawn_location": "世界中心 (0|0) 附近",
-      "description_zh": "愚者獨特神器，允許建造大倉庫和大糧倉",
+      "description_zh": "愚者獨特神器，允許建造大倉庫和大穀倉",
       "description_en": "Unique fool artifact, allows building Great Warehouse and Granary"
     }
   }

@@ -13,7 +13,7 @@ export interface OpeningAdvice {
   source: string
 }
 
-/** 跟部族有關的欄位（拓荒者花費、打野兵）；missing＝Excel 沒有這個部族的資料 */
+/** 跟部族有關的欄位（開拓者花費、打野兵）；missing＝Excel 沒有這個部族的資料 */
 export interface OpeningStepTribeOverride {
   building?: string
   building_en?: string
@@ -52,7 +52,7 @@ export interface OpeningStep {
   pop: number | null
   res_per_cp?: number | null
   count?: number
-  /** 這個部族不用做這一步（例如只有帝國騎兵才要的倉庫 5） */
+  /** 這個部族不用做這一步（例如只有帝國騎士才要的倉庫 5） */
   skip?: boolean
   why: OpeningAdvice | null
   by_tribe?: Partial<Record<TribeType, OpeningStepTribeOverride>>

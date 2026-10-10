@@ -182,7 +182,7 @@ describe('首都產量模擬：加成建築算進去的數字都有 building', (
     expect(kindsOf(rowLabel(d, '糧食 /hr'))).toBe('fieldHighLevel cropSim')
     expect(kindsOf(rowLabel(d, '木 + 土 + 鐵 /hr'))).toBe('fieldHighLevel building cropSim')
     expect(kindsOf(screen.getByTestId('calc-result-title'))).toBe('fieldHighLevel building cropSim')
-    for (const l of ['鋸木廠', '磚廠', '鑄鐵廠']) set(l, 0)
+    for (const l of ['鋸木廠', '磚廠', '鋼鐵鑄造廠']) set(l, 0)
     expect(kindsOf(rowLabel(d, '木 + 土 + 鐵 /hr'))).toBe('fieldHighLevel cropSim')
     expect(kindsOf(screen.getByTestId('calc-result-title'))).toBe('fieldHighLevel cropSim')
     expect(kindsOf(within(d).getByTestId('cropsim-breakdown-title'))).toBe('fieldHighLevel cropSim')

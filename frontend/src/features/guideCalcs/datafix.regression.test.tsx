@@ -165,7 +165,7 @@ describe('PassiveCpCalculator UI', () => {
     render(<MemoryRouter><PassiveCpCalculator /></MemoryRouter>)
     expect(screen.getAllByText('村莊大樓').length).toBeGreaterThan(0)
     expect(screen.getAllByText('城鎮廳').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('鐵匠鋪／防具工坊').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('盔甲廠').length).toBeGreaterThan(0)
     expect(screen.queryByText('Main Building')).toBeNull()
   })
   describe('in English', () => {
@@ -184,7 +184,7 @@ describe('PassiveCpCalculator UI', () => {
 
 describe('待驗證 follows the generator verified flag', () => {
   const unverified = [
-    'stable', 'academy', 'blacksmith', 'armoury', 'workshop', 'town_hall', 'residence', 'palace',
+    'stable', 'academy', 'blacksmith', 'workshop', 'town_hall', 'residence', 'palace',
     'treasury', 'sawmill', 'brickyard', 'iron_foundry', 'grain_mill', 'bakery', 'trade_office',
     'tournament_square', 'city_wall', 'earth_wall', 'great_barracks', 'great_stable',
     'great_warehouse', 'great_granary',
